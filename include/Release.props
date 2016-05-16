@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2016 Amebis
+	Copyright 2016 GÉANT
+
+    This file is part of GEANTLink.
+
+    GEANTLink is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    GEANTLink is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with GEANTLink. If not, see <http://www.gnu.org/licenses/>.
+-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros" />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+    </Link>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup />
+  <Target Name="Sign" Condition="'$(ManifestCertificateThumbprint)' != '' and ('$(ConfigurationType)' == 'Application' or '$(ConfigurationType)' == 'DynamicLibrary')" AfterTargets="_Manifest" BeforeTargets="RegisterOutput" Inputs="$(OutDir)$(TargetName)$(TargetExt)" Outputs="$(IntDir)$(TargetName).sign">
+    <Message Text="Signing output file..." />
+    <SignFile CertificateThumbprint="$(ManifestCertificateThumbprint)" TimestampUrl="$(ManifestTimestampUrl)" SigningTarget="$(OutDir)$(TargetName)$(TargetExt)" />
+    <Touch Files="$(IntDir)$(TargetName).sign" AlwaysCreate="true" />
+  </Target>
+</Project>

@@ -1,0 +1,3 @@
+[submodule "MSI/MSIBuild"]
+	path = MSI/MSIBuild
+	url = https://github.com/Amebis/MSIBuild.git

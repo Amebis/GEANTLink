@@ -1,0 +1,12 @@
+/Win32.Debug
+/Win32.Release
+/x64.Debug
+/x64.Release
+/PackageGUID.mak
+/GEANTLink*.cab
+/GEANTLink*.ddf
+/GEANTLink*.dep
+/GEANTLink*.inf
+/GEANTLink*.msi
+/GEANTLink*.out
+/GEANTLink*.rpt

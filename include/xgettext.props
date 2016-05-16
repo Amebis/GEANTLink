@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 1991-2016 Amebis
+	Copyright 2016 GÉANT
+
+    This file is part of GEANTLink.
+
+    GEANTLink is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    GEANTLink is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with GEANTLink. If not, see <http://www.gnu.org/licenses/>.
+-->
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(POCompileBeforeTargets)' == '' and '$(POCompileAfterTargets)' == '' and '$(ConfigurationType)' != 'Makefile'">
+    <POCompileBeforeTargets>Midl</POCompileBeforeTargets>
+    <POCompileAfterTargets>CustomBuild</POCompileAfterTargets>
+  </PropertyGroup>
+  <PropertyGroup>
+    <POCompilationDependsOn Condition="'$(ConfigurationType)' != 'Makefile'">_SelectedFiles;$(POCompilationDependsOn)</POCompilationDependsOn>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <POCompile>
+      <OperationMode>MO</OperationMode>
+      <Strict>false</Strict>
+      <CheckFormat>false</CheckFormat>
+      <CheckHeader>false</CheckHeader>
+      <CheckDomain>false</CheckDomain>
+      <CheckCompat>false</CheckCompat>
+      <CheckAccel>None</CheckAccel>
+      <OutputFile>$(OutDir)%(Filename).mo</OutputFile>
+      <UseFuzzy>false</UseFuzzy>
+      <Alignment>1</Alignment>
+      <Endianess>LSB</Endianess>
+      <AdditionalOptions></AdditionalOptions>
+      <CommandLineTemplate>msgfmt.exe [AllOptions] [AdditionalOptions] [Inputs]</CommandLineTemplate>
+    </POCompile>
+  </ItemDefinitionGroup>
+</Project>
