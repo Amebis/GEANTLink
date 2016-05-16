@@ -23,9 +23,12 @@
 
 BOOL WINAPI DllMain(_In_ HINSTANCE hinstDLL, _In_ DWORD fdwReason, _In_ LPVOID lpvReserved)
 {
-    UNREFERENCED_PARAMETER(hinstDLL);
-    UNREFERENCED_PARAMETER(fdwReason);
     UNREFERENCED_PARAMETER(lpvReserved);
+
+    if (fdwReason == DLL_PROCESS_ATTACH) {
+        winstd::tstring filename;
+        GetModuleFileName(hinstDLL, filename);
+    }
 
     return TRUE;
 }

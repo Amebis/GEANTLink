@@ -1,3 +1,6 @@
 [submodule "MSI/MSIBuild"]
 	path = MSI/MSIBuild
 	url = https://github.com/Amebis/MSIBuild.git
+[submodule "lib/WinStd"]
+	path = lib/WinStd
+	url = https://github.com/Amebis/WinStd.git

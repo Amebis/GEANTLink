@@ -20,4 +20,6 @@
 
 #pragma once
 
+#include <WinStd/Win.h>
+
 #include <Windows.h>

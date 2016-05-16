@@ -10,6 +10,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EAP Methods", "EAP Methods"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EAPTTLS", "EAPMethods\build\EAPTTLS.vcxproj", "{331B6077-E3E2-4867-B93E-9D3F57280DE7}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{E66A3FE1-4EE4-401F-8EAD-BE518B230393}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WinStd", "lib\WinStd\build\WinStd.vcxproj", "{47399D91-7EB9-41DE-B521-514BA5DB0C43}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -26,11 +30,20 @@ Global
 		{331B6077-E3E2-4867-B93E-9D3F57280DE7}.Release|Win32.Build.0 = Release|Win32
 		{331B6077-E3E2-4867-B93E-9D3F57280DE7}.Release|x64.ActiveCfg = Release|x64
 		{331B6077-E3E2-4867-B93E-9D3F57280DE7}.Release|x64.Build.0 = Release|x64
+		{47399D91-7EB9-41DE-B521-514BA5DB0C43}.Debug|Win32.ActiveCfg = Debug|Win32
+		{47399D91-7EB9-41DE-B521-514BA5DB0C43}.Debug|Win32.Build.0 = Debug|Win32
+		{47399D91-7EB9-41DE-B521-514BA5DB0C43}.Debug|x64.ActiveCfg = Debug|x64
+		{47399D91-7EB9-41DE-B521-514BA5DB0C43}.Debug|x64.Build.0 = Debug|x64
+		{47399D91-7EB9-41DE-B521-514BA5DB0C43}.Release|Win32.ActiveCfg = Release|Win32
+		{47399D91-7EB9-41DE-B521-514BA5DB0C43}.Release|Win32.Build.0 = Release|Win32
+		{47399D91-7EB9-41DE-B521-514BA5DB0C43}.Release|x64.ActiveCfg = Release|x64
+		{47399D91-7EB9-41DE-B521-514BA5DB0C43}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{331B6077-E3E2-4867-B93E-9D3F57280DE7} = {60BAAC3D-DC98-4C19-BC40-1A86963DE86C}
+		{47399D91-7EB9-41DE-B521-514BA5DB0C43} = {E66A3FE1-4EE4-401F-8EAD-BE518B230393}
 	EndGlobalSection
 EndGlobal

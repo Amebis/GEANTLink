@@ -8,7 +8,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>..\include;..\..\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include;..\..\include;..\..\lib\WinStd\include</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup />
