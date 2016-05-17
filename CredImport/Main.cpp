@@ -43,13 +43,15 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_ HINSTANCE hPrevInstance, _In
         return -1;
     }
 
-    // Decode password.
-    vector<unsigned char> password;
+    // Decode password (Base64 >> UTF-8 >> UTF-16).
+    sanitizing_vector<char> password_utf8;
     {
         base64_dec dec;
         bool is_last;
-        dec.decode(password, is_last, pwcArglist[2], (size_t)-1);
+        dec.decode(password_utf8, is_last, pwcArglist[2], (size_t)-1);
     }
+    sanitizing_wstring password;
+    MultiByteToWideChar(CP_UTF8, 0, password_utf8.data(), (int)password_utf8.size(), password);
 
     return 0;
 }

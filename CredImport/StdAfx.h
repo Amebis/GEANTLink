@@ -21,6 +21,7 @@
 #pragma once
 
 #include <WinStd/Base64.h>
+#include <WinStd/Win.h>
 
 #include <tchar.h>
 #include <Windows.h>
