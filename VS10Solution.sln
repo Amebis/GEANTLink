@@ -16,7 +16,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WinStd", "lib\WinStd\build\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utilities", "Utilities", "{7B5EC9B7-208C-426A-941D-DAF9271BD4A4}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CredImport", "CredImport\CredImport.vcxproj", "{2D3CE079-7EB1-4F47-B79E-F0310671ECCB}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CredWrite", "CredWrite\CredWrite.vcxproj", "{2D3CE079-7EB1-4F47-B79E-F0310671ECCB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

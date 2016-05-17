@@ -20,7 +20,10 @@
 
 #pragma once
 
+#include "../include/Version.h"
+
 #include <WinStd/Base64.h>
+#include <WinStd/Cred.h>
 #include <WinStd/Win.h>
 
 #include <tchar.h>
