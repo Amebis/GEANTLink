@@ -18,7 +18,7 @@
     along with GEANTLink. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "StdAfx.h"
+#include <StdAfx.h>
 
 
 BOOL WINAPI DllMain(_In_ HINSTANCE hinstDLL, _In_ DWORD fdwReason, _In_ LPVOID lpvReserved)
