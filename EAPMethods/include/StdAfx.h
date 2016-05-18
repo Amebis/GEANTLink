@@ -20,6 +20,12 @@
 
 #pragma once
 
+#include <WinStd/ETW.h>
 #include <WinStd/Win.h>
 
+#include <eaptypes.h>
+
+#include <tchar.h>
 #include <Windows.h>
+
+#include <EAPMethodETW.h>

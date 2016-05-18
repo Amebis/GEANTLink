@@ -7,6 +7,9 @@
   <PropertyGroup />
   <ItemDefinitionGroup>
     <ResourceCompile />
+    <ClCompile>
+      <PreprocessorDefinitions>EAPMETHOD_TYPE=21;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup />
 </Project>

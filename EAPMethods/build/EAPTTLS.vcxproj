@@ -98,6 +98,23 @@
       <Project>{47399d91-7eb9-41de-b521-514ba5db0c43}</Project>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\res\EAPMethod.man">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">mc.exe "%(Identity)" -u -b -z "EAPMethodETW" -e "h" -h "$(IntDir)." -r "$(IntDir)."</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">mc.exe "%(Identity)" -u -b -z "EAPMethodETW" -e "h" -h "$(IntDir)." -r "$(IntDir)."</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">mc.exe "%(Identity)" -u -b -z "EAPMethodETW" -e "h" -h "$(IntDir)." -r "$(IntDir)."</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">mc.exe "%(Identity)" -u -b -z "EAPMethodETW" -e "h" -h "$(IntDir)." -r "$(IntDir)."</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compiling manifest...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compiling manifest...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compiling manifest...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compiling manifest...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)EAPMethodETW.h;$(IntDir)EAPMethodETW.rc;$(IntDir)EAPMethodETW_MSG00001.bin;$(IntDir)EAPMethodETWTEMP.BIN;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)EAPMethodETW.h;$(IntDir)EAPMethodETW.rc;$(IntDir)EAPMethodETW_MSG00001.bin;$(IntDir)EAPMethodETWTEMP.BIN;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)EAPMethodETW.h;$(IntDir)EAPMethodETW.rc;$(IntDir)EAPMethodETW_MSG00001.bin;$(IntDir)EAPMethodETWTEMP.BIN;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)EAPMethodETW.h;$(IntDir)EAPMethodETW.rc;$(IntDir)EAPMethodETW_MSG00001.bin;$(IntDir)EAPMethodETWTEMP.BIN;%(Outputs)</Outputs>
+    </CustomBuild>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
