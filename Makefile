@@ -81,6 +81,22 @@ Publish :: "MSI\MSIBuild\Version\Version.mak"
 	$(MAKE) /f "Makefile" /$(MAKEFLAGS) Version
 	cd "$(MAKEDIR)"
 
+GenRSAKeypair :: \
+	"include\KeyPrivate.bin" \
+	"include\KeyPublic.bin"
+
+"include\KeyPrivate.bin" :
+	if exist $@ del /f /q $@
+	if exist "$(@:"=).tmp" del /f /q "$(@:"=).tmp"
+	openssl.exe genrsa 2048 | openssl.exe rsa -inform PEM -outform DER -out "$(@:"=).tmp"
+	move /y "$(@:"=).tmp" $@ > NUL
+
+"include\KeyPublic.bin" : "include\KeyPrivate.bin"
+	if exist $@ del /f /q $@
+	if exist "$(@:"=).tmp" del /f /q "$(@:"=).tmp"
+	openssl.exe rsa -in $** -inform DER -outform DER -out "$(@:"=).tmp" -pubout
+	move /y "$(@:"=).tmp" $@ > NUL
+
 !ELSE
 
 ######################################################################

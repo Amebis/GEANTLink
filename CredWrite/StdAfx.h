@@ -24,6 +24,7 @@
 
 #include <WinStd/Base64.h>
 #include <WinStd/Cred.h>
+#include <WinStd/Crypt.h>
 #include <WinStd/Win.h>
 
 #include <tchar.h>

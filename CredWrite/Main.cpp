@@ -20,6 +20,8 @@
 
 #include "StdAfx.h"
 
+#pragma comment(lib, "Crypt32.lib")
+
 using namespace std;
 using namespace winstd;
 
@@ -51,45 +53,83 @@ static int CredWrite()
     assert(target_name.length() < CRED_MAX_GENERIC_TARGET_NAME_LENGTH);
 
     // Prepare password.
-    string password_enc_utf8;
+    string password_enc;
     {
         // Convert Base64 >> UTF-8.
-        sanitizing_vector<char> password_utf8;
+        sanitizing_vector<char> password;
         base64_dec dec;
         bool is_last;
-        dec.decode(password_utf8, is_last, pwcArglist[2], (size_t)-1);
+        dec.decode(password, is_last, pwcArglist[2], (size_t)-1);
 
-        // Convert UTF-8 >> UTF-16.
-        sanitizing_wstring password;
-        MultiByteToWideChar(CP_UTF8, 0, password_utf8.data(), (int)password_utf8.size(), password);
-
-        // Encrypt the password.
-        wstring password_enc;
-        CRED_PROTECTION_TYPE cpt;
-        if (!CredProtect(TRUE, password.data(), (DWORD)password.size(), password_enc, &cpt)) {
-            OutputDebugStr(_T("CredProtect failed (error %u).\n"), GetLastError());
+        // Prepare cryptographics provider.
+        crypt_prov cp;
+        if (!cp.create(NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT)) {
+            OutputDebugStr(_T("CryptAcquireContext failed (error %u).\n"), GetLastError());
             return 2;
         }
 
-        // Convert UTF-16 >> UTF-8.
-        WideCharToMultiByte(CP_UTF8, 0, password_enc.data(), (int)password_enc.size(), password_enc_utf8, NULL, NULL);
+        // Import the public key.
+        HRSRC res = FindResource(NULL, MAKEINTRESOURCE(1), RT_RCDATA);
+        assert(res);
+        HGLOBAL res_handle = LoadResource(NULL, res);
+        assert(res_handle);
+        crypt_key key;
+        unique_ptr<CERT_PUBLIC_KEY_INFO, LocalFree_delete<CERT_PUBLIC_KEY_INFO> > keyinfo_data;
+        DWORD keyinfo_size = 0;
+        if (!CryptDecodeObjectEx(X509_ASN_ENCODING, X509_PUBLIC_KEY_INFO, (const BYTE*)::LockResource(res_handle), ::SizeofResource(NULL, res), CRYPT_DECODE_ALLOC_FLAG, NULL, &keyinfo_data, &keyinfo_size) ||
+            !key.import_public(cp, X509_ASN_ENCODING, keyinfo_data.get()))
+        {
+            OutputDebugStr(_T("Public key import failed (error %u).\n"), GetLastError());
+            return 2;
+        }
+
+        // Pre-allocate memory to allow space, as encryption will grow the data, and we need additional 16B at the end for MD5 hash.
+        DWORD dwBlockLen;
+        if (!CryptGetKeyParam(key, KP_BLOCKLEN, dwBlockLen, 0)) dwBlockLen = 0;
+        password.reserve((password.size() + dwBlockLen - 1) / dwBlockLen * dwBlockLen + 16);
+
+        // Encrypt the password using our public key. Calculate MD5 hash and append it.
+        crypt_hash hash;
+        if (!hash.create(cp, CALG_MD5)) {
+            OutputDebugStr(_T("Creating MD5 hash failed (error %u).\n"), GetLastError());
+            return 2;
+        }
+        if (!CryptEncrypt(key, hash, TRUE, 0, password)) {
+            OutputDebugStr(_T("Encrypting password failed (error %u).\n"), GetLastError());
+            return 2;
+        }
+        vector<char> hash_bin;
+        CryptGetHashParam(hash, HP_HASHVAL, hash_bin, 0);
+        password.insert(password.end(), hash_bin.begin(), hash_bin.end());
+
+        // Convert encrypted password to Base64, since CredProtectA() fail for binary strings.
+        string password_base64;
+        base64_enc enc;
+        enc.encode(password_base64, password.data(), password.size());
+
+        // Encrypt the password using user's key.
+        CRED_PROTECTION_TYPE cpt;
+        if (!CredProtectA(TRUE, password_base64.c_str(), (DWORD)password_base64.length(), password_enc, &cpt)) {
+            OutputDebugStr(_T("CredProtect failed (error %u).\n"), GetLastError());
+            return 2;
+        }
     }
-    assert(password_enc_utf8.size()*sizeof(char) < CRED_MAX_CREDENTIAL_BLOB_SIZE);
+    assert(password_enc.size()*sizeof(char) < CRED_MAX_CREDENTIAL_BLOB_SIZE);
 
     // Write credentials.
     CREDENTIAL cred = {
-        0,                                              // Flags
-        CRED_TYPE_GENERIC,                              // Type
-        (LPWSTR)target_name.c_str(),                    // TargetName
-        _T(""),                                         // Comment
-        { 0, 0 },                                       // LastWritten
-        (DWORD)password_enc_utf8.size()*sizeof(char),   // CredentialBlobSize
-        (LPBYTE)password_enc_utf8.data(),               // CredentialBlob
-        CRED_PERSIST_ENTERPRISE,                        // Persist
-        0,                                              // AttributeCount
-        NULL,                                           // Attributes
-        NULL,                                           // TargetAlias
-        pwcArglist[1]                                   // UserName
+        0,                                          // Flags
+        CRED_TYPE_GENERIC,                          // Type
+        (LPWSTR)target_name.c_str(),                // TargetName
+        _T(""),                                     // Comment
+        { 0, 0 },                                   // LastWritten
+        (DWORD)password_enc.size()*sizeof(char),    // CredentialBlobSize
+        (LPBYTE)password_enc.data(),                // CredentialBlob
+        CRED_PERSIST_ENTERPRISE,                    // Persist
+        0,                                          // AttributeCount
+        NULL,                                       // Attributes
+        NULL,                                       // TargetAlias
+        pwcArglist[1]                               // UserName
     };
     if (!CredWrite(&cred, 0)) {
         OutputDebugStr(_T("CredWrite failed (error %u).\n"), GetLastError());
