@@ -20,7 +20,8 @@
 
 PRODUCT_NAME=GEANTLink
 OUTPUT_DIR=output
-PUBLISH_DIR=\\amebis.doma\Splet\WWW\Apache\www.amebis.si-prenos\$(PRODUCT_NAME)
+#PUBLISH_DIR=\\amebis.doma\Splet\WWW\Apache\www.amebis.si-prenos\$(PRODUCT_NAME)
+PUBLISH_DIR=C:\Users\Simon\ownCloud\GÉANT\$(PRODUCT_NAME)
 
 !IF "$(PROCESSOR_ARCHITECTURE)" == "AMD64"
 PLAT=x64
@@ -206,6 +207,7 @@ Publish :: \
 	"$(PUBLISH_PACKAGE_DIR)" \
 	$(REDIST_EN_WIN32) \
 	$(REDIST_EN_X64) \
+	"$(PUBLISH_PACKAGE_DIR)\CredWrite.exe" \
 #	$(REDIST_SL_WIN32) \
 #	$(REDIST_SL_X64)
 
@@ -257,6 +259,9 @@ $(REDIST_EN_X64) : "$(OUTPUT_DIR)\$(PRODUCT_NAME)64.3.msi"
 #
 #"$(OUTPUT_DIR)\Setup\$(PRODUCT_NAME)Sl64D.msi" : "$(OUTPUT_DIR)\$(PRODUCT_NAME)Sl64D.3.msi"
 #	copy /y $** $@ > NUL
+
+"$(PUBLISH_PACKAGE_DIR)\CredWrite.exe" : "$(OUTPUT_DIR)\Win32.Release\CredWrite.exe"
+	copy /y $** $@ > NUL
 
 
 ######################################################################
