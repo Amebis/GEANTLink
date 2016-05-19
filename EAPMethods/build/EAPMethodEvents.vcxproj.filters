@@ -15,20 +15,12 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\StdAfx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+    <CustomBuild Include="..\res\EAPMethodETW.man">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\StdAfx.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="EAPTTLS.rc">
+    <ResourceCompile Include="EAPMethodEvents.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>

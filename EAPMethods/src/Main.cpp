@@ -102,10 +102,10 @@ BOOL WINAPI DllMain(_In_ HINSTANCE hinstDLL, _In_ DWORD fdwReason, _In_ LPVOID l
         g_ep = new event_provider();
         assert(g_ep);
         g_ep->create(&EAPMETHOD_TRACE_EVENT_PROVIDER);
-        g_ep->write<unsigned int>(&EAPMETHOD_TRACE_EVT_MODULE_LOAD, EAPMETHOD_TYPE);
+        g_ep->write(&EAPMETHOD_TRACE_EVT_MODULE_LOAD, event_data((unsigned int)EAPMETHOD_TYPE), event_data::blank);
     } else if (fdwReason == DLL_PROCESS_DETACH) {
         assert(g_ep);
-        g_ep->write<unsigned int>(&EAPMETHOD_TRACE_EVT_MODULE_UNLOAD, EAPMETHOD_TYPE);
+        g_ep->write(&EAPMETHOD_TRACE_EVT_MODULE_UNLOAD, event_data((unsigned int)EAPMETHOD_TYPE), event_data::blank);
         delete g_ep;
 
         assert(!_CrtDumpMemoryLeaks());
