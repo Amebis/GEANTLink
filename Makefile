@@ -188,6 +188,9 @@ RegisterDLLs :: \
 	"$(OUTPUT_DIR)\$(PLAT).Debug\EAPTTLS.dll"
 	reg.exe add "HKLM\SYSTEM\CurrentControlSet\services\EapHost\Methods\67532"    /ve                           /t REG_SZ    /d "$(PRODUCT_NAME)"                                        /f > NUL
 	reg.exe add "HKLM\SYSTEM\CurrentControlSet\services\EapHost\Methods\67532\21" /v "PeerDllPath"              /t REG_SZ    /d "$(MAKEDIR)\$(OUTPUT_DIR)\$(PLAT).Debug\EAPTTLS.dll"     /f > NUL
+	reg.exe add "HKLM\SYSTEM\CurrentControlSet\services\EapHost\Methods\67532\21" /v "PeerConfigUIPath"         /t REG_SZ    /d "$(MAKEDIR)\$(OUTPUT_DIR)\$(PLAT).Debug\EAPTTLSUI.dll"   /f > NUL
+	reg.exe add "HKLM\SYSTEM\CurrentControlSet\services\EapHost\Methods\67532\21" /v "PeerIdentityPath"         /t REG_SZ    /d "$(MAKEDIR)\$(OUTPUT_DIR)\$(PLAT).Debug\EAPTTLSUI.dll"   /f > NUL
+	reg.exe add "HKLM\SYSTEM\CurrentControlSet\services\EapHost\Methods\67532\21" /v "PeerInteractiveUIPath"    /t REG_SZ    /d "$(MAKEDIR)\$(OUTPUT_DIR)\$(PLAT).Debug\EAPTTLSUI.dll"   /f > NUL
 	reg.exe add "HKLM\SYSTEM\CurrentControlSet\services\EapHost\Methods\67532\21" /v "PeerFriendlyName"         /t REG_SZ    /d "@$(MAKEDIR)\$(OUTPUT_DIR)\$(PLAT).Debug\EAPTTLS.dll,-1" /f > NUL
 	reg.exe add "HKLM\SYSTEM\CurrentControlSet\services\EapHost\Methods\67532\21" /v "PeerInvokePasswordDialog" /t REG_DWORD /d 0                                                        /f > NUL
 	reg.exe add "HKLM\SYSTEM\CurrentControlSet\services\EapHost\Methods\67532\21" /v "PeerInvokeUsernameDialog" /t REG_DWORD /d 0                                                        /f > NUL

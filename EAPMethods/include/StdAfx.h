@@ -28,9 +28,7 @@
 #include <WinStd/Win.h>
 
 #include <eaptypes.h>
-extern "C" {
 #include <eapmethodpeerapis.h>
-}
 
 #include <Commctrl.h>
 #include <tchar.h>

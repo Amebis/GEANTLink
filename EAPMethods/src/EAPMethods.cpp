@@ -130,3 +130,12 @@ DWORD eap::session_base::set_response_attributes(_In_ EapAttributes *pAttribs, _
 
     return ERROR_SUCCESS;
 }
+
+
+//////////////////////////////////////////////////////////////////////
+// eap::peer_ui_base
+//////////////////////////////////////////////////////////////////////
+
+eap::peer_ui_base::peer_ui_base() : eap_module_base()
+{
+}

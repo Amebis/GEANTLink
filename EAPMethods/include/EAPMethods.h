@@ -34,7 +34,9 @@ extern "C" {
 namespace eap
 {
     class session_base;
+    class eap_module_base;
     template<class Ts> class peer;
+    class peer_ui_base;
 };
 
 #pragma once
@@ -132,10 +134,9 @@ namespace eap
 
 
     ///
-    /// EAP peer base class
+    /// EAP module base class
     ///
-    template<class Ts>
-    class peer
+    class eap_module_base
     {
     public:
         inline DWORD create()
@@ -150,54 +151,9 @@ namespace eap
         }
 
 
-        virtual ~peer()
+        virtual ~eap_module_base()
         {
             m_ep.write(&EAPMETHOD_TRACE_EVT_MODULE_UNLOAD, winstd::event_data((BYTE)EAPMETHOD_TYPE), winstd::event_data::blank);
-        }
-
-
-        ///
-        /// Obtains a set of function pointers for an implementation of the EAP peer method currently loaded on the EAPHost service
-        ///
-        /// \sa [EapPeerGetInfo function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363608.aspx)
-        ///
-        inline void get_info(_Out_ EAP_PEER_METHOD_ROUTINES *pEapPeerMethodRoutines) const
-        {
-            ETW_FN_VOID;
-
-            assert(pEapPeerMethodRoutines);
-
-            pEapPeerMethodRoutines->dwVersion                    = PRODUCT_VERSION;
-            pEapPeerMethodRoutines->pEapType                     = NULL;
-
-            pEapPeerMethodRoutines->EapPeerInitialize            = initialize;
-            pEapPeerMethodRoutines->EapPeerShutdown              = shutdown;
-            pEapPeerMethodRoutines->EapPeerBeginSession          = begin_session;
-            pEapPeerMethodRoutines->EapPeerEndSession            = end_session;
-            pEapPeerMethodRoutines->EapPeerSetCredentials        = NULL;    // Always NULL unless we want to use generic credential UI
-            pEapPeerMethodRoutines->EapPeerGetIdentity           = get_identity;
-            pEapPeerMethodRoutines->EapPeerProcessRequestPacket  = process_request_packet;
-            pEapPeerMethodRoutines->EapPeerGetResponsePacket     = get_response_packet;
-            pEapPeerMethodRoutines->EapPeerGetResult             = get_result;
-            pEapPeerMethodRoutines->EapPeerGetUIContext          = get_ui_context;
-            pEapPeerMethodRoutines->EapPeerSetUIContext          = set_ui_context;
-            pEapPeerMethodRoutines->EapPeerGetResponseAttributes = get_response_attributes;
-            pEapPeerMethodRoutines->EapPeerSetResponseAttributes = set_response_attributes;
-        }
-
-
-        ///
-        /// Free BLOB allocated with this peer
-        ///
-        inline void free_memory(_In_ void *ptr)
-        {
-            ETW_FN_VOID;
-
-            if (ptr) {
-                // Since we do security here and some of the BLOBs contain credentials, sanitize every memory block before freeing.
-                SecureZeroMemory(ptr, HeapSize(m_heap, 0, ptr));
-                HeapFree(m_heap, 0, ptr);
-            }
         }
 
 
@@ -258,6 +214,21 @@ namespace eap
 
 
         ///
+        /// Free BLOB allocated with this peer
+        ///
+        inline void free_memory(_In_ void *ptr)
+        {
+            ETW_FN_VOID;
+
+            if (ptr) {
+                // Since we do security here and some of the BLOBs contain credentials, sanitize every memory block before freeing.
+                SecureZeroMemory(ptr, HeapSize(m_heap, 0, ptr));
+                HeapFree(m_heap, 0, ptr);
+            }
+        }
+
+
+        ///
         /// Free EAP_ERROR allocated with `make_error()` method
         ///
         void free_error_memory(_In_ EAP_ERROR *err)
@@ -268,6 +239,49 @@ namespace eap
                 // pRootCauseString and pRepairString always trail the ppEapError to reduce number of (de)allocations.
                 HeapFree(m_heap, 0, err);
             }
+        }
+
+
+    protected:
+        winstd::heap m_heap;                    ///< Heap
+        mutable winstd::event_provider m_ep;    ///< Event Provider
+    };
+
+
+    ///
+    /// EAP peer base class
+    ///
+    template<class Ts>
+    class peer : public eap_module_base
+    {
+    public:
+        ///
+        /// Obtains a set of function pointers for an implementation of the EAP peer method currently loaded on the EAPHost service
+        ///
+        /// \sa [EapPeerGetInfo function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363608.aspx)
+        ///
+        inline void get_info(_Out_ EAP_PEER_METHOD_ROUTINES *pEapPeerMethodRoutines) const
+        {
+            ETW_FN_VOID;
+
+            assert(pEapPeerMethodRoutines);
+
+            pEapPeerMethodRoutines->dwVersion                    = PRODUCT_VERSION;
+            pEapPeerMethodRoutines->pEapType                     = NULL;
+
+            pEapPeerMethodRoutines->EapPeerInitialize            = initialize;
+            pEapPeerMethodRoutines->EapPeerShutdown              = shutdown;
+            pEapPeerMethodRoutines->EapPeerBeginSession          = begin_session;
+            pEapPeerMethodRoutines->EapPeerEndSession            = end_session;
+            pEapPeerMethodRoutines->EapPeerSetCredentials        = NULL;    // Always NULL unless we want to use generic credential UI
+            pEapPeerMethodRoutines->EapPeerGetIdentity           = get_identity;
+            pEapPeerMethodRoutines->EapPeerProcessRequestPacket  = process_request_packet;
+            pEapPeerMethodRoutines->EapPeerGetResponsePacket     = get_response_packet;
+            pEapPeerMethodRoutines->EapPeerGetResult             = get_result;
+            pEapPeerMethodRoutines->EapPeerGetUIContext          = get_ui_context;
+            pEapPeerMethodRoutines->EapPeerSetUIContext          = set_ui_context;
+            pEapPeerMethodRoutines->EapPeerGetResponseAttributes = get_response_attributes;
+            pEapPeerMethodRoutines->EapPeerSetResponseAttributes = set_response_attributes;
         }
 
     protected:
@@ -446,9 +460,65 @@ namespace eap
             assert(hSession);
             return static_cast<Ts*>(hSession)->set_response_attributes(pAttribs, pEapOutput, ppEapError);
         }
+    };
 
-    protected:
-        winstd::heap m_heap;                    ///< Heap
-        mutable winstd::event_provider m_ep;    ///< Event Provider
+
+    ///
+    /// EAP peer UI base class
+    ///
+    class peer_ui_base : public eap_module_base
+    {
+    public:
+        ///
+        /// Constructor
+        ///
+        peer_ui_base();
+
+        ///
+        /// Raises the EAP method's specific connection configuration user interface dialog on the client.
+        ///
+        /// \sa [EapPeerInvokeConfigUI function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363614.aspx)
+        ///
+        virtual DWORD invoke_config_ui(
+            _In_                                 const EAP_METHOD_TYPE *pEapType,
+            _In_                                       HWND            hwndParent,
+            _In_                                       DWORD           dwFlags,
+            _In_                                       DWORD           dwSizeOfConnectionDataIn,
+            _In_count_(dwSizeOfConnectionDataIn) const BYTE            *pConnectionDataIn,
+            _Out_                                      DWORD           *pdwSizeOfConnectionDataOut,
+            _Out_                                      BYTE            **ppConnectionDataOut,
+            _Out_                                      EAP_ERROR       **ppEapError) = 0;
+
+        ///
+        /// Raises a custom interactive user interface dialog to obtain user identity information for the EAP method on the client.
+        ///
+        /// \sa [EapPeerInvokeIdentityUI function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363615.aspx)
+        ///
+        virtual DWORD invoke_identity_ui(
+            _In_                               const EAP_METHOD_TYPE *pEapType,
+            _In_                                     DWORD           dwFlags,
+            _In_                                     HWND            hwndParent,
+            _In_                                     DWORD           dwSizeOfConnectionData,
+            _In_count_(dwSizeOfConnectionData) const BYTE            *pConnectionData,
+            _In_                                     DWORD           dwSizeOfUserData,
+            _In_count_(dwSizeOfUserData)       const BYTE            *pUserData,
+            _Out_                                    DWORD           *pdwSizeOfUserDataOut,
+            _Out_                                    BYTE            **ppUserDataOut,
+            _Out_                                    LPWSTR          *ppwszIdentity,
+            _Out_                                    EAP_ERROR       **ppEapError) = 0;
+
+        ///
+        /// Raises a custom interactive user interface dialog for the EAP method on the client.
+        ///
+        /// \sa [EapPeerInvokeInteractiveUI function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363616.aspx)
+        ///
+        virtual DWORD invoke_interactive_ui(
+            _In_                              const EAP_METHOD_TYPE *pEapType,
+            _In_                                    HWND            hwndParent,
+            _In_                                    DWORD           dwSizeofUIContextData,
+            _In_count_(dwSizeofUIContextData) const BYTE            *pUIContextData,
+            _Out_                                   DWORD           *pdwSizeOfDataFromInteractiveUI,
+            _Out_                                   BYTE            **ppDataFromInteractiveUI,
+            _Out_                                   EAP_ERROR       **ppEapError) = 0;
     };
 };

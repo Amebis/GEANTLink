@@ -10,7 +10,7 @@
       <PreprocessorDefinitions>EAPMETHOD_TYPE=21;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <ModuleDefinitionFile>EAPMethod.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>EAPMethodUI.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup />

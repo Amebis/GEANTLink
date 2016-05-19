@@ -24,6 +24,7 @@ namespace eap
 {
     class session_ttls;
     class peer_ttls;
+    class peer_ttls_ui;
 }
 
 #pragma once
@@ -43,5 +44,62 @@ namespace eap
 
     class peer_ttls : public peer<session_ttls>
     {
+    };
+
+
+    class peer_ttls_ui : public peer_ui_base
+    {
+    public:
+        ///
+        /// Constructor
+        ///
+        peer_ttls_ui();
+
+        ///
+        /// Raises the EAP method's specific connection configuration user interface dialog on the client.
+        ///
+        /// \sa [EapPeerInvokeConfigUI function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363614.aspx)
+        ///
+        virtual DWORD invoke_config_ui(
+            _In_                                 const EAP_METHOD_TYPE *pEapType,
+            _In_                                       HWND            hwndParent,
+            _In_                                       DWORD           dwFlags,
+            _In_                                       DWORD           dwSizeOfConnectionDataIn,
+            _In_count_(dwSizeOfConnectionDataIn) const BYTE            *pConnectionDataIn,
+            _Out_                                      DWORD           *pdwSizeOfConnectionDataOut,
+            _Out_                                      BYTE            **ppConnectionDataOut,
+            _Out_                                      EAP_ERROR       **ppEapError);
+
+        ///
+        /// Raises a custom interactive user interface dialog to obtain user identity information for the EAP method on the client.
+        ///
+        /// \sa [EapPeerInvokeIdentityUI function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363615.aspx)
+        ///
+        virtual DWORD invoke_identity_ui(
+            _In_                               const EAP_METHOD_TYPE *pEapType,
+            _In_                                     DWORD           dwFlags,
+            _In_                                     HWND            hwndParent,
+            _In_                                     DWORD           dwSizeOfConnectionData,
+            _In_count_(dwSizeOfConnectionData) const BYTE            *pConnectionData,
+            _In_                                     DWORD           dwSizeOfUserData,
+            _In_count_(dwSizeOfUserData)       const BYTE            *pUserData,
+            _Out_                                    DWORD           *pdwSizeOfUserDataOut,
+            _Out_                                    BYTE            **ppUserDataOut,
+            _Out_                                    LPWSTR          *ppwszIdentity,
+            _Out_                                    EAP_ERROR       **ppEapError);
+
+        ///
+        /// Raises a custom interactive user interface dialog for the EAP method on the client.
+        ///
+        /// \sa [EapPeerInvokeInteractiveUI function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363616.aspx)
+        ///
+        virtual DWORD invoke_interactive_ui(
+            _In_                              const EAP_METHOD_TYPE *pEapType,
+            _In_                                    HWND            hwndParent,
+            _In_                                    DWORD           dwSizeofUIContextData,
+            _In_count_(dwSizeofUIContextData) const BYTE            *pUIContextData,
+            _Out_                                   DWORD           *pdwSizeOfDataFromInteractiveUI,
+            _Out_                                   BYTE            **ppDataFromInteractiveUI,
+            _Out_                                   EAP_ERROR       **ppEapError);
     };
 }

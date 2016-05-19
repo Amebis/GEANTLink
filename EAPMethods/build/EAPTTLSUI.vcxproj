@@ -19,8 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{331B6077-E3E2-4867-B93E-9D3F57280DE7}</ProjectGuid>
-    <RootNamespace>EAPTTLS</RootNamespace>
+    <ProjectGuid>{DD7A97CA-F18E-43B7-95C4-D06E6A291624}</ProjectGuid>
+    <RootNamespace>EAPTTLSUI</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -52,25 +52,25 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\include\Win32.props" />
     <Import Project="..\..\include\Debug.props" />
-    <Import Project="EAPTTLS.props" />
+    <Import Project="EAPTTLSUI.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\include\x64.props" />
     <Import Project="..\..\include\Debug.props" />
-    <Import Project="EAPTTLS.props" />
+    <Import Project="EAPTTLSUI.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\include\Win32.props" />
     <Import Project="..\..\include\Release.props" />
-    <Import Project="EAPTTLS.props" />
+    <Import Project="EAPTTLSUI.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\include\x64.props" />
     <Import Project="..\..\include\Release.props" />
-    <Import Project="EAPTTLS.props" />
+    <Import Project="EAPTTLSUI.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />
@@ -86,7 +86,7 @@
   <ItemGroup>
     <ClCompile Include="..\src\EAPMethods.cpp" />
     <ClCompile Include="..\src\EAPTTLS.cpp" />
-    <ClCompile Include="..\src\Main.cpp" />
+    <ClCompile Include="..\src\MainUI.cpp" />
     <ClCompile Include="..\src\StdAfx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -95,7 +95,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="EAPTTLS.rc" />
+    <ResourceCompile Include="EAPTTLSUI.rc" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\lib\WinStd\build\WinStd.vcxproj">
@@ -106,7 +106,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="EAPMethod.def" />
+    <None Include="EAPMethodUI.def" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
