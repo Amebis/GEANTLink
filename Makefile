@@ -73,6 +73,8 @@ Setup \
 SetupDebug \
 Register \
 Unregister \
+StopServices \
+StartServices \
 Publish :: "MSI\MSIBuild\Version\Version.mak"
 	$(MAKE) /f "Makefile" /$(MAKEFLAGS) HAS_VERSION=1 $@
 
@@ -137,30 +139,62 @@ SetupDebug :: \
 #	"$(OUTPUT_DIR)\Setup\$(PRODUCT_NAME)Sl32D.msi" \
 #	"$(OUTPUT_DIR)\Setup\$(PRODUCT_NAME)Sl64D.msi"
 
-#Register :: \
-#	RegisterSettings \
+Register :: \
+	StopServices \
+	RegisterDLLs \
+	StartServices \
 #	RegisterShortcuts
-#
-#Unregister :: \
+
+Unregister :: \
 #	UnregisterShortcuts \
-#	UnregisterSettings
-#
-#RegisterSettings ::
-#	reg.exe add "HKLM\Software\Amebis\$(PRODUCT_NAME)" /v "LocalizationRepositoryPath" /t REG_SZ /d "$(MAKEDIR)\$(OUTPUT_DIR)\locale" $(REG_FLAGS) > NUL
-#	reg.exe add "HKLM\Software\Amebis\$(PRODUCT_NAME)" /v "DatabasePath"               /t REG_SZ /d "$(MAKEDIR)\$(OUTPUT_DIR)\data"   $(REG_FLAGS) > NUL
-#!IF "$(PROCESSOR_ARCHITECTURE)" == "AMD64"
-#	reg.exe add "HKLM\Software\Amebis\$(PRODUCT_NAME)" /v "LocalizationRepositoryPath" /t REG_SZ /d "$(MAKEDIR)\$(OUTPUT_DIR)\locale" $(REG_FLAGS32) > NUL
-#	reg.exe add "HKLM\Software\Amebis\$(PRODUCT_NAME)" /v "DatabasePath"               /t REG_SZ /d "$(MAKEDIR)\$(OUTPUT_DIR)\data"   $(REG_FLAGS32) > NUL
-#!ENDIF
-#
-#UnregisterSettings ::
-#	-reg.exe delete "HKLM\Software\Amebis\$(PRODUCT_NAME)" /v "LocalizationRepositoryPath" $(REG_FLAGS) > NUL
-#	-reg.exe delete "HKLM\Software\Amebis\$(PRODUCT_NAME)" /v "DatabasePath"               $(REG_FLAGS) > NUL
-#!IF "$(PROCESSOR_ARCHITECTURE)" == "AMD64"
-#	-reg.exe delete "HKLM\Software\Amebis\$(PRODUCT_NAME)" /v "LocalizationRepositoryPath" $(REG_FLAGS32) > NUL
-#	-reg.exe delete "HKLM\Software\Amebis\$(PRODUCT_NAME)" /v "DatabasePath"               $(REG_FLAGS32) > NUL
-#!ENDIF
-#
+	StopServices \
+	UnregisterDLLs \
+	StartServices
+
+StartServices ::
+	cmd.exe /c <<"$(TEMP)\start_EapHost.bat"
+@echo off
+net.exe start EapHost
+if errorlevel 3 exit %errorlevel%
+if errorlevel 2 exit 0
+exit %errorlevel%
+<<NOKEEP
+# Enable dot3svc service (Wired AutoConfig) and start it
+	sc.exe config dot3svc start= auto
+	cmd.exe /c <<"$(TEMP)\start_dot3svc.bat"
+@echo off
+net.exe start dot3svc
+if errorlevel 3 exit %errorlevel%
+if errorlevel 2 exit 0
+exit %errorlevel%
+<<NOKEEP
+# Enable Wlansvc service (WLAN AutoConfig) and start it
+	sc.exe config Wlansvc start= auto
+	cmd.exe /c <<"$(TEMP)\start_Wlansvc.bat"
+@echo off
+net.exe start Wlansvc
+if errorlevel 3 exit %errorlevel%
+if errorlevel 2 exit 0
+exit %errorlevel%
+<<NOKEEP
+
+StopServices ::
+	-net.exe stop Wlansvc
+	-net.exe stop dot3svc
+	-net.exe stop EapHost
+
+RegisterDLLs :: \
+	"$(OUTPUT_DIR)\$(PLAT).Debug\EAPTTLS.dll"
+	reg.exe add "HKLM\SYSTEM\CurrentControlSet\services\EapHost\Methods\67532"    /ve                           /t REG_SZ    /d "$(PRODUCT_NAME)"                                        /f > NUL
+	reg.exe add "HKLM\SYSTEM\CurrentControlSet\services\EapHost\Methods\67532\21" /v "PeerDllPath"              /t REG_SZ    /d "$(MAKEDIR)\$(OUTPUT_DIR)\$(PLAT).Debug\EAPTTLS.dll"     /f > NUL
+	reg.exe add "HKLM\SYSTEM\CurrentControlSet\services\EapHost\Methods\67532\21" /v "PeerFriendlyName"         /t REG_SZ    /d "@$(MAKEDIR)\$(OUTPUT_DIR)\$(PLAT).Debug\EAPTTLS.dll,-1" /f > NUL
+	reg.exe add "HKLM\SYSTEM\CurrentControlSet\services\EapHost\Methods\67532\21" /v "PeerInvokePasswordDialog" /t REG_DWORD /d 0                                                        /f > NUL
+	reg.exe add "HKLM\SYSTEM\CurrentControlSet\services\EapHost\Methods\67532\21" /v "PeerInvokeUsernameDialog" /t REG_DWORD /d 0                                                        /f > NUL
+	reg.exe add "HKLM\SYSTEM\CurrentControlSet\services\EapHost\Methods\67532\21" /v "Properties"               /t REG_DWORD /d 389871807                                                /f > NUL
+
+UnregisterDLLs ::
+	-reg.exe delete "HKLM\SYSTEM\CurrentControlSet\services\EapHost\Methods\67532" /f > NUL
+
 #RegisterShortcuts :: \
 #	"$(PROGRAMDATA)\Microsoft\Windows\Start Menu\Programs\$(PRODUCT_NAME)" \
 #	"$(PROGRAMDATA)\Microsoft\Windows\Start Menu\Programs\$(PRODUCT_NAME)\$(PRODUCT_NAME).lnk"
@@ -237,25 +271,33 @@ $(REDIST_EN_X64) : "$(OUTPUT_DIR)\$(PRODUCT_NAME)64.3.msi"
 # Building
 ######################################################################
 
-#"$(OUTPUT_DIR)\Win32.Release\$(PRODUCT_NAME).exe" \
+"$(OUTPUT_DIR)\Win32.Release\CredWrite.exe" \
+"$(OUTPUT_DIR)\Win32.Release\EAPMethodEvents.dll" \
+"$(OUTPUT_DIR)\Win32.Release\EAPTTLS.dll" \
 "$(OUTPUT_DIR)\$(PRODUCT_NAME)32.3.msi" \
 #"$(OUTPUT_DIR)\$(PRODUCT_NAME)Sl32.3.msi" \
 ::
 	devenv.com "VS10Solution.sln" /build "Release|Win32"
 
-#"$(OUTPUT_DIR)\Win32.Debug\$(PRODUCT_NAME).exe" \
+"$(OUTPUT_DIR)\Win32.Debug\CredWrite.exe" \
+"$(OUTPUT_DIR)\Win32.Debug\EAPMethodEvents.dll" \
+"$(OUTPUT_DIR)\Win32.Debug\EAPTTLS.dll" \
 "$(OUTPUT_DIR)\$(PRODUCT_NAME)32D.3.msi" \
 #"$(OUTPUT_DIR)\$(PRODUCT_NAME)Sl32D.3.msi"
 ::
 	devenv.com "VS10Solution.sln" /build "Debug|Win32"
 
-#"$(OUTPUT_DIR)\x64.Release\$(PRODUCT_NAME).exe" \
+"$(OUTPUT_DIR)\x64.Release\CredWrite.exe" \
+"$(OUTPUT_DIR)\x64.Release\EAPMethodEvents.dll" \
+"$(OUTPUT_DIR)\x64.Release\EAPTTLS.dll" \
 "$(OUTPUT_DIR)\$(PRODUCT_NAME)64.3.msi" \
 #"$(OUTPUT_DIR)\$(PRODUCT_NAME)Sl64.3.msi"
 ::
 	devenv.com "VS10Solution.sln" /build "Release|x64"
 
-#"$(OUTPUT_DIR)\x64.Debug\$(PRODUCT_NAME).exe" \
+"$(OUTPUT_DIR)\x64.Debug\CredWrite.exe" \
+"$(OUTPUT_DIR)\x64.Debug\EAPMethodEvents.dll" \
+"$(OUTPUT_DIR)\x64.Debug\EAPTTLS.dll" \
 "$(OUTPUT_DIR)\$(PRODUCT_NAME)64D.3.msi" \
 #"$(OUTPUT_DIR)\$(PRODUCT_NAME)Sl64D.3.msi"
 ::
