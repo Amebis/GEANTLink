@@ -18,23 +18,13 @@
     along with GEANTLink. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#include <StdAfx.h>
 
-#include "../../include/Version.h"
 
-#include "../include/EAPTTLS.h"
+//////////////////////////////////////////////////////////////////////
+// eap::session_ttls
+//////////////////////////////////////////////////////////////////////
 
-#include <WinStd/ETW.h>
-#include <WinStd/Win.h>
-
-#include <eaptypes.h>
-extern "C" {
-#include <eapmethodpeerapis.h>
+eap::session_ttls::session_ttls() : session_base()
+{
 }
-
-#include <Commctrl.h>
-#include <tchar.h>
-#include <Shlwapi.h>
-#include <Windows.h>
-
-#include <EAPMethodETW.h>

@@ -18,23 +18,30 @@
     along with GEANTLink. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#include "EAPMethods.h"
 
-#include "../../include/Version.h"
-
-#include "../include/EAPTTLS.h"
-
-#include <WinStd/ETW.h>
-#include <WinStd/Win.h>
-
-#include <eaptypes.h>
-extern "C" {
-#include <eapmethodpeerapis.h>
+namespace eap
+{
+    class session_ttls;
+    class peer_ttls;
 }
 
-#include <Commctrl.h>
-#include <tchar.h>
-#include <Shlwapi.h>
-#include <Windows.h>
+#pragma once
 
-#include <EAPMethodETW.h>
+
+namespace eap
+{
+    class session_ttls : public session_base
+    {
+    public:
+        ///
+        /// Constructor
+        ///
+        session_ttls();
+    };
+
+
+    class peer_ttls : public peer<session_ttls>
+    {
+    };
+}

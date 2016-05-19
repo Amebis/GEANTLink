@@ -79,9 +79,13 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
   <ItemGroup>
+    <ClInclude Include="..\include\EAPMethods.h" />
+    <ClInclude Include="..\include\EAPTTLS.h" />
     <ClInclude Include="..\include\StdAfx.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\EAPMethods.cpp" />
+    <ClCompile Include="..\src\EAPTTLS.cpp" />
     <ClCompile Include="..\src\Main.cpp" />
     <ClCompile Include="..\src\StdAfx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
