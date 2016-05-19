@@ -20,6 +20,8 @@
 
 !INCLUDE "..\..\..\include\MSIBuildCfg.mak"
 
+MSIBUILD_IS_LOCALIZEABLE=1
+
 
 ######################################################################
 # CustomAction
@@ -85,6 +87,33 @@ InstallExecuteSequence	Action
 caSet$(MSIBUILD_PRODUCT_NAME_UC)DIR1	OLD$(MSIBUILD_PRODUCT_NAME_UC)DIR AND UILevel < 4	1001
 caSet$(MSIBUILD_PRODUCT_NAME_UC)DIR2	INSTALLDIR AND UILevel < 4	1002
 <<NOKEEP
+
+
+######################################################################
+# LaunchCondition
+
+All :: "$(LANG).$(PLAT).$(CFG).LaunchCondition-2.idt"
+
+"En.$(PLAT).$(CFG).LaunchCondition-2.idtx" : "Makefile" "..\..\..\include\MSIBuildCfg.mak"
+	-if exist $@ del /f /q $@
+	move /y << $@ > NUL
+Condition	Description
+s255	l255
+LaunchCondition	Condition
+VersionNT >= "600"	[ProductName] requires Windows Vista or later version of Windows.
+<<NOKEEP
+
+"De.$(PLAT).$(CFG).LaunchCondition-2.idt" : "En.$(PLAT).$(CFG).LaunchCondition-2.idtx" "..\locale\de_DE.po"
+	rcxgettext.exe idtp $@ $**
+
+"En.$(PLAT).$(CFG).LaunchCondition-2.idt" : "En.$(PLAT).$(CFG).LaunchCondition-2.idtx"
+	copy /y $** $@ > NUL
+
+"It.$(PLAT).$(CFG).LaunchCondition-2.idt" : "En.$(PLAT).$(CFG).LaunchCondition-2.idtx" "..\locale\it_IT.po"
+	rcxgettext.exe idtp $@ $**
+
+"Sl.$(PLAT).$(CFG).LaunchCondition-2.idt" : "En.$(PLAT).$(CFG).LaunchCondition-2.idtx" "..\locale\sl_SI.po"
+	rcxgettext.exe idtp $@ $**
 
 
 ######################################################################
