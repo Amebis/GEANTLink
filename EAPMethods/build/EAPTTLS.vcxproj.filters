@@ -24,6 +24,15 @@
     <ClInclude Include="..\include\EAPTTLS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\PAP.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\EAPXML.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\EAPSerialize.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\StdAfx.cpp">
@@ -36,6 +45,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\EAPTTLS.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\PAP.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

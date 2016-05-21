@@ -38,6 +38,9 @@
     <ClCompile Include="..\src\EAPTTLS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\PAP.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="EAPTTLSUI.rc">

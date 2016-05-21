@@ -87,6 +87,7 @@
     <ClCompile Include="..\src\EAPMethods.cpp" />
     <ClCompile Include="..\src\EAPTTLS.cpp" />
     <ClCompile Include="..\src\MainUI.cpp" />
+    <ClCompile Include="..\src\PAP.cpp" />
     <ClCompile Include="..\src\StdAfx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
