@@ -6,7 +6,7 @@ Imports given credentials to Windows Credential Manager for GEANTLink use
 CredWrite <username> <password> [<realm>]
 ```
 
-- `username` - a user name usually of the form user@domain
+- `username` - Base64 encoded UTF-8 user name (usually of the form user@domain or domain\user)
 - `password` - Base64 encoded UTF-8 user password
 - `realm`    - A realm ID to allow grouping of credentials over different WLAN profiles (optional, default is domain part of `username`)
 
