@@ -1,0 +1,125 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: EAPMethods\n"
+"POT-Creation-Date: 2016-06-02 15:58+0200\n"
+"PO-Revision-Date: 2016-06-02 12:27+0200\n"
+"Last-Translator: Simon Rozman <simon.rozman@amebis.si>\n"
+"Language-Team: Amebis, d. o. o., Kamnik <info@amebis.si>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.8\n"
+"X-Poedit-Basepath: ..\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: en_US\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: _\n"
+"X-Poedit-SearchPath-0: res\n"
+"X-Poedit-SearchPath-1: MSIBuild\n"
+
+#: res/EAPTLSUI.cpp:23
+msgid "Server Trust"
+msgstr ""
+
+#: res/EAPTLSUI.cpp:34
+msgid "Describe the servers you trust to prevent credential interception in case of man-in-the-middle attacks."
+msgstr ""
+
+#: res/EAPTLSUI.cpp:41
+msgid "Acceptable Certificate Authorities:"
+msgstr ""
+
+#: res/EAPTLSUI.cpp:46
+msgid "List of certificate authorities server's certificate must be issued by"
+msgstr ""
+
+#: res/EAPTLSUI.cpp:53
+msgid "Add CA"
+msgstr ""
+
+#: res/EAPTLSUI.cpp:54
+msgid "Adds a new certificate authority to the list"
+msgstr ""
+
+#: res/EAPTLSUI.cpp:58
+msgid "&Remove CA"
+msgstr ""
+
+#: res/EAPTLSUI.cpp:59
+msgid "Removes selected certificate authorities from the list"
+msgstr ""
+
+#: res/EAPTLSUI.cpp:72
+msgid "Acceptable server &names:"
+msgstr ""
+
+#: res/EAPTLSUI.cpp:77
+msgid "A semicolon delimited list of acceptable server FQDN names; blank to skip name check; \"*\" wildchar allowed"
+msgstr ""
+
+#: res/EAPTLSUI.cpp:81
+msgid "(Example: foo.bar.com;*.domain.org)"
+msgstr ""
+
+#: res/EAPTTLSUI.cpp:23
+msgid "Outer Identity"
+msgstr ""
+
+#: res/EAPTTLSUI.cpp:34
+msgid "Select the user ID supplicant introduces itself as to authenticator:"
+msgstr ""
+
+#: res/EAPTTLSUI.cpp:41
+msgid "&Same as inner identity"
+msgstr ""
+
+#: res/EAPTTLSUI.cpp:42
+msgid "Use my true user name"
+msgstr ""
+
+#: res/EAPTTLSUI.cpp:46
+msgid "Use &empty outer identity (RFC 4822)"
+msgstr ""
+
+#: res/EAPTTLSUI.cpp:48
+msgid "Ommit my user name and use @mydomain.org only"
+msgstr ""
+
+#: res/EAPTTLSUI.cpp:55
+msgid "&Custom outer identity:"
+msgstr ""
+
+#: res/EAPTTLSUI.cpp:56
+msgid "Specify custom outer identity"
+msgstr ""
+
+#: res/EAPTTLSUI.cpp:61
+msgid "Custom outer identity to use"
+msgstr ""
+
+#: MSIBuild/En.Win32.Release.Feature-2.idtx:3
+#: MSIBuild/En.x64.Release.Feature-2.idtx:3
+#, fuzzy
+msgid "1252"
+msgstr "1250"
+
+#: MSIBuild/En.Win32.Release.Feature-2.idtx:4
+#: MSIBuild/En.x64.Release.Feature-2.idtx:4
+msgid "EAP Peer Methods"
+msgstr ""
+
+#: MSIBuild/En.Win32.Release.Feature-2.idtx:4
+#: MSIBuild/En.x64.Release.Feature-2.idtx:4
+msgid "Modules to support individual EAP methods"
+msgstr ""
+
+#: MSIBuild/En.Win32.Release.Feature-2.idtx:5
+#: MSIBuild/En.x64.Release.Feature-2.idtx:5
+msgid "TTLS"
+msgstr ""
+
+#: MSIBuild/En.Win32.Release.Feature-2.idtx:5
+#: MSIBuild/En.x64.Release.Feature-2.idtx:5
+msgid "Tunneled Transport Layer Security"
+msgstr ""

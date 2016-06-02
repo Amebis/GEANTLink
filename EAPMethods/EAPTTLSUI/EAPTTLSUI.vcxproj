@@ -87,6 +87,8 @@
     <ClInclude Include="..\res\EAPTTLSUI.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\res\EAPTLSUI.cpp" />
+    <ClCompile Include="..\res\EAPTTLSUI.cpp" />
     <ClCompile Include="..\src\EAPMethods.cpp" />
     <ClCompile Include="..\src\EAPTLS.cpp" />
     <ClCompile Include="..\src\EAPTTLS.cpp" />
