@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\StdAfx.h">
+    <ClInclude Include="StdAfx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\EAPMethods.h">
@@ -27,9 +27,15 @@
     <ClInclude Include="..\include\EAPTLS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\res\EAPTLSUI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\res\EAPTTLSUI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\StdAfx.cpp">
+    <ClCompile Include="StdAfx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\MainUI.cpp">
@@ -54,7 +60,7 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="EAPMethodUI.def">
+    <None Include="..\build\EAPMethodUI.def">
       <Filter>Source Files</Filter>
     </None>
   </ItemGroup>
