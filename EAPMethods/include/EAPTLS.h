@@ -91,7 +91,7 @@ namespace eap
         ///
         /// \param[in]  pDoc         XML document
         /// \param[in]  pConfigRoot  Suggested root element for saving configuration
-        /// \param[out] ppEapError   Pointer to error descriptor in case of failure. Free using `module::free_memory()`.
+        /// \param[out] ppEapError   Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
         ///
         /// \returns
         /// - \c ERROR_SUCCESS if succeeded
@@ -103,7 +103,7 @@ namespace eap
         /// Load configuration from XML document
         ///
         /// \param[in]  pConfigRoot  Root element for loading configuration
-        /// \param[out] ppEapError   Pointer to error descriptor in case of failure. Free using `module::free_memory()`.
+        /// \param[out] ppEapError   Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
         ///
         /// \returns
         /// - \c ERROR_SUCCESS if succeeded
