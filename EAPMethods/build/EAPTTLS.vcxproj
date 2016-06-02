@@ -81,6 +81,7 @@
   <ItemGroup>
     <ClInclude Include="..\include\EAPMethods.h" />
     <ClInclude Include="..\include\EAPSerialize.h" />
+    <ClInclude Include="..\include\EAPTLS.h" />
     <ClInclude Include="..\include\EAPTTLS.h" />
     <ClInclude Include="..\include\EAPXML.h" />
     <ClInclude Include="..\include\PAP.h" />
@@ -88,6 +89,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\EAPMethods.cpp" />
+    <ClCompile Include="..\src\EAPTLS.cpp" />
     <ClCompile Include="..\src\EAPTTLS.cpp" />
     <ClCompile Include="..\src\Main.cpp" />
     <ClCompile Include="..\src\PAP.cpp" />

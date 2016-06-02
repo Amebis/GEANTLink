@@ -80,11 +80,13 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
   <ItemGroup>
     <ClInclude Include="..\include\EAPMethods.h" />
+    <ClInclude Include="..\include\EAPTLS.h" />
     <ClInclude Include="..\include\EAPTTLS.h" />
     <ClInclude Include="..\include\StdAfx.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\EAPMethods.cpp" />
+    <ClCompile Include="..\src\EAPTLS.cpp" />
     <ClCompile Include="..\src\EAPTTLS.cpp" />
     <ClCompile Include="..\src\MainUI.cpp" />
     <ClCompile Include="..\src\PAP.cpp" />
