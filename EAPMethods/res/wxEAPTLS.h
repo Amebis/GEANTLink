@@ -5,8 +5,8 @@
 // PLEASE DO "NOT" EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
-#ifndef __EAPTLSUI_H__
-#define __EAPTLSUI_H__
+#ifndef __WXEAPTLS_H__
+#define __WXEAPTLS_H__
 
 #include <wx/artprov.h>
 #include <wx/xrc/xmlres.h>
@@ -68,4 +68,4 @@ class wxEAPTLSConfigBase : public wxPanel
 	
 };
 
-#endif //__EAPTLSUI_H__
+#endif //__WXEAPTLS_H__

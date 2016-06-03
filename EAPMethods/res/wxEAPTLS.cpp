@@ -7,7 +7,7 @@
 
 #include <StdAfx.h>
 
-#include "EAPTLSUI.h"
+#include "wxEAPTLS.h"
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -25,7 +25,7 @@ wxEAPTLSConfigBase::wxEAPTLSConfigBase( wxWindow* parent, wxWindowID id, const w
 	wxBoxSizer* sb_server_trust_horiz;
 	sb_server_trust_horiz = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_server_trust_icon = new wxStaticBitmap( sb_server_trust->GetStaticBox(), wxID_ANY, wxIcon( wxT("server_trust.ico"), wxBITMAP_TYPE_ICO_RESOURCE, 32, 32 ), wxDefaultPosition, wxDefaultSize, 0 );
+	m_server_trust_icon = new wxStaticBitmap( sb_server_trust->GetStaticBox(), wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
 	sb_server_trust_horiz->Add( m_server_trust_icon, 0, wxALL, 5 );
 	
 	wxBoxSizer* sb_server_trust_vert;
@@ -42,7 +42,7 @@ wxEAPTLSConfigBase::wxEAPTLSConfigBase( wxWindow* parent, wxWindowID id, const w
 	m_root_ca_lbl->Wrap( -1 );
 	sb_root_ca->Add( m_root_ca_lbl, 0, wxEXPAND|wxBOTTOM, 5 );
 	
-	m_root_ca = new wxListBox( sb_server_trust->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, NULL, wxLB_MULTIPLE ); 
+	m_root_ca = new wxListBox( sb_server_trust->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, NULL, wxLB_MULTIPLE|wxLB_SORT ); 
 	m_root_ca->SetToolTip( _("List of certificate authorities server's certificate must be issued by") );
 	
 	sb_root_ca->Add( m_root_ca, 1, wxEXPAND|wxBOTTOM, 5 );

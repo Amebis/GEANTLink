@@ -7,7 +7,7 @@
 
 #include <StdAfx.h>
 
-#include "EAPTTLSUI.h"
+#include "wxEAPTTLS.h"
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -25,7 +25,7 @@ wxEAPTTLSConfigBase::wxEAPTTLSConfigBase( wxWindow* parent, wxWindowID id, const
 	wxBoxSizer* sb_outer_identity_horiz;
 	sb_outer_identity_horiz = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_outer_identity_icon = new wxStaticBitmap( sb_outer_identity->GetStaticBox(), wxID_ANY, wxIcon( wxT("outer_identity.ico"), wxBITMAP_TYPE_ICO_RESOURCE, 32, 32 ), wxDefaultPosition, wxDefaultSize, 0 );
+	m_outer_identity_icon = new wxStaticBitmap( sb_outer_identity->GetStaticBox(), wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
 	sb_outer_identity_horiz->Add( m_outer_identity_icon, 0, wxALL, 5 );
 	
 	wxBoxSizer* sb_outer_identity_vert;
@@ -44,7 +44,6 @@ wxEAPTTLSConfigBase::wxEAPTTLSConfigBase( wxWindow* parent, wxWindowID id, const
 	sb_outer_identity_radio->Add( m_outer_identity_same, 1, wxEXPAND, 5 );
 	
 	m_outer_identity_empty = new wxRadioButton( sb_outer_identity->GetStaticBox(), wxID_ANY, _("Use &empty outer identity (RFC 4822)"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_outer_identity_empty->SetValue( true ); 
 	m_outer_identity_empty->SetToolTip( _("Ommit my user name and use @mydomain.org only") );
 	
 	sb_outer_identity_radio->Add( m_outer_identity_empty, 1, wxEXPAND, 5 );
@@ -57,10 +56,10 @@ wxEAPTTLSConfigBase::wxEAPTTLSConfigBase( wxWindow* parent, wxWindowID id, const
 	
 	sb_outer_identity_custom->Add( m_outer_identity_custom, 0, wxEXPAND, 5 );
 	
-	m_outer_identity_custom_val_ = new wxTextCtrl( sb_outer_identity->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_outer_identity_custom_val_->SetToolTip( _("Custom outer identity to use") );
+	m_outer_identity_custom_val = new wxTextCtrl( sb_outer_identity->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_outer_identity_custom_val->SetToolTip( _("Custom outer identity to use") );
 	
-	sb_outer_identity_custom->Add( m_outer_identity_custom_val_, 1, wxEXPAND, 5 );
+	sb_outer_identity_custom->Add( m_outer_identity_custom_val, 1, wxEXPAND, 5 );
 	
 	
 	sb_outer_identity_radio->Add( sb_outer_identity_custom, 1, wxEXPAND, 5 );

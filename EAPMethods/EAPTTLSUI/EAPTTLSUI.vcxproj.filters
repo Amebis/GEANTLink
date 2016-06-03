@@ -13,6 +13,15 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\wx">
+      <UniqueIdentifier>{51f0404d-9280-4fcc-8138-5d1f815ce568}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\wx">
+      <UniqueIdentifier>{9befee7a-5dff-41dd-b080-4e26ccb19a7f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\wx">
+      <UniqueIdentifier>{0ec1840b-101c-415a-91c6-2c7eb4530c15}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="StdAfx.h">
@@ -27,11 +36,29 @@
     <ClInclude Include="..\include\EAPTLS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\res\EAPTLSUI.h">
+    <ClInclude Include="..\include\PAP.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\res\EAPTTLSUI.h">
+    <ClInclude Include="..\res\wxEAPTLS.h">
+      <Filter>Header Files\wx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\res\wxEAPTTLS.h">
+      <Filter>Header Files\wx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\EAPTLSUI.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\EAPTTLSUI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\EAPMethodsUI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\res\wxEAPMethods.h">
+      <Filter>Header Files\wx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\res\wxpass.h">
+      <Filter>Header Files\wx</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -53,10 +80,25 @@
     <ClCompile Include="..\src\EAPTLS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\res\EAPTLSUI.cpp">
+    <ClCompile Include="..\src\EAPTTLSUI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\res\EAPTTLSUI.cpp">
+    <ClCompile Include="..\res\wxEAPTLS.cpp">
+      <Filter>Source Files\wx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\res\wxEAPTTLS.cpp">
+      <Filter>Source Files\wx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\EAPTLSUI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\res\wxEAPMethods.cpp">
+      <Filter>Source Files\wx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\res\wxpass.cpp">
+      <Filter>Source Files\wx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\EAPMethodsUI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -68,6 +110,21 @@
   <ItemGroup>
     <None Include="..\build\EAPMethodUI.def">
       <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\res\wxEAPTLS.fbp">
+      <Filter>Resource Files\wx</Filter>
+    </None>
+    <None Include="..\res\wxEAPTTLS.fbp">
+      <Filter>Resource Files\wx</Filter>
+    </None>
+    <None Include="..\res\wxEAPMethods.fbp">
+      <Filter>Resource Files\wx</Filter>
+    </None>
+    <None Include="..\res\banner.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\res\wxpass.fbp">
+      <Filter>Resource Files\wx</Filter>
     </None>
   </ItemGroup>
 </Project>

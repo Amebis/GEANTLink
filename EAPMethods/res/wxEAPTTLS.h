@@ -5,8 +5,8 @@
 // PLEASE DO "NOT" EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
-#ifndef __EAPTTLSUI_H__
-#define __EAPTTLSUI_H__
+#ifndef __WXEAPTTLS_H__
+#define __WXEAPTTLS_H__
 
 #include <wx/artprov.h>
 #include <wx/xrc/xmlres.h>
@@ -49,7 +49,7 @@ class wxEAPTTLSConfigBase : public wxPanel
 		wxRadioButton* m_outer_identity_same;
 		wxRadioButton* m_outer_identity_empty;
 		wxRadioButton* m_outer_identity_custom;
-		wxTextCtrl* m_outer_identity_custom_val_;
+		wxTextCtrl* m_outer_identity_custom_val;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnOuterIdentitySame( wxCommandEvent& event ) { event.Skip(); }
@@ -64,4 +64,4 @@ class wxEAPTTLSConfigBase : public wxPanel
 	
 };
 
-#endif //__EAPTTLSUI_H__
+#endif //__WXEAPTTLS_H__
