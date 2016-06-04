@@ -31,9 +31,9 @@
 ///////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class wxEAPTLSConfigBase
+/// Class wxEAPTLSConfigPanelBase
 ///////////////////////////////////////////////////////////////////////////////
-class wxEAPTLSConfigBase : public wxPanel 
+class wxEAPTLSConfigPanelBase : public wxPanel 
 {
 	DECLARE_EVENT_TABLE()
 	private:
@@ -63,8 +63,8 @@ class wxEAPTLSConfigBase : public wxPanel
 	
 	public:
 		
-		wxEAPTLSConfigBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL ); 
-		~wxEAPTLSConfigBase();
+		wxEAPTLSConfigPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL ); 
+		~wxEAPTLSConfigPanelBase();
 	
 };
 

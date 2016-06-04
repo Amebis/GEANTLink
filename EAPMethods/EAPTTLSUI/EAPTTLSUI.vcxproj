@@ -125,7 +125,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\build\EAPMethodUI.def" />
-    <None Include="..\res\banner.bmp" />
     <None Include="..\res\wxEAPMethods.fbp" />
     <None Include="..\res\wxEAPTLS.fbp" />
     <None Include="..\res\wxEAPTTLS.fbp" />

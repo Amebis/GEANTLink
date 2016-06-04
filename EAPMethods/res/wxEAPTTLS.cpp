@@ -11,13 +11,13 @@
 
 ///////////////////////////////////////////////////////////////////////////
 
-BEGIN_EVENT_TABLE( wxEAPTTLSConfigBase, wxPanel )
-	EVT_RADIOBUTTON( wxID_ANY, wxEAPTTLSConfigBase::_wxFB_OnOuterIdentitySame )
-	EVT_RADIOBUTTON( wxID_ANY, wxEAPTTLSConfigBase::_wxFB_OnOuterIdentityEmpty )
-	EVT_RADIOBUTTON( wxID_ANY, wxEAPTTLSConfigBase::_wxFB_OnOuterIdentityCustom )
+BEGIN_EVENT_TABLE( wxEAPTTLSConfigPanelBase, wxPanel )
+	EVT_RADIOBUTTON( wxID_ANY, wxEAPTTLSConfigPanelBase::_wxFB_OnOuterIdentitySame )
+	EVT_RADIOBUTTON( wxID_ANY, wxEAPTTLSConfigPanelBase::_wxFB_OnOuterIdentityEmpty )
+	EVT_RADIOBUTTON( wxID_ANY, wxEAPTTLSConfigPanelBase::_wxFB_OnOuterIdentityCustom )
 END_EVENT_TABLE()
 
-wxEAPTTLSConfigBase::wxEAPTTLSConfigBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+wxEAPTTLSConfigPanelBase::wxEAPTTLSConfigPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
 	wxStaticBoxSizer* sb_outer_identity;
 	sb_outer_identity = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Outer Identity") ), wxVERTICAL );
@@ -78,6 +78,6 @@ wxEAPTTLSConfigBase::wxEAPTTLSConfigBase( wxWindow* parent, wxWindowID id, const
 	this->Layout();
 }
 
-wxEAPTTLSConfigBase::~wxEAPTTLSConfigBase()
+wxEAPTTLSConfigPanelBase::~wxEAPTTLSConfigPanelBase()
 {
 }

@@ -11,10 +11,7 @@
 #include <wx/artprov.h>
 #include <wx/xrc/xmlres.h>
 #include <wx/intl.h>
-#include <wx/bitmap.h>
-#include <wx/image.h>
-#include <wx/icon.h>
-#include <wx/statbmp.h>
+class wxEAPBannerPanel;
 #include <wx/gdicmn.h>
 #include <wx/font.h>
 #include <wx/colour.h>
@@ -24,6 +21,8 @@
 #include <wx/sizer.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
+#include <wx/stattext.h>
+#include <wx/panel.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -35,7 +34,7 @@ class wxEAPConfigBase : public wxDialog
 	private:
 	
 	protected:
-		wxStaticBitmap* m_banner;
+		wxEAPBannerPanel *m_banner;
 		wxNotebook* m_providers;
 		wxStdDialogButtonSizer* m_buttons;
 		wxButton* m_buttonsOK;
@@ -45,6 +44,23 @@ class wxEAPConfigBase : public wxDialog
 		
 		wxEAPConfigBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("EAP Method Configuration"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
 		~wxEAPConfigBase();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class wxEAPBannerPanelBase
+///////////////////////////////////////////////////////////////////////////////
+class wxEAPBannerPanelBase : public wxPanel 
+{
+	private:
+	
+	protected:
+		wxStaticText* m_product_name;
+	
+	public:
+		
+		wxEAPBannerPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = 0 ); 
+		~wxEAPBannerPanelBase();
 	
 };
 

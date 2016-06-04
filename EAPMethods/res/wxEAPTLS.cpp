@@ -11,13 +11,13 @@
 
 ///////////////////////////////////////////////////////////////////////////
 
-BEGIN_EVENT_TABLE( wxEAPTLSConfigBase, wxPanel )
-	EVT_LISTBOX_DCLICK( wxID_ANY, wxEAPTLSConfigBase::_wxFB_OnRootCADClick )
-	EVT_BUTTON( wxID_ANY, wxEAPTLSConfigBase::_wxFB_OnRootCAAdd )
-	EVT_BUTTON( wxID_ANY, wxEAPTLSConfigBase::_wxFB_OnRootCARemove )
+BEGIN_EVENT_TABLE( wxEAPTLSConfigPanelBase, wxPanel )
+	EVT_LISTBOX_DCLICK( wxID_ANY, wxEAPTLSConfigPanelBase::_wxFB_OnRootCADClick )
+	EVT_BUTTON( wxID_ANY, wxEAPTLSConfigPanelBase::_wxFB_OnRootCAAdd )
+	EVT_BUTTON( wxID_ANY, wxEAPTLSConfigPanelBase::_wxFB_OnRootCARemove )
 END_EVENT_TABLE()
 
-wxEAPTLSConfigBase::wxEAPTLSConfigBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+wxEAPTLSConfigPanelBase::wxEAPTLSConfigPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
 	wxStaticBoxSizer* sb_server_trust;
 	sb_server_trust = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Server Trust") ), wxVERTICAL );
@@ -96,6 +96,6 @@ wxEAPTLSConfigBase::wxEAPTLSConfigBase( wxWindow* parent, wxWindowID id, const w
 	this->Layout();
 }
 
-wxEAPTLSConfigBase::~wxEAPTLSConfigBase()
+wxEAPTLSConfigPanelBase::~wxEAPTLSConfigPanelBase()
 {
 }

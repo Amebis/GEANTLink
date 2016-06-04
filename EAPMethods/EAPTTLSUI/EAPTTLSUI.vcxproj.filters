@@ -120,9 +120,6 @@
     <None Include="..\res\wxEAPMethods.fbp">
       <Filter>Resource Files\wx</Filter>
     </None>
-    <None Include="..\res\banner.bmp">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="..\res\wxpass.fbp">
       <Filter>Resource Files\wx</Filter>
     </None>
