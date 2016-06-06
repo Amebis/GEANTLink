@@ -79,18 +79,18 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
   <ItemGroup>
-    <ClInclude Include="..\include\EAPMethods.h" />
-    <ClInclude Include="..\include\EAPSerialize.h" />
-    <ClInclude Include="..\include\EAPTLS.h" />
-    <ClInclude Include="..\include\EAPTTLS.h" />
+    <ClInclude Include="..\include\EAP.h" />
+    <ClInclude Include="..\include\EAPSerial.h" />
+    <ClInclude Include="..\include\TLS.h" />
+    <ClInclude Include="..\include\TTLS.h" />
     <ClInclude Include="..\include\EAPXML.h" />
     <ClInclude Include="..\include\PAP.h" />
     <ClInclude Include="StdAfx.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\EAPMethods.cpp" />
-    <ClCompile Include="..\src\EAPTLS.cpp" />
-    <ClCompile Include="..\src\EAPTTLS.cpp" />
+    <ClCompile Include="..\src\EAP.cpp" />
+    <ClCompile Include="..\src\TLS.cpp" />
+    <ClCompile Include="..\src\TTLS.cpp" />
     <ClCompile Include="..\src\Main.cpp" />
     <ClCompile Include="..\src\PAP.cpp" />
     <ClCompile Include="StdAfx.cpp">

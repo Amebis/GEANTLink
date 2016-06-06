@@ -7,15 +7,9 @@
 
 #include <StdAfx.h>
 
-#include "wxEAPTLS.h"
+#include "wxTLS_UI.h"
 
 ///////////////////////////////////////////////////////////////////////////
-
-BEGIN_EVENT_TABLE( wxEAPTLSConfigPanelBase, wxPanel )
-	EVT_LISTBOX_DCLICK( wxID_ANY, wxEAPTLSConfigPanelBase::_wxFB_OnRootCADClick )
-	EVT_BUTTON( wxID_ANY, wxEAPTLSConfigPanelBase::_wxFB_OnRootCAAdd )
-	EVT_BUTTON( wxID_ANY, wxEAPTLSConfigPanelBase::_wxFB_OnRootCARemove )
-END_EVENT_TABLE()
 
 wxEAPTLSConfigPanelBase::wxEAPTLSConfigPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
@@ -42,7 +36,7 @@ wxEAPTLSConfigPanelBase::wxEAPTLSConfigPanelBase( wxWindow* parent, wxWindowID i
 	m_root_ca_lbl->Wrap( -1 );
 	sb_root_ca->Add( m_root_ca_lbl, 0, wxEXPAND|wxBOTTOM, 5 );
 	
-	m_root_ca = new wxListBox( sb_server_trust->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, NULL, wxLB_MULTIPLE|wxLB_SORT ); 
+	m_root_ca = new wxListBox( sb_server_trust->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, NULL, wxLB_SORT ); 
 	m_root_ca->SetToolTip( _("List of certificate authorities server's certificate must be issued by") );
 	
 	sb_root_ca->Add( m_root_ca, 1, wxEXPAND|wxBOTTOM, 5 );
@@ -50,10 +44,15 @@ wxEAPTLSConfigPanelBase::wxEAPTLSConfigPanelBase( wxWindow* parent, wxWindowID i
 	wxBoxSizer* sb_root_ca_btn;
 	sb_root_ca_btn = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_root_ca_add = new wxButton( sb_server_trust->GetStaticBox(), wxID_ANY, _("Add CA"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_root_ca_add->SetToolTip( _("Adds a new certificate authority to the list") );
+	m_root_ca_add_store = new wxButton( sb_server_trust->GetStaticBox(), wxID_ANY, _("Add CA from Store..."), wxDefaultPosition, wxDefaultSize, 0 );
+	m_root_ca_add_store->SetToolTip( _("Adds a new certificate authority from the certificate store to the list") );
 	
-	sb_root_ca_btn->Add( m_root_ca_add, 0, wxRIGHT, 5 );
+	sb_root_ca_btn->Add( m_root_ca_add_store, 0, wxRIGHT, 5 );
+	
+	m_root_ca_add_file = new wxButton( sb_server_trust->GetStaticBox(), wxID_ANY, _("Add CA from File..."), wxDefaultPosition, wxDefaultSize, 0 );
+	m_root_ca_add_file->SetToolTip( _("Adds a new certificate authority from the file to the list") );
+	
+	sb_root_ca_btn->Add( m_root_ca_add_file, 0, wxRIGHT|wxLEFT, 5 );
 	
 	m_root_ca_remove = new wxButton( sb_server_trust->GetStaticBox(), wxID_ANY, _("&Remove CA"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_root_ca_remove->SetToolTip( _("Removes selected certificate authorities from the list") );
@@ -94,8 +93,18 @@ wxEAPTLSConfigPanelBase::wxEAPTLSConfigPanelBase( wxWindow* parent, wxWindowID i
 	
 	this->SetSizer( sb_server_trust );
 	this->Layout();
+	
+	// Connect Events
+	m_root_ca->Connect( wxEVT_COMMAND_LISTBOX_DOUBLECLICKED, wxCommandEventHandler( wxEAPTLSConfigPanelBase::OnRootCADClick ), NULL, this );
+	m_root_ca_add_file->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPTLSConfigPanelBase::OnRootCAAddFile ), NULL, this );
+	m_root_ca_remove->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPTLSConfigPanelBase::OnRootCARemove ), NULL, this );
 }
 
 wxEAPTLSConfigPanelBase::~wxEAPTLSConfigPanelBase()
 {
+	// Disconnect Events
+	m_root_ca->Disconnect( wxEVT_COMMAND_LISTBOX_DOUBLECLICKED, wxCommandEventHandler( wxEAPTLSConfigPanelBase::OnRootCADClick ), NULL, this );
+	m_root_ca_add_file->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPTLSConfigPanelBase::OnRootCAAddFile ), NULL, this );
+	m_root_ca_remove->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPTLSConfigPanelBase::OnRootCARemove ), NULL, this );
+	
 }

@@ -5,8 +5,8 @@
 // PLEASE DO "NOT" EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
-#ifndef __WXEAPTTLS_H__
-#define __WXEAPTTLS_H__
+#ifndef __WXTTLS_UI_H__
+#define __WXTTLS_UI_H__
 
 #include <wx/artprov.h>
 #include <wx/xrc/xmlres.h>
@@ -34,14 +34,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 class wxEAPTTLSConfigPanelBase : public wxPanel 
 {
-	DECLARE_EVENT_TABLE()
 	private:
-		
-		// Private event handlers
-		void _wxFB_OnOuterIdentitySame( wxCommandEvent& event ){ OnOuterIdentitySame( event ); }
-		void _wxFB_OnOuterIdentityEmpty( wxCommandEvent& event ){ OnOuterIdentityEmpty( event ); }
-		void _wxFB_OnOuterIdentityCustom( wxCommandEvent& event ){ OnOuterIdentityCustom( event ); }
-		
 	
 	protected:
 		wxStaticBitmap* m_outer_identity_icon;
@@ -52,8 +45,6 @@ class wxEAPTTLSConfigPanelBase : public wxPanel
 		wxTextCtrl* m_outer_identity_custom_val;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnOuterIdentitySame( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnOuterIdentityEmpty( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOuterIdentityCustom( wxCommandEvent& event ) { event.Skip(); }
 		
 	
@@ -64,4 +55,4 @@ class wxEAPTTLSConfigPanelBase : public wxPanel
 	
 };
 
-#endif //__WXEAPTTLS_H__
+#endif //__WXTTLS_UI_H__

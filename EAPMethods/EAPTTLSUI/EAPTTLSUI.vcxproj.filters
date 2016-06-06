@@ -27,78 +27,72 @@
     <ClInclude Include="StdAfx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\EAPMethods.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\EAPTTLS.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\EAPTLS.h">
+    <ClInclude Include="..\include\TTLS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\PAP.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\res\wxEAPTLS.h">
-      <Filter>Header Files\wx</Filter>
-    </ClInclude>
-    <ClInclude Include="..\res\wxEAPTTLS.h">
-      <Filter>Header Files\wx</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\EAPTLSUI.h">
+    <ClInclude Include="..\include\TLS_UI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\EAPTTLSUI.h">
+    <ClInclude Include="..\include\TLS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\EAPMethodsUI.h">
+    <ClInclude Include="..\res\wxEAP_UI.h">
+      <Filter>Header Files\wx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\res\wxTLS_UI.h">
+      <Filter>Header Files\wx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\res\wxTTLS_UI.h">
+      <Filter>Header Files\wx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\EAP.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\res\wxEAPMethods.h">
-      <Filter>Header Files\wx</Filter>
+    <ClInclude Include="..\include\EAP_UI.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\res\wxpass.h">
-      <Filter>Header Files\wx</Filter>
+    <ClInclude Include="..\include\TTLS_UI.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="StdAfx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\MainUI.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\EAPMethods.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\EAPTTLS.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\PAP.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\EAPTLS.cpp">
+    <ClCompile Include="..\res\wxEAP_UI.cpp">
+      <Filter>Source Files\wx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\res\wxTLS_UI.cpp">
+      <Filter>Source Files\wx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\res\wxTTLS_UI.cpp">
+      <Filter>Source Files\wx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\EAP.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\EAPTTLSUI.cpp">
+    <ClCompile Include="..\src\EAP_UI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\res\wxEAPTLS.cpp">
-      <Filter>Source Files\wx</Filter>
-    </ClCompile>
-    <ClCompile Include="..\res\wxEAPTTLS.cpp">
-      <Filter>Source Files\wx</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\EAPTLSUI.cpp">
+    <ClCompile Include="..\src\TLS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\res\wxEAPMethods.cpp">
-      <Filter>Source Files\wx</Filter>
+    <ClCompile Include="..\src\TLS_UI.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\res\wxpass.cpp">
-      <Filter>Source Files\wx</Filter>
+    <ClCompile Include="..\src\TTLS.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\EAPMethodsUI.cpp">
+    <ClCompile Include="..\src\TTLS_UI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Main_UI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -111,16 +105,13 @@
     <None Include="..\build\EAPMethodUI.def">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="..\res\wxEAPTLS.fbp">
+    <None Include="..\res\wxEAP_UI.fbp">
       <Filter>Resource Files\wx</Filter>
     </None>
-    <None Include="..\res\wxEAPTTLS.fbp">
+    <None Include="..\res\wxTTLS_UI.fbp">
       <Filter>Resource Files\wx</Filter>
     </None>
-    <None Include="..\res\wxEAPMethods.fbp">
-      <Filter>Resource Files\wx</Filter>
-    </None>
-    <None Include="..\res\wxpass.fbp">
+    <None Include="..\res\wxTLS_UI.fbp">
       <Filter>Resource Files\wx</Filter>
     </None>
   </ItemGroup>

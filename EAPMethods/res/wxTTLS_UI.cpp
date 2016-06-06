@@ -7,15 +7,9 @@
 
 #include <StdAfx.h>
 
-#include "wxEAPTTLS.h"
+#include "wxTTLS_UI.h"
 
 ///////////////////////////////////////////////////////////////////////////
-
-BEGIN_EVENT_TABLE( wxEAPTTLSConfigPanelBase, wxPanel )
-	EVT_RADIOBUTTON( wxID_ANY, wxEAPTTLSConfigPanelBase::_wxFB_OnOuterIdentitySame )
-	EVT_RADIOBUTTON( wxID_ANY, wxEAPTTLSConfigPanelBase::_wxFB_OnOuterIdentityEmpty )
-	EVT_RADIOBUTTON( wxID_ANY, wxEAPTTLSConfigPanelBase::_wxFB_OnOuterIdentityCustom )
-END_EVENT_TABLE()
 
 wxEAPTTLSConfigPanelBase::wxEAPTTLSConfigPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
@@ -76,8 +70,14 @@ wxEAPTTLSConfigPanelBase::wxEAPTTLSConfigPanelBase( wxWindow* parent, wxWindowID
 	
 	this->SetSizer( sb_outer_identity );
 	this->Layout();
+	
+	// Connect Events
+	m_outer_identity_custom->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( wxEAPTTLSConfigPanelBase::OnOuterIdentityCustom ), NULL, this );
 }
 
 wxEAPTTLSConfigPanelBase::~wxEAPTTLSConfigPanelBase()
 {
+	// Disconnect Events
+	m_outer_identity_custom->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( wxEAPTTLSConfigPanelBase::OnOuterIdentityCustom ), NULL, this );
+	
 }

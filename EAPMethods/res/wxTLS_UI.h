@@ -5,8 +5,8 @@
 // PLEASE DO "NOT" EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
-#ifndef __WXEAPTLS_H__
-#define __WXEAPTLS_H__
+#ifndef __WXTLS_UI_H__
+#define __WXTLS_UI_H__
 
 #include <wx/artprov.h>
 #include <wx/xrc/xmlres.h>
@@ -35,21 +35,15 @@
 ///////////////////////////////////////////////////////////////////////////////
 class wxEAPTLSConfigPanelBase : public wxPanel 
 {
-	DECLARE_EVENT_TABLE()
 	private:
-		
-		// Private event handlers
-		void _wxFB_OnRootCADClick( wxCommandEvent& event ){ OnRootCADClick( event ); }
-		void _wxFB_OnRootCAAdd( wxCommandEvent& event ){ OnRootCAAdd( event ); }
-		void _wxFB_OnRootCARemove( wxCommandEvent& event ){ OnRootCARemove( event ); }
-		
 	
 	protected:
 		wxStaticBitmap* m_server_trust_icon;
 		wxStaticText* m_server_trust_label;
 		wxStaticText* m_root_ca_lbl;
 		wxListBox* m_root_ca;
-		wxButton* m_root_ca_add;
+		wxButton* m_root_ca_add_store;
+		wxButton* m_root_ca_add_file;
 		wxButton* m_root_ca_remove;
 		wxStaticText* m_server_names_label;
 		wxTextCtrl* m_server_names;
@@ -57,7 +51,7 @@ class wxEAPTLSConfigPanelBase : public wxPanel
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnRootCADClick( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnRootCAAdd( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnRootCAAddFile( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRootCARemove( wxCommandEvent& event ) { event.Skip(); }
 		
 	
@@ -68,4 +62,4 @@ class wxEAPTLSConfigPanelBase : public wxPanel
 	
 };
 
-#endif //__WXEAPTLS_H__
+#endif //__WXTLS_UI_H__

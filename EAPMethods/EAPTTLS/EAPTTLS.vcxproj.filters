@@ -18,10 +18,7 @@
     <ClInclude Include="StdAfx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\EAPMethods.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\EAPTTLS.h">
+    <ClInclude Include="..\include\TTLS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\PAP.h">
@@ -30,10 +27,13 @@
     <ClInclude Include="..\include\EAPXML.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\EAPSerialize.h">
+    <ClInclude Include="..\include\TLS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\EAPTLS.h">
+    <ClInclude Include="..\include\EAP.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\EAPSerial.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -44,16 +44,16 @@
     <ClCompile Include="..\src\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\EAPMethods.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\EAPTTLS.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\PAP.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\EAPTLS.cpp">
+    <ClCompile Include="..\src\EAP.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\TLS.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\TTLS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -63,7 +63,7 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="EAPMethod.def">
+    <None Include="..\build\EAPMethod.def">
       <Filter>Source Files</Filter>
     </None>
   </ItemGroup>
