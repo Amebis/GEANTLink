@@ -47,7 +47,7 @@ wxEAPConfigBase::~wxEAPConfigBase()
 
 wxEAPBannerPanelBase::wxEAPBannerPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
-	this->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
+	this->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_HIGHLIGHT ) );
 	this->SetMinSize( wxSize( -1,48 ) );
 	
 	wxBoxSizer* sc_content;
@@ -56,6 +56,7 @@ wxEAPBannerPanelBase::wxEAPBannerPanelBase( wxWindow* parent, wxWindowID id, con
 	m_product_name = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
 	m_product_name->Wrap( -1 );
 	m_product_name->SetFont( wxFont( 14, 70, 90, 90, false, wxEmptyString ) );
+	m_product_name->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_HIGHLIGHTTEXT ) );
 	
 	sc_content->Add( m_product_name, 0, wxALL|wxEXPAND, 5 );
 	

@@ -293,7 +293,7 @@
         <object class="Panel" expanded="1">
             <property name="aui_managed">0</property>
             <property name="aui_manager_style">wxAUI_MGR_DEFAULT</property>
-            <property name="bg">wxSYS_COLOUR_WINDOW</property>
+            <property name="bg">wxSYS_COLOUR_HIGHLIGHT</property>
             <property name="context_help"></property>
             <property name="context_menu">1</property>
             <property name="enabled">1</property>
@@ -373,7 +373,7 @@
                         <property name="dock_fixed">0</property>
                         <property name="docking">Left</property>
                         <property name="enabled">1</property>
-                        <property name="fg"></property>
+                        <property name="fg">wxSYS_COLOUR_HIGHLIGHTTEXT</property>
                         <property name="floatable">1</property>
                         <property name="font">,90,90,14,70,0</property>
                         <property name="gripper">0</property>
