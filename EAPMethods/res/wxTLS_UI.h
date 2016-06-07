@@ -50,7 +50,9 @@ class wxEAPTLSConfigPanelBase : public wxPanel
 		wxStaticText* m_server_names_note;
 		
 		// Virtual event handlers, overide them in your derived class
+		virtual void OnRootCA( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRootCADClick( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnRootCAAddStore( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRootCAAddFile( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRootCARemove( wxCommandEvent& event ) { event.Skip(); }
 		

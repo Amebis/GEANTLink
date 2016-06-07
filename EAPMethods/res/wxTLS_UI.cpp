@@ -55,6 +55,7 @@ wxEAPTLSConfigPanelBase::wxEAPTLSConfigPanelBase( wxWindow* parent, wxWindowID i
 	sb_root_ca_btn->Add( m_root_ca_add_file, 0, wxRIGHT|wxLEFT, 5 );
 	
 	m_root_ca_remove = new wxButton( sb_server_trust->GetStaticBox(), wxID_ANY, _("&Remove CA"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_root_ca_remove->Enable( false );
 	m_root_ca_remove->SetToolTip( _("Removes selected certificate authorities from the list") );
 	
 	sb_root_ca_btn->Add( m_root_ca_remove, 0, wxLEFT, 5 );
@@ -95,7 +96,9 @@ wxEAPTLSConfigPanelBase::wxEAPTLSConfigPanelBase( wxWindow* parent, wxWindowID i
 	this->Layout();
 	
 	// Connect Events
+	m_root_ca->Connect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( wxEAPTLSConfigPanelBase::OnRootCA ), NULL, this );
 	m_root_ca->Connect( wxEVT_COMMAND_LISTBOX_DOUBLECLICKED, wxCommandEventHandler( wxEAPTLSConfigPanelBase::OnRootCADClick ), NULL, this );
+	m_root_ca_add_store->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPTLSConfigPanelBase::OnRootCAAddStore ), NULL, this );
 	m_root_ca_add_file->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPTLSConfigPanelBase::OnRootCAAddFile ), NULL, this );
 	m_root_ca_remove->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPTLSConfigPanelBase::OnRootCARemove ), NULL, this );
 }
@@ -103,7 +106,9 @@ wxEAPTLSConfigPanelBase::wxEAPTLSConfigPanelBase( wxWindow* parent, wxWindowID i
 wxEAPTLSConfigPanelBase::~wxEAPTLSConfigPanelBase()
 {
 	// Disconnect Events
+	m_root_ca->Disconnect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( wxEAPTLSConfigPanelBase::OnRootCA ), NULL, this );
 	m_root_ca->Disconnect( wxEVT_COMMAND_LISTBOX_DOUBLECLICKED, wxCommandEventHandler( wxEAPTLSConfigPanelBase::OnRootCADClick ), NULL, this );
+	m_root_ca_add_store->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPTLSConfigPanelBase::OnRootCAAddStore ), NULL, this );
 	m_root_ca_add_file->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPTLSConfigPanelBase::OnRootCAAddFile ), NULL, this );
 	m_root_ca_remove->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPTLSConfigPanelBase::OnRootCARemove ), NULL, this );
 	
