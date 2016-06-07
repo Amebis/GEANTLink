@@ -40,8 +40,6 @@ wxEAPConfigBase::wxEAPConfigBase( wxWindow* parent, wxWindowID id, const wxStrin
 	this->SetSizer( sz_content );
 	this->Layout();
 	sz_content->Fit( this );
-	
-	this->Centre( wxBOTH );
 }
 
 wxEAPConfigBase::~wxEAPConfigBase()
