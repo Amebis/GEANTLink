@@ -27,6 +27,9 @@
 #include <wx/textctrl.h>
 #include <wx/statbox.h>
 #include <wx/panel.h>
+#include <wx/radiobut.h>
+#include <wx/choice.h>
+#include <wx/checkbox.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -61,6 +64,33 @@ class wxEAPTLSConfigPanelBase : public wxPanel
 		
 		wxEAPTLSConfigPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL ); 
 		~wxEAPTLSConfigPanelBase();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class wxTLSConfigCredentialsPanelBase
+///////////////////////////////////////////////////////////////////////////////
+class wxTLSConfigCredentialsPanelBase : public wxPanel 
+{
+	private:
+	
+	protected:
+		wxStaticBitmap* m_credentials_icon;
+		wxStaticText* m_credentials_label;
+		wxRadioButton* m_cert_none;
+		wxRadioButton* m_cert_select;
+		wxChoice* m_cert_select_val;
+		wxCheckBox* m_prompt;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnCertSelect( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnPrompt( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		wxTLSConfigCredentialsPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL ); 
+		~wxTLSConfigCredentialsPanelBase();
 	
 };
 

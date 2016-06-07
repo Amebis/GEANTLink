@@ -53,12 +53,12 @@ wxEAPBannerPanelBase::wxEAPBannerPanelBase( wxWindow* parent, wxWindowID id, con
 	wxBoxSizer* sc_content;
 	sc_content = new wxBoxSizer( wxVERTICAL );
 	
-	m_product_name = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
-	m_product_name->Wrap( -1 );
-	m_product_name->SetFont( wxFont( 14, 70, 90, 90, false, wxEmptyString ) );
-	m_product_name->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_HIGHLIGHTTEXT ) );
+	m_title = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
+	m_title->Wrap( -1 );
+	m_title->SetFont( wxFont( 14, 70, 90, 90, false, wxEmptyString ) );
+	m_title->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_HIGHLIGHTTEXT ) );
 	
-	sc_content->Add( m_product_name, 0, wxALL|wxEXPAND, 5 );
+	sc_content->Add( m_title, 0, wxALL|wxEXPAND, 5 );
 	
 	
 	this->SetSizer( sc_content );
@@ -70,74 +70,10 @@ wxEAPBannerPanelBase::~wxEAPBannerPanelBase()
 {
 }
 
-wxCredentialsConfigPanelBase::wxCredentialsConfigPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+wxPasswordConfigCredentialsPanelBase::wxPasswordConfigCredentialsPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
 	wxStaticBoxSizer* sb_credentials;
-	sb_credentials = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Client Credentials") ), wxVERTICAL );
-	
-	wxBoxSizer* sb_credentials_horiz;
-	sb_credentials_horiz = new wxBoxSizer( wxHORIZONTAL );
-	
-	m_credentials_icon = new wxStaticBitmap( sb_credentials->GetStaticBox(), wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
-	sb_credentials_horiz->Add( m_credentials_icon, 0, wxALL, 5 );
-	
-	wxBoxSizer* sb_credentials_vert;
-	sb_credentials_vert = new wxBoxSizer( wxVERTICAL );
-	
-	m_credentials_label = new wxStaticText( sb_credentials->GetStaticBox(), wxID_ANY, _("Manage your credentials to identify you during the connection attempt."), wxDefaultPosition, wxDefaultSize, 0 );
-	m_credentials_label->Wrap( 446 );
-	sb_credentials_vert->Add( m_credentials_label, 0, wxALL|wxEXPAND, 5 );
-	
-	m_allow_save = new wxCheckBox( sb_credentials->GetStaticBox(), wxID_ANY, _("Allow credentials to be &remembered in Credential Manager"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_allow_save->SetHelpText( _("Check if you would like to allow saving credentials to Windows Credential Manager") );
-	
-	sb_credentials_vert->Add( m_allow_save, 0, wxALL, 5 );
-	
-	wxBoxSizer* sb_cred_store_btn;
-	sb_cred_store_btn = new wxBoxSizer( wxHORIZONTAL );
-	
-	m_cred_store_set = new wxButton( sb_credentials->GetStaticBox(), wxID_ANY, _("&Set Credentials..."), wxDefaultPosition, wxDefaultSize, 0 );
-	m_cred_store_set->SetToolTip( _("Adds a new certificate authority from the file to the list") );
-	
-	sb_cred_store_btn->Add( m_cred_store_set, 0, wxRIGHT|wxLEFT, 5 );
-	
-	m_cred_store_clear = new wxButton( sb_credentials->GetStaticBox(), wxID_ANY, _("&Clear Credentials"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_cred_store_clear->SetToolTip( _("Removes selected certificate authorities from the list") );
-	
-	sb_cred_store_btn->Add( m_cred_store_clear, 0, wxLEFT, 5 );
-	
-	
-	sb_credentials_vert->Add( sb_cred_store_btn, 0, wxALIGN_RIGHT|wxALL, 5 );
-	
-	
-	sb_credentials_horiz->Add( sb_credentials_vert, 1, wxEXPAND, 5 );
-	
-	
-	sb_credentials->Add( sb_credentials_horiz, 1, wxEXPAND, 5 );
-	
-	
-	this->SetSizer( sb_credentials );
-	this->Layout();
-	
-	// Connect Events
-	m_allow_save->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxCredentialsConfigPanelBase::OnAllowSave ), NULL, this );
-	m_cred_store_set->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxCredentialsConfigPanelBase::OnCredentialsSet ), NULL, this );
-	m_cred_store_clear->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxCredentialsConfigPanelBase::OnCredentialsClear ), NULL, this );
-}
-
-wxCredentialsConfigPanelBase::~wxCredentialsConfigPanelBase()
-{
-	// Disconnect Events
-	m_allow_save->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxCredentialsConfigPanelBase::OnAllowSave ), NULL, this );
-	m_cred_store_set->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxCredentialsConfigPanelBase::OnCredentialsSet ), NULL, this );
-	m_cred_store_clear->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxCredentialsConfigPanelBase::OnCredentialsClear ), NULL, this );
-	
-}
-
-wxPasswordCredentialsPanelBase::wxPasswordCredentialsPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
-{
-	wxStaticBoxSizer* sb_credentials;
-	sb_credentials = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Session Credentials") ), wxVERTICAL );
+	sb_credentials = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Client Certificate") ), wxVERTICAL );
 	
 	wxBoxSizer* sb_credentials_horiz;
 	sb_credentials_horiz = new wxBoxSizer( wxHORIZONTAL );
@@ -176,10 +112,10 @@ wxPasswordCredentialsPanelBase::wxPasswordCredentialsPanelBase( wxWindow* parent
 	
 	sb_credentials_vert->Add( sb_credentials_tbl, 0, wxEXPAND|wxALL, 5 );
 	
-	m_remember = new wxCheckBox( sb_credentials->GetStaticBox(), wxID_ANY, _("&Remember my credentials"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_remember->SetHelpText( _("Check if you would like to save the credentials to Windows Credential Manager") );
+	m_prompt = new wxCheckBox( sb_credentials->GetStaticBox(), wxID_ANY, _("&Prompt when connecting"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_prompt->SetHelpText( _("Check if you would like to enter credentials on every connection") );
 	
-	sb_credentials_vert->Add( m_remember, 0, wxALL|wxEXPAND, 5 );
+	sb_credentials_vert->Add( m_prompt, 0, wxALL|wxEXPAND, 5 );
 	
 	
 	sb_credentials_horiz->Add( sb_credentials_vert, 1, wxEXPAND, 5 );
@@ -192,6 +128,6 @@ wxPasswordCredentialsPanelBase::wxPasswordCredentialsPanelBase( wxWindow* parent
 	this->Layout();
 }
 
-wxPasswordCredentialsPanelBase::~wxPasswordCredentialsPanelBase()
+wxPasswordConfigCredentialsPanelBase::~wxPasswordConfigCredentialsPanelBase()
 {
 }

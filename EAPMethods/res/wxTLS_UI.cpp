@@ -113,3 +113,78 @@ wxEAPTLSConfigPanelBase::~wxEAPTLSConfigPanelBase()
 	m_root_ca_remove->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPTLSConfigPanelBase::OnRootCARemove ), NULL, this );
 	
 }
+
+wxTLSConfigCredentialsPanelBase::wxTLSConfigCredentialsPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+{
+	wxStaticBoxSizer* sb_credentials;
+	sb_credentials = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Client Credentials") ), wxVERTICAL );
+	
+	wxBoxSizer* sb_credentials_horiz;
+	sb_credentials_horiz = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_credentials_icon = new wxStaticBitmap( sb_credentials->GetStaticBox(), wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
+	sb_credentials_horiz->Add( m_credentials_icon, 0, wxALL, 5 );
+	
+	wxBoxSizer* sb_credentials_vert;
+	sb_credentials_vert = new wxBoxSizer( wxVERTICAL );
+	
+	m_credentials_label = new wxStaticText( sb_credentials->GetStaticBox(), wxID_ANY, _("Please select your client certificate to use for authentication."), wxDefaultPosition, wxDefaultSize, 0 );
+	m_credentials_label->Wrap( 446 );
+	sb_credentials_vert->Add( m_credentials_label, 0, wxALL|wxEXPAND, 5 );
+	
+	wxBoxSizer* sb_cert_radio;
+	sb_cert_radio = new wxBoxSizer( wxVERTICAL );
+	
+	m_cert_none = new wxRadioButton( sb_credentials->GetStaticBox(), wxID_ANY, _("Co&nnect without providing a client certificate"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP );
+	m_cert_none->SetToolTip( _("Select if your server does not require you to provide a client certificate") );
+	
+	sb_cert_radio->Add( m_cert_none, 1, wxEXPAND, 5 );
+	
+	wxBoxSizer* sb_cert_select;
+	sb_cert_select = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_cert_select = new wxRadioButton( sb_credentials->GetStaticBox(), wxID_ANY, _("Use the following &certificate:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_cert_select->SetToolTip( _("Select if you need to provide a client certificate when connecting") );
+	
+	sb_cert_select->Add( m_cert_select, 0, wxEXPAND, 5 );
+	
+	wxArrayString m_cert_select_valChoices;
+	m_cert_select_val = new wxChoice( sb_credentials->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxDefaultSize, m_cert_select_valChoices, wxCB_SORT );
+	m_cert_select_val->SetSelection( 0 );
+	m_cert_select_val->SetToolTip( _("Client certificate to use for authentication") );
+	
+	sb_cert_select->Add( m_cert_select_val, 1, wxEXPAND, 5 );
+	
+	
+	sb_cert_radio->Add( sb_cert_select, 1, wxEXPAND, 5 );
+	
+	
+	sb_credentials_vert->Add( sb_cert_radio, 0, wxEXPAND|wxALL, 5 );
+	
+	m_prompt = new wxCheckBox( sb_credentials->GetStaticBox(), wxID_ANY, _("&Prompt when connecting"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_prompt->SetHelpText( _("Check if you would like to select certificate on every connection") );
+	
+	sb_credentials_vert->Add( m_prompt, 0, wxALL|wxEXPAND, 5 );
+	
+	
+	sb_credentials_horiz->Add( sb_credentials_vert, 1, wxEXPAND, 5 );
+	
+	
+	sb_credentials->Add( sb_credentials_horiz, 0, wxEXPAND, 5 );
+	
+	
+	this->SetSizer( sb_credentials );
+	this->Layout();
+	
+	// Connect Events
+	m_cert_select->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( wxTLSConfigCredentialsPanelBase::OnCertSelect ), NULL, this );
+	m_prompt->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxTLSConfigCredentialsPanelBase::OnPrompt ), NULL, this );
+}
+
+wxTLSConfigCredentialsPanelBase::~wxTLSConfigCredentialsPanelBase()
+{
+	// Disconnect Events
+	m_cert_select->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( wxTLSConfigCredentialsPanelBase::OnCertSelect ), NULL, this );
+	m_prompt->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxTLSConfigCredentialsPanelBase::OnPrompt ), NULL, this );
+	
+}

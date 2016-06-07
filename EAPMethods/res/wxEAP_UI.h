@@ -27,9 +27,9 @@ class wxEAPBannerPanel;
 #include <wx/image.h>
 #include <wx/icon.h>
 #include <wx/statbmp.h>
+#include <wx/textctrl.h>
 #include <wx/checkbox.h>
 #include <wx/statbox.h>
-#include <wx/textctrl.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -62,7 +62,7 @@ class wxEAPBannerPanelBase : public wxPanel
 	private:
 	
 	protected:
-		wxStaticText* m_product_name;
+		wxStaticText* m_title;
 	
 	public:
 		
@@ -72,36 +72,9 @@ class wxEAPBannerPanelBase : public wxPanel
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class wxCredentialsConfigPanelBase
+/// Class wxPasswordConfigCredentialsPanelBase
 ///////////////////////////////////////////////////////////////////////////////
-class wxCredentialsConfigPanelBase : public wxPanel 
-{
-	private:
-	
-	protected:
-		wxStaticBitmap* m_credentials_icon;
-		wxStaticText* m_credentials_label;
-		wxCheckBox* m_allow_save;
-		wxButton* m_cred_store_set;
-		wxButton* m_cred_store_clear;
-		
-		// Virtual event handlers, overide them in your derived class
-		virtual void OnAllowSave( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnCredentialsSet( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnCredentialsClear( wxCommandEvent& event ) { event.Skip(); }
-		
-	
-	public:
-		
-		wxCredentialsConfigPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL ); 
-		~wxCredentialsConfigPanelBase();
-	
-};
-
-///////////////////////////////////////////////////////////////////////////////
-/// Class wxPasswordCredentialsPanelBase
-///////////////////////////////////////////////////////////////////////////////
-class wxPasswordCredentialsPanelBase : public wxPanel 
+class wxPasswordConfigCredentialsPanelBase : public wxPanel 
 {
 	private:
 	
@@ -112,12 +85,12 @@ class wxPasswordCredentialsPanelBase : public wxPanel
 		wxTextCtrl* m_identity;
 		wxStaticText* m_password_label;
 		wxTextCtrl* m_password;
-		wxCheckBox* m_remember;
+		wxCheckBox* m_prompt;
 	
 	public:
 		
-		wxPasswordCredentialsPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL ); 
-		~wxPasswordCredentialsPanelBase();
+		wxPasswordConfigCredentialsPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL ); 
+		~wxPasswordConfigCredentialsPanelBase();
 	
 };
 
