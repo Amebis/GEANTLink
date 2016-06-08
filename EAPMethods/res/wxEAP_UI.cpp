@@ -70,7 +70,7 @@ wxEAPBannerPanelBase::~wxEAPBannerPanelBase()
 {
 }
 
-wxPasswordConfigCredentialsPanelBase::wxPasswordConfigCredentialsPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+wxPasswordCredentialsPanelBase::wxPasswordCredentialsPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
 	wxStaticBoxSizer* sb_credentials;
 	sb_credentials = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Client Certificate") ), wxVERTICAL );
@@ -112,10 +112,10 @@ wxPasswordConfigCredentialsPanelBase::wxPasswordConfigCredentialsPanelBase( wxWi
 	
 	sb_credentials_vert->Add( sb_credentials_tbl, 0, wxEXPAND|wxALL, 5 );
 	
-	m_prompt = new wxCheckBox( sb_credentials->GetStaticBox(), wxID_ANY, _("&Prompt when connecting"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_prompt->SetHelpText( _("Check if you would like to enter credentials on every connection") );
+	m_remember = new wxCheckBox( sb_credentials->GetStaticBox(), wxID_ANY, _("&Remember credentials"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_remember->SetHelpText( _("Check if you would like to save username and password") );
 	
-	sb_credentials_vert->Add( m_prompt, 0, wxALL|wxEXPAND, 5 );
+	sb_credentials_vert->Add( m_remember, 0, wxALL|wxEXPAND, 5 );
 	
 	
 	sb_credentials_horiz->Add( sb_credentials_vert, 1, wxEXPAND, 5 );
@@ -128,6 +128,6 @@ wxPasswordConfigCredentialsPanelBase::wxPasswordConfigCredentialsPanelBase( wxWi
 	this->Layout();
 }
 
-wxPasswordConfigCredentialsPanelBase::~wxPasswordConfigCredentialsPanelBase()
+wxPasswordCredentialsPanelBase::~wxPasswordCredentialsPanelBase()
 {
 }

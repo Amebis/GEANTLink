@@ -68,9 +68,9 @@ class wxEAPTLSConfigPanelBase : public wxPanel
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class wxTLSConfigCredentialsPanelBase
+/// Class wxTLSCredentialsPanelBase
 ///////////////////////////////////////////////////////////////////////////////
-class wxTLSConfigCredentialsPanelBase : public wxPanel 
+class wxTLSCredentialsPanelBase : public wxPanel 
 {
 	private:
 	
@@ -80,17 +80,17 @@ class wxTLSConfigCredentialsPanelBase : public wxPanel
 		wxRadioButton* m_cert_none;
 		wxRadioButton* m_cert_select;
 		wxChoice* m_cert_select_val;
-		wxCheckBox* m_prompt;
+		wxCheckBox* m_remember;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnCertSelect( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnPrompt( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnRemember( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
 		
-		wxTLSConfigCredentialsPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL ); 
-		~wxTLSConfigCredentialsPanelBase();
+		wxTLSCredentialsPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL ); 
+		~wxTLSCredentialsPanelBase();
 	
 };
 

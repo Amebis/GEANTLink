@@ -72,9 +72,9 @@ class wxEAPBannerPanelBase : public wxPanel
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class wxPasswordConfigCredentialsPanelBase
+/// Class wxPasswordCredentialsPanelBase
 ///////////////////////////////////////////////////////////////////////////////
-class wxPasswordConfigCredentialsPanelBase : public wxPanel 
+class wxPasswordCredentialsPanelBase : public wxPanel 
 {
 	private:
 	
@@ -85,12 +85,12 @@ class wxPasswordConfigCredentialsPanelBase : public wxPanel
 		wxTextCtrl* m_identity;
 		wxStaticText* m_password_label;
 		wxTextCtrl* m_password;
-		wxCheckBox* m_prompt;
+		wxCheckBox* m_remember;
 	
 	public:
 		
-		wxPasswordConfigCredentialsPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL ); 
-		~wxPasswordConfigCredentialsPanelBase();
+		wxPasswordCredentialsPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL ); 
+		~wxPasswordCredentialsPanelBase();
 	
 };
 

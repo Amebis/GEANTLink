@@ -80,6 +80,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
   <ItemGroup>
     <ClInclude Include="..\include\EAP.h" />
+    <ClInclude Include="..\include\EAPXML.h" />
     <ClInclude Include="..\include\EAP_UI.h" />
     <ClInclude Include="..\include\TLS.h" />
     <ClInclude Include="..\include\TTLS.h" />
