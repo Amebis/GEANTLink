@@ -1,5 +1,5 @@
 #CredWrite
-Imports given credentials to Windows Credential Manager for GEANTLink use
+Imports given credentials to Windows Credential Manager for GÉANTLink use
 
 ##Usage
 ```
@@ -16,5 +16,4 @@ Return codes:
 - -1 = Invalid parameters
 - 0  = Success
 - 1  = Error parsing command line
-- 2  = Error encrypting password
-- 3  = Error writing credentials to Credential Manager
+- 2  = Error encrypting password or writing credentials
