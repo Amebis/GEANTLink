@@ -87,6 +87,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\EAPMethods\src\EAP.cpp" />
+    <ClCompile Include="..\EAPMethods\src\PAP.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="StdAfx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

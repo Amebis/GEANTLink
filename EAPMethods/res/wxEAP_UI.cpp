@@ -15,16 +15,16 @@ wxEAPConfigDialogBase::wxEAPConfigDialogBase( wxWindow* parent, wxWindowID id, c
 {
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
 	
-	wxBoxSizer* sz_content;
-	sz_content = new wxBoxSizer( wxVERTICAL );
+	wxBoxSizer* sb_content;
+	sb_content = new wxBoxSizer( wxVERTICAL );
 	
 	m_banner = new wxEAPBannerPanel( this );
 	
-	sz_content->Add( m_banner, 0, wxEXPAND|wxBOTTOM, 5 );
+	sb_content->Add( m_banner, 0, wxEXPAND|wxBOTTOM, 5 );
 	
 	m_providers = new wxNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
 	
-	sz_content->Add( m_providers, 1, wxEXPAND|wxALL, 5 );
+	sb_content->Add( m_providers, 1, wxEXPAND|wxALL, 5 );
 	
 	m_buttons = new wxStdDialogButtonSizer();
 	m_buttonsOK = new wxButton( this, wxID_OK );
@@ -33,12 +33,12 @@ wxEAPConfigDialogBase::wxEAPConfigDialogBase( wxWindow* parent, wxWindowID id, c
 	m_buttons->AddButton( m_buttonsCancel );
 	m_buttons->Realize();
 	
-	sz_content->Add( m_buttons, 0, wxEXPAND|wxALL, 5 );
+	sb_content->Add( m_buttons, 0, wxEXPAND|wxALL, 5 );
 	
 	
-	this->SetSizer( sz_content );
+	this->SetSizer( sb_content );
 	this->Layout();
-	sz_content->Fit( this );
+	sb_content->Fit( this );
 	
 	// Connect Events
 	this->Connect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( wxEAPConfigDialogBase::OnInitDialog ) );
@@ -55,17 +55,17 @@ wxEAPCredentialsDialogBase::wxEAPCredentialsDialogBase( wxWindow* parent, wxWind
 {
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
 	
-	wxBoxSizer* sz_content;
-	sz_content = new wxBoxSizer( wxVERTICAL );
+	wxBoxSizer* sb_content;
+	sb_content = new wxBoxSizer( wxVERTICAL );
 	
 	m_banner = new wxEAPBannerPanel( this );
 	
-	sz_content->Add( m_banner, 0, wxEXPAND|wxBOTTOM, 5 );
+	sb_content->Add( m_banner, 0, wxEXPAND|wxBOTTOM, 5 );
 	
 	m_panels = new wxBoxSizer( wxVERTICAL );
 	
 	
-	sz_content->Add( m_panels, 1, wxEXPAND|wxALL, 5 );
+	sb_content->Add( m_panels, 1, wxEXPAND|wxALL, 5 );
 	
 	m_buttons = new wxStdDialogButtonSizer();
 	m_buttonsOK = new wxButton( this, wxID_OK );
@@ -74,16 +74,22 @@ wxEAPCredentialsDialogBase::wxEAPCredentialsDialogBase( wxWindow* parent, wxWind
 	m_buttons->AddButton( m_buttonsCancel );
 	m_buttons->Realize();
 	
-	sz_content->Add( m_buttons, 0, wxEXPAND|wxALL, 5 );
+	sb_content->Add( m_buttons, 0, wxEXPAND|wxALL, 5 );
 	
 	
-	this->SetSizer( sz_content );
+	this->SetSizer( sb_content );
 	this->Layout();
-	sz_content->Fit( this );
+	sb_content->Fit( this );
+	
+	// Connect Events
+	this->Connect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( wxEAPCredentialsDialogBase::OnInitDialog ) );
 }
 
 wxEAPCredentialsDialogBase::~wxEAPCredentialsDialogBase()
 {
+	// Disconnect Events
+	this->Disconnect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( wxEAPCredentialsDialogBase::OnInitDialog ) );
+	
 }
 
 wxEAPBannerPanelBase::wxEAPBannerPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
@@ -96,7 +102,7 @@ wxEAPBannerPanelBase::wxEAPBannerPanelBase( wxWindow* parent, wxWindowID id, con
 	
 	m_title = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
 	m_title->Wrap( -1 );
-	m_title->SetFont( wxFont( 14, 70, 90, 90, false, wxEmptyString ) );
+	m_title->SetFont( wxFont( 18, 70, 90, 90, false, wxEmptyString ) );
 	m_title->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_HIGHLIGHTTEXT ) );
 	
 	sc_content->Add( m_title, 0, wxALL|wxEXPAND, 5 );
@@ -217,7 +223,7 @@ wxPasswordCredentialsPanelBase::wxPasswordCredentialsPanelBase( wxWindow* parent
 	sb_credentials_tbl->Add( m_identity_label, 0, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_identity = new wxTextCtrl( sb_credentials->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_identity->SetToolTip( _("Enter your user name here (user@domain.org, DOMAINUser, etc.)") );
+	m_identity->SetToolTip( _("Enter your user name here (user@domain.org, DOMAIN\\User, etc.)") );
 	
 	sb_credentials_tbl->Add( m_identity, 2, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
 	

@@ -29,6 +29,9 @@
     <ClCompile Include="..\EAPMethods\src\EAP.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\EAPMethods\src\PAP.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CredWrite.rc">

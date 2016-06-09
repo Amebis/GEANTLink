@@ -34,9 +34,9 @@
 ///////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class wxEAPTLSConfigPanelBase
+/// Class wxEAPTLSServerTrustConfigPanelBase
 ///////////////////////////////////////////////////////////////////////////////
-class wxEAPTLSConfigPanelBase : public wxPanel 
+class wxEAPTLSServerTrustConfigPanelBase : public wxPanel 
 {
 	private:
 	
@@ -62,8 +62,8 @@ class wxEAPTLSConfigPanelBase : public wxPanel
 	
 	public:
 		
-		wxEAPTLSConfigPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL ); 
-		~wxEAPTLSConfigPanelBase();
+		wxEAPTLSServerTrustConfigPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL ); 
+		~wxEAPTLSServerTrustConfigPanelBase();
 	
 };
 

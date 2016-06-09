@@ -71,6 +71,10 @@ class wxEAPCredentialsDialogBase : public wxDialog
 		wxStdDialogButtonSizer* m_buttons;
 		wxButton* m_buttonsOK;
 		wxButton* m_buttonsCancel;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnInitDialog( wxInitDialogEvent& event ) { event.Skip(); }
+		
 	
 	public:
 		

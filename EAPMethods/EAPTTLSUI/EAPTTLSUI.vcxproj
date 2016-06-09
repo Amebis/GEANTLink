@@ -82,6 +82,7 @@
     <ClInclude Include="..\include\EAP.h" />
     <ClInclude Include="..\include\EAPXML.h" />
     <ClInclude Include="..\include\EAP_UI.h" />
+    <ClInclude Include="..\include\PAP_UI.h" />
     <ClInclude Include="..\include\TLS.h" />
     <ClInclude Include="..\include\TTLS.h" />
     <ClInclude Include="..\include\TTLS_UI.h" />
@@ -97,6 +98,7 @@
     <ClCompile Include="..\res\wxTLS_UI.cpp" />
     <ClCompile Include="..\res\wxTTLS_UI.cpp" />
     <ClCompile Include="..\src\EAP.cpp" />
+    <ClCompile Include="..\src\PAP_UI.cpp" />
     <ClCompile Include="..\src\TLS.cpp" />
     <ClCompile Include="..\src\TTLS.cpp" />
     <ClCompile Include="..\src\TTLS_UI.cpp" />
