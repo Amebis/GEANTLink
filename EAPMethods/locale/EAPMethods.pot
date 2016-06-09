@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: EAPMethods\n"
-"POT-Creation-Date: 2016-06-02 15:58+0200\n"
+"POT-Creation-Date: 2016-06-09 15:19+0200\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
 "Last-Translator: Simon Rozman <simon.rozman@amebis.si>\n"
 "Language-Team: Amebis, d. o. o., Kamnik <info@amebis.si>\n"
@@ -17,109 +17,288 @@ msgstr ""
 "X-Poedit-KeywordsList: _\n"
 "X-Poedit-SearchPath-0: res\n"
 "X-Poedit-SearchPath-1: MSIBuild\n"
+"X-Poedit-SearchPath-2: src\n"
+"X-Poedit-SearchPath-3: include\n"
 
-#: res/EAPTLSUI.cpp:23
+#: res/wxEAP_UI.cpp:123 res/wxEAP_UI.cpp:200
+msgid "Client Credentials"
+msgstr ""
+
+#: res/wxEAP_UI.cpp:134
+msgid "Manage your credentials stored in Windows Credential Manager."
+msgstr ""
+
+#: res/wxEAP_UI.cpp:144
+msgid "Identity:"
+msgstr ""
+
+#: res/wxEAP_UI.cpp:149
+msgid "Enter your user name here (user@domain.org, DOMAINUser, etc.)"
+msgstr ""
+
+#: res/wxEAP_UI.cpp:159
+msgid "&Set Credentials..."
+msgstr ""
+
+#: res/wxEAP_UI.cpp:160
+msgid "Click here to set or modify your credentials"
+msgstr ""
+
+#: res/wxEAP_UI.cpp:164
+msgid "&Clear Credentials"
+msgstr ""
+
+#: res/wxEAP_UI.cpp:165
+msgid ""
+"Click to clear your credentials from Credential Manager.\n"
+"Note: You will be prompted to enter credentials when connecting."
+msgstr ""
+
+#: res/wxEAP_UI.cpp:211
+msgid "Please provide your user ID and password."
+msgstr ""
+
+#: res/wxEAP_UI.cpp:221
+msgid "User ID:"
+msgstr ""
+
+#: res/wxEAP_UI.cpp:226
+msgid "Enter your user name here (user@domain.org, DOMAIN\\User, etc.)"
+msgstr ""
+
+#: res/wxEAP_UI.cpp:230
+msgid "Password:"
+msgstr ""
+
+#: res/wxEAP_UI.cpp:235
+msgid "Enter your password here"
+msgstr ""
+
+#: res/wxEAP_UI.cpp:242 res/wxTLS_UI.cpp:164
+msgid "&Remember"
+msgstr ""
+
+#: res/wxEAP_UI.cpp:243
+msgid "Check if you would like to save username and password"
+msgstr ""
+
+#: res/wxTLS_UI.cpp:17
 msgid "Server Trust"
 msgstr ""
 
-#: res/EAPTLSUI.cpp:34
+#: res/wxTLS_UI.cpp:28
 msgid "Describe the servers you trust to prevent credential interception in case of man-in-the-middle attacks."
 msgstr ""
 
-#: res/EAPTLSUI.cpp:41
+#: res/wxTLS_UI.cpp:35
 msgid "Acceptable Certificate Authorities:"
 msgstr ""
 
-#: res/EAPTLSUI.cpp:46
+#: res/wxTLS_UI.cpp:40
 msgid "List of certificate authorities server's certificate must be issued by"
 msgstr ""
 
-#: res/EAPTLSUI.cpp:53
-msgid "Add CA"
+#: res/wxTLS_UI.cpp:47
+msgid "Add CA from Store..."
 msgstr ""
 
-#: res/EAPTLSUI.cpp:54
-msgid "Adds a new certificate authority to the list"
+#: res/wxTLS_UI.cpp:48
+msgid "Adds a new certificate authority from the certificate store to the list"
 msgstr ""
 
-#: res/EAPTLSUI.cpp:58
+#: res/wxTLS_UI.cpp:52
+msgid "Add CA from File..."
+msgstr ""
+
+#: res/wxTLS_UI.cpp:53
+msgid "Adds a new certificate authority from the file to the list"
+msgstr ""
+
+#: res/wxTLS_UI.cpp:57
 msgid "&Remove CA"
 msgstr ""
 
-#: res/EAPTLSUI.cpp:59
+#: res/wxTLS_UI.cpp:59
 msgid "Removes selected certificate authorities from the list"
 msgstr ""
 
-#: res/EAPTLSUI.cpp:72
+#: res/wxTLS_UI.cpp:72
 msgid "Acceptable server &names:"
 msgstr ""
 
-#: res/EAPTLSUI.cpp:77
+#: res/wxTLS_UI.cpp:77
 msgid "A semicolon delimited list of acceptable server FQDN names; blank to skip name check; \"*\" wildchar allowed"
 msgstr ""
 
-#: res/EAPTLSUI.cpp:81
+#: res/wxTLS_UI.cpp:81
 msgid "(Example: foo.bar.com;*.domain.org)"
 msgstr ""
 
-#: res/EAPTTLSUI.cpp:23
+#: res/wxTLS_UI.cpp:120
+msgid "TLS Client Certificate"
+msgstr ""
+
+#: res/wxTLS_UI.cpp:131
+msgid "Please select your client certificate to use for authentication."
+msgstr ""
+
+#: res/wxTLS_UI.cpp:138
+msgid "Co&nnect without providing a client certificate"
+msgstr ""
+
+#: res/wxTLS_UI.cpp:139
+msgid "Select if your server does not require you to provide a client certificate"
+msgstr ""
+
+#: res/wxTLS_UI.cpp:146
+msgid "Use the following &certificate:"
+msgstr ""
+
+#: res/wxTLS_UI.cpp:147
+msgid "Select if you need to provide a client certificate when connecting"
+msgstr ""
+
+#: res/wxTLS_UI.cpp:154
+msgid "Client certificate to use for authentication"
+msgstr ""
+
+#: res/wxTLS_UI.cpp:165
+msgid "Check if you would like to save certificate selection"
+msgstr ""
+
+#: res/wxTTLS_UI.cpp:17
 msgid "Outer Identity"
 msgstr ""
 
-#: res/EAPTTLSUI.cpp:34
+#: res/wxTTLS_UI.cpp:28
 msgid "Select the user ID supplicant introduces itself as to authenticator:"
 msgstr ""
 
-#: res/EAPTTLSUI.cpp:41
+#: res/wxTTLS_UI.cpp:35
 msgid "&Same as inner identity"
 msgstr ""
 
-#: res/EAPTTLSUI.cpp:42
+#: res/wxTTLS_UI.cpp:36
 msgid "Use my true user name"
 msgstr ""
 
-#: res/EAPTTLSUI.cpp:46
+#: res/wxTTLS_UI.cpp:40
 msgid "Use &empty outer identity (RFC 4822)"
 msgstr ""
 
-#: res/EAPTTLSUI.cpp:48
+#: res/wxTTLS_UI.cpp:41
 msgid "Ommit my user name and use @mydomain.org only"
 msgstr ""
 
-#: res/EAPTTLSUI.cpp:55
+#: res/wxTTLS_UI.cpp:48
 msgid "&Custom outer identity:"
 msgstr ""
 
-#: res/EAPTTLSUI.cpp:56
+#: res/wxTTLS_UI.cpp:49
 msgid "Specify custom outer identity"
 msgstr ""
 
-#: res/EAPTTLSUI.cpp:61
+#: res/wxTTLS_UI.cpp:54
 msgid "Custom outer identity to use"
 msgstr ""
 
-#: MSIBuild/En.Win32.Release.Feature-2.idtx:3
-#: MSIBuild/En.x64.Release.Feature-2.idtx:3
+#: src/PAP_UI.cpp:41
+msgid "This method requires no additional settings."
+msgstr ""
+
+#: src/TLS_UI.cpp:198
+#, c-format
+msgid "Invalid character in host name found: %c"
+msgstr ""
+
+#: src/TLS_UI.cpp:198
+msgid "Validation conflict"
+msgstr ""
+
+#: src/TLS_UI.cpp:550
+msgid "Add Certificate"
+msgstr ""
+
+#: src/TLS_UI.cpp:551
+msgid "Certificate Files (*.cer;*.crt;*.der;*.p7b;*.pem)"
+msgstr ""
+
+#: src/TLS_UI.cpp:552
+msgid "X.509 Certificate Files (*.cer;*.crt;*.der;*.pem)"
+msgstr ""
+
+#: src/TLS_UI.cpp:553
+msgid "PKCS #7 Certificate Files (*.p7b)"
+msgstr ""
+
+#: src/TLS_UI.cpp:554
+msgid "All Files (*.*)"
+msgstr ""
+
+#: src/TLS_UI.cpp:570
+#, c-format
+msgid "Invalid or unsupported certificate file %s"
+msgstr ""
+
+#: src/TLS_UI.cpp:570
 #, fuzzy
-msgid "1252"
-msgstr "1250"
+msgid "Error"
+msgstr "Napaka pri nalaganju knjižnice MSI.DLL (%1!ld!)."
 
-#: MSIBuild/En.Win32.Release.Feature-2.idtx:4
-#: MSIBuild/En.x64.Release.Feature-2.idtx:4
-msgid "EAP Peer Methods"
+#: src/TTLS_UI.cpp:172
+msgid "Outer Authentication"
 msgstr ""
 
-#: MSIBuild/En.Win32.Release.Feature-2.idtx:4
-#: MSIBuild/En.x64.Release.Feature-2.idtx:4
-msgid "Modules to support individual EAP methods"
+#: src/TTLS_UI.cpp:185
+msgid "Inner Authentication"
 msgstr ""
 
-#: MSIBuild/En.Win32.Release.Feature-2.idtx:5
-#: MSIBuild/En.x64.Release.Feature-2.idtx:5
-msgid "TTLS"
+#: src/TTLS_UI.cpp:191
+msgid "Select inner authentication method from the list"
 msgstr ""
 
-#: MSIBuild/En.Win32.Release.Feature-2.idtx:5
-#: MSIBuild/En.x64.Release.Feature-2.idtx:5
-msgid "Tunneled Transport Layer Security"
+#: src/TTLS_UI.cpp:192
+msgid "PAP"
+msgstr ""
+
+#: include/EAP_UI.h:272
+msgid "<blank>"
+msgstr ""
+
+#: include/EAP_UI.h:278
+#, c-format
+msgid "<error %u>"
+msgstr ""
+
+#: include/EAP_UI.h:301
+#, c-format
+msgid "Deleting credentials failed (error %u)."
+msgstr ""
+
+#: include/EAP_UI.h:358
+#, c-format
+msgid "Error reading credentials from Credential Manager: %ls (error %u)"
+msgstr ""
+
+#: include/EAP_UI.h:361
+#, c-format
+msgid "Reading credentials failed (error %u)."
+msgstr ""
+
+#: include/EAP_UI.h:376
+#, c-format
+msgid "Error writing credentials to Credential Manager: %ls (error %u)"
+msgstr ""
+
+#: include/EAP_UI.h:379
+#, c-format
+msgid "Writing credentials failed (error %u)."
+msgstr ""
+
+#: res/wxEAP_UI.h:56
+msgid "EAP Method Configuration"
+msgstr ""
+
+#: res/wxEAP_UI.h:81
+msgid "EAP Credentials"
 msgstr ""
