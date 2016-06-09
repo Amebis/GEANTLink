@@ -68,9 +68,9 @@ class wxEAPTLSConfigPanelBase : public wxPanel
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class wxTLSCredentialsPanelBase
+/// Class wxEAPTLSCredentialsPanelBase
 ///////////////////////////////////////////////////////////////////////////////
-class wxTLSCredentialsPanelBase : public wxPanel 
+class wxEAPTLSCredentialsPanelBase : public wxPanel 
 {
 	private:
 	
@@ -84,13 +84,12 @@ class wxTLSCredentialsPanelBase : public wxPanel
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnCertSelect( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnRemember( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
 		
-		wxTLSCredentialsPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL ); 
-		~wxTLSCredentialsPanelBase();
+		wxEAPTLSCredentialsPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL ); 
+		~wxEAPTLSCredentialsPanelBase();
 	
 };
 

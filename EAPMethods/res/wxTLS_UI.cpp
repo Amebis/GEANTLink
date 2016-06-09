@@ -114,10 +114,10 @@ wxEAPTLSConfigPanelBase::~wxEAPTLSConfigPanelBase()
 	
 }
 
-wxTLSCredentialsPanelBase::wxTLSCredentialsPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+wxEAPTLSCredentialsPanelBase::wxEAPTLSCredentialsPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
 	wxStaticBoxSizer* sb_credentials;
-	sb_credentials = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Client Credentials") ), wxVERTICAL );
+	sb_credentials = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("TLS Client Certificate") ), wxVERTICAL );
 	
 	wxBoxSizer* sb_credentials_horiz;
 	sb_credentials_horiz = new wxBoxSizer( wxHORIZONTAL );
@@ -161,7 +161,7 @@ wxTLSCredentialsPanelBase::wxTLSCredentialsPanelBase( wxWindow* parent, wxWindow
 	
 	sb_credentials_vert->Add( sb_cert_radio, 0, wxEXPAND|wxALL, 5 );
 	
-	m_remember = new wxCheckBox( sb_credentials->GetStaticBox(), wxID_ANY, _("&Remember credentials"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_remember = new wxCheckBox( sb_credentials->GetStaticBox(), wxID_ANY, _("&Remember"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_remember->SetHelpText( _("Check if you would like to save certificate selection") );
 	
 	sb_credentials_vert->Add( m_remember, 0, wxALL|wxEXPAND, 5 );
@@ -177,14 +177,12 @@ wxTLSCredentialsPanelBase::wxTLSCredentialsPanelBase( wxWindow* parent, wxWindow
 	this->Layout();
 	
 	// Connect Events
-	m_cert_select->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( wxTLSCredentialsPanelBase::OnCertSelect ), NULL, this );
-	m_remember->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxTLSCredentialsPanelBase::OnRemember ), NULL, this );
+	m_cert_select->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( wxEAPTLSCredentialsPanelBase::OnCertSelect ), NULL, this );
 }
 
-wxTLSCredentialsPanelBase::~wxTLSCredentialsPanelBase()
+wxEAPTLSCredentialsPanelBase::~wxEAPTLSCredentialsPanelBase()
 {
 	// Disconnect Events
-	m_cert_select->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( wxTLSCredentialsPanelBase::OnCertSelect ), NULL, this );
-	m_remember->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( wxTLSCredentialsPanelBase::OnRemember ), NULL, this );
+	m_cert_select->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( wxEAPTLSCredentialsPanelBase::OnCertSelect ), NULL, this );
 	
 }
