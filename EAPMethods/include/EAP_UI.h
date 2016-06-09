@@ -231,6 +231,11 @@ public:
     /// Constructs a banner pannel and set the title text to product name
     ///
     wxEAPBannerPanel(wxWindow* parent);
+
+protected:
+    /// \cond internal
+    virtual bool AcceptsFocusFromKeyboard() const { return false; }
+    /// \endcond
 };
 
 

@@ -204,6 +204,8 @@ wxEAPTTLSConfig::wxEAPTTLSConfig(eap::config_ttls &cfg, LPCTSTR pszCredTarget, w
     this->SetSizer(sb_content);
     this->Layout();
 
+    m_outer_identity->SetFocusFromKbd();
+
     // Connect Events
     this->Connect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(wxEAPTTLSConfig::OnInitDialog));
 }

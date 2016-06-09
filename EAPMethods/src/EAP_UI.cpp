@@ -36,11 +36,14 @@ wxEAPCredentialsDialog::wxEAPCredentialsDialog(wxWindow* parent) : wxEAPCredenti
 
 void wxEAPCredentialsDialog::AddContents(wxPanel **contents, size_t content_count)
 {
-    for (size_t i = 0; i < content_count; i++)
-        m_panels->Add(contents[i], 0, wxALL|wxEXPAND, 5);
+    if (content_count) {
+        for (size_t i = 0; i < content_count; i++)
+            m_panels->Add(contents[i], 0, wxALL|wxEXPAND, 5);
 
-    this->Layout();
-    this->GetSizer()->Fit(this);
+        this->Layout();
+        this->GetSizer()->Fit(this);
+        contents[0]->SetFocusFromKbd();
+    }
 }
 
 
