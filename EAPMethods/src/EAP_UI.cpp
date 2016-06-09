@@ -85,6 +85,7 @@ bool wxPasswordCredentialsPanel::TransferDataToWindow()
     wxCHECK(__super::TransferDataToWindow(), false);
 
     m_identity->SetValue(m_cred.m_identity);
+    m_identity->SetSelection(0, -1);
     m_password->SetValue(m_cred.m_password.empty() ? wxEmptyString : s_dummy_password);
 
     return true;
