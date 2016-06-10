@@ -8,11 +8,8 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir);..\EAPMethodEvents\temp\EAPMethodEvents.$(Platform).$(Configuration).$(PlatformToolset);..\include;..\..\lib\WinStd\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);..\..\lib\Events\build\temp\Events.$(Platform).$(Configuration).$(PlatformToolset);..\include;..\..\lib\WinStd\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
-    <ResourceCompile>
-      <AdditionalIncludeDirectories>temp\EAPMethodEvents.$(Platform).$(Configuration).$(PlatformToolset);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup />
 </Project>

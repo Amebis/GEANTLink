@@ -20,12 +20,10 @@
 
 #include "StdAfx.h"
 
-#pragma comment(lib, "Crypt32.lib")
-
 using namespace std;
 using namespace winstd;
 
-eap::module g_module;
+eap::module g_module(eap::type_undefined);
 
 
 static int CredWrite()

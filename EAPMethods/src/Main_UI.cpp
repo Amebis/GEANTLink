@@ -20,6 +20,8 @@
 
 #include <StdAfx.h>
 
+#pragma comment(lib, "msxml6.lib")
+
 
 #if EAPMETHOD_TYPE==21
 #define _EAPMETHOD_PEER_UI eap::peer_ttls_ui

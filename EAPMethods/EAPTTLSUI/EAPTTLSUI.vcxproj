@@ -79,33 +79,10 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
   <ItemGroup>
-    <ClInclude Include="..\include\EAP.h" />
-    <ClInclude Include="..\include\EAPXML.h" />
-    <ClInclude Include="..\include\EAP_UI.h" />
-    <ClInclude Include="..\include\PAP_UI.h" />
-    <ClInclude Include="..\include\TLS.h" />
-    <ClInclude Include="..\include\TTLS.h" />
-    <ClInclude Include="..\include\TTLS_UI.h" />
-    <ClInclude Include="..\include\PAP.h" />
-    <ClInclude Include="..\include\TLS_UI.h" />
-    <ClInclude Include="..\res\wxEAP_UI.h" />
     <ClInclude Include="StdAfx.h" />
-    <ClInclude Include="..\res\wxTLS_UI.h" />
-    <ClInclude Include="..\res\wxTTLS_UI.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\res\wxEAP_UI.cpp" />
-    <ClCompile Include="..\res\wxTLS_UI.cpp" />
-    <ClCompile Include="..\res\wxTTLS_UI.cpp" />
-    <ClCompile Include="..\src\EAP.cpp" />
-    <ClCompile Include="..\src\PAP_UI.cpp" />
-    <ClCompile Include="..\src\TLS.cpp" />
-    <ClCompile Include="..\src\TTLS.cpp" />
-    <ClCompile Include="..\src\TTLS_UI.cpp" />
     <ClCompile Include="..\src\Main_UI.cpp" />
-    <ClCompile Include="..\src\PAP.cpp" />
-    <ClCompile Include="..\src\EAP_UI.cpp" />
-    <ClCompile Include="..\src\TLS_UI.cpp" />
     <ClCompile Include="StdAfx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -117,18 +94,39 @@
     <ResourceCompile Include="EAPTTLSUI.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\lib\EAPBase\build\EAPBase.vcxproj">
+      <Project>{ad6816a0-9600-4e01-8c49-39d03d1e791f}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\lib\EAPBase_UI\build\EAPBase_UI.vcxproj">
+      <Project>{d4b54856-be1f-4937-a8f7-495125be76be}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\lib\Events\build\Events.vcxproj">
+      <Project>{d63f24bd-92a0-4d6b-8b69-ed947e4d2b1b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\lib\PAP\build\PAP.vcxproj">
+      <Project>{36b0cf8a-7794-46c3-8099-825ba962b4c7}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\lib\PAP_UI\build\PAP_UI.vcxproj">
+      <Project>{3d309c2e-64ab-4bc4-a16d-468571a2bc1a}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\lib\TLS\build\TLS.vcxproj">
+      <Project>{4d40cb8a-812e-4f12-b23a-31af743878e8}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\lib\TLS_UI\build\TLS_UI.vcxproj">
+      <Project>{9a25c261-8ade-4938-8393-e857ef0e37e9}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\lib\TTLS\build\TTLS.vcxproj">
+      <Project>{ee0ef0d9-a475-4038-8637-5754724f65b0}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\lib\TTLS_UI\build\TTLS_UI.vcxproj">
+      <Project>{42f0f0f4-c928-4860-a4e4-94991c2c3d90}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\lib\WinStd\build\WinStd.vcxproj">
       <Project>{47399d91-7eb9-41de-b521-514ba5db0c43}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\EAPMethodEvents\EAPMethodEvents.vcxproj">
-      <Project>{d63f24bd-92a0-4d6b-8b69-ed947e4d2b1b}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\build\EAPMethodUI.def" />
-    <None Include="..\res\wxEAP_UI.fbp" />
-    <None Include="..\res\wxTLS_UI.fbp" />
-    <None Include="..\res\wxTTLS_UI.fbp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

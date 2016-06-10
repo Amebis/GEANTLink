@@ -20,17 +20,30 @@
 
 #pragma once
 
-#include "../include/Version.h"
+#include "../lib/PAP/include/Credentials.h"
+#include "../lib/EAPBase/include/Module.h"
 
-#include "../EAPMethods/include/EAP.h"
-#include "../EAPMethods/include/PAP.h"
-
+#include <WinStd/Common.h>
 #include <WinStd/Base64.h>
-#include <WinStd/Cred.h>
-#include <WinStd/Crypt.h>
 #include <WinStd/Win.h>
 
-#include <tchar.h>
 #include <Windows.h>
+#include <eaptypes.h> // Must include after <Windows.h>
+#include <tchar.h>
 
 #include <memory>
+
+//#include "../include/Version.h"
+//
+//#include "../EAPMethods/include/EAP.h"
+//#include "../EAPMethods/include/PAP.h"
+//
+//#include <WinStd/Base64.h>
+//#include <WinStd/Cred.h>
+//#include <WinStd/Crypt.h>
+//#include <WinStd/Win.h>
+//
+//#include <tchar.h>
+//#include <Windows.h>
+//
+//#include <memory>

@@ -20,31 +20,5 @@
 
 #pragma once
 
-#include "../../include/Version.h"
-
-#include "../include/EAP.h"
-#include "../include/EAPSerial.h"
-#include "../include/TLS.h"
-#include "../include/TTLS.h"
-#include "../include/EAPXML.h"
-#include "../include/PAP.h"
-
-#include <WinStd/Base64.h>
-#include <WinStd/Cred.h>
-#include <WinStd/Crypt.h>
-#include <WinStd/ETW.h>
-#include <WinStd/Hex.h>
-#include <WinStd/Win.h>
-
-#include <eaptypes.h>
-#include <eapmethodpeerapis.h>
-
-#include <Commctrl.h>
-#include <Msi.h>
-#include <tchar.h>
-#include <Shlwapi.h>
-#include <Windows.h>
-
-#include <EAPMethodETW.h>
-
-#pragma comment(lib, "Crypt32.lib")
+#include "../../lib/TTLS/include/Module.h"
+#include "../../lib/TTLS/include/Session.h"

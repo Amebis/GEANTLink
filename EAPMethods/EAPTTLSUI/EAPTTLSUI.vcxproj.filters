@@ -13,54 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\wx">
-      <UniqueIdentifier>{51f0404d-9280-4fcc-8138-5d1f815ce568}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\wx">
-      <UniqueIdentifier>{9befee7a-5dff-41dd-b080-4e26ccb19a7f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resource Files\wx">
-      <UniqueIdentifier>{0ec1840b-101c-415a-91c6-2c7eb4530c15}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="StdAfx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\TTLS.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\PAP.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\TLS_UI.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\TLS.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\res\wxEAP_UI.h">
-      <Filter>Header Files\wx</Filter>
-    </ClInclude>
-    <ClInclude Include="..\res\wxTLS_UI.h">
-      <Filter>Header Files\wx</Filter>
-    </ClInclude>
-    <ClInclude Include="..\res\wxTTLS_UI.h">
-      <Filter>Header Files\wx</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\EAP.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\EAP_UI.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\TTLS_UI.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\EAPXML.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\PAP_UI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -68,40 +23,7 @@
     <ClCompile Include="StdAfx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\PAP.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\res\wxEAP_UI.cpp">
-      <Filter>Source Files\wx</Filter>
-    </ClCompile>
-    <ClCompile Include="..\res\wxTLS_UI.cpp">
-      <Filter>Source Files\wx</Filter>
-    </ClCompile>
-    <ClCompile Include="..\res\wxTTLS_UI.cpp">
-      <Filter>Source Files\wx</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\EAP.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\EAP_UI.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\TLS.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\TLS_UI.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\TTLS.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\TTLS_UI.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Main_UI.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\PAP_UI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -113,15 +35,6 @@
   <ItemGroup>
     <None Include="..\build\EAPMethodUI.def">
       <Filter>Source Files</Filter>
-    </None>
-    <None Include="..\res\wxEAP_UI.fbp">
-      <Filter>Resource Files\wx</Filter>
-    </None>
-    <None Include="..\res\wxTTLS_UI.fbp">
-      <Filter>Resource Files\wx</Filter>
-    </None>
-    <None Include="..\res\wxTLS_UI.fbp">
-      <Filter>Resource Files\wx</Filter>
     </None>
   </ItemGroup>
 </Project>
