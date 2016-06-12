@@ -30,8 +30,29 @@ namespace eap
 
 namespace eapserial
 {
+    ///
+    /// Packs a PAP based method configuration
+    ///
+    /// \param[inout] cursor  Memory cursor
+    /// \param[in]    val     Configuration to pack
+    ///
     inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::config_pap &val);
+
+    ///
+    /// Returns packed size of a PAP based method configuration
+    ///
+    /// \param[in] val  Configuration to pack
+    ///
+    /// \returns Size of data when packed (in bytes)
+    ///
     inline size_t get_pk_size(const eap::config_pap &val);
+
+    ///
+    /// Unpacks a PAP based method configuration
+    ///
+    /// \param[inout] cursor  Memory cursor
+    /// \param[out]   val     Configuration to unpack to
+    ///
     inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::config_pap &val);
 }
 
@@ -107,37 +128,18 @@ namespace eap
 
 namespace eapserial
 {
-    ///
-    /// Packs a PAP based method configuration
-    ///
-    /// \param[inout] cursor  Memory cursor
-    /// \param[in]    val     Configuration to pack
-    ///
     inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::config_pap &val)
     {
         pack(cursor, (const eap::config_pass&)val);
     }
 
 
-    ///
-    /// Returns packed size of a PAP based method configuration
-    ///
-    /// \param[in] val  Configuration to pack
-    ///
-    /// \returns Size of data when packed (in bytes)
-    ///
     inline size_t get_pk_size(const eap::config_pap &val)
     {
         return get_pk_size((const eap::config_pass&)val);
     }
 
 
-    ///
-    /// Unpacks a PAP based method configuration
-    ///
-    /// \param[inout] cursor  Memory cursor
-    /// \param[out]   val     Configuration to unpack to
-    ///
     inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::config_pap &val)
     {
         unpack(cursor, (eap::config_pass&)val);
