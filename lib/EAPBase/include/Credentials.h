@@ -158,22 +158,6 @@ namespace eap
         ///
         virtual bool empty() const;
 
-        /// \name XML credentials management
-        /// @{
-
-        ///
-        /// Save credentials to XML document
-        ///
-        /// \param[in]  pDoc         XML document
-        /// \param[in]  pConfigRoot  Suggested root element for saving credentials
-        /// \param[out] ppEapError   Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
-        ///
-        /// \returns Always returns \c ERROR_NOT_SUPPORTED, as credentials are non-exportable.
-        ///
-        virtual DWORD save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const;
-
-        /// @}
-
         /// \name Storage
         /// @{
 
@@ -356,6 +340,19 @@ namespace eap
 
         /// \name XML configuration management
         /// @{
+
+        ///
+        /// Save credentials to XML document
+        ///
+        /// \param[in]  pDoc         XML document
+        /// \param[in]  pConfigRoot  Suggested root element for saving credentials
+        /// \param[out] ppEapError   Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
+        ///
+        /// \returns
+        /// - \c ERROR_SUCCESS if succeeded
+        /// - error code otherwise
+        ///
+        virtual DWORD save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const;
 
         ///
         /// Load credentials from XML document

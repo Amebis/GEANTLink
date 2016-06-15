@@ -83,17 +83,6 @@ bool eap::credentials::empty() const
 }
 
 
-DWORD eap::credentials::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
-{
-    UNREFERENCED_PARAMETER(pDoc);
-    UNREFERENCED_PARAMETER(pConfigRoot);
-    UNREFERENCED_PARAMETER(ppEapError);
-
-    // Yeah, right!? Credentials are non-exportable!
-    return ERROR_NOT_SUPPORTED;
-}
-
-
 DWORD eap::credentials::encrypt(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _Out_ std::vector<unsigned char> &enc, _Out_ EAP_ERROR **ppEapError, _Out_opt_ HCRYPTHASH hHash) const
 {
     assert(ppEapError);
@@ -192,6 +181,33 @@ void eap::credentials_pass::clear()
 bool eap::credentials_pass::empty() const
 {
     return credentials::empty() && m_password.empty();
+}
+
+
+DWORD eap::credentials_pass::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
+{
+    const bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
+    DWORD dwResult;
+
+    // <UserName>
+    if (!m_identity.empty())
+        if ((dwResult = eapxml::put_element_value(pDoc, pConfigRoot, bstr(L"UserName"), bstrNamespace, bstr(m_identity))) != ERROR_SUCCESS) {
+            *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <UserName> element."), NULL);
+            return dwResult;
+        }
+
+    // <Password>
+    if (!m_password.empty()) {
+        bstr pass(m_password);
+        dwResult = eapxml::put_element_value(pDoc, pConfigRoot, bstr(L"Password"), bstrNamespace, pass);
+        SecureZeroMemory((BSTR)pass, sizeof(OLECHAR)*pass.length());
+        if (dwResult != ERROR_SUCCESS) {
+            *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <Password> element."), NULL);
+            return dwResult;
+        }
+    }
+
+    return ERROR_SUCCESS;
 }
 
 

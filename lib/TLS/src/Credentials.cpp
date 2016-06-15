@@ -84,6 +84,23 @@ bool eap::credentials_tls::empty() const
 
 
 
+DWORD eap::credentials_tls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
+{
+    const bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
+    DWORD dwResult;
+
+    // <CertHash>
+    if (!m_cert_hash.empty())
+        if ((dwResult = eapxml::put_element_hex(pDoc, pConfigRoot, bstr(L"CertHash"), bstrNamespace, m_cert_hash.data(), m_cert_hash.size())) != ERROR_SUCCESS) {
+            *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <CertHash> element."), NULL);
+            return dwResult;
+        }
+
+    return ERROR_SUCCESS;
+}
+
+
+
 DWORD eap::credentials_tls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError)
 {
     assert(pConfigRoot);
