@@ -158,6 +158,36 @@ namespace eap
         ///
         virtual bool empty() const;
 
+        /// \name XML configuration management
+        /// @{
+
+        ///
+        /// Save credentials to XML document
+        ///
+        /// \param[in]  pDoc         XML document
+        /// \param[in]  pConfigRoot  Suggested root element for saving credentials
+        /// \param[out] ppEapError   Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
+        ///
+        /// \returns
+        /// - \c ERROR_SUCCESS if succeeded
+        /// - error code otherwise
+        ///
+        virtual DWORD save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const;
+
+        ///
+        /// Load credentials from XML document
+        ///
+        /// \param[in]  pConfigRoot  Root element for loading credentials
+        /// \param[out] ppEapError   Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
+        ///
+        /// \returns
+        /// - \c ERROR_SUCCESS if succeeded
+        /// - error code otherwise
+        ///
+        virtual DWORD load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError);
+
+        /// @}
+
         /// \name Storage
         /// @{
 
@@ -335,23 +365,19 @@ namespace eapserial
 {
     inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::credentials &val)
     {
-        pack(cursor, (const eap::config&)val);
-        pack(cursor, val.m_identity         );
+        pack(cursor, val.m_identity);
     }
 
 
     inline size_t get_pk_size(const eap::credentials &val)
     {
-        return
-            get_pk_size((const eap::config&)val) +
-            get_pk_size(val.m_identity         );
+        return get_pk_size(val.m_identity);
     }
 
 
     inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::credentials &val)
     {
-        unpack(cursor, (eap::config&)val);
-        unpack(cursor, val.m_identity   );
+        unpack(cursor, val.m_identity);
     }
 
 

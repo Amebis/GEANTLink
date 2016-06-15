@@ -29,6 +29,34 @@ namespace eap
     class credentials_pap;
 }
 
+namespace eapserial
+{
+    ///
+    /// Packs a PAP method credentials
+    ///
+    /// \param[inout] cursor  Memory cursor
+    /// \param[in]    val     Credentials to pack
+    ///
+    inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::credentials_pap &val);
+
+    ///
+    /// Returns packed size of a PAP method credentials
+    ///
+    /// \param[in] val  Credentials to pack
+    ///
+    /// \returns Size of data when packed (in bytes)
+    ///
+    inline size_t get_pk_size(const eap::credentials_pap &val);
+
+    ///
+    /// Unpacks a PAP method credentials
+    ///
+    /// \param[inout] cursor  Memory cursor
+    /// \param[out]   val     Credentials to unpack to
+    ///
+    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::credentials_pap &val);
+}
+
 #pragma once
 
 #include "../../EAPBase/include/Credentials.h"
@@ -99,4 +127,25 @@ namespace eap
 
         /// @}
     };
+}
+
+
+namespace eapserial
+{
+    inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::credentials_pap &val)
+    {
+        pack(cursor, (const eap::credentials_pass&)val);
+    }
+
+
+    inline size_t get_pk_size(const eap::credentials_pap &val)
+    {
+        return get_pk_size((const eap::credentials_pass&)val);
+    }
+
+
+    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::credentials_pap &val)
+    {
+        unpack(cursor, (eap::credentials_pass&)val);
+    }
 }

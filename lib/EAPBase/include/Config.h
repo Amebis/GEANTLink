@@ -28,9 +28,9 @@ namespace eap
     class config;
 
     ///
-    /// Base class for method configuration storage
+    /// Base template for method configuration storage
     ///
-    class config_method;
+    template <class _Tcred> class config_method;
 
     ///
     /// Provider configuration
@@ -41,11 +41,6 @@ namespace eap
     /// Providers configuration
     ///
     template <class _Tprov> class config_providers;
-
-    ///
-    /// Password based method configuration
-    ///
-    typedef config_method config_pass;
 }
 
 namespace eapserial
@@ -56,7 +51,7 @@ namespace eapserial
     /// \param[inout] cursor  Memory cursor
     /// \param[in]    val     Configuration to pack
     ///
-    inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::config_method &val);
+    template <class _Tcred> inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::config_method<_Tcred> &val);
 
     ///
     /// Returns packed size of a method configuration
@@ -65,7 +60,7 @@ namespace eapserial
     ///
     /// \returns Size of data when packed (in bytes)
     ///
-    inline size_t get_pk_size(const eap::config_method &val);
+    template <class _Tcred> inline size_t get_pk_size(const eap::config_method<_Tcred> &val);
 
     ///
     /// Unpacks a method configuration
@@ -73,7 +68,7 @@ namespace eapserial
     /// \param[inout] cursor  Memory cursor
     /// \param[out]   val     Configuration to unpack to
     ///
-    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::config_method &val);
+    template <class _Tcred> inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::config_method<_Tcred> &val);
 
     ///
     /// Packs a provider configuration
@@ -234,6 +229,7 @@ namespace eap
     };
 
 
+    template <class _Tcred>
     class config_method : public config
     {
     public:
@@ -242,21 +238,44 @@ namespace eap
         ///
         /// \param[in] mod  Reference of the EAP module to use for global services
         ///
-        config_method(_In_ module &mod);
+        config_method(_In_ module &mod) :
+            m_allow_save(true),
+            m_use_preshared(false),
+            m_preshared(mod),
+            config(mod)
+        {
+        }
+
 
         ///
         /// Copies configuration
         ///
         /// \param[in] other  Configuration to copy from
         ///
-        config_method(_In_ const config_method &other);
+        config_method(_In_ const config_method<_Tcred> &other) :
+            m_allow_save(other.m_allow_save),
+            m_anonymous_identity(other.m_anonymous_identity),
+            m_use_preshared(other.m_use_preshared),
+            m_preshared(other.m_preshared),
+            config(other)
+        {
+        }
+
 
         ///
         /// Moves configuration
         ///
         /// \param[in] other  Configuration to move from
         ///
-        config_method(_Inout_ config_method &&other);
+        config_method(_Inout_ config_method<_Tcred> &&other) :
+            m_allow_save(std::move(other.m_allow_save)),
+            m_anonymous_identity(std::move(other.m_anonymous_identity)),
+            m_use_preshared(std::move(other.m_use_preshared)),
+            m_preshared(std::move(other.m_preshared)),
+            config(std::move(other))
+        {
+        }
+
 
         ///
         /// Copies configuration
@@ -265,7 +284,19 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        config_method& operator=(_In_ const config_method &other);
+        config_method& operator=(_In_ const config_method<_Tcred> &other)
+        {
+            if (this != &other) {
+                (config&)*this       = other;
+                m_allow_save         = other.m_allow_save;
+                m_anonymous_identity = other.m_anonymous_identity;
+                m_use_preshared      = other.m_use_preshared;
+                m_preshared          = other.m_preshared;
+            }
+
+            return *this;
+        }
+
 
         ///
         /// Moves configuration
@@ -274,7 +305,19 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        config_method& operator=(_Inout_ config_method &&other);
+        config_method& operator=(_Inout_ config_method<_Tcred> &&other)
+        {
+            if (this != &other) {
+                (config&&)*this      = std::move(other);
+                m_allow_save         = std::move(other.m_allow_save);
+                m_anonymous_identity = std::move(other.m_anonymous_identity);
+                m_use_preshared      = std::move(other.m_use_preshared);
+                m_preshared          = std::move(other.m_preshared);
+            }
+
+            return *this;
+        }
+
 
         /// \name XML configuration management
         /// @{
@@ -290,7 +333,38 @@ namespace eap
         /// - \c ERROR_SUCCESS if succeeded
         /// - error code otherwise
         ///
-        virtual DWORD save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const;
+        virtual DWORD save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
+        {
+            const winstd::bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
+            DWORD dwResult;
+
+            // <ClientSideCredential>
+            winstd::com_obj<IXMLDOMElement> pXmlElClientSideCredential;
+            if ((dwResult = eapxml::create_element(pDoc, pConfigRoot, winstd::bstr(L"eap-metadata:ClientSideCredential"), winstd::bstr(L"ClientSideCredential"), bstrNamespace, &pXmlElClientSideCredential)) != ERROR_SUCCESS) {
+                *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <ClientSideCredential> element."), NULL);
+                return dwResult;
+            }
+
+            // <ClientSideCredential>/<allow-save>
+            if ((dwResult = eapxml::put_element_value(pDoc, pXmlElClientSideCredential, winstd::bstr(L"allow-save"), bstrNamespace, m_allow_save)) != ERROR_SUCCESS) {
+                *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <allow-save> element."), NULL);
+                return dwResult;
+            }
+
+            // <ClientSideCredential>/<AnonymousIdentity>
+            if (!m_anonymous_identity.empty())
+                if ((dwResult = eapxml::put_element_value(pDoc, pXmlElClientSideCredential, winstd::bstr(L"AnonymousIdentity"), bstrNamespace, winstd::bstr(m_anonymous_identity))) != ERROR_SUCCESS) {
+                    *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <AnonymousIdentity> element."), NULL);
+                    return dwResult;
+                }
+
+            if (m_use_preshared)
+                if ((dwResult = m_preshared.save(pDoc, pXmlElClientSideCredential, ppEapError)) != ERROR_SUCCESS)
+                    return dwResult;
+
+            return ERROR_SUCCESS;
+        }
+
 
         ///
         /// Load configuration from XML document
@@ -302,7 +376,36 @@ namespace eap
         /// - \c ERROR_SUCCESS if succeeded
         /// - error code otherwise
         ///
-        virtual DWORD load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError);
+        virtual DWORD load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError)
+        {
+            DWORD dwResult;
+
+            m_allow_save = true;
+            m_use_preshared = false;
+            m_preshared.clear();
+            m_anonymous_identity.clear();
+
+            // <ClientSideCredential>
+            winstd::com_obj<IXMLDOMElement> pXmlElClientSideCredential;
+            if (eapxml::select_element(pConfigRoot, winstd::bstr(L"eap-metadata:ClientSideCredential"), &pXmlElClientSideCredential) == ERROR_SUCCESS) {
+                // <allow-save>
+                eapxml::get_element_value(pXmlElClientSideCredential, winstd::bstr(L"eap-metadata:allow-save"), &m_allow_save);
+
+                // <AnonymousIdentity>
+                eapxml::get_element_value(pXmlElClientSideCredential, winstd::bstr(L"eap-metadata:AnonymousIdentity"), m_anonymous_identity);
+
+                if ((dwResult = m_preshared.load(pXmlElClientSideCredential, ppEapError)) != ERROR_SUCCESS) {
+                    // This is not really an error - merely an indication pre-shared credentials are unavailable.
+                    if (*ppEapError) {
+                        m_module.free_error_memory(*ppEapError);
+                        *ppEapError = NULL;
+                    }
+                } else
+                    m_use_preshared = true;
+            }
+
+            return ERROR_SUCCESS;
+        }
 
         /// @}
 
@@ -314,8 +417,10 @@ namespace eap
         virtual type_t get_method_id() const = 0;
 
     public:
-        bool m_allow_save;                      ///< Are credentials allowed to be saved to Windows Credential Manager?
-        std::wstring m_anonymous_identity;      ///< Anonymous identity
+        bool m_allow_save;                  ///< Are credentials allowed to be saved to Windows Credential Manager?
+        std::wstring m_anonymous_identity;  ///< Anonymous identity
+        bool m_use_preshared;               ///< Does configuration use pre-shared credentials?
+        _Tcred m_preshared;                 ///< Pre-shared credentials
     };
 
 
@@ -757,25 +862,34 @@ namespace eap
 
 namespace eapserial
 {
-    inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::config_method &val)
+    template <class _Tcred>
+    inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::config_method<_Tcred> &val)
     {
         pack(cursor, val.m_allow_save        );
         pack(cursor, val.m_anonymous_identity);
+        pack(cursor, val.m_use_preshared     );
+        pack(cursor, val.m_preshared         );
     }
 
 
-    inline size_t get_pk_size(const eap::config_method &val)
+    template <class _Tcred>
+    inline size_t get_pk_size(const eap::config_method<_Tcred> &val)
     {
         return
             get_pk_size(val.m_allow_save        ) +
-            get_pk_size(val.m_anonymous_identity);
+            get_pk_size(val.m_anonymous_identity) +
+            get_pk_size(val.m_use_preshared     ) +
+            get_pk_size(val.m_preshared         );
     }
 
 
-    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::config_method &val)
+    template <class _Tcred>
+    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::config_method<_Tcred> &val)
     {
         unpack(cursor, val.m_allow_save        );
         unpack(cursor, val.m_anonymous_identity);
+        unpack(cursor, val.m_use_preshared     );
+        unpack(cursor, val.m_preshared         );
     }
 
 

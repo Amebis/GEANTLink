@@ -23,6 +23,8 @@
 
 #if !defined(RC_INVOKED) && !defined(MIDL_PASS)
 
+#include <sal.h>
+
 namespace eap
 {
     ///
@@ -33,8 +35,38 @@ namespace eap
     enum type_t;
 }
 
+namespace eapserial
+{
+    ///
+    /// Packs an EAP method type
+    ///
+    /// \param[inout] cursor  Memory cursor
+    /// \param[in]    val     EAP method type to pack
+    ///
+    inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::type_t &val);
+
+    ///
+    /// Returns packed size of an EAP method type
+    ///
+    /// \param[in] val  EAP method type to pack
+    ///
+    /// \returns Size of data when packed (in bytes)
+    ///
+    inline size_t get_pk_size(const eap::type_t &val);
+
+    ///
+    /// Unpacks an EAP method type
+    ///
+    /// \param[inout] cursor  Memory cursor
+    /// \param[out]   val     EAP method type to unpack to
+    ///
+    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::type_t &val);
+}
+
 
 #pragma once
+
+#include "EAPSerial.h"
 
 
 namespace eap
@@ -47,6 +79,29 @@ namespace eap
         type_mschapv2  = 26,     ///< EAP-MSCHAPv2
         type_pap       = 192,    ///< PAP (Not actually an EAP method; Moved to the Unassigned area)
     };
+}
+
+
+namespace eapserial
+{
+    inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::type_t &val)
+    {
+        pack(cursor, (unsigned char)val);
+    }
+
+
+    inline size_t get_pk_size(_In_ const eap::type_t &val)
+    {
+        return get_pk_size((unsigned char)val);
+    }
+
+
+    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::type_t &val)
+    {
+        unsigned char t;
+        unpack(cursor, t);
+        val = (eap::type_t)t;
+    }
 }
 
 #endif

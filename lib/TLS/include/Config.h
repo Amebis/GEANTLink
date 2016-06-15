@@ -58,6 +58,8 @@ namespace eapserial
 
 #pragma once
 
+#include "Credentials.h"
+
 #include "../../EAPBase/include/Config.h"
 
 #include <WinStd/Crypt.h>
@@ -70,7 +72,7 @@ namespace eapserial
 
 namespace eap
 {
-    class config_tls : public config_method
+    class config_tls : public config_method<credentials_tls>
     {
     public:
         ///
@@ -174,24 +176,24 @@ namespace eapserial
 {
     inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::config_tls &val)
     {
-        pack(cursor, (const eap::config_method&)val);
-        pack(cursor, val.m_trusted_root_ca  );
-        pack(cursor, val.m_server_names     );
+        pack(cursor, (const eap::config_method<eap::credentials_tls>&)val);
+        pack(cursor, val.m_trusted_root_ca);
+        pack(cursor, val.m_server_names   );
     }
 
 
     inline size_t get_pk_size(const eap::config_tls &val)
     {
         return
-            get_pk_size((const eap::config_method&)val) +
-            get_pk_size(val.m_trusted_root_ca  ) +
-            get_pk_size(val.m_server_names     );
+            get_pk_size((const eap::config_method<eap::credentials_tls>&)val) +
+            get_pk_size(val.m_trusted_root_ca) +
+            get_pk_size(val.m_server_names   );
     }
 
 
     inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::config_tls &val)
     {
-        unpack(cursor, (eap::config_method&)val    );
+        unpack(cursor, (eap::config_method<eap::credentials_tls>&)val);
         unpack(cursor, val.m_trusted_root_ca);
         unpack(cursor, val.m_server_names   );
     }

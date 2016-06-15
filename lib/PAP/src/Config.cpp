@@ -25,19 +25,19 @@
 // eap::config_pap
 //////////////////////////////////////////////////////////////////////
 
-eap::config_pap::config_pap(_In_ module &mod) : config_pass(mod)
+eap::config_pap::config_pap(_In_ module &mod) : config_method<credentials_pap>(mod)
 {
 }
 
 
 eap::config_pap::config_pap(_In_ const config_pap &other) :
-    config_pass(other)
+    config_method<credentials_pap>(other)
 {
 }
 
 
 eap::config_pap::config_pap(_Inout_ config_pap &&other) :
-    config_pass(std::move(other))
+    config_method<credentials_pap>(std::move(other))
 {
 }
 
@@ -45,7 +45,7 @@ eap::config_pap::config_pap(_Inout_ config_pap &&other) :
 eap::config_pap& eap::config_pap::operator=(_In_ const config_pap &other)
 {
     if (this != &other)
-        (config_pass&)*this = other;
+        (config_method<credentials_pap>&)*this = other;
 
     return *this;
 }
@@ -54,7 +54,7 @@ eap::config_pap& eap::config_pap::operator=(_In_ const config_pap &other)
 eap::config_pap& eap::config_pap::operator=(_Inout_ config_pap &&other)
 {
     if (this != &other)
-        (config_pass&&)*this = std::move(other);
+        (config_method<credentials_pap>&&)*this = std::move(other);
 
     return *this;
 }

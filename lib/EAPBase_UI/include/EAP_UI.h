@@ -206,26 +206,72 @@ public:
 
 protected:
     /// \cond internal
+
+    virtual bool TransferDataToWindow()
+    {
+        wxCHECK(wxEAPCredentialsConfigPanelBase::TransferDataToWindow(), false);
+
+        if (!m_cfg.m_use_preshared) {
+            m_own->SetValue(true);
+        } else {
+            m_preshared->SetValue(true);
+            m_cred = m_cfg.m_preshared;
+        }
+
+        return true;
+    }
+
+
+    virtual bool TransferDataFromWindow()
+    {
+        if (m_own->GetValue()) {
+            m_cfg.m_use_preshared = false;
+        } else {
+            m_cfg.m_use_preshared = true;
+            m_cfg.m_preshared = m_cred;
+        }
+
+        return wxEAPCredentialsConfigPanelBase::TransferDataFromWindow();
+    }
+
+
     virtual void OnUpdateUI(wxUpdateUIEvent& event)
     {
         UNREFERENCED_PARAMETER(event);
         DWORD dwResult;
 
+        bool has_own;
         std::unique_ptr<CREDENTIAL, winstd::CredFree_delete<CREDENTIAL> > cred;
         if (CredRead(m_cred.target_name(m_target.c_str()).c_str(), CRED_TYPE_GENERIC, 0, (PCREDENTIAL*)&cred)) {
-            m_clear->Enable(true);
-            m_identity->SetValue(cred->UserName && cred->UserName[0] != 0 ? cred->UserName : _("<blank>"));
+            m_identity_own->SetValue(cred->UserName && cred->UserName[0] != 0 ? cred->UserName : _("<blank>"));
+            has_own = true;
         } else if ((dwResult = GetLastError()) == ERROR_NOT_FOUND) {
-            m_clear->Enable(false);
-            m_identity->Clear();
+            m_identity_own->Clear();
+            has_own = false;
         } else {
-            m_clear->Enable(true);
-            m_identity->SetValue(wxString::Format(_("<error %u>"), dwResult));
+            m_identity_own->SetValue(wxString::Format(_("<error %u>"), dwResult));
+            has_own = true;
+        }
+
+        if (m_own->GetValue()) {
+            m_identity_own      ->Enable(true);
+            m_set_own           ->Enable(true);
+            m_clear_own         ->Enable(has_own);
+            m_identity_preshared->Enable(false);
+            m_identity_preshared->SetValue(wxEmptyString);
+            m_set_preshared     ->Enable(false);
+        } else {
+            m_identity_own      ->Enable(false);
+            m_set_own           ->Enable(false);
+            m_clear_own         ->Enable(false);
+            m_identity_preshared->Enable(true);
+            m_identity_preshared->SetValue(!m_cred.empty() ? m_cred.m_identity : _("<blank>"));
+            m_set_preshared     ->Enable(true);
         }
     }
 
 
-    virtual void OnSet(wxCommandEvent& event)
+    virtual void OnSetOwn(wxCommandEvent& event)
     {
         UNREFERENCED_PARAMETER(event);
 
@@ -238,13 +284,27 @@ protected:
     }
 
 
-    virtual void OnClear(wxCommandEvent& event)
+    virtual void OnClearOwn(wxCommandEvent& event)
     {
         UNREFERENCED_PARAMETER(event);
 
         if (!CredDelete(m_cred.target_name(m_target.c_str()).c_str(), CRED_TYPE_GENERIC, 0))
             wxLogError(_("Deleting credentials failed (error %u)."), GetLastError());
     }
+
+
+    virtual void OnSetPreshared(wxCommandEvent& event)
+    {
+        UNREFERENCED_PARAMETER(event);
+
+        wxEAPCredentialsDialog dlg(this);
+
+        _Tpanel *panel = new _Tpanel(m_cred, _T(""), &dlg, true);
+
+        dlg.AddContents((wxPanel**)&panel, 1);
+        dlg.ShowModal();
+    }
+
     /// \endcond
 
 protected:
@@ -275,8 +335,8 @@ public:
         m_target(pszCredTarget),
         _Tbase(parent)
     {
-        if (is_config) {
-            // User is setting credentials via configuration UI.
+        if (m_target.empty() || is_config) {
+            // No Credential Manager, or user is setting credentials via configuration UI.
             // => Pointless if not stored to Credential Manager
             m_remember->SetValue(true);
             m_remember->Enable(false);
@@ -290,17 +350,19 @@ protected:
     {
         wxCHECK(_Tbase::TransferDataToWindow(), false);
 
-        // Read credentials from Credential Manager
-        EAP_ERROR *pEapError;
-        DWORD dwResult;
-        if ((dwResult = m_cred.retrieve(m_target.c_str(), &pEapError)) == ERROR_SUCCESS) {
-            m_remember->SetValue(true);
-        } else if (dwResult != ERROR_NOT_FOUND) {
-            if (pEapError) {
-                wxLogError(winstd::tstring_printf(_("Error reading credentials from Credential Manager: %ls (error %u)"), pEapError->pRootCauseString, pEapError->dwWinError).c_str());
-                m_cred.m_module.free_error_memory(pEapError);
-            } else
-                wxLogError(_("Reading credentials failed (error %u)."), dwResult);
+        if (!m_target.empty()) {
+            // Read credentials from Credential Manager
+            EAP_ERROR *pEapError;
+            DWORD dwResult;
+            if ((dwResult = m_cred.retrieve(m_target.c_str(), &pEapError)) == ERROR_SUCCESS) {
+                m_remember->SetValue(true);
+            } else if (dwResult != ERROR_NOT_FOUND) {
+                if (pEapError) {
+                    wxLogError(winstd::tstring_printf(_("Error reading credentials from Credential Manager: %ls (error %u)"), pEapError->pRootCauseString, pEapError->dwWinError).c_str());
+                    m_cred.m_module.free_error_memory(pEapError);
+                } else
+                    wxLogError(_("Reading credentials failed (error %u)."), dwResult);
+            }
         }
 
         return true;
@@ -309,16 +371,18 @@ protected:
 
     virtual bool TransferDataFromWindow()
     {
-        // Write credentials to credential manager.
-        if (m_remember->GetValue()) {
-            EAP_ERROR *pEapError;
-            DWORD dwResult;
-            if ((dwResult = m_cred.store(m_target.c_str(), &pEapError)) != ERROR_SUCCESS) {
-                if (pEapError) {
-                    wxLogError(winstd::tstring_printf(_("Error writing credentials to Credential Manager: %ls (error %u)"), pEapError->pRootCauseString, pEapError->dwWinError).c_str());
-                    m_cred.m_module.free_error_memory(pEapError);
-                } else
-                    wxLogError(_("Writing credentials failed (error %u)."), dwResult);
+        if (!m_target.empty()) {
+            // Write credentials to credential manager.
+            if (m_remember->GetValue()) {
+                EAP_ERROR *pEapError;
+                DWORD dwResult;
+                if ((dwResult = m_cred.store(m_target.c_str(), &pEapError)) != ERROR_SUCCESS) {
+                    if (pEapError) {
+                        wxLogError(winstd::tstring_printf(_("Error writing credentials to Credential Manager: %ls (error %u)"), pEapError->pRootCauseString, pEapError->dwWinError).c_str());
+                        m_cred.m_module.free_error_memory(pEapError);
+                    } else
+                        wxLogError(_("Writing credentials failed (error %u)."), dwResult);
+                }
             }
         }
 

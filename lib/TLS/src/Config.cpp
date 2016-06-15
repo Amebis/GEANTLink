@@ -28,7 +28,7 @@ using namespace winstd;
 // eap::config_tls
 //////////////////////////////////////////////////////////////////////
 
-eap::config_tls::config_tls(_In_ module &mod) : config_method(mod)
+eap::config_tls::config_tls(_In_ module &mod) : config_method<credentials_tls>(mod)
 {
 }
 
@@ -36,7 +36,7 @@ eap::config_tls::config_tls(_In_ module &mod) : config_method(mod)
 eap::config_tls::config_tls(_In_ const config_tls &other) :
     m_trusted_root_ca(other.m_trusted_root_ca),
     m_server_names(other.m_server_names),
-    config_method(other)
+    config_method<credentials_tls>(other)
 {
 }
 
@@ -44,7 +44,7 @@ eap::config_tls::config_tls(_In_ const config_tls &other) :
 eap::config_tls::config_tls(_Inout_ config_tls &&other) :
     m_trusted_root_ca(std::move(other.m_trusted_root_ca)),
     m_server_names(std::move(other.m_server_names)),
-    config_method(std::move(other))
+    config_method<credentials_tls>(std::move(other))
 {
 }
 
@@ -52,9 +52,9 @@ eap::config_tls::config_tls(_Inout_ config_tls &&other) :
 eap::config_tls& eap::config_tls::operator=(_In_ const eap::config_tls &other)
 {
     if (this != &other) {
-        (config_method&)*this = other;
-        m_trusted_root_ca     = other.m_trusted_root_ca;
-        m_server_names        = other.m_server_names;
+        (config_method<credentials_tls>&)*this = other;
+        m_trusted_root_ca = other.m_trusted_root_ca;
+        m_server_names    = other.m_server_names;
     }
 
     return *this;
@@ -64,9 +64,9 @@ eap::config_tls& eap::config_tls::operator=(_In_ const eap::config_tls &other)
 eap::config_tls& eap::config_tls::operator=(_Inout_ eap::config_tls &&other)
 {
     if (this != &other) {
-        (config_method&&)*this = std::move(other);
-        m_trusted_root_ca      = std::move(other.m_trusted_root_ca);
-        m_server_names         = std::move(other.m_server_names);
+        (config_method<credentials_tls>&&)*this = std::move(other);
+        m_trusted_root_ca = std::move(other.m_trusted_root_ca);
+        m_server_names    = std::move(other.m_server_names);
     }
 
     return *this;
@@ -129,7 +129,7 @@ DWORD eap::config_tls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfi
         }
     }
 
-    return config_method::save(pDoc, pConfigRoot, ppEapError);
+    return config_method<credentials_tls>::save(pDoc, pConfigRoot, ppEapError);
 }
 
 
@@ -180,7 +180,7 @@ DWORD eap::config_tls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppE
         }
     }
 
-    return config_method::load(pConfigRoot, ppEapError);
+    return config_method<credentials_tls>::load(pConfigRoot, ppEapError);
 }
 
 

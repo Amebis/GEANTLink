@@ -83,6 +83,35 @@ bool eap::credentials::empty() const
 }
 
 
+DWORD eap::credentials::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
+{
+    const bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
+    DWORD dwResult;
+
+    // <UserName>
+    if ((dwResult = eapxml::put_element_value(pDoc, pConfigRoot, bstr(L"UserName"), bstrNamespace, bstr(m_identity))) != ERROR_SUCCESS) {
+        *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <UserName> element."), NULL);
+        return dwResult;
+    }
+
+    return ERROR_SUCCESS;
+}
+
+
+DWORD eap::credentials::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError)
+{
+    assert(pConfigRoot);
+    DWORD dwResult;
+
+    if ((dwResult = eapxml::get_element_value(pConfigRoot, bstr(L"eap-metadata:UserName"), m_identity)) != ERROR_SUCCESS) {
+        *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error reading <UserName> element."), NULL);
+        return dwResult;
+    }
+
+    return ERROR_SUCCESS;
+}
+
+
 //////////////////////////////////////////////////////////////////////
 // eap::credentials_pass
 //////////////////////////////////////////////////////////////////////
@@ -146,22 +175,16 @@ DWORD eap::credentials_pass::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *
     const bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
     DWORD dwResult;
 
-    // <UserName>
-    if (!m_identity.empty())
-        if ((dwResult = eapxml::put_element_value(pDoc, pConfigRoot, bstr(L"UserName"), bstrNamespace, bstr(m_identity))) != ERROR_SUCCESS) {
-            *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <UserName> element."), NULL);
-            return dwResult;
-        }
+    if ((dwResult = credentials::save(pDoc, pConfigRoot, ppEapError)) != ERROR_SUCCESS)
+        return dwResult;
 
     // <Password>
-    if (!m_password.empty()) {
-        bstr pass(m_password);
-        dwResult = eapxml::put_element_value(pDoc, pConfigRoot, bstr(L"Password"), bstrNamespace, pass);
-        SecureZeroMemory((BSTR)pass, sizeof(OLECHAR)*pass.length());
-        if (dwResult != ERROR_SUCCESS) {
-            *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <Password> element."), NULL);
-            return dwResult;
-        }
+    bstr pass(m_password);
+    dwResult = eapxml::put_element_value(pDoc, pConfigRoot, bstr(L"Password"), bstrNamespace, pass);
+    SecureZeroMemory((BSTR)pass, sizeof(OLECHAR)*pass.length());
+    if (dwResult != ERROR_SUCCESS) {
+        *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <Password> element."), NULL);
+        return dwResult;
     }
 
     return ERROR_SUCCESS;
@@ -171,13 +194,17 @@ DWORD eap::credentials_pass::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *
 DWORD eap::credentials_pass::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError)
 {
     assert(pConfigRoot);
-    UNREFERENCED_PARAMETER(ppEapError);
+    DWORD dwResult;
 
-    eapxml::get_element_value(pConfigRoot, bstr(L"eap-metadata:UserName"), m_identity);
+    if ((dwResult = credentials::load(pConfigRoot, ppEapError)) != ERROR_SUCCESS)
+        return dwResult;
 
     bstr pass;
-    if ((eapxml::get_element_value(pConfigRoot, bstr(L"eap-metadata:Password"), &pass)) == ERROR_SUCCESS)
-        m_password = pass;
+    if ((dwResult = eapxml::get_element_value(pConfigRoot, bstr(L"eap-metadata:Password"), &pass)) != ERROR_SUCCESS) {
+        *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error reading <Password> element."), NULL);
+        return dwResult;
+    }
+    m_password = pass;
     SecureZeroMemory((BSTR)pass, sizeof(OLECHAR)*pass.length());
 
     return ERROR_SUCCESS;

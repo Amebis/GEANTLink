@@ -158,7 +158,7 @@ namespace eap {
         virtual eap::type_t get_method_id() const;
 
     public:
-        config_method *m_inner;    ///< Inner authentication configuration
+        config *m_inner;    ///< Inner authentication configuration
     };
 }
 
@@ -170,26 +170,31 @@ namespace eapserial
         pack(cursor, (const eap::config_tls&)val);
         if (val.m_inner) {
             if (dynamic_cast<eap::config_pap*>(val.m_inner)) {
-                pack(cursor, (unsigned char)eap::type_pap);
+                pack(cursor, eap::type_pap);
                 pack(cursor, (const eap::config_pap&)*val.m_inner);
             } else {
                 assert(0); // Unsupported inner authentication method type.
-                pack(cursor, (unsigned char)0);
+                pack(cursor, eap::type_undefined);
             }
         } else
-            pack(cursor, (unsigned char)0);
+            pack(cursor, eap::type_undefined);
     }
 
 
     inline size_t get_pk_size(const eap::config_ttls &val)
     {
-        size_t size_inner = sizeof(unsigned char);
+        size_t size_inner;
         if (val.m_inner) {
-            if (dynamic_cast<eap::config_pap*>(val.m_inner))
-                size_inner += get_pk_size((const eap::config_pap&)*val.m_inner);
-            else
+            if (dynamic_cast<eap::config_pap*>(val.m_inner)) {
+                size_inner =
+                    get_pk_size(eap::type_pap) +
+                    get_pk_size((const eap::config_pap&)*val.m_inner);
+            } else {
+                size_inner = get_pk_size(eap::type_undefined);
                 assert(0); // Unsupported inner authentication method type.
-        }
+            }
+        } else
+            size_inner = get_pk_size(eap::type_undefined);
 
         return
             get_pk_size((const eap::config_tls&)val) +
@@ -201,16 +206,19 @@ namespace eapserial
     {
         unpack(cursor, (eap::config_tls&)val);
 
-        assert(!val.m_inner);
-        unsigned char eap_type;
+        if (val.m_inner)
+            delete val.m_inner;
+
+        eap::type_t eap_type;
         unpack(cursor, eap_type);
         switch (eap_type) {
             case eap::type_pap:
                 val.m_inner = new eap::config_pap(val.m_module);
                 unpack(cursor, (eap::config_pap&)*val.m_inner);
                 break;
-            case 0           : break;
-            default          : assert(0); // Unsupported inner authentication method type.
+            default:
+                val.m_inner = NULL;
+                assert(0); // Unsupported inner authentication method type.
         }
     }
 }

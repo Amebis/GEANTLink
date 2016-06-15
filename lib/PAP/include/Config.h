@@ -58,6 +58,7 @@ namespace eapserial
 
 #pragma once
 
+#include "Credentials.h"
 #include "../../EAPBase/include/Config.h"
 
 #include <Windows.h>
@@ -67,7 +68,7 @@ namespace eapserial
 
 namespace eap
 {
-    class config_pap : public config_pass
+    class config_pap : public config_method<credentials_pap>
     {
     public:
         ///
@@ -130,18 +131,18 @@ namespace eapserial
 {
     inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::config_pap &val)
     {
-        pack(cursor, (const eap::config_pass&)val);
+        pack(cursor, (const eap::config_method<eap::credentials_pap>&)val);
     }
 
 
     inline size_t get_pk_size(const eap::config_pap &val)
     {
-        return get_pk_size((const eap::config_pass&)val);
+        return get_pk_size((const eap::config_method<eap::credentials_pap>&)val);
     }
 
 
     inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::config_pap &val)
     {
-        unpack(cursor, (eap::config_pass&)val);
+        unpack(cursor, (eap::config_method<eap::credentials_pap>&)val);
     }
 }

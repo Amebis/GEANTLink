@@ -27,6 +27,7 @@ class wxEAPBannerPanel;
 #include <wx/image.h>
 #include <wx/icon.h>
 #include <wx/statbmp.h>
+#include <wx/radiobut.h>
 #include <wx/textctrl.h>
 #include <wx/statbox.h>
 #include <wx/checkbox.h>
@@ -110,15 +111,19 @@ class wxEAPCredentialsConfigPanelBase : public wxPanel
 	protected:
 		wxStaticBitmap* m_credentials_icon;
 		wxStaticText* m_credentials_label;
-		wxStaticText* m_identity_label;
-		wxTextCtrl* m_identity;
-		wxButton* m_set;
-		wxButton* m_clear;
+		wxRadioButton* m_own;
+		wxTextCtrl* m_identity_own;
+		wxButton* m_clear_own;
+		wxButton* m_set_own;
+		wxRadioButton* m_preshared;
+		wxTextCtrl* m_identity_preshared;
+		wxButton* m_set_preshared;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnUpdateUI( wxUpdateUIEvent& event ) { event.Skip(); }
-		virtual void OnSet( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnClear( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnClearOwn( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSetOwn( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSetPreshared( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:

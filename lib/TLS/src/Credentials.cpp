@@ -41,7 +41,7 @@ eap::credentials_tls::credentials_tls(_In_ const credentials_tls &other) :
 
 
 eap::credentials_tls::credentials_tls(_Inout_ credentials_tls &&other) :
-    m_cert_hash(std::move(m_cert_hash)),
+    m_cert_hash(std::move(other.m_cert_hash)),
     credentials(std::move(other))
 {
 }
@@ -93,12 +93,14 @@ DWORD eap::credentials_tls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *p
     const bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
     DWORD dwResult;
 
+    if ((dwResult = credentials::save(pDoc, pConfigRoot, ppEapError)) != ERROR_SUCCESS)
+        return dwResult;
+
     // <CertHash>
-    if (!m_cert_hash.empty())
-        if ((dwResult = eapxml::put_element_hex(pDoc, pConfigRoot, bstr(L"CertHash"), bstrNamespace, m_cert_hash.data(), m_cert_hash.size())) != ERROR_SUCCESS) {
-            *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <CertHash> element."), NULL);
-            return dwResult;
-        }
+    if ((dwResult = eapxml::put_element_hex(pDoc, pConfigRoot, bstr(L"CertHash"), bstrNamespace, m_cert_hash.data(), m_cert_hash.size())) != ERROR_SUCCESS) {
+        *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <CertHash> element."), NULL);
+        return dwResult;
+    }
 
     return ERROR_SUCCESS;
 }
@@ -107,9 +109,16 @@ DWORD eap::credentials_tls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *p
 DWORD eap::credentials_tls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError)
 {
     assert(pConfigRoot);
-    UNREFERENCED_PARAMETER(ppEapError);
+    DWORD dwResult;
 
-    eapxml::get_element_hex(pConfigRoot, bstr(L"CertHash"), m_cert_hash);
+    if ((dwResult = credentials::load(pConfigRoot, ppEapError)) != ERROR_SUCCESS)
+        return dwResult;
+
+    // <CertHash>
+    if ((dwResult = eapxml::get_element_hex(pConfigRoot, bstr(L"eap-metadata:CertHash"), m_cert_hash)) != ERROR_SUCCESS) {
+        *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error reading <CertHash> element."), NULL);
+        return dwResult;
+    }
 
     return ERROR_SUCCESS;
 }

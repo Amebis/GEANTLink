@@ -95,6 +95,36 @@ bool eap::credentials_ttls::empty() const
 }
 
 
+DWORD eap::credentials_ttls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
+{
+    const bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
+    DWORD dwResult;
+    HRESULT hr;
+
+    if ((dwResult = credentials_tls::save(pDoc, pConfigRoot, ppEapError)) != ERROR_SUCCESS)
+        return dwResult;
+
+    if (m_inner) {
+        // <InnerAuthenticationMethod>
+        winstd::com_obj<IXMLDOMElement> pXmlElInnerAuthenticationMethod;
+        if ((dwResult = eapxml::create_element(pDoc, winstd::bstr(L"InnerAuthenticationMethod"), bstrNamespace, &pXmlElInnerAuthenticationMethod))) {
+            *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <InnerAuthenticationMethod> element."), NULL);
+            return dwResult;
+        }
+
+        if ((dwResult = m_inner->save(pDoc, pXmlElInnerAuthenticationMethod, ppEapError)) != ERROR_SUCCESS)
+            return dwResult;
+
+        if (FAILED(hr = pConfigRoot->appendChild(pXmlElInnerAuthenticationMethod, NULL))) {
+            *ppEapError = m_module.make_error(dwResult = HRESULT_CODE(hr), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error appending <InnerAuthenticationMethod> element."), NULL);
+            return dwResult;
+        }
+    }
+
+    return ERROR_SUCCESS;
+}
+
+
 DWORD eap::credentials_ttls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError)
 {
     assert(pConfigRoot);

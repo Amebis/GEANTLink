@@ -23,6 +23,8 @@ wxEAPConfigDialogBase::wxEAPConfigDialogBase( wxWindow* parent, wxWindowID id, c
 	sb_content->Add( m_banner, 0, wxEXPAND|wxBOTTOM, 5 );
 	
 	m_providers = new wxNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
+	m_providers->SetExtraStyle( wxWS_EX_VALIDATE_RECURSIVELY );
+	
 	
 	sb_content->Add( m_providers, 1, wxEXPAND|wxALL, 10 );
 	
@@ -131,43 +133,86 @@ wxEAPCredentialsConfigPanelBase::wxEAPCredentialsConfigPanelBase( wxWindow* pare
 	wxBoxSizer* sb_credentials_vert;
 	sb_credentials_vert = new wxBoxSizer( wxVERTICAL );
 	
-	m_credentials_label = new wxStaticText( sb_credentials->GetStaticBox(), wxID_ANY, _("Manage your credentials stored in Windows Credential Manager."), wxDefaultPosition, wxDefaultSize, 0 );
+	m_credentials_label = new wxStaticText( sb_credentials->GetStaticBox(), wxID_ANY, _("Manage credentials used to connect."), wxDefaultPosition, wxDefaultSize, 0 );
 	m_credentials_label->Wrap( 446 );
 	sb_credentials_vert->Add( m_credentials_label, 0, wxALL|wxEXPAND, 5 );
 	
-	wxFlexGridSizer* sb_credentials_tbl;
-	sb_credentials_tbl = new wxFlexGridSizer( 0, 2, 5, 5 );
-	sb_credentials_tbl->AddGrowableCol( 1 );
-	sb_credentials_tbl->SetFlexibleDirection( wxBOTH );
-	sb_credentials_tbl->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	wxBoxSizer* sb_cred_radio;
+	sb_cred_radio = new wxBoxSizer( wxVERTICAL );
 	
-	m_identity_label = new wxStaticText( sb_credentials->GetStaticBox(), wxID_ANY, _("Identity:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_identity_label->Wrap( -1 );
-	sb_credentials_tbl->Add( m_identity_label, 0, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
+	wxBoxSizer* sz_own;
+	sz_own = new wxBoxSizer( wxVERTICAL );
 	
-	m_identity = new wxTextCtrl( sb_credentials->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY );
-	m_identity->SetToolTip( _("Enter your user name here (user@domain.org, DOMAINUser, etc.)") );
+	wxBoxSizer* sz_own_inner;
+	sz_own_inner = new wxBoxSizer( wxHORIZONTAL );
 	
-	sb_credentials_tbl->Add( m_identity, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
+	m_own = new wxRadioButton( sb_credentials->GetStaticBox(), wxID_ANY, _("Use &own credentials:"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP );
+	m_own->SetToolTip( _("Select this option if you have your unique credentials to connect") );
 	
+	sz_own_inner->Add( m_own, 2, wxEXPAND, 5 );
 	
-	sb_credentials_vert->Add( sb_credentials_tbl, 0, wxEXPAND|wxALL, 5 );
+	m_identity_own = new wxTextCtrl( sb_credentials->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY );
+	m_identity_own->SetToolTip( _("Enter your user name here (user@domain.org, DOMAINUser, etc.)") );
 	
-	wxBoxSizer* sb_buttons;
-	sb_buttons = new wxBoxSizer( wxHORIZONTAL );
-	
-	m_set = new wxButton( sb_credentials->GetStaticBox(), wxID_ANY, _("&Set Credentials..."), wxDefaultPosition, wxDefaultSize, 0 );
-	m_set->SetToolTip( _("Click here to set or modify your credentials") );
-	
-	sb_buttons->Add( m_set, 0, wxRIGHT, 5 );
-	
-	m_clear = new wxButton( sb_credentials->GetStaticBox(), wxID_ANY, _("&Clear Credentials"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_clear->SetToolTip( _("Click to clear your credentials from Credential Manager.\nNote: You will be prompted to enter credentials when connecting.") );
-	
-	sb_buttons->Add( m_clear, 0, wxLEFT, 5 );
+	sz_own_inner->Add( m_identity_own, 3, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	
-	sb_credentials_vert->Add( sb_buttons, 0, wxALIGN_RIGHT|wxALL, 5 );
+	sz_own->Add( sz_own_inner, 1, wxEXPAND|wxBOTTOM, 5 );
+	
+	wxBoxSizer* sb_buttons_own;
+	sb_buttons_own = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_clear_own = new wxButton( sb_credentials->GetStaticBox(), wxID_ANY, _("&Clear Credentials"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_clear_own->SetToolTip( _("Click to clear your credentials from Credential Manager.\nNote: You will be prompted to enter credentials when connecting.") );
+	
+	sb_buttons_own->Add( m_clear_own, 0, wxRIGHT, 5 );
+	
+	m_set_own = new wxButton( sb_credentials->GetStaticBox(), wxID_ANY, _("&Set Credentials..."), wxDefaultPosition, wxDefaultSize, 0 );
+	m_set_own->SetToolTip( _("Click here to set or modify your credentials") );
+	
+	sb_buttons_own->Add( m_set_own, 0, wxLEFT, 5 );
+	
+	
+	sz_own->Add( sb_buttons_own, 0, wxALIGN_RIGHT, 5 );
+	
+	
+	sb_cred_radio->Add( sz_own, 0, wxEXPAND|wxBOTTOM, 5 );
+	
+	wxBoxSizer* sz_preshared;
+	sz_preshared = new wxBoxSizer( wxVERTICAL );
+	
+	wxBoxSizer* sz_preshared_inner;
+	sz_preshared_inner = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_preshared = new wxRadioButton( sb_credentials->GetStaticBox(), wxID_ANY, _("Use &pre-shared credentials:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_preshared->SetToolTip( _("Select this options if all clients connect using the same credentials") );
+	
+	sz_preshared_inner->Add( m_preshared, 2, wxEXPAND, 5 );
+	
+	m_identity_preshared = new wxTextCtrl( sb_credentials->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY );
+	m_identity_preshared->SetToolTip( _("Enter your user name here (user@domain.org, DOMAINUser, etc.)") );
+	
+	sz_preshared_inner->Add( m_identity_preshared, 3, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	
+	sz_preshared->Add( sz_preshared_inner, 1, wxEXPAND|wxBOTTOM, 5 );
+	
+	wxBoxSizer* sb_buttons_preshared;
+	sb_buttons_preshared = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_set_preshared = new wxButton( sb_credentials->GetStaticBox(), wxID_ANY, _("&Set Credentials..."), wxDefaultPosition, wxDefaultSize, 0 );
+	m_set_preshared->SetToolTip( _("Click here to set or modify your credentials") );
+	
+	sb_buttons_preshared->Add( m_set_preshared, 0, 0, 5 );
+	
+	
+	sz_preshared->Add( sb_buttons_preshared, 0, wxALIGN_RIGHT, 5 );
+	
+	
+	sb_cred_radio->Add( sz_preshared, 0, wxEXPAND|wxTOP, 5 );
+	
+	
+	sb_credentials_vert->Add( sb_cred_radio, 0, wxEXPAND|wxALL, 5 );
 	
 	
 	sb_credentials_horiz->Add( sb_credentials_vert, 1, wxEXPAND, 5 );
@@ -181,16 +226,18 @@ wxEAPCredentialsConfigPanelBase::wxEAPCredentialsConfigPanelBase( wxWindow* pare
 	
 	// Connect Events
 	this->Connect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( wxEAPCredentialsConfigPanelBase::OnUpdateUI ) );
-	m_set->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPCredentialsConfigPanelBase::OnSet ), NULL, this );
-	m_clear->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPCredentialsConfigPanelBase::OnClear ), NULL, this );
+	m_clear_own->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPCredentialsConfigPanelBase::OnClearOwn ), NULL, this );
+	m_set_own->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPCredentialsConfigPanelBase::OnSetOwn ), NULL, this );
+	m_set_preshared->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPCredentialsConfigPanelBase::OnSetPreshared ), NULL, this );
 }
 
 wxEAPCredentialsConfigPanelBase::~wxEAPCredentialsConfigPanelBase()
 {
 	// Disconnect Events
 	this->Disconnect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( wxEAPCredentialsConfigPanelBase::OnUpdateUI ) );
-	m_set->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPCredentialsConfigPanelBase::OnSet ), NULL, this );
-	m_clear->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPCredentialsConfigPanelBase::OnClear ), NULL, this );
+	m_clear_own->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPCredentialsConfigPanelBase::OnClearOwn ), NULL, this );
+	m_set_own->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPCredentialsConfigPanelBase::OnSetOwn ), NULL, this );
+	m_set_preshared->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPCredentialsConfigPanelBase::OnSetPreshared ), NULL, this );
 	
 }
 

@@ -93,6 +93,9 @@ DWORD eap::config_ttls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConf
     const bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
     DWORD dwResult;
 
+    if ((dwResult = config_tls::save(pDoc, pConfigRoot, ppEapError)) != ERROR_SUCCESS)
+        return dwResult;
+
     // <InnerAuthenticationMethod>
     com_obj<IXMLDOMElement> pXmlElInnerAuthenticationMethod;
     if ((dwResult = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:InnerAuthenticationMethod"), bstr(L"InnerAuthenticationMethod"), bstrNamespace, &pXmlElInnerAuthenticationMethod)) != ERROR_SUCCESS) {
@@ -113,7 +116,7 @@ DWORD eap::config_ttls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConf
     } else
         return dwResult = ERROR_NOT_SUPPORTED;
 
-    return config_tls::save(pDoc, pConfigRoot, ppEapError);
+    return ERROR_SUCCESS;
 }
 
 
@@ -121,6 +124,9 @@ DWORD eap::config_ttls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **pp
 {
     assert(ppEapError);
     DWORD dwResult;
+
+    if ((dwResult = config_tls::load(pConfigRoot, ppEapError)) != ERROR_SUCCESS)
+        return dwResult;
 
     // Load inner authentication configuration (<InnerAuthenticationMethod>).
     com_obj<IXMLDOMElement> pXmlElInnerAuthenticationMethod;
@@ -151,7 +157,7 @@ DWORD eap::config_ttls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **pp
         return dwResult;
     }
 
-    return config_tls::load(pConfigRoot, ppEapError);
+    return ERROR_SUCCESS;
 }
 
 
