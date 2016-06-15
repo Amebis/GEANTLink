@@ -290,7 +290,7 @@ bool eap::credentials_pass::retrieve(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR
     }
 
     // Convert Base64 to binary encrypted password, since CredProtectA() fail for binary strings.
-    vector<char, sanitizing_allocator<char> > password;
+    vector<unsigned char> password;
     base64_dec dec;
     bool is_last;
     dec.decode(password, is_last, password_base64.c_str(), password_base64.length());
