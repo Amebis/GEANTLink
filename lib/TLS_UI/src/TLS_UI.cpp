@@ -625,15 +625,14 @@ wxEAPTLSConfigPanel::wxEAPTLSConfigPanel(eap::config_tls &cfg, LPCTSTR pszCredTa
     sb_content = new wxBoxSizer( wxVERTICAL );
 
     m_server_trust = new wxEAPTLSServerTrustPanel(cfg, this);
-    sb_content->Add(m_server_trust, 0, wxALL|wxEXPAND, 5);
-
     if (cfg.m_allow_save) {
+        sb_content->Add(m_server_trust, 0, wxDOWN|wxEXPAND, 5);
         m_credentials = new wxEAPTLSCredentialsConfigPanel(cfg, pszCredTarget, this);
-        sb_content->Add(m_credentials, 0, wxALL|wxEXPAND, 5);
-    } else
+        sb_content->Add(m_credentials, 0, wxUP|wxEXPAND, 5);
+    } else {
+        sb_content->Add(m_server_trust, 0, wxEXPAND, 5);
         m_credentials = NULL;
-
-    sb_content->Add(10, 10, 1, wxEXPAND, 5);
+    }
 
     this->SetSizer(sb_content);
     this->Layout();

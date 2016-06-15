@@ -89,6 +89,18 @@ wxEAPTTLSConfig::wxEAPTTLSConfig(eap::config_ttls &cfg, LPCTSTR pszCredTarget, w
     wxBoxSizer* sb_content;
     sb_content = new wxBoxSizer( wxVERTICAL );
 
+    m_inner_title = new wxStaticText(this, wxID_ANY, _("Inner Authentication"), wxDefaultPosition, wxDefaultSize, 0);
+    m_inner_title->SetFont(wxFont(18, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxEmptyString));
+    m_inner_title->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_INACTIVECAPTION ) );
+    sb_content->Add(m_inner_title, 0, wxALL|wxALIGN_RIGHT, 5);
+
+    m_inner_type = new wxChoicebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxCHB_DEFAULT);
+    m_inner_type->SetToolTip( _("Select inner authentication method from the list") );
+    m_inner_type->AddPage(new wxPAPConfigPanel(m_cfg_pap, pszCredTarget, m_inner_type), _("PAP"));
+    sb_content->Add(m_inner_type, 0, wxALL|wxEXPAND, 5);
+
+    sb_content->Add(20, 20, 1, wxALL|wxEXPAND, 5);
+
     m_outer_title = new wxStaticText(this, wxID_ANY, _("Outer Authentication"), wxDefaultPosition, wxDefaultSize, 0);
     m_outer_title->SetFont(wxFont(18, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxEmptyString));
     m_outer_title->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_INACTIVECAPTION ) );
@@ -99,18 +111,6 @@ wxEAPTTLSConfig::wxEAPTTLSConfig(eap::config_ttls &cfg, LPCTSTR pszCredTarget, w
 
     m_tls = new wxEAPTLSConfigPanel(m_cfg, pszCredTarget, this);
     sb_content->Add(m_tls, 0, wxALL|wxEXPAND, 5);
-
-    sb_content->Add(20, 20, 1, wxEXPAND, 5);
-
-    m_inner_title = new wxStaticText(this, wxID_ANY, _("Inner Authentication"), wxDefaultPosition, wxDefaultSize, 0);
-    m_inner_title->SetFont(wxFont(18, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxEmptyString));
-    m_inner_title->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_INACTIVECAPTION ) );
-    sb_content->Add(m_inner_title, 0, wxALL|wxALIGN_RIGHT, 5);
-
-    m_inner_type = new wxChoicebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxCHB_DEFAULT);
-    m_inner_type->SetToolTip( _("Select inner authentication method from the list") );
-    m_inner_type->AddPage(new wxPAPConfigPanel(m_cfg_pap, pszCredTarget, m_inner_type), _("PAP"));
-    sb_content->Add(m_inner_type, 0, wxALL|wxEXPAND, 5);
 
     wxSize size = sb_content->CalcMin();
     if (size.y > 500) {

@@ -24,7 +24,7 @@ wxEAPConfigDialogBase::wxEAPConfigDialogBase( wxWindow* parent, wxWindowID id, c
 	
 	m_providers = new wxNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
 	
-	sb_content->Add( m_providers, 1, wxEXPAND|wxALL, 5 );
+	sb_content->Add( m_providers, 1, wxEXPAND|wxALL, 10 );
 	
 	m_buttons = new wxStdDialogButtonSizer();
 	m_buttonsOK = new wxButton( this, wxID_OK );

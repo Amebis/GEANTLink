@@ -32,7 +32,7 @@ wxPAPConfigPanel::wxPAPConfigPanel(eap::config_pap &cfg, LPCTSTR pszCredTarget, 
 
     if (cfg.m_allow_save) {
         m_credentials = new wxPAPCredentialsConfigPanel(cfg, pszCredTarget, this);
-        sb_content->Add(m_credentials, 0, wxALL|wxEXPAND, 5);
+        sb_content->Add(m_credentials, 0, wxEXPAND, 5);
 
         m_label = NULL;
     } else {
@@ -40,10 +40,8 @@ wxPAPConfigPanel::wxPAPConfigPanel(eap::config_pap &cfg, LPCTSTR pszCredTarget, 
 
         m_label = new wxStaticText(this, wxID_ANY, _("This method requires no additional settings."), wxDefaultPosition, wxDefaultSize, 0);
         m_label->Wrap(-1);
-        sb_content->Add(m_label, 0, wxALL|wxEXPAND, 5);
+        sb_content->Add(m_label, 0, wxEXPAND, 5);
     }
-
-    sb_content->Add(10, 10, 1, wxEXPAND, 5);
 
     this->SetSizer(sb_content);
     this->Layout();
