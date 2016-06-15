@@ -94,6 +94,49 @@ DWORD eap::credentials::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConf
 }
 
 
+DWORD eap::credentials::encrypt(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _Out_ std::vector<unsigned char> &enc, _Out_ EAP_ERROR **ppEapError, _Out_opt_ HCRYPTHASH hHash) const
+{
+    assert(ppEapError);
+    DWORD dwResult;
+
+    // Import the public key.
+    HRSRC res = FindResource(m_module.m_instance, MAKEINTRESOURCE(IDR_EAP_KEY_PUBLIC), RT_RCDATA);
+    assert(res);
+    HGLOBAL res_handle = LoadResource(m_module.m_instance, res);
+    assert(res_handle);
+    crypt_key key;
+    unique_ptr<CERT_PUBLIC_KEY_INFO, LocalFree_delete<CERT_PUBLIC_KEY_INFO> > keyinfo_data;
+    DWORD keyinfo_size = 0;
+    if (!CryptDecodeObjectEx(X509_ASN_ENCODING, X509_PUBLIC_KEY_INFO, (const BYTE*)::LockResource(res_handle), ::SizeofResource(m_module.m_instance, res), CRYPT_DECODE_ALLOC_FLAG, NULL, &keyinfo_data, &keyinfo_size)) {
+        *ppEapError = m_module.make_error(dwResult = GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CryptDecodeObjectEx failed."), NULL);
+        return dwResult;
+    }
+
+    if (!key.import_public(hProv, X509_ASN_ENCODING, keyinfo_data.get())) {
+        *ppEapError = m_module.make_error(dwResult = GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Public key import failed."), NULL);
+        return dwResult;
+    }
+
+    // Pre-allocate memory to allow space, as encryption will grow the data.
+    DWORD dwBlockLen;
+    vector<unsigned char, sanitizing_allocator<unsigned char> > buf(size);
+    memcpy(buf.data(), data, size);
+    if (!CryptGetKeyParam(key, KP_BLOCKLEN, dwBlockLen, 0)) dwBlockLen = 0;
+    buf.reserve((size + dwBlockLen - 1) / dwBlockLen * dwBlockLen);
+
+    // Encrypt the data using our public key.
+    if (!CryptEncrypt(key, hHash, TRUE, 0, buf)) {
+        *ppEapError = m_module.make_error(dwResult = GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Encrypting data failed."), NULL);
+        return dwResult;
+    }
+
+    // Copy encrypted data.
+    enc.assign(buf.begin(), buf.end());
+
+    return ERROR_SUCCESS;
+}
+
+
 //////////////////////////////////////////////////////////////////////
 // eap::credentials_pass
 //////////////////////////////////////////////////////////////////////
@@ -182,45 +225,23 @@ DWORD eap::credentials_pass::store(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR *
         return dwResult;
     }
 
-    // Import the public key.
-    HRSRC res = FindResource(m_module.m_instance, MAKEINTRESOURCE(IDR_EAP_KEY_PUBLIC), RT_RCDATA);
-    assert(res);
-    HGLOBAL res_handle = LoadResource(m_module.m_instance, res);
-    assert(res_handle);
-    crypt_key key;
-    unique_ptr<CERT_PUBLIC_KEY_INFO, LocalFree_delete<CERT_PUBLIC_KEY_INFO> > keyinfo_data;
-    DWORD keyinfo_size = 0;
-    if (!CryptDecodeObjectEx(X509_ASN_ENCODING, X509_PUBLIC_KEY_INFO, (const BYTE*)::LockResource(res_handle), ::SizeofResource(m_module.m_instance, res), CRYPT_DECODE_ALLOC_FLAG, NULL, &keyinfo_data, &keyinfo_size)) {
-        *ppEapError = m_module.make_error(dwResult = GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CryptDecodeObjectEx failed."), NULL);
-        return dwResult;
-    }
-
-    if (!key.import_public(cp, X509_ASN_ENCODING, keyinfo_data.get())) {
-        *ppEapError = m_module.make_error(dwResult = GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Public key import failed."), NULL);
-        return dwResult;
-    }
-
     // Convert password to UTF-8.
     sanitizing_string password_utf8;
     WideCharToMultiByte(CP_UTF8, 0, m_password.c_str(), (int)m_password.length(), password_utf8, NULL, NULL);
 
-    // Pre-allocate memory to allow space, as encryption will grow the data, and we need additional 16B at the end for MD5 hash.
-    DWORD dwBlockLen;
-    vector<char, sanitizing_allocator<char> > password(password_utf8.length());
-    memcpy(password.data(), password_utf8.c_str(), sizeof(char)*password_utf8.length());
-    if (!CryptGetKeyParam(key, KP_BLOCKLEN, dwBlockLen, 0)) dwBlockLen = 0;
-    password.reserve((password.size() + dwBlockLen - 1) / dwBlockLen * dwBlockLen + 16);
-
-    // Encrypt the password using our public key. Calculate MD5 hash and append it.
+    // Create hash.
     crypt_hash hash;
     if (!hash.create(cp, CALG_MD5)) {
         *ppEapError = m_module.make_error(dwResult = GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Creating MD5 hash failed."), NULL);
         return dwResult;
     }
-    if (!CryptEncrypt(key, hash, TRUE, 0, password)) {
-        *ppEapError = m_module.make_error(dwResult = GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Encrypting password failed."), NULL);
+
+    // Encrypt password.
+    vector<unsigned char> password;
+    if ((dwResult = encrypt(cp, password_utf8.c_str(), password_utf8.length()*sizeof(sanitizing_string::value_type), password, ppEapError, hash)) != ERROR_SUCCESS)
         return dwResult;
-    }
+
+    // Calculate MD5 hash and append it.
     vector<char> hash_bin;
     CryptGetHashParam(hash, HP_HASHVAL, hash_bin, 0);
     password.insert(password.end(), hash_bin.begin(), hash_bin.end());
@@ -312,35 +333,16 @@ DWORD eap::credentials_pass::retrieve(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERRO
         return dwResult;
     }
 
-    // Truncate hash from encrypted password.
+    // Extract hash from encrypted password.
     vector<char> hash_bin;
     size_t enc_size = password.size() - dwHashSize;
     hash_bin.assign(password.begin() + enc_size, password.end());
-    password.resize(enc_size);
 
-    // Import the private key.
-    HRSRC res = FindResource(m_module.m_instance, MAKEINTRESOURCE(IDR_EAP_KEY_PRIVATE), RT_RCDATA);
-    assert(res);
-    HGLOBAL res_handle = LoadResource(m_module.m_instance, res);
-    assert(res_handle);
-    crypt_key key;
-    unique_ptr<unsigned char[], LocalFree_delete<unsigned char[]> > keyinfo_data;
-    DWORD keyinfo_size = 0;
-    if (!CryptDecodeObjectEx(X509_ASN_ENCODING, PKCS_RSA_PRIVATE_KEY, (const BYTE*)::LockResource(res_handle), ::SizeofResource(m_module.m_instance, res), CRYPT_DECODE_ALLOC_FLAG, NULL, &keyinfo_data, &keyinfo_size)) {
-        *ppEapError = m_module.make_error(dwResult = GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CryptDecodeObjectEx failed."), NULL);
+    // Decrypt password.
+    if ((dwResult = decrypt(cp, password.data(), enc_size, password, ppEapError, hash)) != ERROR_SUCCESS)
         return dwResult;
-    }
 
-    if (!key.import(cp, keyinfo_data.get(), keyinfo_size, NULL, 0)) {
-        *ppEapError = m_module.make_error(dwResult = GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Private key import failed."), NULL);
-        return dwResult;
-    }
-
-    // Decrypt the password using our private key. Calculate MD5 hash and verify it.
-    if (!CryptDecrypt(key, hash, TRUE, 0, password)) {
-        *ppEapError = m_module.make_error(dwResult = GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Decrypting password failed."), NULL);
-        return dwResult;
-    }
+    // Calculate MD5 hash and verify it.
     vector<char> hash2_bin;
     CryptGetHashParam(hash, HP_HASHVAL, hash2_bin, 0);
     if (hash_bin != hash2_bin) {
