@@ -130,9 +130,8 @@ DWORD WINAPI EapPeerConfigXml2Blob(
         // Load configuration.
         pConfigDoc->setProperty(winstd::bstr(L"SelectionNamespaces"), winstd::variant(L"xmlns:eap-metadata=\"urn:ietf:params:xml:ns:yang:ietf-eap-metadata\""));
         _EAPMETHOD_PEER_UI::config_type cfg(g_peer);
-        dwResult = cfg.load(pXmlElConfig, ppEapError);
-        if (dwResult != ERROR_SUCCESS)
-            return dwResult;
+        if (!cfg.load(pXmlElConfig, ppEapError))
+            return dwResult = *ppEapError ? (*ppEapError)->dwWinError : ERROR_INVALID_DATA;
 
         // Allocate BLOB for configuration.
         assert(ppConfigOut);
@@ -225,8 +224,8 @@ DWORD WINAPI EapPeerConfigBlob2Xml(
 
         // Save all providers.
         pDoc->setProperty(winstd::bstr(L"SelectionNamespaces"), winstd::variant(L"xmlns:eap-metadata=\"urn:ietf:params:xml:ns:yang:ietf-eap-metadata\""));
-        if ((dwResult = cfg.save(pDoc, pXmlElConfig, ppEapError)) != ERROR_SUCCESS)
-            return dwResult;
+        if (!cfg.save(pDoc, pXmlElConfig, ppEapError))
+            return dwResult = *ppEapError ? (*ppEapError)->dwWinError : ERROR_INVALID_DATA;
 
         *ppConfigDoc = pDoc.detach();
     }
@@ -281,8 +280,8 @@ DWORD WINAPI EapPeerInvokeConfigUI(
             assert(cursor - pConnectionDataIn <= (ptrdiff_t)dwConnectionDataInSize);
         }
 
-        if ((dwResult = g_peer.invoke_config_ui(hwndParent, cfg, ppEapError)) != ERROR_SUCCESS)
-            return dwResult;
+        if (!g_peer.invoke_config_ui(hwndParent, cfg, ppEapError))
+            return dwResult = *ppEapError ? (*ppEapError)->dwWinError : ERROR_INVALID_DATA;
 
         // Allocate BLOB for configuration.
         assert(ppConnectionDataOut);
@@ -364,8 +363,8 @@ DWORD WINAPI EapPeerInvokeIdentityUI(
             assert(cursor - pUserData <= (ptrdiff_t)dwUserDataSize);
         }
 
-        if ((dwResult = g_peer.invoke_identity_ui(hwndParent, dwFlags, cfg, usr, ppwszIdentity, ppEapError)) != ERROR_SUCCESS)
-            return dwResult;
+        if (!g_peer.invoke_identity_ui(hwndParent, dwFlags, cfg, usr, ppwszIdentity, ppEapError))
+            return dwResult = *ppEapError ? (*ppEapError)->dwWinError : ERROR_INVALID_DATA;
 
         // Allocate BLOB for user data.
         assert(ppUserDataOut);
@@ -432,8 +431,8 @@ DWORD WINAPI EapPeerInvokeInteractiveUI(
         }
 
         _EAPMETHOD_PEER_UI::interactive_response_type res;
-        if ((dwResult = g_peer.invoke_interactive_ui(hwndParent, req, res, ppEapError)) != ERROR_SUCCESS)
-            return dwResult;
+        if (!g_peer.invoke_interactive_ui(hwndParent, req, res, ppEapError))
+            return dwResult = *ppEapError ? (*ppEapError)->dwWinError : ERROR_INVALID_DATA;
 
         // Allocate BLOB for user data.
         assert(ppDataFromInteractiveUI);

@@ -353,16 +353,14 @@ protected:
         if (!m_target.empty()) {
             // Read credentials from Credential Manager
             EAP_ERROR *pEapError;
-            DWORD dwResult;
-            if ((dwResult = m_cred.retrieve(m_target.c_str(), &pEapError)) == ERROR_SUCCESS) {
+            if (m_cred.retrieve(m_target.c_str(), &pEapError)) {
                 m_remember->SetValue(true);
-            } else if (dwResult != ERROR_NOT_FOUND) {
-                if (pEapError) {
+            } else if (pEapError) {
+                if (pEapError->dwWinError != ERROR_NOT_FOUND)
                     wxLogError(winstd::tstring_printf(_("Error reading credentials from Credential Manager: %ls (error %u)"), pEapError->pRootCauseString, pEapError->dwWinError).c_str());
-                    m_cred.m_module.free_error_memory(pEapError);
-                } else
-                    wxLogError(_("Reading credentials failed (error %u)."), dwResult);
-            }
+                m_cred.m_module.free_error_memory(pEapError);
+            } else
+                wxLogError(_("Reading credentials failed."));
         }
 
         return true;
@@ -375,13 +373,12 @@ protected:
             // Write credentials to credential manager.
             if (m_remember->GetValue()) {
                 EAP_ERROR *pEapError;
-                DWORD dwResult;
-                if ((dwResult = m_cred.store(m_target.c_str(), &pEapError)) != ERROR_SUCCESS) {
+                if (!m_cred.store(m_target.c_str(), &pEapError)) {
                     if (pEapError) {
                         wxLogError(winstd::tstring_printf(_("Error writing credentials to Credential Manager: %ls (error %u)"), pEapError->pRootCauseString, pEapError->dwWinError).c_str());
                         m_cred.m_module.free_error_memory(pEapError);
                     } else
-                        wxLogError(_("Writing credentials failed (error %u)."), dwResult);
+                        wxLogError(_("Writing credentials failed."));
                 }
             }
         }

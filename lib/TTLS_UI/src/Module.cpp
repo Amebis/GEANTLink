@@ -30,7 +30,7 @@ eap::peer_ttls_ui::peer_ttls_ui() : peer_ui<eap::config_ttls, eap::credentials_t
 }
 
 
-DWORD eap::peer_ttls_ui::invoke_config_ui(
+bool eap::peer_ttls_ui::invoke_config_ui(
     _In_    HWND        hwndParent,
     _Inout_ config_type &cfg,
     _Out_   EAP_ERROR   **ppEapError)
@@ -59,11 +59,16 @@ DWORD eap::peer_ttls_ui::invoke_config_ui(
 
     // Clean-up and return.
     wxEntryCleanup();
-    return result == wxID_OK ? ERROR_SUCCESS : ERROR_CANCELLED;
+    if (result != wxID_OK) {
+        *ppEapError = make_error(ERROR_CANCELLED, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Cancelled."), NULL);
+        return false;
+    }
+
+    return true;
 }
 
 
-DWORD eap::peer_ttls_ui::invoke_identity_ui(
+bool eap::peer_ttls_ui::invoke_identity_ui(
             _In_    HWND          hwndParent,
             _In_    DWORD         dwFlags,
             _Inout_ config_type   &cfg,
@@ -80,11 +85,11 @@ DWORD eap::peer_ttls_ui::invoke_identity_ui(
     InitCommonControls();
     MessageBox(hwndParent, _T(PRODUCT_NAME_STR) _T(" credential prompt goes here!"), _T(PRODUCT_NAME_STR) _T(" Credentials"), MB_OK);
 
-    return ERROR_SUCCESS;
+    return true;
 }
 
 
-DWORD eap::peer_ttls_ui::invoke_interactive_ui(
+bool eap::peer_ttls_ui::invoke_interactive_ui(
             _In_        HWND                      hwndParent,
             _In_  const interactive_request_type  &req,
             _Out_       interactive_response_type &res,
@@ -97,5 +102,5 @@ DWORD eap::peer_ttls_ui::invoke_interactive_ui(
     InitCommonControls();
     MessageBox(hwndParent, _T(PRODUCT_NAME_STR) _T(" interactive UI goes here!"), _T(PRODUCT_NAME_STR) _T(" Prompt"), MB_OK);
 
-    return ERROR_SUCCESS;
+    return true;
 }

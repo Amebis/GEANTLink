@@ -123,10 +123,9 @@ void eap::module::free_error_memory(_In_ EAP_ERROR *err)
 }
 
 
-DWORD eap::module::encrypt(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _Out_ std::vector<unsigned char> &enc, _Out_ EAP_ERROR **ppEapError, _Out_opt_ HCRYPTHASH hHash) const
+bool eap::module::encrypt(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _Out_ std::vector<unsigned char> &enc, _Out_ EAP_ERROR **ppEapError, _Out_opt_ HCRYPTHASH hHash) const
 {
     assert(ppEapError);
-    DWORD dwResult;
 
     // Import the public key.
     HRSRC res = FindResource(m_instance, MAKEINTRESOURCE(IDR_EAP_KEY_PUBLIC), RT_RCDATA);
@@ -137,13 +136,13 @@ DWORD eap::module::encrypt(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const voi
     unique_ptr<CERT_PUBLIC_KEY_INFO, LocalFree_delete<CERT_PUBLIC_KEY_INFO> > keyinfo_data;
     DWORD keyinfo_size = 0;
     if (!CryptDecodeObjectEx(X509_ASN_ENCODING, X509_PUBLIC_KEY_INFO, (const BYTE*)::LockResource(res_handle), ::SizeofResource(m_instance, res), CRYPT_DECODE_ALLOC_FLAG, NULL, &keyinfo_data, &keyinfo_size)) {
-        *ppEapError = make_error(dwResult = GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CryptDecodeObjectEx failed."), NULL);
-        return dwResult;
+        *ppEapError = make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CryptDecodeObjectEx failed."), NULL);
+        return false;
     }
 
     if (!key.import_public(hProv, X509_ASN_ENCODING, keyinfo_data.get())) {
-        *ppEapError = make_error(dwResult = GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Public key import failed."), NULL);
-        return dwResult;
+        *ppEapError = make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Public key import failed."), NULL);
+        return false;
     }
 
     // Pre-allocate memory to allow space, as encryption will grow the data.
@@ -155,39 +154,37 @@ DWORD eap::module::encrypt(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const voi
 
     // Encrypt the data using our public key.
     if (!CryptEncrypt(key, hHash, TRUE, 0, buf)) {
-        *ppEapError = make_error(dwResult = GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Encrypting data failed."), NULL);
-        return dwResult;
+        *ppEapError = make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Encrypting data failed."), NULL);
+        return false;
     }
 
     // Copy encrypted data.
     enc.assign(buf.begin(), buf.end());
-
-    return ERROR_SUCCESS;
+    return true;
 }
 
 
-DWORD eap::module::encrypt_md5(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _Out_ std::vector<unsigned char> &enc, _Out_ EAP_ERROR **ppEapError) const
+bool eap::module::encrypt_md5(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _Out_ std::vector<unsigned char> &enc, _Out_ EAP_ERROR **ppEapError) const
 {
-    DWORD dwResult;
-
     // Create hash.
     crypt_hash hash;
     if (!hash.create(hProv, CALG_MD5)) {
-        *ppEapError = make_error(dwResult = GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Creating MD5 hash failed."), NULL);
-        return dwResult;
+        *ppEapError = make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Creating MD5 hash failed."), NULL);
+        return false;
     }
 
     // Encrypt data.
-    if ((dwResult = encrypt(hProv, data, size, enc, ppEapError, hash)) != ERROR_SUCCESS)
-        return dwResult;
+    if (!encrypt(hProv, data, size, enc, ppEapError, hash))
+        return false;
 
-    // Calculate MD5 hash and append it.
+    // Calculate MD5 hash.
     vector<unsigned char> hash_bin;
     if (!CryptGetHashParam(hash, HP_HASHVAL, hash_bin, 0)) {
-        *ppEapError = make_error(dwResult = GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Calculating MD5 hash failed."), NULL);
-        return dwResult;
+        *ppEapError = make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Calculating MD5 hash failed."), NULL);
+        return false;
     }
-    enc.insert(enc.end(), hash_bin.begin(), hash_bin.end());
 
-    return ERROR_SUCCESS;
+    // Append hash.
+    enc.insert(enc.end(), hash_bin.begin(), hash_bin.end());
+    return true;
 }

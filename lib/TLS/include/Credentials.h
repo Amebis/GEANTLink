@@ -136,10 +136,10 @@ namespace eap
         /// \param[out] ppEapError   Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
         ///
         /// \returns
-        /// - \c ERROR_SUCCESS if succeeded
-        /// - error code otherwise
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
         ///
-        virtual DWORD save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const;
+        virtual bool save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const;
 
         ///
         /// Load credentials from XML document
@@ -148,10 +148,10 @@ namespace eap
         /// \param[out] ppEapError   Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
         ///
         /// \returns
-        /// - \c ERROR_SUCCESS if succeeded
-        /// - error code otherwise
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
         ///
-        virtual DWORD load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError);
+        virtual bool load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError);
 
         /// @}
 
@@ -165,10 +165,10 @@ namespace eap
         /// \param[out] ppEapError     Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
         ///
         /// \returns
-        /// - \c ERROR_SUCCESS if succeeded
-        /// - error code otherwise
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
         ///
-        virtual DWORD store(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **ppEapError) const;
+        virtual bool store(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **ppEapError) const;
 
         ///
         /// Retrieve credentials from Windows Credential Manager
@@ -177,10 +177,10 @@ namespace eap
         /// \param[out] ppEapError     Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
         ///
         /// \returns
-        /// - \c ERROR_SUCCESS if succeeded
-        /// - error code otherwise
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
         ///
-        virtual DWORD retrieve(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **ppEapError);
+        virtual bool retrieve(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **ppEapError);
 
         ///
         /// Return target suffix for Windows Credential Manager credential name

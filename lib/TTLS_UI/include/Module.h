@@ -53,10 +53,10 @@ namespace eap
         /// \param[out]   ppEapError  Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
         ///
         /// \returns
-        /// - \c ERROR_SUCCESS if succeeded
-        /// - error code otherwise
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
         ///
-        virtual DWORD invoke_config_ui(
+        virtual bool invoke_config_ui(
             _In_    HWND        hwndParent,
             _Inout_ config_type &cfg,
             _Out_   EAP_ERROR   **ppEapError);
@@ -74,10 +74,10 @@ namespace eap
         /// \param[out]   ppEapError     Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
         ///
         /// \returns
-        /// - \c ERROR_SUCCESS if succeeded
-        /// - error code otherwise
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
         ///
-        virtual DWORD invoke_identity_ui(
+        virtual bool invoke_identity_ui(
             _In_    HWND          hwndParent,
             _In_    DWORD         dwFlags,
             _Inout_ config_type   &cfg,
@@ -96,10 +96,10 @@ namespace eap
         /// \param[out] ppEapError     Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
         ///
         /// \returns
-        /// - \c ERROR_SUCCESS if succeeded
-        /// - error code otherwise
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
         ///
-        virtual DWORD invoke_interactive_ui(
+        virtual bool invoke_interactive_ui(
             _In_        HWND                      hwndParent,
             _In_  const interactive_request_type  &req,
             _Out_       interactive_response_type &res,

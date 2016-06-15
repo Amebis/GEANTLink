@@ -28,6 +28,8 @@ namespace eap
 
 #pragma once
 
+#include "Module.h"
+
 #include <Windows.h>
 #include <eaptypes.h> // Must include after <Windows.h>
 extern "C" {
@@ -44,12 +46,41 @@ namespace eap
         ///
         /// Constructs a session
         ///
-        session();
+        /// \param[in] mod  Reference of the EAP module to use for global services
+        ///
+        session(_In_ module &mod);
 
         ///
-        /// Destructs the session
+        /// Copies session
         ///
-        virtual ~session();
+        /// \param[in] other  Session to copy from
+        ///
+        session(_In_ const session &other);
+
+        ///
+        /// Moves session
+        ///
+        /// \param[in] other  Session to move from
+        ///
+        session(_Inout_ session &&other);
+
+        ///
+        /// Copies session
+        ///
+        /// \param[in] other  Session to copy from
+        ///
+        /// \returns Reference to this object
+        ///
+        session& operator=(_In_ const session &other);
+
+        ///
+        /// Moves session
+        ///
+        /// \param[in] other  Session to move from
+        ///
+        /// \returns Reference to this object
+        ///
+        session& operator=(_Inout_ session &&other);
 
         /// \name Session start/end
         /// @{
@@ -59,7 +90,11 @@ namespace eap
         ///
         /// \sa [EapPeerBeginSession function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363600.aspx)
         ///
-        virtual DWORD begin(
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
+        ///
+        virtual bool begin(
             _In_                                   DWORD         dwFlags,
             _In_                             const EapAttributes *pAttributeArray,
             _In_                                   HANDLE        hTokenImpersonateUser,
@@ -75,7 +110,11 @@ namespace eap
         ///
         /// \sa [EapPeerEndSession function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363604.aspx)
         ///
-        virtual DWORD end(_Out_ EAP_ERROR **ppEapError);
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
+        ///
+        virtual bool end(_Out_ EAP_ERROR **ppEapError);
 
         /// @}
 
@@ -87,7 +126,11 @@ namespace eap
         ///
         /// \sa [EapPeerProcessRequestPacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363621.aspx)
         ///
-        virtual DWORD process_request_packet(
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
+        ///
+        virtual bool process_request_packet(
             _In_                                       DWORD               dwReceivedPacketSize,
             _In_bytecount_(dwReceivedPacketSize) const EapPacket           *pReceivedPacket,
             _Out_                                      EapPeerMethodOutput *pEapOutput,
@@ -98,7 +141,11 @@ namespace eap
         ///
         /// \sa [EapPeerGetResponsePacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363610.aspx)
         ///
-        virtual DWORD get_response_packet(
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
+        ///
+        virtual bool get_response_packet(
             _Inout_                            DWORD              *pdwSendPacketSize,
             _Inout_bytecap_(*dwSendPacketSize) EapPacket          *pSendPacket,
             _Out_                              EAP_ERROR          **ppEapError);
@@ -108,7 +155,11 @@ namespace eap
         ///
         /// \sa [EapPeerGetResult function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363611.aspx)
         ///
-        virtual DWORD get_result(_In_ EapPeerMethodResultReason reason, _Out_ EapPeerMethodResult *ppResult, _Out_ EAP_ERROR **ppEapError);
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
+        ///
+        virtual bool get_result(_In_ EapPeerMethodResultReason reason, _Out_ EapPeerMethodResult *ppResult, _Out_ EAP_ERROR **ppEapError);
 
         /// @}
 
@@ -122,7 +173,11 @@ namespace eap
         ///
         /// \sa [EapPeerGetUIContext function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363612.aspx)
         ///
-        virtual DWORD get_ui_context(
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
+        ///
+        virtual bool get_ui_context(
             _Out_ DWORD     *pdwUIContextDataSize,
             _Out_ BYTE      **ppUIContextData,
             _Out_ EAP_ERROR **ppEapError);
@@ -134,7 +189,11 @@ namespace eap
         ///
         /// \sa [EapPeerSetUIContext function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363626.aspx)
         ///
-        virtual DWORD set_ui_context(
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
+        ///
+        virtual bool set_ui_context(
             _In_                                  DWORD               dwUIContextDataSize,
             _In_count_(dwUIContextDataSize) const BYTE                *pUIContextData,
             _In_                            const EapPeerMethodOutput *pEapOutput,
@@ -150,15 +209,26 @@ namespace eap
         ///
         /// \sa [EapPeerGetResponseAttributes function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363609.aspx)
         ///
-        virtual DWORD get_response_attributes(_Out_ EapAttributes *pAttribs, _Out_ EAP_ERROR **ppEapError);
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
+        ///
+        virtual bool get_response_attributes(_Out_ EapAttributes *pAttribs, _Out_ EAP_ERROR **ppEapError);
 
         ///
         /// Provides an updated array of EAP response attributes to the EAP method.
         ///
         /// \sa [EapPeerSetResponseAttributes function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363625.aspx)
         ///
-        virtual DWORD set_response_attributes(const _In_ EapAttributes *pAttribs, _Out_ EapPeerMethodOutput *pEapOutput, _Out_ EAP_ERROR **ppEapError);
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
+        ///
+        virtual bool set_response_attributes(const _In_ EapAttributes *pAttribs, _Out_ EapPeerMethodOutput *pEapOutput, _Out_ EAP_ERROR **ppEapError);
 
         /// @}
+
+    public:
+        module &m_module;   ///< Reference of the EAP module
     };
 }

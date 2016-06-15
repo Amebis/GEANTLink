@@ -48,21 +48,33 @@ namespace eap
         ///
         /// \sa [EapPeerGetInfo function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363613.aspx)
         ///
-        virtual DWORD initialize(_Out_ EAP_ERROR **ppEapError);
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
+        ///
+        virtual bool initialize(_Out_ EAP_ERROR **ppEapError);
 
         ///
         /// Shuts down the EAP method and prepares to unload its corresponding DLL.
         ///
         /// \sa [EapPeerShutdown function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363627.aspx)
         ///
-        virtual DWORD shutdown(_Out_ EAP_ERROR **ppEapError);
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
+        ///
+        virtual bool shutdown(_Out_ EAP_ERROR **ppEapError);
 
         ///
         /// Returns the user data and user identity after being called by EAPHost.
         ///
         /// \sa [EapPeerGetIdentity function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363607.aspx)
         ///
-        virtual DWORD get_identity(
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
+        ///
+        virtual bool get_identity(
             _In_                                   DWORD     dwFlags,
             _In_                                   DWORD     dwConnectionDataSize,
             _In_count_(dwConnectionDataSize) const BYTE      *pConnectionData,
@@ -80,7 +92,11 @@ namespace eap
         ///
         /// \sa [EapPeerGetMethodProperties function](https://msdn.microsoft.com/en-us/library/windows/desktop/hh706636.aspx)
         ///
-        virtual DWORD get_method_properties(
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
+        ///
+        virtual bool get_method_properties(
             _In_                                DWORD                     dwVersion,
             _In_                                DWORD                     dwFlags,
             _In_                                HANDLE                    hUserImpersonationToken,

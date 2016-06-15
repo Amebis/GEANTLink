@@ -79,17 +79,20 @@ eap::config* eap::config_tls::clone() const
 }
 
 
-DWORD eap::config_tls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
+bool eap::config_tls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
 {
     const bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
     DWORD dwResult;
     HRESULT hr;
 
+    if (!config_method<credentials_tls>::save(pDoc, pConfigRoot, ppEapError))
+        return false;
+
     // <ServerSideCredential>
     com_obj<IXMLDOMElement> pXmlElServerSideCredential;
     if ((dwResult = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:ServerSideCredential"), bstr(L"ServerSideCredential"), bstrNamespace, &pXmlElServerSideCredential)) != ERROR_SUCCESS) {
         *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <ServerSideCredential> element."), NULL);
-        return dwResult;
+        return false;
     }
 
     for (list<cert_context>::const_iterator i = m_trusted_root_ca.begin(), i_end = m_trusted_root_ca.end(); i != i_end; ++i) {
@@ -97,25 +100,25 @@ DWORD eap::config_tls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfi
         com_obj<IXMLDOMElement> pXmlElCA;
         if ((dwResult = eapxml::create_element(pDoc, bstr(L"CA"), bstrNamespace, &pXmlElCA))) {
             *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <CA> element."), NULL);
-            return dwResult;
+            return false;
         }
 
         // <CA>/<format>
         if ((dwResult = eapxml::put_element_value(pDoc, pXmlElCA, bstr(L"format"), bstrNamespace, bstr(L"PEM"))) != ERROR_SUCCESS) {
             *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <format> element."), NULL);
-            return dwResult;
+            return false;
         }
 
         // <CA>/<cert-data>
         const cert_context &cc = *i;
         if ((dwResult = eapxml::put_element_base64(pDoc, pXmlElCA, bstr(L"cert-data"), bstrNamespace, cc->pbCertEncoded, cc->cbCertEncoded)) != ERROR_SUCCESS) {
             *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <cert-data> element."), NULL);
-            return dwResult;
+            return false;
         }
 
         if (FAILED(hr = pXmlElServerSideCredential->appendChild(pXmlElCA, NULL))) {
-            *ppEapError = m_module.make_error(dwResult = HRESULT_CODE(hr), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error appending <CA> element."), NULL);
-            return dwResult;
+            *ppEapError = m_module.make_error(HRESULT_CODE(hr), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error appending <CA> element."), NULL);
+            return false;
         }
     }
 
@@ -125,16 +128,19 @@ DWORD eap::config_tls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfi
         MultiByteToWideChar(CP_UTF8, 0, i->c_str(), (int)i->length(), str);
         if ((dwResult = eapxml::put_element_value(pDoc, pXmlElServerSideCredential, bstr(L"ServerName"), bstrNamespace, bstr(str))) != ERROR_SUCCESS) {
             *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <ServerName> element."), NULL);
-            return dwResult;
+            return false;
         }
     }
 
-    return config_method<credentials_tls>::save(pDoc, pConfigRoot, ppEapError);
+    return true;
 }
 
 
-DWORD eap::config_tls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError)
+bool eap::config_tls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError)
 {
+    if (!config_method<credentials_tls>::load(pConfigRoot, ppEapError))
+        return false;
+
     m_trusted_root_ca.clear();
     m_server_names.clear();
 
@@ -180,7 +186,7 @@ DWORD eap::config_tls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppE
         }
     }
 
-    return config_method<credentials_tls>::load(pConfigRoot, ppEapError);
+    return true;
 }
 
 

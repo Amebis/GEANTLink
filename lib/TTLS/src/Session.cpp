@@ -28,6 +28,36 @@ using namespace winstd;
 // eap::session_ttls
 //////////////////////////////////////////////////////////////////////
 
-eap::session_ttls::session_ttls() : session()
+eap::session_ttls::session_ttls(_In_ module &mod) : session(mod)
 {
+}
+
+
+eap::session_ttls::session_ttls(_In_ const session_ttls &other) :
+    session(other)
+{
+}
+
+
+eap::session_ttls::session_ttls(_Inout_ session_ttls &&other) :
+    session(std::move(other))
+{
+}
+
+
+eap::session_ttls& eap::session_ttls::operator=(_In_ const session_ttls &other)
+{
+    if (this != &other)
+        (session&)*this = other;
+
+    return *this;
+}
+
+
+eap::session_ttls& eap::session_ttls::operator=(_Inout_ session_ttls &&other)
+{
+    if (this != &other)
+        (session&)*this = std::move(other);
+
+    return *this;
 }

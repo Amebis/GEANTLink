@@ -83,7 +83,7 @@ bool eap::credentials::empty() const
 }
 
 
-DWORD eap::credentials::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
+bool eap::credentials::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
 {
     const bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
     DWORD dwResult;
@@ -91,24 +91,24 @@ DWORD eap::credentials::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConf
     // <UserName>
     if ((dwResult = eapxml::put_element_value(pDoc, pConfigRoot, bstr(L"UserName"), bstrNamespace, bstr(m_identity))) != ERROR_SUCCESS) {
         *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <UserName> element."), NULL);
-        return dwResult;
+        return false;
     }
 
-    return ERROR_SUCCESS;
+    return true;
 }
 
 
-DWORD eap::credentials::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError)
+bool eap::credentials::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError)
 {
     assert(pConfigRoot);
     DWORD dwResult;
 
     if ((dwResult = eapxml::get_element_value(pConfigRoot, bstr(L"eap-metadata:UserName"), m_identity)) != ERROR_SUCCESS) {
         *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error reading <UserName> element."), NULL);
-        return dwResult;
+        return false;
     }
 
-    return ERROR_SUCCESS;
+    return true;
 }
 
 
@@ -170,13 +170,13 @@ bool eap::credentials_pass::empty() const
 }
 
 
-DWORD eap::credentials_pass::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
+bool eap::credentials_pass::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
 {
     const bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
     DWORD dwResult;
 
-    if ((dwResult = credentials::save(pDoc, pConfigRoot, ppEapError)) != ERROR_SUCCESS)
-        return dwResult;
+    if (!credentials::save(pDoc, pConfigRoot, ppEapError))
+        return false;
 
     // <Password>
     bstr pass(m_password);
@@ -184,51 +184,50 @@ DWORD eap::credentials_pass::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *
     SecureZeroMemory((BSTR)pass, sizeof(OLECHAR)*pass.length());
     if (dwResult != ERROR_SUCCESS) {
         *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <Password> element."), NULL);
-        return dwResult;
+        return false;
     }
 
-    return ERROR_SUCCESS;
+    return true;
 }
 
 
-DWORD eap::credentials_pass::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError)
+bool eap::credentials_pass::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError)
 {
     assert(pConfigRoot);
     DWORD dwResult;
 
-    if ((dwResult = credentials::load(pConfigRoot, ppEapError)) != ERROR_SUCCESS)
-        return dwResult;
+    if (!credentials::load(pConfigRoot, ppEapError))
+        return false;
 
     bstr pass;
     if ((dwResult = eapxml::get_element_value(pConfigRoot, bstr(L"eap-metadata:Password"), &pass)) != ERROR_SUCCESS) {
         *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error reading <Password> element."), NULL);
-        return dwResult;
+        return false;
     }
     m_password = pass;
     SecureZeroMemory((BSTR)pass, sizeof(OLECHAR)*pass.length());
 
-    return ERROR_SUCCESS;
+    return true;
 }
 
 
-DWORD eap::credentials_pass::store(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **ppEapError) const
+bool eap::credentials_pass::store(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **ppEapError) const
 {
     assert(pszTargetName);
     assert(ppEapError);
-    DWORD dwResult;
     string password_enc;
 
     // Prepare cryptographics provider.
     crypt_prov cp;
     if (!cp.create(NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT)) {
-        *ppEapError = m_module.make_error(dwResult = GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CryptAcquireContext failed."), NULL);
-        return dwResult;
+        *ppEapError = m_module.make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CryptAcquireContext failed."), NULL);
+        return false;
     }
 
     // Encrypt password.
     vector<unsigned char> password;
-    if ((dwResult = m_module.encrypt_md5(cp, m_password, password, ppEapError)) != ERROR_SUCCESS)
-        return dwResult;
+    if (!m_module.encrypt_md5(cp, m_password, password, ppEapError))
+        return false;
 
     // Convert encrypted password to Base64, since CredProtectA() fail for binary strings.
     string password_base64;
@@ -238,8 +237,8 @@ DWORD eap::credentials_pass::store(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR *
     // Encrypt the password using user's key.
     CRED_PROTECTION_TYPE cpt;
     if (!CredProtectA(TRUE, password_base64.c_str(), (DWORD)password_base64.length(), password_enc, &cpt)) {
-        *ppEapError = m_module.make_error(dwResult = GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CredProtect failed."), NULL);
-        return dwResult;
+        *ppEapError = m_module.make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CredProtect failed."), NULL);
+        return false;
     }
 
     tstring target(target_name(pszTargetName));
@@ -262,24 +261,23 @@ DWORD eap::credentials_pass::store(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR *
         (LPTSTR)m_identity.c_str()  // UserName
     };
     if (!CredWrite(&cred, 0)) {
-        *ppEapError = m_module.make_error(dwResult = GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CredWrite failed."), NULL);
-        return dwResult;
+        *ppEapError = m_module.make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CredWrite failed."), NULL);
+        return false;
     }
 
-    return ERROR_SUCCESS;
+    return true;
 }
 
 
-DWORD eap::credentials_pass::retrieve(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **ppEapError)
+bool eap::credentials_pass::retrieve(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **ppEapError)
 {
     assert(pszTargetName);
-    DWORD dwResult;
 
     // Read credentials.
     unique_ptr<CREDENTIAL, CredFree_delete<CREDENTIAL> > cred;
     if (!CredRead(target_name(pszTargetName).c_str(), CRED_TYPE_GENERIC, 0, (PCREDENTIAL*)&cred)) {
-        *ppEapError = m_module.make_error(dwResult = GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CredRead failed."), NULL);
-        return dwResult;
+        *ppEapError = m_module.make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CredRead failed."), NULL);
+        return false;
     }
 
     m_identity = cred->UserName;
@@ -287,8 +285,8 @@ DWORD eap::credentials_pass::retrieve(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERRO
     // Decrypt the password using user's key.
     string password_base64;
     if (!CredUnprotectA(TRUE, (LPCSTR)(cred->CredentialBlob), cred->CredentialBlobSize, password_base64)) {
-        *ppEapError = m_module.make_error(dwResult = GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CredUnprotect failed."), NULL);
-        return dwResult;
+        *ppEapError = m_module.make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CredUnprotect failed."), NULL);
+        return false;
     }
 
     // Convert Base64 to binary encrypted password, since CredProtectA() fail for binary strings.
@@ -300,13 +298,10 @@ DWORD eap::credentials_pass::retrieve(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERRO
     // Prepare cryptographics provider.
     crypt_prov cp;
     if (!cp.create(NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT)) {
-        *ppEapError = m_module.make_error(dwResult = GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CryptAcquireContext failed."), NULL);
-        return dwResult;
+        *ppEapError = m_module.make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CryptAcquireContext failed."), NULL);
+        return false;
     }
 
     // Decrypt password.
-    if ((dwResult = m_module.decrypt_md5(cp, password.data(), password.size(), m_password, ppEapError)) != ERROR_SUCCESS)
-        return dwResult;
-
-    return ERROR_SUCCESS;
+    return m_module.decrypt_md5(cp, password.data(), password.size(), m_password, ppEapError);
 }

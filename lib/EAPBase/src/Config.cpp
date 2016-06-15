@@ -46,11 +46,6 @@ eap::config::config(_Inout_ config &&other) :
 }
 
 
-eap::config::~config()
-{
-}
-
-
 eap::config& eap::config::operator=(_In_ const config &other)
 {
     UNREFERENCED_PARAMETER(other);

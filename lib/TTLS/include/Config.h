@@ -131,10 +131,10 @@ namespace eap {
         /// \param[out] ppEapError   Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
         ///
         /// \returns
-        /// - \c ERROR_SUCCESS if succeeded
-        /// - error code otherwise
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
         ///
-        virtual DWORD save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const;
+        virtual bool save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const;
 
         ///
         /// Load configuration from XML document
@@ -143,10 +143,10 @@ namespace eap {
         /// \param[out] ppEapError   Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
         ///
         /// \returns
-        /// - \c ERROR_SUCCESS if succeeded
-        /// - error code otherwise
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
         ///
-        virtual DWORD load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError);
+        virtual bool load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError);
 
         /// @}
 

@@ -88,51 +88,53 @@ eap::config* eap::config_ttls::clone() const
 }
 
 
-DWORD eap::config_ttls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
+bool eap::config_ttls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
 {
     const bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
     DWORD dwResult;
 
-    if ((dwResult = config_tls::save(pDoc, pConfigRoot, ppEapError)) != ERROR_SUCCESS)
-        return dwResult;
+    if (!config_tls::save(pDoc, pConfigRoot, ppEapError))
+        return false;
 
     // <InnerAuthenticationMethod>
     com_obj<IXMLDOMElement> pXmlElInnerAuthenticationMethod;
     if ((dwResult = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:InnerAuthenticationMethod"), bstr(L"InnerAuthenticationMethod"), bstrNamespace, &pXmlElInnerAuthenticationMethod)) != ERROR_SUCCESS) {
         *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <InnerAuthenticationMethod> element."), NULL);
-        return dwResult;
+        return false;
     }
 
     if (dynamic_cast<const config_pap*>(m_inner)) {
         // <InnerAuthenticationMethod>/<NonEAPAuthMethod>
         if ((dwResult = eapxml::put_element_value(pDoc, pXmlElInnerAuthenticationMethod, bstr(L"NonEAPAuthMethod"), bstrNamespace, bstr(L"PAP"))) != ERROR_SUCCESS) {
             *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <NonEAPAuthMethod> element."), NULL);
-            return dwResult;
+            return false;
         }
 
         // <InnerAuthenticationMethod>/...
-        if ((dwResult = m_inner->save(pDoc, pXmlElInnerAuthenticationMethod, ppEapError)) != ERROR_SUCCESS)
-            return dwResult;
-    } else
-        return dwResult = ERROR_NOT_SUPPORTED;
+        if (!m_inner->save(pDoc, pXmlElInnerAuthenticationMethod, ppEapError))
+            return false;
+    } else {
+        *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Unsupported inner authentication method."), NULL);
+        return false;
+    }
 
-    return ERROR_SUCCESS;
+    return true;
 }
 
 
-DWORD eap::config_ttls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError)
+bool eap::config_ttls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError)
 {
     assert(ppEapError);
     DWORD dwResult;
 
-    if ((dwResult = config_tls::load(pConfigRoot, ppEapError)) != ERROR_SUCCESS)
-        return dwResult;
+    if (!config_tls::load(pConfigRoot, ppEapError))
+        return false;
 
     // Load inner authentication configuration (<InnerAuthenticationMethod>).
     com_obj<IXMLDOMElement> pXmlElInnerAuthenticationMethod;
     if ((dwResult = eapxml::select_element(pConfigRoot, bstr(L"eap-metadata:InnerAuthenticationMethod"), &pXmlElInnerAuthenticationMethod)) != ERROR_SUCCESS) {
         *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error selecting <InnerAuthenticationMethod> element."), NULL);
-        return dwResult;
+        return false;
     }
 
     // Determine inner authentication type (<EAPMethod> and <NonEAPAuthMethod>).
@@ -150,14 +152,14 @@ DWORD eap::config_ttls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **pp
         // PAP
         assert(!m_inner);
         m_inner = new eap::config_pap(m_module);
-        if ((dwResult = m_inner->load(pXmlElInnerAuthenticationMethod, ppEapError)) != ERROR_SUCCESS)
-            return dwResult;
+        if (!m_inner->load(pXmlElInnerAuthenticationMethod, ppEapError))
+            return false;
     } else {
-        *ppEapError = m_module.make_error(dwResult = ERROR_NOT_SUPPORTED, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Unsupported inner authentication method."), NULL);
-        return dwResult;
+        *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Unsupported inner authentication method."), NULL);
+        return false;
     }
 
-    return ERROR_SUCCESS;
+    return true;
 }
 
 

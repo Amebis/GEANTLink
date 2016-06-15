@@ -88,47 +88,46 @@ bool eap::credentials_tls::empty() const
 }
 
 
-DWORD eap::credentials_tls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
+bool eap::credentials_tls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
 {
     const bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
     DWORD dwResult;
 
-    if ((dwResult = credentials::save(pDoc, pConfigRoot, ppEapError)) != ERROR_SUCCESS)
-        return dwResult;
+    if (!credentials::save(pDoc, pConfigRoot, ppEapError))
+        return false;
 
     // <CertHash>
     if ((dwResult = eapxml::put_element_hex(pDoc, pConfigRoot, bstr(L"CertHash"), bstrNamespace, m_cert_hash.data(), m_cert_hash.size())) != ERROR_SUCCESS) {
         *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <CertHash> element."), NULL);
-        return dwResult;
+        return false;
     }
 
-    return ERROR_SUCCESS;
+    return true;
 }
 
 
-DWORD eap::credentials_tls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError)
+bool eap::credentials_tls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError)
 {
     assert(pConfigRoot);
     DWORD dwResult;
 
-    if ((dwResult = credentials::load(pConfigRoot, ppEapError)) != ERROR_SUCCESS)
-        return dwResult;
+    if (!credentials::load(pConfigRoot, ppEapError))
+        return false;
 
     // <CertHash>
     if ((dwResult = eapxml::get_element_hex(pConfigRoot, bstr(L"eap-metadata:CertHash"), m_cert_hash)) != ERROR_SUCCESS) {
         *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error reading <CertHash> element."), NULL);
-        return dwResult;
+        return false;
     }
 
-    return ERROR_SUCCESS;
+    return true;
 }
 
 
-DWORD eap::credentials_tls::store(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **ppEapError) const
+bool eap::credentials_tls::store(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **ppEapError) const
 {
     assert(pszTargetName);
     assert(ppEapError);
-    DWORD dwResult;
 
     tstring target(target_name(pszTargetName));
 
@@ -150,24 +149,23 @@ DWORD eap::credentials_tls::store(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **
         (LPTSTR)m_identity.c_str()  // UserName
     };
     if (!CredWrite(&cred, 0)) {
-        *ppEapError = m_module.make_error(dwResult = GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CredWrite failed."), NULL);
-        return dwResult;
+        *ppEapError = m_module.make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CredWrite failed."), NULL);
+        return false;
     }
 
-    return ERROR_SUCCESS;
+    return true;
 }
 
 
-DWORD eap::credentials_tls::retrieve(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **ppEapError)
+bool eap::credentials_tls::retrieve(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **ppEapError)
 {
     assert(pszTargetName && _tcslen(pszTargetName) < CRED_MAX_GENERIC_TARGET_NAME_LENGTH);
-    DWORD dwResult;
 
     // Read credentials.
     unique_ptr<CREDENTIAL, CredFree_delete<CREDENTIAL> > cred;
     if (!CredRead(target_name(pszTargetName).c_str(), CRED_TYPE_GENERIC, 0, (PCREDENTIAL*)&cred)) {
-        *ppEapError = m_module.make_error(dwResult = GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CredRead failed."), NULL);
-        return dwResult;
+        *ppEapError = m_module.make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CredRead failed."), NULL);
+        return false;
     }
 
     if (cred->UserName)
@@ -177,5 +175,5 @@ DWORD eap::credentials_tls::retrieve(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR
 
     m_cert_hash.assign(cred->CredentialBlob, cred->CredentialBlob + cred->CredentialBlobSize);
 
-    return ERROR_SUCCESS;
+    return true;
 }

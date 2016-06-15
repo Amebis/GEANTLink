@@ -33,7 +33,7 @@ eap::peer_ttls::peer_ttls() : peer(type_ttls)
 }
 
 
-DWORD eap::peer_ttls::initialize(_Out_ EAP_ERROR **ppEapError)
+bool eap::peer_ttls::initialize(_Out_ EAP_ERROR **ppEapError)
 {
     UNREFERENCED_PARAMETER(ppEapError);
 
@@ -47,18 +47,18 @@ DWORD eap::peer_ttls::initialize(_Out_ EAP_ERROR **ppEapError)
         MsiUseFeature(_T(PRODUCT_VERSION_GUID), _T("featEAPTTLS"));
 #endif
 
-    return ERROR_SUCCESS;
+    return true;
 }
 
 
-DWORD eap::peer_ttls::shutdown(_Out_ EAP_ERROR **ppEapError)
+bool eap::peer_ttls::shutdown(_Out_ EAP_ERROR **ppEapError)
 {
     UNREFERENCED_PARAMETER(ppEapError);
-    return ERROR_SUCCESS;
+    return true;
 }
 
 
-DWORD eap::peer_ttls::get_identity(
+bool eap::peer_ttls::get_identity(
     _In_                                   DWORD     dwFlags,
     _In_                                   DWORD     dwConnectionDataSize,
     _In_count_(dwConnectionDataSize) const BYTE      *pConnectionData,
@@ -83,13 +83,12 @@ DWORD eap::peer_ttls::get_identity(
     UNREFERENCED_PARAMETER(ppwszIdentity);
     UNREFERENCED_PARAMETER(ppEapError);
 
-    DWORD dwResult = ERROR_NOT_SUPPORTED;
-    ETW_FN_DWORD(dwResult);
-    return dwResult;
+    *ppEapError = make_error(ERROR_NOT_SUPPORTED, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Not supported."), NULL);
+    return false;
 }
 
 
-DWORD eap::peer_ttls::get_method_properties(
+bool eap::peer_ttls::get_method_properties(
     _In_                                DWORD                     dwVersion,
     _In_                                DWORD                     dwFlags,
     _In_                                HANDLE                    hUserImpersonationToken,
@@ -110,7 +109,6 @@ DWORD eap::peer_ttls::get_method_properties(
     UNREFERENCED_PARAMETER(pMethodPropertyArray);
     UNREFERENCED_PARAMETER(ppEapError);
 
-    DWORD dwResult = ERROR_NOT_SUPPORTED;
-    ETW_FN_DWORD(dwResult);
-    return dwResult;
+    *ppEapError = make_error(ERROR_NOT_SUPPORTED, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Not supported."), NULL);
+    return false;
 }

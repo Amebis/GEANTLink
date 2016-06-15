@@ -39,6 +39,40 @@ namespace eap
         ///
         /// Constructor
         ///
-        session_ttls();
+        /// \param[in] mod  Reference of the EAP module to use for global services
+        ///
+        session_ttls(_In_ module &mod);
+
+        ///
+        /// Copies TTLS session
+        ///
+        /// \param[in] other  Session to copy from
+        ///
+        session_ttls(_In_ const session_ttls &other);
+
+        ///
+        /// Moves TTLS session
+        ///
+        /// \param[in] other  Session to move from
+        ///
+        session_ttls(_Inout_ session_ttls &&other);
+
+        ///
+        /// Copies TTLS session
+        ///
+        /// \param[in] other  Session to copy from
+        ///
+        /// \returns Reference to this object
+        ///
+        session_ttls& operator=(_In_ const session_ttls &other);
+
+        ///
+        /// Moves TTLS session
+        ///
+        /// \param[in] other  Session to move from
+        ///
+        /// \returns Reference to this object
+        ///
+        session_ttls& operator=(_Inout_ session_ttls &&other);
     };
 }

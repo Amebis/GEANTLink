@@ -165,11 +165,6 @@ namespace eap
         config(_Inout_ config &&other);
 
         ///
-        /// Destructs configuration
-        ///
-        virtual ~config();
-
-        ///
         /// Copies configuration
         ///
         /// \param[in] other  Configuration to copy from
@@ -205,10 +200,10 @@ namespace eap
         /// \param[out] ppEapError   Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
         ///
         /// \returns
-        /// - \c ERROR_SUCCESS if succeeded
-        /// - error code otherwise
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
         ///
-        virtual DWORD save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const = 0;
+        virtual bool save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const = 0;
 
         ///
         /// Load configuration from XML document
@@ -217,10 +212,10 @@ namespace eap
         /// \param[out] ppEapError   Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
         ///
         /// \returns
-        /// - \c ERROR_SUCCESS if succeeded
-        /// - error code otherwise
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
         ///
-        virtual DWORD load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) = 0;
+        virtual bool load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) = 0;
 
         /// @}
 
@@ -330,10 +325,10 @@ namespace eap
         /// \param[out] ppEapError   Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
         ///
         /// \returns
-        /// - \c ERROR_SUCCESS if succeeded
-        /// - error code otherwise
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
         ///
-        virtual DWORD save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
+        virtual bool save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
         {
             const winstd::bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
             DWORD dwResult;
@@ -342,27 +337,27 @@ namespace eap
             winstd::com_obj<IXMLDOMElement> pXmlElClientSideCredential;
             if ((dwResult = eapxml::create_element(pDoc, pConfigRoot, winstd::bstr(L"eap-metadata:ClientSideCredential"), winstd::bstr(L"ClientSideCredential"), bstrNamespace, &pXmlElClientSideCredential)) != ERROR_SUCCESS) {
                 *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <ClientSideCredential> element."), NULL);
-                return dwResult;
+                return false;
             }
 
             // <ClientSideCredential>/<allow-save>
             if ((dwResult = eapxml::put_element_value(pDoc, pXmlElClientSideCredential, winstd::bstr(L"allow-save"), bstrNamespace, m_allow_save)) != ERROR_SUCCESS) {
                 *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <allow-save> element."), NULL);
-                return dwResult;
+                return false;
             }
 
             // <ClientSideCredential>/<AnonymousIdentity>
             if (!m_anonymous_identity.empty())
                 if ((dwResult = eapxml::put_element_value(pDoc, pXmlElClientSideCredential, winstd::bstr(L"AnonymousIdentity"), bstrNamespace, winstd::bstr(m_anonymous_identity))) != ERROR_SUCCESS) {
                     *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <AnonymousIdentity> element."), NULL);
-                    return dwResult;
+                    return false;
                 }
 
             if (m_use_preshared)
-                if ((dwResult = m_preshared.save(pDoc, pXmlElClientSideCredential, ppEapError)) != ERROR_SUCCESS)
-                    return dwResult;
+                if (!m_preshared.save(pDoc, pXmlElClientSideCredential, ppEapError))
+                    return false;
 
-            return ERROR_SUCCESS;
+            return true;
         }
 
 
@@ -373,13 +368,11 @@ namespace eap
         /// \param[out] ppEapError   Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
         ///
         /// \returns
-        /// - \c ERROR_SUCCESS if succeeded
-        /// - error code otherwise
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
         ///
-        virtual DWORD load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError)
+        virtual bool load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError)
         {
-            DWORD dwResult;
-
             m_allow_save = true;
             m_use_preshared = false;
             m_preshared.clear();
@@ -394,7 +387,7 @@ namespace eap
                 // <AnonymousIdentity>
                 eapxml::get_element_value(pXmlElClientSideCredential, winstd::bstr(L"eap-metadata:AnonymousIdentity"), m_anonymous_identity);
 
-                if ((dwResult = m_preshared.load(pXmlElClientSideCredential, ppEapError)) != ERROR_SUCCESS) {
+                if (!m_preshared.load(pXmlElClientSideCredential, ppEapError)) {
                     // This is not really an error - merely an indication pre-shared credentials are unavailable.
                     if (*ppEapError) {
                         m_module.free_error_memory(*ppEapError);
@@ -404,7 +397,7 @@ namespace eap
                     m_use_preshared = true;
             }
 
-            return ERROR_SUCCESS;
+            return true;
         }
 
         /// @}
@@ -527,10 +520,10 @@ namespace eap
         /// \param[out] ppEapError   Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
         ///
         /// \returns
-        /// - \c ERROR_SUCCESS if succeeded
-        /// - error code otherwise
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
         ///
-        virtual DWORD save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
+        virtual bool save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
         {
             const winstd::bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
             DWORD dwResult;
@@ -540,42 +533,42 @@ namespace eap
             if (!m_id.empty())
                 if ((dwResult = eapxml::put_element_value(pDoc, pConfigRoot, winstd::bstr(L"ID"), bstrNamespace, winstd::bstr(m_id))) != ERROR_SUCCESS) {
                     *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <ID> element."), NULL);
-                    return dwResult;
+                    return false;
                 }
 
             // <ProviderInfo>
             winstd::com_obj<IXMLDOMElement> pXmlElProviderInfo;
             if ((dwResult = eapxml::create_element(pDoc, pConfigRoot, winstd::bstr(L"eap-metadata:ProviderInfo"), winstd::bstr(L"ProviderInfo"), bstrNamespace, &pXmlElProviderInfo)) != ERROR_SUCCESS) {
                 *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <ProviderInfo> element."), NULL);
-                return dwResult;
+                return false;
             }
 
             // <ProviderInfo>/<CredentialPrompt>
             if (!m_lbl_alt_credential.empty())
                 if ((dwResult = eapxml::put_element_value(pDoc, pXmlElProviderInfo, winstd::bstr(L"CredentialPrompt"), bstrNamespace, winstd::bstr(m_lbl_alt_credential))) != ERROR_SUCCESS) {
                     *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <CredentialPrompt> element."), NULL);
-                    return dwResult;
+                    return false;
                 }
 
             // <ProviderInfo>/<UserNameLabel>
             if (!m_lbl_alt_identity.empty())
                 if ((dwResult = eapxml::put_element_value(pDoc, pXmlElProviderInfo, winstd::bstr(L"UserNameLabel"), bstrNamespace, winstd::bstr(m_lbl_alt_identity))) != ERROR_SUCCESS) {
                     *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <UserNameLabel> element."), NULL);
-                    return dwResult;
+                    return false;
                 }
 
             // <ProviderInfo>/<PasswordLabel>
             if (!m_lbl_alt_password.empty())
                 if ((dwResult = eapxml::put_element_value(pDoc, pXmlElProviderInfo, winstd::bstr(L"PasswordLabel"), bstrNamespace, winstd::bstr(m_lbl_alt_password))) != ERROR_SUCCESS) {
                     *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <PasswordLabel> element."), NULL);
-                    return dwResult;
+                    return false;
                 }
 
             // <AuthenticationMethods>
             winstd::com_obj<IXMLDOMElement> pXmlElAuthenticationMethods;
             if ((dwResult = eapxml::create_element(pDoc, pConfigRoot, winstd::bstr(L"eap-metadata:AuthenticationMethods"), winstd::bstr(L"AuthenticationMethods"), bstrNamespace, &pXmlElAuthenticationMethods)) != ERROR_SUCCESS) {
                 *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <AuthenticationMethods> element."), NULL);
-                return dwResult;
+                return false;
             }
 
             for (std::list<_Tmeth>::const_iterator method = m_methods.cbegin(), method_end = m_methods.cend(); method != method_end; ++method) {
@@ -583,20 +576,20 @@ namespace eap
                 winstd::com_obj<IXMLDOMElement> pXmlElAuthenticationMethod;
                 if ((dwResult = eapxml::create_element(pDoc, winstd::bstr(L"AuthenticationMethod"), bstrNamespace, &pXmlElAuthenticationMethod))) {
                     *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <AuthenticationMethod> element."), NULL);
-                    return dwResult;
+                    return false;
                 }
 
                 // <AuthenticationMethod>/...
-                if ((dwResult = method->save(pDoc, pXmlElAuthenticationMethod, ppEapError)) != ERROR_SUCCESS)
-                    return dwResult;
+                if (!method->save(pDoc, pXmlElAuthenticationMethod, ppEapError))
+                    return false;
 
                 if (FAILED(hr = pXmlElAuthenticationMethods->appendChild(pXmlElAuthenticationMethod, NULL))) {
-                    *ppEapError = m_module.make_error(dwResult = HRESULT_CODE(hr), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error appending <AuthenticationMethod> element."), NULL);
-                    return dwResult;
+                    *ppEapError = m_module.make_error(HRESULT_CODE(hr), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error appending <AuthenticationMethod> element."), NULL);
+                    return false;
                 }
             }
 
-            return dwResult;
+            return true;
         }
 
 
@@ -607,10 +600,10 @@ namespace eap
         /// \param[out] ppEapError   Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
         ///
         /// \returns
-        /// - \c ERROR_SUCCESS if succeeded
-        /// - error code otherwise
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
         ///
-        virtual DWORD load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError)
+        virtual bool load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError)
         {
             assert(pConfigRoot);
             assert(ppEapError);
@@ -642,8 +635,8 @@ namespace eap
             m_methods.clear();
             winstd::com_obj<IXMLDOMNodeList> pXmlListMethods;
             if ((dwResult = eapxml::select_nodes(pConfigRoot, winstd::bstr(L"eap-metadata:AuthenticationMethods/eap-metadata:AuthenticationMethod"), &pXmlListMethods)) != ERROR_SUCCESS) {
-                *ppEapError = m_module.make_error(dwResult = ERROR_NOT_FOUND, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error selecting <AuthenticationMethods>/<AuthenticationMethod> elements."), NULL);
-                return dwResult;
+                *ppEapError = m_module.make_error(ERROR_NOT_FOUND, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error selecting <AuthenticationMethods>/<AuthenticationMethod> elements."), NULL);
+                return false;
             }
             long lCount = 0;
             pXmlListMethods->get_length(&lCount);
@@ -663,15 +656,14 @@ namespace eap
                 }
 
                 // Load configuration.
-                dwResult = cfg.load(pXmlElMethod, ppEapError);
-                if (dwResult != ERROR_SUCCESS)
-                    return dwResult;
+                if (!cfg.load(pXmlElMethod, ppEapError))
+                    return false;
 
                 // Add configuration to the list.
                 m_methods.push_back(std::move(cfg));
             }
 
-            return ERROR_SUCCESS;
+            return true;
         }
 
         /// @}
@@ -772,10 +764,10 @@ namespace eap
         /// \param[out] ppEapError   Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
         ///
         /// \returns
-        /// - \c ERROR_SUCCESS if succeeded
-        /// - error code otherwise
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
         ///
-        virtual DWORD save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
+        virtual bool save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
         {
             const winstd::bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
             DWORD dwResult;
@@ -784,8 +776,8 @@ namespace eap
             // Select <EAPIdentityProviderList> node.
             winstd::com_obj<IXMLDOMNode> pXmlElIdentityProviderList;
             if ((dwResult = eapxml::select_node(pConfigRoot, winstd::bstr(L"eap-metadata:EAPIdentityProviderList"), &pXmlElIdentityProviderList)) != ERROR_SUCCESS) {
-                *ppEapError = m_module.make_error(dwResult = ERROR_NOT_FOUND, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error selecting <EAPIdentityProviderList> element."), NULL);
-                return dwResult;
+                *ppEapError = m_module.make_error(ERROR_NOT_FOUND, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error selecting <EAPIdentityProviderList> element."), NULL);
+                return false;
             }
 
             for (std::list<_Tprov>::const_iterator provider = m_providers.cbegin(), provider_end = m_providers.cend(); provider != provider_end; ++provider) {
@@ -793,20 +785,20 @@ namespace eap
                 winstd::com_obj<IXMLDOMElement> pXmlElIdentityProvider;
                 if ((dwResult = eapxml::create_element(pDoc, winstd::bstr(L"EAPIdentityProvider"), bstrNamespace, &pXmlElIdentityProvider))) {
                     *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <EAPIdentityProvider> element."), NULL);
-                    return dwResult;
+                    return false;
                 }
 
                 // <EAPIdentityProvider>/...
-                if ((dwResult = provider->save(pDoc, pXmlElIdentityProvider, ppEapError)) != ERROR_SUCCESS)
-                    return dwResult;
+                if (!provider->save(pDoc, pXmlElIdentityProvider, ppEapError))
+                    return false;
 
                 if (FAILED(hr = pXmlElIdentityProviderList->appendChild(pXmlElIdentityProvider, NULL))) {
-                    *ppEapError = m_module.make_error(dwResult = HRESULT_CODE(hr), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error appending <EAPIdentityProvider> element."), NULL);
-                    return dwResult;
+                    *ppEapError = m_module.make_error(HRESULT_CODE(hr), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error appending <EAPIdentityProvider> element."), NULL);
+                    return false;
                 }
             }
 
-            return dwResult;
+            return true;
         }
 
 
@@ -817,10 +809,10 @@ namespace eap
         /// \param[out] ppEapError   Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
         ///
         /// \returns
-        /// - \c ERROR_SUCCESS if succeeded
-        /// - error code otherwise
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
         ///
-        virtual DWORD load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError)
+        virtual bool load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError)
         {
             assert(pConfigRoot);
             assert(ppEapError);
@@ -829,8 +821,8 @@ namespace eap
             // Iterate authentication providers (<EAPIdentityProvider>).
             winstd::com_obj<IXMLDOMNodeList> pXmlListProviders;
             if ((dwResult = eapxml::select_nodes(pConfigRoot, winstd::bstr(L"eap-metadata:EAPIdentityProviderList/eap-metadata:EAPIdentityProvider"), &pXmlListProviders)) != ERROR_SUCCESS) {
-                *ppEapError = m_module.make_error(dwResult = ERROR_NOT_FOUND, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error selecting <EAPIdentityProviderList><EAPIdentityProvider> elements."), NULL);
-                return dwResult;
+                *ppEapError = m_module.make_error(ERROR_NOT_FOUND, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error selecting <EAPIdentityProviderList><EAPIdentityProvider> elements."), NULL);
+                return false;
             }
             long lCount = 0;
             pXmlListProviders->get_length(&lCount);
@@ -841,15 +833,14 @@ namespace eap
                 _Tprov prov(m_module);
 
                 // Load provider.
-                dwResult = prov.load(pXmlElProvider, ppEapError);
-                if (dwResult != ERROR_SUCCESS)
-                    return dwResult;
+                if (!prov.load(pXmlElProvider, ppEapError))
+                    return false;
 
                 // Add provider to the list.
                 m_providers.push_back(std::move(prov));
             }
 
-            return dwResult;
+            return true;
         }
 
         /// @}

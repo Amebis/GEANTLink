@@ -28,17 +28,41 @@ using namespace winstd;
 // eap::session
 //////////////////////////////////////////////////////////////////////
 
-eap::session::session()
+eap::session::session(_In_ module &mod) :
+    m_module(mod)
 {
 }
 
 
-eap::session::~session()
+eap::session::session(_In_ const session &other) :
+    m_module(other.m_module)
 {
 }
 
 
-DWORD eap::session::begin(
+eap::session::session(_Inout_ session &&other) :
+    m_module(other.m_module)
+{
+}
+
+
+eap::session& eap::session::operator=(_In_ const session &other)
+{
+    UNREFERENCED_PARAMETER(other);
+    assert(&m_module == &other.m_module); // Copy session within same module only!
+    return *this;
+}
+
+
+eap::session& eap::session::operator=(_Inout_ session &&other)
+{
+    UNREFERENCED_PARAMETER(other);
+    assert(&m_module == &other.m_module); // Move session within same module only!
+    return *this;
+}
+
+
+bool eap::session::begin(
     _In_                                   DWORD         dwFlags,
     _In_                             const EapAttributes *pAttributeArray,
     _In_                                   HANDLE        hTokenImpersonateUser,
@@ -59,19 +83,19 @@ DWORD eap::session::begin(
     UNREFERENCED_PARAMETER(dwMaxSendPacketSize);
     UNREFERENCED_PARAMETER(ppEapError);
 
-    return ERROR_SUCCESS;
+    return true;
 }
 
 
-DWORD eap::session::end(_Out_ EAP_ERROR **ppEapError)
+bool eap::session::end(_Out_ EAP_ERROR **ppEapError)
 {
     UNREFERENCED_PARAMETER(ppEapError);
 
-    return ERROR_SUCCESS;
+    return true;
 }
 
 
-DWORD eap::session::process_request_packet(
+bool eap::session::process_request_packet(
     _In_                                       DWORD               dwReceivedPacketSize,
     _In_bytecount_(dwReceivedPacketSize) const EapPacket           *pReceivedPacket,
     _Out_                                      EapPeerMethodOutput *pEapOutput,
@@ -80,49 +104,53 @@ DWORD eap::session::process_request_packet(
     UNREFERENCED_PARAMETER(dwReceivedPacketSize);
     UNREFERENCED_PARAMETER(pReceivedPacket);
     UNREFERENCED_PARAMETER(pEapOutput);
-    UNREFERENCED_PARAMETER(ppEapError);
+    assert(ppEapError);
 
-    return ERROR_NOT_SUPPORTED;
+    *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Not supported."), NULL);
+    return false;
 }
 
 
-DWORD eap::session::get_response_packet(
+bool eap::session::get_response_packet(
     _Inout_                            DWORD              *pdwSendPacketSize,
     _Inout_bytecap_(*dwSendPacketSize) EapPacket          *pSendPacket,
     _Out_                              EAP_ERROR          **ppEapError)
 {
     UNREFERENCED_PARAMETER(pdwSendPacketSize);
     UNREFERENCED_PARAMETER(pSendPacket);
-    UNREFERENCED_PARAMETER(ppEapError);
+    assert(ppEapError);
 
-    return ERROR_NOT_SUPPORTED;
+    *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Not supported."), NULL);
+    return false;
 }
 
 
-DWORD eap::session::get_result(_In_ EapPeerMethodResultReason reason, _Out_ EapPeerMethodResult *ppResult, _Out_ EAP_ERROR **ppEapError)
+bool eap::session::get_result(_In_ EapPeerMethodResultReason reason, _Out_ EapPeerMethodResult *ppResult, _Out_ EAP_ERROR **ppEapError)
 {
     UNREFERENCED_PARAMETER(reason);
     UNREFERENCED_PARAMETER(ppResult);
-    UNREFERENCED_PARAMETER(ppEapError);
+    assert(ppEapError);
 
-    return ERROR_NOT_SUPPORTED;
+    *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Not supported."), NULL);
+    return false;
 }
 
 
-DWORD eap::session::get_ui_context(
+bool eap::session::get_ui_context(
     _Out_ DWORD     *pdwUIContextDataSize,
     _Out_ BYTE      **ppUIContextData,
     _Out_ EAP_ERROR **ppEapError)
 {
     UNREFERENCED_PARAMETER(pdwUIContextDataSize);
     UNREFERENCED_PARAMETER(ppUIContextData);
-    UNREFERENCED_PARAMETER(ppEapError);
+    assert(ppEapError);
 
-    return ERROR_NOT_SUPPORTED;
+    *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Not supported."), NULL);
+    return false;
 }
 
 
-DWORD eap::session::set_ui_context(
+bool eap::session::set_ui_context(
     _In_                                  DWORD               dwUIContextDataSize,
     _In_count_(dwUIContextDataSize) const BYTE                *pUIContextData,
     _In_                            const EapPeerMethodOutput *pEapOutput,
@@ -131,26 +159,29 @@ DWORD eap::session::set_ui_context(
     UNREFERENCED_PARAMETER(dwUIContextDataSize);
     UNREFERENCED_PARAMETER(pUIContextData);
     UNREFERENCED_PARAMETER(pEapOutput);
-    UNREFERENCED_PARAMETER(ppEapError);
+    assert(ppEapError);
 
-    return ERROR_NOT_SUPPORTED;
+    *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Not supported."), NULL);
+    return false;
 }
 
 
-DWORD eap::session::get_response_attributes(_Out_ EapAttributes *pAttribs, _Out_ EAP_ERROR **ppEapError)
+bool eap::session::get_response_attributes(_Out_ EapAttributes *pAttribs, _Out_ EAP_ERROR **ppEapError)
 {
     UNREFERENCED_PARAMETER(pAttribs);
-    UNREFERENCED_PARAMETER(ppEapError);
+    assert(ppEapError);
 
-    return ERROR_NOT_SUPPORTED;
+    *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Not supported."), NULL);
+    return false;
 }
 
 
-DWORD eap::session::set_response_attributes(const _In_ EapAttributes *pAttribs, _Out_ EapPeerMethodOutput *pEapOutput, _Out_ EAP_ERROR **ppEapError)
+bool eap::session::set_response_attributes(const _In_ EapAttributes *pAttribs, _Out_ EapPeerMethodOutput *pEapOutput, _Out_ EAP_ERROR **ppEapError)
 {
     UNREFERENCED_PARAMETER(pAttribs);
     UNREFERENCED_PARAMETER(pEapOutput);
-    UNREFERENCED_PARAMETER(ppEapError);
+    assert(ppEapError);
 
-    return ERROR_NOT_SUPPORTED;
+    *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Not supported."), NULL);
+    return false;
 }
