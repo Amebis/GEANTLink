@@ -353,20 +353,28 @@ namespace eapserial
 
     inline void pack(_Inout_ unsigned char *&cursor, _In_ const winstd::cert_context &val)
     {
-        *(DWORD*&)cursor = val->dwCertEncodingType;
-        cursor += sizeof(DWORD);
+        if (val) {
+            *(DWORD*&)cursor = val->dwCertEncodingType;
+            cursor += sizeof(DWORD);
 
-        *(DWORD*&)cursor = val->cbCertEncoded;
-        cursor += sizeof(DWORD);
+            *(DWORD*&)cursor = val->cbCertEncoded;
+            cursor += sizeof(DWORD);
 
-        memcpy(cursor, val->pbCertEncoded, val->cbCertEncoded);
-        cursor += val->cbCertEncoded;
+            memcpy(cursor, val->pbCertEncoded, val->cbCertEncoded);
+            cursor += val->cbCertEncoded;
+        } else {
+            *(DWORD*&)cursor = 0;
+            cursor += sizeof(DWORD);
+
+            *(DWORD*&)cursor = 0;
+            cursor += sizeof(DWORD);
+        }
     }
 
 
     inline size_t get_pk_size(const winstd::cert_context &val)
     {
-        return sizeof(DWORD) + sizeof(DWORD) + val->cbCertEncoded;
+        return sizeof(DWORD) + sizeof(DWORD) + (val ? val->cbCertEncoded : 0);
     }
 
 
@@ -378,7 +386,10 @@ namespace eapserial
         DWORD dwCertEncodedSize = *(DWORD*&)cursor;
         cursor += sizeof(DWORD);
 
-        val.create(dwCertEncodingType, (BYTE*)cursor, dwCertEncodedSize);
-        cursor += dwCertEncodedSize;
+        if (dwCertEncodedSize) {
+            val.create(dwCertEncodingType, (BYTE*)cursor, dwCertEncodedSize);
+            cursor += dwCertEncodedSize;
+        } else
+            val.free();
     }
 }
