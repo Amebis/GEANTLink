@@ -147,7 +147,9 @@ bool wxEAPTTLSConfig::TransferDataToWindow()
     } else
         wxFAIL_MSG(wxT("Unsupported inner authentication method type."));
 
-    return wxScrolledWindow::TransferDataToWindow();
+    // Do not invoke inherited TransferDataToWindow(), as it will call others TransferDataToWindow().
+    // This will handle wxEAPTTLSConfig::OnInitDialog() via wxEVT_INIT_DIALOG forwarding.
+    return true /*wxScrolledWindow::TransferDataToWindow()*/;
 }
 
 
@@ -171,6 +173,9 @@ bool wxEAPTTLSConfig::TransferDataFromWindow()
 
 void wxEAPTTLSConfig::OnInitDialog(wxInitDialogEvent& event)
 {
+    // Call TransferDataToWindow() manually, as wxScrolledWindow somehow skips that.
+    TransferDataToWindow();
+
     // Forward the event to child panels.
     m_outer_identity->GetEventHandler()->ProcessEvent(event);
     m_tls->GetEventHandler()->ProcessEvent(event);
