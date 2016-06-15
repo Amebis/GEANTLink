@@ -60,6 +60,7 @@ namespace eap
 #include <Windows.h>
 #include <eaptypes.h> // Must include after <Windows.h>
 #include <sal.h>
+#include <tchar.h>
 
 #include <EventsETW.h> // Must include after <Windows.h>
 
@@ -78,6 +79,9 @@ namespace eap
         /// Destructs the module
         ///
         virtual ~module();
+
+        /// \name Memory management
+        /// @{
 
         ///
         /// Allocate a EAP_ERROR and fill it according to dwErrorCode
@@ -98,6 +102,341 @@ namespace eap
         /// Free EAP_ERROR allocated with `make_error()` method
         ///
         void free_error_memory(_In_ EAP_ERROR *err);
+
+        /// @}
+
+
+        /// \name Encryption
+        /// @{
+
+        ///
+        /// Encrypts data
+        ///
+        /// \param[in ] hProv       Handle of cryptographics provider
+        /// \param[in ] data        Pointer to data to encrypt
+        /// \param[in ] size        Size of \p data in bytes
+        /// \param[out] enc         Encrypted data
+        /// \param[out] ppEapError  Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
+        /// \param[out] hHash       Handle of hashing object
+        ///
+        /// \returns
+        /// - \c ERROR_SUCCESS if succeeded
+        /// - error code otherwise
+        ///
+        DWORD encrypt(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _Out_ std::vector<unsigned char> &enc, _Out_ EAP_ERROR **ppEapError, _Out_opt_ HCRYPTHASH hHash = NULL) const;
+
+
+        ///
+        /// Encrypts a string
+        ///
+        /// \param[in ] hProv       Handle of cryptographics provider
+        /// \param[in ] val         String to encrypt
+        /// \param[out] enc         Encrypted data
+        /// \param[out] ppEapError  Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
+        /// \param[out] hHash       Handle of hashing object
+        ///
+        /// \returns
+        /// - \c ERROR_SUCCESS if succeeded
+        /// - error code otherwise
+        ///
+        template<class _Elem, class _Traits, class _Ax>
+        DWORD encrypt(_In_ HCRYPTPROV hProv, _In_ const std::basic_string<_Elem, _Traits, _Ax> &val, _Out_ std::vector<unsigned char> &enc, _Out_ EAP_ERROR **ppEapError, _Out_opt_ HCRYPTHASH hHash = NULL) const
+        {
+            return encrypt(hProv, val.c_str(), val.length*sizeof(_Elem), enc, ppEapError, hHash);
+        }
+
+
+        ///
+        /// Encrypts a wide string
+        ///
+        /// \param[in ] hProv       Handle of cryptographics provider
+        /// \param[in ] val         String to encrypt
+        /// \param[out] enc         Encrypted data
+        /// \param[out] ppEapError  Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
+        /// \param[out] hHash       Handle of hashing object
+        ///
+        /// \returns
+        /// - \c ERROR_SUCCESS if succeeded
+        /// - error code otherwise
+        ///
+        template<class _Traits, class _Ax>
+        DWORD encrypt(_In_ HCRYPTPROV hProv, _In_ const std::basic_string<wchar_t, _Traits, _Ax> &val, _Out_ std::vector<unsigned char> &enc, _Out_ EAP_ERROR **ppEapError, _Out_opt_ HCRYPTHASH hHash = NULL) const
+        {
+            winstd::sanitizing_string val_utf8;
+            WideCharToMultiByte(CP_UTF8, 0, val.c_str(), (int)val.length(), val_utf8, NULL, NULL);
+            return encrypt(hProv, val_utf8, enc, ppEapError, hHash);
+        }
+
+
+        ///
+        /// Encrypts data and add MD5 hash for integrity check
+        ///
+        /// \param[in ] hProv       Handle of cryptographics provider
+        /// \param[in ] data        Pointer to data to encrypt
+        /// \param[in ] size        Size of \p data in bytes
+        /// \param[out] enc         Encrypted data with 16B MD5 hash appended
+        /// \param[out] ppEapError  Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
+        ///
+        /// \returns
+        /// - \c ERROR_SUCCESS if succeeded
+        /// - error code otherwise
+        ///
+        DWORD encrypt_md5(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _Out_ std::vector<unsigned char> &enc, _Out_ EAP_ERROR **ppEapError) const;
+
+
+        ///
+        /// Encrypts a string and add MD5 hash for integrity check
+        ///
+        /// \param[in ] hProv       Handle of cryptographics provider
+        /// \param[in ] val         String to encrypt
+        /// \param[out] enc         Encrypted data with 16B MD5 hash appended
+        /// \param[out] ppEapError  Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
+        ///
+        /// \returns
+        /// - \c ERROR_SUCCESS if succeeded
+        /// - error code otherwise
+        ///
+        template<class _Elem, class _Traits, class _Ax>
+        DWORD encrypt_md5(_In_ HCRYPTPROV hProv, _In_ const std::basic_string<_Elem, _Traits, _Ax> &val, _Out_ std::vector<unsigned char> &enc, _Out_ EAP_ERROR **ppEapError) const
+        {
+            return encrypt_md5(hProv, val.c_str(), val.length()*sizeof(_Elem), enc, ppEapError);
+        }
+
+
+        ///
+        /// Encrypts a wide string and add MD5 hash for integrity check
+        ///
+        /// \param[in ] hProv       Handle of cryptographics provider
+        /// \param[in ] val         String to encrypt
+        /// \param[out] enc         Encrypted data with 16B MD5 hash appended
+        /// \param[out] ppEapError  Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
+        ///
+        /// \returns
+        /// - \c ERROR_SUCCESS if succeeded
+        /// - error code otherwise
+        ///
+        template<class _Traits, class _Ax>
+        DWORD encrypt_md5(_In_ HCRYPTPROV hProv, _In_ const std::basic_string<wchar_t, _Traits, _Ax> &val, _Out_ std::vector<unsigned char> &enc, _Out_ EAP_ERROR **ppEapError) const
+        {
+            winstd::sanitizing_string val_utf8;
+            WideCharToMultiByte(CP_UTF8, 0, val.c_str(), (int)val.length(), val_utf8, NULL, NULL);
+            return encrypt_md5(hProv, val_utf8, enc, ppEapError);
+        }
+
+
+        ///
+        /// Decrypts data
+        ///
+        /// \param[in ] hProv       Handle of cryptographics provider
+        /// \param[in ] data        Pointer to data to decrypt
+        /// \param[in ] size        Size of \p data in bytes
+        /// \param[out] dec         Decrypted data
+        /// \param[out] ppEapError  Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
+        /// \param[out] hHash       Handle of hashing object
+        ///
+        /// \returns
+        /// - \c ERROR_SUCCESS if succeeded
+        /// - error code otherwise
+        ///
+        template<class _Ty, class _Ax>
+        DWORD decrypt(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _Out_ std::vector<_Ty, _Ax> &dec, _Out_ EAP_ERROR **ppEapError, _Out_opt_ HCRYPTHASH hHash = NULL) const
+        {
+            assert(ppEapError);
+            DWORD dwResult;
+
+            // Import the private key.
+            HRSRC res = FindResource(m_instance, MAKEINTRESOURCE(IDR_EAP_KEY_PRIVATE), RT_RCDATA);
+            assert(res);
+            HGLOBAL res_handle = LoadResource(m_instance, res);
+            assert(res_handle);
+            crypt_key key;
+            unique_ptr<unsigned char[], LocalFree_delete<unsigned char[]> > keyinfo_data;
+            DWORD keyinfo_size = 0;
+            if (!CryptDecodeObjectEx(X509_ASN_ENCODING, PKCS_RSA_PRIVATE_KEY, (const BYTE*)::LockResource(res_handle), ::SizeofResource(m_instance, res), CRYPT_DECODE_ALLOC_FLAG, NULL, &keyinfo_data, &keyinfo_size)) {
+                *ppEapError = make_error(dwResult = GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CryptDecodeObjectEx failed."), NULL);
+                return dwResult;
+            }
+
+            if (!key.import(hProv, keyinfo_data.get(), keyinfo_size, NULL, 0)) {
+                *ppEapError = make_error(dwResult = GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Private key import failed."), NULL);
+                return dwResult;
+            }
+
+            // Decrypt the data using our private key.
+            vector<unsigned char, sanitizing_allocator<unsigned char> > buf(size);
+            memcpy(buf.data(), data, size);
+            if (!CryptDecrypt(key, hHash, TRUE, 0, buf)) {
+                *ppEapError = make_error(dwResult = GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Decrypting password failed."), NULL);
+                return dwResult;
+            }
+
+            dec.assign(buf.begin(), buf.end());
+
+            return ERROR_SUCCESS;
+        }
+
+
+        ///
+        /// Decrypts a string
+        ///
+        /// \param[in ] hProv       Handle of cryptographics provider
+        /// \param[in ] data        Pointer to data to decrypt
+        /// \param[in ] size        Size of \p data in bytes
+        /// \param[out] dec         Decrypted string
+        /// \param[out] ppEapError  Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
+        /// \param[out] hHash       Handle of hashing object
+        ///
+        /// \returns
+        /// - \c ERROR_SUCCESS if succeeded
+        /// - error code otherwise
+        ///
+        template<class _Elem, class _Traits, class _Ax>
+        DWORD decrypt(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _Out_ std::basic_string<_Elem, _Traits, _Ax> &dec, _Out_ EAP_ERROR **ppEapError, _Out_opt_ HCRYPTHASH hHash = NULL) const
+        {
+            DWORD dwResult;
+
+            std::vector<_Elem, sanitizing_allocator<_Elem> > buf;
+            if ((dwResult = decrypt(hProv, data, size, buf, ppEapError, hHash)) != ERROR_SUCCESS)
+                return dwResult;
+            dec.assign((const _Elem*)buf.begin(), (const _Elem*)buf.end());
+
+            return ERROR_SUCCESS;
+        }
+
+
+        ///
+        /// Decrypts a wide string
+        ///
+        /// \param[in ] hProv       Handle of cryptographics provider
+        /// \param[in ] data        Pointer to data to decrypt
+        /// \param[in ] size        Size of \p data in bytes
+        /// \param[out] dec         Decrypted string
+        /// \param[out] ppEapError  Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
+        /// \param[out] hHash       Handle of hashing object
+        ///
+        /// \returns
+        /// - \c ERROR_SUCCESS if succeeded
+        /// - error code otherwise
+        ///
+        template<class _Traits, class _Ax>
+        DWORD decrypt(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _Out_ std::basic_string<wchar_t, _Traits, _Ax> &dec, _Out_ EAP_ERROR **ppEapError, _Out_opt_ HCRYPTHASH hHash = NULL) const
+        {
+            DWORD dwResult;
+
+            winstd::sanitizing_string buf;
+            if ((dwResult = decrypt(hProv, data, size, buf, ppEapError, hHash)) != ERROR_SUCCESS)
+                return dwResult;
+            MultiByteToWideChar(CP_UTF8, 0, buf.data(), (int)buf.size(), dec);
+
+            return ERROR_SUCCESS;
+        }
+
+
+        ///
+        /// Decrypts data with MD5 integrity check
+        ///
+        /// \param[in ] hProv       Handle of cryptographics provider
+        /// \param[in ] data        Pointer to data with 16B MD5 hash appended to decrypt
+        /// \param[in ] size        Size of \p data in bytes
+        /// \param[out] dec         Decrypted data
+        /// \param[out] ppEapError  Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
+        ///
+        /// \returns
+        /// - \c ERROR_SUCCESS if succeeded
+        /// - error code otherwise
+        ///
+        template<class _Ty, class _Ax>
+        DWORD decrypt_md5(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _Out_ std::vector<_Ty, _Ax> &dec, _Out_ EAP_ERROR **ppEapError) const
+        {
+            DWORD dwResult;
+
+            // Create hash.
+            crypt_hash hash;
+            if (!hash.create(hProv, CALG_MD5)) {
+                *ppEapError = make_error(dwResult = GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Creating MD5 hash failed."), NULL);
+                return dwResult;
+            }
+            DWORD dwHashSize, dwHashSizeSize = sizeof(dwHashSize);
+            CryptGetHashParam(hash, HP_HASHSIZE, (LPBYTE)&dwHashSize, &dwHashSizeSize, 0);
+            if (size < dwHashSize) {
+                *ppEapError = make_error(dwResult = ERROR_INVALID_DATA, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Encrypted data too short."), NULL);
+                return dwResult;
+            }
+            size_t enc_size = size - dwHashSize;
+
+            // Decrypt data.
+            if ((dwResult = decrypt(hProv, data, enc_size, dec, ppEapError, hash)) != ERROR_SUCCESS)
+                return dwResult;
+
+            // Calculate MD5 hash and verify it.
+            vector<unsigned char> hash_bin;
+            if (!CryptGetHashParam(hash, HP_HASHVAL, hash_bin, 0)) {
+                *ppEapError = make_error(dwResult = GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Calculating MD5 hash failed."), NULL);
+                return dwResult;
+            }
+            if (memcmp((unsigned char*)data + enc_size, hash_bin.data(), dwHashSize) != 0) {
+                *ppEapError = make_error(dwResult = ERROR_INVALID_DATA, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Invalid encrypted data."), NULL);
+                return dwResult;
+            }
+
+            return ERROR_SUCCESS;
+        }
+
+
+        ///
+        /// Decrypts a string with MD5 integrity check
+        ///
+        /// \param[in ] hProv       Handle of cryptographics provider
+        /// \param[in ] data        Pointer to data with 16B MD5 hash appended to decrypt
+        /// \param[in ] size        Size of \p data in bytes
+        /// \param[out] dec         Decrypted string
+        /// \param[out] ppEapError  Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
+        ///
+        /// \returns
+        /// - \c ERROR_SUCCESS if succeeded
+        /// - error code otherwise
+        ///
+        template<class _Elem, class _Traits, class _Ax>
+        DWORD decrypt_md5(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _Out_ std::basic_string<_Elem, _Traits, _Ax> &dec, _Out_ EAP_ERROR **ppEapError) const
+        {
+            DWORD dwResult;
+
+            std::vector<_Elem, sanitizing_allocator<_Elem> > buf;
+            if ((dwResult = decrypt_md5(hProv, data, size, buf, ppEapError)) != ERROR_SUCCESS)
+                return dwResult;
+            dec.assign(buf.data(), buf.size());
+
+            return ERROR_SUCCESS;
+        }
+
+
+        ///
+        /// Decrypts a wide string with MD5 integrity check
+        ///
+        /// \param[in ] hProv       Handle of cryptographics provider
+        /// \param[in ] data        Pointer to data with 16B MD5 hash appended to decrypt
+        /// \param[in ] size        Size of \p data in bytes
+        /// \param[out] dec         Decrypted string
+        /// \param[out] ppEapError  Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
+        ///
+        /// \returns
+        /// - \c ERROR_SUCCESS if succeeded
+        /// - error code otherwise
+        ///
+        template<class _Traits, class _Ax>
+        DWORD decrypt_md5(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _Out_ std::basic_string<wchar_t, _Traits, _Ax> &dec, _Out_ EAP_ERROR **ppEapError) const
+        {
+            DWORD dwResult;
+
+            winstd::sanitizing_string buf;
+            if ((dwResult = decrypt_md5(hProv, data, size, buf, ppEapError)) != ERROR_SUCCESS)
+                return dwResult;
+            MultiByteToWideChar(CP_UTF8, 0, buf.data(), (int)buf.size(), dec);
+
+            return ERROR_SUCCESS;
+        }
+
+        /// @}
 
     public:
         HINSTANCE m_instance;                   ///< Windows module instance
