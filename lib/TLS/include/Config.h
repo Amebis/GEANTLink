@@ -117,7 +117,7 @@ namespace eap
         ///
         /// \returns Pointer to cloned configuration
         ///
-        virtual config* clone() const { return new config_tls(*this); }
+        virtual config* clone() const;
 
         /// \name XML configuration management
         /// @{
@@ -154,7 +154,7 @@ namespace eap
         ///
         /// \returns `eap::type_tls`
         ///
-        virtual eap::type_t get_method_id() { return eap::type_tls; }
+        virtual eap::type_t get_method_id() const;
 
         ///
         /// Adds CA to the list of trusted root CA's

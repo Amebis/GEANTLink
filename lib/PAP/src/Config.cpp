@@ -60,3 +60,13 @@ eap::config_pap& eap::config_pap::operator=(_Inout_ config_pap &&other)
 }
 
 
+eap::config* eap::config_pap::clone() const
+{
+    return new config_pap(*this);
+}
+
+
+eap::type_t eap::config_pap::get_method_id() const
+{
+    return eap::type_pap;
+}

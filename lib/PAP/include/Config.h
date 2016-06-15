@@ -114,14 +114,14 @@ namespace eap
         ///
         /// \returns Pointer to cloned configuration
         ///
-        virtual config* clone() const { return new config_pap(*this); }
+        virtual config* clone() const;
 
         ///
         /// Returns EAP method type of this configuration
         ///
         /// \returns `eap::type_pap`
         ///
-        virtual eap::type_t get_method_id() { return eap::type_pap; }
+        virtual eap::type_t get_method_id() const;
     };
 }
 

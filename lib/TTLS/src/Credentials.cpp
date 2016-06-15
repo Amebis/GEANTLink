@@ -75,6 +75,11 @@ eap::credentials_ttls& eap::credentials_ttls::operator=(_Inout_ credentials_ttls
 }
 
 
+eap::config* eap::credentials_ttls::clone() const
+{
+    return new credentials_ttls(*this);
+}
+
 
 void eap::credentials_ttls::clear()
 {
@@ -88,7 +93,6 @@ bool eap::credentials_ttls::empty() const
 {
     return credentials_tls::empty() && (!m_inner || m_inner->empty());
 }
-
 
 
 DWORD eap::credentials_ttls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError)

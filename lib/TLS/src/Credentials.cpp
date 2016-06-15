@@ -69,6 +69,11 @@ eap::credentials_tls& eap::credentials_tls::operator=(_Inout_ credentials_tls &&
 }
 
 
+eap::config* eap::credentials_tls::clone() const
+{
+    return new credentials_tls(*this);
+}
+
 
 void eap::credentials_tls::clear()
 {
@@ -81,7 +86,6 @@ bool eap::credentials_tls::empty() const
 {
     return credentials::empty() && m_cert_hash.empty();
 }
-
 
 
 DWORD eap::credentials_tls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
@@ -98,7 +102,6 @@ DWORD eap::credentials_tls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *p
 
     return ERROR_SUCCESS;
 }
-
 
 
 DWORD eap::credentials_tls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError)

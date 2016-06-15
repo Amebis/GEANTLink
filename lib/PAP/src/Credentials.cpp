@@ -58,3 +58,15 @@ eap::credentials_pap& eap::credentials_pap::operator=(_Inout_ credentials_pap &&
 
     return *this;
 }
+
+
+eap::config* eap::credentials_pap::clone() const
+{
+    return new credentials_pap(*this);
+}
+
+
+LPCTSTR eap::credentials_pap::target_suffix() const
+{
+    return _T("PAP");
+}

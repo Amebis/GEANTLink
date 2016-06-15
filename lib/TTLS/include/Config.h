@@ -118,7 +118,7 @@ namespace eap {
         ///
         /// \returns Pointer to cloned configuration
         ///
-        virtual config* clone() const { return new config_ttls(*this); }
+        virtual config* clone() const;
 
         /// \name XML configuration management
         /// @{
@@ -155,7 +155,7 @@ namespace eap {
         ///
         /// \returns `eap::type_ttls`
         ///
-        virtual eap::type_t get_method_id() { return eap::type_ttls; }
+        virtual eap::type_t get_method_id() const;
 
     public:
         config_method *m_inner;    ///< Inner authentication configuration

@@ -73,6 +73,12 @@ eap::config_tls& eap::config_tls::operator=(_Inout_ eap::config_tls &&other)
 }
 
 
+eap::config* eap::config_tls::clone() const
+{
+    return new config_tls(*this);
+}
+
+
 DWORD eap::config_tls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
 {
     const bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
@@ -175,6 +181,12 @@ DWORD eap::config_tls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppE
     }
 
     return config_method::load(pConfigRoot, ppEapError);
+}
+
+
+eap::type_t eap::config_tls::get_method_id() const
+{
+    return eap::type_tls;
 }
 
 

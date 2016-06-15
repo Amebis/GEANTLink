@@ -311,7 +311,7 @@ namespace eap
         ///
         /// \returns One of `eap::type_t` constants.
         ///
-        virtual type_t get_method_id() = 0;
+        virtual type_t get_method_id() const = 0;
 
     public:
         bool m_allow_save;                      ///< Are credentials allowed to be saved to Windows Credential Manager?

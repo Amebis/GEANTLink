@@ -113,7 +113,7 @@ namespace eap
         ///
         /// \returns Pointer to cloned credentials
         ///
-        virtual config* clone() const { return new credentials_tls(*this); }
+        virtual config* clone() const;
 
         ///
         /// Resets credentials

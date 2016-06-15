@@ -87,7 +87,7 @@ namespace eap
         ///
         /// \returns Pointer to cloned credentials
         ///
-        virtual config* clone() const { return new credentials_pap(*this); }
+        virtual config* clone() const;
 
         /// \name Storage
         /// @{
@@ -95,7 +95,7 @@ namespace eap
         ///
         /// Return target suffix for Windows Credential Manager credential name
         ///
-        virtual LPCTSTR target_suffix() const { return _T("PAP"); }
+        virtual LPCTSTR target_suffix() const;
 
         /// @}
     };
