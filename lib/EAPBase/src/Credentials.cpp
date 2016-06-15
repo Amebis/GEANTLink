@@ -238,7 +238,7 @@ DWORD eap::credentials_pass::store(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR *
 
     // Encrypt password.
     vector<unsigned char> password;
-    if ((dwResult = encrypt(cp, password_utf8.c_str(), password_utf8.length()*sizeof(sanitizing_string::value_type), password, ppEapError, hash)) != ERROR_SUCCESS)
+    if ((dwResult = encrypt(cp, password_utf8.c_str(), password_utf8.length(), password, ppEapError, hash)) != ERROR_SUCCESS)
         return dwResult;
 
     // Calculate MD5 hash and append it.
@@ -261,21 +261,21 @@ DWORD eap::credentials_pass::store(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR *
     tstring target(target_name(pszTargetName));
 
     // Write credentials.
-    assert(password_enc.size()*sizeof(char) < CRED_MAX_CREDENTIAL_BLOB_SIZE);
-    assert(m_identity.length()              < CRED_MAX_USERNAME_LENGTH     );
+    assert(password_enc.size() < CRED_MAX_CREDENTIAL_BLOB_SIZE);
+    assert(m_identity.length() < CRED_MAX_USERNAME_LENGTH     );
     CREDENTIAL cred = {
-        0,                                          // Flags
-        CRED_TYPE_GENERIC,                          // Type
-        (LPTSTR)target.c_str(),                     // TargetName
-        _T(""),                                     // Comment
-        { 0, 0 },                                   // LastWritten
-        (DWORD)password_enc.size()*sizeof(char),    // CredentialBlobSize
-        (LPBYTE)password_enc.data(),                // CredentialBlob
-        CRED_PERSIST_ENTERPRISE,                    // Persist
-        0,                                          // AttributeCount
-        NULL,                                       // Attributes
-        NULL,                                       // TargetAlias
-        (LPTSTR)m_identity.c_str()                  // UserName
+        0,                          // Flags
+        CRED_TYPE_GENERIC,          // Type
+        (LPTSTR)target.c_str(),     // TargetName
+        _T(""),                     // Comment
+        { 0, 0 },                   // LastWritten
+        (DWORD)password_enc.size(), // CredentialBlobSize
+        (LPBYTE)password_enc.data(),// CredentialBlob
+        CRED_PERSIST_ENTERPRISE,    // Persist
+        0,                          // AttributeCount
+        NULL,                       // Attributes
+        NULL,                       // TargetAlias
+        (LPTSTR)m_identity.c_str()  // UserName
     };
     if (!CredWrite(&cred, 0)) {
         *ppEapError = m_module.make_error(dwResult = GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CredWrite failed."), NULL);
@@ -302,7 +302,7 @@ DWORD eap::credentials_pass::retrieve(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERRO
 
     // Decrypt the password using user's key.
     string password_base64;
-    if (!CredUnprotectA(TRUE, (LPCSTR)(cred->CredentialBlob), cred->CredentialBlobSize/sizeof(char), password_base64)) {
+    if (!CredUnprotectA(TRUE, (LPCSTR)(cred->CredentialBlob), cred->CredentialBlobSize, password_base64)) {
         *ppEapError = m_module.make_error(dwResult = GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CredUnprotect failed."), NULL);
         return dwResult;
     }

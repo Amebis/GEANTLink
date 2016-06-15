@@ -104,21 +104,21 @@ DWORD eap::credentials_tls::store(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **
     tstring target(target_name(pszTargetName));
 
     // Write credentials.
-    assert(m_cert_hash.size()*sizeof(char) < CRED_MAX_CREDENTIAL_BLOB_SIZE);
-    assert(m_identity.length()             < CRED_MAX_USERNAME_LENGTH     );
+    assert(m_cert_hash.size()  < CRED_MAX_CREDENTIAL_BLOB_SIZE);
+    assert(m_identity.length() < CRED_MAX_USERNAME_LENGTH     );
     CREDENTIAL cred = {
-        0,                                      // Flags
-        CRED_TYPE_GENERIC,                      // Type
-        (LPTSTR)target.c_str(),                 // TargetName
-        _T(""),                                 // Comment
-        { 0, 0 },                               // LastWritten
-        (DWORD)m_cert_hash.size()*sizeof(char), // CredentialBlobSize
-        (LPBYTE)m_cert_hash.data(),             // CredentialBlob
-        CRED_PERSIST_ENTERPRISE,                // Persist
-        0,                                      // AttributeCount
-        NULL,                                   // Attributes
-        NULL,                                   // TargetAlias
-        (LPTSTR)m_identity.c_str()              // UserName
+        0,                          // Flags
+        CRED_TYPE_GENERIC,          // Type
+        (LPTSTR)target.c_str(),     // TargetName
+        _T(""),                     // Comment
+        { 0, 0 },                   // LastWritten
+        (DWORD)m_cert_hash.size(),  // CredentialBlobSize
+        (LPBYTE)m_cert_hash.data(), // CredentialBlob
+        CRED_PERSIST_ENTERPRISE,    // Persist
+        0,                          // AttributeCount
+        NULL,                       // Attributes
+        NULL,                       // TargetAlias
+        (LPTSTR)m_identity.c_str()  // UserName
     };
     if (!CredWrite(&cred, 0)) {
         *ppEapError = m_module.make_error(dwResult = GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CredWrite failed."), NULL);

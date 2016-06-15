@@ -251,7 +251,7 @@ namespace eapserial
     template<class _Traits, class _Ax>
     inline size_t get_pk_size(const std::basic_string<wchar_t, _Traits, _Ax> &val)
     {
-        return sizeof(std::string::size_type) + sizeof(char)*WideCharToMultiByte(CP_UTF8, 0, val.c_str(), (int)val.length(), NULL, 0, NULL, NULL);
+        return sizeof(std::string::size_type) + WideCharToMultiByte(CP_UTF8, 0, val.c_str(), (int)val.length(), NULL, 0, NULL, NULL);
     }
 
 
