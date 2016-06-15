@@ -86,13 +86,14 @@ static int CredWrite()
 #ifdef _DEBUG
     {
         eap::credentials_pap cred_stored(g_module);
-        dwResult = cred_stored.retrieve(target_name.c_str(), &pEapError);
-        if (pEapError) {
-            OutputDebugStr(_T("%ls (error %u)\n"), pEapError->pRootCauseString, pEapError->dwWinError);
-            g_module.free_error_memory(pEapError);
-            pEapError = NULL;
-        } else
-            OutputDebugStr(_T("Reading credentials failed (error %u).\n"), dwResult);
+        if ((dwResult = cred_stored.retrieve(target_name.c_str(), &pEapError)) != ERROR_SUCCESS) {
+            if (pEapError) {
+                OutputDebugStr(_T("%ls (error %u)\n"), pEapError->pRootCauseString, pEapError->dwWinError);
+                g_module.free_error_memory(pEapError);
+                pEapError = NULL;
+            } else
+                OutputDebugStr(_T("Reading credentials failed (error %u).\n"), dwResult);
+        }
     }
 #endif
     if ((dwResult = cred.store(target_name.c_str(), &pEapError)) != ERROR_SUCCESS) {
