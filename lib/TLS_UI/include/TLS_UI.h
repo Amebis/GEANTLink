@@ -34,11 +34,6 @@
 class wxCertificateClientData;
 
 ///
-/// Helper class for auto-destroyable certificates used in wxWidget's item containers
-///
-class wxCertificateSelectionClientData;
-
-///
 /// Validator for host name
 ///
 class wxHostNameValidator;
@@ -113,45 +108,6 @@ public:
 
 public:
     PCCERT_CONTEXT m_cert;  ///< Certificate
-};
-
-
-class wxCertificateSelectionClientData : public wxClientData
-{
-public:
-    ///
-    /// Default constructor
-    ///
-    wxCertificateSelectionClientData();
-
-    ///
-    /// Constructs client data object
-    ///
-    wxCertificateSelectionClientData(const wchar_t *identity, unsigned char *hash, size_t hash_size);
-
-    ///
-    /// Constructs client data object with copy
-    ///
-    wxCertificateSelectionClientData(const std::wstring &identity, const std::vector<unsigned char> &hash);
-
-    ///
-    /// Constructs client data object with move
-    ///
-    wxCertificateSelectionClientData(std::wstring &&identity, std::vector<unsigned char> &&hash);
-
-    ///
-    /// Constructs client data object with copy
-    ///
-    wxCertificateSelectionClientData(const wxCertificateSelectionClientData &other);
-
-    ///
-    /// Constructs client data object with move
-    ///
-    wxCertificateSelectionClientData(wxCertificateSelectionClientData &&other);
-
-public:
-    std::wstring m_identity;            ///< Client identity
-    std::vector<unsigned char> m_hash;  ///< Client certificate hash (certificates are kept in Personal Certificate Storage)
 };
 
 

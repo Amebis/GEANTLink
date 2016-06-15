@@ -77,50 +77,6 @@ wxCertificateClientData::~wxCertificateClientData()
 
 
 //////////////////////////////////////////////////////////////////////
-// wxCertificateSelectionClientData
-//////////////////////////////////////////////////////////////////////
-
-wxCertificateSelectionClientData::wxCertificateSelectionClientData()
-{
-}
-
-
-wxCertificateSelectionClientData::wxCertificateSelectionClientData(const wchar_t *identity, unsigned char *hash, size_t hash_size) :
-    m_identity(identity),
-    m_hash(hash, hash + hash_size)
-{
-}
-
-
-wxCertificateSelectionClientData::wxCertificateSelectionClientData(const std::wstring &identity, const std::vector<unsigned char> &hash) :
-    m_identity(identity),
-    m_hash(hash)
-{
-}
-
-
-wxCertificateSelectionClientData::wxCertificateSelectionClientData(std::wstring &&identity, std::vector<unsigned char> &&hash) :
-    m_identity(std::move(identity)),
-    m_hash(std::move(hash))
-{
-}
-
-
-wxCertificateSelectionClientData::wxCertificateSelectionClientData(const wxCertificateSelectionClientData &other) :
-    m_identity(other.m_identity),
-    m_hash(other.m_hash)
-{
-}
-
-
-wxCertificateSelectionClientData::wxCertificateSelectionClientData(wxCertificateSelectionClientData &&other) :
-    m_identity(std::move(other.m_identity)),
-    m_hash(std::move(other.m_hash))
-{
-}
-
-
-//////////////////////////////////////////////////////////////////////
 // wxHostNameValidator
 //////////////////////////////////////////////////////////////////////
 
@@ -417,13 +373,16 @@ bool wxEAPTLSCredentialsPanel::TransferDataToWindow()
             }
 
             // Prepare certificate information.
-            std::unique_ptr<wxCertificateSelectionClientData> data(new wxCertificateSelectionClientData);
-            eap::get_cert_title(cert, data->m_identity);
+            std::unique_ptr<wxCertificateClientData> data(new wxCertificateClientData(CertDuplicateCertificateContext(cert)));
 
             // Add to list.
-            CertGetCertificateContextProperty(cert, CERT_HASH_PROP_ID, data->m_hash);
-            bool is_selected = data->m_hash == m_cred.m_cert_hash;
-            int i = m_cert_select_val->Append(data->m_identity, data.release());
+            bool is_selected =
+                m_cred.m_cert &&
+                m_cred.m_cert->cbCertEncoded == data->m_cert->cbCertEncoded &&
+                memcmp(m_cred.m_cert->pbCertEncoded, data->m_cert->pbCertEncoded, m_cred.m_cert->cbCertEncoded) == 0;
+            winstd::tstring name;
+            eap::get_cert_title(cert, name);
+            int i = m_cert_select_val->Append(name, data.release());
             if (is_selected) {
                 m_cert_select_val->SetSelection(i);
                 is_found = true;
@@ -450,10 +409,12 @@ bool wxEAPTLSCredentialsPanel::TransferDataFromWindow()
     if (m_cert_none->GetValue())
         m_cred.clear();
     else {
-        const wxCertificateSelectionClientData *data = dynamic_cast<const wxCertificateSelectionClientData*>(m_cert_select_val->GetClientObject(m_cert_select_val->GetSelection()));
+        const wxCertificateClientData *data = dynamic_cast<const wxCertificateClientData*>(m_cert_select_val->GetClientObject(m_cert_select_val->GetSelection()));
         if (data) {
-            m_cred.m_identity  = data->m_identity;
-            m_cred.m_cert_hash = data->m_hash;
+            m_cred.m_cert.attach_duplicated(data->m_cert);
+
+            // Generate identity. TODO: Find which CERT_NAME_... constant returns valid identity (username@domain or DOMAIN\Username).
+            CertGetNameString(m_cred.m_cert, CERT_NAME_SIMPLE_DISPLAY_TYPE, 0, NULL, m_cred.m_identity);
         } else
             m_cred.clear();
     }

@@ -156,13 +156,23 @@ bool eap::config_tls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEa
                 com_obj<IXMLDOMNode> pXmlElCA;
                 pXmlListCAs->get_item(j, &pXmlElCA);
                 bstr bstrFormat;
-                if (eapxml::get_element_value(pXmlElCA, bstr(L"eap-metadata:format"), &bstrFormat) == ERROR_SUCCESS) {
-                    if (CompareStringEx(LOCALE_NAME_INVARIANT, NORM_IGNORECASE, bstrFormat, bstrFormat.length(), L"PEM", -1, NULL, NULL, 0) == CSTR_EQUAL) {
-                        vector<unsigned char> aData;
-                        if (eapxml::get_element_base64(pXmlElCA, bstr(L"eap-metadata:cert-data"), aData) == ERROR_SUCCESS)
-                            add_trusted_ca(X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, aData.data(), (DWORD)aData.size());
-                    }
+                if (eapxml::get_element_value(pXmlElCA, bstr(L"eap-metadata:format"), &bstrFormat) != ERROR_SUCCESS) {
+                    // <format> not specified.
+                    continue;
                 }
+
+                if (CompareStringEx(LOCALE_NAME_INVARIANT, NORM_IGNORECASE, bstrFormat, bstrFormat.length(), L"PEM", -1, NULL, NULL, 0) != CSTR_EQUAL) {
+                    // Certificate must be PEM encoded.
+                    continue;
+                }
+
+                vector<unsigned char> aData;
+                if (eapxml::get_element_base64(pXmlElCA, bstr(L"eap-metadata:cert-data"), aData) != ERROR_SUCCESS) {
+                    // Error reading <cert-data> element.
+                    continue;
+                }
+
+                add_trusted_ca(X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, aData.data(), (DWORD)aData.size());
             }
         }
 
