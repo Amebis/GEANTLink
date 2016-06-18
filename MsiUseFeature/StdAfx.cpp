@@ -18,17 +18,4 @@
     along with GÉANTLink. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
-
-#include "../lib/PAP/include/Credentials.h"
-#include "../lib/EAPBase/include/Module.h"
-
-#include <WinStd/Common.h>
-#include <WinStd/Base64.h>
-#include <WinStd/Win.h>
-
-#include <Windows.h>
-#include <eaptypes.h> // Must include after <Windows.h>
-#include <tchar.h>
-
-#include <memory>
+#include "StdAfx.h"
