@@ -142,7 +142,7 @@ namespace eap
         template<class _Elem, class _Traits, class _Ax>
         bool encrypt(_In_ HCRYPTPROV hProv, _In_ const std::basic_string<_Elem, _Traits, _Ax> &val, _Out_ std::vector<unsigned char> &enc, _Out_ EAP_ERROR **ppEapError, _Out_opt_ HCRYPTHASH hHash = NULL) const
         {
-            return encrypt(hProv, val.c_str(), val.length*sizeof(_Elem), enc, ppEapError, hHash);
+            return encrypt(hProv, val.c_str(), val.length()*sizeof(_Elem), enc, ppEapError, hHash);
         }
 
 
@@ -295,7 +295,7 @@ namespace eap
             std::vector<_Elem, sanitizing_allocator<_Elem> > buf;
             if (!decrypt(hProv, data, size, buf, ppEapError, hHash))
                 return false;
-            dec.assign((const _Elem*)buf.begin(), (const _Elem*)buf.end());
+            dec.assign(buf.data(), buf.size());
 
             return true;
         }
