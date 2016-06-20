@@ -32,9 +32,6 @@
     <ClCompile Include="..\src\StdAfx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\TTLS_UI.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\res\wxTTLS_UI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

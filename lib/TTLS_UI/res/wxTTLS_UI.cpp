@@ -72,12 +72,12 @@ wxEAPTTLSConfigPanelBase::wxEAPTTLSConfigPanelBase( wxWindow* parent, wxWindowID
 	this->Layout();
 	
 	// Connect Events
-	m_outer_identity_custom->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( wxEAPTTLSConfigPanelBase::OnOuterIdentityCustom ), NULL, this );
+	this->Connect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( wxEAPTTLSConfigPanelBase::OnUpdateUI ) );
 }
 
 wxEAPTTLSConfigPanelBase::~wxEAPTTLSConfigPanelBase()
 {
 	// Disconnect Events
-	m_outer_identity_custom->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( wxEAPTTLSConfigPanelBase::OnOuterIdentityCustom ), NULL, this );
+	this->Disconnect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( wxEAPTTLSConfigPanelBase::OnUpdateUI ) );
 	
 }

@@ -77,7 +77,7 @@
             <event name="OnRightUp"></event>
             <event name="OnSetFocus"></event>
             <event name="OnSize"></event>
-            <event name="OnUpdateUI"></event>
+            <event name="OnUpdateUI">OnUpdateUI</event>
             <object class="wxStaticBoxSizer" expanded="1">
                 <property name="id">wxID_ANY</property>
                 <property name="label">Outer Identity</property>
@@ -541,7 +541,7 @@
                                                         <event name="OnMouseEvents"></event>
                                                         <event name="OnMouseWheel"></event>
                                                         <event name="OnPaint"></event>
-                                                        <event name="OnRadioButton">OnOuterIdentityCustom</event>
+                                                        <event name="OnRadioButton"></event>
                                                         <event name="OnRightDClick"></event>
                                                         <event name="OnRightDown"></event>
                                                         <event name="OnRightUp"></event>

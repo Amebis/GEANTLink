@@ -96,7 +96,7 @@ wxEAPTLSServerTrustConfigPanelBase::wxEAPTLSServerTrustConfigPanelBase( wxWindow
 	this->Layout();
 	
 	// Connect Events
-	m_root_ca->Connect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( wxEAPTLSServerTrustConfigPanelBase::OnRootCA ), NULL, this );
+	this->Connect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( wxEAPTLSServerTrustConfigPanelBase::OnUpdateUI ) );
 	m_root_ca->Connect( wxEVT_COMMAND_LISTBOX_DOUBLECLICKED, wxCommandEventHandler( wxEAPTLSServerTrustConfigPanelBase::OnRootCADClick ), NULL, this );
 	m_root_ca_add_store->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPTLSServerTrustConfigPanelBase::OnRootCAAddStore ), NULL, this );
 	m_root_ca_add_file->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPTLSServerTrustConfigPanelBase::OnRootCAAddFile ), NULL, this );
@@ -106,7 +106,7 @@ wxEAPTLSServerTrustConfigPanelBase::wxEAPTLSServerTrustConfigPanelBase( wxWindow
 wxEAPTLSServerTrustConfigPanelBase::~wxEAPTLSServerTrustConfigPanelBase()
 {
 	// Disconnect Events
-	m_root_ca->Disconnect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( wxEAPTLSServerTrustConfigPanelBase::OnRootCA ), NULL, this );
+	this->Disconnect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( wxEAPTLSServerTrustConfigPanelBase::OnUpdateUI ) );
 	m_root_ca->Disconnect( wxEVT_COMMAND_LISTBOX_DOUBLECLICKED, wxCommandEventHandler( wxEAPTLSServerTrustConfigPanelBase::OnRootCADClick ), NULL, this );
 	m_root_ca_add_store->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPTLSServerTrustConfigPanelBase::OnRootCAAddStore ), NULL, this );
 	m_root_ca_add_file->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPTLSServerTrustConfigPanelBase::OnRootCAAddFile ), NULL, this );

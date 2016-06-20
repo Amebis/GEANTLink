@@ -332,7 +332,7 @@ bool wxFQDNListValidator::Parse(const wxString &val_in, size_t i_start, size_t i
             // Skip trailing white-space.
             for (; i < i_end && _istspace(buf[i_end - 1]); i_end--);
 
-            if (wxHostNameValidator::Parse(val_in, i, i_end, ctrl, parent, fqdn)) {
+            if (wxFQDNValidator::Parse(val_in, i, i_end, ctrl, parent, fqdn)) {
                 // The rest of the FQDN list parsed succesfully.
                 if (fqdn && !fqdn->empty()) _val_out.push_back(std::move(*fqdn));
                 if (val_out) *val_out = std::move(_val_out);
@@ -349,7 +349,7 @@ bool wxFQDNListValidator::Parse(const wxString &val_in, size_t i_start, size_t i
 //////////////////////////////////////////////////////////////////////
 
 wxEAPTLSCredentialsPanel::wxEAPTLSCredentialsPanel(eap::credentials_tls &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config) :
-    wxCredentialsPanel<wxEAPTLSCredentialsPanelBase, eap::credentials_tls>(cred, pszCredTarget, parent, is_config)
+    wxCredentialsPanel<eap::credentials_tls, wxEAPTLSCredentialsPanelBase>(cred, pszCredTarget, parent, is_config)
 {
     // Load and set icon.
     if (m_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
@@ -359,8 +359,6 @@ wxEAPTLSCredentialsPanel::wxEAPTLSCredentialsPanel(eap::credentials_tls &cred, L
 
 bool wxEAPTLSCredentialsPanel::TransferDataToWindow()
 {
-    wxCHECK(__super::TransferDataToWindow(), false);
-
     // Populate certificate list.
     bool is_found = false;
     winstd::cert_store store;
@@ -400,7 +398,7 @@ bool wxEAPTLSCredentialsPanel::TransferDataToWindow()
             m_cert_select_val->SetSelection(0);
     }
 
-    return true;
+    return __super::TransferDataToWindow();
 }
 
 
@@ -419,6 +417,8 @@ bool wxEAPTLSCredentialsPanel::TransferDataFromWindow()
             m_cred.clear();
     }
 
+    // Inherited TransferDataFromWindow() calls m_cred.store().
+    // Therefore, call it only now, that m_cred is set.
     return __super::TransferDataFromWindow();
 }
 
@@ -427,193 +427,4 @@ void wxEAPTLSCredentialsPanel::OnCertSelect(wxCommandEvent& event)
 {
     UNREFERENCED_PARAMETER(event);
     m_cert_select_val->Enable(m_cert_select->GetValue());
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// wxEAPTLSServerTrustPanel
-//////////////////////////////////////////////////////////////////////
-
-wxEAPTLSServerTrustPanel::wxEAPTLSServerTrustPanel(eap::config_tls &cfg, wxWindow* parent) :
-    m_cfg(cfg),
-    wxEAPTLSServerTrustConfigPanelBase(parent)
-{
-    // Load and set icon.
-    if (m_certmgr.load(_T("certmgr.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
-        wxSetIconFromResource(m_server_trust_icon, m_icon, m_certmgr, MAKEINTRESOURCE(218));
-
-    m_server_names->SetValidator(wxFQDNListValidator(&(m_cfg.m_server_names)));
-}
-
-
-bool wxEAPTLSServerTrustPanel::TransferDataToWindow()
-{
-    wxCHECK(wxEAPTLSServerTrustConfigPanelBase::TransferDataToWindow(), false);
-
-    // Populate trusted CA list.
-    for (std::list<winstd::cert_context>::const_iterator cert = m_cfg.m_trusted_root_ca.cbegin(), cert_end = m_cfg.m_trusted_root_ca.cend(); cert != cert_end; ++cert) {
-        winstd::tstring name;
-        if (CertGetNameString(*cert, CERT_NAME_SIMPLE_DISPLAY_TYPE, 0, NULL, name) > 0)
-            m_root_ca->Append(wxString(name), new wxCertificateClientData(cert->duplicate()));
-    }
-
-    return true;
-}
-
-
-bool wxEAPTLSServerTrustPanel::TransferDataFromWindow()
-{
-    // Parse trusted CA list.
-    m_cfg.m_trusted_root_ca.clear();
-    for (unsigned int i = 0, i_end = m_root_ca->GetCount(); i < i_end; i++) {
-        wxCertificateClientData *cert = dynamic_cast<wxCertificateClientData*>(m_root_ca->GetClientObject(i));
-        if (cert)
-            m_cfg.add_trusted_ca(cert->m_cert->dwCertEncodingType, cert->m_cert->pbCertEncoded, cert->m_cert->cbCertEncoded);
-    }
-
-    return wxEAPTLSServerTrustConfigPanelBase::TransferDataFromWindow();
-}
-
-
-void wxEAPTLSServerTrustPanel::OnRootCA(wxCommandEvent& event)
-{
-    wxCertificateClientData *cert = dynamic_cast<wxCertificateClientData*>(event.GetClientObject());
-    m_root_ca_remove->Enable(cert ? true : false);
-}
-
-
-void wxEAPTLSServerTrustPanel::OnRootCADClick(wxCommandEvent& event)
-{
-    wxCertificateClientData *cert = dynamic_cast<wxCertificateClientData*>(event.GetClientObject());
-    if (cert)
-        CryptUIDlgViewContext(CERT_STORE_CERTIFICATE_CONTEXT, cert->m_cert, this->GetHWND(), NULL, 0, NULL);
-}
-
-
-void wxEAPTLSServerTrustPanel::OnRootCAAddStore(wxCommandEvent& event)
-{
-    UNREFERENCED_PARAMETER(event);
-
-    winstd::cert_store store;
-    if (store.create(NULL, _T("ROOT"))) {
-        winstd::cert_context cert;
-        cert.attach(CryptUIDlgSelectCertificateFromStore(store, this->GetHWND(), NULL, NULL, 0, 0, NULL));
-        if (cert)
-            AddRootCA(cert);
-    }
-}
-
-
-void wxEAPTLSServerTrustPanel::OnRootCAAddFile(wxCommandEvent& event)
-{
-    UNREFERENCED_PARAMETER(event);
-
-    const wxString separator(wxT("|"));
-    wxFileDialog open_dialog(this, _("Add Certificate"), wxEmptyString, wxEmptyString,
-        _("Certificate Files (*.cer;*.crt;*.der;*.p7b;*.pem)") + separator + wxT("*.cer;*.crt;*.der;*.p7b;*.pem") + separator +
-        _("X.509 Certificate Files (*.cer;*.crt;*.der;*.pem)") + separator + wxT("*.cer;*.crt;*.der;*.pem") + separator +
-        _("PKCS #7 Certificate Files (*.p7b)") + separator + wxT("*.p7b") + separator +
-        _("All Files (*.*)") + separator + wxT("*.*"),
-        wxFD_OPEN|wxFD_FILE_MUST_EXIST|wxFD_MULTIPLE);
-    if (open_dialog.ShowModal() == wxID_CANCEL) {
-        event.Skip();
-        return;
-    }
-
-    wxArrayString paths;
-    open_dialog.GetPaths(paths);
-    for (size_t i = 0, i_end = paths.GetCount(); i < i_end; i++) {
-        // Load certificate(s) from file.
-        winstd::cert_store cs;
-        if (cs.create(CERT_STORE_PROV_FILENAME, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, NULL, CERT_STORE_OPEN_EXISTING_FLAG | CERT_STORE_READONLY_FLAG, (LPCTSTR)(paths[i]))) {
-            for (PCCERT_CONTEXT cert = NULL; (cert = CertEnumCertificatesInStore(cs, cert)) != NULL;)
-                AddRootCA(cert);
-        } else
-            wxMessageBox(wxString::Format(_("Invalid or unsupported certificate file %s"), paths[i]), _("Error"), wxOK | wxICON_EXCLAMATION, this);
-    }
-}
-
-
-void wxEAPTLSServerTrustPanel::OnRootCARemove(wxCommandEvent& event)
-{
-    UNREFERENCED_PARAMETER(event);
-
-    wxArrayInt selections;
-    for (int i = m_root_ca->GetSelections(selections); i--; )
-        m_root_ca->Delete(selections[i]);
-
-    m_root_ca_remove->Enable(false);
-}
-
-
-bool wxEAPTLSServerTrustPanel::AddRootCA(PCCERT_CONTEXT cert)
-{
-    for (unsigned int i = 0, i_end = m_root_ca->GetCount(); i < i_end; i++) {
-        wxCertificateClientData *c = dynamic_cast<wxCertificateClientData*>(m_root_ca->GetClientObject(i));
-        if (c && c->m_cert &&
-            c->m_cert->cbCertEncoded == cert->cbCertEncoded &&
-            memcmp(c->m_cert->pbCertEncoded, cert->pbCertEncoded, cert->cbCertEncoded) == 0)
-        {
-            // This certificate is already on the list.
-            m_root_ca->SetSelection(i);
-            m_root_ca_remove->Enable();
-            return false;
-        }
-    }
-
-    // Add certificate to the list.
-    winstd::tstring name;
-    if (CertGetNameString(cert, CERT_NAME_SIMPLE_DISPLAY_TYPE, 0, NULL, name) > 0) {
-        int i = m_root_ca->Append(wxString(name), new wxCertificateClientData(CertDuplicateCertificateContext(cert)));
-        if (0 <= i) {
-            m_root_ca->SetSelection(i);
-            m_root_ca_remove->Enable();
-        }
-        return true;
-    }
-
-    return false;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// wxEAPTLSConfigPanel
-//////////////////////////////////////////////////////////////////////
-
-wxEAPTLSConfigPanel::wxEAPTLSConfigPanel(eap::config_tls &cfg, LPCTSTR pszCredTarget, wxWindow* parent) : wxPanel(parent)
-{
-    wxBoxSizer* sb_content;
-    sb_content = new wxBoxSizer( wxVERTICAL );
-
-    m_server_trust = new wxEAPTLSServerTrustPanel(cfg, this);
-    if (cfg.m_allow_save) {
-        sb_content->Add(m_server_trust, 0, wxDOWN|wxEXPAND, 5);
-        m_credentials = new wxEAPTLSCredentialsConfigPanel(cfg, pszCredTarget, this);
-        sb_content->Add(m_credentials, 0, wxUP|wxEXPAND, 5);
-    } else {
-        sb_content->Add(m_server_trust, 0, wxEXPAND, 5);
-        m_credentials = NULL;
-    }
-
-    this->SetSizer(sb_content);
-    this->Layout();
-
-    // Connect Events
-    this->Connect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(wxEAPTLSConfigPanel::OnInitDialog));
-}
-
-
-wxEAPTLSConfigPanel::~wxEAPTLSConfigPanel()
-{
-    // Disconnect Events
-    this->Disconnect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(wxEAPTLSConfigPanel::OnInitDialog));
-}
-
-
-void wxEAPTLSConfigPanel::OnInitDialog(wxInitDialogEvent& event)
-{
-    // Forward the event to child panels.
-    m_server_trust->GetEventHandler()->ProcessEvent(event);
-    if (m_credentials)
-        m_credentials->GetEventHandler()->ProcessEvent(event);
 }

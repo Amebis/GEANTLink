@@ -442,9 +442,14 @@ namespace eap
     {
     public:
         ///
+        /// Provider configuration data type
+        ///
+        typedef config_provider<_Tcfg> provider_config_type;
+
+        ///
         /// Configuration data type
         ///
-        typedef config_providers<config_provider<_Tcfg> > config_type;
+        typedef config_providers<provider_config_type> config_type;
 
         ///
         /// Identity data type

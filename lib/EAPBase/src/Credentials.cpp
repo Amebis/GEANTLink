@@ -280,7 +280,10 @@ bool eap::credentials_pass::retrieve(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR
         return false;
     }
 
-    m_identity = cred->UserName;
+    if (cred->UserName)
+        m_identity = cred->UserName;
+    else
+        m_identity.clear();
 
     // Decrypt the password using user's key.
     string password_base64;

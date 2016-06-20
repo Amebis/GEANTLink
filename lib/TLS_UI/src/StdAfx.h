@@ -25,8 +25,3 @@
 #include "../../../include/Version.h"
 
 #include "../include/TLS_UI.h"
-
-#include <wx/filedlg.h>
-#include <wx/msgdlg.h>
-
-#include <cryptuiapi.h>

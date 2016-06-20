@@ -102,6 +102,24 @@ class wxEAPBannerPanelBase : public wxPanel
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+/// Class wxEAPProviderLockedBase
+///////////////////////////////////////////////////////////////////////////////
+class wxEAPProviderLockedBase : public wxPanel 
+{
+	private:
+	
+	protected:
+		wxStaticBitmap* m_provider_locked_icon;
+		wxStaticText* m_provider_locked_label;
+	
+	public:
+		
+		wxEAPProviderLockedBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxSIMPLE_BORDER|wxTAB_TRAVERSAL ); 
+		~wxEAPProviderLockedBase();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
 /// Class wxEAPCredentialsConfigPanelBase
 ///////////////////////////////////////////////////////////////////////////////
 class wxEAPCredentialsConfigPanelBase : public wxPanel 
@@ -112,12 +130,12 @@ class wxEAPCredentialsConfigPanelBase : public wxPanel
 		wxStaticBitmap* m_credentials_icon;
 		wxStaticText* m_credentials_label;
 		wxRadioButton* m_own;
-		wxTextCtrl* m_identity_own;
-		wxButton* m_clear_own;
-		wxButton* m_set_own;
+		wxTextCtrl* m_own_identity;
+		wxButton* m_own_clear;
+		wxButton* m_own_set;
 		wxRadioButton* m_preshared;
-		wxTextCtrl* m_identity_preshared;
-		wxButton* m_set_preshared;
+		wxTextCtrl* m_preshared_identity;
+		wxButton* m_preshared_set;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnUpdateUI( wxUpdateUIEvent& event ) { event.Skip(); }

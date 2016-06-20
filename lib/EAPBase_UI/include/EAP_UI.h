@@ -26,7 +26,7 @@
 ///
 /// EAP configuration dialog
 ///
-template <class _Tcfg, class _wxT> class wxEAPConfigDialog;
+template <class _Tmeth, class _wxT> class wxEAPConfigDialog;
 
 ///
 /// EAP credentials dialog
@@ -39,14 +39,19 @@ class wxEAPCredentialsDialog;
 class wxEAPBannerPanel;
 
 ///
+/// EAP Provider-locked congifuration note
+///
+template <class _Tprov> class wxEAPProviderLocked;
+
+///
 /// Base template for credentials configuration panel
 ///
-template <class _Tcfg, class _Tcred, class _Tpanel> class wxEAPCredentialsConfigPanel;
+template <class _Tprov, class _Tmeth, class _wxT> class wxEAPCredentialsConfigPanel;
 
 ///
 /// Base template for all credential panels
 ///
-template <class _Tbase, class _Tcred> class wxCredentialsPanel;
+template <class _Tcred, class _Tbase> class wxCredentialsPanel;
 
 ///
 /// Password credentials panel
@@ -115,6 +120,7 @@ public:
             for (; method != method_end; ++method, count++)
                 m_providers->AddPage(
                     new _wxT(
+                        *provider,
                         provider->m_methods.front(),
                         provider->m_id.c_str(),
                         m_providers),
@@ -182,18 +188,51 @@ protected:
 };
 
 
-template <class _Tcfg, class _Tcred, class _Tpanel>
+template <class _Tprov>
+class wxEAPProviderLocked : public wxEAPProviderLockedBase
+{
+public:
+    ///
+    /// Constructs a notice pannel and set the title text
+    ///
+    wxEAPProviderLocked(_Tprov &prov, wxWindow* parent) : wxEAPProviderLockedBase(parent)
+    {
+        // Load and set icon.
+        if (m_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
+            wxSetIconFromResource(m_provider_locked_icon, m_icon, m_shell32, MAKEINTRESOURCE(48));
+
+        m_provider_locked_label->SetLabel(
+            wxString::Format(_("%s has pre-set parts of this configuration. Those parts are locked to prevent accidental modification."),
+            !prov.m_name.empty() ? prov.m_name.c_str() :
+            !prov.m_id  .empty() ? winstd::string_printf(_("Your %ls provider"), prov.m_id.c_str()).c_str() : _("Your provider")));
+        m_provider_locked_label->Wrap(452);
+    }
+
+protected:
+    /// \cond internal
+    virtual bool AcceptsFocusFromKeyboard() const { return false; }
+    /// \endcond
+
+protected:
+    winstd::library m_shell32;                  ///< shell32.dll resource library reference
+    wxIcon m_icon;                              ///< Panel icon
+};
+
+
+template <class _Tprov, class _Tmeth, class _wxT>
 class wxEAPCredentialsConfigPanel : public wxEAPCredentialsConfigPanelBase
 {
 public:
     ///
     /// Constructs a credential configuration panel
     ///
+    /// \param[inout] prov           Provider configuration data
     /// \param[inout] cfg            Configuration data
     /// \param[in]    pszCredTarget  Target name of credentials in Windows Credential Manager. Can be further decorated to create final target name.
     /// \param[in]    parent         Parent window
     ///
-    wxEAPCredentialsConfigPanel(_Tcfg &cfg, LPCTSTR pszCredTarget, wxWindow *parent) :
+    wxEAPCredentialsConfigPanel(_Tprov &prov, _Tmeth &cfg, LPCTSTR pszCredTarget, wxWindow *parent) :
+        m_prov(prov),
         m_cfg(cfg),
         m_target(pszCredTarget),
         m_cred(m_cfg.m_module),
@@ -201,7 +240,7 @@ public:
     {
         // Load and set icon.
         if (m_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
-            wxSetIconFromResource(m_credentials_icon, m_icon, m_shell32, MAKEINTRESOURCE(48));
+            wxSetIconFromResource(m_credentials_icon, m_icon, m_shell32, MAKEINTRESOURCE(/*16770*/269));
     }
 
 protected:
@@ -209,29 +248,41 @@ protected:
 
     virtual bool TransferDataToWindow()
     {
-        wxCHECK(wxEAPCredentialsConfigPanelBase::TransferDataToWindow(), false);
+        if (m_prov.m_read_only) {
+            // This is provider-locked configuration. Disable controls.
+            m_own               ->Enable(false);
+            m_preshared         ->Enable(false);
+            m_preshared_identity->Enable(false);
+            m_preshared_set     ->Enable(false);
+        }
 
         if (!m_cfg.m_use_preshared) {
             m_own->SetValue(true);
+            m_cred.clear();
         } else {
             m_preshared->SetValue(true);
             m_cred = m_cfg.m_preshared;
         }
 
-        return true;
+        return wxEAPCredentialsConfigPanelBase::TransferDataToWindow();
     }
 
 
     virtual bool TransferDataFromWindow()
     {
-        if (m_own->GetValue()) {
-            m_cfg.m_use_preshared = false;
-        } else {
-            m_cfg.m_use_preshared = true;
-            m_cfg.m_preshared = m_cred;
+        wxCHECK(wxEAPCredentialsConfigPanelBase::TransferDataFromWindow(), false);
+
+        if (!m_prov.m_read_only) {
+            // This is not a provider-locked configuration. Save the data.
+            if (m_own->GetValue()) {
+                m_cfg.m_use_preshared = false;
+            } else {
+                m_cfg.m_use_preshared = true;
+                m_cfg.m_preshared = m_cred;
+            }
         }
 
-        return wxEAPCredentialsConfigPanelBase::TransferDataFromWindow();
+        return true;
     }
 
 
@@ -240,33 +291,48 @@ protected:
         UNREFERENCED_PARAMETER(event);
         DWORD dwResult;
 
-        bool has_own;
-        std::unique_ptr<CREDENTIAL, winstd::CredFree_delete<CREDENTIAL> > cred;
-        if (CredRead(m_cred.target_name(m_target.c_str()).c_str(), CRED_TYPE_GENERIC, 0, (PCREDENTIAL*)&cred)) {
-            m_identity_own->SetValue(cred->UserName && cred->UserName[0] != 0 ? cred->UserName : _("<blank>"));
-            has_own = true;
-        } else if ((dwResult = GetLastError()) == ERROR_NOT_FOUND) {
-            m_identity_own->Clear();
-            has_own = false;
+        if (m_cfg.m_allow_save) {
+            bool has_own;
+            std::unique_ptr<CREDENTIAL, winstd::CredFree_delete<CREDENTIAL> > cred;
+            if (CredRead(m_cred.target_name(m_target.c_str()).c_str(), CRED_TYPE_GENERIC, 0, (PCREDENTIAL*)&cred)) {
+                m_own_identity->SetValue(cred->UserName && cred->UserName[0] != 0 ? cred->UserName : _("<blank>"));
+                has_own = true;
+            } else if ((dwResult = GetLastError()) == ERROR_NOT_FOUND) {
+                m_own_identity->Clear();
+                has_own = false;
+            } else {
+                m_own_identity->SetValue(wxString::Format(_("<error %u>"), dwResult));
+                has_own = true;
+            }
+
+            if (m_own->GetValue()) {
+                m_own_identity->Enable(true);
+                m_own_set     ->Enable(true);
+                m_own_clear   ->Enable(has_own);
+            } else {
+                m_own_identity->Enable(false);
+                m_own_set     ->Enable(false);
+                m_own_clear   ->Enable(false);
+            }
         } else {
-            m_identity_own->SetValue(wxString::Format(_("<error %u>"), dwResult));
-            has_own = true;
+            m_own_identity->Clear();
+
+            m_own_identity->Enable(false);
+            m_own_set     ->Enable(false);
+            m_own_clear   ->Enable(false);
         }
 
-        if (m_own->GetValue()) {
-            m_identity_own      ->Enable(true);
-            m_set_own           ->Enable(true);
-            m_clear_own         ->Enable(has_own);
-            m_identity_preshared->Enable(false);
-            m_identity_preshared->SetValue(wxEmptyString);
-            m_set_preshared     ->Enable(false);
-        } else {
-            m_identity_own      ->Enable(false);
-            m_set_own           ->Enable(false);
-            m_clear_own         ->Enable(false);
-            m_identity_preshared->Enable(true);
-            m_identity_preshared->SetValue(!m_cred.empty() ? m_cred.m_identity : _("<blank>"));
-            m_set_preshared     ->Enable(true);
+        m_preshared_identity->SetValue(!m_cred.empty() ? m_cred.m_identity : _("<blank>"));
+
+        if (!m_prov.m_read_only) {
+            // This is not a provider-locked configuration. Selectively enable/disable controls.
+            if (m_own->GetValue()) {
+                m_preshared_identity->Enable(false);
+                m_preshared_set     ->Enable(false);
+            } else {
+                m_preshared_identity->Enable(true);
+                m_preshared_set     ->Enable(true);
+            }
         }
     }
 
@@ -277,7 +343,7 @@ protected:
 
         wxEAPCredentialsDialog dlg(this);
 
-        _Tpanel *panel = new _Tpanel(m_cred, m_target.c_str(), &dlg, true);
+        _wxT *panel = new _wxT(m_cred, m_target.c_str(), &dlg, true);
 
         dlg.AddContents((wxPanel**)&panel, 1);
         dlg.ShowModal();
@@ -299,7 +365,7 @@ protected:
 
         wxEAPCredentialsDialog dlg(this);
 
-        _Tpanel *panel = new _Tpanel(m_cred, _T(""), &dlg, true);
+        _wxT *panel = new _wxT(m_cred, _T(""), &dlg, true);
 
         dlg.AddContents((wxPanel**)&panel, 1);
         dlg.ShowModal();
@@ -308,17 +374,18 @@ protected:
     /// \endcond
 
 protected:
-    _Tcfg &m_cfg;               ///< EAP configuration
-    winstd::library m_shell32;  ///< shell32.dll resource library reference
-    wxIcon m_icon;              ///< Panel icon
-    winstd::tstring m_target;   ///< Credential Manager target
+    _Tprov &m_prov;                             ///< EAP provider
+    _Tmeth &m_cfg;                              ///< EAP configuration
+    winstd::library m_shell32;                  ///< shell32.dll resource library reference
+    wxIcon m_icon;                              ///< Panel icon
+    winstd::tstring m_target;                   ///< Credential Manager target
 
 private:
-    _Tcred m_cred;              ///< Temporary credential data
+    typename _Tmeth::credentials_type m_cred;   ///< Temporary credential data
 };
 
 
-template <class _Tbase, class _Tcred>
+template <class _Tcred, class _Tbase>
 class wxCredentialsPanel : public _Tbase
 {
 public:
@@ -348,8 +415,6 @@ protected:
 
     virtual bool TransferDataToWindow()
     {
-        wxCHECK(_Tbase::TransferDataToWindow(), false);
-
         if (!m_target.empty()) {
             // Read credentials from Credential Manager
             EAP_ERROR *pEapError;
@@ -363,12 +428,14 @@ protected:
                 wxLogError(_("Reading credentials failed."));
         }
 
-        return true;
+        return _Tbase::TransferDataToWindow();
     }
 
 
     virtual bool TransferDataFromWindow()
     {
+        wxCHECK(_Tbase::TransferDataFromWindow(), false);
+
         if (!m_target.empty()) {
             // Write credentials to credential manager.
             if (m_remember->GetValue()) {
@@ -383,7 +450,7 @@ protected:
             }
         }
 
-        return _Tbase::TransferDataFromWindow();
+        return true;
     }
 
     /// \endcond
@@ -394,7 +461,7 @@ protected:
 };
 
 
-class wxPasswordCredentialsPanel : public wxCredentialsPanel<wxPasswordCredentialsPanelBase, eap::credentials_pass>
+class wxPasswordCredentialsPanel : public wxCredentialsPanel<eap::credentials_pass, wxPasswordCredentialsPanelBase>
 {
 public:
     ///

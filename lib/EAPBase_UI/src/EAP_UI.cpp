@@ -72,7 +72,7 @@ const wxStringCharType *wxPasswordCredentialsPanel::s_dummy_password = wxT("dumm
 
 
 wxPasswordCredentialsPanel::wxPasswordCredentialsPanel(eap::credentials_pass &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config) :
-    wxCredentialsPanel<wxPasswordCredentialsPanelBase, eap::credentials_pass>(cred, pszCredTarget, parent, is_config)
+    wxCredentialsPanel<eap::credentials_pass, wxPasswordCredentialsPanelBase>(cred, pszCredTarget, parent, is_config)
 {
     // Load and set icon.
     if (m_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
@@ -82,6 +82,8 @@ wxPasswordCredentialsPanel::wxPasswordCredentialsPanel(eap::credentials_pass &cr
 
 bool wxPasswordCredentialsPanel::TransferDataToWindow()
 {
+    // Inherited TransferDataToWindow() calls m_cred.retrieve().
+    // Therefore, call it now, to set m_cred.
     wxCHECK(__super::TransferDataToWindow(), false);
 
     m_identity->SetValue(m_cred.m_identity);
@@ -102,5 +104,7 @@ bool wxPasswordCredentialsPanel::TransferDataFromWindow()
         pass.assign(pass.length(), wxT('*'));
     }
 
+    // Inherited TransferDataFromWindow() calls m_cred.store().
+    // Therefore, call it only now, that m_cred is set.
     return __super::TransferDataFromWindow();
 }

@@ -45,7 +45,7 @@ class wxEAPTTLSConfigPanelBase : public wxPanel
 		wxTextCtrl* m_outer_identity_custom_val;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnOuterIdentityCustom( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnUpdateUI( wxUpdateUIEvent& event ) { event.Skip(); }
 		
 	
 	public:

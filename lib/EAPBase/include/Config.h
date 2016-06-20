@@ -229,6 +229,12 @@ namespace eap
     {
     public:
         ///
+        /// Configuration credentials type
+        ///
+        typedef _Tcred credentials_type;
+
+    public:
+        ///
         /// Constructs configuration
         ///
         /// \param[in] mod  Reference of the EAP module to use for global services
@@ -422,11 +428,19 @@ namespace eap
     {
     public:
         ///
+        /// Provider method configuration type
+        ///
+        typedef _Tmeth config_method_type;
+
+    public:
+        ///
         /// Constructs configuration
         ///
         /// \param[in] mod  Reference of the EAP module to use for global services
         ///
-        config_provider(_In_ module &mod) : config(mod)
+        config_provider(_In_ module &mod) :
+            m_read_only(false),
+            config(mod)
         {
         }
 
@@ -436,7 +450,9 @@ namespace eap
         /// \param[in] other  Configuration to copy from
         ///
         config_provider(_In_ const config_provider &other) :
+            m_read_only(other.m_read_only),
             m_id(other.m_id),
+            m_name(other.m_name),
             m_lbl_alt_credential(other.m_lbl_alt_credential),
             m_lbl_alt_identity(other.m_lbl_alt_identity),
             m_lbl_alt_password(other.m_lbl_alt_password),
@@ -451,7 +467,9 @@ namespace eap
         /// \param[in] other  Configuration to move from
         ///
         config_provider(_Inout_ config_provider &&other) :
+            m_read_only(std::move(other.m_read_only)),
             m_id(std::move(other.m_id)),
+            m_name(std::move(other.m_name)),
             m_lbl_alt_credential(std::move(other.m_lbl_alt_credential)),
             m_lbl_alt_identity(std::move(other.m_lbl_alt_identity)),
             m_lbl_alt_password(std::move(other.m_lbl_alt_password)),
@@ -471,7 +489,9 @@ namespace eap
         {
             if (this != &other) {
                 (config&)*this       = other;
+                m_read_only          = other.m_read_only;
                 m_id                 = other.m_id;
+                m_name               = other.m_name;
                 m_lbl_alt_credential = other.m_lbl_alt_credential;
                 m_lbl_alt_identity   = other.m_lbl_alt_identity;
                 m_lbl_alt_password   = other.m_lbl_alt_password;
@@ -492,7 +512,9 @@ namespace eap
         {
             if (this != &other) {
                 (config&&)*this      = std::move(other);
+                m_read_only          = std::move(m_read_only);
                 m_id                 = std::move(other.m_id);
+                m_name               = std::move(other.m_name);
                 m_lbl_alt_credential = std::move(other.m_lbl_alt_credential);
                 m_lbl_alt_identity   = std::move(other.m_lbl_alt_identity);
                 m_lbl_alt_password   = std::move(other.m_lbl_alt_password);
@@ -529,6 +551,12 @@ namespace eap
             DWORD dwResult;
             HRESULT hr;
 
+            // <read-only>
+            if ((dwResult = eapxml::put_element_value(pDoc, pConfigRoot, winstd::bstr(L"read-only"), bstrNamespace, m_read_only)) != ERROR_SUCCESS) {
+                *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <read-only> element."), NULL);
+                return false;
+            }
+
             // <ID>
             if (!m_id.empty())
                 if ((dwResult = eapxml::put_element_value(pDoc, pConfigRoot, winstd::bstr(L"ID"), bstrNamespace, winstd::bstr(m_id))) != ERROR_SUCCESS) {
@@ -542,6 +570,13 @@ namespace eap
                 *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <ProviderInfo> element."), NULL);
                 return false;
             }
+
+            // <ProviderInfo>/<DisplayName>
+            if (!m_name.empty())
+                if ((dwResult = eapxml::put_element_value(pDoc, pXmlElProviderInfo, winstd::bstr(L"DisplayName"), bstrNamespace, winstd::bstr(m_name))) != ERROR_SUCCESS) {
+                    *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <DisplayName> element."), NULL);
+                    return false;
+                }
 
             // <ProviderInfo>/<CredentialPrompt>
             if (!m_lbl_alt_credential.empty())
@@ -611,16 +646,24 @@ namespace eap
             std::wstring lang;
             LoadString(m_module.m_instance, 2, lang);
 
+            // <read-only>
+            if ((dwResult = eapxml::get_element_value(pConfigRoot, winstd::bstr(L"eap-metadata:read-only"), &m_read_only)) != ERROR_SUCCESS)
+                m_read_only = true;
+
             // <ID>
             m_id.clear();
             eapxml::get_element_value(pConfigRoot, winstd::bstr(L"eap-metadata:ID"), m_id);
 
             // <ProviderInfo>
+            m_name.clear();
             m_lbl_alt_credential.clear();
             m_lbl_alt_identity.clear();
             m_lbl_alt_password.clear();
             winstd::com_obj<IXMLDOMElement> pXmlElProviderInfo;
             if (eapxml::select_element(pConfigRoot, winstd::bstr(L"eap-metadata:ProviderInfo"), &pXmlElProviderInfo) == ERROR_SUCCESS) {
+                // <DisplayName>
+                eapxml::get_element_localized(pXmlElProviderInfo, winstd::bstr(L"eap-metadata:DisplayName"), lang.c_str(), m_name);
+
                 // <CredentialPrompt>
                 eapxml::get_element_localized(pXmlElProviderInfo, winstd::bstr(L"eap-metadata:CredentialPrompt"), lang.c_str(), m_lbl_alt_credential);
 
@@ -669,7 +712,9 @@ namespace eap
         /// @}
 
     public:
+        bool m_read_only;                       ///< Is profile read-only
         std::wstring m_id;                      ///< Profile ID
+        winstd::tstring m_name;                 ///< Provider name
         winstd::tstring m_lbl_alt_credential;   ///< Alternative label for credential prompt
         winstd::tstring m_lbl_alt_identity;     ///< Alternative label for identity prompt
         winstd::tstring m_lbl_alt_password;     ///< Alternative label for password prompt
@@ -887,7 +932,9 @@ namespace eapserial
     template <class _Tmeth>
     inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::config_provider<_Tmeth> &val)
     {
+        pack(cursor, val.m_read_only         );
         pack(cursor, val.m_id                );
+        pack(cursor, val.m_name              );
         pack(cursor, val.m_lbl_alt_credential);
         pack(cursor, val.m_lbl_alt_identity  );
         pack(cursor, val.m_lbl_alt_password  );
@@ -899,7 +946,9 @@ namespace eapserial
     inline size_t get_pk_size(const eap::config_provider<_Tmeth> &val)
     {
         return
+            get_pk_size(val.m_read_only         ) +
             get_pk_size(val.m_id                ) +
+            get_pk_size(val.m_name              ) +
             get_pk_size(val.m_lbl_alt_credential) +
             get_pk_size(val.m_lbl_alt_identity  ) +
             get_pk_size(val.m_lbl_alt_password  ) +
@@ -910,7 +959,9 @@ namespace eapserial
     template <class _Tmeth>
     inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::config_provider<_Tmeth> &val)
     {
+        unpack(cursor, val.m_read_only         );
         unpack(cursor, val.m_id                );
+        unpack(cursor, val.m_name              );
         unpack(cursor, val.m_lbl_alt_credential);
         unpack(cursor, val.m_lbl_alt_identity  );
         unpack(cursor, val.m_lbl_alt_password  );

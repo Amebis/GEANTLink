@@ -150,7 +150,7 @@ bool eap::module::encrypt(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void
     vector<unsigned char, sanitizing_allocator<unsigned char> > buf(size);
     memcpy(buf.data(), data, size);
     if (!CryptGetKeyParam(key, KP_BLOCKLEN, dwBlockLen, 0)) dwBlockLen = 0;
-    buf.reserve((size + dwBlockLen - 1) / dwBlockLen * dwBlockLen);
+    buf.reserve(std::max<size_t>((size + dwBlockLen - 1) / dwBlockLen, 1) * dwBlockLen);
 
     // Encrypt the data using our public key.
     if (!CryptEncrypt(key, hHash, TRUE, 0, buf)) {
