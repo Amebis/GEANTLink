@@ -41,7 +41,7 @@ template <class _Tprov> class wxPAPConfigPanel;
 
 
 template <class _Tprov>
-class wxPAPCredentialsConfigPanel : public wxEAPCredentialsConfigPanel<_Tprov, eap::config_pap, wxPasswordCredentialsPanel>
+class wxPAPCredentialsConfigPanel : public wxEAPCredentialsConfigPanel<_Tprov, eap::config_pap, wxPasswordCredentialsPanel<_Tprov> >
 {
 public:
     ///
@@ -53,7 +53,7 @@ public:
     /// \param[in]    parent         Parent window
     ///
     wxPAPCredentialsConfigPanel(_Tprov &prov, eap::config_pap &cfg, LPCTSTR pszCredTarget, wxWindow *parent) :
-        wxEAPCredentialsConfigPanel<_Tprov, eap::config_pap, wxPasswordCredentialsPanel>(prov, cfg, pszCredTarget, parent)
+        wxEAPCredentialsConfigPanel<_Tprov, eap::config_pap, wxPasswordCredentialsPanel<_Tprov> >(prov, cfg, pszCredTarget, parent)
     {
     }
 };

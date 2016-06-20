@@ -56,7 +56,7 @@ template <class _Tcred, class _Tbase> class wxCredentialsPanel;
 ///
 /// Password credentials panel
 ///
-class wxPasswordCredentialsPanel;
+template <class _Tprov> class wxPasswordCredentialsPanel;
 
 ///
 /// Sets icon from resource
@@ -343,7 +343,7 @@ protected:
 
         wxEAPCredentialsDialog dlg(this);
 
-        _wxT *panel = new _wxT(m_cred, m_target.c_str(), &dlg, true);
+        _wxT *panel = new _wxT(m_prov, m_cred, m_target.c_str(), &dlg, true);
 
         dlg.AddContents((wxPanel**)&panel, 1);
         dlg.ShowModal();
@@ -365,7 +365,7 @@ protected:
 
         wxEAPCredentialsDialog dlg(this);
 
-        _wxT *panel = new _wxT(m_cred, _T(""), &dlg, true);
+        _wxT *panel = new _wxT(m_prov, m_cred, _T(""), &dlg, true);
 
         dlg.AddContents((wxPanel**)&panel, 1);
         dlg.ShowModal();
@@ -461,23 +461,79 @@ protected:
 };
 
 
+template <class _Tprov>
 class wxPasswordCredentialsPanel : public wxCredentialsPanel<eap::credentials_pass, wxPasswordCredentialsPanelBase>
 {
 public:
     ///
     /// Constructs a password credentials panel
     ///
+    /// \param[inout] prov           EAP provider
     /// \param[inout] cred           Credentials data
     /// \param[in]    pszCredTarget  Target name of credentials in Windows Credential Manager. Can be further decorated to create final target name.
     /// \param[in]    parent         Parent window
     /// \param[in]    is_config      Is this panel used to pre-enter credentials? When \c true, the "Remember" checkbox is always selected and disabled.
     ///
-    wxPasswordCredentialsPanel(eap::credentials_pass &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config = false);
+    wxPasswordCredentialsPanel(_Tprov &prov, eap::credentials_pass &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config = false) :
+        wxCredentialsPanel<eap::credentials_pass, wxPasswordCredentialsPanelBase>(cred, pszCredTarget, parent, is_config)
+    {
+        // Load and set icon.
+        if (m_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
+            wxSetIconFromResource(m_credentials_icon, m_icon, m_shell32, MAKEINTRESOURCE(269));
+
+        bool layout = false;
+        if (!prov.m_lbl_alt_credential.empty()) {
+            m_credentials_label->SetLabel(prov.m_lbl_alt_credential);
+            m_credentials_label->Wrap( 446 );
+            layout = true;
+        }
+
+        if (!prov.m_lbl_alt_identity.empty()) {
+            m_identity_label->SetLabel(prov.m_lbl_alt_identity);
+            layout = true;
+        }
+
+        if (!prov.m_lbl_alt_password.empty()) {
+            m_password_label->SetLabel(prov.m_lbl_alt_password);
+            layout = true;
+        }
+
+        if (layout)
+            this->Layout();
+    }
 
 protected:
     /// \cond internal
-    virtual bool TransferDataToWindow();
-    virtual bool TransferDataFromWindow();
+
+    virtual bool TransferDataToWindow()
+    {
+        // Inherited TransferDataToWindow() calls m_cred.retrieve().
+        // Therefore, call it now, to set m_cred.
+        wxCHECK(__super::TransferDataToWindow(), false);
+
+        m_identity->SetValue(m_cred.m_identity);
+        m_identity->SetSelection(0, -1);
+        m_password->SetValue(m_cred.m_password.empty() ? wxEmptyString : s_dummy_password);
+
+        return true;
+    }
+
+
+    virtual bool TransferDataFromWindow()
+    {
+        m_cred.m_identity = m_identity->GetValue();
+
+        wxString pass = m_password->GetValue();
+        if (pass.compare(s_dummy_password) != 0) {
+            m_cred.m_password = pass;
+            pass.assign(pass.length(), wxT('*'));
+        }
+
+        // Inherited TransferDataFromWindow() calls m_cred.store().
+        // Therefore, call it only now, that m_cred is set.
+        return __super::TransferDataFromWindow();
+    }
+
     /// \endcond
 
 protected:
@@ -487,6 +543,10 @@ protected:
 private:
     static const wxStringCharType *s_dummy_password;
 };
+
+
+template <class _Tprov>
+const wxStringCharType *wxPasswordCredentialsPanel<_Tprov>::s_dummy_password = wxT("dummypass");
 
 
 inline bool wxSetIconFromResource(wxStaticBitmap *bmp, wxIcon &icon, HINSTANCE hinst, PCWSTR pszName)

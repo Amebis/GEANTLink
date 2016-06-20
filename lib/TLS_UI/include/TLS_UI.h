@@ -58,7 +58,7 @@ class wxFQDNListValidator;
 ///
 /// EAPTLS credential panel
 ///
-class wxEAPTLSCredentialsPanel;
+template <class _Tprov> class wxEAPTLSCredentialsPanel;
 
 ///
 /// EAPTLS server trust configuration panel
@@ -256,19 +256,98 @@ protected:
 };
 
 
+template <class _Tprov>
 class wxEAPTLSCredentialsPanel : public wxCredentialsPanel<eap::credentials_tls, wxEAPTLSCredentialsPanelBase>
 {
 public:
     ///
     /// Constructs a configuration panel
     ///
-    wxEAPTLSCredentialsPanel(eap::credentials_tls &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config = false);
+    wxEAPTLSCredentialsPanel(_Tprov &prov, eap::credentials_tls &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config = false) :
+        wxCredentialsPanel<eap::credentials_tls, wxEAPTLSCredentialsPanelBase>(cred, pszCredTarget, parent, is_config)
+    {
+        UNREFERENCED_PARAMETER(prov);
+
+        // Load and set icon.
+        if (m_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
+            wxSetIconFromResource(m_credentials_icon, m_icon, m_shell32, MAKEINTRESOURCE(269));
+    }
 
 protected:
     /// \cond internal
-    virtual bool TransferDataToWindow();
-    virtual bool TransferDataFromWindow();
-    virtual void OnCertSelect(wxCommandEvent& event);
+
+    virtual bool TransferDataToWindow()
+    {
+        // Populate certificate list.
+        bool is_found = false;
+        winstd::cert_store store;
+        if (store.create(CERT_STORE_PROV_SYSTEM, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, (HCRYPTPROV)NULL, CERT_SYSTEM_STORE_CURRENT_USER, _T("My"))) {
+            for (PCCERT_CONTEXT cert = NULL; (cert = CertEnumCertificatesInStore(store, cert)) != NULL;) {
+                DWORD dwKeySpec = 0, dwSize = sizeof(dwKeySpec);
+                if (!CertGetCertificateContextProperty(cert, CERT_KEY_SPEC_PROP_ID, &dwKeySpec, &dwSize) || !dwKeySpec) {
+                    // Skip certificates without private key.
+                    continue;
+                }
+
+                // Prepare certificate information.
+                std::unique_ptr<wxCertificateClientData> data(new wxCertificateClientData(CertDuplicateCertificateContext(cert)));
+
+                // Add to list.
+                bool is_selected =
+                    m_cred.m_cert &&
+                    m_cred.m_cert->cbCertEncoded == data->m_cert->cbCertEncoded &&
+                    memcmp(m_cred.m_cert->pbCertEncoded, data->m_cert->pbCertEncoded, m_cred.m_cert->cbCertEncoded) == 0;
+                winstd::tstring name;
+                eap::get_cert_title(cert, name);
+                int i = m_cert_select_val->Append(name, data.release());
+                if (is_selected) {
+                    m_cert_select_val->SetSelection(i);
+                    is_found = true;
+                }
+            }
+        }
+
+        if (is_found) {
+            m_cert_select    ->SetValue(true);
+            m_cert_select_val->Enable(true);
+        } else {
+            m_cert_none      ->SetValue(true);
+            m_cert_select_val->Enable(false);
+            if (!m_cert_select_val->IsEmpty())
+                m_cert_select_val->SetSelection(0);
+        }
+
+        return __super::TransferDataToWindow();
+    }
+
+
+    virtual bool TransferDataFromWindow()
+    {
+        if (m_cert_none->GetValue())
+            m_cred.clear();
+        else {
+            const wxCertificateClientData *data = dynamic_cast<const wxCertificateClientData*>(m_cert_select_val->GetClientObject(m_cert_select_val->GetSelection()));
+            if (data) {
+                m_cred.m_cert.attach_duplicated(data->m_cert);
+
+                // Generate identity. TODO: Find which CERT_NAME_... constant returns valid identity (username@domain or DOMAIN\Username).
+                CertGetNameString(m_cred.m_cert, CERT_NAME_SIMPLE_DISPLAY_TYPE, 0, NULL, m_cred.m_identity);
+            } else
+                m_cred.clear();
+        }
+
+        // Inherited TransferDataFromWindow() calls m_cred.store().
+        // Therefore, call it only now, that m_cred is set.
+        return __super::TransferDataFromWindow();
+    }
+
+
+    virtual void OnCertSelect(wxCommandEvent& event)
+    {
+        UNREFERENCED_PARAMETER(event);
+        m_cert_select_val->Enable(m_cert_select->GetValue());
+    }
+
     /// \endcond
 
 protected:
@@ -469,7 +548,7 @@ protected:
 
 
 template <class _Tprov>
-class wxEAPTLSCredentialsConfigPanel : public wxEAPCredentialsConfigPanel<_Tprov, eap::config_tls, wxEAPTLSCredentialsPanel>
+class wxEAPTLSCredentialsConfigPanel : public wxEAPCredentialsConfigPanel<_Tprov, eap::config_tls, wxEAPTLSCredentialsPanel<_Tprov> >
 {
 public:
     ///
@@ -481,7 +560,7 @@ public:
     /// \param[in]    parent         Parent window
     ///
     wxEAPTLSCredentialsConfigPanel(_Tprov &prov, eap::config_tls &cfg, LPCTSTR pszCredTarget, wxWindow *parent) :
-        wxEAPCredentialsConfigPanel<_Tprov, eap::config_tls, wxEAPTLSCredentialsPanel>(prov, cfg, pszCredTarget, parent)
+        wxEAPCredentialsConfigPanel<_Tprov, eap::config_tls, wxEAPTLSCredentialsPanel<_Tprov> >(prov, cfg, pszCredTarget, parent)
     {
     }
 };
