@@ -215,7 +215,6 @@ bool eap::credentials_pass::store(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **
 {
     assert(pszTargetName);
     assert(ppEapError);
-    string password_enc;
 
     // Prepare cryptographics provider.
     crypt_prov cp;
@@ -225,26 +224,25 @@ bool eap::credentials_pass::store(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **
     }
 
     // Encrypt password.
-    vector<unsigned char> password;
-    if (!m_module.encrypt_md5(cp, m_password, password, ppEapError))
+    vector<unsigned char> cred_int;
+    if (!m_module.encrypt(cp, m_password, cred_int, ppEapError))
         return false;
 
-    // Convert encrypted password to Base64, since CredProtectA() fail for binary strings.
-    string password_base64;
-    base64_enc enc;
-    enc.encode(password_base64, password.data(), password.size());
-
     // Encrypt the password using user's key.
-    CRED_PROTECTION_TYPE cpt;
-    if (!CredProtectA(TRUE, password_base64.c_str(), (DWORD)password_base64.length(), password_enc, &cpt)) {
-        *ppEapError = m_module.make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CredProtect failed."), NULL);
+    DATA_BLOB cred_blob = {
+        (DWORD)cred_int.size(),
+        (LPBYTE)cred_int.data()
+    };
+    data_blob cred_enc;
+    if (!CryptProtectData(&cred_blob, NULL, NULL, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN, &cred_enc)) {
+        *ppEapError = m_module.make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CryptProtectData failed."), NULL);
         return false;
     }
 
     tstring target(target_name(pszTargetName));
 
     // Write credentials.
-    assert(password_enc.size() < CRED_MAX_CREDENTIAL_BLOB_SIZE);
+    assert(cred_enc.cbData     < CRED_MAX_CREDENTIAL_BLOB_SIZE);
     assert(m_identity.length() < CRED_MAX_USERNAME_LENGTH     );
     CREDENTIAL cred = {
         0,                          // Flags
@@ -252,8 +250,8 @@ bool eap::credentials_pass::store(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **
         (LPTSTR)target.c_str(),     // TargetName
         _T(""),                     // Comment
         { 0, 0 },                   // LastWritten
-        (DWORD)password_enc.size(), // CredentialBlobSize
-        (LPBYTE)password_enc.data(),// CredentialBlob
+        cred_enc.cbData,            // CredentialBlobSize
+        cred_enc.pbData,            // CredentialBlob
         CRED_PERSIST_ENTERPRISE,    // Persist
         0,                          // AttributeCount
         NULL,                       // Attributes
@@ -280,23 +278,16 @@ bool eap::credentials_pass::retrieve(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR
         return false;
     }
 
-    if (cred->UserName)
-        m_identity = cred->UserName;
-    else
-        m_identity.clear();
-
     // Decrypt the password using user's key.
-    string password_base64;
-    if (!CredUnprotectA(TRUE, (LPCSTR)(cred->CredentialBlob), cred->CredentialBlobSize, password_base64)) {
-        *ppEapError = m_module.make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CredUnprotect failed."), NULL);
+    DATA_BLOB cred_enc = {
+        cred->CredentialBlobSize,
+        cred->CredentialBlob
+    };
+    data_blob cred_int;
+    if (!CryptUnprotectData(&cred_enc, NULL, NULL, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN | CRYPTPROTECT_VERIFY_PROTECTION, &cred_int)) {
+        *ppEapError = m_module.make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CryptUnprotectData failed."), NULL);
         return false;
     }
-
-    // Convert Base64 to binary encrypted password, since CredProtectA() fail for binary strings.
-    vector<unsigned char> password;
-    base64_dec dec;
-    bool is_last;
-    dec.decode(password, is_last, password_base64.c_str(), password_base64.length());
 
     // Prepare cryptographics provider.
     crypt_prov cp;
@@ -306,5 +297,13 @@ bool eap::credentials_pass::retrieve(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR
     }
 
     // Decrypt password.
-    return m_module.decrypt_md5(cp, password.data(), password.size(), m_password, ppEapError);
+    if (!m_module.decrypt(cp, cred_int.pbData, cred_int.cbData, m_password, ppEapError))
+        return false;
+
+    if (cred->UserName)
+        m_identity = cred->UserName;
+    else
+        m_identity.clear();
+
+    return true;
 }

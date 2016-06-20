@@ -170,7 +170,6 @@ bool eap::credentials_tls::store(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **p
 {
     assert(pszTargetName);
     assert(ppEapError);
-    string cert_enc;
 
     // Prepare cryptographics provider.
     crypt_prov cp;
@@ -180,26 +179,25 @@ bool eap::credentials_tls::store(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **p
     }
 
     // Encrypt certificate.
-    vector<unsigned char> cert;
-    if (!m_module.encrypt_md5(cp, m_cert->pbCertEncoded, m_cert->cbCertEncoded, cert, ppEapError))
+    vector<unsigned char> cred_int;
+    if (!m_module.encrypt(cp, m_cert->pbCertEncoded, m_cert->cbCertEncoded, cred_int, ppEapError))
         return false;
 
-    // Convert encrypted certificate to Base64, since CredProtectA() fail for binary strings.
-    string cert_base64;
-    base64_enc enc;
-    enc.encode(cert_base64, cert.data(), cert.size());
-
     // Encrypt the certificate using user's key.
-    CRED_PROTECTION_TYPE cpt;
-    if (!CredProtectA(TRUE, cert_base64.c_str(), (DWORD)cert_base64.length(), cert_enc, &cpt)) {
-        *ppEapError = m_module.make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CredProtect failed."), NULL);
+    DATA_BLOB cred_blob = {
+        (DWORD)cred_int.size(),
+        (LPBYTE)cred_int.data()
+    };
+    data_blob cred_enc;
+    if (!CryptProtectData(&cred_blob, NULL, NULL, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN, &cred_enc)) {
+        *ppEapError = m_module.make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CryptProtectData failed."), NULL);
         return false;
     }
 
     tstring target(target_name(pszTargetName));
 
     // Write credentials.
-    assert(cert_enc.size()     < CRED_MAX_CREDENTIAL_BLOB_SIZE);
+    assert(cred_enc.cbData     < CRED_MAX_CREDENTIAL_BLOB_SIZE);
     assert(m_identity.length() < CRED_MAX_USERNAME_LENGTH     );
     CREDENTIAL cred = {
         0,                          // Flags
@@ -207,8 +205,8 @@ bool eap::credentials_tls::store(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **p
         (LPTSTR)target.c_str(),     // TargetName
         _T(""),                     // Comment
         { 0, 0 },                   // LastWritten
-        (DWORD)cert_enc.size(),     // CredentialBlobSize
-        (LPBYTE)cert_enc.data(),    // CredentialBlob
+        cred_enc.cbData,            // CredentialBlobSize
+        cred_enc.pbData,            // CredentialBlob
         CRED_PERSIST_ENTERPRISE,    // Persist
         0,                          // AttributeCount
         NULL,                       // Attributes
@@ -236,17 +234,15 @@ bool eap::credentials_tls::retrieve(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR 
     }
 
     // Decrypt the certificate using user's key.
-    string cert_base64;
-    if (!CredUnprotectA(TRUE, (LPCSTR)(cred->CredentialBlob), cred->CredentialBlobSize, cert_base64)) {
-        *ppEapError = m_module.make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CredUnprotect failed."), NULL);
+    DATA_BLOB cred_enc = {
+        cred->CredentialBlobSize,
+        cred->CredentialBlob
+    };
+    data_blob cred_int;
+    if (!CryptUnprotectData(&cred_enc, NULL, NULL, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN | CRYPTPROTECT_VERIFY_PROTECTION, &cred_int)) {
+        *ppEapError = m_module.make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CryptUnprotectData failed."), NULL);
         return false;
     }
-
-    // Convert Base64 to binary encrypted certificate, since CredProtectA() fail for binary strings.
-    vector<unsigned char> cert;
-    base64_dec dec;
-    bool is_last;
-    dec.decode(cert, is_last, cert_base64.c_str(), cert_base64.length());
 
     // Prepare cryptographics provider.
     crypt_prov cp;
@@ -257,7 +253,7 @@ bool eap::credentials_tls::retrieve(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR 
 
     // Decrypt certificate.
     vector<unsigned char, sanitizing_allocator<unsigned char> > _cert;
-    if (!m_module.decrypt_md5(cp, cert.data(), cert.size(), _cert, ppEapError))
+    if (!m_module.decrypt(cp, cred_int.pbData, cred_int.cbData, _cert, ppEapError))
         return false;
 
     if (!m_cert.create(X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, _cert.data(), (DWORD)_cert.size())) {
