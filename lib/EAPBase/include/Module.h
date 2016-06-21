@@ -18,14 +18,6 @@
     along with GÉANTLink. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#define ETW_ERROR(kw, f, ...)   m_ep.write(TRACE_LEVEL_ERROR      , kw, _T(__FUNCTION__) _T(" ") f, ##__VA_ARGS__)
-#define ETW_WARNING(kw, f, ...) m_ep.write(TRACE_LEVEL_WARNING    , kw, _T(__FUNCTION__) _T(" ") f, ##__VA_ARGS__)
-#define ETW_INFO(kw, f, ...)    m_ep.write(TRACE_LEVEL_INFORMATION, kw, _T(__FUNCTION__) _T(" ") f, ##__VA_ARGS__)
-#define ETW_VERBOSE(kw, f, ...) m_ep.write(TRACE_LEVEL_VERBOSE    , kw, _T(__FUNCTION__) _T(" ") f, ##__VA_ARGS__)
-#define ETW_FN_VOID             winstd::event_fn_auto    <         &EAPMETHOD_TRACE_EVT_FN_CALL, &EAPMETHOD_TRACE_EVT_FN_RETURN        > _event_auto(m_ep, __FUNCTION__)
-#define ETW_FN_DWORD(res)       winstd::event_fn_auto_ret<DWORD  , &EAPMETHOD_TRACE_EVT_FN_CALL, &EAPMETHOD_TRACE_EVT_FN_RETURN_DWORD  > _event_auto(m_ep, __FUNCTION__, res)
-#define ETW_FN_HRESULT(res)     winstd::event_fn_auto_ret<HRESULT, &EAPMETHOD_TRACE_EVT_FN_CALL, &EAPMETHOD_TRACE_EVT_FN_RETURN_HRESULT> _event_auto(m_ep, __FUNCTION__, res)
-
 namespace eap
 {
     ///
@@ -86,7 +78,7 @@ namespace eap
         ///
         /// Allocate a EAP_ERROR and fill it according to dwErrorCode
         ///
-        EAP_ERROR* make_error(_In_ DWORD dwErrorCode, _In_ DWORD dwReasonCode, _In_ LPCGUID pRootCauseGuid, _In_ LPCGUID pRepairGuid, _In_ LPCGUID pHelpLinkGuid, _In_z_ LPCWSTR pszRootCauseString, _In_z_ LPCWSTR pszRepairString) const;
+        EAP_ERROR* make_error(_In_ DWORD dwErrorCode, _In_opt_z_ LPCWSTR pszRootCauseString = NULL, _In_opt_z_ LPCWSTR pszRepairString = NULL, _In_opt_ DWORD dwReasonCode = 0, _In_opt_ LPCGUID pRootCauseGuid = NULL, _In_opt_ LPCGUID pRepairGuid = NULL, _In_opt_ LPCGUID pHelpLinkGuid = NULL) const;
 
         ///
         /// Allocate BLOB
@@ -105,6 +97,39 @@ namespace eap
 
         /// @}
 
+        /// \name Logging
+        /// @{
+
+        ///
+        /// Writes EAPMETHOD_TRACE_EVT_FN_CALL and returns auto event writer class
+        ///
+        /// \param[in] pszFnName  Function name
+        ///
+        /// \returns A new auto event writer that writes EAPMETHOD_TRACE_EVT_FN_RETURN event on destruction
+        ///
+        inline winstd::event_fn_auto get_event_fn_auto(_In_z_ LPCSTR pszFnName) const
+        {
+            return winstd::event_fn_auto(m_ep, &EAPMETHOD_TRACE_EVT_FN_CALL, &EAPMETHOD_TRACE_EVT_FN_RETURN_DWORD, pszFnName);
+        }
+
+        ///
+        /// Writes EAPMETHOD_TRACE_EVT_FN_CALL and returns auto event writer class
+        ///
+        /// \param[in] pszFnName  Function name
+        ///
+        /// \returns A new auto event writer that writes EAPMETHOD_TRACE_EVT_FN_RETURN_DWORD event on destruction
+        ///
+        inline winstd::event_fn_auto_ret<DWORD> get_event_fn_auto(_In_z_ LPCSTR pszFnName, _In_ DWORD &result) const
+        {
+            return winstd::event_fn_auto_ret<DWORD>(m_ep, &EAPMETHOD_TRACE_EVT_FN_CALL, &EAPMETHOD_TRACE_EVT_FN_RETURN_DWORD, pszFnName, result);
+        }
+
+        ///
+        /// Logs error
+        ///
+        void log_error(_In_ const EAP_ERROR *err) const;
+
+        /// @}
 
         /// \name Encryption
         /// @{
@@ -252,12 +277,12 @@ namespace eap
             unique_ptr<unsigned char[], LocalFree_delete<unsigned char[]> > keyinfo_data;
             DWORD keyinfo_size = 0;
             if (!CryptDecodeObjectEx(X509_ASN_ENCODING, PKCS_RSA_PRIVATE_KEY, (const BYTE*)::LockResource(res_handle), ::SizeofResource(m_instance, res), CRYPT_DECODE_ALLOC_FLAG, NULL, &keyinfo_data, &keyinfo_size)) {
-                *ppEapError = make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CryptDecodeObjectEx failed."), NULL);
+                *ppEapError = make_error(GetLastError(), _T(__FUNCTION__) _T(" CryptDecodeObjectEx failed."));
                 return false;
             }
 
             if (!key.import(hProv, keyinfo_data.get(), keyinfo_size, NULL, 0)) {
-                *ppEapError = make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Private key import failed."), NULL);
+                *ppEapError = make_error(GetLastError(), _T(__FUNCTION__) _T(" Private key import failed."));
                 return false;
             }
 
@@ -265,7 +290,7 @@ namespace eap
             vector<unsigned char, sanitizing_allocator<unsigned char> > buf(size);
             memcpy(buf.data(), data, size);
             if (!CryptDecrypt(key, hHash, TRUE, 0, buf)) {
-                *ppEapError = make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Decrypting password failed."), NULL);
+                *ppEapError = make_error(GetLastError(), _T(__FUNCTION__) _T(" CryptDecrypt failed."));
                 return false;
             }
 
@@ -346,13 +371,13 @@ namespace eap
             // Create hash.
             crypt_hash hash;
             if (!hash.create(hProv, CALG_MD5)) {
-                *ppEapError = make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Creating MD5 hash failed."), NULL);
+                *ppEapError = make_error(GetLastError(), _T(__FUNCTION__) _T(" Creating MD5 hash failed."));
                 return false;
             }
             DWORD dwHashSize, dwHashSizeSize = sizeof(dwHashSize);
             CryptGetHashParam(hash, HP_HASHSIZE, (LPBYTE)&dwHashSize, &dwHashSizeSize, 0);
             if (size < dwHashSize) {
-                *ppEapError = make_error(ERROR_INVALID_DATA, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Encrypted data too short."), NULL);
+                *ppEapError = make_error(ERROR_INVALID_DATA, _T(__FUNCTION__) _T(" Encrypted data too short."));
                 return false;
             }
             size_t enc_size = size - dwHashSize;
@@ -364,11 +389,11 @@ namespace eap
             // Calculate MD5 hash and verify it.
             vector<unsigned char> hash_bin;
             if (!CryptGetHashParam(hash, HP_HASHVAL, hash_bin, 0)) {
-                *ppEapError = make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Calculating MD5 hash failed."), NULL);
+                *ppEapError = make_error(GetLastError(), _T(__FUNCTION__) _T(" Calculating MD5 hash failed."));
                 return false;
             }
             if (memcmp((unsigned char*)data + enc_size, hash_bin.data(), dwHashSize) != 0) {
-                *ppEapError = make_error(ERROR_INVALID_DATA, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Invalid encrypted data."), NULL);
+                *ppEapError = make_error(ERROR_INVALID_DATA, _T(__FUNCTION__) _T(" Invalid encrypted data."));
                 return false;
             }
 
@@ -571,7 +596,7 @@ namespace eap
             UNREFERENCED_PARAMETER(pEapConfigInputFieldsArray);
             UNREFERENCED_PARAMETER(ppEapError);
 
-            *ppEapError = make_error(ERROR_NOT_SUPPORTED, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Not supported."), NULL);
+            *ppEapError = make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
             return false;
         }
 
@@ -603,7 +628,7 @@ namespace eap
             UNREFERENCED_PARAMETER(ppUserBlob);
             UNREFERENCED_PARAMETER(ppEapError);
 
-            *ppEapError = make_error(ERROR_NOT_SUPPORTED, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Not supported."), NULL);
+            *ppEapError = make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
             return false;
         }
 
@@ -633,7 +658,7 @@ namespace eap
             UNREFERENCED_PARAMETER(ppEapError);
             UNREFERENCED_PARAMETER(pvReserved);
 
-            *ppEapError = make_error(ERROR_NOT_SUPPORTED, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Not supported."), NULL);
+            *ppEapError = make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
             return false;
         }
 
@@ -667,7 +692,7 @@ namespace eap
             UNREFERENCED_PARAMETER(ppEapError);
             UNREFERENCED_PARAMETER(ppvReserved);
 
-            *ppEapError = make_error(ERROR_NOT_SUPPORTED, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Not supported."), NULL);
+            *ppEapError = make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
             return false;
         }
     };

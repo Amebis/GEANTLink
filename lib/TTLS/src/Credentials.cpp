@@ -108,7 +108,7 @@ bool eap::credentials_ttls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *p
         // <InnerAuthenticationMethod>
         winstd::com_obj<IXMLDOMElement> pXmlElInnerAuthenticationMethod;
         if ((dwResult = eapxml::create_element(pDoc, winstd::bstr(L"InnerAuthenticationMethod"), bstrNamespace, &pXmlElInnerAuthenticationMethod))) {
-            *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <InnerAuthenticationMethod> element."), NULL);
+            *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <InnerAuthenticationMethod> element."));
             return false;
         }
 
@@ -116,7 +116,7 @@ bool eap::credentials_ttls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *p
             return false;
 
         if (FAILED(hr = pConfigRoot->appendChild(pXmlElInnerAuthenticationMethod, NULL))) {
-            *ppEapError = m_module.make_error(HRESULT_CODE(hr), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error appending <InnerAuthenticationMethod> element."), NULL);
+            *ppEapError = m_module.make_error(HRESULT_CODE(hr), _T(__FUNCTION__) _T(" Error appending <InnerAuthenticationMethod> element."));
             return false;
         }
     }
@@ -136,7 +136,7 @@ bool eap::credentials_ttls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR 
     if (m_inner) {
         com_obj<IXMLDOMNode> pXmlElInnerAuthenticationMethod;
         if ((dwResult = eapxml::select_node(pConfigRoot, bstr(L"eap-metadata:InnerAuthenticationMethod"), &pXmlElInnerAuthenticationMethod)) != ERROR_SUCCESS) {
-            *ppEapError = m_module.make_error(ERROR_NOT_FOUND, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error selecting <InnerAuthenticationMethod> element."), NULL);
+            *ppEapError = m_module.make_error(ERROR_NOT_FOUND, _T(__FUNCTION__) _T(" Error selecting <InnerAuthenticationMethod> element."), _T("Please make sure profile XML is a valid ") _T(PRODUCT_NAME_STR) _T(" profile XML document."));
             return false;
         }
 

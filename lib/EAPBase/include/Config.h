@@ -127,6 +127,8 @@ namespace eapserial
 #include "EAPSerial.h"
 #include "EAPXML.h"
 
+#include "../../../include/Version.h"
+
 #include <WinStd/COM.h>
 #include <WinStd/Common.h>
 
@@ -342,20 +344,20 @@ namespace eap
             // <ClientSideCredential>
             winstd::com_obj<IXMLDOMElement> pXmlElClientSideCredential;
             if ((dwResult = eapxml::create_element(pDoc, pConfigRoot, winstd::bstr(L"eap-metadata:ClientSideCredential"), winstd::bstr(L"ClientSideCredential"), bstrNamespace, &pXmlElClientSideCredential)) != ERROR_SUCCESS) {
-                *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <ClientSideCredential> element."), NULL);
+                *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <ClientSideCredential> element."));
                 return false;
             }
 
             // <ClientSideCredential>/<allow-save>
             if ((dwResult = eapxml::put_element_value(pDoc, pXmlElClientSideCredential, winstd::bstr(L"allow-save"), bstrNamespace, m_allow_save)) != ERROR_SUCCESS) {
-                *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <allow-save> element."), NULL);
+                *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <allow-save> element."));
                 return false;
             }
 
             // <ClientSideCredential>/<AnonymousIdentity>
             if (!m_anonymous_identity.empty())
                 if ((dwResult = eapxml::put_element_value(pDoc, pXmlElClientSideCredential, winstd::bstr(L"AnonymousIdentity"), bstrNamespace, winstd::bstr(m_anonymous_identity))) != ERROR_SUCCESS) {
-                    *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <AnonymousIdentity> element."), NULL);
+                    *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <AnonymousIdentity> element."));
                     return false;
                 }
 
@@ -565,84 +567,84 @@ namespace eap
 
             // <read-only>
             if ((dwResult = eapxml::put_element_value(pDoc, pConfigRoot, winstd::bstr(L"read-only"), bstrNamespace, m_read_only)) != ERROR_SUCCESS) {
-                *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <read-only> element."), NULL);
+                *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <read-only> element."));
                 return false;
             }
 
             // <ID>
             if (!m_id.empty())
                 if ((dwResult = eapxml::put_element_value(pDoc, pConfigRoot, winstd::bstr(L"ID"), bstrNamespace, winstd::bstr(m_id))) != ERROR_SUCCESS) {
-                    *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <ID> element."), NULL);
+                    *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <ID> element."));
                     return false;
                 }
 
             // <ProviderInfo>
             winstd::com_obj<IXMLDOMElement> pXmlElProviderInfo;
             if ((dwResult = eapxml::create_element(pDoc, pConfigRoot, winstd::bstr(L"eap-metadata:ProviderInfo"), winstd::bstr(L"ProviderInfo"), bstrNamespace, &pXmlElProviderInfo)) != ERROR_SUCCESS) {
-                *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <ProviderInfo> element."), NULL);
+                *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <ProviderInfo> element."));
                 return false;
             }
 
             // <ProviderInfo>/<DisplayName>
             if (!m_name.empty())
                 if ((dwResult = eapxml::put_element_value(pDoc, pXmlElProviderInfo, winstd::bstr(L"DisplayName"), bstrNamespace, winstd::bstr(m_name))) != ERROR_SUCCESS) {
-                    *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <DisplayName> element."), NULL);
+                    *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <DisplayName> element."));
                     return false;
                 }
 
             // <ProviderInfo>/<Helpdesk>
             winstd::com_obj<IXMLDOMElement> pXmlElHelpdesk;
             if ((dwResult = eapxml::create_element(pDoc, pXmlElProviderInfo, winstd::bstr(L"eap-metadata:Helpdesk"), winstd::bstr(L"Helpdesk"), bstrNamespace, &pXmlElHelpdesk)) != ERROR_SUCCESS) {
-                *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <Helpdesk> element."), NULL);
+                *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <Helpdesk> element."));
                 return false;
             }
 
             // <ProviderInfo>/<Helpdesk>/<EmailAddress>
             if (!m_help_email.empty())
                 if ((dwResult = eapxml::put_element_value(pDoc, pXmlElHelpdesk, winstd::bstr(L"EmailAddress"), bstrNamespace, winstd::bstr(m_help_email))) != ERROR_SUCCESS) {
-                    *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <EmailAddress> element."), NULL);
+                    *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <EmailAddress> element."));
                     return false;
                 }
 
             // <ProviderInfo>/<Helpdesk>/<WebAddress>
             if (!m_help_web.empty())
                 if ((dwResult = eapxml::put_element_value(pDoc, pXmlElHelpdesk, winstd::bstr(L"WebAddress"), bstrNamespace, winstd::bstr(m_help_web))) != ERROR_SUCCESS) {
-                    *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <WebAddress> element."), NULL);
+                    *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <WebAddress> element."));
                     return false;
                 }
 
             // <ProviderInfo>/<Helpdesk>/<Phone>
             if (!m_help_phone.empty())
                 if ((dwResult = eapxml::put_element_value(pDoc, pXmlElHelpdesk, winstd::bstr(L"Phone"), bstrNamespace, winstd::bstr(m_help_phone))) != ERROR_SUCCESS) {
-                    *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <Phone> element."), NULL);
+                    *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <Phone> element."));
                     return false;
                 }
 
             // <ProviderInfo>/<CredentialPrompt>
             if (!m_lbl_alt_credential.empty())
                 if ((dwResult = eapxml::put_element_value(pDoc, pXmlElProviderInfo, winstd::bstr(L"CredentialPrompt"), bstrNamespace, winstd::bstr(m_lbl_alt_credential))) != ERROR_SUCCESS) {
-                    *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <CredentialPrompt> element."), NULL);
+                    *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <CredentialPrompt> element."));
                     return false;
                 }
 
             // <ProviderInfo>/<UserNameLabel>
             if (!m_lbl_alt_identity.empty())
                 if ((dwResult = eapxml::put_element_value(pDoc, pXmlElProviderInfo, winstd::bstr(L"UserNameLabel"), bstrNamespace, winstd::bstr(m_lbl_alt_identity))) != ERROR_SUCCESS) {
-                    *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <UserNameLabel> element."), NULL);
+                    *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <UserNameLabel> element."));
                     return false;
                 }
 
             // <ProviderInfo>/<PasswordLabel>
             if (!m_lbl_alt_password.empty())
                 if ((dwResult = eapxml::put_element_value(pDoc, pXmlElProviderInfo, winstd::bstr(L"PasswordLabel"), bstrNamespace, winstd::bstr(m_lbl_alt_password))) != ERROR_SUCCESS) {
-                    *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <PasswordLabel> element."), NULL);
+                    *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <PasswordLabel> element."));
                     return false;
                 }
 
             // <AuthenticationMethods>
             winstd::com_obj<IXMLDOMElement> pXmlElAuthenticationMethods;
             if ((dwResult = eapxml::create_element(pDoc, pConfigRoot, winstd::bstr(L"eap-metadata:AuthenticationMethods"), winstd::bstr(L"AuthenticationMethods"), bstrNamespace, &pXmlElAuthenticationMethods)) != ERROR_SUCCESS) {
-                *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <AuthenticationMethods> element."), NULL);
+                *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <AuthenticationMethods> element."));
                 return false;
             }
 
@@ -650,7 +652,7 @@ namespace eap
                 // <AuthenticationMethod>
                 winstd::com_obj<IXMLDOMElement> pXmlElAuthenticationMethod;
                 if ((dwResult = eapxml::create_element(pDoc, winstd::bstr(L"AuthenticationMethod"), bstrNamespace, &pXmlElAuthenticationMethod))) {
-                    *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <AuthenticationMethod> element."), NULL);
+                    *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <AuthenticationMethod> element."));
                     return false;
                 }
 
@@ -659,7 +661,7 @@ namespace eap
                     return false;
 
                 if (FAILED(hr = pXmlElAuthenticationMethods->appendChild(pXmlElAuthenticationMethod, NULL))) {
-                    *ppEapError = m_module.make_error(HRESULT_CODE(hr), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error appending <AuthenticationMethod> element."), NULL);
+                    *ppEapError = m_module.make_error(HRESULT_CODE(hr), _T(__FUNCTION__) _T(" Error appending <AuthenticationMethod> element."));
                     return false;
                 }
             }
@@ -733,7 +735,7 @@ namespace eap
             m_methods.clear();
             winstd::com_obj<IXMLDOMNodeList> pXmlListMethods;
             if ((dwResult = eapxml::select_nodes(pConfigRoot, winstd::bstr(L"eap-metadata:AuthenticationMethods/eap-metadata:AuthenticationMethod"), &pXmlListMethods)) != ERROR_SUCCESS) {
-                *ppEapError = m_module.make_error(ERROR_NOT_FOUND, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error selecting <AuthenticationMethods>/<AuthenticationMethod> elements."), NULL);
+                *ppEapError = m_module.make_error(ERROR_NOT_FOUND, _T(__FUNCTION__) _T(" Error selecting <AuthenticationMethods>/<AuthenticationMethod> elements."), _T("Please make sure profile XML is a valid ") _T(PRODUCT_NAME_STR) _T(" profile XML document."));
                 return false;
             }
             long lCount = 0;
@@ -879,7 +881,7 @@ namespace eap
             // Select <EAPIdentityProviderList> node.
             winstd::com_obj<IXMLDOMNode> pXmlElIdentityProviderList;
             if ((dwResult = eapxml::select_node(pConfigRoot, winstd::bstr(L"eap-metadata:EAPIdentityProviderList"), &pXmlElIdentityProviderList)) != ERROR_SUCCESS) {
-                *ppEapError = m_module.make_error(ERROR_NOT_FOUND, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error selecting <EAPIdentityProviderList> element."), NULL);
+                *ppEapError = m_module.make_error(ERROR_NOT_FOUND, _T(__FUNCTION__) _T(" Error selecting <EAPIdentityProviderList> element."), _T("Please make sure profile XML is a valid ") _T(PRODUCT_NAME_STR) _T(" profile XML document."));
                 return false;
             }
 
@@ -887,7 +889,7 @@ namespace eap
                 // <EAPIdentityProvider>
                 winstd::com_obj<IXMLDOMElement> pXmlElIdentityProvider;
                 if ((dwResult = eapxml::create_element(pDoc, winstd::bstr(L"EAPIdentityProvider"), bstrNamespace, &pXmlElIdentityProvider))) {
-                    *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <EAPIdentityProvider> element."), NULL);
+                    *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <EAPIdentityProvider> element."));
                     return false;
                 }
 
@@ -896,7 +898,7 @@ namespace eap
                     return false;
 
                 if (FAILED(hr = pXmlElIdentityProviderList->appendChild(pXmlElIdentityProvider, NULL))) {
-                    *ppEapError = m_module.make_error(HRESULT_CODE(hr), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error appending <EAPIdentityProvider> element."), NULL);
+                    *ppEapError = m_module.make_error(HRESULT_CODE(hr), _T(__FUNCTION__) _T(" Error appending <EAPIdentityProvider> element."));
                     return false;
                 }
             }
@@ -924,7 +926,7 @@ namespace eap
             // Iterate authentication providers (<EAPIdentityProvider>).
             winstd::com_obj<IXMLDOMNodeList> pXmlListProviders;
             if ((dwResult = eapxml::select_nodes(pConfigRoot, winstd::bstr(L"eap-metadata:EAPIdentityProviderList/eap-metadata:EAPIdentityProvider"), &pXmlListProviders)) != ERROR_SUCCESS) {
-                *ppEapError = m_module.make_error(ERROR_NOT_FOUND, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error selecting <EAPIdentityProviderList><EAPIdentityProvider> elements."), NULL);
+                *ppEapError = m_module.make_error(ERROR_NOT_FOUND, _T(__FUNCTION__) _T(" Error selecting <EAPIdentityProviderList><EAPIdentityProvider> elements."), _T("Please make sure profile XML is a valid ") _T(PRODUCT_NAME_STR) _T(" profile XML document."));
                 return false;
             }
             long lCount = 0;

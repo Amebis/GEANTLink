@@ -101,26 +101,26 @@ bool eap::credentials_tls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pC
     // <ClientCertificate>
     com_obj<IXMLDOMElement> pXmlElClientCertificate;
     if ((dwResult = eapxml::create_element(pDoc, bstr(L"ClientCertificate"), bstrNamespace, &pXmlElClientCertificate))) {
-        *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <ClientCertificate> element."), NULL);
+        *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <ClientCertificate> element."));
         return false;
     }
 
     if (m_cert) {
         // <ClientCertificate>/<format>
         if ((dwResult = eapxml::put_element_value(pDoc, pXmlElClientCertificate, bstr(L"format"), bstrNamespace, bstr(L"PEM"))) != ERROR_SUCCESS) {
-            *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <format> element."), NULL);
+            *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <format> element."));
             return false;
         }
 
         // <ClientCertificate>/<cert-data>
         if ((dwResult = eapxml::put_element_base64(pDoc, pXmlElClientCertificate, bstr(L"cert-data"), bstrNamespace, m_cert->pbCertEncoded, m_cert->cbCertEncoded)) != ERROR_SUCCESS) {
-            *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <cert-data> element."), NULL);
+            *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <cert-data> element."));
             return false;
         }
     }
 
     if (FAILED(hr = pConfigRoot->appendChild(pXmlElClientCertificate, NULL))) {
-        *ppEapError = m_module.make_error(HRESULT_CODE(hr), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error appending <ClientCertificate> element."), NULL);
+        *ppEapError = m_module.make_error(HRESULT_CODE(hr), _T(__FUNCTION__) _T(" Error appending <ClientCertificate> element."));
         return false;
     }
 
@@ -143,7 +143,7 @@ bool eap::credentials_tls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR *
     // <ClientCertificate>
     com_obj<IXMLDOMElement> pXmlElClientCertificate;
     if ((dwResult = eapxml::select_element(pConfigRoot, bstr(L"eap-metadata:ClientCertificate"), &pXmlElClientCertificate)) != ERROR_SUCCESS) {
-        *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error reading <ClientCertificate> element."), NULL);
+        *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error reading <ClientCertificate> element."), _T("Please make sure profile XML is a valid ") _T(PRODUCT_NAME_STR) _T(" profile XML document."));
         return false;
     }
 
@@ -174,7 +174,7 @@ bool eap::credentials_tls::store(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **p
     // Prepare cryptographics provider.
     crypt_prov cp;
     if (!cp.create(NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT)) {
-        *ppEapError = m_module.make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CryptAcquireContext failed."), NULL);
+        *ppEapError = m_module.make_error(GetLastError(), _T(__FUNCTION__) _T(" CryptAcquireContext failed."));
         return false;
     }
 
@@ -190,7 +190,7 @@ bool eap::credentials_tls::store(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **p
     };
     data_blob cred_enc;
     if (!CryptProtectData(&cred_blob, NULL, NULL, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN, &cred_enc)) {
-        *ppEapError = m_module.make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CryptProtectData failed."), NULL);
+        *ppEapError = m_module.make_error(GetLastError(), _T(__FUNCTION__) _T(" CryptProtectData failed."));
         return false;
     }
 
@@ -214,7 +214,7 @@ bool eap::credentials_tls::store(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **p
         (LPTSTR)m_identity.c_str()  // UserName
     };
     if (!CredWrite(&cred, 0)) {
-        *ppEapError = m_module.make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CredWrite failed."), NULL);
+        *ppEapError = m_module.make_error(GetLastError(), _T(__FUNCTION__) _T(" CredWrite failed."));
         return false;
     }
 
@@ -229,7 +229,7 @@ bool eap::credentials_tls::retrieve(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR 
     // Read credentials.
     unique_ptr<CREDENTIAL, CredFree_delete<CREDENTIAL> > cred;
     if (!CredRead(target_name(pszTargetName).c_str(), CRED_TYPE_GENERIC, 0, (PCREDENTIAL*)&cred)) {
-        *ppEapError = m_module.make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CredRead failed."), NULL);
+        *ppEapError = m_module.make_error(GetLastError(), _T(__FUNCTION__) _T(" CredRead failed."));
         return false;
     }
 
@@ -240,14 +240,14 @@ bool eap::credentials_tls::retrieve(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR 
     };
     data_blob cred_int;
     if (!CryptUnprotectData(&cred_enc, NULL, NULL, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN | CRYPTPROTECT_VERIFY_PROTECTION, &cred_int)) {
-        *ppEapError = m_module.make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CryptUnprotectData failed."), NULL);
+        *ppEapError = m_module.make_error(GetLastError(), _T(__FUNCTION__) _T(" CryptUnprotectData failed."));
         return false;
     }
 
     // Prepare cryptographics provider.
     crypt_prov cp;
     if (!cp.create(NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT)) {
-        *ppEapError = m_module.make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CryptAcquireContext failed."), NULL);
+        *ppEapError = m_module.make_error(GetLastError(), _T(__FUNCTION__) _T(" CryptAcquireContext failed."));
         return false;
     }
 
@@ -257,7 +257,7 @@ bool eap::credentials_tls::retrieve(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR 
         return false;
 
     if (!m_cert.create(X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, _cert.data(), (DWORD)_cert.size())) {
-        *ppEapError = m_module.make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error loading certificate."), NULL);
+        *ppEapError = m_module.make_error(GetLastError(), _T(__FUNCTION__) _T(" Error loading certificate."));
         return false;
     }
 

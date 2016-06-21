@@ -45,13 +45,13 @@ eap::module::~module()
 }
 
 
-EAP_ERROR* eap::module::make_error(_In_ DWORD dwErrorCode, _In_ DWORD dwReasonCode, _In_ LPCGUID pRootCauseGuid, _In_ LPCGUID pRepairGuid, _In_ LPCGUID pHelpLinkGuid, _In_z_ LPCWSTR pszRootCauseString, _In_z_ LPCWSTR pszRepairString) const
+EAP_ERROR* eap::module::make_error(_In_ DWORD dwErrorCode, _In_opt_z_ LPCWSTR pszRootCauseString, _In_opt_z_ LPCWSTR pszRepairString, _In_opt_ DWORD dwReasonCode, _In_opt_ LPCGUID pRootCauseGuid, _In_opt_ LPCGUID pRepairGuid, _In_opt_ LPCGUID pHelpLinkGuid) const
 {
     // Calculate memory size requirement.
     SIZE_T
         nRootCauseSize    = pszRootCauseString != NULL && pszRootCauseString[0] ? (wcslen(pszRootCauseString) + 1)*sizeof(WCHAR) : 0,
         nRepairStringSize = pszRepairString    != NULL && pszRepairString   [0] ? (wcslen(pszRepairString   ) + 1)*sizeof(WCHAR) : 0,
-        nEapErrorSize = sizeof(EAP_ERROR) + nRootCauseSize + nRepairStringSize;
+        nEapErrorSize     = sizeof(EAP_ERROR) + nRootCauseSize + nRepairStringSize;
 
     EAP_ERROR *pError = (EAP_ERROR*)HeapAlloc(m_heap, 0, nEapErrorSize);
     if (!pError)
@@ -81,19 +81,6 @@ EAP_ERROR* eap::module::make_error(_In_ DWORD dwErrorCode, _In_ DWORD dwReasonCo
     } else
         pError->pRepairString = NULL;
 
-    // Write trace event.
-    vector<EVENT_DATA_DESCRIPTOR> evt_desc;
-    evt_desc.reserve(8);
-    evt_desc.push_back(event_data(pError->dwWinError));
-    evt_desc.push_back(event_data(pError->type.eapType.type));
-    evt_desc.push_back(event_data(pError->dwReasonCode));
-    evt_desc.push_back(event_data(&(pError->rootCauseGuid), sizeof(GUID)));
-    evt_desc.push_back(event_data(&(pError->repairGuid), sizeof(GUID)));
-    evt_desc.push_back(event_data(&(pError->helpLinkGuid), sizeof(GUID)));
-    evt_desc.push_back(event_data(pError->pRootCauseString));
-    evt_desc.push_back(event_data(pError->pRepairString));
-    m_ep.write(&EAPMETHOD_TRACE_EAP_ERROR, (ULONG)evt_desc.size(), evt_desc.data());
-
     return pError;
 }
 
@@ -106,8 +93,6 @@ BYTE* eap::module::alloc_memory(_In_ size_t size)
 
 void eap::module::free_memory(_In_ BYTE *ptr)
 {
-    ETW_FN_VOID;
-
     // Since we do security here and some of the BLOBs contain credentials, sanitize every memory block before freeing.
     SecureZeroMemory(ptr, HeapSize(m_heap, 0, ptr));
     HeapFree(m_heap, 0, ptr);
@@ -116,10 +101,27 @@ void eap::module::free_memory(_In_ BYTE *ptr)
 
 void eap::module::free_error_memory(_In_ EAP_ERROR *err)
 {
-    ETW_FN_VOID;
-
     // pRootCauseString and pRepairString always trail the ppEapError to reduce number of (de)allocations.
     HeapFree(m_heap, 0, err);
+}
+
+
+void eap::module::log_error(_In_ const EAP_ERROR *err) const
+{
+    assert(err);
+
+    // Write trace event.
+    vector<EVENT_DATA_DESCRIPTOR> evt_desc;
+    evt_desc.reserve(8);
+    evt_desc.push_back(event_data(err->dwWinError));
+    evt_desc.push_back(event_data(err->type.eapType.type));
+    evt_desc.push_back(event_data(err->dwReasonCode));
+    evt_desc.push_back(event_data(&(err->rootCauseGuid), sizeof(GUID)));
+    evt_desc.push_back(event_data(&(err->repairGuid), sizeof(GUID)));
+    evt_desc.push_back(event_data(&(err->helpLinkGuid), sizeof(GUID)));
+    evt_desc.push_back(event_data(err->pRootCauseString));
+    evt_desc.push_back(event_data(err->pRepairString));
+    m_ep.write(&EAPMETHOD_TRACE_EAP_ERROR, (ULONG)evt_desc.size(), evt_desc.data());
 }
 
 
@@ -136,12 +138,12 @@ bool eap::module::encrypt(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void
     unique_ptr<CERT_PUBLIC_KEY_INFO, LocalFree_delete<CERT_PUBLIC_KEY_INFO> > keyinfo_data;
     DWORD keyinfo_size = 0;
     if (!CryptDecodeObjectEx(X509_ASN_ENCODING, X509_PUBLIC_KEY_INFO, (const BYTE*)::LockResource(res_handle), ::SizeofResource(m_instance, res), CRYPT_DECODE_ALLOC_FLAG, NULL, &keyinfo_data, &keyinfo_size)) {
-        *ppEapError = make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CryptDecodeObjectEx failed."), NULL);
+        *ppEapError = make_error(GetLastError(), _T(__FUNCTION__) _T(" CryptDecodeObjectEx failed."));
         return false;
     }
 
     if (!key.import_public(hProv, X509_ASN_ENCODING, keyinfo_data.get())) {
-        *ppEapError = make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Public key import failed."), NULL);
+        *ppEapError = make_error(GetLastError(), _T(__FUNCTION__) _T(" Public key import failed."));
         return false;
     }
 
@@ -154,7 +156,7 @@ bool eap::module::encrypt(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void
 
     // Encrypt the data using our public key.
     if (!CryptEncrypt(key, hHash, TRUE, 0, buf)) {
-        *ppEapError = make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Encrypting data failed."), NULL);
+        *ppEapError = make_error(GetLastError(), _T(__FUNCTION__) _T(" CryptEncrypt failed."));
         return false;
     }
 
@@ -169,7 +171,7 @@ bool eap::module::encrypt_md5(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const 
     // Create hash.
     crypt_hash hash;
     if (!hash.create(hProv, CALG_MD5)) {
-        *ppEapError = make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Creating MD5 hash failed."), NULL);
+        *ppEapError = make_error(GetLastError(), _T(__FUNCTION__) _T(" Creating MD5 hash failed."));
         return false;
     }
 
@@ -180,7 +182,7 @@ bool eap::module::encrypt_md5(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const 
     // Calculate MD5 hash.
     vector<unsigned char> hash_bin;
     if (!CryptGetHashParam(hash, HP_HASHVAL, hash_bin, 0)) {
-        *ppEapError = make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Calculating MD5 hash failed."), NULL);
+        *ppEapError = make_error(GetLastError(), _T(__FUNCTION__) _T(" Calculating MD5 hash failed."));
         return false;
     }
 

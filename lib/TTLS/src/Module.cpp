@@ -83,7 +83,7 @@ bool eap::peer_ttls::get_identity(
     UNREFERENCED_PARAMETER(ppwszIdentity);
     UNREFERENCED_PARAMETER(ppEapError);
 
-    *ppEapError = make_error(ERROR_NOT_SUPPORTED, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Not supported."), NULL);
+    *ppEapError = make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
     return false;
 }
 
@@ -109,6 +109,6 @@ bool eap::peer_ttls::get_method_properties(
     UNREFERENCED_PARAMETER(pMethodPropertyArray);
     UNREFERENCED_PARAMETER(ppEapError);
 
-    *ppEapError = make_error(ERROR_NOT_SUPPORTED, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Not supported."), NULL);
+    *ppEapError = make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
     return false;
 }

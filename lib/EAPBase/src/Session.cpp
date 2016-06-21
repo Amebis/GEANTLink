@@ -106,7 +106,7 @@ bool eap::session::process_request_packet(
     UNREFERENCED_PARAMETER(pEapOutput);
     assert(ppEapError);
 
-    *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Not supported."), NULL);
+    *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
     return false;
 }
 
@@ -120,7 +120,7 @@ bool eap::session::get_response_packet(
     UNREFERENCED_PARAMETER(pSendPacket);
     assert(ppEapError);
 
-    *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Not supported."), NULL);
+    *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
     return false;
 }
 
@@ -131,7 +131,7 @@ bool eap::session::get_result(_In_ EapPeerMethodResultReason reason, _Out_ EapPe
     UNREFERENCED_PARAMETER(ppResult);
     assert(ppEapError);
 
-    *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Not supported."), NULL);
+    *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
     return false;
 }
 
@@ -145,7 +145,7 @@ bool eap::session::get_ui_context(
     UNREFERENCED_PARAMETER(ppUIContextData);
     assert(ppEapError);
 
-    *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Not supported."), NULL);
+    *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
     return false;
 }
 
@@ -161,7 +161,7 @@ bool eap::session::set_ui_context(
     UNREFERENCED_PARAMETER(pEapOutput);
     assert(ppEapError);
 
-    *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Not supported."), NULL);
+    *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
     return false;
 }
 
@@ -171,7 +171,7 @@ bool eap::session::get_response_attributes(_Out_ EapAttributes *pAttribs, _Out_ 
     UNREFERENCED_PARAMETER(pAttribs);
     assert(ppEapError);
 
-    *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Not supported."), NULL);
+    *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
     return false;
 }
 
@@ -182,6 +182,6 @@ bool eap::session::set_response_attributes(const _In_ EapAttributes *pAttribs, _
     UNREFERENCED_PARAMETER(pEapOutput);
     assert(ppEapError);
 
-    *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Not supported."), NULL);
+    *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
     return false;
 }

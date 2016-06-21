@@ -60,7 +60,7 @@ bool eap::peer_ttls_ui::invoke_config_ui(
     // Clean-up and return.
     wxEntryCleanup();
     if (result != wxID_OK) {
-        *ppEapError = make_error(ERROR_CANCELLED, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Cancelled."), NULL);
+        *ppEapError = make_error(ERROR_CANCELLED, _T(__FUNCTION__) _T(" Cancelled."));
         return false;
     }
 

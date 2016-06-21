@@ -99,14 +99,14 @@ bool eap::config_ttls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfi
     // <InnerAuthenticationMethod>
     com_obj<IXMLDOMElement> pXmlElInnerAuthenticationMethod;
     if ((dwResult = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:InnerAuthenticationMethod"), bstr(L"InnerAuthenticationMethod"), bstrNamespace, &pXmlElInnerAuthenticationMethod)) != ERROR_SUCCESS) {
-        *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <InnerAuthenticationMethod> element."), NULL);
+        *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <InnerAuthenticationMethod> element."));
         return false;
     }
 
     if (dynamic_cast<const config_pap*>(m_inner)) {
         // <InnerAuthenticationMethod>/<NonEAPAuthMethod>
         if ((dwResult = eapxml::put_element_value(pDoc, pXmlElInnerAuthenticationMethod, bstr(L"NonEAPAuthMethod"), bstrNamespace, bstr(L"PAP"))) != ERROR_SUCCESS) {
-            *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <NonEAPAuthMethod> element."), NULL);
+            *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <NonEAPAuthMethod> element."));
             return false;
         }
 
@@ -114,7 +114,7 @@ bool eap::config_ttls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfi
         if (!m_inner->save(pDoc, pXmlElInnerAuthenticationMethod, ppEapError))
             return false;
     } else {
-        *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Unsupported inner authentication method."), NULL);
+        *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Unsupported inner authentication method."));
         return false;
     }
 
@@ -133,7 +133,7 @@ bool eap::config_ttls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppE
     // Load inner authentication configuration (<InnerAuthenticationMethod>).
     com_obj<IXMLDOMElement> pXmlElInnerAuthenticationMethod;
     if ((dwResult = eapxml::select_element(pConfigRoot, bstr(L"eap-metadata:InnerAuthenticationMethod"), &pXmlElInnerAuthenticationMethod)) != ERROR_SUCCESS) {
-        *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error selecting <InnerAuthenticationMethod> element."), NULL);
+        *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error selecting <InnerAuthenticationMethod> element."), _T("Please make sure profile XML is a valid ") _T(PRODUCT_NAME_STR) _T(" profile XML document."));
         return false;
     }
 
@@ -155,7 +155,7 @@ bool eap::config_ttls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppE
         if (!m_inner->load(pXmlElInnerAuthenticationMethod, ppEapError))
             return false;
     } else {
-        *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Unsupported inner authentication method."), NULL);
+        *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Unsupported inner authentication method."));
         return false;
     }
 

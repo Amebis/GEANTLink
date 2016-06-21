@@ -90,7 +90,7 @@ bool eap::credentials::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfi
 
     // <UserName>
     if ((dwResult = eapxml::put_element_value(pDoc, pConfigRoot, bstr(L"UserName"), bstrNamespace, bstr(m_identity))) != ERROR_SUCCESS) {
-        *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <UserName> element."), NULL);
+        *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <UserName> element."));
         return false;
     }
 
@@ -104,7 +104,7 @@ bool eap::credentials::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppE
     DWORD dwResult;
 
     if ((dwResult = eapxml::get_element_value(pConfigRoot, bstr(L"eap-metadata:UserName"), m_identity)) != ERROR_SUCCESS) {
-        *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error reading <UserName> element."), NULL);
+        *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error reading <UserName> element."), _T("Please make sure profile XML is a valid ") _T(PRODUCT_NAME_STR) _T(" profile XML document."));
         return false;
     }
 
@@ -183,7 +183,7 @@ bool eap::credentials_pass::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *p
     dwResult = eapxml::put_element_value(pDoc, pConfigRoot, bstr(L"Password"), bstrNamespace, pass);
     SecureZeroMemory((BSTR)pass, sizeof(OLECHAR)*pass.length());
     if (dwResult != ERROR_SUCCESS) {
-        *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <Password> element."), NULL);
+        *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <Password> element."));
         return false;
     }
 
@@ -201,7 +201,7 @@ bool eap::credentials_pass::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR 
 
     bstr pass;
     if ((dwResult = eapxml::get_element_value(pConfigRoot, bstr(L"eap-metadata:Password"), &pass)) != ERROR_SUCCESS) {
-        *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error reading <Password> element."), NULL);
+        *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error reading <Password> element."), _T("Please make sure profile XML is a valid ") _T(PRODUCT_NAME_STR) _T(" profile XML document."));
         return false;
     }
     m_password = pass;
@@ -219,7 +219,7 @@ bool eap::credentials_pass::store(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **
     // Prepare cryptographics provider.
     crypt_prov cp;
     if (!cp.create(NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT)) {
-        *ppEapError = m_module.make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CryptAcquireContext failed."), NULL);
+        *ppEapError = m_module.make_error(GetLastError(), _T(__FUNCTION__) _T(" CryptAcquireContext failed."));
         return false;
     }
 
@@ -235,7 +235,7 @@ bool eap::credentials_pass::store(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **
     };
     data_blob cred_enc;
     if (!CryptProtectData(&cred_blob, NULL, NULL, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN, &cred_enc)) {
-        *ppEapError = m_module.make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CryptProtectData failed."), NULL);
+        *ppEapError = m_module.make_error(GetLastError(), _T(__FUNCTION__) _T(" CryptProtectData failed."));
         return false;
     }
 
@@ -259,7 +259,7 @@ bool eap::credentials_pass::store(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **
         (LPTSTR)m_identity.c_str()  // UserName
     };
     if (!CredWrite(&cred, 0)) {
-        *ppEapError = m_module.make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CredWrite failed."), NULL);
+        *ppEapError = m_module.make_error(GetLastError(), _T(__FUNCTION__) _T(" CredWrite failed."));
         return false;
     }
 
@@ -274,7 +274,7 @@ bool eap::credentials_pass::retrieve(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR
     // Read credentials.
     unique_ptr<CREDENTIAL, CredFree_delete<CREDENTIAL> > cred;
     if (!CredRead(target_name(pszTargetName).c_str(), CRED_TYPE_GENERIC, 0, (PCREDENTIAL*)&cred)) {
-        *ppEapError = m_module.make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CredRead failed."), NULL);
+        *ppEapError = m_module.make_error(GetLastError(), _T(__FUNCTION__) _T(" CredRead failed."));
         return false;
     }
 
@@ -285,14 +285,14 @@ bool eap::credentials_pass::retrieve(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR
     };
     data_blob cred_int;
     if (!CryptUnprotectData(&cred_enc, NULL, NULL, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN | CRYPTPROTECT_VERIFY_PROTECTION, &cred_int)) {
-        *ppEapError = m_module.make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CryptUnprotectData failed."), NULL);
+        *ppEapError = m_module.make_error(GetLastError(), _T(__FUNCTION__) _T(" CryptUnprotectData failed."));
         return false;
     }
 
     // Prepare cryptographics provider.
     crypt_prov cp;
     if (!cp.create(NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT)) {
-        *ppEapError = m_module.make_error(GetLastError(), 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" CryptAcquireContext failed."), NULL);
+        *ppEapError = m_module.make_error(GetLastError(), _T(__FUNCTION__) _T(" CryptAcquireContext failed."));
         return false;
     }
 
