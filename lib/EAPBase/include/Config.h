@@ -453,6 +453,9 @@ namespace eap
             m_read_only(other.m_read_only),
             m_id(other.m_id),
             m_name(other.m_name),
+            m_help_email(other.m_help_email),
+            m_help_web(other.m_help_web),
+            m_help_phone(other.m_help_phone),
             m_lbl_alt_credential(other.m_lbl_alt_credential),
             m_lbl_alt_identity(other.m_lbl_alt_identity),
             m_lbl_alt_password(other.m_lbl_alt_password),
@@ -470,6 +473,9 @@ namespace eap
             m_read_only(std::move(other.m_read_only)),
             m_id(std::move(other.m_id)),
             m_name(std::move(other.m_name)),
+            m_help_email(std::move(other.m_help_email)),
+            m_help_web(std::move(other.m_help_web)),
+            m_help_phone(std::move(other.m_help_phone)),
             m_lbl_alt_credential(std::move(other.m_lbl_alt_credential)),
             m_lbl_alt_identity(std::move(other.m_lbl_alt_identity)),
             m_lbl_alt_password(std::move(other.m_lbl_alt_password)),
@@ -492,6 +498,9 @@ namespace eap
                 m_read_only          = other.m_read_only;
                 m_id                 = other.m_id;
                 m_name               = other.m_name;
+                m_help_email         = other.m_help_email;
+                m_help_web           = other.m_help_web;
+                m_help_phone         = other.m_help_phone;
                 m_lbl_alt_credential = other.m_lbl_alt_credential;
                 m_lbl_alt_identity   = other.m_lbl_alt_identity;
                 m_lbl_alt_password   = other.m_lbl_alt_password;
@@ -515,6 +524,9 @@ namespace eap
                 m_read_only          = std::move(m_read_only);
                 m_id                 = std::move(other.m_id);
                 m_name               = std::move(other.m_name);
+                m_help_email         = std::move(other.m_help_email);
+                m_help_web           = std::move(other.m_help_web);
+                m_help_phone         = std::move(other.m_help_phone);
                 m_lbl_alt_credential = std::move(other.m_lbl_alt_credential);
                 m_lbl_alt_identity   = std::move(other.m_lbl_alt_identity);
                 m_lbl_alt_password   = std::move(other.m_lbl_alt_password);
@@ -575,6 +587,34 @@ namespace eap
             if (!m_name.empty())
                 if ((dwResult = eapxml::put_element_value(pDoc, pXmlElProviderInfo, winstd::bstr(L"DisplayName"), bstrNamespace, winstd::bstr(m_name))) != ERROR_SUCCESS) {
                     *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <DisplayName> element."), NULL);
+                    return false;
+                }
+
+            // <ProviderInfo>/<Helpdesk>
+            winstd::com_obj<IXMLDOMElement> pXmlElHelpdesk;
+            if ((dwResult = eapxml::create_element(pDoc, pXmlElProviderInfo, winstd::bstr(L"eap-metadata:Helpdesk"), winstd::bstr(L"Helpdesk"), bstrNamespace, &pXmlElHelpdesk)) != ERROR_SUCCESS) {
+                *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <Helpdesk> element."), NULL);
+                return false;
+            }
+
+            // <ProviderInfo>/<Helpdesk>/<EmailAddress>
+            if (!m_help_email.empty())
+                if ((dwResult = eapxml::put_element_value(pDoc, pXmlElHelpdesk, winstd::bstr(L"EmailAddress"), bstrNamespace, winstd::bstr(m_help_email))) != ERROR_SUCCESS) {
+                    *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <EmailAddress> element."), NULL);
+                    return false;
+                }
+
+            // <ProviderInfo>/<Helpdesk>/<WebAddress>
+            if (!m_help_web.empty())
+                if ((dwResult = eapxml::put_element_value(pDoc, pXmlElHelpdesk, winstd::bstr(L"WebAddress"), bstrNamespace, winstd::bstr(m_help_web))) != ERROR_SUCCESS) {
+                    *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <WebAddress> element."), NULL);
+                    return false;
+                }
+
+            // <ProviderInfo>/<Helpdesk>/<Phone>
+            if (!m_help_phone.empty())
+                if ((dwResult = eapxml::put_element_value(pDoc, pXmlElHelpdesk, winstd::bstr(L"Phone"), bstrNamespace, winstd::bstr(m_help_phone))) != ERROR_SUCCESS) {
+                    *ppEapError = m_module.make_error(dwResult, 0, NULL, NULL, NULL, _T(__FUNCTION__) _T(" Error creating <Phone> element."), NULL);
                     return false;
                 }
 
@@ -656,6 +696,9 @@ namespace eap
 
             // <ProviderInfo>
             m_name.clear();
+            m_help_email.clear();
+            m_help_web.clear();
+            m_help_phone.clear();
             m_lbl_alt_credential.clear();
             m_lbl_alt_identity.clear();
             m_lbl_alt_password.clear();
@@ -663,6 +706,18 @@ namespace eap
             if (eapxml::select_element(pConfigRoot, winstd::bstr(L"eap-metadata:ProviderInfo"), &pXmlElProviderInfo) == ERROR_SUCCESS) {
                 // <DisplayName>
                 eapxml::get_element_localized(pXmlElProviderInfo, winstd::bstr(L"eap-metadata:DisplayName"), lang.c_str(), m_name);
+
+                winstd::com_obj<IXMLDOMElement> pXmlElHelpdesk;
+                if (eapxml::select_element(pXmlElProviderInfo, winstd::bstr(L"eap-metadata:Helpdesk"), &pXmlElHelpdesk) == ERROR_SUCCESS) {
+                    // <Helpdesk>/<EmailAddress>
+                    eapxml::get_element_localized(pXmlElHelpdesk, winstd::bstr(L"eap-metadata:EmailAddress"), lang.c_str(), m_help_email);
+
+                    // <Helpdesk>/<WebAddress>
+                    eapxml::get_element_localized(pXmlElHelpdesk, winstd::bstr(L"eap-metadata:WebAddress"), lang.c_str(), m_help_web);
+
+                    // <Helpdesk>/<Phone>
+                    eapxml::get_element_localized(pXmlElHelpdesk, winstd::bstr(L"eap-metadata:Phone"), lang.c_str(), m_help_phone);
+                }
 
                 // <CredentialPrompt>
                 eapxml::get_element_localized(pXmlElProviderInfo, winstd::bstr(L"eap-metadata:CredentialPrompt"), lang.c_str(), m_lbl_alt_credential);
@@ -715,6 +770,9 @@ namespace eap
         bool m_read_only;                       ///< Is profile read-only
         std::wstring m_id;                      ///< Profile ID
         winstd::tstring m_name;                 ///< Provider name
+        winstd::tstring m_help_email;           ///< Helpdesk e-mail
+        winstd::tstring m_help_web;             ///< Helpdesk website URL
+        winstd::tstring m_help_phone;           ///< Helpdesk phone
         winstd::tstring m_lbl_alt_credential;   ///< Alternative label for credential prompt
         winstd::tstring m_lbl_alt_identity;     ///< Alternative label for identity prompt
         winstd::tstring m_lbl_alt_password;     ///< Alternative label for password prompt
@@ -935,6 +993,9 @@ namespace eapserial
         pack(cursor, val.m_read_only         );
         pack(cursor, val.m_id                );
         pack(cursor, val.m_name              );
+        pack(cursor, val.m_help_email        );
+        pack(cursor, val.m_help_web          );
+        pack(cursor, val.m_help_phone        );
         pack(cursor, val.m_lbl_alt_credential);
         pack(cursor, val.m_lbl_alt_identity  );
         pack(cursor, val.m_lbl_alt_password  );
@@ -949,6 +1010,9 @@ namespace eapserial
             get_pk_size(val.m_read_only         ) +
             get_pk_size(val.m_id                ) +
             get_pk_size(val.m_name              ) +
+            get_pk_size(val.m_help_email        ) +
+            get_pk_size(val.m_help_web          ) +
+            get_pk_size(val.m_help_phone        ) +
             get_pk_size(val.m_lbl_alt_credential) +
             get_pk_size(val.m_lbl_alt_identity  ) +
             get_pk_size(val.m_lbl_alt_password  ) +
@@ -962,6 +1026,9 @@ namespace eapserial
         unpack(cursor, val.m_read_only         );
         unpack(cursor, val.m_id                );
         unpack(cursor, val.m_name              );
+        unpack(cursor, val.m_help_email        );
+        unpack(cursor, val.m_help_web          );
+        unpack(cursor, val.m_help_phone        );
         unpack(cursor, val.m_lbl_alt_credential);
         unpack(cursor, val.m_lbl_alt_identity  );
         unpack(cursor, val.m_lbl_alt_password  );

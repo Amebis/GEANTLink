@@ -129,15 +129,14 @@ wxEAPProviderLockedBase::wxEAPProviderLockedBase( wxWindow* parent, wxWindowID i
 	m_provider_locked_icon = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
 	sb_provider_locked_horiz->Add( m_provider_locked_icon, 0, wxALL, 5 );
 	
-	wxBoxSizer* sb_provider_locked_vert;
-	sb_provider_locked_vert = new wxBoxSizer( wxVERTICAL );
+	m_provider_locked_vert = new wxBoxSizer( wxVERTICAL );
 	
 	m_provider_locked_label = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	m_provider_locked_label->Wrap( 452 );
-	sb_provider_locked_vert->Add( m_provider_locked_label, 0, wxALL|wxEXPAND, 5 );
+	m_provider_locked_vert->Add( m_provider_locked_label, 0, wxALL|wxEXPAND, 5 );
 	
 	
-	sb_provider_locked_horiz->Add( sb_provider_locked_vert, 1, wxEXPAND, 5 );
+	sb_provider_locked_horiz->Add( m_provider_locked_vert, 1, wxEXPAND, 5 );
 	
 	
 	this->SetSizer( sb_provider_locked_horiz );

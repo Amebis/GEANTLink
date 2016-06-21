@@ -18,6 +18,7 @@
     along with GÉANTLink. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <wx/hyperlink.h>
 #include <wx/icon.h>
 #include <wx/statbmp.h>
 #include <Windows.h>
@@ -223,25 +224,106 @@ public:
     ///
     /// Constructs a notice pannel and set the title text
     ///
-    wxEAPProviderLocked(_Tprov &prov, wxWindow* parent) : wxEAPProviderLockedBase(parent)
+    wxEAPProviderLocked(_Tprov &prov, wxWindow* parent) :
+        m_prov(prov),
+        wxEAPProviderLockedBase(parent)
     {
         // Load and set icon.
         if (m_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
             wxSetIconFromResource(m_provider_locked_icon, m_icon, m_shell32, MAKEINTRESOURCE(48));
 
-        m_provider_locked_label->SetLabel(
-            wxString::Format(_("%s has pre-set parts of this configuration. Those parts are locked to prevent accidental modification."),
-            !prov.m_name.empty() ? prov.m_name.c_str() :
-            !prov.m_id  .empty() ? winstd::string_printf(_("Your %ls provider"), prov.m_id.c_str()).c_str() : _("Your provider")));
+        m_provider_locked_label->SetLabel(wxString::Format(_("%s has pre-set parts of this configuration. Those parts are locked to prevent accidental modification."),
+            !m_prov.m_name.empty() ? m_prov.m_name.c_str() :
+            !m_prov.m_id  .empty() ? winstd::string_printf(_("Your %ls provider"), m_prov.m_id.c_str()).c_str() : _("Your provider")));
         m_provider_locked_label->Wrap(452);
+
+        if (!m_prov.m_help_email.empty() || !m_prov.m_help_web.empty() || !m_prov.m_help_phone.empty()) {
+            wxStaticText *provider_notice = new wxStaticText(this, wxID_ANY, wxString::Format(_("For additional help and instructions, please contact %s at:"),
+                !m_prov.m_name.empty() ? m_prov.m_name.c_str() :
+                !m_prov.m_id  .empty() ? winstd::string_printf(_("your %ls provider"), m_prov.m_id.c_str()).c_str() : _("your provider")), wxDefaultPosition, wxDefaultSize, 0);
+            provider_notice->Wrap(452);
+            m_provider_locked_vert->Add(provider_notice, 0, wxUP|wxLEFT|wxRIGHT|wxEXPAND, 5);
+
+            wxFlexGridSizer* sb_contact_tbl;
+            sb_contact_tbl = new wxFlexGridSizer(0, 2, 5, 5);
+            sb_contact_tbl->AddGrowableCol(1);
+            sb_contact_tbl->SetFlexibleDirection(wxBOTH);
+            sb_contact_tbl->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+
+            wxFont font_wingdings(-1, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Wingdings"));
+
+            if (!m_prov.m_help_web.empty()) {
+                wxStaticText *label = new wxStaticText(this, wxID_ANY, wxT("\xb6"), wxDefaultPosition, wxDefaultSize, 0);
+                label->Wrap(-1);
+                label->SetFont(font_wingdings);
+                sb_contact_tbl->Add(label, 0, wxEXPAND|wxALIGN_TOP, 5);
+
+                wxHyperlinkCtrl *value = new wxHyperlinkCtrl(this, wxID_ANY, m_prov.m_help_web, m_prov.m_help_web, wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE);
+                value->SetToolTip(_("Open the default web browser"));
+                sb_contact_tbl->Add(value, 0, wxEXPAND|wxALIGN_TOP, 5);
+            }
+
+            if (!m_prov.m_help_email.empty()) {
+                wxStaticText *label = new wxStaticText(this, wxID_ANY, wxT("\x2a"), wxDefaultPosition, wxDefaultSize, 0);
+                label->Wrap(-1);
+                label->SetFont(font_wingdings);
+                sb_contact_tbl->Add(label, 0, wxEXPAND|wxALIGN_TOP, 5);
+
+                wxHyperlinkCtrl *value = new wxHyperlinkCtrl(this, wxID_ANY, m_prov.m_help_email, wxString(wxT("mailto:")) + m_prov.m_help_email, wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE);
+                value->SetToolTip(_("Open your e-mail program"));
+                sb_contact_tbl->Add(value, 0, wxEXPAND|wxALIGN_TOP, 5);
+            }
+
+            if (!m_prov.m_help_phone.empty()) {
+                wxStaticText *label = new wxStaticText(this, wxID_ANY, wxT("\x29"), wxDefaultPosition, wxDefaultSize, 0);
+                label->Wrap(-1);
+                label->SetFont(font_wingdings);
+                sb_contact_tbl->Add(label, 0, wxEXPAND|wxALIGN_TOP, 5);
+
+                wxHyperlinkCtrl *value = new wxHyperlinkCtrl(this, wxID_ANY, m_prov.m_help_phone, wxString(wxT("tel:")) + GetPhoneNumber(m_prov.m_help_phone.c_str()), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE);
+                value->SetToolTip(_("Dial the phone number"));
+                sb_contact_tbl->Add(value, 0, wxEXPAND|wxALIGN_TOP, 5);
+            }
+
+            m_provider_locked_vert->Add(sb_contact_tbl, 0, wxLEFT|wxRIGHT|wxDOWN|wxEXPAND, 5);
+        }
+
+        this->Layout();
     }
 
 protected:
     /// \cond internal
-    virtual bool AcceptsFocusFromKeyboard() const { return false; }
+
+    virtual bool AcceptsFocusFromKeyboard() const
+    {
+        return !m_prov.m_help_email.empty() || !m_prov.m_help_web.empty() || !m_prov.m_help_phone.empty();
+    }
+
+    template<class _Elem, class _Traits, class _Ax>
+    static std::basic_string<_Elem, _Traits, _Ax> GetPhoneNumber(_In_z_ const _Elem *num)
+    {
+        assert(num);
+
+        std::basic_string<_Elem, _Traits, _Ax> str;
+        for (; *num; num++) {
+            _Elem c = *num;
+            if ('0' <= c && c <= '9' || c == '+' || c == '*' || c == '#')
+                str += c;
+        }
+
+        return str;
+    }
+
+    template<class _Elem>
+    static std::basic_string<_Elem, std::char_traits<_Elem>, std::allocator<_Elem> > GetPhoneNumber(_In_z_ const _Elem *num)
+    {
+        return GetPhoneNumber<_Elem, std::char_traits<_Elem>, std::allocator<_Elem> >(num);
+    }
+
     /// \endcond
 
 protected:
+    _Tprov &m_prov;                             ///< EAP provider
     winstd::library m_shell32;                  ///< shell32.dll resource library reference
     wxIcon m_icon;                              ///< Panel icon
 };

@@ -110,6 +110,7 @@ class wxEAPProviderLockedBase : public wxPanel
 	
 	protected:
 		wxStaticBitmap* m_provider_locked_icon;
+		wxBoxSizer* m_provider_locked_vert;
 		wxStaticText* m_provider_locked_label;
 	
 	public:
