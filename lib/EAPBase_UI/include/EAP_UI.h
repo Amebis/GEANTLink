@@ -31,7 +31,7 @@ template <class _Tmeth, class _wxT> class wxEAPConfigDialog;
 ///
 /// EAP credentials dialog
 ///
-class wxEAPCredentialsDialog;
+template <class _Tprov> class wxEAPCredentialsDialog;
 
 ///
 /// EAP dialog banner
@@ -153,22 +153,50 @@ protected:
 };
 
 
+template <class _Tprov>
 class wxEAPCredentialsDialog : public wxEAPCredentialsDialogBase
 {
 public:
     ///
     /// Constructs a credential dialog
     ///
-    wxEAPCredentialsDialog(wxWindow* parent);
+    wxEAPCredentialsDialog(_Tprov &prov, wxWindow* parent) : wxEAPCredentialsDialogBase(parent)
+    {
+        // Set extra style here, as wxFormBuilder overrides all default flags.
+        this->SetExtraStyle(this->GetExtraStyle() | wxWS_EX_VALIDATE_RECURSIVELY);
+
+        // Set banner title.
+        m_banner->m_title->SetLabel(wxString::Format(_("%s Credentials"), prov.m_id.c_str()));
+
+        m_buttonsOK->SetDefault();
+    }
+
 
     ///
     /// Adds panels to the dialog
     ///
-    void AddContents(wxPanel **contents, size_t content_count);
+    void AddContents(wxPanel **contents, size_t content_count)
+    {
+        if (content_count) {
+            for (size_t i = 0; i < content_count; i++)
+                m_panels->Add(contents[i], 0, wxALL|wxEXPAND, 5);
+
+            this->Layout();
+            this->GetSizer()->Fit(this);
+            contents[0]->SetFocusFromKbd();
+        }
+    }
+
 
 protected:
     /// \cond internal
-    virtual void OnInitDialog(wxInitDialogEvent& event);
+
+    virtual void OnInitDialog(wxInitDialogEvent& event)
+    {
+        for (wxSizerItemList::compatibility_iterator panel = m_panels->GetChildren().GetFirst(); panel; panel = panel->GetNext())
+            panel->GetData()->GetWindow()->GetEventHandler()->ProcessEvent(event);
+    }
+
     /// \endcond
 };
 
@@ -341,7 +369,7 @@ protected:
     {
         UNREFERENCED_PARAMETER(event);
 
-        wxEAPCredentialsDialog dlg(this);
+        wxEAPCredentialsDialog<_Tprov> dlg(m_prov, this);
 
         _wxT *panel = new _wxT(m_prov, m_cred, m_target.c_str(), &dlg, true);
 
@@ -363,7 +391,7 @@ protected:
     {
         UNREFERENCED_PARAMETER(event);
 
-        wxEAPCredentialsDialog dlg(this);
+        wxEAPCredentialsDialog<_Tprov> dlg(m_prov, this);
 
         _wxT *panel = new _wxT(m_prov, m_cred, _T(""), &dlg, true);
 

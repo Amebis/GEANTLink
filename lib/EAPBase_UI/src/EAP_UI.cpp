@@ -22,39 +22,6 @@
 
 
 //////////////////////////////////////////////////////////////////////
-// wxEAPCredentialsDialog
-//////////////////////////////////////////////////////////////////////
-
-wxEAPCredentialsDialog::wxEAPCredentialsDialog(wxWindow* parent) : wxEAPCredentialsDialogBase(parent)
-{
-    // Set extra style here, as wxFormBuilder overrides all default flags.
-    this->SetExtraStyle(this->GetExtraStyle() | wxWS_EX_VALIDATE_RECURSIVELY);
-
-    m_buttonsOK->SetDefault();
-}
-
-
-void wxEAPCredentialsDialog::AddContents(wxPanel **contents, size_t content_count)
-{
-    if (content_count) {
-        for (size_t i = 0; i < content_count; i++)
-            m_panels->Add(contents[i], 0, wxALL|wxEXPAND, 5);
-
-        this->Layout();
-        this->GetSizer()->Fit(this);
-        contents[0]->SetFocusFromKbd();
-    }
-}
-
-
-void wxEAPCredentialsDialog::OnInitDialog(wxInitDialogEvent& event)
-{
-    for (wxSizerItemList::compatibility_iterator panel = m_panels->GetChildren().GetFirst(); panel; panel = panel->GetNext())
-        panel->GetData()->GetWindow()->GetEventHandler()->ProcessEvent(event);
-}
-
-
-//////////////////////////////////////////////////////////////////////
 // wxEAPBannerPanel
 //////////////////////////////////////////////////////////////////////
 

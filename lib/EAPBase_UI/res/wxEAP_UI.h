@@ -92,9 +92,9 @@ class wxEAPBannerPanelBase : public wxPanel
 	private:
 	
 	protected:
-		wxStaticText* m_title;
 	
 	public:
+		wxStaticText* m_title;
 		
 		wxEAPBannerPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = 0 ); 
 		~wxEAPBannerPanelBase();
