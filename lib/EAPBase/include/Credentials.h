@@ -357,6 +357,11 @@ namespace eap
 
     public:
         winstd::sanitizing_wstring m_password;  ///< Password
+
+    private:
+        /// \cond internal
+        static const unsigned char s_entropy[1024];
+        /// \endcond
     };
 }
 

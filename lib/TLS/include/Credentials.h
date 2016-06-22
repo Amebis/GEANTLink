@@ -194,6 +194,11 @@ namespace eap
 
     public:
         winstd::cert_context m_cert;    ///< Client certificate
+
+    private:
+        /// \cond internal
+        static const unsigned char s_entropy[1024];
+        /// \endcond
     };
 }
 
