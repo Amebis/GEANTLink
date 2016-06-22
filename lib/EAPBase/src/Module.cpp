@@ -129,39 +129,52 @@ bool eap::module::encrypt(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void
 {
     assert(ppEapError);
 
-    // Import the public key.
+    // Generate 256-bit AES session key.
+    crypt_key key_aes;
+    if (!CryptGenKey(hProv, CALG_AES_256, MAKELONG(CRYPT_EXPORTABLE, 256), &key_aes)) {
+        *ppEapError = make_error(GetLastError(), _T(__FUNCTION__) _T(" CryptGenKey failed."));
+        return false;
+    }
+
+    // Import the public RSA key.
     HRSRC res = FindResource(m_instance, MAKEINTRESOURCE(IDR_EAP_KEY_PUBLIC), RT_RCDATA);
     assert(res);
     HGLOBAL res_handle = LoadResource(m_instance, res);
     assert(res_handle);
-    crypt_key key;
+    crypt_key key_rsa;
     unique_ptr<CERT_PUBLIC_KEY_INFO, LocalFree_delete<CERT_PUBLIC_KEY_INFO> > keyinfo_data;
     DWORD keyinfo_size = 0;
     if (!CryptDecodeObjectEx(X509_ASN_ENCODING, X509_PUBLIC_KEY_INFO, (const BYTE*)::LockResource(res_handle), ::SizeofResource(m_instance, res), CRYPT_DECODE_ALLOC_FLAG, NULL, &keyinfo_data, &keyinfo_size)) {
         *ppEapError = make_error(GetLastError(), _T(__FUNCTION__) _T(" CryptDecodeObjectEx failed."));
         return false;
     }
-
-    if (!key.import_public(hProv, X509_ASN_ENCODING, keyinfo_data.get())) {
+    if (!key_rsa.import_public(hProv, X509_ASN_ENCODING, keyinfo_data.get())) {
         *ppEapError = make_error(GetLastError(), _T(__FUNCTION__) _T(" Public key import failed."));
         return false;
     }
 
-    // Pre-allocate memory to allow space, as encryption will grow the data.
-    DWORD dwBlockLen;
-    vector<unsigned char, sanitizing_allocator<unsigned char> > buf(size);
-    memcpy(buf.data(), data, size);
-    if (!CryptGetKeyParam(key, KP_BLOCKLEN, dwBlockLen, 0)) dwBlockLen = 0;
-    buf.reserve(std::max<size_t>((size + dwBlockLen - 1) / dwBlockLen, 1) * dwBlockLen);
+    // Export AES session key encrypted with public RSA key.
+    vector<unsigned char, sanitizing_allocator<unsigned char> > buf;
+    if (!CryptExportKey(key_aes, key_rsa, SIMPLEBLOB, 0, buf)) {
+        *ppEapError = make_error(GetLastError(), _T(__FUNCTION__) _T(" CryptExportKey failed."));
+        return false;
+    }
+    enc.assign(buf.begin(), buf.end());
 
-    // Encrypt the data using our public key.
-    if (!CryptEncrypt(key, hHash, TRUE, 0, buf)) {
+    // Pre-allocate memory to allow space, as encryption will grow the data.
+    buf.assign((const unsigned char*)data, (const unsigned char*)data + size);
+    DWORD dwBlockLen;
+    if (!CryptGetKeyParam(key_aes, KP_BLOCKLEN, dwBlockLen, 0)) dwBlockLen = 0;
+    buf.reserve((size + dwBlockLen) / dwBlockLen * dwBlockLen);
+
+    // Encrypt the data using AES key.
+    if (!CryptEncrypt(key_aes, hHash, TRUE, 0, buf)) {
         *ppEapError = make_error(GetLastError(), _T(__FUNCTION__) _T(" CryptEncrypt failed."));
         return false;
     }
 
-    // Copy encrypted data.
-    enc.assign(buf.begin(), buf.end());
+    // Append encrypted data.
+    enc.insert(enc.cend(), buf.begin(), buf.end());
     return true;
 }
 

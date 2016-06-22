@@ -269,32 +269,37 @@ namespace eap
         {
             assert(ppEapError);
 
-            // Import the private key.
+            // Import the private RSA key.
             HRSRC res = FindResource(m_instance, MAKEINTRESOURCE(IDR_EAP_KEY_PRIVATE), RT_RCDATA);
             assert(res);
             HGLOBAL res_handle = LoadResource(m_instance, res);
             assert(res_handle);
-            crypt_key key;
+            crypt_key key_rsa;
             unique_ptr<unsigned char[], LocalFree_delete<unsigned char[]> > keyinfo_data;
             DWORD keyinfo_size = 0;
             if (!CryptDecodeObjectEx(X509_ASN_ENCODING, PKCS_RSA_PRIVATE_KEY, (const BYTE*)::LockResource(res_handle), ::SizeofResource(m_instance, res), CRYPT_DECODE_ALLOC_FLAG, NULL, &keyinfo_data, &keyinfo_size)) {
                 *ppEapError = make_error(GetLastError(), _T(__FUNCTION__) _T(" CryptDecodeObjectEx failed."));
                 return false;
             }
-
-            if (!key.import(hProv, keyinfo_data.get(), keyinfo_size, NULL, 0)) {
+            if (!key_rsa.import(hProv, keyinfo_data.get(), keyinfo_size, NULL, 0)) {
                 *ppEapError = make_error(GetLastError(), _T(__FUNCTION__) _T(" Private key import failed."));
                 return false;
             }
 
-            // Decrypt the data using our private key.
-            vector<unsigned char, sanitizing_allocator<unsigned char> > buf(size);
-            memcpy(buf.data(), data, size);
-            if (!CryptDecrypt(key, hHash, TRUE, 0, buf)) {
-                *ppEapError = make_error(GetLastError(), _T(__FUNCTION__) _T(" CryptDecrypt failed."));
+            // Import the 256-bit AES session key.
+            crypt_key key_aes;
+            if (!CryptImportKey(hProv, (LPCBYTE)data, 268, key_rsa, 0, &key_aes)) {
+                *ppEapError = make_error(GetLastError(), _T(__FUNCTION__) _T(" CryptImportKey failed."));
                 return false;
             }
 
+            // Decrypt the data using AES session key.
+            vector<unsigned char, sanitizing_allocator<unsigned char> > buf;
+            buf.assign((const unsigned char*)data + 268, (const unsigned char*)data + size);
+            if (!CryptDecrypt(key_aes, hHash, TRUE, 0, buf)) {
+                *ppEapError = make_error(GetLastError(), _T(__FUNCTION__) _T(" CryptDecrypt failed."));
+                return false;
+            }
             dec.assign(buf.begin(), buf.end());
 
             return true;
@@ -475,7 +480,7 @@ namespace eap
             _In_                           DWORD dwDataInSize,
             _Out_                          EAP_ERROR **ppEapError)
         {
-#if 0
+#if 1
             // Prepare cryptographics provider.
             winstd::crypt_prov cp;
             if (!cp.create(NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT)) {
@@ -522,7 +527,7 @@ namespace eap
             _Out_       DWORD     *pdwDataOutSize,
             _Out_       EAP_ERROR **ppEapError)
         {
-#if 0
+#if 1
             // Allocate BLOB.
             std::vector<unsigned char, winstd::sanitizing_allocator<unsigned char> > data;
             data.resize(eapserial::get_pk_size(record));
