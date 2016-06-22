@@ -475,6 +475,7 @@ namespace eap
             _In_                           DWORD dwDataInSize,
             _Out_                          EAP_ERROR **ppEapError)
         {
+#if 0
             // Prepare cryptographics provider.
             winstd::crypt_prov cp;
             if (!cp.create(NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT)) {
@@ -490,6 +491,13 @@ namespace eap
             const unsigned char *cursor = data.data();
             eapserial::unpack(cursor, record);
             assert(cursor - data.data() <= (ptrdiff_t)data.size());
+#else
+            UNREFERENCED_PARAMETER(ppEapError);
+
+            const unsigned char *cursor = pDataIn;
+            eapserial::unpack(cursor, record);
+            assert(cursor - pDataIn <= (ptrdiff_t)dwDataInSize);
+#endif
 
             return true;
         }
@@ -514,6 +522,7 @@ namespace eap
             _Out_       DWORD     *pdwDataOutSize,
             _Out_       EAP_ERROR **ppEapError)
         {
+#if 0
             // Allocate BLOB.
             std::vector<unsigned char, winstd::sanitizing_allocator<unsigned char> > data;
             data.resize(eapserial::get_pk_size(record));
@@ -545,6 +554,22 @@ namespace eap
                 return false;
             }
             memcpy(*ppDataOut, data_enc.data(), *pdwDataOutSize);
+#else
+            // Allocate BLOB.
+            assert(ppDataOut);
+            assert(pdwDataOutSize);
+            *pdwDataOutSize = (DWORD)eapserial::get_pk_size(record);
+            *ppDataOut = alloc_memory(*pdwDataOutSize);
+            if (!*ppDataOut) {
+                log_error(*ppEapError = g_peer.make_error(ERROR_OUTOFMEMORY, tstring_printf(_T(__FUNCTION__) _T(" Error allocating memory for BLOB (%uB)."), *pdwDataOutSize).c_str()));
+                return false;
+            }
+
+            // Pack to BLOB.
+            unsigned char *cursor = *ppDataOut;
+            eapserial::pack(cursor, record);
+            assert(cursor - *ppDataOut <= (ptrdiff_t)*pdwDataOutSize);
+#endif
 
             return true;
         }
