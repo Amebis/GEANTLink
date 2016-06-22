@@ -143,28 +143,15 @@ DWORD WINAPI EapPeerConfigXml2Blob(
         // Load configuration.
         pConfigDoc->setProperty(bstr(L"SelectionNamespaces"), variant(L"xmlns:eap-metadata=\"urn:ietf:params:xml:ns:yang:ietf-eap-metadata\""));
         _EAPMETHOD_PEER_UI::config_type cfg(g_peer);
-        if (!cfg.load(pXmlElConfig, ppEapError)) {
+        if (!cfg.load(pXmlElConfig, ppEapError) ||
+            !g_peer.pack(cfg, ppConfigOut, pdwConfigOutSize, ppEapError))
+        {
             if (*ppEapError) {
                 g_peer.log_error(*ppEapError);
                 return dwResult = (*ppEapError)->dwWinError;
             } else
                 return dwResult = ERROR_INVALID_DATA;
         }
-
-        // Allocate BLOB for configuration.
-        assert(ppConfigOut);
-        assert(pdwConfigOutSize);
-        *pdwConfigOutSize = (DWORD)eapserial::get_pk_size(cfg);
-        *ppConfigOut = g_peer.alloc_memory(*pdwConfigOutSize);
-        if (!*ppConfigOut) {
-            g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_OUTOFMEMORY, tstring_printf(_T(__FUNCTION__) _T(" Error allocating memory for configuration BLOB (%uB)."), *pdwConfigOutSize).c_str()));
-            return dwResult;
-        }
-
-        // Pack BLOB to output.
-        unsigned char *cursor = *ppConfigOut;
-        eapserial::pack(cursor, cfg);
-        assert(cursor - *ppConfigOut <= (ptrdiff_t)*pdwConfigOutSize);
     }
 
     return dwResult;
@@ -212,10 +199,12 @@ DWORD WINAPI EapPeerConfigBlob2Xml(
 
         // Unpack configuration.
         _EAPMETHOD_PEER_UI::config_type cfg(g_peer);
-        if (pConfigIn || !dwConfigInSize) {
-            const unsigned char *cursor = pConfigIn;
-            eapserial::unpack(cursor, cfg);
-            assert(cursor - pConfigIn <= (ptrdiff_t)dwConfigInSize);
+        if (!g_peer.unpack(cfg, pConfigIn, dwConfigInSize, ppEapError)) {
+            if (*ppEapError) {
+                g_peer.log_error(*ppEapError);
+                return dwResult = (*ppEapError)->dwWinError;
+            } else
+                return dwResult = ERROR_INVALID_DATA;
         }
 
         // Create configuration XML document.
@@ -305,36 +294,17 @@ DWORD WINAPI EapPeerInvokeConfigUI(
     else if (!ppConnectionDataOut)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" ppConnectionDataOut is NULL.")));
     else {
-        // Unpack configuration.
         _EAPMETHOD_PEER_UI::config_type cfg(g_peer);
-        if (pConnectionDataIn || !dwConnectionDataInSize) {
-            const unsigned char *cursor = pConnectionDataIn;
-            eapserial::unpack(cursor, cfg);
-            assert(cursor - pConnectionDataIn <= (ptrdiff_t)dwConnectionDataInSize);
-        }
-
-        if (!g_peer.invoke_config_ui(hwndParent, cfg, ppEapError)) {
+        if (!g_peer.unpack(cfg, pConnectionDataIn, dwConnectionDataInSize, ppEapError) ||
+            !g_peer.invoke_config_ui(hwndParent, cfg, ppEapError) ||
+            !g_peer.pack(cfg, ppConnectionDataOut, pdwConnectionDataOutSize, ppEapError))
+        {
             if (*ppEapError) {
                 g_peer.log_error(*ppEapError);
                 return dwResult = (*ppEapError)->dwWinError;
             } else
                 return dwResult = ERROR_INVALID_DATA;
         }
-
-        // Allocate BLOB for configuration.
-        assert(ppConnectionDataOut);
-        assert(pdwConnectionDataOutSize);
-        *pdwConnectionDataOutSize = (DWORD)eapserial::get_pk_size(cfg);
-        *ppConnectionDataOut = g_peer.alloc_memory(*pdwConnectionDataOutSize);
-        if (!*ppConnectionDataOut) {
-            g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_OUTOFMEMORY, tstring_printf(_T(__FUNCTION__) _T(" Error allocating memory for configuration BLOB (%uB)."), *pdwConnectionDataOutSize).c_str()));
-            return dwResult;
-        }
-
-        // Pack BLOB to output.
-        unsigned char *cursor = *ppConnectionDataOut;
-        eapserial::pack(cursor, cfg);
-        assert(cursor - *ppConnectionDataOut <= (ptrdiff_t)*pdwConnectionDataOutSize);
     }
 
     return dwResult;
@@ -389,44 +359,19 @@ DWORD WINAPI EapPeerInvokeIdentityUI(
     else if (!ppwszIdentity)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" ppwszIdentity is NULL.")));
     else {
-        // Unpack configuration.
         _EAPMETHOD_PEER_UI::config_type cfg(g_peer);
-        if (pConnectionData || !dwConnectionDataSize) {
-            const unsigned char *cursor = pConnectionData;
-            eapserial::unpack(cursor, cfg);
-            assert(cursor - pConnectionData <= (ptrdiff_t)dwConnectionDataSize);
-        }
-
-        // Unpack configuration.
         _EAPMETHOD_PEER_UI::identity_type usr(g_peer);
-        if (pUserData || !dwUserDataSize) {
-            const unsigned char *cursor = pUserData;
-            eapserial::unpack(cursor, usr);
-            assert(cursor - pUserData <= (ptrdiff_t)dwUserDataSize);
-        }
-
-        if (!g_peer.invoke_identity_ui(hwndParent, dwFlags, cfg, usr, ppwszIdentity, ppEapError)) {
+        if (!g_peer.unpack(cfg, pConnectionData, dwConnectionDataSize, ppEapError) ||
+            !g_peer.unpack(usr, pUserData, dwUserDataSize, ppEapError) ||
+            !g_peer.invoke_identity_ui(hwndParent, dwFlags, cfg, usr, ppwszIdentity, ppEapError) ||
+            !g_peer.pack(usr, ppUserDataOut, pdwUserDataOutSize, ppEapError))
+        {
             if (*ppEapError) {
                 g_peer.log_error(*ppEapError);
                 return dwResult = (*ppEapError)->dwWinError;
             } else
                 return dwResult = ERROR_INVALID_DATA;
         }
-
-        // Allocate BLOB for user data.
-        assert(ppUserDataOut);
-        assert(pdwUserDataOutSize);
-        *pdwUserDataOutSize = (DWORD)eapserial::get_pk_size(usr);
-        *ppUserDataOut = g_peer.alloc_memory(*pdwUserDataOutSize);
-        if (!*ppUserDataOut) {
-            g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_OUTOFMEMORY, tstring_printf(_T(__FUNCTION__) _T(" Error allocating memory for configuration BLOB (%uB)."), *pdwUserDataOutSize).c_str()));
-            return dwResult;
-        }
-
-        // Pack BLOB to output.
-        unsigned char *cursor = *ppUserDataOut;
-        eapserial::pack(cursor, usr);
-        assert(cursor - *ppUserDataOut <= (ptrdiff_t)*pdwUserDataOutSize);
     }
 
     return dwResult;
@@ -473,37 +418,18 @@ DWORD WINAPI EapPeerInvokeInteractiveUI(
     else if (!ppDataFromInteractiveUI)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" ppDataFromInteractiveUI is NULL.")));
     else {
-        // Unpack request.
         _EAPMETHOD_PEER_UI::interactive_request_type req;
-        if (pUIContextData || !dwUIContextDataSize) {
-            const unsigned char *cursor = pUIContextData;
-            eapserial::unpack(cursor, req);
-            assert(cursor - pUIContextData <= (ptrdiff_t)dwUIContextDataSize);
-        }
-
         _EAPMETHOD_PEER_UI::interactive_response_type res;
-        if (!g_peer.invoke_interactive_ui(hwndParent, req, res, ppEapError)) {
+        if (!g_peer.unpack(req, pUIContextData, dwUIContextDataSize, ppEapError) ||
+            !g_peer.invoke_interactive_ui(hwndParent, req, res, ppEapError) ||
+            !g_peer.pack(res, ppDataFromInteractiveUI, pdwDataFromInteractiveUISize, ppEapError))
+        {
             if (*ppEapError) {
                 g_peer.log_error(*ppEapError);
                 return dwResult = (*ppEapError)->dwWinError;
             } else
                 return dwResult = ERROR_INVALID_DATA;
         }
-
-        // Allocate BLOB for user data.
-        assert(ppDataFromInteractiveUI);
-        assert(pdwDataFromInteractiveUISize);
-        *pdwDataFromInteractiveUISize = (DWORD)eapserial::get_pk_size(res);
-        *ppDataFromInteractiveUI = g_peer.alloc_memory(*pdwDataFromInteractiveUISize);
-        if (!*ppDataFromInteractiveUI) {
-            g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_OUTOFMEMORY, tstring_printf(_T(__FUNCTION__) _T(" Error allocating memory for interactive response (%uB)."), *pdwDataFromInteractiveUISize).c_str()));
-            return dwResult;
-        }
-
-        // Pack BLOB to output.
-        unsigned char *cursor = *ppDataFromInteractiveUI;
-        eapserial::pack(cursor, res);
-        assert(cursor - *ppDataFromInteractiveUI <= (ptrdiff_t)*pdwDataFromInteractiveUISize);
     }
 
     return dwResult;

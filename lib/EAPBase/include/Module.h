@@ -46,8 +46,9 @@ namespace eap
 
 #include "EAP.h"
 
-#include <WinStd/Win.h>
+#include <WinStd/Crypt.h>
 #include <WinStd/ETW.h>
+#include <WinStd/Win.h>
 
 #include <Windows.h>
 #include <eaptypes.h> // Must include after <Windows.h>
@@ -452,6 +453,104 @@ namespace eap
 
         /// @}
 
+        /// \name BLOB management
+        /// @{
+
+        ///
+        /// Unencrypts and unpacks the BLOB
+        ///
+        /// \param[inout] record        Object to unpack to
+        /// \param[in   ] pDataIn       Pointer to encrypted BLOB
+        /// \param[in   ] dwDataInSize  Size of \p pDataIn
+        /// \param[out  ] ppEapError    Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
+        ///
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
+        ///
+        template<class T>
+        bool unpack(
+            _Inout_                        T     &record,
+            _In_count_(dwDataInSize) const BYTE  *pDataIn,
+            _In_                           DWORD dwDataInSize,
+            _Out_                          EAP_ERROR **ppEapError)
+        {
+            // Prepare cryptographics provider.
+            winstd::crypt_prov cp;
+            if (!cp.create(NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT)) {
+                *ppEapError = make_error(GetLastError(), _T(__FUNCTION__) _T(" CryptAcquireContext failed."));
+                return false;
+            }
+
+            // Decrypt data.
+            vector<unsigned char, sanitizing_allocator<unsigned char> > data;
+            if (!decrypt_md5(cp, pDataIn, dwDataInSize, data, ppEapError))
+                return false;
+
+            const unsigned char *cursor = data.data();
+            eapserial::unpack(cursor, record);
+            assert(cursor - data.data() <= (ptrdiff_t)data.size());
+
+            return true;
+        }
+
+
+        ///
+        /// Packs and encrypts to the BLOB
+        ///
+        /// \param[in ] record          Object to pack
+        /// \param[out] ppDataOut       Pointer to pointer to receive encrypted BLOB. Pointer must be freed using `module::free_memory()`.
+        /// \param[out] pdwDataOutSize  Pointer to \p ppDataOut size
+        /// \param[out] ppEapError      Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
+        ///
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
+        ///
+        template<class T>
+        bool pack(
+            _In_  const T         &record,
+            _Out_       BYTE      **ppDataOut,
+            _Out_       DWORD     *pdwDataOutSize,
+            _Out_       EAP_ERROR **ppEapError)
+        {
+            // Allocate BLOB.
+            std::vector<unsigned char, winstd::sanitizing_allocator<unsigned char> > data;
+            data.resize(eapserial::get_pk_size(record));
+
+            // Pack to BLOB.
+            unsigned char *cursor = data.data();
+            eapserial::pack(cursor, record);
+            data.resize(cursor - data.data());
+
+            // Prepare cryptographics provider.
+            winstd::crypt_prov cp;
+            if (!cp.create(NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT)) {
+                *ppEapError = make_error(GetLastError(), _T(__FUNCTION__) _T(" CryptAcquireContext failed."));
+                return false;
+            }
+
+            // Encrypt BLOB.
+            std::vector<unsigned char> data_enc;
+            if (!encrypt_md5(cp, data.data(), data.size(), data_enc, ppEapError))
+                return false;
+
+            // Copy encrypted BLOB to output.
+            assert(ppDataOut);
+            assert(pdwDataOutSize);
+            *pdwDataOutSize = (DWORD)data_enc.size();
+            *ppDataOut = alloc_memory(*pdwDataOutSize);
+            if (!*ppDataOut) {
+                log_error(*ppEapError = g_peer.make_error(ERROR_OUTOFMEMORY, tstring_printf(_T(__FUNCTION__) _T(" Error allocating memory for BLOB (%uB)."), *pdwDataOutSize).c_str()));
+                return false;
+            }
+            memcpy(*ppDataOut, data_enc.data(), *pdwDataOutSize);
+
+            return true;
+        }
+
+        /// @}
+
     public:
         HINSTANCE m_instance;                   ///< Windows module instance
         const type_t m_eap_method;              ///< EAP method type
@@ -540,17 +639,13 @@ namespace eap
         /// - \c false otherwise. See \p ppEapError for details.
         ///
         virtual bool get_identity(
-            _In_                                   DWORD     dwFlags,
-            _In_                                   DWORD     dwConnectionDataSize,
-            _In_count_(dwConnectionDataSize) const BYTE      *pConnectionData,
-            _In_                                   DWORD     dwUserDataSize,
-            _In_count_(dwUserDataSize)       const BYTE      *pUserData,
-            _In_                                   HANDLE    hTokenImpersonateUser,
-            _Out_                                  BOOL      *pfInvokeUI,
-            _Out_                                  DWORD     *pdwUserDataOutSize,
-            _Out_                                  BYTE      **ppUserDataOut,
-            _Out_                                  WCHAR     **ppwszIdentity,
-            _Out_                                  EAP_ERROR **ppEapError) = 0;
+            _In_          DWORD         dwFlags,
+            _In_    const config_type   &cfg,
+            _Inout_       identity_type &usr,
+            _In_          HANDLE        hTokenImpersonateUser,
+            _Out_         BOOL          *pfInvokeUI,
+            _Out_         WCHAR         **ppwszIdentity,
+            _Out_         EAP_ERROR     **ppEapError) = 0;
 
         ///
         /// Defines the implementation of an EAP method-specific function that retrieves the properties of an EAP method given the connection and user data.
@@ -562,15 +657,13 @@ namespace eap
         /// - \c false otherwise. See \p ppEapError for details.
         ///
         virtual bool get_method_properties(
-            _In_                                DWORD                     dwVersion,
-            _In_                                DWORD                     dwFlags,
-            _In_                                HANDLE                    hUserImpersonationToken,
-            _In_                                DWORD                     dwEapConnDataSize,
-            _In_count_(dwEapConnDataSize) const BYTE                      *pEapConnData,
-            _In_                                DWORD                     dwUserDataSize,
-            _In_count_(dwUserDataSize)    const BYTE                      *pUserData,
-            _Out_                               EAP_METHOD_PROPERTY_ARRAY *pMethodPropertyArray,
-            _Out_                               EAP_ERROR                 **ppEapError) const = 0;
+            _In_        DWORD                     dwVersion,
+            _In_        DWORD                     dwFlags,
+            _In_        HANDLE                    hUserImpersonationToken,
+            _In_  const config_type               &cfg,
+            _In_  const identity_type             &usr,
+            _Out_       EAP_METHOD_PROPERTY_ARRAY *pMethodPropertyArray,
+            _Out_       EAP_ERROR                 **ppEapError) const = 0;
 
         ///
         /// Defines the implementation of an EAP method-specific function that obtains the EAP Single-Sign-On (SSO) credential input fields for an EAP method.

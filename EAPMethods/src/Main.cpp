@@ -236,18 +236,12 @@ DWORD APIENTRY EapPeerGetIdentity(
     else if (!ppwszIdentity)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" ppwszIdentity is NULL.")));
     else {
-        if (!g_peer.get_identity(
-            dwFlags,
-            dwConnectionDataSize,
-            pConnectionData,
-            dwUserDataSize,
-            pUserData,
-            hTokenImpersonateUser,
-            pfInvokeUI,
-            pdwUserDataOutSize,
-            ppUserDataOut,
-            ppwszIdentity,
-            ppEapError))
+        _EAPMETHOD_PEER::config_type cfg(g_peer);
+        _EAPMETHOD_PEER::identity_type usr(g_peer);
+        if (!g_peer.unpack(cfg, pConnectionData, dwConnectionDataSize, ppEapError) ||
+            !g_peer.unpack(usr, pUserData, dwUserDataSize, ppEapError) ||
+            !g_peer.get_identity(dwFlags, cfg, usr, hTokenImpersonateUser, pfInvokeUI, ppwszIdentity, ppEapError) ||
+            !g_peer.pack(usr, ppUserDataOut, pdwUserDataOutSize, ppEapError))
         {
             if (*ppEapError) {
                 g_peer.log_error(*ppEapError);
@@ -307,7 +301,10 @@ DWORD APIENTRY EapPeerBeginSession(
         }
 
         // Begin the session.
-        if (!session->begin(dwFlags, pAttributeArray, hTokenImpersonateUser, dwConnectionDataSize, pConnectionData, dwUserDataSize, pUserData, dwMaxSendPacketSize, ppEapError)) {
+        if (!g_peer.unpack(session->m_cfg, pConnectionData, dwConnectionDataSize, ppEapError) ||
+            !g_peer.unpack(session->m_id, pUserData, dwUserDataSize, ppEapError) ||
+            !session->begin(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize, ppEapError))
+        {
             if (*ppEapError) {
                 g_peer.log_error(*ppEapError);
                 return dwResult = (*ppEapError)->dwWinError;
@@ -508,7 +505,10 @@ DWORD APIENTRY EapPeerGetUIContext(
     else if (!ppUIContextData)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" ppUIContextData is NULL.")));
     else {
-        if (!static_cast<_EAPMETHOD_SESSION*>(hSession)->get_ui_context(pdwUIContextDataSize, ppUIContextData, ppEapError)) {
+        _EAPMETHOD_SESSION::interactive_request_type req;
+        if (!static_cast<_EAPMETHOD_SESSION*>(hSession)->get_ui_context(req, ppEapError) ||
+            !g_peer.pack(req, ppUIContextData, pdwUIContextDataSize, ppEapError))
+        {
             if (*ppEapError) {
                 g_peer.log_error(*ppEapError);
                 dwResult = (*ppEapError)->dwWinError;
@@ -554,7 +554,10 @@ DWORD APIENTRY EapPeerSetUIContext(
     else if (!pEapOutput)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pEapOutput is NULL.")));
     else {
-        if (!static_cast<_EAPMETHOD_SESSION*>(hSession)->set_ui_context(dwUIContextDataSize, pUIContextData, pEapOutput, ppEapError)) {
+        _EAPMETHOD_SESSION::interactive_response_type res;
+        if (!g_peer.unpack(res, pUIContextData, dwUIContextDataSize, ppEapError) ||
+            !static_cast<_EAPMETHOD_SESSION*>(hSession)->set_ui_context(res, pEapOutput, ppEapError))
+        {
             if (*ppEapError) {
                 g_peer.log_error(*ppEapError);
                 dwResult = (*ppEapError)->dwWinError;
@@ -681,16 +684,18 @@ DWORD WINAPI EapPeerGetMethodProperties(
     else if (!pMethodPropertyArray)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pMethodPropertyArray is NULL.")));
     else {
-        if (!g_peer.get_method_properties(
-            dwVersion,
-            dwFlags,
-            hUserImpersonationToken,
-            dwEapConnDataSize,
-            pEapConnData,
-            dwUserDataSize,
-            pUserData,
-            pMethodPropertyArray,
-            ppEapError))
+        _EAPMETHOD_PEER::config_type cfg(g_peer);
+        _EAPMETHOD_PEER::identity_type usr(g_peer);
+        if (!g_peer.unpack(cfg, pEapConnData, dwEapConnDataSize, ppEapError) ||
+            !g_peer.unpack(usr, pUserData, dwUserDataSize, ppEapError) ||
+            !g_peer.get_method_properties(
+                dwVersion,
+                dwFlags,
+                hUserImpersonationToken,
+                cfg,
+                usr,
+                pMethodPropertyArray,
+                ppEapError))
         {
             if (*ppEapError) {
                 g_peer.log_error(*ppEapError);
@@ -757,29 +762,16 @@ DWORD WINAPI EapPeerCredentialsXml2Blob(
 
         // Load credentials.
         pCredentialsDoc->setProperty(bstr(L"SelectionNamespaces"), variant(L"xmlns:eap-metadata=\"urn:ietf:params:xml:ns:yang:ietf-eap-metadata\""));
-        _EAPMETHOD_PEER::identity_type cred(g_peer);
-        if (!cred.load(pXmlElCredentials, ppEapError)) {
+        _EAPMETHOD_PEER::identity_type usr(g_peer);
+        if (!usr.load(pXmlElCredentials, ppEapError) ||
+            !g_peer.pack(usr, ppCredentialsOut, pdwCredentialsOutSize, ppEapError))
+        {
             if (*ppEapError) {
                 g_peer.log_error(*ppEapError);
                 return dwResult = (*ppEapError)->dwWinError;
             } else
                 return dwResult = ERROR_INVALID_DATA;
         }
-
-        // Allocate BLOB for credentials.
-        assert(ppCredentialsOut);
-        assert(pdwCredentialsOutSize);
-        *pdwCredentialsOutSize = (DWORD)eapserial::get_pk_size(cred);
-        *ppCredentialsOut = g_peer.alloc_memory(*pdwCredentialsOutSize);
-        if (!*ppCredentialsOut) {
-            g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_OUTOFMEMORY, tstring_printf(_T(__FUNCTION__) _T(" Error allocating memory for configuration BLOB (%uB)."), *pdwCredentialsOutSize).c_str()));
-            return dwResult;
-        }
-
-        // Pack BLOB to output.
-        unsigned char *cursor = *ppCredentialsOut;
-        eapserial::pack(cursor, cred);
-        assert(cursor - *ppCredentialsOut <= (ptrdiff_t)*pdwCredentialsOutSize);
     }
 
     return dwResult;
