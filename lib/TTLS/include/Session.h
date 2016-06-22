@@ -33,7 +33,7 @@ namespace eap
 
 namespace eap
 {
-    class session_ttls : public session
+    class session_ttls : public session<config_ttls, credentials_ttls, int, int>
     {
     public:
         ///

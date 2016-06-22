@@ -23,7 +23,7 @@ namespace eap
     ///
     /// EAP session
     ///
-    class session;
+    template <class _Tcfg, class _Tid, class _Tint, class _Tintres> class session;
 }
 
 #pragma once
@@ -40,29 +40,74 @@ extern "C" {
 
 namespace eap
 {
+    template <class _Tcfg, class _Tid, class _Tint, class _Tintres>
     class session
     {
+    public:
+        ///
+        /// Provider configuration data type
+        ///
+        typedef config_provider<_Tcfg> provider_config_type;
+
+        ///
+        /// Configuration data type
+        ///
+        typedef config_providers<provider_config_type> config_type;
+
+        ///
+        /// Identity data type
+        ///
+        typedef _Tid identity_type;
+
+        ///
+        /// Interactive request data type
+        ///
+        typedef _Tint interactive_request_type;
+
+        ///
+        /// Interactive response data type
+        ///
+        typedef _Tintres interactive_response_type;
+
     public:
         ///
         /// Constructs a session
         ///
         /// \param[in] mod  Reference of the EAP module to use for global services
         ///
-        session(_In_ module &mod);
+        session(_In_ module &mod) :
+            m_module(mod),
+            m_cfg(mod),
+            m_id(mod)
+        {
+        }
+
 
         ///
         /// Copies session
         ///
         /// \param[in] other  Session to copy from
         ///
-        session(_In_ const session &other);
+        session(_In_ const session &other) :
+            m_module(other.m_module),
+            m_cfg(other.m_cfg),
+            m_id(other.m_id)
+        {
+        }
+
 
         ///
         /// Moves session
         ///
         /// \param[in] other  Session to move from
         ///
-        session(_Inout_ session &&other);
+        session(_Inout_ session &&other) :
+            m_module(other.m_module),
+            m_cfg(std::move(other.m_cfg)),
+            m_id(std::move(other.m_id))
+        {
+        }
+
 
         ///
         /// Copies session
@@ -71,7 +116,16 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        session& operator=(_In_ const session &other);
+        session& operator=(_In_ const session &other)
+        {
+            if (this != std::addressof(other)) {
+                assert(std::addressof(m_module) ==std::addressof(other.m_module)); // Copy session within same module only!
+                m_cfg = other.m_cfg;
+                m_id  = other.m_id;
+            }
+            return *this;
+        }
+
 
         ///
         /// Moves session
@@ -80,7 +134,16 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        session& operator=(_Inout_ session &&other);
+        session& operator=(_Inout_ session &&other)
+        {
+            if (this != std::addressof(other)) {
+                assert(std::addressof(m_module) ==std::addressof(other.m_module)); // Move session within same module only!
+                m_cfg = std::move(other.m_cfg);
+                m_id  = std::move(other.m_id);
+            }
+            return *this;
+        }
+
 
         /// \name Session start/end
         /// @{
@@ -95,15 +158,21 @@ namespace eap
         /// - \c false otherwise. See \p ppEapError for details.
         ///
         virtual bool begin(
-            _In_                                   DWORD         dwFlags,
-            _In_                             const EapAttributes *pAttributeArray,
-            _In_                                   HANDLE        hTokenImpersonateUser,
-            _In_                                   DWORD         dwConnectionDataSize,
-            _In_count_(dwConnectionDataSize) const BYTE          *pConnectionData,
-            _In_                                   DWORD         dwUserDataSize,
-            _In_count_(dwUserDataSize)       const BYTE          *pUserData,
-            _In_                                   DWORD         dwMaxSendPacketSize,
-            _Out_                                  EAP_ERROR     **ppEapError);
+            _In_        DWORD         dwFlags,
+            _In_  const EapAttributes *pAttributeArray,
+            _In_        HANDLE        hTokenImpersonateUser,
+            _In_        DWORD         dwMaxSendPacketSize,
+            _Out_       EAP_ERROR     **ppEapError)
+        {
+            UNREFERENCED_PARAMETER(dwFlags);
+            UNREFERENCED_PARAMETER(pAttributeArray);
+            UNREFERENCED_PARAMETER(hTokenImpersonateUser);
+            UNREFERENCED_PARAMETER(dwMaxSendPacketSize);
+            UNREFERENCED_PARAMETER(ppEapError);
+
+            return true;
+        }
+
 
         ///
         /// Ends an EAP authentication session for the EAP method.
@@ -114,7 +183,12 @@ namespace eap
         /// - \c true if succeeded
         /// - \c false otherwise. See \p ppEapError for details.
         ///
-        virtual bool end(_Out_ EAP_ERROR **ppEapError);
+        virtual bool end(_Out_ EAP_ERROR **ppEapError)
+        {
+            UNREFERENCED_PARAMETER(ppEapError);
+
+            return true;
+        }
 
         /// @}
 
@@ -134,7 +208,17 @@ namespace eap
             _In_                                       DWORD               dwReceivedPacketSize,
             _In_bytecount_(dwReceivedPacketSize) const EapPacket           *pReceivedPacket,
             _Out_                                      EapPeerMethodOutput *pEapOutput,
-            _Out_                                      EAP_ERROR           **ppEapError);
+            _Out_                                      EAP_ERROR           **ppEapError)
+        {
+            UNREFERENCED_PARAMETER(dwReceivedPacketSize);
+            UNREFERENCED_PARAMETER(pReceivedPacket);
+            UNREFERENCED_PARAMETER(pEapOutput);
+            assert(ppEapError);
+
+            *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
+            return false;
+        }
+
 
         ///
         /// Obtains a response packet from the EAP method.
@@ -148,7 +232,16 @@ namespace eap
         virtual bool get_response_packet(
             _Inout_                            DWORD              *pdwSendPacketSize,
             _Inout_bytecap_(*dwSendPacketSize) EapPacket          *pSendPacket,
-            _Out_                              EAP_ERROR          **ppEapError);
+            _Out_                              EAP_ERROR          **ppEapError)
+        {
+            UNREFERENCED_PARAMETER(pdwSendPacketSize);
+            UNREFERENCED_PARAMETER(pSendPacket);
+            assert(ppEapError);
+
+            *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
+            return false;
+        }
+
 
         ///
         /// Obtains the result of an authentication session from the EAP method.
@@ -159,7 +252,15 @@ namespace eap
         /// - \c true if succeeded
         /// - \c false otherwise. See \p ppEapError for details.
         ///
-        virtual bool get_result(_In_ EapPeerMethodResultReason reason, _Out_ EapPeerMethodResult *ppResult, _Out_ EAP_ERROR **ppEapError);
+        virtual bool get_result(_In_ EapPeerMethodResultReason reason, _Out_ EapPeerMethodResult *ppResult, _Out_ EAP_ERROR **ppEapError)
+        {
+            UNREFERENCED_PARAMETER(reason);
+            UNREFERENCED_PARAMETER(ppResult);
+            assert(ppEapError);
+
+            *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
+            return false;
+        }
 
         /// @}
 
@@ -178,9 +279,16 @@ namespace eap
         /// - \c false otherwise. See \p ppEapError for details.
         ///
         virtual bool get_ui_context(
-            _Out_ DWORD     *pdwUIContextDataSize,
-            _Out_ BYTE      **ppUIContextData,
-            _Out_ EAP_ERROR **ppEapError);
+            _Out_ interactive_request_type &req,
+            _Out_ EAP_ERROR **ppEapError)
+        {
+            UNREFERENCED_PARAMETER(req);
+            assert(ppEapError);
+
+            *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
+            return false;
+        }
+
 
         ///
         /// Provides a user interface context to the EAP method.
@@ -194,10 +302,17 @@ namespace eap
         /// - \c false otherwise. See \p ppEapError for details.
         ///
         virtual bool set_ui_context(
-            _In_                                  DWORD               dwUIContextDataSize,
-            _In_count_(dwUIContextDataSize) const BYTE                *pUIContextData,
-            _In_                            const EapPeerMethodOutput *pEapOutput,
-            _Out_                                 EAP_ERROR           **ppEapError);
+            _In_ const interactive_response_type &res,
+            _In_ const EapPeerMethodOutput       *pEapOutput,
+            _Out_      EAP_ERROR                 **ppEapError)
+        {
+            UNREFERENCED_PARAMETER(res);
+            UNREFERENCED_PARAMETER(pEapOutput);
+            assert(ppEapError);
+
+            *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
+            return false;
+        }
 
         /// @}
 
@@ -213,7 +328,15 @@ namespace eap
         /// - \c true if succeeded
         /// - \c false otherwise. See \p ppEapError for details.
         ///
-        virtual bool get_response_attributes(_Out_ EapAttributes *pAttribs, _Out_ EAP_ERROR **ppEapError);
+        virtual bool get_response_attributes(_Out_ EapAttributes *pAttribs, _Out_ EAP_ERROR **ppEapError)
+        {
+            UNREFERENCED_PARAMETER(pAttribs);
+            assert(ppEapError);
+
+            *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
+            return false;
+        }
+
 
         ///
         /// Provides an updated array of EAP response attributes to the EAP method.
@@ -224,11 +347,21 @@ namespace eap
         /// - \c true if succeeded
         /// - \c false otherwise. See \p ppEapError for details.
         ///
-        virtual bool set_response_attributes(const _In_ EapAttributes *pAttribs, _Out_ EapPeerMethodOutput *pEapOutput, _Out_ EAP_ERROR **ppEapError);
+        virtual bool set_response_attributes(const _In_ EapAttributes *pAttribs, _Out_ EapPeerMethodOutput *pEapOutput, _Out_ EAP_ERROR **ppEapError)
+        {
+            UNREFERENCED_PARAMETER(pAttribs);
+            UNREFERENCED_PARAMETER(pEapOutput);
+            assert(ppEapError);
+
+            *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
+            return false;
+        }
 
         /// @}
 
     public:
         module &m_module;   ///< Reference of the EAP module
+        config_type m_cfg;  ///< Session configuration
+        identity_type m_id; ///< User identity
     };
 }

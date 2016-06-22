@@ -59,27 +59,19 @@ bool eap::peer_ttls::shutdown(_Out_ EAP_ERROR **ppEapError)
 
 
 bool eap::peer_ttls::get_identity(
-    _In_                                   DWORD     dwFlags,
-    _In_                                   DWORD     dwConnectionDataSize,
-    _In_count_(dwConnectionDataSize) const BYTE      *pConnectionData,
-    _In_                                   DWORD     dwUserDataSize,
-    _In_count_(dwUserDataSize)       const BYTE      *pUserData,
-    _In_                                   HANDLE    hTokenImpersonateUser,
-    _Out_                                  BOOL      *pfInvokeUI,
-    _Out_                                  DWORD     *pdwUserDataOutSize,
-    _Out_                                  BYTE      **ppUserDataOut,
-    _Out_                                  WCHAR     **ppwszIdentity,
-    _Out_                                  EAP_ERROR **ppEapError)
+    _In_          DWORD         dwFlags,
+    _In_    const config_type   &cfg,
+    _Inout_       identity_type &usr,
+    _In_          HANDLE        hTokenImpersonateUser,
+    _Out_         BOOL          *pfInvokeUI,
+    _Out_         WCHAR         **ppwszIdentity,
+    _Out_         EAP_ERROR     **ppEapError)
 {
     UNREFERENCED_PARAMETER(dwFlags);
-    UNREFERENCED_PARAMETER(dwConnectionDataSize);
-    UNREFERENCED_PARAMETER(pConnectionData);
-    UNREFERENCED_PARAMETER(dwUserDataSize);
-    UNREFERENCED_PARAMETER(pUserData);
+    UNREFERENCED_PARAMETER(cfg);
+    UNREFERENCED_PARAMETER(usr);
     UNREFERENCED_PARAMETER(hTokenImpersonateUser);
     UNREFERENCED_PARAMETER(pfInvokeUI);
-    UNREFERENCED_PARAMETER(pdwUserDataOutSize);
-    UNREFERENCED_PARAMETER(ppUserDataOut);
     UNREFERENCED_PARAMETER(ppwszIdentity);
     UNREFERENCED_PARAMETER(ppEapError);
 
@@ -89,23 +81,19 @@ bool eap::peer_ttls::get_identity(
 
 
 bool eap::peer_ttls::get_method_properties(
-    _In_                                DWORD                     dwVersion,
-    _In_                                DWORD                     dwFlags,
-    _In_                                HANDLE                    hUserImpersonationToken,
-    _In_                                DWORD                     dwEapConnDataSize,
-    _In_count_(dwEapConnDataSize) const BYTE                      *pEapConnData,
-    _In_                                DWORD                     dwUserDataSize,
-    _In_count_(dwUserDataSize)    const BYTE                      *pUserData,
-    _Out_                               EAP_METHOD_PROPERTY_ARRAY *pMethodPropertyArray,
-    _Out_                               EAP_ERROR                 **ppEapError) const
+    _In_        DWORD                     dwVersion,
+    _In_        DWORD                     dwFlags,
+    _In_        HANDLE                    hUserImpersonationToken,
+    _In_  const config_type               &cfg,
+    _In_  const identity_type             &usr,
+    _Out_       EAP_METHOD_PROPERTY_ARRAY *pMethodPropertyArray,
+    _Out_       EAP_ERROR                 **ppEapError) const
 {
     UNREFERENCED_PARAMETER(dwVersion);
     UNREFERENCED_PARAMETER(dwFlags);
     UNREFERENCED_PARAMETER(hUserImpersonationToken);
-    UNREFERENCED_PARAMETER(dwEapConnDataSize);
-    UNREFERENCED_PARAMETER(pEapConnData);
-    UNREFERENCED_PARAMETER(dwUserDataSize);
-    UNREFERENCED_PARAMETER(pUserData);
+    UNREFERENCED_PARAMETER(cfg);
+    UNREFERENCED_PARAMETER(usr);
     UNREFERENCED_PARAMETER(pMethodPropertyArray);
     UNREFERENCED_PARAMETER(ppEapError);
 

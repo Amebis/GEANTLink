@@ -40,9 +40,6 @@
     <ClCompile Include="..\src\StdAfx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Session.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Config.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
