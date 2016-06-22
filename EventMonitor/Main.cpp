@@ -20,13 +20,10 @@
 
 #include "StdAfx.h"
 
+#pragma comment(lib, "tdh.lib")
+
 using namespace std;
 using namespace winstd;
-
-// {B963A9BE-2D21-4A4C-BE47-10490AD63AB9}
-static const GUID g_session_id = 
-{ 0xb963a9be, 0x2d21, 0x4a4c, { 0xbe, 0x47, 0x10, 0x49, 0xa, 0xd6, 0x3a, 0xb9 } };
-
 
 static vector<TRACEHANDLE> g_traces;
 
@@ -46,9 +43,36 @@ static BOOL WINAPI ConsoleHandler(_In_ DWORD dwCtrlType)
 }
 
 
-static VOID WINAPI EventRecordCallback(_In_ PEVENT_RECORD EventRecord)
+static VOID WINAPI EventRecordCallback(_In_ PEVENT_RECORD pEvent)
 {
-    UNREFERENCED_PARAMETER(EventRecord);
+    {
+        FILETIME ft;
+        ft.dwHighDateTime = pEvent->EventHeader.TimeStamp.HighPart;
+        ft.dwLowDateTime = pEvent->EventHeader.TimeStamp.LowPart;
+
+        SYSTEMTIME st;
+        FileTimeToSystemTime(&ft, &st);
+
+        SYSTEMTIME st_local;
+        SystemTimeToTzSpecificLocalTime(NULL, &st, &st_local);
+
+        ULONGLONG
+            ts = pEvent->EventHeader.TimeStamp.QuadPart,
+            nanosec = (ts % 10000000) * 100;
+
+        _ftprintf(stdout, _T("%04d-%02d-%02d %02d:%02d:%02d.%09I64u"),
+            st_local.wYear, st_local.wMonth, st_local.wDay, st_local.wHour, st_local.wMinute, st_local.wSecond, nanosec);
+    }
+
+    {
+        unique_ptr<TRACE_EVENT_INFO> info;
+        ULONG ulResult;
+        if ((ulResult = TdhGetEventInformation(pEvent, 0, NULL, info)) == ERROR_SUCCESS) {
+            _ftprintf(stdout, _T(" %ls"), info->EventMessageOffset ? (LPCWSTR)((LPCBYTE)info.get() + info->EventMessageOffset) : L"");
+        }
+    }
+
+    _ftprintf(stdout, _T("\n"));
 }
 
 
@@ -61,9 +85,14 @@ int  main(int argc, const char    *argv[])
     UNREFERENCED_PARAMETER(argc);
     UNREFERENCED_PARAMETER(argv);
 
+    setlocale(LC_ALL, ".OCP");
+
+    // Initialize COM.
+    com_initializer com_init(NULL);
+
+    // Start a new session.
     ULONG ulResult;
     event_session session;
-
     for (unsigned int i = 0; ; i++) {
         //tstring log_file(tstring_printf(i ? _T("test.etl") : _T("test %u.etl"), i));
         tstring name(tstring_printf(i ? _T(PRODUCT_NAME_STR) _T(" Event Monitor Session %u") : _T(PRODUCT_NAME_STR) _T(" Event Monitor Session"), i));
@@ -84,7 +113,7 @@ int  main(int argc, const char    *argv[])
         properties->Wnode.BufferSize    = ulSize;
         properties->Wnode.Flags         = WNODE_FLAG_TRACED_GUID;
         properties->Wnode.ClientContext = 1; //QPC clock resolution
-        properties->Wnode.Guid          = g_session_id;
+        CoCreateGuid(&(properties->Wnode.Guid));
         properties->LogFileMode         = /*EVENT_TRACE_FILE_MODE_SEQUENTIAL |*/ EVENT_TRACE_REAL_TIME_MODE;
         properties->MaximumFileSize     = 1;  // 1 MB
         properties->LoggerNameOffset    = sizeof(EVENT_TRACE_PROPERTIES);
@@ -98,6 +127,7 @@ int  main(int argc, const char    *argv[])
             return 1;
         } else if (ulResult == ERROR_ALREADY_EXISTS) {
             _ftprintf(stderr, _T("The %s event session already exists.\n"), name.c_str());
+            // Do not despair... Retry with a new session name and ID.
             continue;
         } else {
             _ftprintf(stderr, _T("Error creating event session (error %u).\n"), ulResult);

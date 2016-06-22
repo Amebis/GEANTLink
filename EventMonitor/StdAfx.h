@@ -22,6 +22,7 @@
 
 #include "../include/Version.h"
 
+#include <WinStd/COM.h>
 #include <WinStd/ETW.h>
 
 #include <Windows.h>
