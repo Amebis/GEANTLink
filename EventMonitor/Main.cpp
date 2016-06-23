@@ -528,10 +528,18 @@ int  main(int argc, const char    *argv[])
     }
 
     // Enable event provider we are interested in to log events to our session.
-    event_trace_enabler trace_enabler(session, &EAPMETHOD_TRACE_EVENT_PROVIDER, TRACE_LEVEL_VERBOSE);
-    if ((ulResult = trace_enabler.status()) != ERROR_SUCCESS) {
+    event_trace_enabler trace_enabler_event(session, &EAPMETHOD_TRACE_EVENT_PROVIDER, TRACE_LEVEL_VERBOSE);
+    if ((ulResult = trace_enabler_event.status()) != ERROR_SUCCESS) {
         _ftprintf(stderr, _T("Error enabling event provider (error %u).\n"), ulResult);
         return 1;
+    }
+
+    // {6EB8DB94-FE96-443F-A366-5FE0CEE7FB1C}
+    static const GUID s_provider_eaphost = { 0X6EB8DB94, 0XFE96, 0X443F, { 0XA3, 0X66, 0X5F, 0XE0, 0XCE, 0XE7, 0XFB, 0X1C } };
+    event_trace_enabler trace_enabler_eaphost(session, &s_provider_eaphost, TRACE_LEVEL_INFORMATION);
+    if ((ulResult = trace_enabler_eaphost.status()) != ERROR_SUCCESS) {
+        // If the EAPHost trace provider failed to enable, do not despair.
+        _ftprintf(stderr, _T("Error enabling EAPHost event provider (error %u).\n"), ulResult);
     }
 
     // Open trace.
