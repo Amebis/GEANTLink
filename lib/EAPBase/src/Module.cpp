@@ -33,7 +33,7 @@ eap::module::module(type_t eap_method) :
     m_instance(NULL)
 {
     m_ep.create(&EAPMETHOD_TRACE_EVENT_PROVIDER);
-    m_ep.write(&EAPMETHOD_TRACE_EVT_MODULE_LOAD, event_data((BYTE)m_eap_method), event_data::blank);
+    m_ep.write(&EAPMETHOD_TRACE_EVT_MODULE_LOAD, event_data((DWORD)m_eap_method), event_data::blank);
 
     m_heap.create(0, 0, 0);
 }
@@ -41,7 +41,7 @@ eap::module::module(type_t eap_method) :
 
 eap::module::~module()
 {
-    m_ep.write(&EAPMETHOD_TRACE_EVT_MODULE_UNLOAD, event_data((BYTE)m_eap_method), event_data::blank);
+    m_ep.write(&EAPMETHOD_TRACE_EVT_MODULE_UNLOAD, event_data((DWORD)m_eap_method), event_data::blank);
 }
 
 
@@ -114,7 +114,8 @@ void eap::module::log_error(_In_ const EAP_ERROR *err) const
     vector<EVENT_DATA_DESCRIPTOR> evt_desc;
     evt_desc.reserve(8);
     evt_desc.push_back(event_data(err->dwWinError));
-    evt_desc.push_back(event_data(err->type.eapType.type));
+    DWORD dwType = err->type.eapType.type;
+    evt_desc.push_back(event_data(dwType));
     evt_desc.push_back(event_data(err->dwReasonCode));
     evt_desc.push_back(event_data(&(err->rootCauseGuid), sizeof(GUID)));
     evt_desc.push_back(event_data(&(err->repairGuid), sizeof(GUID)));
