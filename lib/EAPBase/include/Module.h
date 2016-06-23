@@ -110,7 +110,7 @@ namespace eap
         ///
         inline winstd::event_fn_auto get_event_fn_auto(_In_z_ LPCSTR pszFnName) const
         {
-            return winstd::event_fn_auto(m_ep, &EAPMETHOD_TRACE_EVT_FN_CALL, &EAPMETHOD_TRACE_EVT_FN_RETURN_DWORD, pszFnName);
+            return winstd::event_fn_auto(m_ep, &EAPMETHOD_TRACE_EVT_FN_CALL, &EAPMETHOD_TRACE_EVT_FN_RETURN, pszFnName);
         }
 
         ///
