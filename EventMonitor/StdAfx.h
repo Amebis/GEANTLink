@@ -24,8 +24,12 @@
 
 #include <WinStd/COM.h>
 #include <WinStd/ETW.h>
+#include <WinStd/Win.h>
 
 #include <Windows.h>
+#include <in6addr.h>
+#include <MSTcpIP.h>
+#include <Sddl.h>
 #include <tchar.h>
 
 #include <vector>
