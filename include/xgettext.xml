@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 1991-2016 Amebis
+	Copyright 2016 GÉANT
+
+    This file is part of GÉANTLink.
+
+    GÉANTLink is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    GÉANTLink is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with GÉANTLink. If not, see <http://www.gnu.org/licenses/>.
+-->
+<ProjectSchemaDefinitions xmlns="clr-namespace:Microsoft.Build.Framework.XamlTypes;assembly=Microsoft.Build.Framework" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:sys="clr-namespace:System;assembly=mscorlib" xmlns:transformCallback="Microsoft.Cpp.Dev10.ConvertPropertyCallback">
+  <Rule Name="POCompile" PageTemplate="tool" DisplayName="PO Compiler" SwitchPrefix="--" Order="200">
+    <Rule.DataSource>
+      <DataSource Persistence="ProjectFile" ItemType="POCompile" />
+    </Rule.DataSource>
+    <Rule.Categories>
+      <Category Name="General"      DisplayName="General" />
+      <Category Name="Input"        DisplayName="Input" />
+      <Category Name="Output"       DisplayName="Output" />
+      <Category Name="Command Line" DisplayName="Command Line" Subtype="CommandLine" />
+    </Rule.Categories>
+    <EnumProperty   Category="General" Name="OperationMode" DisplayName="Operation Mode" Description="Specifies the operation mode.">
+      <EnumValue Name="MO"                                  DisplayName="Default"       Description="Generate MO file (default)." />
+      <EnumValue Name="Java"      Switch="java"             DisplayName="Java"          Description="Generate a Java ResourceBundle class." />
+      <EnumValue Name="Java2"     Switch="java2"            DisplayName="Java2"         Description="Like Java, and assume Java2 (JDK 1.2 or higher)." />
+      <EnumValue Name="Csharp"    Switch="csharp"           DisplayName="C#"            Description="Generate a .NET .dll file." />
+      <EnumValue Name="CsharpRes" Switch="csharp-resources" DisplayName="C# Resource"   Description="Generate a .NET .resources file." />
+      <EnumValue Name="Tcl"       Switch="tcl"              DisplayName="Tcl"           Description="Generate a tcl/msgcat .msg file." />
+      <EnumValue Name="Qt"        Switch="qt"               DisplayName="Qt"            Description="Generate a Qt .qm file." />
+      <EnumValue Name="Desktop"   Switch="desktop"          DisplayName="Desktop Entry" Description="Generate a .desktop file." />
+    </EnumProperty>
+    <BoolProperty   Category="General" Name="Strict"      Switch="strict"              DisplayName="Enable strict mode"  Description="Enable strict Uniforum mode." />
+    <BoolProperty   Category="Input"   Name="CheckFormat" Switch="check-format"        DisplayName="Check Format"        Description="Check language dependent format strings." />
+    <BoolProperty   Category="Input"   Name="CheckHeader" Switch="check-header"        DisplayName="Check Header"        Description="Verify presence and contents of the header entry." />
+    <BoolProperty   Category="Input"   Name="CheckDomain" Switch="check-domain"        DisplayName="Check Domain"        Description="Check for conflicts between domain directives and the --output-file option." />
+    <BoolProperty   Category="Input"   Name="CheckCompat" Switch="check-compatibility" DisplayName="Check Compatibility" Description="Check that GNU msgfmt behaves like X/Open msgfmt." />
+    <EnumProperty   Category="Input"   Name="CheckAccel"                               DisplayName="Check Accelerators"  Description="Check presence of keyboard accelerators for menu items.">
+      <EnumValue Name="None"                                                       DisplayName="None"       Description="No check" />
+      <EnumValue Name="Amperstand"   Switch="check-accelerators=&quot;&amp;&quot;" DisplayName="Amperstand" Description="Check keyborad accellerator marked with an amperstand &amp;." />
+    </EnumProperty>
+    <StringProperty Category="Output"  Name="OutputFile"  Switch="output-file="        DisplayName="Output File"         Description="The name and location of the output file that compiler creates." Subtype="file" />
+    <BoolProperty   Category="Output"  Name="UseFuzzy"    Switch="use-fuzzy"           DisplayName="Use Fuzzy Entries"   Description="Use fuzzy entries in output." />
+    <IntProperty    Category="Output"  Name="Alignment"   Switch="alignment="          DisplayName="Align Strings"       Description="Align strings to given bytes (default: 1)." />
+    <EnumProperty   Category="Output"  Name="Endianess"                                DisplayName="Endianess"           Description="Write out 32-bit numbers in the given byte order (default: platform specific).">
+      <EnumValue Name="LSB" Switch="endianness=little" DisplayName="LSB" Description="Least significant byte first" />
+      <EnumValue Name="MSB" Switch="endianness=big"    DisplayName="MSB" Description="Most significant byte first" />
+    </EnumProperty>
+    <StringListProperty Category="Command Line" Name="Inputs" Subtype="file" IsRequired="true" >
+      <StringListProperty.DataSource>
+        <DataSource Persistence="ProjectFile" ItemType="POCompile" SourceType="Item" />
+      </StringListProperty.DataSource>
+    </StringListProperty>
+    <StringProperty Category="Command Line" Name="AdditionalOptions" Subtype="AdditionalOptions" DisplayName="Additional Options" Description="Additional Options" />
+    <DynamicEnumProperty Category="Command Line" Name="POCompileBeforeTargets" EnumProvider="Targets" DisplayName="Execute Before" Description="Specifies the targets for the build customization to run before." IncludeInCommandLine="False">
+      <DynamicEnumProperty.ProviderSettings>
+        <NameValuePair Name="Exclude" Value="^POCompileBeforeTargets|^Compute" />
+      </DynamicEnumProperty.ProviderSettings>
+      <DynamicEnumProperty.DataSource>
+        <DataSource Persistence="ProjectFile" HasConfigurationCondition="true" />
+      </DynamicEnumProperty.DataSource>
+    </DynamicEnumProperty>
+    <DynamicEnumProperty Category="Command Line" Name="POCompileAfterTargets" EnumProvider="Targets"  DisplayName="Execute After" Description="Specifies the targets for the build customization to run after." IncludeInCommandLine="False">
+      <DynamicEnumProperty.ProviderSettings>
+        <NameValuePair Name="Exclude" Value="^POCompileAfterTargets|^Compute" />
+      </DynamicEnumProperty.ProviderSettings>
+      <DynamicEnumProperty.DataSource>
+        <DataSource Persistence="ProjectFile" ItemType="" HasConfigurationCondition="true" />
+      </DynamicEnumProperty.DataSource>
+    </DynamicEnumProperty>
+  </Rule>
+  <ItemType Name="POCompile" DisplayName="PO Compiler" />
+  <FileExtension Name="*.po" ContentType="POCompile" />
+  <ContentType Name="POCompile" DisplayName="PO Compiler" ItemType="POCompile" />
+</ProjectSchemaDefinitions>

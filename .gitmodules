@@ -4,3 +4,6 @@
 [submodule "lib/WinStd"]
 	path = lib/WinStd
 	url = https://github.com/Amebis/WinStd.git
+[submodule "lib/wxExtend"]
+	path = lib/wxExtend
+	url = https://github.com/Amebis/wxExtend.git
