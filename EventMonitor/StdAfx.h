@@ -21,6 +21,7 @@
 #pragma once
 
 #include "App.h"
+#include "ETWLog.h"
 #include "Frame.h"
 #include "LogPanel.h"
 
@@ -29,19 +30,19 @@
 #include <wxex/common.h>
 #include <wxex/persist/auimanager.h>
 
+#include <WinStd/COM.h>
+#include <WinStd/ETW.h>
+#include <WinStd/Win.h>
+
 #include <Windows.h>
 #include <Msi.h>
 #include <tchar.h>
 
-//#include <WinStd/COM.h>
-//#include <WinStd/ETW.h>
-//#include <WinStd/Win.h>
-//
-//#include <in6addr.h>
-//#include <MSTcpIP.h>
-//#include <Sddl.h>
-//#include <tchar.h>
-//
-//#include <vector>
-//
-//#include <EventsETW.h> // Must include after <Windows.h>
+#include <in6addr.h>
+#include <MSTcpIP.h>
+#include <Sddl.h>
+#include <tchar.h>
+
+#include <vector>
+
+#include <EventsETW.h> // Must include after <Windows.h>

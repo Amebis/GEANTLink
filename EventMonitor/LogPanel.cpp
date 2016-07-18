@@ -27,9 +27,6 @@
 
 wxEventMonitorLogPanel::wxEventMonitorLogPanel(wxWindow* parent) : wxEventMonitorLogPanelBase(parent)
 {
-    m_log->AppendColumn(_("Time"));
-    m_log->AppendColumn(_("Source"));
-
     // Set focus.
     m_log->SetFocus();
 }
@@ -52,30 +49,32 @@ wxString wxPersistentEventMonitorLogPanel::GetKind() const
 
 void wxPersistentEventMonitorLogPanel::Save() const
 {
-    //const wxEventMonitorLogPanel * const wnd = static_cast<const wxEventMonitorLogPanel*>(GetWindow());
+    const wxEventMonitorLogPanel * const wnd = static_cast<const wxEventMonitorLogPanel*>(GetWindow());
 
-    //SaveValue(wxT("splitDecomposed"), wnd->m_splitterDecomposed->GetSashPosition());
-    //SaveValue(wxT("splitComposed"  ), wnd->m_splitterComposed  ->GetSashPosition());
+    // Save log's column widths.
+    wxListItem col;
+    col.SetMask(wxLIST_MASK_TEXT | wxLIST_MASK_WIDTH);
+    for (int i = 0, n = wnd->m_log->GetColumnCount(); i < n; i++) {
+        wnd->m_log->GetColumn(i, col);
+        SaveValue(wxString::Format(wxT("Column%sWidth"), col.GetText().c_str()), col.GetWidth());
+    }
 }
 
 
 bool wxPersistentEventMonitorLogPanel::Restore()
 {
-    //wxEventMonitorLogPanel * const wnd = static_cast<wxEventMonitorLogPanel*>(GetWindow());
+    wxEventMonitorLogPanel * const wnd = static_cast<wxEventMonitorLogPanel*>(GetWindow());
 
-    //int sashVal;
+    // Restore log's column widths.
+    wxListItem col;
+    col.SetMask(wxLIST_MASK_TEXT);
+    for (int i = 0, n = wnd->m_log->GetColumnCount(); i < n; i++) {
+        wnd->m_log->GetColumn(i, col);
 
-    //if (RestoreValue(wxT("splitDecomposed"), &sashVal)) {
-    //    // wxFormBuilder sets initial splitter stash in idle event handler after GUI settles. Overriding our loaded value. Disconnect it's idle event handler.
-    //    wnd->m_splitterDecomposed->Disconnect( wxEVT_IDLE, wxIdleEventHandler( wxEventMonitorLogPanelBase::m_splitterDecomposedOnIdle ), NULL, wnd );
-    //    wnd->m_splitterDecomposed->SetSashPosition(sashVal);
-    //}
-
-    //if (RestoreValue(wxT("splitComposed"), &sashVal)) {
-    //    // wxFormBuilder sets initial splitter stash in idle event handler after GUI settles. Overriding our loaded value. Disconnect it's idle event handler.
-    //    wnd->m_splitterComposed->Disconnect( wxEVT_IDLE, wxIdleEventHandler( wxEventMonitorLogPanelBase::m_splitterComposedOnIdle ), NULL, wnd );
-    //    wnd->m_splitterComposed->SetSashPosition(sashVal);
-    //}
+        int width;
+        if (RestoreValue(wxString::Format(wxT("Column%sWidth"), col.GetText().c_str()), &width))
+            wnd->m_log->SetColumnWidth(i, width);
+    }
 
     return true;
 }

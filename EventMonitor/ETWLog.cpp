@@ -1,0 +1,829 @@
+/*
+    Copyright 2015-2016 Amebis
+    Copyright 2016 GÉANT
+
+    This file is part of GÉANTLink.
+
+    GÉANTLink is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    GÉANTLink is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with GÉANTLink. If not, see <http://www.gnu.org/licenses/>.
+*/
+
+#include "StdAfx.h"
+
+#pragma comment(lib, "tdh.lib")
+#pragma comment(lib, "Ws2_32.lib")
+
+using namespace std;
+using namespace winstd;
+
+
+//////////////////////////////////////////////////////////////////////////
+// Local helper functions declarations
+//////////////////////////////////////////////////////////////////////////
+
+static tstring MapToString(_In_ const EVENT_MAP_INFO *pMapInfo, _In_ LPCBYTE pData);
+static tstring DataToString(_In_ USHORT InType, _In_ USHORT OutType, _In_count_(nDataSize) LPCBYTE pData, _In_ SIZE_T nDataSize, _In_ const EVENT_MAP_INFO *pMapInfo, _In_ BYTE nPtrSize);
+static ULONG GetArraySize(PEVENT_RECORD pEvent, PTRACE_EVENT_INFO pInfo, ULONG i, ULONG *pulArraySize);
+static tstring PropertyToString(PEVENT_RECORD pEvent, PTRACE_EVENT_INFO pInfo, ULONG ulPropIndex, LPWSTR pStructureName, ULONG ulStructIndex, BYTE nPtrSize);
+
+
+//////////////////////////////////////////////////////////////////////////
+// wxETWEvent
+//////////////////////////////////////////////////////////////////////////
+
+const EVENT_RECORD wxETWEvent::s_record_null = {};
+
+
+wxETWEvent::wxETWEvent(wxEventType type, const EVENT_RECORD &record) :
+    m_record(record),
+    wxEvent(0, type)
+{
+    DoSetExtendedData(record.ExtendedDataCount, record.ExtendedData);
+    DoSetUserData(record.UserDataLength, record.UserData);
+}
+
+
+wxETWEvent::wxETWEvent(const wxETWEvent& event) :
+    m_record(event.m_record),
+    wxEvent(event)
+{
+    DoSetExtendedData(event.m_record.ExtendedDataCount, event.m_record.ExtendedData);
+    DoSetUserData(event.m_record.UserDataLength, event.m_record.UserData);
+}
+
+
+wxETWEvent::~wxETWEvent()
+{
+    if (m_record.ExtendedData)
+        delete (unsigned char*)m_record.ExtendedData;
+
+    if (m_record.UserData)
+        delete (unsigned char*)m_record.UserData;
+}
+
+
+bool wxETWEvent::SetExtendedData(size_t extended_data_count, const EVENT_HEADER_EXTENDED_DATA_ITEM *extended_data)
+{
+    if (m_record.ExtendedData)
+        delete (unsigned char*)m_record.ExtendedData;
+
+    return DoSetExtendedData(extended_data_count, extended_data);
+}
+
+
+bool wxETWEvent::SetUserData(size_t user_data_length, const void *user_data)
+{
+    if (m_record.UserData)
+        delete (unsigned char*)m_record.UserData;
+
+    return DoSetUserData(user_data_length, user_data);
+}
+
+
+bool wxETWEvent::DoSetExtendedData(size_t extended_data_count, const EVENT_HEADER_EXTENDED_DATA_ITEM *extended_data)
+{
+    if (extended_data_count) {
+        wxASSERT_MSG(extended_data, wxT("extended data is NULL"));
+
+        // Count the total required memory.
+        size_t data_size = 0;
+        for (size_t i = 0; i < extended_data_count; i++)
+            data_size += extended_data[i].DataSize;
+
+        // Allocate memory for extended data.
+        m_record.ExtendedData = (EVENT_HEADER_EXTENDED_DATA_ITEM*)(new unsigned char[sizeof(EVENT_HEADER_EXTENDED_DATA_ITEM)*extended_data_count + data_size]);
+        wxCHECK_MSG(m_record.ExtendedData, false, wxT("extended data memory allocation failed"));
+
+        // Bulk-copy extended data descriptors.
+        memcpy(m_record.ExtendedData, extended_data, sizeof(EVENT_HEADER_EXTENDED_DATA_ITEM) * extended_data_count);
+
+        // Copy the data.
+        unsigned char *ptr = (unsigned char*)(m_record.ExtendedData + extended_data_count);
+        for (size_t i = 0; i < extended_data_count; i++) {
+            if (extended_data[i].DataSize) {
+                memcpy(ptr, (void*)(extended_data[i].DataPtr), extended_data[i].DataSize);
+                m_record.ExtendedData[i].DataPtr = (ULONGLONG)ptr;
+                ptr += extended_data[i].DataSize;
+            } else
+                m_record.ExtendedData[i].DataPtr = NULL;
+        }
+    } else
+        m_record.ExtendedData = NULL;
+
+    m_record.ExtendedDataCount = extended_data_count;
+
+    return true;
+}
+
+
+bool wxETWEvent::DoSetUserData(size_t user_data_length, const void *user_data)
+{
+    if (user_data_length) {
+        wxASSERT_MSG(user_data, wxT("user data is NULL"));
+
+        // Allocate memory for user data.
+        m_record.UserData = new unsigned char[user_data_length];
+        wxCHECK_MSG(m_record.UserData, false, wxT("user data memory allocation failed"));
+
+        // Copy user data.
+        memcpy(m_record.UserData, user_data, user_data_length);
+    } else
+        m_record.UserData = NULL;
+
+    m_record.UserDataLength = user_data_length;
+
+    return true;
+}
+
+
+IMPLEMENT_DYNAMIC_CLASS(wxETWEvent, wxEvent)
+wxDEFINE_EVENT(wxEVT_ETW_EVENT, wxETWEvent);
+
+
+//////////////////////////////////////////////////////////////////////////
+// wxEventTraceProcessorThread
+//////////////////////////////////////////////////////////////////////////
+
+wxEventTraceProcessorThread::wxEventTraceProcessorThread(wxEvtHandler *parent, const wxArrayString &sessions) :
+    m_parent(parent),
+    wxThread(wxTHREAD_JOINABLE)
+{
+    EVENT_TRACE_LOGFILE tlf = {};
+    tlf.ProcessTraceMode    = PROCESS_TRACE_MODE_REAL_TIME | PROCESS_TRACE_MODE_EVENT_RECORD;
+    tlf.EventRecordCallback = EventRecordCallback;
+    tlf.Context             = this;
+
+    for (size_t i = 0, i_end = sessions.GetCount(); i < i_end; i++) {
+        // Open trace.
+        tlf.LoggerName = (LPTSTR)(LPCTSTR)(sessions[i]);
+        event_trace trace;
+        if (!trace.create(&tlf)) {
+            wxLogError(_("Error opening event trace (error %u)."), GetLastError());
+            continue;
+        }
+
+        // Save trace to the table.
+        m_traces.push_back(trace.detach());
+    }
+}
+
+
+wxEventTraceProcessorThread::~wxEventTraceProcessorThread()
+{
+    for (vector<TRACEHANDLE>::iterator trace = m_traces.begin(), trace_end = m_traces.end(); trace != trace_end; ++trace) {
+        TRACEHANDLE &h = *trace;
+        if (h) {
+            // Close trace.
+            CloseTrace(h);
+        }
+    }
+}
+
+
+void wxEventTraceProcessorThread::Abort()
+{
+    for (vector<TRACEHANDLE>::iterator trace = m_traces.begin(), trace_end = m_traces.end(); trace != trace_end; ++trace) {
+        TRACEHANDLE &h = *trace;
+        if (h) {
+            // Close trace.
+            CloseTrace(h);
+            h = NULL;
+        }
+    }
+}
+
+
+wxThread::ExitCode wxEventTraceProcessorThread::Entry()
+{
+    // Process events.
+    ProcessTrace(m_traces.data(), (ULONG)m_traces.size(), NULL, NULL);
+
+    return 0;
+}
+
+
+VOID WINAPI wxEventTraceProcessorThread::EventRecordCallback(_In_ PEVENT_RECORD pEvent)
+{
+    wxASSERT_MSG(pEvent, wxT("event is NULL"));
+    wxASSERT_MSG(pEvent->UserContext, wxT("thread is NULL"));
+
+    wxEventTraceProcessorThread *_this = ((wxEventTraceProcessorThread*)pEvent->UserContext);
+
+    if (_this->TestDestroy()) {
+        // Event processing is pending destruction.
+        return;
+    }
+
+    _this->m_parent->QueueEvent(new wxETWEvent(wxEVT_ETW_EVENT, *pEvent));
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+// wxETWListCtrl
+//////////////////////////////////////////////////////////////////////////
+
+BEGIN_EVENT_TABLE(wxETWListCtrl, wxListCtrl)
+    EVT_ETW_EVENT(wxETWListCtrl::OnETWEvent)
+END_EVENT_TABLE()
+
+
+// {6EB8DB94-FE96-443F-A366-5FE0CEE7FB1C}
+const GUID wxETWListCtrl::s_provider_eaphost = { 0X6EB8DB94, 0XFE96, 0X443F, { 0XA3, 0X66, 0X5F, 0XE0, 0XCE, 0XE7, 0XFB, 0X1C } };
+
+
+wxETWListCtrl::wxETWListCtrl(wxWindow *parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxValidator& validator, const wxString& name) :
+    m_proc(NULL),
+    m_item_id(0),
+    wxListCtrl(parent, id, pos, size, style, validator, name)
+{
+    this->AppendColumn(_("Time"  ), wxLIST_FORMAT_LEFT, 100);
+    this->AppendColumn(_("PID"   ), wxLIST_FORMAT_LEFT, 50 );
+    this->AppendColumn(_("TID"   ), wxLIST_FORMAT_LEFT, 50 );
+    this->AppendColumn(_("Source"), wxLIST_FORMAT_LEFT, 100);
+    this->AppendColumn(_("Event" ), wxLIST_FORMAT_LEFT, wxLIST_AUTOSIZE_USEHEADER);
+
+    // Start a new session.
+    ULONG ulResult;
+    for (unsigned int i = 0; ; i++) {
+        //tstring log_file(tstring_printf(i ? _T("test.etl") : _T("test %u.etl"), i));
+        tstring name(tstring_printf(i ? _T(PRODUCT_NAME_STR) _T(" Event Monitor Session %u") : _T(PRODUCT_NAME_STR) _T(" Event Monitor Session"), i));
+
+        // Allocate session properties.
+        ULONG
+            ulSizeName    = (ULONG)((name    .length() + 1)*sizeof(TCHAR)),
+            //ulSizeLogFile = (ULONG)((log_file.length() + 1)*sizeof(TCHAR)),
+            ulSize        = sizeof(EVENT_TRACE_PROPERTIES) + ulSizeName /*+ ulSizeLogFile*/;
+        unique_ptr<EVENT_TRACE_PROPERTIES> properties((EVENT_TRACE_PROPERTIES*)new char[ulSize]);
+        wxASSERT_MSG(properties, wxT("error allocating session properties memory"));
+
+        // Initialize properties.
+        memset(properties.get(), 0, sizeof(EVENT_TRACE_PROPERTIES));
+        properties->Wnode.BufferSize    = ulSize;
+        properties->Wnode.Flags         = WNODE_FLAG_TRACED_GUID;
+        properties->Wnode.ClientContext = 1; //QPC clock resolution
+        CoCreateGuid(&(properties->Wnode.Guid));
+        properties->LogFileMode         = /*EVENT_TRACE_FILE_MODE_SEQUENTIAL |*/ EVENT_TRACE_REAL_TIME_MODE;
+        properties->MaximumFileSize     = 1;  // 1 MB
+        properties->LoggerNameOffset    = sizeof(EVENT_TRACE_PROPERTIES);
+        //properties->LogFileNameOffset   = sizeof(EVENT_TRACE_PROPERTIES) + ulSizeName;
+        //memcpy((LPTSTR)((char*)properties.get() + properties->LogFileNameOffset), log_file.c_str(), ulSizeLogFile);
+
+        if ((ulResult = m_session.create(name.c_str(), properties.get())) == ERROR_SUCCESS) {
+            break;
+        } else if (ulResult == ERROR_ACCESS_DENIED) {
+            wxLogError(_("Access denied creating event session: you need administrative privileges (Run As Administrator) or be a member of Performance Log Users group to start event tracing session."));
+            return;
+        } else if (ulResult == ERROR_ALREADY_EXISTS) {
+            wxLogDebug(_("The %s event session already exists."), name.c_str());
+            // Do not despair... Retry with a new session name and ID.
+            continue;
+        } else {
+            wxLogError(_("Error creating event session (error %u)."), ulResult);
+            return;
+        }
+    }
+
+    // Enable event providers we are interested in to log events to our session.
+    if ((ulResult = EnableTraceEx(
+        &EAPMETHOD_TRACE_EVENT_PROVIDER,
+        &((const EVENT_TRACE_PROPERTIES*)m_session)->Wnode.Guid,
+        m_session,
+        EVENT_CONTROL_CODE_ENABLE_PROVIDER,
+        TRACE_LEVEL_VERBOSE,
+        0, 0,
+        0,
+        NULL)) != ERROR_SUCCESS)
+    {
+        wxLogError(_("Error enabling event provider (error %u)."), ulResult);
+        return;
+    }
+    if ((ulResult = EnableTraceEx(
+        &s_provider_eaphost,
+        &((const EVENT_TRACE_PROPERTIES*)m_session)->Wnode.Guid,
+        m_session,
+        EVENT_CONTROL_CODE_ENABLE_PROVIDER,
+        TRACE_LEVEL_VERBOSE,
+        0, 0,
+        0,
+        NULL)) != ERROR_SUCCESS)
+    {
+        // If the EAPHost trace provider failed to enable, do not despair.
+        wxLogDebug(_("Error enabling EAPHost event provider (error %u)."), ulResult);
+    }
+
+    // Process events in separate thread, not to block wxWidgets' message pump.
+    wxArrayString sessions;
+    sessions.Add(m_session.name());
+    m_proc = new wxEventTraceProcessorThread(this->GetEventHandler(), sessions);
+    wxASSERT_MSG(m_proc, wxT("error allocating thread memory"));
+    if (m_proc->Run() != wxTHREAD_NO_ERROR) {
+        wxFAIL_MSG("Can't create the thread!");
+        delete m_proc;
+        m_proc = NULL;
+    }
+}
+
+
+wxETWListCtrl::~wxETWListCtrl()
+{
+    if (m_session) {
+        if (m_proc) {
+            m_proc->Abort();
+            m_proc->Delete();
+            delete m_proc;
+        }
+
+        // Disable event providers.
+        EnableTraceEx(
+                &s_provider_eaphost,
+                &((const EVENT_TRACE_PROPERTIES*)m_session)->Wnode.Guid,
+                m_session,
+                EVENT_CONTROL_CODE_DISABLE_PROVIDER,
+                TRACE_LEVEL_VERBOSE,
+                0, 0,
+                0,
+                NULL);
+
+        EnableTraceEx(
+                &EAPMETHOD_TRACE_EVENT_PROVIDER,
+                &((const EVENT_TRACE_PROPERTIES*)m_session)->Wnode.Guid,
+                m_session,
+                EVENT_CONTROL_CODE_DISABLE_PROVIDER,
+                TRACE_LEVEL_VERBOSE,
+                0, 0,
+                0,
+                NULL);
+    }
+}
+
+
+void wxETWListCtrl::OnETWEvent(wxETWEvent& event)
+{
+    EVENT_RECORD &rec = event.GetRecord();
+    bool is_ours = IsEqualGUID(rec.EventHeader.ProviderId, EAPMETHOD_TRACE_EVENT_PROVIDER) ? true : false;
+    int column = 0;
+
+    // Prepare item to insert into the list.
+    wxListItem item;
+    item.SetId(m_item_id++);
+    item.SetTextColour(
+        rec.EventHeader.EventDescriptor.Level >= TRACE_LEVEL_VERBOSE     ? (is_ours ? 0x888888 : 0xaaaaaa) :
+        rec.EventHeader.EventDescriptor.Level >= TRACE_LEVEL_INFORMATION ? (is_ours ? 0x000000 : 0x555555) :
+        rec.EventHeader.EventDescriptor.Level >= TRACE_LEVEL_WARNING     ? (is_ours ? 0x00aacc : 0x55ccdd) :
+                                                                           (is_ours ? 0x0000ff : 0x5555ff));
+    item.SetBackgroundColour(0xffffff);
+
+    {
+        // Output event time-stamp.
+        FILETIME ft;
+        ft.dwHighDateTime = rec.EventHeader.TimeStamp.HighPart;
+        ft.dwLowDateTime = rec.EventHeader.TimeStamp.LowPart;
+
+        SYSTEMTIME st, st_local;
+        FileTimeToSystemTime(&ft, &st);
+        SystemTimeToTzSpecificLocalTime(NULL, &st, &st_local);
+
+        ULONGLONG
+            ts = rec.EventHeader.TimeStamp.QuadPart,
+            nanosec = (ts % 10000000) * 100;
+
+        item.SetColumn(column++);
+        item.SetText(tstring_printf(_T("%04d-%02d-%02d %02d:%02d:%02d.%09I64u"),
+            st_local.wYear, st_local.wMonth, st_local.wDay, st_local.wHour, st_local.wMinute, st_local.wSecond, nanosec));
+        this->InsertItem(item);
+    }
+
+    // Output process ID.
+    item.SetColumn(column++);
+    item.SetText(wxString::Format(wxT("%u"), rec.EventHeader.ProcessId));
+    this->SetItem(item);
+
+    // Output thread ID.
+    item.SetColumn(column++);
+    item.SetText(wxString::Format(wxT("%u"), rec.EventHeader.ThreadId));
+    this->SetItem(item);
+
+    // Output event source.
+    item.SetColumn(column++);
+    item.SetText(is_ours ? wxT(PRODUCT_NAME_STR) : wxT("EAPHost"));
+    this->SetItem(item);
+
+    item.SetColumn(column++);
+    {
+        // Get event meta-info.
+        unique_ptr<TRACE_EVENT_INFO> info;
+        ULONG ulResult;
+        if ((ulResult = TdhGetEventInformation(&rec, 0, NULL, info)) == ERROR_SUCCESS) {
+            if (info->DecodingSource != DecodingSourceWPP) {
+                if (rec.EventHeader.Flags & EVENT_HEADER_FLAG_STRING_ONLY) {
+                    // This is a string-only event. Print it.
+                    item.SetText((LPCWSTR)rec.UserData);
+                } else {
+                    // This is not a string-only event. Prepare parameters.
+
+                    BYTE nPtrSize = (rec.EventHeader.Flags & EVENT_HEADER_FLAG_32_BIT_HEADER) ? 4 : 8;
+                    vector<tstring> props;
+                    vector<DWORD_PTR> props_msg;
+                    props.reserve(info->TopLevelPropertyCount);
+                    props_msg.reserve(info->TopLevelPropertyCount);
+                    for (ULONG i = 0; i < info->TopLevelPropertyCount; i++) {
+                        props.push_back(std::move(PropertyToString(&rec, info.get(), i, NULL, 0, nPtrSize)));
+                        props_msg.push_back((DWORD_PTR)props[i].c_str());
+                    }
+
+                    if (info->EventMessageOffset) {
+                        // Format the message.
+                        item.SetText(wstring_msg(0, (LPCTSTR)((LPCBYTE)info.get() + info->EventMessageOffset), props_msg.data()).c_str());
+                    }
+                }
+            } else if (info->EventMessageOffset) {
+                // This is a WPP event.
+                item.SetText((LPCWSTR)((LPCBYTE)info.get() + info->EventMessageOffset));
+            }
+        }
+    }
+    this->SetItem(item);
+
+    // Bring the record into view.
+    this->EnsureVisible(item.GetId());
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+// Local helper functions
+//////////////////////////////////////////////////////////////////////////
+
+static tstring MapToString(_In_ const EVENT_MAP_INFO *pMapInfo, _In_ LPCBYTE pData)
+{
+    if ( (pMapInfo->Flag &  EVENTMAP_INFO_FLAG_MANIFEST_VALUEMAP) ||
+        ((pMapInfo->Flag &  EVENTMAP_INFO_FLAG_WBEM_VALUEMAP    ) && (pMapInfo->Flag & ~EVENTMAP_INFO_FLAG_WBEM_VALUEMAP) != EVENTMAP_INFO_FLAG_WBEM_FLAG))
+    {
+        if ((pMapInfo->Flag & EVENTMAP_INFO_FLAG_WBEM_NO_MAP) == EVENTMAP_INFO_FLAG_WBEM_NO_MAP)
+            return tstring_printf(_T("%ls"), (PBYTE)pMapInfo + pMapInfo->MapEntryArray[*(PULONG)pData].OutputOffset);
+        else {
+            for (ULONG i = 0; ; i++) {
+                if (i >= pMapInfo->EntryCount)
+                    return tstring_printf(_T("%lu"), *(PULONG)pData);
+                else if (pMapInfo->MapEntryArray[i].Value == *(PULONG)pData)
+                    return tstring_printf(_T("%ls"), (PBYTE)pMapInfo + pMapInfo->MapEntryArray[i].OutputOffset);
+            }
+        }
+    } else if (
+         (pMapInfo->Flag &  EVENTMAP_INFO_FLAG_MANIFEST_BITMAP) ||
+         (pMapInfo->Flag &  EVENTMAP_INFO_FLAG_WBEM_BITMAP    ) ||
+        ((pMapInfo->Flag &  EVENTMAP_INFO_FLAG_WBEM_VALUEMAP  ) && (pMapInfo->Flag & ~EVENTMAP_INFO_FLAG_WBEM_VALUEMAP) == EVENTMAP_INFO_FLAG_WBEM_FLAG))
+    {
+        tstring out;
+
+        if (pMapInfo->Flag & EVENTMAP_INFO_FLAG_WBEM_NO_MAP) {
+            for (ULONG i = 0; i < pMapInfo->EntryCount; i++)
+                if (*(PULONG)pData & (1 << i))
+                    out.append(tstring_printf(out.empty() ? _T("%ls") : _T(" | %ls"), (PBYTE)pMapInfo + pMapInfo->MapEntryArray[i].OutputOffset));
+        } else {
+            for (ULONG i = 0; i < pMapInfo->EntryCount; i++)
+                if ((pMapInfo->MapEntryArray[i].Value & *(PULONG)pData) == pMapInfo->MapEntryArray[i].Value)
+                    out.append(tstring_printf(out.empty() ? _T("%ls") : _T(" | %ls"), (PBYTE)pMapInfo + pMapInfo->MapEntryArray[i].OutputOffset));
+        }
+
+        return out.empty() ? tstring_printf(_T("%lu"), *(PULONG)pData) : out;
+    }
+
+    return _T("<unknown map>");
+}
+
+
+static tstring DataToString(_In_ USHORT InType, _In_ USHORT OutType, _In_count_(nDataSize) LPCBYTE pData, _In_ SIZE_T nDataSize, _In_ const EVENT_MAP_INFO *pMapInfo, _In_ BYTE nPtrSize)
+{
+    assert(pData || !nDataSize);
+
+    switch (InType) {
+        case TDH_INTYPE_UNICODESTRING:
+        case TDH_INTYPE_NONNULLTERMINATEDSTRING:
+        case TDH_INTYPE_UNICODECHAR:
+            return tstring_printf(_T("%.*ls"), nDataSize/sizeof(WCHAR), pData);
+
+        case TDH_INTYPE_ANSISTRING:
+        case TDH_INTYPE_NONNULLTERMINATEDANSISTRING:
+        case TDH_INTYPE_ANSICHAR: {
+            // Convert strings from ANSI code page, all others (JSON, XML etc.) from UTF-8
+            wstring str;
+            MultiByteToWideChar(OutType == TDH_OUTTYPE_STRING ? CP_ACP : CP_UTF8, 0, (LPCSTR)pData, (int)nDataSize, str);
+            return tstring_printf(_T("%ls"), str.c_str());
+        }
+
+        case TDH_INTYPE_COUNTEDSTRING:
+            return DataToString(TDH_INTYPE_NONNULLTERMINATEDSTRING, OutType, (LPCBYTE)((PUSHORT)pData + 1), *(PUSHORT)pData, pMapInfo, nPtrSize);
+
+        case TDH_INTYPE_COUNTEDANSISTRING:
+            return DataToString(TDH_INTYPE_NONNULLTERMINATEDANSISTRING, OutType, (LPCBYTE)((PUSHORT)pData + 1), *(PUSHORT)pData, pMapInfo, nPtrSize);
+
+        case TDH_INTYPE_REVERSEDCOUNTEDSTRING:
+            return DataToString(TDH_INTYPE_NONNULLTERMINATEDSTRING, OutType, (LPCBYTE)((PUSHORT)pData + 1), MAKEWORD(HIBYTE(*(PUSHORT)pData), LOBYTE(*(PUSHORT)pData)), pMapInfo, nPtrSize);
+
+        case TDH_INTYPE_REVERSEDCOUNTEDANSISTRING:
+            return DataToString(TDH_INTYPE_NONNULLTERMINATEDANSISTRING, OutType, (LPCBYTE)((PUSHORT)pData + 1), MAKEWORD(HIBYTE(*(PUSHORT)pData), LOBYTE(*(PUSHORT)pData)), pMapInfo, nPtrSize);
+
+        case TDH_INTYPE_INT8:
+            assert(nDataSize >= sizeof(CHAR));
+            switch (OutType) {
+            case TDH_OUTTYPE_STRING: return DataToString(TDH_INTYPE_ANSICHAR, TDH_OUTTYPE_NULL, pData, nDataSize, pMapInfo, nPtrSize);
+            default                : return tstring_printf(_T("%hd"), *(PCHAR)pData);
+            }
+
+        case TDH_INTYPE_UINT8:
+            assert(nDataSize >= sizeof(BYTE));
+            switch (OutType) {
+            case TDH_OUTTYPE_STRING : return DataToString(TDH_INTYPE_ANSICHAR, TDH_OUTTYPE_NULL, pData, nDataSize, pMapInfo, nPtrSize);
+            case TDH_OUTTYPE_HEXINT8: return tstring_printf(_T("0x%x"), *(PBYTE)pData);
+            default                 : return tstring_printf(_T("%hu" ), *(PBYTE)pData);
+            }
+
+        case TDH_INTYPE_INT16:
+            assert(nDataSize >= sizeof(SHORT));
+            return tstring_printf(_T("%hd"), *(PSHORT)pData);
+
+        case TDH_INTYPE_UINT16:
+            assert(nDataSize >= sizeof(USHORT));
+            switch (OutType) {
+            case TDH_OUTTYPE_PORT    : return tstring_printf(_T("%hu" ), ntohs(*(PUSHORT)pData));
+            case TDH_OUTTYPE_HEXINT16: return tstring_printf(_T("0x%x"),       *(PUSHORT)pData );
+            case TDH_OUTTYPE_STRING  : return tstring_printf(_T("%lc" ),       *(PUSHORT)pData );
+            default                  : return tstring_printf(_T("%hu" ),       *(PUSHORT)pData );
+            }
+
+        case TDH_INTYPE_INT32:
+            assert(nDataSize >= sizeof(LONG));
+            switch (OutType) {
+            case TDH_OUTTYPE_HRESULT: return tstring_printf(_T("0x%x"), *(PLONG)pData);
+            default                 : return tstring_printf(_T("%ld" ), *(PLONG)pData);
+            }
+
+        case TDH_INTYPE_UINT32:
+            assert(nDataSize >= sizeof(ULONG));
+            switch (OutType) {
+                case TDH_OUTTYPE_HRESULT   :
+                case TDH_OUTTYPE_WIN32ERROR:
+                case TDH_OUTTYPE_NTSTATUS  :
+                case TDH_OUTTYPE_HEXINT32  : return tstring_printf(_T("0x%x"       ),  *(PULONG)pData);
+                case TDH_OUTTYPE_IPV4      : return tstring_printf(_T("%d.%d.%d.%d"), (*(PULONG)pData >> 0) & 0xff, (*(PULONG)pData >> 8) & 0xff, (*(PULONG)pData >> 16) & 0xff, (*(PULONG)pData >> 24) & 0xff);
+                default:                     return pMapInfo ? MapToString(pMapInfo, pData) : tstring_printf(_T("%lu"), *(PULONG)pData);
+            }
+
+        case TDH_INTYPE_HEXINT32:
+            return DataToString(TDH_INTYPE_UINT32, TDH_OUTTYPE_HEXINT32, pData, nDataSize, pMapInfo, nPtrSize);
+
+        case TDH_INTYPE_INT64:
+            assert(nDataSize >= sizeof(LONGLONG));
+            return tstring_printf(_T("%I64d"), *(PLONGLONG)pData);
+
+        case TDH_INTYPE_UINT64:
+            assert(nDataSize >= sizeof(ULONGLONG));
+            switch (OutType) {
+            case TDH_OUTTYPE_HEXINT64: return tstring_printf(_T("0x%I64x"), *(PULONGLONG)pData);
+            default                  : return tstring_printf(_T("%I64u"  ), *(PULONGLONG)pData);
+            }
+
+        case TDH_INTYPE_HEXINT64:
+            return DataToString(TDH_INTYPE_UINT64, TDH_OUTTYPE_HEXINT64, pData, nDataSize, pMapInfo, nPtrSize);
+
+        case TDH_INTYPE_FLOAT:
+            assert(nDataSize >= sizeof(FLOAT));
+            return tstring_printf(_T("%f"), *(PFLOAT)pData);
+
+        case TDH_INTYPE_DOUBLE:
+            assert(nDataSize >= sizeof(DOUBLE));
+            return tstring_printf(_T("%I64f"), *(DOUBLE*)pData);
+
+        case TDH_INTYPE_BOOLEAN:
+            assert(nDataSize >= sizeof(ULONG)); // Yes, boolean is really 32-bit.
+            return *(PULONG)pData ? _T("true") : _T("false");
+
+        case TDH_INTYPE_BINARY:
+            switch (OutType) {
+            case TDH_OUTTYPE_IPV6: {
+                auto RtlIpv6AddressToString = (LPTSTR(NTAPI*)(const IN6_ADDR*, LPTSTR))GetProcAddress(GetModuleHandle(_T("ntdll.dll")),
+#ifdef _UNICODE
+                    "RtlIpv6AddressToStringW"
+#else
+                    "RtlIpv6AddressToStringA"
+#endif
+                    );
+                if (RtlIpv6AddressToString) {
+                    TCHAR szIPv6Addr[47];
+                    RtlIpv6AddressToString((IN6_ADDR*)pData, szIPv6Addr);
+                    return tstring_printf(_T("%s"), szIPv6Addr);
+                } else
+                    return _T("<IPv6 address>");
+            }
+            default: {
+                tstring out;
+                for (SIZE_T i = 0; i < nDataSize; i++)
+                    out.append(tstring_printf(i ? _T(" %02x") : _T("%02x"), pData[i]));
+                return out;
+            }}
+
+        case TDH_INTYPE_HEXDUMP:
+            return DataToString(TDH_INTYPE_BINARY, TDH_OUTTYPE_NULL, pData, nDataSize, pMapInfo, nPtrSize);
+
+        case TDH_INTYPE_GUID: {
+            assert(nDataSize >= sizeof(GUID));
+            WCHAR szGuid[39];
+            StringFromGUID2(*(GUID*)pData, szGuid, _countof(szGuid));
+            return tstring_printf(_T("%ls"), szGuid);
+        }
+
+        case TDH_INTYPE_POINTER:
+            assert(nDataSize >= nPtrSize);
+            switch (nPtrSize) {
+            case sizeof(ULONG    ): return tstring_printf(_T("0x%08x"   ), *(PULONG    )pData);
+            case sizeof(ULONGLONG): return tstring_printf(_T("0x%016I64x"), *(PULONGLONG)pData);
+            default: // Unsupported pointer size.
+                assert(0);
+                return _T("<pointer>");
+            }
+
+        case TDH_INTYPE_SIZET:
+            assert(nDataSize >= nPtrSize);
+            switch (nPtrSize) {
+            case sizeof(ULONG    ): return tstring_printf(_T("%u"   ), *(PULONG    )pData);
+            case sizeof(ULONGLONG): return tstring_printf(_T("%I64u"), *(PULONGLONG)pData);
+            default: // Unsupported size_t size.
+                assert(0);
+                return _T("<size_t>");
+            }
+
+        case TDH_INTYPE_FILETIME: {
+            assert(nDataSize >= sizeof(FILETIME));
+            SYSTEMTIME st, st_local;
+            FileTimeToSystemTime((PFILETIME)pData, &st);
+            SystemTimeToTzSpecificLocalTime(NULL, &st, &st_local);
+            return DataToString(TDH_INTYPE_SYSTEMTIME, OutType, (LPCBYTE)&st_local, sizeof(st_local), pMapInfo, nPtrSize);
+        }
+
+        case TDH_INTYPE_SYSTEMTIME:
+            assert(nDataSize >= sizeof(SYSTEMTIME));
+            switch (OutType) {
+            case TDH_OUTTYPE_CULTURE_INSENSITIVE_DATETIME: return tstring_printf(_T("%04d-%02d-%02d %02d:%02d:%02d.%03u"), ((PSYSTEMTIME)pData)->wYear, ((PSYSTEMTIME)pData)->wMonth, ((PSYSTEMTIME)pData)->wDay, ((PSYSTEMTIME)pData)->wHour, ((PSYSTEMTIME)pData)->wMinute, ((PSYSTEMTIME)pData)->wSecond, ((PSYSTEMTIME)pData)->wMilliseconds);
+            default: {
+                tstring out;
+                return GetDateFormat(LOCALE_USER_DEFAULT, DATE_LONGDATE, (PSYSTEMTIME)pData, NULL, out) ? out : tstring(_T("<time>"));
+            }}
+
+        case TDH_INTYPE_WBEMSID:
+            // A WBEM SID is actually a TOKEN_USER structure followed 
+            // by the SID. The size of the TOKEN_USER structure differs 
+            // depending on whether the events were generated on a 32-bit 
+            // or 64-bit architecture. Also the structure is aligned
+            // on an 8-byte boundary, so its size is 8 bytes on a
+            // 32-bit computer and 16 bytes on a 64-bit computer.
+            // Doubling the pointer size handles both cases.
+            assert(nDataSize >= nPtrSize * 2);
+            return (PULONG)pData > 0 ? DataToString(TDH_INTYPE_SID, OutType, pData + nPtrSize * 2, nDataSize - nPtrSize * 2, pMapInfo, nPtrSize) : _T("<WBEM SID>");
+
+        case TDH_INTYPE_SID: {
+            assert(nDataSize >= sizeof(SID));
+            tstring user_name, domain_name;
+            SID_NAME_USE eNameUse;
+            if (LookupAccountSid(NULL, (PSID)pData, &user_name, &domain_name, &eNameUse))
+                return tstring_printf(_T("%s\\%s"), domain_name.c_str(), user_name.c_str());
+            else {
+                unique_ptr<TCHAR[], LocalFree_delete<TCHAR[]> > sid;
+                if (GetLastError() == ERROR_NONE_MAPPED &&
+                    ConvertSidToStringSid((PSID)pData, (LPTSTR*)&sid))
+                    return tstring_printf(_T("%s"), sid.get());
+                else
+                    return _T("<SID>");
+            }
+        }
+
+    default:
+        // It is not actually an error if we do not understand the given data type.
+        assert(0);
+        return _T("<unknown data type>");
+    }
+}
+
+
+static ULONG GetArraySize(PEVENT_RECORD pEvent, PTRACE_EVENT_INFO pInfo, ULONG i, ULONG *pulArraySize)
+{
+    if (pInfo->EventPropertyInfoArray[i].Flags & PropertyParamCount) {
+        ULONG ulResult;
+
+        // Get array count property.
+        PROPERTY_DATA_DESCRIPTOR data_desc = { (ULONGLONG)((LPBYTE)pInfo + pInfo->EventPropertyInfoArray[pInfo->EventPropertyInfoArray[i].countPropertyIndex].NameOffset), ULONG_MAX };
+        vector<unsigned char> count;
+        if ((ulResult = TdhGetProperty(pEvent, 0, NULL, 1, &data_desc, count)) != ERROR_SUCCESS)
+            return ulResult;
+
+        // Copy count value to output.
+        switch (count.size()) {
+        case sizeof(BYTE  ): *pulArraySize = *(const BYTE*  )count.data(); break;
+        case sizeof(USHORT): *pulArraySize = *(const USHORT*)count.data(); break;
+        case sizeof(ULONG ): *pulArraySize = *(const ULONG* )count.data(); break;
+        default            : return ERROR_MORE_DATA;
+        }
+    } else
+        *pulArraySize = pInfo->EventPropertyInfoArray[i].count;
+
+    return ERROR_SUCCESS;
+}
+
+
+static tstring PropertyToString(PEVENT_RECORD pEvent, PTRACE_EVENT_INFO pInfo, ULONG ulPropIndex, LPWSTR pStructureName, ULONG ulStructIndex, BYTE nPtrSize)
+{
+    ULONG ulResult;
+
+    // Get the size of the array if the property is an array.
+    ULONG ulArraySize = 0;
+    if ((ulResult = GetArraySize(pEvent, pInfo, ulPropIndex, &ulArraySize)) != ERROR_SUCCESS)
+        return tstring_printf(_T("<Error getting array size (error %u)>"), ulResult);;
+
+    tstring out;
+
+    if (ulArraySize > 1)
+        out += tstring_printf(_T("[%u]("), ulArraySize);
+
+    for (ULONG k = 0; k < ulArraySize; k++) {
+        if (pInfo->EventPropertyInfoArray[ulPropIndex].Flags & PropertyStruct) {
+            // The property is a structure: print the members of the structure.
+            tstring out;
+            out += _T('(');
+            for (USHORT j = pInfo->EventPropertyInfoArray[ulPropIndex].structType.StructStartIndex, usLastMember = pInfo->EventPropertyInfoArray[ulPropIndex].structType.StructStartIndex + pInfo->EventPropertyInfoArray[ulPropIndex].structType.NumOfStructMembers; j < usLastMember; j++) {
+                out += tstring_printf(_T("%ls: "), (LPBYTE)pInfo + pInfo->EventPropertyInfoArray[j].NameOffset);
+                out += PropertyToString(pEvent, pInfo, j, (LPWSTR)((LPBYTE)(pInfo) + pInfo->EventPropertyInfoArray[ulPropIndex].NameOffset), k, nPtrSize);
+            }
+            out += _T(')');
+        } else {
+            if (pInfo->EventPropertyInfoArray[ulPropIndex].nonStructType.InType  == TDH_INTYPE_BINARY &&
+                pInfo->EventPropertyInfoArray[ulPropIndex].nonStructType.OutType == TDH_OUTTYPE_IPV6)
+            {
+                // The TDH API does not support IPv6 addresses. If the output type is TDH_OUTTYPE_IPV6,
+                // you will not be able to consume the rest of the event. If you try to consume the
+                // remainder of the event, you will get ERROR_EVT_INVALID_EVENT_DATA.
+                return _T("<The event contains an IPv6 address. Skipping.>");
+            } else {
+                vector<BYTE> data;
+                if (pStructureName) {
+                    // To retrieve a member of a structure, you need to specify an array of descriptors. 
+                    // The first descriptor in the array identifies the name of the structure and the second 
+                    // descriptor defines the member of the structure whose data you want to retrieve. 
+                    PROPERTY_DATA_DESCRIPTOR data_desc[2] = {
+                        { (ULONGLONG)pStructureName                                                         , ulStructIndex },
+                        { (ULONGLONG)((LPBYTE)pInfo + pInfo->EventPropertyInfoArray[ulPropIndex].NameOffset), k             }
+                    };
+                    ulResult = TdhGetProperty(pEvent, 0, NULL, _countof(data_desc), data_desc, data);
+                } else {
+                    PROPERTY_DATA_DESCRIPTOR data_desc = { (ULONGLONG)((LPBYTE)pInfo + pInfo->EventPropertyInfoArray[ulPropIndex].NameOffset), k };
+                    ulResult = TdhGetProperty(pEvent, 0, NULL, 1, &data_desc, data);
+                }
+                if (ulResult == ERROR_EVT_INVALID_EVENT_DATA) {
+                    // This happens with empty/NULL data. Not an error actually.
+                    assert(data.empty());
+                } else if (ulResult != ERROR_SUCCESS)
+                    return tstring_printf(_T("<Error getting property (error %u)>"), ulResult);
+
+                // Get the name/value mapping if the property specifies a value map.
+                unique_ptr<EVENT_MAP_INFO> map_info;
+                ulResult = TdhGetEventMapInformation(pEvent, (LPWSTR)((LPBYTE)pInfo + pInfo->EventPropertyInfoArray[ulPropIndex].nonStructType.MapNameOffset), map_info);
+                if (ulResult == ERROR_NOT_FOUND) {
+                    // name/value mapping not found. Not an error actually.
+                    assert(!map_info);
+                } else if (ulResult != ERROR_SUCCESS)
+                    return tstring_printf(_T("<Error getting map information (error %u)>"), ulResult);
+                else if (pInfo->DecodingSource == DecodingSourceXMLFile) {
+                    // The mapped string values defined in a manifest will contain a trailing space
+                    // in the EVENT_MAP_ENTRY structure. Replace the trailing space with a null-
+                    // terminating character, so that the bit mapped strings are correctly formatted.
+                    for (ULONG i = 0; i < map_info->EntryCount; i++) {
+                        SIZE_T len = _tcslen((LPCTSTR)((PBYTE)map_info.get() + map_info->MapEntryArray[i].OutputOffset)) - 1;
+                        ((LPWSTR)((PBYTE)map_info.get() + map_info->MapEntryArray[i].OutputOffset))[len] = 0;
+                    }
+                }
+
+                if (!out.empty()) out += _T(", ");
+                out += !data.empty() ? DataToString(
+                    pInfo->EventPropertyInfoArray[ulPropIndex].nonStructType.InType,
+                    pInfo->EventPropertyInfoArray[ulPropIndex].nonStructType.OutType,
+                    data.data(),
+                    data.size(),
+                    map_info.get(),
+                    nPtrSize) : _T("<null>");
+            }
+        }
+    }
+
+    if (ulArraySize > 1)
+        out += _T(')');
+
+    return out;
+}

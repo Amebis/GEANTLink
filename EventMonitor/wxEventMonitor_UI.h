@@ -11,6 +11,8 @@
 #include <wx/artprov.h>
 #include <wx/xrc/xmlres.h>
 #include <wx/intl.h>
+class wxETWListCtrl;
+
 #include <wx/string.h>
 #include <wx/bitmap.h>
 #include <wx/image.h>
@@ -66,7 +68,7 @@ class wxEventMonitorLogPanelBase : public wxPanel
 	private:
 	
 	protected:
-		wxListCtrl* m_log;
+		wxETWListCtrl* m_log;
 	
 	public:
 		

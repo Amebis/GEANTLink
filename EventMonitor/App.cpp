@@ -18,7 +18,7 @@
     along with GÉANTLink. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #if defined(__WXMSW__)
 #pragma comment(lib, "msi.lib")
 #endif

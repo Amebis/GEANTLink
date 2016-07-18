@@ -7,6 +7,8 @@
 
 #include "StdAfx.h"
 
+#include "ETWLog.h"
+
 #include "wxEventMonitor_UI.h"
 
 ///////////////////////////////////////////////////////////////////////////
@@ -58,7 +60,7 @@ wxEventMonitorLogPanelBase::wxEventMonitorLogPanelBase( wxWindow* parent, wxWind
 	wxBoxSizer* bSizerMain;
 	bSizerMain = new wxBoxSizer( wxVERTICAL );
 	
-	m_log = new wxListCtrl( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_ALIGN_TOP|wxLC_AUTOARRANGE|wxLC_NO_SORT_HEADER|wxLC_REPORT|wxLC_SINGLE_SEL|wxNO_BORDER );
+	m_log = new wxETWListCtrl( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_NO_SORT_HEADER|wxLC_REPORT|wxLC_SINGLE_SEL|wxNO_BORDER );
 	bSizerMain->Add( m_log, 1, wxEXPAND, 5 );
 	
 	
