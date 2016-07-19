@@ -103,10 +103,14 @@ bool eap::credentials::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppE
     assert(pConfigRoot);
     DWORD dwResult;
 
+    std::wstring xpath(eapxml::get_xpath(pConfigRoot));
+
     if ((dwResult = eapxml::get_element_value(pConfigRoot, bstr(L"eap-metadata:UserName"), m_identity)) != ERROR_SUCCESS) {
         *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error reading <UserName> element."), _T("Please make sure profile XML is a valid ") _T(PRODUCT_NAME_STR) _T(" profile XML document."));
         return false;
     }
+
+    m_module.log_config((xpath + L"/UserName").c_str(), m_identity.c_str());
 
     return true;
 }
@@ -199,6 +203,8 @@ bool eap::credentials_pass::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR 
     if (!credentials::load(pConfigRoot, ppEapError))
         return false;
 
+    std::wstring xpath(eapxml::get_xpath(pConfigRoot));
+
     bstr pass;
     if ((dwResult = eapxml::get_element_value(pConfigRoot, bstr(L"eap-metadata:Password"), &pass)) != ERROR_SUCCESS) {
         *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error reading <Password> element."), _T("Please make sure profile XML is a valid ") _T(PRODUCT_NAME_STR) _T(" profile XML document."));
@@ -206,6 +212,14 @@ bool eap::credentials_pass::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR 
     }
     m_password = pass;
     SecureZeroMemory((BSTR)pass, sizeof(OLECHAR)*pass.length());
+
+    m_module.log_config((xpath + L"/Password").c_str(),
+#ifdef _DEBUG
+        m_password.c_str()
+#else
+        L"********"
+#endif
+        );
 
     return true;
 }
@@ -285,6 +299,16 @@ bool eap::credentials_pass::retrieve(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR
         m_identity = cred->UserName;
     else
         m_identity.clear();
+
+    wstring xpath(pszTargetName);
+    m_module.log_config((xpath + L"/Username").c_str(), m_identity.c_str());
+    m_module.log_config((xpath + L"/Password").c_str(),
+#ifdef _DEBUG
+        m_password.c_str()
+#else
+        L"********"
+#endif
+        );
 
     return true;
 }

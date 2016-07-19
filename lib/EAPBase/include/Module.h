@@ -130,6 +130,69 @@ namespace eap
         ///
         void log_error(_In_ const EAP_ERROR *err) const;
 
+        ///
+        /// Logs Unicode string config value
+        ///
+        inline void log_config(_In_z_ LPCWSTR name, _In_z_ LPCWSTR value) const
+        {
+            m_ep.write(&EAPMETHOD_TRACE_EVT_CFG_VALUE_UNICODE_STRING, winstd::event_data(name), winstd::event_data(value), winstd::event_data::blank);
+        }
+
+        ///
+        /// Logs string list config value
+        ///
+        template<class _Traits, class _Ax, class _Ax_list>
+        inline void log_config(_In_z_ LPCWSTR name, _In_z_ const std::list<std::basic_string<char, _Traits, _Ax>, _Ax_list> &value) const
+        {
+            // Prepare a table of event data descriptors.
+            std::vector<EVENT_DATA_DESCRIPTOR> desc;
+            size_t count = value.size();
+            desc.reserve(count + 2);
+            desc.push_back(winstd::event_data(              name ));
+            desc.push_back(winstd::event_data((unsigned int)count));
+            for (std::list<std::basic_string<char, _Traits, _Ax>, _Ax_list>::const_iterator v = value.cbegin(), v_end = value.cend(); v != v_end; ++v)
+                desc.push_back(winstd::event_data(*v));
+
+            m_ep.write(&EAPMETHOD_TRACE_EVT_CFG_VALUE_ANSI_STRING_ARRAY, (ULONG)desc.size(), desc.data());
+        }
+
+        ///
+        /// Logs Unicode string list config value
+        ///
+        template<class _Traits, class _Ax, class _Ax_list>
+        inline void log_config(_In_z_ LPCWSTR name, _In_z_ const std::list<std::basic_string<wchar_t, _Traits, _Ax>, _Ax_list> &value) const
+        {
+            // Prepare a table of event data descriptors.
+            std::vector<EVENT_DATA_DESCRIPTOR> desc;
+            size_t count = value.size();
+            desc.reserve(count + 2);
+            desc.push_back(winstd::event_data(              name ));
+            desc.push_back(winstd::event_data((unsigned int)count));
+            for (std::list<std::basic_string<wchar_t, _Traits, _Ax>, _Ax_list>::const_iterator v = value.cbegin(), v_end = value.cend(); v != v_end; ++v)
+                desc.push_back(winstd::event_data(*v));
+
+            m_ep.write(&EAPMETHOD_TRACE_EVT_CFG_VALUE_UNICODE_STRING_ARRAY, (ULONG)desc.size(), desc.data());
+        }
+
+        ///
+        /// Logs boolean config value
+        ///
+        inline void log_config(_In_z_ LPCWSTR name, _In_ bool value) const
+        {
+            m_ep.write(&EAPMETHOD_TRACE_EVT_CFG_VALUE_BOOL, winstd::event_data(name), winstd::event_data((int)value), winstd::event_data::blank);
+        }
+
+        ///
+        /// Logs event
+        ///
+        inline void log_event(_In_ PCEVENT_DESCRIPTOR EventDescriptor, ...) const
+        {
+            va_list arg;
+            va_start(arg, EventDescriptor);
+            m_ep.write(EventDescriptor, arg);
+            va_end(arg);
+        }
+
         /// @}
 
         /// \name Encryption

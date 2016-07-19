@@ -389,11 +389,15 @@ namespace eap
             // <ClientSideCredential>
             winstd::com_obj<IXMLDOMElement> pXmlElClientSideCredential;
             if (eapxml::select_element(pConfigRoot, winstd::bstr(L"eap-metadata:ClientSideCredential"), &pXmlElClientSideCredential) == ERROR_SUCCESS) {
+                std::wstring xpath(eapxml::get_xpath(pXmlElClientSideCredential));
+
                 // <allow-save>
                 eapxml::get_element_value(pXmlElClientSideCredential, winstd::bstr(L"eap-metadata:allow-save"), &m_allow_save);
+                m_module.log_config((xpath + L"/allow-save").c_str(), m_allow_save);
 
                 // <AnonymousIdentity>
                 eapxml::get_element_value(pXmlElClientSideCredential, winstd::bstr(L"eap-metadata:AnonymousIdentity"), m_anonymous_identity);
+                m_module.log_config((xpath + L"/AnonymousIdentity").c_str(), m_anonymous_identity.c_str());
 
                 if (!m_preshared.load(pXmlElClientSideCredential, ppEapError)) {
                     // This is not really an error - merely an indication pre-shared credentials are unavailable.
@@ -687,14 +691,17 @@ namespace eap
             DWORD dwResult;
             std::wstring lang;
             LoadString(m_module.m_instance, 2, lang);
+            std::wstring xpath(eapxml::get_xpath(pConfigRoot));
 
             // <read-only>
             if ((dwResult = eapxml::get_element_value(pConfigRoot, winstd::bstr(L"eap-metadata:read-only"), &m_read_only)) != ERROR_SUCCESS)
                 m_read_only = true;
+            m_module.log_config((xpath + L"/read-only").c_str(), m_read_only);
 
             // <ID>
             m_id.clear();
             eapxml::get_element_value(pConfigRoot, winstd::bstr(L"eap-metadata:ID"), m_id);
+            m_module.log_config((xpath + L"/ID").c_str(), m_id.c_str());
 
             // <ProviderInfo>
             m_name.clear();
@@ -706,29 +713,40 @@ namespace eap
             m_lbl_alt_password.clear();
             winstd::com_obj<IXMLDOMElement> pXmlElProviderInfo;
             if (eapxml::select_element(pConfigRoot, winstd::bstr(L"eap-metadata:ProviderInfo"), &pXmlElProviderInfo) == ERROR_SUCCESS) {
+                std::wstring xpathProviderInfo(xpath + L"/ProviderInfo");
+
                 // <DisplayName>
                 eapxml::get_element_localized(pXmlElProviderInfo, winstd::bstr(L"eap-metadata:DisplayName"), lang.c_str(), m_name);
+                m_module.log_config((xpathProviderInfo + L"/DisplayName").c_str(), m_name.c_str());
 
                 winstd::com_obj<IXMLDOMElement> pXmlElHelpdesk;
                 if (eapxml::select_element(pXmlElProviderInfo, winstd::bstr(L"eap-metadata:Helpdesk"), &pXmlElHelpdesk) == ERROR_SUCCESS) {
+                    std::wstring xpathHelpdesk(xpathProviderInfo + L"/Helpdesk");
+
                     // <Helpdesk>/<EmailAddress>
                     eapxml::get_element_localized(pXmlElHelpdesk, winstd::bstr(L"eap-metadata:EmailAddress"), lang.c_str(), m_help_email);
+                    m_module.log_config((xpathHelpdesk + L"/EmailAddress").c_str(), m_help_email.c_str());
 
                     // <Helpdesk>/<WebAddress>
                     eapxml::get_element_localized(pXmlElHelpdesk, winstd::bstr(L"eap-metadata:WebAddress"), lang.c_str(), m_help_web);
+                    m_module.log_config((xpathHelpdesk + L"/WebAddress").c_str(), m_help_web.c_str());
 
                     // <Helpdesk>/<Phone>
                     eapxml::get_element_localized(pXmlElHelpdesk, winstd::bstr(L"eap-metadata:Phone"), lang.c_str(), m_help_phone);
+                    m_module.log_config((xpathHelpdesk + L"/Phone").c_str(), m_help_phone.c_str());
                 }
 
                 // <CredentialPrompt>
                 eapxml::get_element_localized(pXmlElProviderInfo, winstd::bstr(L"eap-metadata:CredentialPrompt"), lang.c_str(), m_lbl_alt_credential);
+                m_module.log_config((xpathProviderInfo + L"/CredentialPrompt").c_str(), m_lbl_alt_credential.c_str());
 
                 // <UserNameLabel>
                 eapxml::get_element_localized(pXmlElProviderInfo, winstd::bstr(L"eap-metadata:UserNameLabel"), lang.c_str(), m_lbl_alt_identity);
+                m_module.log_config((xpathProviderInfo + L"/UserNameLabel").c_str(), m_lbl_alt_identity.c_str());
 
                 // <PasswordLabel>
                 eapxml::get_element_localized(pXmlElProviderInfo, winstd::bstr(L"eap-metadata:PasswordLabel"), lang.c_str(), m_lbl_alt_password);
+                m_module.log_config((xpathProviderInfo + L"/PasswordLabel").c_str(), m_lbl_alt_password.c_str());
             }
 
             // Iterate authentication methods (<AuthenticationMethods>).

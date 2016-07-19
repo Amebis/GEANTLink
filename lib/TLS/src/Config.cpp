@@ -179,12 +179,16 @@ bool eap::config_tls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEa
     if (!config_method<credentials_tls>::load(pConfigRoot, ppEapError))
         return false;
 
+    std::wstring xpath(eapxml::get_xpath(pConfigRoot));
+
     m_trusted_root_ca.clear();
     m_server_names.clear();
 
     // <ServerSideCredential>
     com_obj<IXMLDOMElement> pXmlElServerSideCredential;
     if (eapxml::select_element(pConfigRoot, bstr(L"eap-metadata:ServerSideCredential"), &pXmlElServerSideCredential) == ERROR_SUCCESS) {
+        std::wstring xpathServerSideCredential(xpath + L"/ServerSideCredential");
+
         // <CA>
         com_obj<IXMLDOMNodeList> pXmlListCAs;
         long lCACount = 0;
@@ -212,6 +216,12 @@ bool eap::config_tls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEa
 
                 add_trusted_ca(X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, aData.data(), (DWORD)aData.size());
             }
+
+            // Log loaded CA certificates.
+            list<tstring> cert_names;
+            for (std::list<winstd::cert_context>::const_iterator cert = m_trusted_root_ca.cbegin(), cert_end = m_trusted_root_ca.cend(); cert != cert_end; ++cert)
+                cert_names.push_back(std::move(eap::get_cert_title(*cert)));
+            m_module.log_config((xpathServerSideCredential + L"/CA").c_str(), cert_names);
         }
 
         // <ServerName>
@@ -229,8 +239,10 @@ bool eap::config_tls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEa
                 string str;
                 WideCharToMultiByte(CP_UTF8, 0, bstrServerID, bstrServerID.length(), str, NULL, NULL);
 
-                    m_server_names.push_back(str);
+                m_server_names.push_back(str);
             }
+
+            m_module.log_config((xpathServerSideCredential + L"/ServerName").c_str(), m_server_names);
         }
     }
 

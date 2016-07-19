@@ -130,6 +130,8 @@ bool eap::config_ttls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppE
     if (!config_tls::load(pConfigRoot, ppEapError))
         return false;
 
+    std::wstring xpath(eapxml::get_xpath(pConfigRoot));
+
     // Load inner authentication configuration (<InnerAuthenticationMethod>).
     com_obj<IXMLDOMElement> pXmlElInnerAuthenticationMethod;
     if ((dwResult = eapxml::select_element(pConfigRoot, bstr(L"eap-metadata:InnerAuthenticationMethod"), &pXmlElInnerAuthenticationMethod)) != ERROR_SUCCESS) {
@@ -150,6 +152,7 @@ bool eap::config_ttls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppE
         CompareStringEx(LOCALE_NAME_INVARIANT, NORM_IGNORECASE, bstrMethod, bstrMethod.length(), L"PAP", -1, NULL, NULL, 0) == CSTR_EQUAL)
     {
         // PAP
+        m_module.log_config((xpath + L"/NonEAPAuthMethod").c_str(), L"PAP");
         assert(!m_inner);
         m_inner = new eap::config_pap(m_module);
         if (!m_inner->load(pXmlElInnerAuthenticationMethod, ppEapError))

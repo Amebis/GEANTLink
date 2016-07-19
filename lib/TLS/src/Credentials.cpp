@@ -137,6 +137,8 @@ bool eap::credentials_tls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR *
     //if (!credentials::load(pConfigRoot, ppEapError))
     //    return false;
 
+    std::wstring xpath(eapxml::get_xpath(pConfigRoot));
+
     m_identity.clear();
     m_cert.free();
 
@@ -161,6 +163,7 @@ bool eap::credentials_tls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR *
             }
         }
     }
+    m_module.log_config((xpath + L"/ClientCertificate").c_str(), m_cert ? eap::get_cert_title(m_cert).c_str() : L"<blank>");
 
     return true;
 }
@@ -237,6 +240,8 @@ bool eap::credentials_tls::retrieve(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR 
 
     // Generate identity. TODO: Find which CERT_NAME_... constant returns valid identity (username@domain or DOMAIN\Username).
     CertGetNameString(m_cert, CERT_NAME_SIMPLE_DISPLAY_TYPE, 0, NULL, m_identity);
+
+    m_module.log_config((wstring(pszTargetName) + L"/Certificate").c_str(), m_identity.c_str());
 
     return true;
 }
