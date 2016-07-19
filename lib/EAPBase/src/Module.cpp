@@ -122,7 +122,7 @@ void eap::module::log_error(_In_ const EAP_ERROR *err) const
     evt_desc.push_back(event_data(&(err->helpLinkGuid), sizeof(GUID)));
     evt_desc.push_back(event_data(err->pRootCauseString));
     evt_desc.push_back(event_data(err->pRepairString));
-    m_ep.write(&EAPMETHOD_TRACE_EAP_ERROR, (ULONG)evt_desc.size(), evt_desc.data());
+    m_ep.write(&EAPMETHOD_TRACE_EVT_EAP_ERROR, (ULONG)evt_desc.size(), evt_desc.data());
 }
 
 
