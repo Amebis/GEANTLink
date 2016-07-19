@@ -48,6 +48,7 @@ namespace eapxml
     inline DWORD put_element_value(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _In_ bool bValue);
     inline DWORD put_element_base64(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _In_count_(nValueLen) LPCVOID pValue, _In_ SIZE_T nValueLen);
     inline DWORD put_element_hex(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _In_count_(nValueLen) LPCVOID pValue, _In_ SIZE_T nValueLen);
+    inline std::wstring get_xpath(_In_ IXMLDOMNode *pXmlNode);
 }
 
 #pragma once
@@ -384,5 +385,19 @@ namespace eapxml
         winstd::hex_enc enc;
         enc.encode(sHex, pValue, nValueLen);
         return put_element_value(pDoc, pCurrentDOMNode, bstrElementName, bstrNamespace, winstd::bstr(sHex));
+    }
+
+
+    inline std::wstring get_xpath(_In_ IXMLDOMNode *pXmlNode)
+    {
+        if (pXmlNode) {
+            winstd::bstr bstr;
+            winstd::com_obj<IXMLDOMNode> pXmlNodeParent;
+
+            return
+                SUCCEEDED(pXmlNode->get_nodeName(&bstr)) ?
+                SUCCEEDED(pXmlNode->get_parentNode(&pXmlNodeParent)) ? get_xpath(pXmlNodeParent) + L"/" + (LPCWSTR)bstr : (LPCWSTR)bstr : L"?";
+        } else
+            return L"";
     }
 }
