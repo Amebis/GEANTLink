@@ -382,11 +382,8 @@ protected:
         }
 
         // Populate trusted CA list.
-        for (std::list<winstd::cert_context>::const_iterator cert = m_cfg.m_trusted_root_ca.cbegin(), cert_end = m_cfg.m_trusted_root_ca.cend(); cert != cert_end; ++cert) {
-            winstd::tstring name;
-            if (CertGetNameString(*cert, CERT_NAME_SIMPLE_DISPLAY_TYPE, 0, NULL, name) > 0)
-                m_root_ca->Append(wxString(name), new wxCertificateClientData(cert->duplicate()));
-        }
+        for (std::list<winstd::cert_context>::const_iterator cert = m_cfg.m_trusted_root_ca.cbegin(), cert_end = m_cfg.m_trusted_root_ca.cend(); cert != cert_end; ++cert)
+            m_root_ca->Append(wxString(eap::get_cert_title(*cert)), new wxCertificateClientData(cert->duplicate()));
 
         // Set server acceptable names. The edit control will get populated by validator.
         m_server_names_val = m_cfg.m_server_names;
@@ -517,16 +514,11 @@ protected:
         }
 
         // Add certificate to the list.
-        winstd::tstring name;
-        if (CertGetNameString(cert, CERT_NAME_SIMPLE_DISPLAY_TYPE, 0, NULL, name) > 0) {
-            int i = m_root_ca->Append(wxString(name), new wxCertificateClientData(CertDuplicateCertificateContext(cert)));
-            if (0 <= i) {
-                m_root_ca->SetSelection(i);
-            }
-            return true;
-        }
+        int i = m_root_ca->Append(wxString(eap::get_cert_title(cert)), new wxCertificateClientData(CertDuplicateCertificateContext(cert)));
+        if (0 <= i)
+            m_root_ca->SetSelection(i);
 
-        return false;
+        return true;
     }
 
 protected:
