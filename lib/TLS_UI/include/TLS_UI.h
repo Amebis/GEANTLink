@@ -27,8 +27,8 @@
 #include <wx/filedlg.h>
 #include <wx/msgdlg.h>
 
-#include <cryptuiapi.h>
 #include <Windows.h>
+#include <cryptuiapi.h>
 #include <WinCrypt.h> // Must include after <Windows.h>
 
 #include <list>
@@ -74,14 +74,6 @@ template <class _Tprov> class wxEAPTLSCredentialsConfigPanel;
 /// EAPTLS configuration panel
 ///
 template <class _Tprov> class wxEAPTLSConfigPanel;
-
-namespace eap
-{
-    ///
-    /// Helper function to compile human-readable certificate name for UI display
-    ///
-    void get_cert_title(PCCERT_CONTEXT cert, winstd::tstring &title);
-}
 
 #pragma once
 
@@ -297,8 +289,7 @@ protected:
                     m_cred.m_cert &&
                     m_cred.m_cert->cbCertEncoded == data->m_cert->cbCertEncoded &&
                     memcmp(m_cred.m_cert->pbCertEncoded, data->m_cert->pbCertEncoded, m_cred.m_cert->cbCertEncoded) == 0;
-                winstd::tstring name;
-                eap::get_cert_title(cert, name);
+                winstd::tstring name(std::move(eap::get_cert_title(cert)));
                 int i = m_cert_select_val->Append(name, data.release());
                 if (is_selected) {
                     m_cert_select_val->SetSelection(i);

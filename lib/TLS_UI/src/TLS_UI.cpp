@@ -20,44 +20,7 @@
 
 #include "StdAfx.h"
 
-#pragma comment(lib, "Cryptui.lib")
 #pragma comment(lib, "Crypt32.lib")
-
-
-//////////////////////////////////////////////////////////////////////
-// eap::get_cert_title
-//////////////////////////////////////////////////////////////////////
-
-void eap::get_cert_title(PCCERT_CONTEXT cert, winstd::tstring &title)
-{
-    winstd::tstring name, str, issuer;
-    FILETIME ft;
-    SYSTEMTIME st;
-
-    title.clear();
-
-    // Prepare certificate information
-    CertGetNameString(cert, CERT_NAME_SIMPLE_DISPLAY_TYPE, 0, NULL, name);
-    title += name;
-
-    FileTimeToLocalFileTime(&(cert->pCertInfo->NotBefore), &ft);
-    FileTimeToSystemTime(&ft, &st);
-    GetDateFormat(LOCALE_USER_DEFAULT, DATE_SHORTDATE, &st, NULL, str);
-    title += _T(", ");
-    title += str;
-
-    FileTimeToLocalFileTime(&(cert->pCertInfo->NotAfter ), &ft);
-    FileTimeToSystemTime(&ft, &st);
-    GetDateFormat(LOCALE_USER_DEFAULT, DATE_SHORTDATE, &st, NULL, str);
-    title += _T('-');
-    title += str;
-
-    CertGetNameString(cert, CERT_NAME_SIMPLE_DISPLAY_TYPE, CERT_NAME_ISSUER_FLAG, NULL, issuer);
-    if (name != issuer) {
-        title += _T(", ");
-        title += issuer;
-    }
-}
 
 
 //////////////////////////////////////////////////////////////////////

@@ -20,8 +20,46 @@
 
 #include "StdAfx.h"
 
+#pragma comment(lib, "Cryptui.lib")
+
 using namespace std;
 using namespace winstd;
+
+
+//////////////////////////////////////////////////////////////////////
+// eap::get_cert_title
+//////////////////////////////////////////////////////////////////////
+
+tstring eap::get_cert_title(PCCERT_CONTEXT cert)
+{
+    tstring name, str, issuer, title;
+    FILETIME ft;
+    SYSTEMTIME st;
+
+    // Prepare certificate information
+    CertGetNameString(cert, CERT_NAME_SIMPLE_DISPLAY_TYPE, 0, NULL, name);
+    title += name;
+
+    FileTimeToLocalFileTime(&(cert->pCertInfo->NotBefore), &ft);
+    FileTimeToSystemTime(&ft, &st);
+    GetDateFormat(LOCALE_USER_DEFAULT, DATE_SHORTDATE, &st, NULL, str);
+    title += _T(", ");
+    title += str;
+
+    FileTimeToLocalFileTime(&(cert->pCertInfo->NotAfter ), &ft);
+    FileTimeToSystemTime(&ft, &st);
+    GetDateFormat(LOCALE_USER_DEFAULT, DATE_SHORTDATE, &st, NULL, str);
+    title += _T('-');
+    title += str;
+
+    CertGetNameString(cert, CERT_NAME_SIMPLE_DISPLAY_TYPE, CERT_NAME_ISSUER_FLAG, NULL, issuer);
+    if (name != issuer) {
+        title += _T(", ");
+        title += issuer;
+    }
+
+    return title;
+}
 
 
 //////////////////////////////////////////////////////////////////////
@@ -191,7 +229,7 @@ bool eap::config_tls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEa
                 string str;
                 WideCharToMultiByte(CP_UTF8, 0, bstrServerID, bstrServerID.length(), str, NULL, NULL);
 
-                m_server_names.push_back(str);
+                    m_server_names.push_back(str);
             }
         }
     }

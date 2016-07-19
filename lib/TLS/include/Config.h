@@ -20,12 +20,22 @@
 
 #include <sal.h>
 
+#include <WinStd/Common.h>
+
+#include <Windows.h>
+#include <WinCrypt.h> // Must include after <Windows.h>
+
 namespace eap
 {
     ///
     /// TLS configuration
     ///
     class config_tls;
+
+    ///
+    /// Helper function to compile human-readable certificate name for UI display
+    ///
+    winstd::tstring get_cert_title(PCCERT_CONTEXT cert);
 }
 
 namespace eapserial
