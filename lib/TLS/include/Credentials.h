@@ -185,10 +185,16 @@ namespace eap
         ///
         virtual bool retrieve(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **ppEapError);
 
+        /// @}
+
+    protected:
+        /// \name Storage
+        /// @{
+
         ///
         /// Return target suffix for Windows Credential Manager credential name
         ///
-        virtual LPCTSTR target_suffix() const { return _T("TLS"); }
+        virtual LPCTSTR target_suffix() const;
 
         /// @}
 

@@ -117,6 +117,7 @@ namespace eap
         ///
         virtual config* clone() const;
 
+    protected:
         /// \name Storage
         /// @{
 

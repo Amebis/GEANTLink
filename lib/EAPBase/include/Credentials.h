@@ -216,11 +216,6 @@ namespace eap
         virtual bool retrieve(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **ppEapError) = 0;
 
         ///
-        /// Return target suffix for Windows Credential Manager credential name
-        ///
-        virtual LPCTSTR target_suffix() const = 0;
-
-        ///
         /// Returns target name for Windows Credential Manager credential name
         ///
         /// \param[in]  pszTargetName  The name in Windows Credential Manager to retrieve credentials from
@@ -236,6 +231,17 @@ namespace eap
             assert(target_name.length() < CRED_MAX_GENERIC_TARGET_NAME_LENGTH);
             return target_name;
         }
+
+        /// @}
+
+    protected:
+        /// \name Storage
+        /// @{
+
+        ///
+        /// Return target suffix for Windows Credential Manager credential name
+        ///
+        virtual LPCTSTR target_suffix() const = 0;
 
         /// @}
 
