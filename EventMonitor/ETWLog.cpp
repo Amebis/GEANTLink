@@ -749,14 +749,15 @@ static tstring PropertyToString(PEVENT_RECORD pEvent, PTRACE_EVENT_INFO pInfo, U
         return tstring_printf(_T("<Error getting array size (error %u)>"), ulResult);;
 
     tstring out;
+    bool out_nonfirst = false;
 
-    if (ulArraySize > 1)
+    if (pInfo->EventPropertyInfoArray[ulPropIndex].Flags & PropertyParamCount)
         out += tstring_printf(_T("[%u]("), ulArraySize);
 
     for (ULONG k = 0; k < ulArraySize; k++) {
         if (pInfo->EventPropertyInfoArray[ulPropIndex].Flags & PropertyStruct) {
             // The property is a structure: print the members of the structure.
-            tstring out;
+            if (out_nonfirst) out += _T(", "); else out_nonfirst = true;
             out += _T('(');
             for (USHORT j = pInfo->EventPropertyInfoArray[ulPropIndex].structType.StructStartIndex, usLastMember = pInfo->EventPropertyInfoArray[ulPropIndex].structType.StructStartIndex + pInfo->EventPropertyInfoArray[ulPropIndex].structType.NumOfStructMembers; j < usLastMember; j++) {
                 out += tstring_printf(_T("%ls: "), (LPBYTE)pInfo + pInfo->EventPropertyInfoArray[j].NameOffset);
@@ -810,7 +811,7 @@ static tstring PropertyToString(PEVENT_RECORD pEvent, PTRACE_EVENT_INFO pInfo, U
                     }
                 }
 
-                if (!out.empty()) out += _T(", ");
+                if (out_nonfirst) out += _T(", "); else out_nonfirst = true;
                 out += !data.empty() ? DataToString(
                     pInfo->EventPropertyInfoArray[ulPropIndex].nonStructType.InType,
                     pInfo->EventPropertyInfoArray[ulPropIndex].nonStructType.OutType,
@@ -822,7 +823,7 @@ static tstring PropertyToString(PEVENT_RECORD pEvent, PTRACE_EVENT_INFO pInfo, U
         }
     }
 
-    if (ulArraySize > 1)
+    if (pInfo->EventPropertyInfoArray[ulPropIndex].Flags & PropertyParamCount)
         out += _T(')');
 
     return out;
