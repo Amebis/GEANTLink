@@ -32,17 +32,17 @@ wxEND_EVENT_TABLE()
 
 wxEventMonitorFrame::wxEventMonitorFrame() : wxEventMonitorFrameBase(NULL)
 {
-//    // Load main window icons.
-//#ifdef __WINDOWS__
-//    wxIcon icon_small(wxT("00_EventMonitor.ico"), wxBITMAP_TYPE_ICO_RESOURCE, ::GetSystemMetrics(SM_CXSMICON), ::GetSystemMetrics(SM_CYSMICON));
-//    wxIconBundle icons;
-//    icons.AddIcon(icon_small);
-//    icons.AddIcon(wxIcon(wxT("00_EventMonitor.ico"), wxBITMAP_TYPE_ICO_RESOURCE, ::GetSystemMetrics(SM_CXICON), ::GetSystemMetrics(SM_CYICON)));
-//    SetIcons(icons);
-//#else
-//    wxIcon icon_small(wxICON(00_EventMonitor.ico));
-//    SetIcon(icon_small);
-//#endif
+    // Load main window icons.
+#ifdef __WINDOWS__
+    wxIcon icon_small(wxT("00_EventMonitor.ico"), wxBITMAP_TYPE_ICO_RESOURCE, ::GetSystemMetrics(SM_CXSMICON), ::GetSystemMetrics(SM_CYSMICON));
+    wxIconBundle icons;
+    icons.AddIcon(icon_small);
+    icons.AddIcon(wxIcon(wxT("00_EventMonitor.ico"), wxBITMAP_TYPE_ICO_RESOURCE, ::GetSystemMetrics(SM_CXICON), ::GetSystemMetrics(SM_CYICON)));
+    SetIcons(icons);
+#else
+    wxIcon icon_small(wxICON(00_EventMonitor.ico));
+    SetIcon(icon_small);
+#endif
 
     // Restore persistent state of wxAuiManager manually, since m_mgr is not on the heap.
     wxPersistentAuiManager(&m_mgr).Restore();

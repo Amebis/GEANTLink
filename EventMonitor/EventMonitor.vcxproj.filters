@@ -70,5 +70,8 @@
     <None Include="locale\EventMonitor.pot">
       <Filter>Resource Files\Localization</Filter>
     </None>
+    <None Include="res\EventMonitor.ico">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
