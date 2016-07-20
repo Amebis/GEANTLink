@@ -351,10 +351,8 @@ namespace eapserial
     inline void pack(_Inout_ unsigned char *&cursor, _In_ const std::basic_string<_Elem, _Traits, _Ax> &val)
     {
         std::basic_string<_Elem, _Traits, _Ax>::size_type count = val.length();
-        *(std::basic_string<_Elem, _Traits, _Ax>::size_type*&)cursor = count;
-        cursor += sizeof(std::basic_string<_Elem, _Traits, _Ax>::size_type);
-
-        size_t nSize = sizeof(_Elem)*count;
+        assert(strlen(val.c_str()) == count); // String should not contain null characters
+        size_t nSize = sizeof(_Elem)*(count + 1);
         memcpy(cursor, (const _Elem*)val.c_str(), nSize);
         cursor += nSize;
     }
@@ -363,18 +361,16 @@ namespace eapserial
     template<class _Elem, class _Traits, class _Ax>
     inline size_t get_pk_size(const std::basic_string<_Elem, _Traits, _Ax> &val)
     {
-        return sizeof(std::basic_string<_Elem, _Traits, _Ax>::size_type) + sizeof(_Elem)*val.length();
+        return sizeof(_Elem)*(val.length() + 1);
     }
 
 
     template<class _Elem, class _Traits, class _Ax>
     inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ std::basic_string<_Elem, _Traits, _Ax> &val)
     {
-        std::basic_string<_Elem, _Traits, _Ax>::size_type count = *(const std::basic_string<_Elem, _Traits, _Ax>::size_type*&)cursor;
-        cursor += sizeof(std::basic_string<_Elem, _Traits, _Ax>::size_type);
-
+        std::basic_string<_Elem, _Traits, _Ax>::size_type count = strlen((const _Elem*&)cursor);
         val.assign((const _Elem*&)cursor, count);
-        cursor += sizeof(_Elem)*count;
+        cursor += sizeof(_Elem)*(count + 1);
     }
 
 
