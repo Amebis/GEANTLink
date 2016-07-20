@@ -669,16 +669,6 @@ namespace eap
         typedef _Tmeth config_method_type;
 
         ///
-        /// Provider configuration data type
-        ///
-        typedef config_provider<config_method_type> config_provider_type;
-
-        ///
-        /// Configuration data type
-        ///
-        typedef config_providers<config_provider_type> config_providers_type;
-
-        ///
         /// Credentials data type
         ///
         typedef _Tcred credentials_type;
@@ -750,13 +740,13 @@ namespace eap
         /// - \c false otherwise. See \p ppEapError for details.
         ///
         virtual bool get_identity(
-            _In_          DWORD                 dwFlags,
-            _In_    const config_providers_type &cfg,
-            _Inout_       credentials_type      &cred,
-            _In_          HANDLE                hTokenImpersonateUser,
-            _Out_         BOOL                  *pfInvokeUI,
-            _Out_         WCHAR                 **ppwszIdentity,
-            _Out_         EAP_ERROR             **ppEapError) = 0;
+            _In_          DWORD            dwFlags,
+            _In_    const config_providers &cfg,
+            _Inout_       credentials_type &cred,
+            _In_          HANDLE           hTokenImpersonateUser,
+            _Out_         BOOL             *pfInvokeUI,
+            _Out_         WCHAR            **ppwszIdentity,
+            _Out_         EAP_ERROR        **ppEapError) = 0;
 
         ///
         /// Defines the implementation of an EAP method-specific function that retrieves the properties of an EAP method given the connection and user data.
@@ -771,7 +761,7 @@ namespace eap
             _In_        DWORD                     dwVersion,
             _In_        DWORD                     dwFlags,
             _In_        HANDLE                    hUserImpersonationToken,
-            _In_  const config_providers_type     &cfg,
+            _In_  const config_providers          &cfg,
             _In_  const credentials_type          &cred,
             _Out_       EAP_METHOD_PROPERTY_ARRAY *pMethodPropertyArray,
             _Out_       EAP_ERROR                 **ppEapError) const = 0;

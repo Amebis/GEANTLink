@@ -236,7 +236,7 @@ DWORD APIENTRY EapPeerGetIdentity(
     else if (!ppwszIdentity)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" ppwszIdentity is NULL.")));
     else {
-        _EAPMETHOD_PEER::config_providers_type cfg(g_peer);
+        eap::config_providers cfg(g_peer);
         _EAPMETHOD_PEER::credentials_type cred(g_peer);
         if (!g_peer.unpack(cfg, pConnectionData, dwConnectionDataSize, ppEapError) ||
             !g_peer.unpack(cred, pUserData, dwUserDataSize, ppEapError) ||
@@ -684,7 +684,7 @@ DWORD WINAPI EapPeerGetMethodProperties(
     else if (!pMethodPropertyArray)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pMethodPropertyArray is NULL.")));
     else {
-        _EAPMETHOD_PEER::config_providers_type cfg(g_peer);
+        eap::config_providers cfg(g_peer);
         _EAPMETHOD_PEER::credentials_type cred(g_peer);
         if (!g_peer.unpack(cfg, pEapConnData, dwEapConnDataSize, ppEapError) ||
             !g_peer.unpack(cred, pUserData, dwUserDataSize, ppEapError) ||

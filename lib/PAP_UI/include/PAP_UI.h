@@ -25,12 +25,12 @@
 ///
 /// PAP credential configuration panel
 ///
-template <class _Tprov> class wxPAPCredentialsConfigPanel;
+typedef wxEAPCredentialsConfigPanel<eap::config_method_pap, wxPasswordCredentialsPanel> wxPAPCredentialsConfigPanel;
 
 ///
 /// PAP configuration panel
 ///
-template <class _Tprov> class wxPAPConfigPanel;
+class wxPAPConfigPanel;
 
 #pragma once
 
@@ -40,69 +40,24 @@ template <class _Tprov> class wxPAPConfigPanel;
 #include <Windows.h>
 
 
-template <class _Tprov>
-class wxPAPCredentialsConfigPanel : public wxEAPCredentialsConfigPanel<_Tprov, eap::config_method_pap, wxPasswordCredentialsPanel<_Tprov> >
-{
-public:
-    ///
-    /// Constructs a PAP credential configuration panel
-    ///
-    /// \param[inout] prov           Provider configuration data
-    /// \param[inout] cfg            Configuration data
-    /// \param[in]    pszCredTarget  Target name of credentials in Windows Credential Manager. Can be further decorated to create final target name.
-    /// \param[in]    parent         Parent window
-    ///
-    wxPAPCredentialsConfigPanel(_Tprov &prov, eap::config_method_pap &cfg, LPCTSTR pszCredTarget, wxWindow *parent) :
-        wxEAPCredentialsConfigPanel<_Tprov, eap::config_method_pap, wxPasswordCredentialsPanel<_Tprov> >(prov, cfg, pszCredTarget, parent)
-    {
-    }
-};
-
-
-template <class _Tprov>
 class wxPAPConfigPanel : public wxPanel
 {
 public:
     ///
     /// Constructs a configuration panel
     ///
-    wxPAPConfigPanel(_Tprov &prov, eap::config_method_pap &cfg, LPCTSTR pszCredTarget, wxWindow* parent) : wxPanel(parent)
-    {
-        wxBoxSizer* sb_content;
-        sb_content = new wxBoxSizer( wxVERTICAL );
-
-        m_credentials = new wxPAPCredentialsConfigPanel<_Tprov>(prov, cfg, pszCredTarget, this);
-        sb_content->Add(m_credentials, 0, wxEXPAND, 5);
-
-        this->SetSizer(sb_content);
-        this->Layout();
-
-        // Connect Events
-        this->Connect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(wxPAPConfigPanel::OnInitDialog));
-    }
+    wxPAPConfigPanel(const eap::config_provider &prov, eap::config_method_pap &cfg, LPCTSTR pszCredTarget, wxWindow* parent);
 
     ///
     /// Destructs the configuration panel
     ///
-    virtual ~wxPAPConfigPanel()
-    {
-        // Disconnect Events
-        this->Disconnect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(wxPAPConfigPanel::OnInitDialog));
-    }
-
+    virtual ~wxPAPConfigPanel();
 
 protected:
     /// \cond internal
-
-    virtual void OnInitDialog(wxInitDialogEvent& event)
-    {
-        // Forward the event to child panels.
-        if (m_credentials)
-            m_credentials->GetEventHandler()->ProcessEvent(event);
-    }
-
+    virtual void OnInitDialog(wxInitDialogEvent& event);
     /// \endcond
 
 protected:
-    wxPAPCredentialsConfigPanel<_Tprov> *m_credentials; ///< Credentials configuration panel
+    wxPAPCredentialsConfigPanel *m_credentials; ///< Credentials configuration panel
 };

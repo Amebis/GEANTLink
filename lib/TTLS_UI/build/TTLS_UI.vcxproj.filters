@@ -38,6 +38,9 @@
     <ClCompile Include="..\src\Module.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\TTLS_UI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\res\wxTTLS_UI.fbp">

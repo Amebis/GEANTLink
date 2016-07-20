@@ -58,9 +58,9 @@ namespace eap
         /// - \c false otherwise. See \p ppEapError for details.
         ///
         virtual bool invoke_config_ui(
-            _In_    HWND                  hwndParent,
-            _Inout_ config_providers_type &cfg,
-            _Out_   EAP_ERROR             **ppEapError) = 0;
+            _In_    HWND             hwndParent,
+            _Inout_ config_providers &cfg,
+            _Out_   EAP_ERROR        **ppEapError) = 0;
 
         ///
         /// Raises a custom interactive user interface dialog to obtain user identity information for the EAP method on the client.
@@ -79,12 +79,12 @@ namespace eap
         /// - \c false otherwise. See \p ppEapError for details.
         ///
         virtual bool invoke_identity_ui(
-            _In_    HWND                  hwndParent,
-            _In_    DWORD                 dwFlags,
-            _Inout_ config_providers_type &cfg,
-            _Inout_ credentials_type      &cred,
-            _Out_   LPWSTR                *ppwszIdentity,
-            _Out_   EAP_ERROR             **ppEapError) = 0;
+            _In_    HWND             hwndParent,
+            _In_    DWORD            dwFlags,
+            _Inout_ config_providers &cfg,
+            _Inout_ credentials_type &cred,
+            _Out_   LPWSTR           *ppwszIdentity,
+            _Out_   EAP_ERROR        **ppEapError) = 0;
 
         ///
         /// Raises a custom interactive user interface dialog for the EAP method on the client.

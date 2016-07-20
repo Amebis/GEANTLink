@@ -31,9 +31,9 @@ eap::peer_ttls_ui::peer_ttls_ui() : peer_ui<eap::config_method_ttls, eap::creden
 
 
 bool eap::peer_ttls_ui::invoke_config_ui(
-    _In_    HWND                  hwndParent,
-    _Inout_ config_providers_type &cfg,
-    _Out_   EAP_ERROR             **ppEapError)
+    _In_    HWND             hwndParent,
+    _Inout_ config_providers &cfg,
+    _Out_   EAP_ERROR        **ppEapError)
 {
     UNREFERENCED_PARAMETER(ppEapError);
 
@@ -50,7 +50,7 @@ bool eap::peer_ttls_ui::invoke_config_ui(
         wxTopLevelWindows.Append(&parent);
 
         // Create and launch configuration dialog.
-        wxEAPConfigDialog<config_method_ttls, wxTTLSConfigWindow<config_provider_type> > dlg(cfg, &parent);
+        wxEAPConfigDialog<config_method_ttls, wxTTLSConfigWindow> dlg(cfg, &parent);
         result = dlg.ShowModal();
 
         wxTopLevelWindows.DeleteObject(&parent);
@@ -69,12 +69,12 @@ bool eap::peer_ttls_ui::invoke_config_ui(
 
 
 bool eap::peer_ttls_ui::invoke_identity_ui(
-            _In_    HWND                  hwndParent,
-            _In_    DWORD                 dwFlags,
-            _Inout_ config_providers_type &cfg,
-            _Inout_ credentials_type      &cred,
-            _Out_   LPWSTR                *ppwszIdentity,
-            _Out_   EAP_ERROR             **ppEapError)
+            _In_    HWND             hwndParent,
+            _In_    DWORD            dwFlags,
+            _Inout_ config_providers &cfg,
+            _Inout_ credentials_type &cred,
+            _Out_   LPWSTR           *ppwszIdentity,
+            _Out_   EAP_ERROR        **ppEapError)
 {
     UNREFERENCED_PARAMETER(dwFlags);
     UNREFERENCED_PARAMETER(cfg);

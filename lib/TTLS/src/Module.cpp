@@ -59,13 +59,13 @@ bool eap::peer_ttls::shutdown(_Out_ EAP_ERROR **ppEapError)
 
 
 bool eap::peer_ttls::get_identity(
-    _In_          DWORD                 dwFlags,
-    _In_    const config_providers_type &cfg,
-    _Inout_       credentials_type      &cred,
-    _In_          HANDLE                hTokenImpersonateUser,
-    _Out_         BOOL                  *pfInvokeUI,
-    _Out_         WCHAR                 **ppwszIdentity,
-    _Out_         EAP_ERROR             **ppEapError)
+    _In_          DWORD            dwFlags,
+    _In_    const config_providers &cfg,
+    _Inout_       credentials_type &cred,
+    _In_          HANDLE           hTokenImpersonateUser,
+    _Out_         BOOL             *pfInvokeUI,
+    _Out_         WCHAR            **ppwszIdentity,
+    _Out_         EAP_ERROR        **ppEapError)
 {
     UNREFERENCED_PARAMETER(dwFlags);
     UNREFERENCED_PARAMETER(cfg);
@@ -84,7 +84,7 @@ bool eap::peer_ttls::get_method_properties(
     _In_        DWORD                     dwVersion,
     _In_        DWORD                     dwFlags,
     _In_        HANDLE                    hUserImpersonationToken,
-    _In_  const config_providers_type     &cfg,
+    _In_  const config_providers          &cfg,
     _In_  const credentials_type          &cred,
     _Out_       EAP_METHOD_PROPERTY_ARRAY *pMethodPropertyArray,
     _Out_       EAP_ERROR                 **ppEapError) const

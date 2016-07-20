@@ -50,16 +50,6 @@ namespace eap
         typedef _Tmeth config_method_type;
 
         ///
-        /// Provider configuration data type
-        ///
-        typedef config_provider<config_method_type> config_provider_type;
-
-        ///
-        /// Configuration data type
-        ///
-        typedef config_providers<config_provider_type> config_providers_type;
-
-        ///
         /// Credentials data type
         ///
         typedef _Tcred credentials_type;
@@ -365,7 +355,7 @@ namespace eap
 
     public:
         module &m_module;                   ///< Reference of the EAP module
-        config_providers_type m_cfg;        ///< Session configuration
+        config_providers m_cfg;             ///< Session configuration
         credentials_type m_cred;            ///< User credentials
         interactive_request_type m_intreq;  ///< Interactive UI request data
     };
