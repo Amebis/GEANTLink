@@ -239,6 +239,11 @@ namespace eap
         ///
         virtual std::wstring get_identity() const = 0;
 
+        ///
+        /// Returns credential name (for GUI display).
+        ///
+        virtual winstd::tstring get_name() const;
+
     protected:
         /// \name Storage
         /// @{

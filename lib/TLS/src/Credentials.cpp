@@ -156,7 +156,7 @@ bool eap::credentials_tls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR *
                 m_cert.create(X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, aData.data(), (DWORD)aData.size());
         }
     }
-    m_module.log_config((xpath + L"/ClientCertificate").c_str(), m_cert ? eap::get_cert_title(m_cert).c_str() : L"<blank>");
+    m_module.log_config((xpath + L"/ClientCertificate").c_str(), get_name().c_str());
 
     return true;
 }
@@ -177,11 +177,11 @@ bool eap::credentials_tls::store(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **p
     }
 
     tstring target(target_name(pszTargetName));
-    wstring identity(std::move(get_identity()));
+    wstring name(std::move(get_name()));
 
     // Write credentials.
-    assert(cred_enc.cbData   < CRED_MAX_CREDENTIAL_BLOB_SIZE);
-    assert(identity.length() < CRED_MAX_USERNAME_LENGTH     );
+    assert(cred_enc.cbData < CRED_MAX_CREDENTIAL_BLOB_SIZE);
+    assert(name.length()   < CRED_MAX_USERNAME_LENGTH     );
     CREDENTIAL cred = {
         0,                          // Flags
         CRED_TYPE_GENERIC,          // Type
@@ -194,7 +194,7 @@ bool eap::credentials_tls::store(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **p
         0,                          // AttributeCount
         NULL,                       // Attributes
         NULL,                       // TargetAlias
-        (LPTSTR)identity.c_str()    // UserName
+        (LPTSTR)name.c_str()        // UserName
     };
     if (!CredWrite(&cred, 0)) {
         *ppEapError = m_module.make_error(GetLastError(), _T(__FUNCTION__) _T(" CredWrite failed."));
@@ -232,7 +232,7 @@ bool eap::credentials_tls::retrieve(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR 
         return false;
     }
 
-    m_module.log_config((wstring(pszTargetName) + L"/Certificate").c_str(), m_cert ? eap::get_cert_title(m_cert).c_str() : L"<blank>");
+    m_module.log_config((wstring(pszTargetName) + L"/Certificate").c_str(), get_name().c_str());
 
     return true;
 }
@@ -247,6 +247,13 @@ std::wstring eap::credentials_tls::get_identity() const
         return identity;
     } else
         return L"";
+}
+
+
+
+tstring eap::credentials_tls::get_name() const
+{
+    return m_cert ? std::move(eap::get_cert_title(m_cert)) : L"<blank>";
 }
 
 

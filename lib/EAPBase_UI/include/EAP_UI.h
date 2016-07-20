@@ -432,7 +432,7 @@ protected:
             m_own_clear   ->Enable(false);
         }
 
-        m_preshared_identity->SetValue(!m_cred.empty() ? m_cred.get_identity() : _("<blank>"));
+        m_preshared_identity->SetValue(!m_cred.empty() ? m_cred.get_name() : _("<blank>"));
 
         if (!m_prov.m_read_only) {
             // This is not a provider-locked configuration. Selectively enable/disable controls.
