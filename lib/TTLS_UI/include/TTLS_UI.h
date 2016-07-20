@@ -213,7 +213,7 @@ protected:
             m_inner_type->GetChoiceCtrl()->Enable(false);
         }
 
-        eap::config_method_pap *cfg_pap = dynamic_cast<eap::config_method_pap*>(m_cfg.m_inner);
+        eap::config_method_pap *cfg_pap = dynamic_cast<eap::config_method_pap*>(m_cfg.m_inner.get());
         if (cfg_pap) {
             m_cfg_pap = *cfg_pap;
             m_inner_type->SetSelection(0); // 0=PAP
@@ -234,8 +234,7 @@ protected:
             // This is not a provider-locked configuration. Save the data.
             switch (m_inner_type->GetSelection()) {
             case 0: // 0=PAP
-                delete m_cfg.m_inner;
-                m_cfg.m_inner = new eap::config_method_pap(m_cfg_pap);
+                m_cfg.m_inner.reset(new eap::config_method_pap(m_cfg_pap));
                 break;
 
             default:

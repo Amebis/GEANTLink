@@ -29,31 +29,22 @@ using namespace winstd;
 //////////////////////////////////////////////////////////////////////
 
 eap::config_method_ttls::config_method_ttls(_In_ module &mod) :
-    m_inner(NULL),
     config_method_tls(mod)
 {
 }
 
 
 eap::config_method_ttls::config_method_ttls(const _In_ config_method_ttls &other) :
-    m_inner(other.m_inner ? (config_method*)other.m_inner->clone() : NULL),
+    m_inner(other.m_inner ? (config_method*)other.m_inner->clone() : nullptr),
     config_method_tls(other)
 {
 }
 
 
 eap::config_method_ttls::config_method_ttls(_Inout_ config_method_ttls &&other) :
-    m_inner(other.m_inner),
+    m_inner(std::move(other.m_inner)),
     config_method_tls(std::move(other))
 {
-    other.m_inner = NULL;
-}
-
-
-eap::config_method_ttls::~config_method_ttls()
-{
-    if (m_inner)
-        delete m_inner;
 }
 
 
@@ -61,8 +52,7 @@ eap::config_method_ttls& eap::config_method_ttls::operator=(const _In_ config_me
 {
     if (this != &other) {
         (config_method_tls&)*this = other;
-        if (m_inner) delete m_inner;
-        m_inner = other.m_inner ? (config_method*)other.m_inner->clone() : NULL;
+        m_inner.reset(other.m_inner ? (config_method*)other.m_inner->clone() : nullptr);
     }
 
     return *this;
@@ -73,9 +63,7 @@ eap::config_method_ttls& eap::config_method_ttls::operator=(_Inout_ config_metho
 {
     if (this != &other) {
         (config_method_tls&&)*this = std::move(other);
-        if (m_inner) delete m_inner;
-        m_inner = other.m_inner;
-        other.m_inner = NULL;
+        m_inner                    = std::move(other.m_inner);
     }
 
     return *this;
@@ -107,7 +95,7 @@ bool eap::config_method_ttls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode 
         return false;
     }
 
-    if (dynamic_cast<const config_method_pap*>(m_inner)) {
+    if (dynamic_cast<const config_method_pap*>(m_inner.get())) {
         // <InnerAuthenticationMethod>/<NonEAPAuthMethod>
         if ((dwResult = eapxml::put_element_value(pDoc, pXmlElInnerAuthenticationMethod, bstr(L"NonEAPAuthMethod"), bstrNamespace, bstr(L"PAP"))) != ERROR_SUCCESS) {
             *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <NonEAPAuthMethod> element."));
@@ -158,8 +146,7 @@ bool eap::config_method_ttls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERRO
     {
         // PAP
         m_module.log_config((xpath + L"/NonEAPAuthMethod").c_str(), L"PAP");
-        assert(!m_inner);
-        m_inner = new eap::config_method_pap(m_module);
+        m_inner.reset(new eap::config_method_pap(m_module));
         if (!m_inner->load(pXmlElInnerAuthenticationMethod, ppEapError))
             return false;
     } else {
