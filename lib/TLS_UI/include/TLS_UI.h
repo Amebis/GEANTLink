@@ -56,24 +56,24 @@ class wxFQDNValidator;
 class wxFQDNListValidator;
 
 ///
-/// EAPTLS credential panel
+/// TLS credential panel
 ///
-template <class _Tprov> class wxEAPTLSCredentialsPanel;
+template <class _Tprov> class wxTLSCredentialsPanel;
 
 ///
-/// EAPTLS server trust configuration panel
+/// TLS server trust configuration panel
 ///
-template <class _Tprov> class wxEAPTLSServerTrustPanel;
+template <class _Tprov> class wxTLSServerTrustPanel;
 
 ///
 /// TLS credentials configuration panel
 ///
-template <class _Tprov> class wxEAPTLSCredentialsConfigPanel;
+template <class _Tprov> class wxTLSCredentialsConfigPanel;
 
 ///
-/// EAPTLS configuration panel
+/// TLS configuration panel
 ///
-template <class _Tprov> class wxEAPTLSConfigPanel;
+template <class _Tprov> class wxTLSConfigPanel;
 
 #pragma once
 
@@ -249,14 +249,14 @@ protected:
 
 
 template <class _Tprov>
-class wxEAPTLSCredentialsPanel : public wxCredentialsPanel<eap::credentials_tls, wxEAPTLSCredentialsPanelBase>
+class wxTLSCredentialsPanel : public wxEAPCredentialsPanelBase<eap::credentials_tls, wxTLSCredentialsPanelBase>
 {
 public:
     ///
     /// Constructs a configuration panel
     ///
-    wxEAPTLSCredentialsPanel(_Tprov &prov, eap::credentials_tls &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config = false) :
-        wxCredentialsPanel<eap::credentials_tls, wxEAPTLSCredentialsPanelBase>(cred, pszCredTarget, parent, is_config)
+    wxTLSCredentialsPanel(_Tprov &prov, eap::credentials_tls &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config = false) :
+        wxEAPCredentialsPanelBase<eap::credentials_tls, wxTLSCredentialsPanelBase>(cred, pszCredTarget, parent, is_config)
     {
         UNREFERENCED_PARAMETER(prov);
 
@@ -345,13 +345,13 @@ protected:
 
 
 template <class _Tprov>
-class wxEAPTLSServerTrustPanel : public wxEAPTLSServerTrustConfigPanelBase
+class wxTLSServerTrustPanel : public wxEAPTLSServerTrustConfigPanelBase
 {
 public:
     ///
     /// Constructs a configuration panel
     ///
-    wxEAPTLSServerTrustPanel(_Tprov &prov, eap::config_method_tls &cfg, wxWindow* parent) :
+    wxTLSServerTrustPanel(_Tprov &prov, eap::config_method_tls &cfg, wxWindow* parent) :
         m_prov(prov),
         m_cfg(cfg),
         wxEAPTLSServerTrustConfigPanelBase(parent)
@@ -528,7 +528,7 @@ protected:
 
 
 template <class _Tprov>
-class wxEAPTLSCredentialsConfigPanel : public wxEAPCredentialsConfigPanel<_Tprov, eap::config_method_tls, wxEAPTLSCredentialsPanel<_Tprov> >
+class wxTLSCredentialsConfigPanel : public wxEAPCredentialsConfigPanel<_Tprov, eap::config_method_tls, wxTLSCredentialsPanel<_Tprov> >
 {
 public:
     ///
@@ -539,46 +539,46 @@ public:
     /// \param[in]    pszCredTarget  Target name of credentials in Windows Credential Manager. Can be further decorated to create final target name.
     /// \param[in]    parent         Parent window
     ///
-    wxEAPTLSCredentialsConfigPanel(_Tprov &prov, eap::config_method_tls &cfg, LPCTSTR pszCredTarget, wxWindow *parent) :
-        wxEAPCredentialsConfigPanel<_Tprov, eap::config_method_tls, wxEAPTLSCredentialsPanel<_Tprov> >(prov, cfg, pszCredTarget, parent)
+    wxTLSCredentialsConfigPanel(_Tprov &prov, eap::config_method_tls &cfg, LPCTSTR pszCredTarget, wxWindow *parent) :
+        wxEAPCredentialsConfigPanel<_Tprov, eap::config_method_tls, wxTLSCredentialsPanel<_Tprov> >(prov, cfg, pszCredTarget, parent)
     {
     }
 };
 
 
 template <class _Tprov>
-class wxEAPTLSConfigPanel : public wxPanel
+class wxTLSConfigPanel : public wxPanel
 {
 public:
     ///
     /// Constructs a configuration panel
     ///
-    wxEAPTLSConfigPanel(_Tprov &prov, eap::config_method_tls &cfg, LPCTSTR pszCredTarget, wxWindow* parent) : wxPanel(parent)
+    wxTLSConfigPanel(_Tprov &prov, eap::config_method_tls &cfg, LPCTSTR pszCredTarget, wxWindow* parent) : wxPanel(parent)
     {
         wxBoxSizer* sb_content;
         sb_content = new wxBoxSizer( wxVERTICAL );
 
-        m_server_trust = new wxEAPTLSServerTrustPanel<_Tprov>(prov, cfg, this);
+        m_server_trust = new wxTLSServerTrustPanel<_Tprov>(prov, cfg, this);
         sb_content->Add(m_server_trust, 0, wxDOWN|wxEXPAND, 5);
 
-        m_credentials = new wxEAPTLSCredentialsConfigPanel<_Tprov>(prov, cfg, pszCredTarget, this);
+        m_credentials = new wxTLSCredentialsConfigPanel<_Tprov>(prov, cfg, pszCredTarget, this);
         sb_content->Add(m_credentials, 0, wxUP|wxEXPAND, 5);
 
         this->SetSizer(sb_content);
         this->Layout();
 
         // Connect Events
-        this->Connect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(wxEAPTLSConfigPanel::OnInitDialog));
+        this->Connect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(wxTLSConfigPanel::OnInitDialog));
     }
 
 
     ///
     /// Destructs the configuration panel
     ///
-    virtual ~wxEAPTLSConfigPanel()
+    virtual ~wxTLSConfigPanel()
     {
         // Disconnect Events
-        this->Disconnect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(wxEAPTLSConfigPanel::OnInitDialog));
+        this->Disconnect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(wxTLSConfigPanel::OnInitDialog));
     }
 
 protected:
@@ -595,6 +595,6 @@ protected:
     /// \endcond
 
 protected:
-    wxEAPTLSServerTrustPanel<_Tprov> *m_server_trust;       ///< Server trust configuration panel
-    wxEAPTLSCredentialsConfigPanel<_Tprov> *m_credentials;  ///< Credentials configuration panel
+    wxTLSServerTrustPanel<_Tprov> *m_server_trust;       ///< Server trust configuration panel
+    wxTLSCredentialsConfigPanel<_Tprov> *m_credentials;  ///< Credentials configuration panel
 };

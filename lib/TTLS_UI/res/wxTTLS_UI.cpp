@@ -11,7 +11,7 @@
 
 ///////////////////////////////////////////////////////////////////////////
 
-wxEAPTTLSConfigPanelBase::wxEAPTTLSConfigPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+wxTTLSConfigPanelBase::wxTTLSConfigPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
 	wxStaticBoxSizer* sb_outer_identity;
 	sb_outer_identity = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Outer Identity") ), wxVERTICAL );
@@ -72,12 +72,12 @@ wxEAPTTLSConfigPanelBase::wxEAPTTLSConfigPanelBase( wxWindow* parent, wxWindowID
 	this->Layout();
 	
 	// Connect Events
-	this->Connect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( wxEAPTTLSConfigPanelBase::OnUpdateUI ) );
+	this->Connect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( wxTTLSConfigPanelBase::OnUpdateUI ) );
 }
 
-wxEAPTTLSConfigPanelBase::~wxEAPTTLSConfigPanelBase()
+wxTTLSConfigPanelBase::~wxTTLSConfigPanelBase()
 {
 	// Disconnect Events
-	this->Disconnect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( wxEAPTTLSConfigPanelBase::OnUpdateUI ) );
+	this->Disconnect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( wxTTLSConfigPanelBase::OnUpdateUI ) );
 	
 }

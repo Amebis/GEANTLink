@@ -19,14 +19,14 @@
 */
 
 ///
-/// EAPTTLS configuration panel
+/// TTLS configuration panel
 ///
-template <class _Tprov> class wxEAPTTLSConfigPanel;
+template <class _Tprov> class wxTTLSConfigPanel;
 
 ///
-/// EAPTTLS configuration
+/// TTLS configuration scrollable window
 ///
-template <class _Tprov> class wxEAPTTLSConfig;
+template <class _Tprov> class wxTTLSConfigWindow;
 
 #pragma once
 
@@ -47,16 +47,16 @@ template <class _Tprov> class wxEAPTTLSConfig;
 
 
 template <class _Tprov>
-class wxEAPTTLSConfigPanel : public wxEAPTTLSConfigPanelBase
+class wxTTLSConfigPanel : public wxTTLSConfigPanelBase
 {
 public:
     ///
     /// Constructs a configuration panel
     ///
-    wxEAPTTLSConfigPanel(_Tprov &prov, eap::config_method_ttls &cfg, wxWindow* parent) :
+    wxTTLSConfigPanel(_Tprov &prov, eap::config_method_ttls &cfg, wxWindow* parent) :
         m_prov(prov),
         m_cfg(cfg),
-        wxEAPTTLSConfigPanelBase(parent)
+        wxTTLSConfigPanelBase(parent)
     {
         // Load and set icon.
         if (m_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
@@ -86,13 +86,13 @@ protected:
             m_outer_identity_custom_val->SetValue(m_cfg.m_anonymous_identity);
         }
 
-        return wxEAPTTLSConfigPanelBase::TransferDataToWindow();
+        return wxTTLSConfigPanelBase::TransferDataToWindow();
     }
 
 
     virtual bool TransferDataFromWindow()
     {
-        wxCHECK(wxEAPTTLSConfigPanelBase::TransferDataFromWindow(), false);
+        wxCHECK(wxTTLSConfigPanelBase::TransferDataFromWindow(), false);
 
         if (!m_prov.m_read_only) {
             // This is not a provider-locked configuration. Save the data.
@@ -129,7 +129,7 @@ protected:
 
 
 template <class _Tprov>
-class wxEAPTTLSConfig : public wxScrolledWindow
+class wxTTLSConfigWindow : public wxScrolledWindow
 {
 public:
     ///
@@ -139,7 +139,7 @@ public:
     /// \param[in]    pszCredTarget  Target name of credentials in Windows Credential Manager. Can be further decorated to create final target name.
     /// \param[in]    parent         Parent window
     ///
-    wxEAPTTLSConfig(_Tprov &prov, eap::config_method_ttls &cfg, LPCTSTR pszCredTarget, wxWindow* parent) :
+    wxTTLSConfigWindow(_Tprov &prov, eap::config_method_ttls &cfg, LPCTSTR pszCredTarget, wxWindow* parent) :
         m_prov(prov),
         m_cfg(cfg),
         m_cfg_pap(cfg.m_module),
@@ -149,7 +149,7 @@ public:
         sb_content = new wxBoxSizer( wxVERTICAL );
 
         if (prov.m_read_only)
-            sb_content->Add(new wxEAPProviderLocked<_Tprov>(prov, this), 0, wxALL|wxEXPAND, 5);
+            sb_content->Add(new wxEAPProviderLockedPanel<_Tprov>(prov, this), 0, wxALL|wxEXPAND, 5);
 
         m_inner_title = new wxStaticText(this, wxID_ANY, _("Inner Authentication"), wxDefaultPosition, wxDefaultSize, 0);
         m_inner_title->SetFont(wxFont(18, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxEmptyString));
@@ -168,10 +168,10 @@ public:
         m_outer_title->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_INACTIVECAPTION ) );
         sb_content->Add(m_outer_title, 0, wxALL|wxALIGN_RIGHT, 5);
 
-        m_outer_identity = new wxEAPTTLSConfigPanel<_Tprov>(prov, m_cfg, this);
+        m_outer_identity = new wxTTLSConfigPanel<_Tprov>(prov, m_cfg, this);
         sb_content->Add(m_outer_identity, 0, wxALL|wxEXPAND, 5);
 
-        m_tls = new wxEAPTLSConfigPanel<_Tprov>(prov, m_cfg, pszCredTarget, this);
+        m_tls = new wxTLSConfigPanel<_Tprov>(prov, m_cfg, pszCredTarget, this);
         sb_content->Add(m_tls, 0, wxALL|wxEXPAND, 5);
 
         wxSize size = sb_content->CalcMin();
@@ -189,17 +189,17 @@ public:
         m_inner_type->SetFocusFromKbd();
 
         // Connect Events
-        this->Connect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(wxEAPTTLSConfig::OnInitDialog));
+        this->Connect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(wxTTLSConfigWindow::OnInitDialog));
     }
 
 
     ///
     /// Destructs the configuration panel
     ///
-    virtual ~wxEAPTTLSConfig()
+    virtual ~wxTTLSConfigWindow()
     {
         // Disconnect Events
-        this->Disconnect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(wxEAPTTLSConfig::OnInitDialog));
+        this->Disconnect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(wxTTLSConfigWindow::OnInitDialog));
     }
 
 
@@ -221,7 +221,7 @@ protected:
             wxFAIL_MSG(wxT("Unsupported inner authentication method type."));
 
         // Do not invoke inherited TransferDataToWindow(), as it will call others TransferDataToWindow().
-        // This will handle wxEAPTTLSConfig::OnInitDialog() via wxEVT_INIT_DIALOG forwarding.
+        // This will handle wxTTLSConfigWindow::OnInitDialog() via wxEVT_INIT_DIALOG forwarding.
         return true /*wxScrolledWindow::TransferDataToWindow()*/;
     }
 
@@ -265,8 +265,8 @@ protected:
     _Tprov &m_prov;                                 ///< EAP provider
     eap::config_method_ttls &m_cfg;                        ///< TTLS configuration
     wxStaticText *m_outer_title;                    ///< Outer authentication title
-    wxEAPTTLSConfigPanel<_Tprov> *m_outer_identity; ///< Outer identity configuration panel
-    wxEAPTLSConfigPanel<_Tprov> *m_tls;             ///< TLS configuration panel
+    wxTTLSConfigPanel<_Tprov> *m_outer_identity; ///< Outer identity configuration panel
+    wxTLSConfigPanel<_Tprov> *m_tls;             ///< TLS configuration panel
     wxStaticText *m_inner_title;                    ///< Inner authentication title
     wxChoicebook *m_inner_type;                     ///< Inner authentication type
 

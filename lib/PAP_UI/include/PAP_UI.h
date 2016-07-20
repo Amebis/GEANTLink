@@ -23,7 +23,7 @@
 #include "../../PAP/include/Credentials.h"
 
 ///
-/// PAP credentials configuration panel
+/// PAP credential configuration panel
 ///
 template <class _Tprov> class wxPAPCredentialsConfigPanel;
 

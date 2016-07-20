@@ -119,7 +119,7 @@ wxEAPBannerPanelBase::~wxEAPBannerPanelBase()
 {
 }
 
-wxEAPProviderLockedBase::wxEAPProviderLockedBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+wxEAPProviderLockedPanelBase::wxEAPProviderLockedPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
 	this->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_INFOBK ) );
 	
@@ -143,7 +143,7 @@ wxEAPProviderLockedBase::wxEAPProviderLockedBase( wxWindow* parent, wxWindowID i
 	this->Layout();
 }
 
-wxEAPProviderLockedBase::~wxEAPProviderLockedBase()
+wxEAPProviderLockedPanelBase::~wxEAPProviderLockedPanelBase()
 {
 }
 
@@ -269,7 +269,7 @@ wxEAPCredentialsConfigPanelBase::~wxEAPCredentialsConfigPanelBase()
 	
 }
 
-wxPasswordCredentialsPanelBase::wxPasswordCredentialsPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+wxEAPCredentialsPanelPassBase::wxEAPCredentialsPanelPassBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
 	wxStaticBoxSizer* sb_credentials;
 	sb_credentials = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Client Credentials") ), wxVERTICAL );
@@ -330,6 +330,6 @@ wxPasswordCredentialsPanelBase::wxPasswordCredentialsPanelBase( wxWindow* parent
 	this->Layout();
 }
 
-wxPasswordCredentialsPanelBase::~wxPasswordCredentialsPanelBase()
+wxEAPCredentialsPanelPassBase::~wxEAPCredentialsPanelPassBase()
 {
 }

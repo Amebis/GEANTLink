@@ -114,7 +114,7 @@ wxEAPTLSServerTrustConfigPanelBase::~wxEAPTLSServerTrustConfigPanelBase()
 	
 }
 
-wxEAPTLSCredentialsPanelBase::wxEAPTLSCredentialsPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+wxTLSCredentialsPanelBase::wxTLSCredentialsPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
 	wxStaticBoxSizer* sb_credentials;
 	sb_credentials = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("TLS Client Certificate") ), wxVERTICAL );
@@ -177,12 +177,12 @@ wxEAPTLSCredentialsPanelBase::wxEAPTLSCredentialsPanelBase( wxWindow* parent, wx
 	this->Layout();
 	
 	// Connect Events
-	m_cert_select->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( wxEAPTLSCredentialsPanelBase::OnCertSelect ), NULL, this );
+	m_cert_select->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( wxTLSCredentialsPanelBase::OnCertSelect ), NULL, this );
 }
 
-wxEAPTLSCredentialsPanelBase::~wxEAPTLSCredentialsPanelBase()
+wxTLSCredentialsPanelBase::~wxTLSCredentialsPanelBase()
 {
 	// Disconnect Events
-	m_cert_select->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( wxEAPTLSCredentialsPanelBase::OnCertSelect ), NULL, this );
+	m_cert_select->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( wxTLSCredentialsPanelBase::OnCertSelect ), NULL, this );
 	
 }

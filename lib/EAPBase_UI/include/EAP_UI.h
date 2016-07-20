@@ -25,37 +25,37 @@
 
 
 ///
-/// EAP configuration dialog
+/// EAP top-most configuration dialog
 ///
 template <class _Tmeth, class _wxT> class wxEAPConfigDialog;
 
 ///
-/// EAP credentials dialog
+/// EAP top-most credential dialog
 ///
 template <class _Tprov> class wxEAPCredentialsDialog;
 
 ///
-/// EAP dialog banner
+/// Reusable EAP dialog banner for `wxEAPConfigDialog` and `wxEAPCredentialsDialog`
 ///
 class wxEAPBannerPanel;
 
 ///
 /// EAP Provider-locked congifuration note
 ///
-template <class _Tprov> class wxEAPProviderLocked;
+template <class _Tprov> class wxEAPProviderLockedPanel;
 
 ///
-/// Base template for credentials configuration panel
+/// Base template for credential configuration panel
 ///
 template <class _Tprov, class _Tmeth, class _wxT> class wxEAPCredentialsConfigPanel;
 
 ///
-/// Base template for all credential panels
+/// Base template for all credential entry panels
 ///
-template <class _Tcred, class _Tbase> class wxCredentialsPanel;
+template <class _Tcred, class _Tbase> class wxEAPCredentialsPanelBase;
 
 ///
-/// Password credentials panel
+/// Generic password credential entry panel
 ///
 template <class _Tprov> class wxPasswordCredentialsPanel;
 
@@ -218,15 +218,15 @@ protected:
 
 
 template <class _Tprov>
-class wxEAPProviderLocked : public wxEAPProviderLockedBase
+class wxEAPProviderLockedPanel : public wxEAPProviderLockedPanelBase
 {
 public:
     ///
     /// Constructs a notice pannel and set the title text
     ///
-    wxEAPProviderLocked(_Tprov &prov, wxWindow* parent) :
+    wxEAPProviderLockedPanel(_Tprov &prov, wxWindow* parent) :
         m_prov(prov),
-        wxEAPProviderLockedBase(parent)
+        wxEAPProviderLockedPanelBase(parent)
     {
         // Load and set icon.
         if (m_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
@@ -496,7 +496,7 @@ private:
 
 
 template <class _Tcred, class _Tbase>
-class wxCredentialsPanel : public _Tbase
+class wxEAPCredentialsPanelBase : public _Tbase
 {
 public:
     ///
@@ -507,7 +507,7 @@ public:
     /// \param[in]    parent         Parent window
     /// \param[in]    is_config      Is this panel used to pre-enter credentials? When \c true, the "Remember" checkbox is always selected and disabled.
     ///
-    wxCredentialsPanel(_Tcred &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config = false) :
+    wxEAPCredentialsPanelBase(_Tcred &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config = false) :
         m_cred(cred),
         m_target(pszCredTarget),
         _Tbase(parent)
@@ -572,7 +572,7 @@ protected:
 
 
 template <class _Tprov>
-class wxPasswordCredentialsPanel : public wxCredentialsPanel<eap::credentials_pass, wxPasswordCredentialsPanelBase>
+class wxPasswordCredentialsPanel : public wxEAPCredentialsPanelBase<eap::credentials_pass, wxEAPCredentialsPanelPassBase>
 {
 public:
     ///
@@ -585,7 +585,7 @@ public:
     /// \param[in]    is_config      Is this panel used to pre-enter credentials? When \c true, the "Remember" checkbox is always selected and disabled.
     ///
     wxPasswordCredentialsPanel(_Tprov &prov, eap::credentials_pass &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config = false) :
-        wxCredentialsPanel<eap::credentials_pass, wxPasswordCredentialsPanelBase>(cred, pszCredTarget, parent, is_config)
+        wxEAPCredentialsPanelBase<eap::credentials_pass, wxEAPCredentialsPanelPassBase>(cred, pszCredTarget, parent, is_config)
     {
         // Load and set icon.
         if (m_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))

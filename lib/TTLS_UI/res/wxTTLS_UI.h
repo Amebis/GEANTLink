@@ -30,9 +30,9 @@
 ///////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class wxEAPTTLSConfigPanelBase
+/// Class wxTTLSConfigPanelBase
 ///////////////////////////////////////////////////////////////////////////////
-class wxEAPTTLSConfigPanelBase : public wxPanel 
+class wxTTLSConfigPanelBase : public wxPanel 
 {
 	private:
 	
@@ -50,8 +50,8 @@ class wxEAPTTLSConfigPanelBase : public wxPanel
 	
 	public:
 		
-		wxEAPTTLSConfigPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL ); 
-		~wxEAPTTLSConfigPanelBase();
+		wxTTLSConfigPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL ); 
+		~wxTTLSConfigPanelBase();
 	
 };
 

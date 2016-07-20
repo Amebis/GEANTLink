@@ -637,7 +637,7 @@
             <property name="id">wxID_ANY</property>
             <property name="maximum_size"></property>
             <property name="minimum_size"></property>
-            <property name="name">wxEAPProviderLockedBase</property>
+            <property name="name">wxEAPProviderLockedPanelBase</property>
             <property name="pos"></property>
             <property name="size">500,-1</property>
             <property name="subclass"></property>
@@ -1818,7 +1818,7 @@
             <property name="id">wxID_ANY</property>
             <property name="maximum_size"></property>
             <property name="minimum_size"></property>
-            <property name="name">wxPasswordCredentialsPanelBase</property>
+            <property name="name">wxEAPCredentialsPanelPassBase</property>
             <property name="pos"></property>
             <property name="size">500,-1</property>
             <property name="subclass"></property>
