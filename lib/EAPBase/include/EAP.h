@@ -49,12 +49,22 @@ namespace eap
 namespace eapserial
 {
     ///
+    /// Output BLOB cursor
+    ///
+    struct cursor_out;
+
+    ///
+    /// Input BLOB cursor
+    ///
+    struct cursor_in;
+
+    ///
     /// Packs a boolean
     ///
     /// \param[inout] cursor  Memory cursor
     /// \param[in]    val     Variable with data to pack
     ///
-    inline void pack(_Inout_ unsigned char *&cursor, _In_ const bool &val);
+    inline void pack(_Inout_ cursor_out &cursor, _In_ const bool &val);
 
     ///
     /// Returns packed size of a boolean
@@ -71,7 +81,7 @@ namespace eapserial
     /// \param[inout] cursor  Memory cursor
     /// \param[out]   val     Variable to receive unpacked value
     ///
-    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ bool &val);
+    inline void unpack(_Inout_ cursor_in &cursor, _Out_ bool &val);
 
     ///
     /// Packs a byte
@@ -79,7 +89,7 @@ namespace eapserial
     /// \param[inout] cursor  Memory cursor
     /// \param[in]    val     Variable with data to pack
     ///
-    inline void pack(_Inout_ unsigned char *&cursor, _In_ const unsigned char &val);
+    inline void pack(_Inout_ cursor_out &cursor, _In_ const unsigned char &val);
 
     ///
     /// Returns packed size of a byte
@@ -96,7 +106,7 @@ namespace eapserial
     /// \param[inout] cursor  Memory cursor
     /// \param[out]   val     Variable to receive unpacked value
     ///
-    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ unsigned char &val);
+    inline void unpack(_Inout_ cursor_in &cursor, _Out_ unsigned char &val);
 
     ///
     /// Packs an unsigned int
@@ -104,7 +114,7 @@ namespace eapserial
     /// \param[inout] cursor  Memory cursor
     /// \param[in]    val     Variable with data to pack
     ///
-    inline void pack(_Inout_ unsigned char *&cursor, _In_ const unsigned int &val);
+    inline void pack(_Inout_ cursor_out &cursor, _In_ const unsigned int &val);
 
     ///
     /// Returns packed size of an unsigned int
@@ -121,7 +131,7 @@ namespace eapserial
     /// \param[inout] cursor  Memory cursor
     /// \param[out]   val     Variable to receive unpacked value
     ///
-    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ unsigned int &val);
+    inline void unpack(_Inout_ cursor_in &cursor, _Out_ unsigned int &val);
 
 #ifdef _WIN64
     ///
@@ -130,7 +140,7 @@ namespace eapserial
     /// \param[inout] cursor  Memory cursor
     /// \param[in]    val     Variable with data to pack
     ///
-    inline void pack(_Inout_ unsigned char *&cursor, _In_ const size_t &val);
+    inline void pack(_Inout_ cursor_out &cursor, _In_ const size_t &val);
 
     ///
     /// Returns packed size of a size_t
@@ -147,7 +157,7 @@ namespace eapserial
     /// \param[inout] cursor  Memory cursor
     /// \param[out]   val     Variable to receive unpacked value
     ///
-    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ size_t &val);
+    inline void unpack(_Inout_ cursor_in &cursor, _Out_ size_t &val);
 #endif
 
     ///
@@ -156,7 +166,7 @@ namespace eapserial
     /// \param[inout] cursor  Memory cursor
     /// \param[in]    val     String to pack
     ///
-    template<class _Elem, class _Traits, class _Ax> inline void pack(_Inout_ unsigned char *&cursor, _In_ const std::basic_string<_Elem, _Traits, _Ax> &val);
+    template<class _Elem, class _Traits, class _Ax> inline void pack(_Inout_ cursor_out &cursor, _In_ const std::basic_string<_Elem, _Traits, _Ax> &val);
 
     ///
     /// Returns packed size of a string
@@ -173,7 +183,7 @@ namespace eapserial
     /// \param[inout] cursor  Memory cursor
     /// \param[out]   val     String to unpack to
     ///
-    template<class _Elem, class _Traits, class _Ax> inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ std::basic_string<_Elem, _Traits, _Ax> &val);
+    template<class _Elem, class _Traits, class _Ax> inline void unpack(_Inout_ cursor_in &cursor, _Out_ std::basic_string<_Elem, _Traits, _Ax> &val);
 
     ///
     /// Packs a wide string
@@ -181,7 +191,7 @@ namespace eapserial
     /// \param[inout] cursor  Memory cursor
     /// \param[in]    val     String to pack
     ///
-    template<class _Traits, class _Ax> inline void pack(_Inout_ unsigned char *&cursor, _In_ const std::basic_string<wchar_t, _Traits, _Ax> &val);
+    template<class _Traits, class _Ax> inline void pack(_Inout_ cursor_out &cursor, _In_ const std::basic_string<wchar_t, _Traits, _Ax> &val);
 
     ///
     /// Returns packed size of a wide string
@@ -198,7 +208,7 @@ namespace eapserial
     /// \param[inout] cursor  Memory cursor
     /// \param[out]   val     String to unpack to
     ///
-    template<class _Traits, class _Ax> inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ std::basic_string<wchar_t, _Traits, _Ax> &val);
+    template<class _Traits, class _Ax> inline void unpack(_Inout_ cursor_in &cursor, _Out_ std::basic_string<wchar_t, _Traits, _Ax> &val);
 
     ///
     /// Packs a vector
@@ -206,7 +216,7 @@ namespace eapserial
     /// \param[inout] cursor  Memory cursor
     /// \param[in]    val     Vector to pack
     ///
-    template<class _Ty, class _Ax> inline void pack(_Inout_ unsigned char *&cursor, _In_ const std::vector<_Ty, _Ax> &val);
+    template<class _Ty, class _Ax> inline void pack(_Inout_ cursor_out &cursor, _In_ const std::vector<_Ty, _Ax> &val);
 
     ///
     /// Returns packed size of a vector
@@ -223,7 +233,7 @@ namespace eapserial
     /// \param[inout] cursor  Memory cursor
     /// \param[out]   val     Vector to unpack to
     ///
-    template<class _Ty, class _Ax> inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ std::vector<_Ty, _Ax> &val);
+    template<class _Ty, class _Ax> inline void unpack(_Inout_ cursor_in &cursor, _Out_ std::vector<_Ty, _Ax> &val);
 
     ///
     /// Packs a list
@@ -231,7 +241,7 @@ namespace eapserial
     /// \param[inout] cursor  Memory cursor
     /// \param[in]    val     List to pack
     ///
-    template<class _Ty, class _Ax> inline void pack(_Inout_ unsigned char *&cursor, _In_ const std::list<_Ty, _Ax> &val);
+    template<class _Ty, class _Ax> inline void pack(_Inout_ cursor_out &cursor, _In_ const std::list<_Ty, _Ax> &val);
 
     ///
     /// Returns packed size of a list
@@ -248,7 +258,7 @@ namespace eapserial
     /// \param[inout] cursor  Memory cursor
     /// \param[out]   val     List to unpack to
     ///
-    template<class _Ty, class _Ax> inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ std::list<_Ty, _Ax> &val);
+    template<class _Ty, class _Ax> inline void unpack(_Inout_ cursor_in &cursor, _Out_ std::list<_Ty, _Ax> &val);
 
     ///
     /// Packs a std::unique_ptr
@@ -256,7 +266,7 @@ namespace eapserial
     /// \param[inout] cursor  Memory cursor
     /// \param[in]    val     std::unique_ptr to pack
     ///
-    template<class _Ty, class _Dx> inline void pack(_Inout_ unsigned char *&cursor, _In_ const std::unique_ptr<_Ty, _Dx> &val);
+    template<class _Ty, class _Dx> inline void pack(_Inout_ cursor_out &cursor, _In_ const std::unique_ptr<_Ty, _Dx> &val);
 
     ///
     /// Returns packed size of a std::unique_ptr
@@ -275,7 +285,7 @@ namespace eapserial
     ///// \param[inout] cursor  Memory cursor
     ///// \param[out]   val     std::unique_ptr to unpack to
     /////
-    //template<class _Ty, class _Dx> inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ std::unique_ptr<_Ty, _Dx> &val);
+    //template<class _Ty, class _Dx> inline void unpack(_Inout_ cursor_in &cursor, _Out_ std::unique_ptr<_Ty, _Dx> &val);
 
     ///
     /// Packs a certificate context
@@ -283,7 +293,7 @@ namespace eapserial
     /// \param[inout] cursor  Memory cursor
     /// \param[in]    val     Certificate context to pack
     ///
-    inline void pack(_Inout_ unsigned char *&cursor, _In_ const winstd::cert_context &val);
+    inline void pack(_Inout_ cursor_out &cursor, _In_ const winstd::cert_context &val);
 
     ///
     /// Returns packed size of a certificate context
@@ -300,7 +310,7 @@ namespace eapserial
     /// \param[inout] cursor  Memory cursor
     /// \param[out]   val     Certificate context to unpack to
     ///
-    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ winstd::cert_context &val);
+    inline void unpack(_Inout_ cursor_in &cursor, _Out_ winstd::cert_context &val);
 
     ///
     /// Packs an EAP method type
@@ -308,7 +318,7 @@ namespace eapserial
     /// \param[inout] cursor  Memory cursor
     /// \param[in]    val     EAP method type to pack
     ///
-    inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::type_t &val);
+    inline void pack(_Inout_ cursor_out &cursor, _In_ const eap::type_t &val);
 
     ///
     /// Returns packed size of an EAP method type
@@ -325,7 +335,7 @@ namespace eapserial
     /// \param[inout] cursor  Memory cursor
     /// \param[out]   val     EAP method type to unpack to
     ///
-    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::type_t &val);
+    inline void unpack(_Inout_ cursor_in &cursor, _Out_ eap::type_t &val);
 }
 
 #pragma once
@@ -346,10 +356,29 @@ namespace eap
 
 namespace eapserial
 {
-    inline void pack(_Inout_ unsigned char *&cursor, _In_ const bool &val)
+    struct cursor_out
     {
-        *cursor = val ? 1 : 0;
-        cursor++;
+        typedef unsigned char *ptr_type;
+
+        ptr_type ptr;       ///< Pointer to first data unwritten
+        ptr_type ptr_end;   ///< Pointer to the end of available memory
+    };
+
+    struct cursor_in
+    {
+        typedef const unsigned char *ptr_type;
+
+        ptr_type ptr;       ///< Pointer to first data unread
+        ptr_type ptr_end;   ///< Pointer to the end of BLOB
+    };
+
+
+    inline void pack(_Inout_ cursor_out &cursor, _In_ const bool &val)
+    {
+        cursor_out::ptr_type ptr_end = cursor.ptr + 1;
+        assert(ptr_end <= cursor.ptr_end);
+        *cursor.ptr = val ? 1 : 0;
+        cursor.ptr = ptr_end;
     }
 
 
@@ -360,17 +389,21 @@ namespace eapserial
     }
 
 
-    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ bool &val)
+    inline void unpack(_Inout_ cursor_in &cursor, _Out_ bool &val)
     {
-        val = *cursor ? true : false;
-        cursor++;
+        cursor_in::ptr_type ptr_end = cursor.ptr + 1;
+        assert(ptr_end <= cursor.ptr_end);
+        val = *cursor.ptr ? true : false;
+        cursor.ptr = ptr_end;
     }
 
 
-    inline void pack(_Inout_ unsigned char *&cursor, _In_ const unsigned char &val)
+    inline void pack(_Inout_ cursor_out &cursor, _In_ const unsigned char &val)
     {
-        *cursor = val;
-        cursor++;
+        cursor_out::ptr_type ptr_end = cursor.ptr + 1;
+        assert(ptr_end <= cursor.ptr_end);
+        *cursor.ptr = val;
+        cursor.ptr = ptr_end;
     }
 
 
@@ -381,17 +414,21 @@ namespace eapserial
     }
 
 
-    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ unsigned char &val)
+    inline void unpack(_Inout_ cursor_in &cursor, _Out_ unsigned char &val)
     {
-        val = *cursor;
-        cursor++;
+        cursor_in::ptr_type ptr_end = cursor.ptr + 1;
+        assert(ptr_end <= cursor.ptr_end);
+        val = *cursor.ptr;
+        cursor.ptr = ptr_end;
     }
 
 
-    inline void pack(_Inout_ unsigned char *&cursor, _In_ const unsigned int &val)
+    inline void pack(_Inout_ cursor_out &cursor, _In_ const unsigned int &val)
     {
-        *(unsigned int*)cursor = val;
-        cursor += sizeof(unsigned int);
+        cursor_out::ptr_type ptr_end = cursor.ptr + sizeof(unsigned int);
+        assert(ptr_end <= cursor.ptr_end);
+        *(unsigned int*)cursor.ptr = val;
+        cursor.ptr = ptr_end;
     }
 
 
@@ -402,18 +439,22 @@ namespace eapserial
     }
 
 
-    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ unsigned int &val)
+    inline void unpack(_Inout_ cursor_in &cursor, _Out_ unsigned int &val)
     {
-        val = *(unsigned int*)cursor;
-        cursor += sizeof(unsigned int);
+        cursor_in::ptr_type ptr_end = cursor.ptr + sizeof(unsigned int);
+        assert(ptr_end <= cursor.ptr_end);
+        val = *(unsigned int*)cursor.ptr;
+        cursor.ptr = ptr_end;
     }
 
 
 #ifdef _WIN64
-    inline void pack(_Inout_ unsigned char *&cursor, _In_ const size_t &val)
+    inline void pack(_Inout_ cursor_out &cursor, _In_ const size_t &val)
     {
-        *(size_t*)cursor = val;
-        cursor += sizeof(size_t);
+        cursor_out::ptr_type ptr_end = cursor.ptr + sizeof(size_t);
+        assert(ptr_end <= cursor.ptr_end);
+        *(size_t*)cursor.ptr = val;
+        cursor.ptr = ptr_end;
     }
 
 
@@ -424,22 +465,26 @@ namespace eapserial
     }
 
 
-    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ size_t &val)
+    inline void unpack(_Inout_ cursor_in &cursor, _Out_ size_t &val)
     {
-        val = *(size_t*)cursor;
-        cursor += sizeof(size_t);
+        cursor_in::ptr_type ptr_end = cursor.ptr + sizeof(size_t);
+        assert(ptr_end <= cursor.ptr_end);
+        val = *(size_t*)cursor.ptr;
+        cursor.ptr = ptr_end;
     }
 #endif
 
 
     template<class _Elem, class _Traits, class _Ax>
-    inline void pack(_Inout_ unsigned char *&cursor, _In_ const std::basic_string<_Elem, _Traits, _Ax> &val)
+    inline void pack(_Inout_ cursor_out &cursor, _In_ const std::basic_string<_Elem, _Traits, _Ax> &val)
     {
         std::basic_string<_Elem, _Traits, _Ax>::size_type count = val.length();
-        assert(strlen(val.c_str()) == count); // String should not contain null characters
-        size_t nSize = sizeof(_Elem)*(count + 1);
-        memcpy(cursor, (const _Elem*)val.c_str(), nSize);
-        cursor += nSize;
+        assert(strlen(val.c_str()) == count); // String should not contain zero terminators.
+        size_t size = sizeof(_Elem)*(count + 1);
+        cursor_out::ptr_type ptr_end = cursor.ptr + size;
+        assert(ptr_end <= cursor.ptr_end);
+        memcpy(cursor.ptr, (const _Elem*)val.c_str(), size);
+        cursor.ptr = ptr_end;
     }
 
 
@@ -451,16 +496,18 @@ namespace eapserial
 
 
     template<class _Elem, class _Traits, class _Ax>
-    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ std::basic_string<_Elem, _Traits, _Ax> &val)
+    inline void unpack(_Inout_ cursor_in &cursor, _Out_ std::basic_string<_Elem, _Traits, _Ax> &val)
     {
-        std::basic_string<_Elem, _Traits, _Ax>::size_type count = strlen((const _Elem*&)cursor);
-        val.assign((const _Elem*&)cursor, count);
-        cursor += sizeof(_Elem)*(count + 1);
+        size_t count_max = cursor.ptr_end - cursor.ptr;
+        std::basic_string<_Elem, _Traits, _Ax>::size_type count = strnlen((const _Elem*&)cursor.ptr, count_max);
+        assert(count < count_max); // String should be zero terminated.
+        val.assign((const _Elem*&)cursor.ptr, count);
+        cursor.ptr += sizeof(_Elem)*(count + 1);
     }
 
 
     template<class _Traits, class _Ax>
-    inline void pack(_Inout_ unsigned char *&cursor, _In_ const std::basic_string<wchar_t, _Traits, _Ax> &val)
+    inline void pack(_Inout_ cursor_out &cursor, _In_ const std::basic_string<wchar_t, _Traits, _Ax> &val)
     {
         std::string val_utf8;
         WideCharToMultiByte(CP_UTF8, 0, val.c_str(), (int)val.length(), val_utf8, NULL, NULL);
@@ -471,12 +518,12 @@ namespace eapserial
     template<class _Traits, class _Ax>
     inline size_t get_pk_size(const std::basic_string<wchar_t, _Traits, _Ax> &val)
     {
-        return sizeof(std::string::size_type) + WideCharToMultiByte(CP_UTF8, 0, val.c_str(), (int)val.length(), NULL, 0, NULL, NULL);
+        return sizeof(char)*(WideCharToMultiByte(CP_UTF8, 0, val.c_str(), (int)val.length(), NULL, 0, NULL, NULL) + 1);
     }
 
 
     template<class _Traits, class _Ax>
-    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ std::basic_string<wchar_t, _Traits, _Ax> &val)
+    inline void unpack(_Inout_ cursor_in &cursor, _Out_ std::basic_string<wchar_t, _Traits, _Ax> &val)
     {
         std::string val_utf8;
         unpack(cursor, val_utf8);
@@ -485,7 +532,7 @@ namespace eapserial
 
 
     template<class _Ty, class _Ax>
-    inline void pack(_Inout_ unsigned char *&cursor, _In_ const std::vector<_Ty, _Ax> &val)
+    inline void pack(_Inout_ cursor_out &cursor, _In_ const std::vector<_Ty, _Ax> &val)
     {
         std::vector<_Ty, _Ax>::size_type count = val.size();
         pack(cursor, count);
@@ -511,7 +558,7 @@ namespace eapserial
 
 
     template<class _Ty, class _Ax>
-    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ std::vector<_Ty, _Ax> &val)
+    inline void unpack(_Inout_ cursor_in &cursor, _Out_ std::vector<_Ty, _Ax> &val)
     {
         std::vector<_Ty, _Ax>::size_type count;
         unpack(cursor, count);
@@ -529,7 +576,7 @@ namespace eapserial
 
 
     template<class _Ty, class _Ax>
-    inline void pack(_Inout_ unsigned char *&cursor, _In_ const std::list<_Ty, _Ax> &val)
+    inline void pack(_Inout_ cursor_out &cursor, _In_ const std::list<_Ty, _Ax> &val)
     {
         std::list<_Ty, _Ax>::size_type count = val.size();
         pack(cursor, count);
@@ -555,7 +602,7 @@ namespace eapserial
 
 
     template<class _Ty, class _Ax>
-    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ std::list<_Ty, _Ax> &val)
+    inline void unpack(_Inout_ cursor_in &cursor, _Out_ std::list<_Ty, _Ax> &val)
     {
         std::list<_Ty, _Ax>::size_type count;
         unpack(cursor, count);
@@ -572,7 +619,7 @@ namespace eapserial
 
 
     template<class _Ty, class _Dx>
-    inline void pack(_Inout_ unsigned char *&cursor, _In_ const std::unique_ptr<_Ty, _Dx> &val)
+    inline void pack(_Inout_ cursor_out &cursor, _In_ const std::unique_ptr<_Ty, _Dx> &val)
     {
         if (val) {
             pack(cursor, true);
@@ -593,13 +640,15 @@ namespace eapserial
     }
 
 
-    inline void pack(_Inout_ unsigned char *&cursor, _In_ const winstd::cert_context &val)
+    inline void pack(_Inout_ cursor_out &cursor, _In_ const winstd::cert_context &val)
     {
         if (val) {
             pack(cursor, (unsigned int)val->dwCertEncodingType);
             pack(cursor, (unsigned int)val->cbCertEncoded     );
-            memcpy(cursor, val->pbCertEncoded, val->cbCertEncoded);
-            cursor += val->cbCertEncoded;
+            cursor_out::ptr_type ptr_end = cursor.ptr + val->cbCertEncoded;
+            assert(ptr_end <= cursor.ptr_end);
+            memcpy(cursor.ptr, val->pbCertEncoded, val->cbCertEncoded);
+            cursor.ptr = ptr_end;
         } else {
             pack(cursor, (unsigned int)0);
             pack(cursor, (unsigned int)0);
@@ -619,7 +668,7 @@ namespace eapserial
     }
 
 
-    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ winstd::cert_context &val)
+    inline void unpack(_Inout_ cursor_in &cursor, _Out_ winstd::cert_context &val)
     {
         DWORD dwCertEncodingType;
         unpack(cursor, (unsigned int&)dwCertEncodingType);
@@ -628,14 +677,16 @@ namespace eapserial
         unpack(cursor, (unsigned int&)dwCertEncodedSize);
 
         if (dwCertEncodedSize) {
-            val.create(dwCertEncodingType, (BYTE*)cursor, dwCertEncodedSize);
-            cursor += dwCertEncodedSize;
+            cursor_in::ptr_type ptr_end = cursor.ptr + dwCertEncodedSize;
+            assert(ptr_end <= cursor.ptr_end);
+            val.create(dwCertEncodingType, (BYTE*)cursor.ptr, dwCertEncodedSize);
+            cursor.ptr = ptr_end;
         } else
             val.free();
     }
 
 
-    inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::type_t &val)
+    inline void pack(_Inout_ cursor_out &cursor, _In_ const eap::type_t &val)
     {
         pack(cursor, (unsigned char)val);
     }
@@ -647,7 +698,7 @@ namespace eapserial
     }
 
 
-    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::type_t &val)
+    inline void unpack(_Inout_ cursor_in &cursor, _Out_ eap::type_t &val)
     {
         unsigned char t;
         unpack(cursor, t);

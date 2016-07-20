@@ -233,7 +233,7 @@ bool eap::credentials_pass::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR 
 }
 
 
-void eap::credentials_pass::pack(_Inout_ unsigned char *&cursor) const
+void eap::credentials_pass::pack(_Inout_ eapserial::cursor_out &cursor) const
 {
     eap::credentials::pack(cursor);
     eapserial::pack(cursor, m_identity);
@@ -250,7 +250,7 @@ size_t eap::credentials_pass::get_pk_size() const
 }
 
 
-void eap::credentials_pass::unpack(_Inout_ const unsigned char *&cursor)
+void eap::credentials_pass::unpack(_Inout_ eapserial::cursor_in &cursor)
 {
     eap::credentials::unpack(cursor);
     eapserial::unpack(cursor, m_identity);

@@ -149,7 +149,7 @@ bool eap::credentials_ttls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR 
 }
 
 
-void eap::credentials_ttls::pack(_Inout_ unsigned char *&cursor) const
+void eap::credentials_ttls::pack(_Inout_ eapserial::cursor_out &cursor) const
 {
     eap::credentials_tls::pack(cursor);
     if (m_inner) {
@@ -186,7 +186,7 @@ size_t eap::credentials_ttls::get_pk_size() const
 }
 
 
-void eap::credentials_ttls::unpack(_Inout_ const unsigned char *&cursor)
+void eap::credentials_ttls::unpack(_Inout_ eapserial::cursor_in &cursor)
 {
     eap::credentials_tls::unpack(cursor);
 

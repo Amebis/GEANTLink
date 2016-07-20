@@ -53,7 +53,7 @@ namespace eapserial
     /// \param[inout] cursor  Memory cursor
     /// \param[in]    val     Configuration to pack
     ///
-    inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::config &val);
+    inline void pack(_Inout_ cursor_out &cursor, _In_ const eap::config &val);
 
     ///
     /// Returns packed size of a configuration
@@ -70,7 +70,7 @@ namespace eapserial
     /// \param[inout] cursor  Memory cursor
     /// \param[out]   val     Configuration to unpack to
     ///
-    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::config &val);
+    inline void unpack(_Inout_ cursor_in &cursor, _Out_ eap::config &val);
 }
 
 #pragma once
@@ -181,7 +181,7 @@ namespace eap
         ///
         /// \param[inout] cursor  Memory cursor
         ///
-        virtual void pack(_Inout_ unsigned char *&cursor) const;
+        virtual void pack(_Inout_ eapserial::cursor_out &cursor) const;
 
         ///
         /// Returns packed size of a configuration
@@ -195,7 +195,7 @@ namespace eap
         ///
         /// \param[inout] cursor  Memory cursor
         ///
-        virtual void unpack(_Inout_ const unsigned char *&cursor);
+        virtual void unpack(_Inout_ eapserial::cursor_in &cursor);
 
         /// @}
 
@@ -288,7 +288,7 @@ namespace eap
         ///
         /// \param[inout] cursor  Memory cursor
         ///
-        virtual void pack(_Inout_ unsigned char *&cursor) const;
+        virtual void pack(_Inout_ eapserial::cursor_out &cursor) const;
 
         ///
         /// Returns packed size of a configuration
@@ -302,7 +302,7 @@ namespace eap
         ///
         /// \param[inout] cursor  Memory cursor
         ///
-        virtual void unpack(_Inout_ const unsigned char *&cursor);
+        virtual void unpack(_Inout_ eapserial::cursor_in &cursor);
 
         /// @}
 
@@ -412,7 +412,7 @@ namespace eap
         ///
         /// \param[inout] cursor  Memory cursor
         ///
-        virtual void pack(_Inout_ unsigned char *&cursor) const;
+        virtual void pack(_Inout_ eapserial::cursor_out &cursor) const;
 
         ///
         /// Returns packed size of a configuration
@@ -426,7 +426,7 @@ namespace eap
         ///
         /// \param[inout] cursor  Memory cursor
         ///
-        virtual void unpack(_Inout_ const unsigned char *&cursor);
+        virtual void unpack(_Inout_ eapserial::cursor_in &cursor);
 
         /// @}
 
@@ -531,7 +531,7 @@ namespace eap
         ///
         /// \param[inout] cursor  Memory cursor
         ///
-        virtual void pack(_Inout_ unsigned char *&cursor) const;
+        virtual void pack(_Inout_ eapserial::cursor_out &cursor) const;
 
         ///
         /// Returns packed size of a configuration
@@ -545,7 +545,7 @@ namespace eap
         ///
         /// \param[inout] cursor  Memory cursor
         ///
-        virtual void unpack(_Inout_ const unsigned char *&cursor);
+        virtual void unpack(_Inout_ eapserial::cursor_in &cursor);
 
         /// @}
 
@@ -557,7 +557,7 @@ namespace eap
 
 namespace eapserial
 {
-    inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::config &val)
+    inline void pack(_Inout_ cursor_out &cursor, _In_ const eap::config &val)
     {
         val.pack(cursor);
     }
@@ -569,7 +569,7 @@ namespace eapserial
     }
 
 
-    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::config &val)
+    inline void unpack(_Inout_ cursor_in &cursor, _Out_ eap::config &val)
     {
         val.unpack(cursor);
     }

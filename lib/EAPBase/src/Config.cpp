@@ -81,7 +81,7 @@ bool eap::config::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapErr
 }
 
 
-void eap::config::pack(_Inout_ unsigned char *&cursor) const
+void eap::config::pack(_Inout_ eapserial::cursor_out &cursor) const
 {
     UNREFERENCED_PARAMETER(cursor);
 }
@@ -93,7 +93,7 @@ size_t eap::config::get_pk_size() const
 }
 
 
-void eap::config::unpack(_Inout_ const unsigned char *&cursor)
+void eap::config::unpack(_Inout_ eapserial::cursor_in &cursor)
 {
     UNREFERENCED_PARAMETER(cursor);
 }
@@ -236,7 +236,7 @@ bool eap::config_method::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **p
 }
 
 
-void eap::config_method::pack(_Inout_ unsigned char *&cursor) const
+void eap::config_method::pack(_Inout_ eapserial::cursor_out &cursor) const
 {
     config::pack(cursor);
     eapserial::pack(cursor, m_allow_save        );
@@ -262,7 +262,7 @@ size_t eap::config_method::get_pk_size() const
 }
 
 
-void eap::config_method::unpack(_Inout_ const unsigned char *&cursor)
+void eap::config_method::unpack(_Inout_ eapserial::cursor_in &cursor)
 {
     config::unpack(cursor);
     eapserial::unpack(cursor, m_allow_save        );
@@ -590,7 +590,7 @@ bool eap::config_provider::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR *
 }
 
 
-void eap::config_provider::pack(_Inout_ unsigned char *&cursor) const
+void eap::config_provider::pack(_Inout_ eapserial::cursor_out &cursor) const
 {
     config::pack(cursor);
     eapserial::pack(cursor, m_read_only         );
@@ -623,7 +623,7 @@ size_t eap::config_provider::get_pk_size() const
 }
 
 
-void eap::config_provider::unpack(_Inout_ const unsigned char *&cursor)
+void eap::config_provider::unpack(_Inout_ eapserial::cursor_in &cursor)
 {
     config::unpack(cursor);
     eapserial::unpack(cursor, m_read_only         );
@@ -776,7 +776,7 @@ bool eap::config_providers::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR 
 }
 
 
-void eap::config_providers::pack(_Inout_ unsigned char *&cursor) const
+void eap::config_providers::pack(_Inout_ eapserial::cursor_out &cursor) const
 {
     config::pack(cursor);
     eapserial::pack(cursor, m_providers);
@@ -791,7 +791,7 @@ size_t eap::config_providers::get_pk_size() const
 }
 
 
-void eap::config_providers::unpack(_Inout_ const unsigned char *&cursor)
+void eap::config_providers::unpack(_Inout_ eapserial::cursor_in &cursor)
 {
     config::unpack(cursor);
 

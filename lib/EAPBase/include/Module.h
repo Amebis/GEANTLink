@@ -561,15 +561,13 @@ namespace eap
             if (!decrypt_md5(cp, pDataIn, dwDataInSize, data, ppEapError))
                 return false;
 
-            const unsigned char *cursor = data.data();
+            eapserial::cursor_in cursor = { data.data(), data.data() + data.size() };
             eapserial::unpack(cursor, record);
-            assert(cursor - data.data() <= (ptrdiff_t)data.size());
 #else
             UNREFERENCED_PARAMETER(ppEapError);
 
-            const unsigned char *cursor = pDataIn;
+            eapserial::cursor_in cursor = { pDataIn, pDataIn + dwDataInSize };
             eapserial::unpack(cursor, record);
-            assert(cursor - pDataIn <= (ptrdiff_t)dwDataInSize);
 #endif
 
             return true;
@@ -601,9 +599,9 @@ namespace eap
             data.resize(eapserial::get_pk_size(record));
 
             // Pack to BLOB.
-            unsigned char *cursor = data.data();
+            eapserial::cursor_out cursor = { data.data(), data.data() + data.size() };
             eapserial::pack(cursor, record);
-            data.resize(cursor - data.data());
+            data.resize(cursor.ptr - &data.front());
 
             // Prepare cryptographics provider.
             winstd::crypt_prov cp;
@@ -639,9 +637,9 @@ namespace eap
             }
 
             // Pack to BLOB.
-            unsigned char *cursor = *ppDataOut;
+            eapserial::cursor_out cursor = { *ppDataOut, *ppDataOut + *pdwDataOutSize };
             eapserial::pack(cursor, record);
-            assert(cursor - *ppDataOut <= (ptrdiff_t)*pdwDataOutSize);
+            *pdwDataOutSize = cursor.ptr - *ppDataOut;
 #endif
 
             return true;

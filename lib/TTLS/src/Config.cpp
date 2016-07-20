@@ -158,7 +158,7 @@ bool eap::config_method_ttls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERRO
 }
 
 
-void eap::config_method_ttls::pack(_Inout_ unsigned char *&cursor) const
+void eap::config_method_ttls::pack(_Inout_ eapserial::cursor_out &cursor) const
 {
     eap::config_method_tls::pack(cursor);
     if (m_inner) {
@@ -195,7 +195,7 @@ size_t eap::config_method_ttls::get_pk_size() const
 }
 
 
-void eap::config_method_ttls::unpack(_Inout_ const unsigned char *&cursor)
+void eap::config_method_ttls::unpack(_Inout_ eapserial::cursor_in &cursor)
 {
     eap::config_method_tls::unpack(cursor);
 
