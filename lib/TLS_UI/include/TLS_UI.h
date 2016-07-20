@@ -68,7 +68,7 @@ class wxTLSServerTrustPanel;
 ///
 /// TLS credentials configuration panel
 ///
-typedef wxEAPCredentialsConfigPanel<eap::config_method_tls, wxTLSCredentialsPanel> wxTLSCredentialsConfigPanel;
+typedef wxEAPCredentialsConfigPanel<wxTLSCredentialsPanel> wxTLSCredentialsConfigPanel;
 
 ///
 /// TLS configuration panel

@@ -50,7 +50,7 @@ bool eap::peer_ttls_ui::invoke_config_ui(
         wxTopLevelWindows.Append(&parent);
 
         // Create and launch configuration dialog.
-        wxEAPConfigDialog<config_method_ttls, wxTTLSConfigWindow> dlg(cfg, &parent);
+        wxEAPConfigDialog<wxTTLSConfigWindow> dlg(cfg, &parent);
         result = dlg.ShowModal();
 
         wxTopLevelWindows.DeleteObject(&parent);

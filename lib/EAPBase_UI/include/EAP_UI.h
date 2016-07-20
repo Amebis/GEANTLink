@@ -32,7 +32,7 @@ class wxEAPBannerPanel;
 ///
 /// EAP top-most configuration dialog
 ///
-template <class _Tmeth, class _wxT> class wxEAPConfigDialog;
+template <class _wxT> class wxEAPConfigDialog;
 
 ///
 /// EAP top-most credential dialog
@@ -47,7 +47,7 @@ class wxEAPProviderLockedPanel;
 ///
 /// Base template for credential configuration panel
 ///
-template <class _Tmeth, class _wxT> class wxEAPCredentialsConfigPanel;
+template <class _wxT> class wxEAPCredentialsConfigPanel;
 
 ///
 /// Base template for all credential entry panels
@@ -99,15 +99,9 @@ protected:
 };
 
 
-template <class _Tmeth, class _wxT>
+template <class _wxT>
 class wxEAPConfigDialog : public wxEAPConfigDialogBase
 {
-public:
-    ///
-    /// This data type
-    ///
-    typedef wxEAPConfigDialog<_Tmeth, _wxT> _T;
-
 public:
     ///
     /// Constructs a configuration dialog
@@ -146,7 +140,7 @@ protected:
     {
         // Forward the event to child panels.
         for (wxWindowList::compatibility_iterator provider = m_providers->GetChildren().GetFirst(); provider; provider = provider->GetNext()) {
-            _wxT *prov = wxDynamicCast(provider->GetData(), _wxT);
+            wxWindow *prov = wxDynamicCast(provider->GetData(), wxWindow);
             if (prov)
                 prov->GetEventHandler()->ProcessEvent(event);
         }
@@ -222,7 +216,7 @@ protected:
 };
 
 
-template <class _Tmeth, class _wxT>
+template <class _wxT>
 class wxEAPCredentialsConfigPanel : public wxEAPCredentialsConfigPanelBase
 {
 public:
@@ -234,7 +228,7 @@ public:
     /// \param[in]    pszCredTarget  Target name of credentials in Windows Credential Manager. Can be further decorated to create final target name.
     /// \param[in]    parent         Parent window
     ///
-    wxEAPCredentialsConfigPanel(const eap::config_provider &prov, _Tmeth &cfg, LPCTSTR pszCredTarget, wxWindow *parent) :
+    wxEAPCredentialsConfigPanel(const eap::config_provider &prov, eap::config_method &cfg, LPCTSTR pszCredTarget, wxWindow *parent) :
         m_prov(prov),
         m_cfg(cfg),
         m_target(pszCredTarget),
@@ -372,7 +366,7 @@ protected:
 
 protected:
     const eap::config_provider &m_prov;         ///< EAP provider
-    _Tmeth &m_cfg;                              ///< EAP configuration
+    eap::config_method &m_cfg;                  ///< EAP method configuration
     winstd::library m_shell32;                  ///< shell32.dll resource library reference
     wxIcon m_icon;                              ///< Panel icon
     winstd::tstring m_target;                   ///< Credential Manager target
