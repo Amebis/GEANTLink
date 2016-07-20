@@ -287,11 +287,10 @@ namespace eap
             _Out_ interactive_request_type &req,
             _Out_ EAP_ERROR **ppEapError)
         {
-            UNREFERENCED_PARAMETER(req);
-            assert(ppEapError);
+            UNREFERENCED_PARAMETER(ppEapError);
 
-            *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
-            return false;
+            req = m_intreq;
+            return true;
         }
 
 
@@ -365,8 +364,9 @@ namespace eap
         /// @}
 
     public:
-        module &m_module;               ///< Reference of the EAP module
-        config_providers_type m_cfg;    ///< Session configuration
-        credentials_type m_cred;        ///< User credentials
+        module &m_module;                   ///< Reference of the EAP module
+        config_providers_type m_cfg;        ///< Session configuration
+        credentials_type m_cred;            ///< User credentials
+        interactive_request_type m_intreq;  ///< Interactive UI request data
     };
 }
