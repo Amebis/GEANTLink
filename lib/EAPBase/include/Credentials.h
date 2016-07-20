@@ -234,6 +234,11 @@ namespace eap
 
         /// @}
 
+        ///
+        /// Returns credential identity.
+        ///
+        virtual std::wstring get_identity() const = 0;
+
     protected:
         /// \name Storage
         /// @{
@@ -244,9 +249,6 @@ namespace eap
         virtual LPCTSTR target_suffix() const = 0;
 
         /// @}
-
-    public:
-        std::wstring m_identity;    ///< Identity (username\@domain, certificate name etc.)
     };
 
 
@@ -361,7 +363,13 @@ namespace eap
 
         /// @}
 
+        ///
+        /// Returns credential identity.
+        ///
+        virtual std::wstring get_identity() const;
+
     public:
+        std::wstring               m_identity;  ///< Identity (username\@domain, certificate name etc.)
         winstd::sanitizing_wstring m_password;  ///< Password
 
     private:
@@ -376,25 +384,29 @@ namespace eapserial
 {
     inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::credentials &val)
     {
-        pack(cursor, val.m_identity);
+        UNREFERENCED_PARAMETER(cursor);
+        UNREFERENCED_PARAMETER(val   );
     }
 
 
     inline size_t get_pk_size(const eap::credentials &val)
     {
-        return get_pk_size(val.m_identity);
+        UNREFERENCED_PARAMETER(val);
+        return 0;
     }
 
 
     inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::credentials &val)
     {
-        unpack(cursor, val.m_identity);
+        UNREFERENCED_PARAMETER(cursor);
+        UNREFERENCED_PARAMETER(val   );
     }
 
 
     inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::credentials_pass &val)
     {
         pack(cursor, (const eap::credentials&)val);
+        pack(cursor, val.m_identity              );
         pack(cursor, val.m_password              );
     }
 
@@ -403,6 +415,7 @@ namespace eapserial
     {
         return
             get_pk_size((const eap::credentials&)val) +
+            get_pk_size(val.m_identity              ) +
             get_pk_size(val.m_password              );
     }
 
@@ -410,6 +423,7 @@ namespace eapserial
     inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::credentials_pass &val)
     {
         unpack(cursor, (eap::credentials&)val);
+        unpack(cursor, val.m_identity        );
         unpack(cursor, val.m_password        );
     }
 }

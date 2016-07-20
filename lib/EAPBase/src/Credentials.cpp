@@ -36,14 +36,12 @@ eap::credentials::credentials(_In_ module &mod) : config(mod)
 
 
 eap::credentials::credentials(_In_ const credentials &other) :
-    m_identity(other.m_identity),
     config(other)
 {
 }
 
 
 eap::credentials::credentials(_Inout_ credentials &&other) :
-    m_identity(std::move(other.m_identity)),
     config(std::move(other))
 {
 }
@@ -51,10 +49,8 @@ eap::credentials::credentials(_Inout_ credentials &&other) :
 
 eap::credentials& eap::credentials::operator=(_In_ const credentials &other)
 {
-    if (this != &other) {
+    if (this != &other)
         (config&)*this = other;
-        m_identity     = other.m_identity;
-    }
 
     return *this;
 }
@@ -62,10 +58,8 @@ eap::credentials& eap::credentials::operator=(_In_ const credentials &other)
 
 eap::credentials& eap::credentials::operator=(_Inout_ credentials &&other)
 {
-    if (this != &other) {
+    if (this != &other)
         (config&)*this = std::move(other);
-        m_identity     = std::move(other.m_identity);
-    }
 
     return *this;
 }
@@ -73,26 +67,21 @@ eap::credentials& eap::credentials::operator=(_Inout_ credentials &&other)
 
 void eap::credentials::clear()
 {
-    m_identity.clear();
 }
 
 
 bool eap::credentials::empty() const
 {
-    return m_identity.empty();
+    // Base class always report empty credentials.
+    return true;
 }
 
 
 bool eap::credentials::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
 {
-    const bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
-    DWORD dwResult;
-
-    // <UserName>
-    if ((dwResult = eapxml::put_element_value(pDoc, pConfigRoot, bstr(L"UserName"), bstrNamespace, bstr(m_identity))) != ERROR_SUCCESS) {
-        *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <UserName> element."));
-        return false;
-    }
+    UNREFERENCED_PARAMETER(pDoc);
+    UNREFERENCED_PARAMETER(pConfigRoot);
+    UNREFERENCED_PARAMETER(ppEapError);
 
     return true;
 }
@@ -100,17 +89,8 @@ bool eap::credentials::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfi
 
 bool eap::credentials::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError)
 {
-    assert(pConfigRoot);
-    DWORD dwResult;
-
-    std::wstring xpath(eapxml::get_xpath(pConfigRoot));
-
-    if ((dwResult = eapxml::get_element_value(pConfigRoot, bstr(L"eap-metadata:UserName"), m_identity)) != ERROR_SUCCESS) {
-        *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error reading <UserName> element."), _T("Please make sure profile XML is a valid ") _T(PRODUCT_NAME_STR) _T(" profile XML document."));
-        return false;
-    }
-
-    m_module.log_config((xpath + L"/UserName").c_str(), m_identity.c_str());
+    UNREFERENCED_PARAMETER(pConfigRoot);
+    UNREFERENCED_PARAMETER(ppEapError);
 
     return true;
 }
@@ -126,6 +106,7 @@ eap::credentials_pass::credentials_pass(_In_ module &mod) : credentials(mod)
 
 
 eap::credentials_pass::credentials_pass(_In_ const credentials_pass &other) :
+    m_identity(other.m_identity),
     m_password(other.m_password),
     credentials(other)
 {
@@ -133,6 +114,7 @@ eap::credentials_pass::credentials_pass(_In_ const credentials_pass &other) :
 
 
 eap::credentials_pass::credentials_pass(_Inout_ credentials_pass &&other) :
+    m_identity(std::move(other.m_identity)),
     m_password(std::move(other.m_password)),
     credentials(std::move(other))
 {
@@ -143,6 +125,7 @@ eap::credentials_pass& eap::credentials_pass::operator=(_In_ const credentials_p
 {
     if (this != &other) {
         (credentials&)*this = other;
+        m_identity          = other.m_identity;
         m_password          = other.m_password;
     }
 
@@ -154,6 +137,7 @@ eap::credentials_pass& eap::credentials_pass::operator=(_Inout_ credentials_pass
 {
     if (this != &other) {
         (credentials&)*this = std::move(other);
+        m_identity          = std::move(other.m_identity);
         m_password          = std::move(other.m_password);
     }
 
@@ -164,13 +148,14 @@ eap::credentials_pass& eap::credentials_pass::operator=(_Inout_ credentials_pass
 void eap::credentials_pass::clear()
 {
     credentials::clear();
+    m_identity.clear();
     m_password.clear();
 }
 
 
 bool eap::credentials_pass::empty() const
 {
-    return credentials::empty() && m_password.empty();
+    return credentials::empty() && m_identity.empty() && m_password.empty();
 }
 
 
@@ -181,6 +166,12 @@ bool eap::credentials_pass::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *p
 
     if (!credentials::save(pDoc, pConfigRoot, ppEapError))
         return false;
+
+    // <UserName>
+    if ((dwResult = eapxml::put_element_value(pDoc, pConfigRoot, bstr(L"UserName"), bstrNamespace, bstr(m_identity))) != ERROR_SUCCESS) {
+        *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <UserName> element."));
+        return false;
+    }
 
     // <Password>
     bstr pass(m_password);
@@ -204,6 +195,13 @@ bool eap::credentials_pass::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR 
         return false;
 
     std::wstring xpath(eapxml::get_xpath(pConfigRoot));
+
+    if ((dwResult = eapxml::get_element_value(pConfigRoot, bstr(L"eap-metadata:UserName"), m_identity)) != ERROR_SUCCESS) {
+        *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error reading <UserName> element."), _T("Please make sure profile XML is a valid ") _T(PRODUCT_NAME_STR) _T(" profile XML document."));
+        return false;
+    }
+
+    m_module.log_config((xpath + L"/UserName").c_str(), m_identity.c_str());
 
     bstr pass;
     if ((dwResult = eapxml::get_element_value(pConfigRoot, bstr(L"eap-metadata:Password"), &pass)) != ERROR_SUCCESS) {
@@ -311,6 +309,12 @@ bool eap::credentials_pass::retrieve(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR
         );
 
     return true;
+}
+
+
+std::wstring eap::credentials_pass::get_identity() const
+{
+    return m_identity;
 }
 
 

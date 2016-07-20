@@ -187,6 +187,11 @@ namespace eap
 
         /// @}
 
+        ///
+        /// Returns credential identity.
+        ///
+        virtual std::wstring get_identity() const;
+
     protected:
         /// \name Storage
         /// @{
@@ -213,8 +218,7 @@ namespace eapserial
 {
     inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::credentials_tls &val)
     {
-        // Don't save m_identity. We rebuild it on every load.
-        //pack(cursor, (const eap::credentials&)val);
+        pack(cursor, (const eap::credentials&)val);
         pack(cursor, val.m_cert                  );
     }
 
@@ -222,21 +226,14 @@ namespace eapserial
     inline size_t get_pk_size(const eap::credentials_tls &val)
     {
         return
-            // Don't save m_identity. We rebuild it on every load.
-            //get_pk_size((const eap::credentials&)val) +
+            get_pk_size((const eap::credentials&)val) +
             get_pk_size(val.m_cert                  );
     }
 
 
     inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::credentials_tls &val)
     {
-        // Don't load m_identity. We rebuild it on load.
-        //unpack(cursor, (eap::credentials&)val);
+        unpack(cursor, (eap::credentials&)val);
         unpack(cursor, val.m_cert            );
-
-        if (val.m_cert) {
-            // Generate identity. TODO: Find which CERT_NAME_... constant returns valid identity (username@domain or DOMAIN\Username).
-            CertGetNameString(val.m_cert, CERT_NAME_SIMPLE_DISPLAY_TYPE, 0, NULL, val.m_identity);
-        }
     }
 }

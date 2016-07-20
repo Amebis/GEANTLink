@@ -94,9 +94,8 @@ bool eap::credentials_tls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pC
     DWORD dwResult;
     HRESULT hr;
 
-    // Don't save m_identity. We rebuild it on every load.
-    //if (!credentials::save(pDoc, pConfigRoot, ppEapError))
-    //    return false;
+    if (!credentials::save(pDoc, pConfigRoot, ppEapError))
+        return false;
 
     // <ClientCertificate>
     com_obj<IXMLDOMElement> pXmlElClientCertificate;
@@ -133,13 +132,11 @@ bool eap::credentials_tls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR *
     assert(pConfigRoot);
     DWORD dwResult;
 
-    // Don't load m_identity. We rebuild it on load.
-    //if (!credentials::load(pConfigRoot, ppEapError))
-    //    return false;
+    if (!credentials::load(pConfigRoot, ppEapError))
+        return false;
 
     std::wstring xpath(eapxml::get_xpath(pConfigRoot));
 
-    m_identity.clear();
     m_cert.free();
 
     // <ClientCertificate>
@@ -155,12 +152,8 @@ bool eap::credentials_tls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR *
         if (CompareStringEx(LOCALE_NAME_INVARIANT, NORM_IGNORECASE, bstrFormat, bstrFormat.length(), L"PEM", -1, NULL, NULL, 0) == CSTR_EQUAL) {
             // <ClientCertificate>/<cert-data>
             vector<unsigned char> aData;
-            if ((dwResult = eapxml::get_element_base64(pXmlElClientCertificate, bstr(L"eap-metadata:cert-data"), aData)) == ERROR_SUCCESS) {
-                if (m_cert.create(X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, aData.data(), (DWORD)aData.size())) {
-                    // Generate identity. TODO: Find which CERT_NAME_... constant returns valid identity (username@domain or DOMAIN\Username).
-                    CertGetNameString(m_cert, CERT_NAME_SIMPLE_DISPLAY_TYPE, 0, NULL, m_identity);
-                }
-            }
+            if ((dwResult = eapxml::get_element_base64(pXmlElClientCertificate, bstr(L"eap-metadata:cert-data"), aData)) == ERROR_SUCCESS)
+                m_cert.create(X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, aData.data(), (DWORD)aData.size());
         }
     }
     m_module.log_config((xpath + L"/ClientCertificate").c_str(), m_cert ? eap::get_cert_title(m_cert).c_str() : L"<blank>");
@@ -184,10 +177,11 @@ bool eap::credentials_tls::store(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **p
     }
 
     tstring target(target_name(pszTargetName));
+    wstring identity(std::move(get_identity()));
 
     // Write credentials.
-    assert(cred_enc.cbData     < CRED_MAX_CREDENTIAL_BLOB_SIZE);
-    assert(m_identity.length() < CRED_MAX_USERNAME_LENGTH     );
+    assert(cred_enc.cbData   < CRED_MAX_CREDENTIAL_BLOB_SIZE);
+    assert(identity.length() < CRED_MAX_USERNAME_LENGTH     );
     CREDENTIAL cred = {
         0,                          // Flags
         CRED_TYPE_GENERIC,          // Type
@@ -200,7 +194,7 @@ bool eap::credentials_tls::store(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **p
         0,                          // AttributeCount
         NULL,                       // Attributes
         NULL,                       // TargetAlias
-        (LPTSTR)m_identity.c_str()  // UserName
+        (LPTSTR)identity.c_str()    // UserName
     };
     if (!CredWrite(&cred, 0)) {
         *ppEapError = m_module.make_error(GetLastError(), _T(__FUNCTION__) _T(" CredWrite failed."));
@@ -238,12 +232,21 @@ bool eap::credentials_tls::retrieve(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR 
         return false;
     }
 
-    // Generate identity. TODO: Find which CERT_NAME_... constant returns valid identity (username@domain or DOMAIN\Username).
-    CertGetNameString(m_cert, CERT_NAME_SIMPLE_DISPLAY_TYPE, 0, NULL, m_identity);
-
-    m_module.log_config((wstring(pszTargetName) + L"/Certificate").c_str(), m_identity.c_str());
+    m_module.log_config((wstring(pszTargetName) + L"/Certificate").c_str(), m_cert ? eap::get_cert_title(m_cert).c_str() : L"<blank>");
 
     return true;
+}
+
+
+std::wstring eap::credentials_tls::get_identity() const
+{
+    if (m_cert) {
+        // Generate identity. TODO: Find which CERT_NAME_... constant returns valid identity (username@domain or DOMAIN\Username).
+        wstring identity;
+        CertGetNameString(m_cert, CERT_NAME_SIMPLE_DISPLAY_TYPE, 0, NULL, identity);
+        return identity;
+    } else
+        return L"";
 }
 
 

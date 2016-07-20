@@ -318,12 +318,9 @@ protected:
             m_cred.clear();
         else {
             const wxCertificateClientData *data = dynamic_cast<const wxCertificateClientData*>(m_cert_select_val->GetClientObject(m_cert_select_val->GetSelection()));
-            if (data) {
+            if (data)
                 m_cred.m_cert.attach_duplicated(data->m_cert);
-
-                // Generate identity. TODO: Find which CERT_NAME_... constant returns valid identity (username@domain or DOMAIN\Username).
-                CertGetNameString(m_cred.m_cert, CERT_NAME_SIMPLE_DISPLAY_TYPE, 0, NULL, m_cred.m_identity);
-            } else
+            else
                 m_cred.clear();
         }
 
