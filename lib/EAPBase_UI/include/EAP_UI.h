@@ -116,8 +116,8 @@ public:
 
         for (std::list<_Tprov>::iterator provider = m_cfg.m_providers.begin(), provider_end = m_cfg.m_providers.end(); provider != provider_end; ++provider) {
             bool is_single = provider->m_methods.size() == 1;
-            std::list<std::unique_ptr<_Tmeth> >::size_type count = 0;
-            std::list<std::unique_ptr<_Tmeth> >::iterator method = provider->m_methods.begin(), method_end = provider->m_methods.end();
+            std::list<std::unique_ptr<eap::config_method> >::size_type count = 0;
+            std::list<std::unique_ptr<eap::config_method> >::iterator method = provider->m_methods.begin(), method_end = provider->m_methods.end();
             for (; method != method_end; ++method, count++)
                 m_providers->AddPage(
                     new _wxT(

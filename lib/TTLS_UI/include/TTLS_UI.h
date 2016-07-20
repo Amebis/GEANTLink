@@ -121,10 +121,10 @@ protected:
     /// \endcond
 
 protected:
-    _Tprov &m_prov;             ///< EAP provider
-    eap::config_method_ttls &m_cfg;    ///< TTLS configuration
-    winstd::library m_shell32;  ///< shell32.dll resource library reference
-    wxIcon m_icon;              ///< Panel icon
+    _Tprov &m_prov;                 ///< EAP provider
+    eap::config_method_ttls &m_cfg; ///< TTLS configuration
+    winstd::library m_shell32;      ///< shell32.dll resource library reference
+    wxIcon m_icon;                  ///< Panel icon
 };
 
 
@@ -139,9 +139,9 @@ public:
     /// \param[in]    pszCredTarget  Target name of credentials in Windows Credential Manager. Can be further decorated to create final target name.
     /// \param[in]    parent         Parent window
     ///
-    wxTTLSConfigWindow(_Tprov &prov, eap::config_method_ttls &cfg, LPCTSTR pszCredTarget, wxWindow* parent) :
+    wxTTLSConfigWindow(_Tprov &prov, eap::config_method &cfg, LPCTSTR pszCredTarget, wxWindow* parent) :
         m_prov(prov),
-        m_cfg(cfg),
+        m_cfg((eap::config_method_ttls&)cfg),
         m_cfg_pap(cfg.m_module),
         wxScrolledWindow(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxVSCROLL)
     {
@@ -269,5 +269,6 @@ protected:
     wxStaticText *m_inner_title;                 ///< Inner authentication title
     wxChoicebook *m_inner_type;                  ///< Inner authentication type
 
-    eap::config_method_pap m_cfg_pap;            ///< Temporary PAP configuration
+    // Temprary inner method configurations to hold data until applied
+    eap::config_method_pap m_cfg_pap;            ///< PAP configuration
 };

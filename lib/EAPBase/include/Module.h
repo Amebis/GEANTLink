@@ -96,6 +96,11 @@ namespace eap
         ///
         void free_error_memory(_In_ EAP_ERROR *err);
 
+        ///
+        /// Makes a new method config for the given method type
+        ///
+        virtual config_method* make_config_method() = 0;
+
         /// @}
 
         /// \name Logging
@@ -693,6 +698,14 @@ namespace eap
         /// Constructs a EAP peer module for the given EAP type
         ///
         peer_base(_In_ type_t eap_method) : module(eap_method) {}
+
+        ///
+        /// Makes a new method config for the given method type
+        ///
+        virtual config_method* make_config_method()
+        {
+            return new config_method_type(*this);
+        }
     };
 
 
