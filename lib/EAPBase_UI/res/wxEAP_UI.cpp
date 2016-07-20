@@ -180,7 +180,7 @@ wxEAPCredentialsConfigPanelBase::wxEAPCredentialsConfigPanelBase( wxWindow* pare
 	sz_own_inner->Add( m_own, 2, wxEXPAND, 5 );
 	
 	m_own_identity = new wxTextCtrl( sb_credentials->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY );
-	m_own_identity->SetToolTip( _("Enter your user name here (user@domain.org, DOMAINUser, etc.)") );
+	m_own_identity->SetToolTip( _("Your credentials loaded from Windows Credential Manager") );
 	
 	sz_own_inner->Add( m_own_identity, 3, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
 	
@@ -218,7 +218,7 @@ wxEAPCredentialsConfigPanelBase::wxEAPCredentialsConfigPanelBase( wxWindow* pare
 	sz_preshared_inner->Add( m_preshared, 2, wxEXPAND, 5 );
 	
 	m_preshared_identity = new wxTextCtrl( sb_credentials->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY );
-	m_preshared_identity->SetToolTip( _("Enter your user name here (user@domain.org, DOMAINUser, etc.)") );
+	m_preshared_identity->SetToolTip( _("Common (pre-shared) credentials") );
 	
 	sz_preshared_inner->Add( m_preshared_identity, 3, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
 	
