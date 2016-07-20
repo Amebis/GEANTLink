@@ -53,7 +53,7 @@ public:
     ///
     /// Constructs a configuration panel
     ///
-    wxEAPTTLSConfigPanel(_Tprov &prov, eap::config_ttls &cfg, wxWindow* parent) :
+    wxEAPTTLSConfigPanel(_Tprov &prov, eap::config_method_ttls &cfg, wxWindow* parent) :
         m_prov(prov),
         m_cfg(cfg),
         wxEAPTTLSConfigPanelBase(parent)
@@ -122,7 +122,7 @@ protected:
 
 protected:
     _Tprov &m_prov;             ///< EAP provider
-    eap::config_ttls &m_cfg;    ///< TTLS configuration
+    eap::config_method_ttls &m_cfg;    ///< TTLS configuration
     winstd::library m_shell32;  ///< shell32.dll resource library reference
     wxIcon m_icon;              ///< Panel icon
 };
@@ -139,7 +139,7 @@ public:
     /// \param[in]    pszCredTarget  Target name of credentials in Windows Credential Manager. Can be further decorated to create final target name.
     /// \param[in]    parent         Parent window
     ///
-    wxEAPTTLSConfig(_Tprov &prov, eap::config_ttls &cfg, LPCTSTR pszCredTarget, wxWindow* parent) :
+    wxEAPTTLSConfig(_Tprov &prov, eap::config_method_ttls &cfg, LPCTSTR pszCredTarget, wxWindow* parent) :
         m_prov(prov),
         m_cfg(cfg),
         m_cfg_pap(cfg.m_module),
@@ -213,7 +213,7 @@ protected:
             m_inner_type->GetChoiceCtrl()->Enable(false);
         }
 
-        eap::config_pap *cfg_pap = dynamic_cast<eap::config_pap*>(m_cfg.m_inner);
+        eap::config_method_pap *cfg_pap = dynamic_cast<eap::config_method_pap*>(m_cfg.m_inner);
         if (cfg_pap) {
             m_cfg_pap = *cfg_pap;
             m_inner_type->SetSelection(0); // 0=PAP
@@ -235,7 +235,7 @@ protected:
             switch (m_inner_type->GetSelection()) {
             case 0: // 0=PAP
                 delete m_cfg.m_inner;
-                m_cfg.m_inner = new eap::config_pap(m_cfg_pap);
+                m_cfg.m_inner = new eap::config_method_pap(m_cfg_pap);
                 break;
 
             default:
@@ -263,12 +263,12 @@ protected:
 
 protected:
     _Tprov &m_prov;                                 ///< EAP provider
-    eap::config_ttls &m_cfg;                        ///< TTLS configuration
+    eap::config_method_ttls &m_cfg;                        ///< TTLS configuration
     wxStaticText *m_outer_title;                    ///< Outer authentication title
     wxEAPTTLSConfigPanel<_Tprov> *m_outer_identity; ///< Outer identity configuration panel
     wxEAPTLSConfigPanel<_Tprov> *m_tls;             ///< TLS configuration panel
     wxStaticText *m_inner_title;                    ///< Inner authentication title
     wxChoicebook *m_inner_type;                     ///< Inner authentication type
 
-    eap::config_pap m_cfg_pap;                      ///< Temporary PAP configuration
+    eap::config_method_pap m_cfg_pap;                      ///< Temporary PAP configuration
 };

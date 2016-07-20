@@ -35,7 +35,7 @@ namespace eap
 
 namespace eap
 {
-    class peer_ttls : public peer<config_ttls, credentials_ttls, bool, bool>
+    class peer_ttls : public peer<config_method_ttls, credentials_ttls, bool, bool>
     {
     public:
         ///

@@ -25,7 +25,7 @@ namespace eap
     ///
     /// PAP configuration
     ///
-    class config_pap;
+    class config_method_pap;
 }
 
 namespace eapserial
@@ -36,7 +36,7 @@ namespace eapserial
     /// \param[inout] cursor  Memory cursor
     /// \param[in]    val     Configuration to pack
     ///
-    inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::config_pap &val);
+    inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::config_method_pap &val);
 
     ///
     /// Returns packed size of a PAP based method configuration
@@ -45,7 +45,7 @@ namespace eapserial
     ///
     /// \returns Size of data when packed (in bytes)
     ///
-    inline size_t get_pk_size(const eap::config_pap &val);
+    inline size_t get_pk_size(const eap::config_method_pap &val);
 
     ///
     /// Unpacks a PAP based method configuration
@@ -53,7 +53,7 @@ namespace eapserial
     /// \param[inout] cursor  Memory cursor
     /// \param[out]   val     Configuration to unpack to
     ///
-    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::config_pap &val);
+    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::config_method_pap &val);
 }
 
 #pragma once
@@ -68,7 +68,7 @@ namespace eapserial
 
 namespace eap
 {
-    class config_pap : public config_method<credentials_pap>
+    class config_method_pap : public config_method<credentials_pap>
     {
     public:
         ///
@@ -76,21 +76,21 @@ namespace eap
         ///
         /// \param[in] mod  Reference of the EAP module to use for global services
         ///
-        config_pap(_In_ module &mod);
+        config_method_pap(_In_ module &mod);
 
         ///
         /// Copies configuration
         ///
         /// \param[in] other  Configuration to copy from
         ///
-        config_pap(_In_ const config_pap &other);
+        config_method_pap(_In_ const config_method_pap &other);
 
         ///
         /// Moves configuration
         ///
         /// \param[in] other  Configuration to move from
         ///
-        config_pap(_Inout_ config_pap &&other);
+        config_method_pap(_Inout_ config_method_pap &&other);
 
         ///
         /// Copies configuration
@@ -99,7 +99,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        config_pap& operator=(_In_ const config_pap &other);
+        config_method_pap& operator=(_In_ const config_method_pap &other);
 
         ///
         /// Moves configuration
@@ -108,7 +108,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        config_pap& operator=(_Inout_ config_pap &&other);
+        config_method_pap& operator=(_Inout_ config_method_pap &&other);
 
         ///
         /// Clones configuration
@@ -129,19 +129,19 @@ namespace eap
 
 namespace eapserial
 {
-    inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::config_pap &val)
+    inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::config_method_pap &val)
     {
         pack(cursor, (const eap::config_method<eap::credentials_pap>&)val);
     }
 
 
-    inline size_t get_pk_size(const eap::config_pap &val)
+    inline size_t get_pk_size(const eap::config_method_pap &val)
     {
         return get_pk_size((const eap::config_method<eap::credentials_pap>&)val);
     }
 
 
-    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::config_pap &val)
+    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::config_method_pap &val)
     {
         unpack(cursor, (eap::config_method<eap::credentials_pap>&)val);
     }

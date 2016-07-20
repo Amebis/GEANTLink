@@ -33,12 +33,12 @@ namespace eap
     template <class _Tcred> class config_method;
 
     ///
-    /// Provider configuration
+    /// Single provider configuration
     ///
     template <class _Tmeth> class config_provider;
 
     ///
-    /// Providers configuration
+    /// List of providers configuration
     ///
     template <class _Tprov> class config_providers;
 }

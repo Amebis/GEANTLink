@@ -351,7 +351,7 @@ public:
     ///
     /// Constructs a configuration panel
     ///
-    wxEAPTLSServerTrustPanel(_Tprov &prov, eap::config_tls &cfg, wxWindow* parent) :
+    wxEAPTLSServerTrustPanel(_Tprov &prov, eap::config_method_tls &cfg, wxWindow* parent) :
         m_prov(prov),
         m_cfg(cfg),
         wxEAPTLSServerTrustConfigPanelBase(parent)
@@ -520,7 +520,7 @@ protected:
 
 protected:
     _Tprov &m_prov;                             ///< EAP provider
-    eap::config_tls &m_cfg;                     ///< TLS configuration
+    eap::config_method_tls &m_cfg;                     ///< TLS configuration
     winstd::library m_certmgr;                  ///< certmgr.dll resource library reference
     wxIcon m_icon;                              ///< Panel icon
     std::list<std::string> m_server_names_val;  ///< Acceptable authenticating server names
@@ -528,7 +528,7 @@ protected:
 
 
 template <class _Tprov>
-class wxEAPTLSCredentialsConfigPanel : public wxEAPCredentialsConfigPanel<_Tprov, eap::config_tls, wxEAPTLSCredentialsPanel<_Tprov> >
+class wxEAPTLSCredentialsConfigPanel : public wxEAPCredentialsConfigPanel<_Tprov, eap::config_method_tls, wxEAPTLSCredentialsPanel<_Tprov> >
 {
 public:
     ///
@@ -539,8 +539,8 @@ public:
     /// \param[in]    pszCredTarget  Target name of credentials in Windows Credential Manager. Can be further decorated to create final target name.
     /// \param[in]    parent         Parent window
     ///
-    wxEAPTLSCredentialsConfigPanel(_Tprov &prov, eap::config_tls &cfg, LPCTSTR pszCredTarget, wxWindow *parent) :
-        wxEAPCredentialsConfigPanel<_Tprov, eap::config_tls, wxEAPTLSCredentialsPanel<_Tprov> >(prov, cfg, pszCredTarget, parent)
+    wxEAPTLSCredentialsConfigPanel(_Tprov &prov, eap::config_method_tls &cfg, LPCTSTR pszCredTarget, wxWindow *parent) :
+        wxEAPCredentialsConfigPanel<_Tprov, eap::config_method_tls, wxEAPTLSCredentialsPanel<_Tprov> >(prov, cfg, pszCredTarget, parent)
     {
     }
 };
@@ -553,7 +553,7 @@ public:
     ///
     /// Constructs a configuration panel
     ///
-    wxEAPTLSConfigPanel(_Tprov &prov, eap::config_tls &cfg, LPCTSTR pszCredTarget, wxWindow* parent) : wxPanel(parent)
+    wxEAPTLSConfigPanel(_Tprov &prov, eap::config_method_tls &cfg, LPCTSTR pszCredTarget, wxWindow* parent) : wxPanel(parent)
     {
         wxBoxSizer* sb_content;
         sb_content = new wxBoxSizer( wxVERTICAL );

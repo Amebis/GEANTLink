@@ -25,7 +25,7 @@
 // eap::peer_ttls_ui
 //////////////////////////////////////////////////////////////////////
 
-eap::peer_ttls_ui::peer_ttls_ui() : peer_ui<eap::config_ttls, eap::credentials_ttls, bool, bool>(type_ttls)
+eap::peer_ttls_ui::peer_ttls_ui() : peer_ui<eap::config_method_ttls, eap::credentials_ttls, bool, bool>(type_ttls)
 {
 }
 
@@ -50,7 +50,7 @@ bool eap::peer_ttls_ui::invoke_config_ui(
         wxTopLevelWindows.Append(&parent);
 
         // Create and launch configuration dialog.
-        wxEAPConfigDialog<config_ttls, wxEAPTTLSConfig<provider_config_type> > dlg(cfg, &parent);
+        wxEAPConfigDialog<config_method_ttls, wxEAPTTLSConfig<provider_config_type> > dlg(cfg, &parent);
         result = dlg.ShowModal();
 
         wxTopLevelWindows.DeleteObject(&parent);

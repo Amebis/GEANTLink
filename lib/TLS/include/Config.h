@@ -30,7 +30,7 @@ namespace eap
     ///
     /// TLS configuration
     ///
-    class config_tls;
+    class config_method_tls;
 
     ///
     /// Helper function to compile human-readable certificate name for UI display
@@ -46,7 +46,7 @@ namespace eapserial
     /// \param[inout] cursor  Memory cursor
     /// \param[in]    val     Configuration to pack
     ///
-    inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::config_tls &val);
+    inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::config_method_tls &val);
 
     ///
     /// Returns packed size of a TLS method configuration
@@ -55,7 +55,7 @@ namespace eapserial
     ///
     /// \returns Size of data when packed (in bytes)
     ///
-    inline size_t get_pk_size(const eap::config_tls &val);
+    inline size_t get_pk_size(const eap::config_method_tls &val);
 
     ///
     /// Unpacks a TLS method configuration
@@ -63,7 +63,7 @@ namespace eapserial
     /// \param[inout] cursor  Memory cursor
     /// \param[out]   val     Configuration to unpack to
     ///
-    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::config_tls &val);
+    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::config_method_tls &val);
 }
 
 #pragma once
@@ -82,7 +82,7 @@ namespace eapserial
 
 namespace eap
 {
-    class config_tls : public config_method<credentials_tls>
+    class config_method_tls : public config_method<credentials_tls>
     {
     public:
         ///
@@ -90,21 +90,21 @@ namespace eap
         ///
         /// \param[in] mod  Reference of the EAP module to use for global services
         ///
-        config_tls(_In_ module &mod);
+        config_method_tls(_In_ module &mod);
 
         ///
         /// Copies configuration
         ///
         /// \param[in] other  Configuration to copy from
         ///
-        config_tls(_In_ const config_tls &other);
+        config_method_tls(_In_ const config_method_tls &other);
 
         ///
         /// Moves configuration
         ///
         /// \param[in] other  Configuration to move from
         ///
-        config_tls(_Inout_ config_tls &&other);
+        config_method_tls(_Inout_ config_method_tls &&other);
 
         ///
         /// Copies configuration
@@ -113,7 +113,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        config_tls& operator=(_In_ const config_tls &other);
+        config_method_tls& operator=(_In_ const config_method_tls &other);
 
         ///
         /// Moves configuration
@@ -122,7 +122,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        config_tls& operator=(_Inout_ config_tls &&other);
+        config_method_tls& operator=(_Inout_ config_method_tls &&other);
 
         ///
         /// Clones configuration
@@ -184,7 +184,7 @@ namespace eap
 
 namespace eapserial
 {
-    inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::config_tls &val)
+    inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::config_method_tls &val)
     {
         pack(cursor, (const eap::config_method<eap::credentials_tls>&)val);
         pack(cursor, val.m_trusted_root_ca);
@@ -192,7 +192,7 @@ namespace eapserial
     }
 
 
-    inline size_t get_pk_size(const eap::config_tls &val)
+    inline size_t get_pk_size(const eap::config_method_tls &val)
     {
         return
             get_pk_size((const eap::config_method<eap::credentials_tls>&)val) +
@@ -201,7 +201,7 @@ namespace eapserial
     }
 
 
-    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::config_tls &val)
+    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::config_method_tls &val)
     {
         unpack(cursor, (eap::config_method<eap::credentials_tls>&)val);
         unpack(cursor, val.m_trusted_root_ca);

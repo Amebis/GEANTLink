@@ -41,7 +41,7 @@ template <class _Tprov> class wxPAPConfigPanel;
 
 
 template <class _Tprov>
-class wxPAPCredentialsConfigPanel : public wxEAPCredentialsConfigPanel<_Tprov, eap::config_pap, wxPasswordCredentialsPanel<_Tprov> >
+class wxPAPCredentialsConfigPanel : public wxEAPCredentialsConfigPanel<_Tprov, eap::config_method_pap, wxPasswordCredentialsPanel<_Tprov> >
 {
 public:
     ///
@@ -52,8 +52,8 @@ public:
     /// \param[in]    pszCredTarget  Target name of credentials in Windows Credential Manager. Can be further decorated to create final target name.
     /// \param[in]    parent         Parent window
     ///
-    wxPAPCredentialsConfigPanel(_Tprov &prov, eap::config_pap &cfg, LPCTSTR pszCredTarget, wxWindow *parent) :
-        wxEAPCredentialsConfigPanel<_Tprov, eap::config_pap, wxPasswordCredentialsPanel<_Tprov> >(prov, cfg, pszCredTarget, parent)
+    wxPAPCredentialsConfigPanel(_Tprov &prov, eap::config_method_pap &cfg, LPCTSTR pszCredTarget, wxWindow *parent) :
+        wxEAPCredentialsConfigPanel<_Tprov, eap::config_method_pap, wxPasswordCredentialsPanel<_Tprov> >(prov, cfg, pszCredTarget, parent)
     {
     }
 };
@@ -66,7 +66,7 @@ public:
     ///
     /// Constructs a configuration panel
     ///
-    wxPAPConfigPanel(_Tprov &prov, eap::config_pap &cfg, LPCTSTR pszCredTarget, wxWindow* parent) : wxPanel(parent)
+    wxPAPConfigPanel(_Tprov &prov, eap::config_method_pap &cfg, LPCTSTR pszCredTarget, wxWindow* parent) : wxPanel(parent)
     {
         wxBoxSizer* sb_content;
         sb_content = new wxBoxSizer( wxVERTICAL );

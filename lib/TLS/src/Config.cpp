@@ -63,15 +63,15 @@ tstring eap::get_cert_title(PCCERT_CONTEXT cert)
 
 
 //////////////////////////////////////////////////////////////////////
-// eap::config_tls
+// eap::config_method_tls
 //////////////////////////////////////////////////////////////////////
 
-eap::config_tls::config_tls(_In_ module &mod) : config_method<credentials_tls>(mod)
+eap::config_method_tls::config_method_tls(_In_ module &mod) : config_method<credentials_tls>(mod)
 {
 }
 
 
-eap::config_tls::config_tls(_In_ const config_tls &other) :
+eap::config_method_tls::config_method_tls(_In_ const config_method_tls &other) :
     m_trusted_root_ca(other.m_trusted_root_ca),
     m_server_names(other.m_server_names),
     config_method<credentials_tls>(other)
@@ -79,7 +79,7 @@ eap::config_tls::config_tls(_In_ const config_tls &other) :
 }
 
 
-eap::config_tls::config_tls(_Inout_ config_tls &&other) :
+eap::config_method_tls::config_method_tls(_Inout_ config_method_tls &&other) :
     m_trusted_root_ca(std::move(other.m_trusted_root_ca)),
     m_server_names(std::move(other.m_server_names)),
     config_method<credentials_tls>(std::move(other))
@@ -87,7 +87,7 @@ eap::config_tls::config_tls(_Inout_ config_tls &&other) :
 }
 
 
-eap::config_tls& eap::config_tls::operator=(_In_ const eap::config_tls &other)
+eap::config_method_tls& eap::config_method_tls::operator=(_In_ const eap::config_method_tls &other)
 {
     if (this != &other) {
         (config_method<credentials_tls>&)*this = other;
@@ -99,7 +99,7 @@ eap::config_tls& eap::config_tls::operator=(_In_ const eap::config_tls &other)
 }
 
 
-eap::config_tls& eap::config_tls::operator=(_Inout_ eap::config_tls &&other)
+eap::config_method_tls& eap::config_method_tls::operator=(_Inout_ eap::config_method_tls &&other)
 {
     if (this != &other) {
         (config_method<credentials_tls>&&)*this = std::move(other);
@@ -111,13 +111,13 @@ eap::config_tls& eap::config_tls::operator=(_Inout_ eap::config_tls &&other)
 }
 
 
-eap::config* eap::config_tls::clone() const
+eap::config* eap::config_method_tls::clone() const
 {
-    return new config_tls(*this);
+    return new config_method_tls(*this);
 }
 
 
-bool eap::config_tls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
+bool eap::config_method_tls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
 {
     assert(pDoc);
     assert(pConfigRoot);
@@ -178,7 +178,7 @@ bool eap::config_tls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfig
 }
 
 
-bool eap::config_tls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError)
+bool eap::config_method_tls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError)
 {
     assert(pConfigRoot);
 
@@ -256,13 +256,13 @@ bool eap::config_tls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEa
 }
 
 
-eap::type_t eap::config_tls::get_method_id() const
+eap::type_t eap::config_method_tls::get_method_id() const
 {
     return eap::type_tls;
 }
 
 
-bool eap::config_tls::add_trusted_ca(_In_  DWORD dwCertEncodingType, _In_  const BYTE *pbCertEncoded, _In_  DWORD cbCertEncoded)
+bool eap::config_method_tls::add_trusted_ca(_In_  DWORD dwCertEncodingType, _In_  const BYTE *pbCertEncoded, _In_  DWORD cbCertEncoded)
 {
     cert_context cert;
     if (!cert.create(dwCertEncodingType, pbCertEncoded, cbCertEncoded)) {

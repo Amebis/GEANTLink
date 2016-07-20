@@ -25,7 +25,7 @@ namespace eap
     ///
     /// TTLS configuration
     ///
-    class config_ttls;
+    class config_method_ttls;
 }
 
 namespace eapserial
@@ -36,7 +36,7 @@ namespace eapserial
     /// \param[inout] cursor  Memory cursor
     /// \param[in]    val     Configuration to pack
     ///
-    inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::config_ttls &val);
+    inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::config_method_ttls &val);
 
     ///
     /// Returns packed size of a TTLS based method configuration
@@ -45,7 +45,7 @@ namespace eapserial
     ///
     /// \returns Size of data when packed (in bytes)
     ///
-    inline size_t get_pk_size(const eap::config_ttls &val);
+    inline size_t get_pk_size(const eap::config_method_ttls &val);
 
     ///
     /// Unpacks a TTLS based method configuration
@@ -53,7 +53,7 @@ namespace eapserial
     /// \param[inout] cursor  Memory cursor
     /// \param[out]   val     Configuration to unpack to
     ///
-    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::config_ttls &val);
+    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::config_method_ttls &val);
 }
 
 #pragma once
@@ -66,7 +66,7 @@ namespace eapserial
 
 
 namespace eap {
-    class config_ttls : public config_tls
+    class config_method_ttls : public config_method_tls
     {
     public:
         ///
@@ -74,26 +74,26 @@ namespace eap {
         ///
         /// \param[in] mod  Reference of the EAP module to use for global services
         ///
-        config_ttls(_In_ module &mod);
+        config_method_ttls(_In_ module &mod);
 
         ///
         /// Copies configuration
         ///
         /// \param[in] other  Configuration to copy from
         ///
-        config_ttls(const _In_ config_ttls &other);
+        config_method_ttls(const _In_ config_method_ttls &other);
 
         ///
         /// Moves configuration
         ///
         /// \param[in] other  Configuration to move from
         ///
-        config_ttls(_Inout_ config_ttls &&other);
+        config_method_ttls(_Inout_ config_method_ttls &&other);
 
         ///
         /// Destructs configuration
         ///
-        virtual ~config_ttls();
+        virtual ~config_method_ttls();
 
         ///
         /// Copies configuration
@@ -102,7 +102,7 @@ namespace eap {
         ///
         /// \returns Reference to this object
         ///
-        config_ttls& operator=(const _In_ config_ttls &other);
+        config_method_ttls& operator=(const _In_ config_method_ttls &other);
 
         ///
         /// Moves configuration
@@ -111,7 +111,7 @@ namespace eap {
         ///
         /// \returns Reference to this object
         ///
-        config_ttls& operator=(_Inout_ config_ttls &&other);
+        config_method_ttls& operator=(_Inout_ config_method_ttls &&other);
 
         ///
         /// Clones configuration
@@ -165,13 +165,13 @@ namespace eap {
 
 namespace eapserial
 {
-    inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::config_ttls &val)
+    inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::config_method_ttls &val)
     {
-        pack(cursor, (const eap::config_tls&)val);
+        pack(cursor, (const eap::config_method_tls&)val);
         if (val.m_inner) {
-            if (dynamic_cast<eap::config_pap*>(val.m_inner)) {
+            if (dynamic_cast<eap::config_method_pap*>(val.m_inner)) {
                 pack(cursor, eap::type_pap);
-                pack(cursor, (const eap::config_pap&)*val.m_inner);
+                pack(cursor, (const eap::config_method_pap&)*val.m_inner);
             } else {
                 assert(0); // Unsupported inner authentication method type.
                 pack(cursor, eap::type_undefined);
@@ -181,14 +181,14 @@ namespace eapserial
     }
 
 
-    inline size_t get_pk_size(const eap::config_ttls &val)
+    inline size_t get_pk_size(const eap::config_method_ttls &val)
     {
         size_t size_inner;
         if (val.m_inner) {
-            if (dynamic_cast<eap::config_pap*>(val.m_inner)) {
+            if (dynamic_cast<eap::config_method_pap*>(val.m_inner)) {
                 size_inner =
                     get_pk_size(eap::type_pap) +
-                    get_pk_size((const eap::config_pap&)*val.m_inner);
+                    get_pk_size((const eap::config_method_pap&)*val.m_inner);
             } else {
                 size_inner = get_pk_size(eap::type_undefined);
                 assert(0); // Unsupported inner authentication method type.
@@ -197,14 +197,14 @@ namespace eapserial
             size_inner = get_pk_size(eap::type_undefined);
 
         return
-            get_pk_size((const eap::config_tls&)val) +
+            get_pk_size((const eap::config_method_tls&)val) +
             size_inner;
     }
 
 
-    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::config_ttls &val)
+    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::config_method_ttls &val)
     {
-        unpack(cursor, (eap::config_tls&)val);
+        unpack(cursor, (eap::config_method_tls&)val);
 
         if (val.m_inner)
             delete val.m_inner;
@@ -213,8 +213,8 @@ namespace eapserial
         unpack(cursor, eap_type);
         switch (eap_type) {
             case eap::type_pap:
-                val.m_inner = new eap::config_pap(val.m_module);
-                unpack(cursor, (eap::config_pap&)*val.m_inner);
+                val.m_inner = new eap::config_method_pap(val.m_module);
+                unpack(cursor, (eap::config_method_pap&)*val.m_inner);
                 break;
             default:
                 val.m_inner = NULL;

@@ -28,19 +28,19 @@ using namespace winstd;
 // eap::session_ttls
 //////////////////////////////////////////////////////////////////////
 
-eap::session_ttls::session_ttls(_In_ module &mod) : session<config_ttls, credentials_ttls, bool, bool>(mod)
+eap::session_ttls::session_ttls(_In_ module &mod) : session<config_method_ttls, credentials_ttls, bool, bool>(mod)
 {
 }
 
 
 eap::session_ttls::session_ttls(_In_ const session_ttls &other) :
-    session<config_ttls, credentials_ttls, bool, bool>(other)
+    session<config_method_ttls, credentials_ttls, bool, bool>(other)
 {
 }
 
 
 eap::session_ttls::session_ttls(_Inout_ session_ttls &&other) :
-    session<config_ttls, credentials_ttls, bool, bool>(std::move(other))
+    session<config_method_ttls, credentials_ttls, bool, bool>(std::move(other))
 {
 }
 
@@ -48,7 +48,7 @@ eap::session_ttls::session_ttls(_Inout_ session_ttls &&other) :
 eap::session_ttls& eap::session_ttls::operator=(_In_ const session_ttls &other)
 {
     if (this != &other)
-        (session<config_ttls, credentials_ttls, bool, bool>&)*this = other;
+        (session<config_method_ttls, credentials_ttls, bool, bool>&)*this = other;
 
     return *this;
 }
@@ -57,7 +57,7 @@ eap::session_ttls& eap::session_ttls::operator=(_In_ const session_ttls &other)
 eap::session_ttls& eap::session_ttls::operator=(_Inout_ session_ttls &&other)
 {
     if (this != &other)
-        (session<config_ttls, credentials_ttls, bool, bool>&)*this = std::move(other);
+        (session<config_method_ttls, credentials_ttls, bool, bool>&)*this = std::move(other);
 
     return *this;
 }
