@@ -72,13 +72,13 @@ bool eap::peer_ttls_ui::invoke_identity_ui(
             _In_    HWND                  hwndParent,
             _In_    DWORD                 dwFlags,
             _Inout_ config_providers_type &cfg,
-            _Inout_ credentials_type      &usr,
+            _Inout_ credentials_type      &cred,
             _Out_   LPWSTR                *ppwszIdentity,
             _Out_   EAP_ERROR             **ppEapError)
 {
     UNREFERENCED_PARAMETER(dwFlags);
     UNREFERENCED_PARAMETER(cfg);
-    UNREFERENCED_PARAMETER(usr);
+    UNREFERENCED_PARAMETER(cred);
     UNREFERENCED_PARAMETER(ppwszIdentity);
     UNREFERENCED_PARAMETER(ppEapError);
 

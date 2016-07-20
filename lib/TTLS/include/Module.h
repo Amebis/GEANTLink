@@ -77,7 +77,7 @@ namespace eap
         virtual bool get_identity(
             _In_          DWORD                 dwFlags,
             _In_    const config_providers_type &cfg,
-            _Inout_       credentials_type      &usr,
+            _Inout_       credentials_type      &cred,
             _In_          HANDLE                hTokenImpersonateUser,
             _Out_         BOOL                  *pfInvokeUI,
             _Out_         WCHAR                 **ppwszIdentity,
@@ -97,7 +97,7 @@ namespace eap
             _In_        DWORD                     dwFlags,
             _In_        HANDLE                    hUserImpersonationToken,
             _In_  const config_providers_type     &cfg,
-            _In_  const credentials_type          &usr,
+            _In_  const credentials_type          &cred,
             _Out_       EAP_METHOD_PROPERTY_ARRAY *pMethodPropertyArray,
             _Out_       EAP_ERROR                 **ppEapError) const;
     };

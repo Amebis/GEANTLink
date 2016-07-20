@@ -360,11 +360,11 @@ DWORD WINAPI EapPeerInvokeIdentityUI(
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" ppwszIdentity is NULL.")));
     else {
         _EAPMETHOD_PEER_UI::config_providers_type cfg(g_peer);
-        _EAPMETHOD_PEER_UI::credentials_type usr(g_peer);
+        _EAPMETHOD_PEER_UI::credentials_type cred(g_peer);
         if (!g_peer.unpack(cfg, pConnectionData, dwConnectionDataSize, ppEapError) ||
-            !g_peer.unpack(usr, pUserData, dwUserDataSize, ppEapError) ||
-            !g_peer.invoke_identity_ui(hwndParent, dwFlags, cfg, usr, ppwszIdentity, ppEapError) ||
-            !g_peer.pack(usr, ppUserDataOut, pdwUserDataOutSize, ppEapError))
+            !g_peer.unpack(cred, pUserData, dwUserDataSize, ppEapError) ||
+            !g_peer.invoke_identity_ui(hwndParent, dwFlags, cfg, cred, ppwszIdentity, ppEapError) ||
+            !g_peer.pack(cred, ppUserDataOut, pdwUserDataOutSize, ppEapError))
         {
             if (*ppEapError) {
                 g_peer.log_error(*ppEapError);

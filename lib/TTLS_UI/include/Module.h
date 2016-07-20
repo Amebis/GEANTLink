@@ -69,7 +69,7 @@ namespace eap
         /// \param[in]    hwndParent     Parent window
         /// \param[in]    dwFlags        Flags passed to `EapPeerInvokeIdentityUI()` call
         /// \param[inout] cfg            Configuration
-        /// \param[inout] usr            User data to edit
+        /// \param[inout] cred           User credentials to edit
         /// \param[out]   ppwszIdentity  Pointer to user identity. Free using `module::free_memory()`.
         /// \param[out]   ppEapError     Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
         ///
@@ -81,7 +81,7 @@ namespace eap
             _In_    HWND                  hwndParent,
             _In_    DWORD                 dwFlags,
             _Inout_ config_providers_type &cfg,
-            _Inout_ credentials_type      &usr,
+            _Inout_ credentials_type      &cred,
             _Out_   LPWSTR                *ppwszIdentity,
             _Out_   EAP_ERROR             **ppEapError);
 
