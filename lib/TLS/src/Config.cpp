@@ -119,12 +119,16 @@ eap::config* eap::config_tls::clone() const
 
 bool eap::config_tls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
 {
-    const bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
-    DWORD dwResult;
-    HRESULT hr;
+    assert(pDoc);
+    assert(pConfigRoot);
+    assert(ppEapError);
 
     if (!config_method<credentials_tls>::save(pDoc, pConfigRoot, ppEapError))
         return false;
+
+    const bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
+    DWORD dwResult;
+    HRESULT hr;
 
     // <ServerSideCredential>
     com_obj<IXMLDOMElement> pXmlElServerSideCredential;
@@ -176,6 +180,8 @@ bool eap::config_tls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfig
 
 bool eap::config_tls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError)
 {
+    assert(pConfigRoot);
+
     if (!config_method<credentials_tls>::load(pConfigRoot, ppEapError))
         return false;
 

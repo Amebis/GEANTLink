@@ -389,22 +389,19 @@ namespace eapserial
 {
     inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::credentials &val)
     {
-        UNREFERENCED_PARAMETER(cursor);
-        UNREFERENCED_PARAMETER(val   );
+        pack(cursor, (const eap::config&)val);
     }
 
 
     inline size_t get_pk_size(const eap::credentials &val)
     {
-        UNREFERENCED_PARAMETER(val);
-        return 0;
+        return get_pk_size((const eap::config&)val);
     }
 
 
     inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::credentials &val)
     {
-        UNREFERENCED_PARAMETER(cursor);
-        UNREFERENCED_PARAMETER(val   );
+        unpack(cursor, (eap::config&)val);
     }
 
 

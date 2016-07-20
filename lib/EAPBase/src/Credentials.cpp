@@ -79,9 +79,8 @@ bool eap::credentials::empty() const
 
 bool eap::credentials::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
 {
-    UNREFERENCED_PARAMETER(pDoc);
-    UNREFERENCED_PARAMETER(pConfigRoot);
-    UNREFERENCED_PARAMETER(ppEapError);
+    if (!config::save(pDoc, pConfigRoot, ppEapError))
+        return false;
 
     return true;
 }
@@ -89,8 +88,8 @@ bool eap::credentials::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfi
 
 bool eap::credentials::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError)
 {
-    UNREFERENCED_PARAMETER(pConfigRoot);
-    UNREFERENCED_PARAMETER(ppEapError);
+    if (!config::load(pConfigRoot, ppEapError))
+        return false;
 
     return true;
 }
@@ -167,11 +166,15 @@ bool eap::credentials_pass::empty() const
 
 bool eap::credentials_pass::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
 {
-    const bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
-    DWORD dwResult;
+    assert(pDoc);
+    assert(pConfigRoot);
+    assert(ppEapError);
 
     if (!credentials::save(pDoc, pConfigRoot, ppEapError))
         return false;
+
+    const bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
+    DWORD dwResult;
 
     // <UserName>
     if ((dwResult = eapxml::put_element_value(pDoc, pConfigRoot, bstr(L"UserName"), bstrNamespace, bstr(m_identity))) != ERROR_SUCCESS) {
@@ -195,6 +198,7 @@ bool eap::credentials_pass::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *p
 bool eap::credentials_pass::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError)
 {
     assert(pConfigRoot);
+    assert(ppEapError);
     DWORD dwResult;
 
     if (!credentials::load(pConfigRoot, ppEapError))

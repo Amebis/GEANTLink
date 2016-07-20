@@ -90,11 +90,15 @@ eap::config* eap::config_ttls::clone() const
 
 bool eap::config_ttls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
 {
-    const bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
-    DWORD dwResult;
+    assert(pDoc);
+    assert(pConfigRoot);
+    assert(ppEapError);
 
     if (!config_tls::save(pDoc, pConfigRoot, ppEapError))
         return false;
+
+    const bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
+    DWORD dwResult;
 
     // <InnerAuthenticationMethod>
     com_obj<IXMLDOMElement> pXmlElInnerAuthenticationMethod;
@@ -124,6 +128,7 @@ bool eap::config_ttls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfi
 
 bool eap::config_ttls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError)
 {
+    assert(pConfigRoot);
     assert(ppEapError);
     DWORD dwResult;
 

@@ -60,3 +60,22 @@ eap::config& eap::config::operator=(_Inout_ config &&other)
     assert(&m_module == &other.m_module); // Move configuration within same module only!
     return *this;
 }
+
+
+bool eap::config::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
+{
+    UNREFERENCED_PARAMETER(pDoc);
+    UNREFERENCED_PARAMETER(pConfigRoot);
+    UNREFERENCED_PARAMETER(ppEapError);
+
+    return true;
+}
+
+
+bool eap::config::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError)
+{
+    UNREFERENCED_PARAMETER(pConfigRoot);
+    UNREFERENCED_PARAMETER(ppEapError);
+
+    return true;
+}

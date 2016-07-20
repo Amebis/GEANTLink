@@ -46,6 +46,31 @@ namespace eap
 namespace eapserial
 {
     ///
+    /// Packs a configuration
+    ///
+    /// \param[inout] cursor  Memory cursor
+    /// \param[in]    val     Configuration to pack
+    ///
+    inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::config &val);
+
+    ///
+    /// Returns packed size of a configuration
+    ///
+    /// \param[in] val  Configuration to pack
+    ///
+    /// \returns Size of data when packed (in bytes)
+    ///
+    inline size_t get_pk_size(const eap::config &val);
+
+    ///
+    /// Unpacks a configuration
+    ///
+    /// \param[inout] cursor  Memory cursor
+    /// \param[out]   val     Configuration to unpack to
+    ///
+    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::config &val);
+
+    ///
     /// Packs a method configuration
     ///
     /// \param[inout] cursor  Memory cursor
@@ -205,7 +230,7 @@ namespace eap
         /// - \c true if succeeded
         /// - \c false otherwise. See \p ppEapError for details.
         ///
-        virtual bool save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const = 0;
+        virtual bool save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const;
 
         ///
         /// Load configuration from XML document
@@ -217,7 +242,7 @@ namespace eap
         /// - \c true if succeeded
         /// - \c false otherwise. See \p ppEapError for details.
         ///
-        virtual bool load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) = 0;
+        virtual bool load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError);
 
         /// @}
 
@@ -338,6 +363,13 @@ namespace eap
         ///
         virtual bool save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
         {
+            assert(pDoc);
+            assert(pConfigRoot);
+            assert(ppEapError);
+
+            if (!config::save(pDoc, pConfigRoot, ppEapError))
+                return false;
+
             const winstd::bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
             DWORD dwResult;
 
@@ -381,6 +413,12 @@ namespace eap
         ///
         virtual bool load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError)
         {
+            assert(pConfigRoot);
+            assert(ppEapError);
+
+            if (!config::load(pConfigRoot, ppEapError))
+                return false;
+
             m_allow_save = true;
             m_use_preshared = false;
             m_preshared.clear();
@@ -565,6 +603,9 @@ namespace eap
         ///
         virtual bool save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
         {
+            if (!config::save(pDoc, pConfigRoot, ppEapError))
+                return false;
+
             const winstd::bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
             DWORD dwResult;
             HRESULT hr;
@@ -689,9 +730,10 @@ namespace eap
             assert(pConfigRoot);
             assert(ppEapError);
             DWORD dwResult;
-            std::wstring lang;
-            LoadString(m_module.m_instance, 2, lang);
             std::wstring xpath(eapxml::get_xpath(pConfigRoot));
+
+            if (!config::load(pConfigRoot, ppEapError))
+                return false;
 
             // <read-only>
             if ((dwResult = eapxml::get_element_value(pConfigRoot, winstd::bstr(L"eap-metadata:read-only"), &m_read_only)) != ERROR_SUCCESS)
@@ -713,6 +755,8 @@ namespace eap
             m_lbl_alt_password.clear();
             winstd::com_obj<IXMLDOMElement> pXmlElProviderInfo;
             if (eapxml::select_element(pConfigRoot, winstd::bstr(L"eap-metadata:ProviderInfo"), &pXmlElProviderInfo) == ERROR_SUCCESS) {
+                std::wstring lang;
+                LoadString(m_module.m_instance, 2, lang);
                 std::wstring xpathProviderInfo(xpath + L"/ProviderInfo");
 
                 // <DisplayName>
@@ -892,6 +936,9 @@ namespace eap
         ///
         virtual bool save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
         {
+            if (!config::save(pDoc, pConfigRoot, ppEapError))
+                return false;
+
             const winstd::bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
             DWORD dwResult;
             HRESULT hr;
@@ -941,6 +988,9 @@ namespace eap
             assert(ppEapError);
             DWORD dwResult;
 
+            if (!config::load(pConfigRoot, ppEapError))
+                return false;
+
             // Iterate authentication providers (<EAPIdentityProvider>).
             winstd::com_obj<IXMLDOMNodeList> pXmlListProviders;
             if ((dwResult = eapxml::select_nodes(pConfigRoot, winstd::bstr(L"eap-metadata:EAPIdentityProviderList/eap-metadata:EAPIdentityProvider"), &pXmlListProviders)) != ERROR_SUCCESS) {
@@ -976,9 +1026,31 @@ namespace eap
 
 namespace eapserial
 {
+    inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::config &val)
+    {
+        UNREFERENCED_PARAMETER(cursor);
+        UNREFERENCED_PARAMETER(val   );
+    }
+
+
+    inline size_t get_pk_size(const eap::config &val)
+    {
+        UNREFERENCED_PARAMETER(val);
+        return 0;
+    }
+
+
+    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::config &val)
+    {
+        UNREFERENCED_PARAMETER(cursor);
+        UNREFERENCED_PARAMETER(val   );
+    }
+
+
     template <class _Tcred>
     inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::config_method<_Tcred> &val)
     {
+        pack(cursor, (const eap::config&)val );
         pack(cursor, val.m_allow_save        );
         pack(cursor, val.m_anonymous_identity);
         pack(cursor, val.m_use_preshared     );
@@ -990,6 +1062,7 @@ namespace eapserial
     inline size_t get_pk_size(const eap::config_method<_Tcred> &val)
     {
         return
+            get_pk_size((const eap::config&)val ) +
             get_pk_size(val.m_allow_save        ) +
             get_pk_size(val.m_anonymous_identity) +
             get_pk_size(val.m_use_preshared     ) +
@@ -1000,6 +1073,7 @@ namespace eapserial
     template <class _Tcred>
     inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::config_method<_Tcred> &val)
     {
+        unpack(cursor, (eap::config&)val       );
         unpack(cursor, val.m_allow_save        );
         unpack(cursor, val.m_anonymous_identity);
         unpack(cursor, val.m_use_preshared     );
@@ -1010,6 +1084,7 @@ namespace eapserial
     template <class _Tmeth>
     inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::config_provider<_Tmeth> &val)
     {
+        pack(cursor, (const eap::config&)val );
         pack(cursor, val.m_read_only         );
         pack(cursor, val.m_id                );
         pack(cursor, val.m_name              );
@@ -1027,6 +1102,7 @@ namespace eapserial
     inline size_t get_pk_size(const eap::config_provider<_Tmeth> &val)
     {
         return
+            get_pk_size((const eap::config&)val ) +
             get_pk_size(val.m_read_only         ) +
             get_pk_size(val.m_id                ) +
             get_pk_size(val.m_name              ) +
@@ -1043,6 +1119,7 @@ namespace eapserial
     template <class _Tmeth>
     inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::config_provider<_Tmeth> &val)
     {
+        unpack(cursor, (eap::config&)val       );
         unpack(cursor, val.m_read_only         );
         unpack(cursor, val.m_id                );
         unpack(cursor, val.m_name              );
@@ -1067,20 +1144,25 @@ namespace eapserial
     template <class _Tprov>
     inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::config_providers<_Tprov> &val)
     {
-        pack(cursor, val.m_providers);
+        pack(cursor, (const eap::config&)val);
+        pack(cursor, val.m_providers        );
     }
 
 
     template <class _Tprov>
     inline size_t get_pk_size(const eap::config_providers<_Tprov> &val)
     {
-        return get_pk_size(val.m_providers);
+        return
+            get_pk_size((const eap::config&)val) +
+            get_pk_size(val.m_providers        );
     }
 
 
     template <class _Tprov>
     inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::config_providers<_Tprov> &val)
     {
+        unpack(cursor, (eap::config&)val);
+
         std::list<_Tprov>::size_type count = *(const std::list<_Tprov>::size_type*&)cursor;
         cursor += sizeof(std::list<_Tprov>::size_type);
         val.m_providers.clear();

@@ -97,12 +97,16 @@ bool eap::credentials_ttls::empty() const
 
 bool eap::credentials_ttls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
 {
-    const bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
-    DWORD dwResult;
-    HRESULT hr;
+    assert(pDoc);
+    assert(pConfigRoot);
+    assert(ppEapError);
 
     if (!credentials_tls::save(pDoc, pConfigRoot, ppEapError))
         return false;
+
+    const bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
+    DWORD dwResult;
+    HRESULT hr;
 
     if (m_inner) {
         // <InnerAuthenticationMethod>
@@ -128,6 +132,7 @@ bool eap::credentials_ttls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *p
 bool eap::credentials_ttls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError)
 {
     assert(pConfigRoot);
+    assert(ppEapError);
     DWORD dwResult;
 
     if (!credentials_tls::load(pConfigRoot, ppEapError))
