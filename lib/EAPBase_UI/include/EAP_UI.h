@@ -345,7 +345,7 @@ public:
         m_prov(prov),
         m_cfg(cfg),
         m_target(pszCredTarget),
-        m_cred(m_cfg.m_module),
+        m_cred(cfg.make_credentials()),
         wxEAPCredentialsConfigPanelBase(parent)
     {
         // Load and set icon.
@@ -366,12 +366,11 @@ protected:
             m_preshared_set     ->Enable(false);
         }
 
-        if (!m_cfg.m_use_preshared) {
+        if (!m_cfg.m_preshared) {
             m_own->SetValue(true);
-            m_cred.clear();
         } else {
             m_preshared->SetValue(true);
-            m_cred = m_cfg.m_preshared;
+            m_cred.reset((eap::credentials*)m_cfg.m_preshared->clone());
         }
 
         return wxEAPCredentialsConfigPanelBase::TransferDataToWindow();
@@ -384,12 +383,7 @@ protected:
 
         if (!m_prov.m_read_only) {
             // This is not a provider-locked configuration. Save the data.
-            if (m_own->GetValue()) {
-                m_cfg.m_use_preshared = false;
-            } else {
-                m_cfg.m_use_preshared = true;
-                m_cfg.m_preshared = m_cred;
-            }
+            m_cfg.m_preshared.reset(m_own->GetValue() ? nullptr : (eap::credentials*)m_cred->clone());
         }
 
         return true;
@@ -404,7 +398,7 @@ protected:
         if (m_cfg.m_allow_save) {
             bool has_own;
             std::unique_ptr<CREDENTIAL, winstd::CredFree_delete<CREDENTIAL> > cred;
-            if (CredRead(m_cred.target_name(m_target.c_str()).c_str(), CRED_TYPE_GENERIC, 0, (PCREDENTIAL*)&cred)) {
+            if (CredRead(m_cred->target_name(m_target.c_str()).c_str(), CRED_TYPE_GENERIC, 0, (PCREDENTIAL*)&cred)) {
                 m_own_identity->SetValue(cred->UserName && cred->UserName[0] != 0 ? cred->UserName : _("<blank>"));
                 has_own = true;
             } else if ((dwResult = GetLastError()) == ERROR_NOT_FOUND) {
@@ -432,7 +426,7 @@ protected:
             m_own_clear   ->Enable(false);
         }
 
-        m_preshared_identity->SetValue(!m_cred.empty() ? m_cred.get_name() : _("<blank>"));
+        m_preshared_identity->SetValue(!m_cred->empty() ? m_cred->get_name() : _("<blank>"));
 
         if (!m_prov.m_read_only) {
             // This is not a provider-locked configuration. Selectively enable/disable controls.
@@ -453,7 +447,7 @@ protected:
 
         wxEAPCredentialsDialog<_Tprov> dlg(m_prov, this);
 
-        _wxT *panel = new _wxT(m_prov, m_cred, m_target.c_str(), &dlg, true);
+        _wxT *panel = new _wxT(m_prov, (typename _Tmeth::credentials_type&)*m_cred, m_target.c_str(), &dlg, true);
 
         dlg.AddContents((wxPanel**)&panel, 1);
         dlg.ShowModal();
@@ -464,7 +458,7 @@ protected:
     {
         UNREFERENCED_PARAMETER(event);
 
-        if (!CredDelete(m_cred.target_name(m_target.c_str()).c_str(), CRED_TYPE_GENERIC, 0))
+        if (!CredDelete(m_cred->target_name(m_target.c_str()).c_str(), CRED_TYPE_GENERIC, 0))
             wxLogError(_("Deleting credentials failed (error %u)."), GetLastError());
     }
 
@@ -475,7 +469,7 @@ protected:
 
         wxEAPCredentialsDialog<_Tprov> dlg(m_prov, this);
 
-        _wxT *panel = new _wxT(m_prov, m_cred, _T(""), &dlg, true);
+        _wxT *panel = new _wxT(m_prov, (typename _Tmeth::credentials_type&)*m_cred, _T(""), &dlg, true);
 
         dlg.AddContents((wxPanel**)&panel, 1);
         dlg.ShowModal();
@@ -491,7 +485,7 @@ protected:
     winstd::tstring m_target;                   ///< Credential Manager target
 
 private:
-    typename _Tmeth::credentials_type m_cred;   ///< Temporary credential data
+    std::unique_ptr<eap::credentials> m_cred;   ///< Temporary credential data
 };
 
 

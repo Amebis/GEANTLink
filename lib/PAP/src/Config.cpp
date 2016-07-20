@@ -66,6 +66,12 @@ eap::config* eap::config_method_pap::clone() const
 }
 
 
+eap::credentials* eap::config_method_pap::make_credentials() const
+{
+    return new credentials_pap(m_module);
+}
+
+
 eap::type_t eap::config_method_pap::get_method_id() const
 {
     return eap::type_pap;

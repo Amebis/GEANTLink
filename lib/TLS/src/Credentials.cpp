@@ -167,6 +167,28 @@ bool eap::credentials_tls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR *
 }
 
 
+void eap::credentials_tls::pack(_Inout_ unsigned char *&cursor) const
+{
+    eap::credentials::pack(cursor);
+    eapserial::pack(cursor, m_cert);
+}
+
+
+size_t eap::credentials_tls::get_pk_size() const
+{
+    return
+        eap::credentials::get_pk_size() +
+        eapserial::get_pk_size(m_cert);
+}
+
+
+void eap::credentials_tls::unpack(_Inout_ const unsigned char *&cursor)
+{
+    eap::credentials::unpack(cursor);
+    eapserial::unpack(cursor, m_cert);
+}
+
+
 bool eap::credentials_tls::store(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **ppEapError) const
 {
     assert(pszTargetName);

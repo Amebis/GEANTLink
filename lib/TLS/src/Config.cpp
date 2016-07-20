@@ -256,6 +256,37 @@ bool eap::config_method_tls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR
 }
 
 
+void eap::config_method_tls::pack(_Inout_ unsigned char *&cursor) const
+{
+    eap::config_method<eap::credentials_tls>::pack(cursor);
+    eapserial::pack(cursor, m_trusted_root_ca);
+    eapserial::pack(cursor, m_server_names   );
+}
+
+
+size_t eap::config_method_tls::get_pk_size() const
+{
+    return
+        eap::config_method<eap::credentials_tls>::get_pk_size() +
+        eapserial::get_pk_size(m_trusted_root_ca) +
+        eapserial::get_pk_size(m_server_names   );
+}
+
+
+void eap::config_method_tls::unpack(_Inout_ const unsigned char *&cursor)
+{
+    eap::config_method<eap::credentials_tls>::unpack(cursor);
+    eapserial::unpack(cursor, m_trusted_root_ca);
+    eapserial::unpack(cursor, m_server_names   );
+}
+
+
+eap::credentials* eap::config_method_tls::make_credentials() const
+{
+    return new credentials_tls(m_module);
+}
+
+
 eap::type_t eap::config_method_tls::get_method_id() const
 {
     return eap::type_tls;

@@ -33,59 +33,6 @@ namespace eap
     class credentials_pass;
 }
 
-namespace eapserial
-{
-    ///
-    /// Packs a method credentials
-    ///
-    /// \param[inout] cursor  Memory cursor
-    /// \param[in]    val     Credentials to pack
-    ///
-    inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::credentials &val);
-
-    ///
-    /// Returns packed size of a method credentials
-    ///
-    /// \param[in] val  Credentials to pack
-    ///
-    /// \returns Size of data when packed (in bytes)
-    ///
-    inline size_t get_pk_size(const eap::credentials &val);
-
-    ///
-    /// Unpacks a method credentials
-    ///
-    /// \param[inout] cursor  Memory cursor
-    /// \param[out]   val     Credentials to unpack to
-    ///
-    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::credentials &val);
-
-    ///
-    /// Packs a password based method credentials
-    ///
-    /// \param[inout] cursor  Memory cursor
-    /// \param[in]    val     Credentials to pack
-    ///
-    inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::credentials_pass &val);
-
-    ///
-    /// Returns packed size of a password based method credentials
-    ///
-    /// \param[in] val  Credentials to pack
-    ///
-    /// \returns Size of data when packed (in bytes)
-    ///
-    inline size_t get_pk_size(const eap::credentials_pass &val);
-
-    ///
-    /// Unpacks a password based method credentials
-    ///
-    /// \param[inout] cursor  Memory cursor
-    /// \param[out]   val     Credentials to unpack to
-    ///
-    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::credentials_pass &val);
-}
-
 #pragma once
 
 #include "Config.h"
@@ -339,6 +286,32 @@ namespace eap
 
         /// @}
 
+        /// \name BLOB management
+        /// @{
+
+        ///
+        /// Packs a configuration
+        ///
+        /// \param[inout] cursor  Memory cursor
+        ///
+        virtual void pack(_Inout_ unsigned char *&cursor) const;
+
+        ///
+        /// Returns packed size of a configuration
+        ///
+        /// \returns Size of data when packed (in bytes)
+        ///
+        virtual size_t get_pk_size() const;
+
+        ///
+        /// Unpacks a configuration
+        ///
+        /// \param[inout] cursor  Memory cursor
+        ///
+        virtual void unpack(_Inout_ const unsigned char *&cursor);
+
+        /// @}
+
         /// \name Storage
         /// @{
 
@@ -382,50 +355,4 @@ namespace eap
         static const unsigned char s_entropy[1024];
         /// \endcond
     };
-}
-
-
-namespace eapserial
-{
-    inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::credentials &val)
-    {
-        pack(cursor, (const eap::config&)val);
-    }
-
-
-    inline size_t get_pk_size(const eap::credentials &val)
-    {
-        return get_pk_size((const eap::config&)val);
-    }
-
-
-    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::credentials &val)
-    {
-        unpack(cursor, (eap::config&)val);
-    }
-
-
-    inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::credentials_pass &val)
-    {
-        pack(cursor, (const eap::credentials&)val);
-        pack(cursor, val.m_identity              );
-        pack(cursor, val.m_password              );
-    }
-
-
-    inline size_t get_pk_size(const eap::credentials_pass &val)
-    {
-        return
-            get_pk_size((const eap::credentials&)val) +
-            get_pk_size(val.m_identity              ) +
-            get_pk_size(val.m_password              );
-    }
-
-
-    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::credentials_pass &val)
-    {
-        unpack(cursor, (eap::credentials&)val);
-        unpack(cursor, val.m_identity        );
-        unpack(cursor, val.m_password        );
-    }
 }

@@ -158,6 +158,61 @@ bool eap::config_method_ttls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERRO
 }
 
 
+void eap::config_method_ttls::pack(_Inout_ unsigned char *&cursor) const
+{
+    eap::config_method_tls::pack(cursor);
+    if (m_inner) {
+        if (dynamic_cast<eap::config_method_pap*>(m_inner.get())) {
+            eapserial::pack(cursor, eap::type_pap);
+            m_inner->pack(cursor);
+        } else {
+            assert(0); // Unsupported inner authentication method type.
+            eapserial::pack(cursor, eap::type_undefined);
+        }
+    } else
+        eapserial::pack(cursor, eap::type_undefined);
+}
+
+
+size_t eap::config_method_ttls::get_pk_size() const
+{
+    size_t size_inner;
+    if (m_inner) {
+        if (dynamic_cast<eap::config_method_pap*>(m_inner.get())) {
+            size_inner =
+                eapserial::get_pk_size(eap::type_pap) +
+                m_inner->get_pk_size();
+        } else {
+            assert(0); // Unsupported inner authentication method type.
+            size_inner = eapserial::get_pk_size(eap::type_undefined);
+        }
+    } else
+        size_inner = eapserial::get_pk_size(eap::type_undefined);
+
+    return
+        eap::config_method_tls::get_pk_size() +
+        size_inner;
+}
+
+
+void eap::config_method_ttls::unpack(_Inout_ const unsigned char *&cursor)
+{
+    eap::config_method_tls::unpack(cursor);
+
+    eap::type_t eap_type;
+    eapserial::unpack(cursor, eap_type);
+    switch (eap_type) {
+        case eap::type_pap:
+            m_inner.reset(new eap::config_method_pap(m_module));
+            m_inner->unpack(cursor);
+            break;
+        default:
+            assert(0); // Unsupported inner authentication method type.
+            m_inner.reset(nullptr);
+    }
+}
+
+
 eap::type_t eap::config_method_ttls::get_method_id() const
 {
     return eap::type_ttls;

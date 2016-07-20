@@ -28,34 +28,6 @@ namespace eap
     class config_method_pap;
 }
 
-namespace eapserial
-{
-    ///
-    /// Packs a PAP based method configuration
-    ///
-    /// \param[inout] cursor  Memory cursor
-    /// \param[in]    val     Configuration to pack
-    ///
-    inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::config_method_pap &val);
-
-    ///
-    /// Returns packed size of a PAP based method configuration
-    ///
-    /// \param[in] val  Configuration to pack
-    ///
-    /// \returns Size of data when packed (in bytes)
-    ///
-    inline size_t get_pk_size(const eap::config_method_pap &val);
-
-    ///
-    /// Unpacks a PAP based method configuration
-    ///
-    /// \param[inout] cursor  Memory cursor
-    /// \param[out]   val     Configuration to unpack to
-    ///
-    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::config_method_pap &val);
-}
-
 #pragma once
 
 #include "Credentials.h"
@@ -118,31 +90,15 @@ namespace eap
         virtual config* clone() const;
 
         ///
+        /// Makes new set of credentials for the given method type
+        ///
+        virtual credentials* make_credentials() const;
+
+        ///
         /// Returns EAP method type of this configuration
         ///
         /// \returns `eap::type_pap`
         ///
         virtual eap::type_t get_method_id() const;
     };
-}
-
-
-namespace eapserial
-{
-    inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::config_method_pap &val)
-    {
-        pack(cursor, (const eap::config_method<eap::credentials_pap>&)val);
-    }
-
-
-    inline size_t get_pk_size(const eap::config_method_pap &val)
-    {
-        return get_pk_size((const eap::config_method<eap::credentials_pap>&)val);
-    }
-
-
-    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::config_method_pap &val)
-    {
-        unpack(cursor, (eap::config_method<eap::credentials_pap>&)val);
-    }
 }

@@ -28,34 +28,6 @@ namespace eap
     class credentials_tls;
 }
 
-namespace eapserial
-{
-    ///
-    /// Packs a TLS method credentials
-    ///
-    /// \param[inout] cursor  Memory cursor
-    /// \param[in]    val     Credentials to pack
-    ///
-    inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::credentials_tls &val);
-
-    ///
-    /// Returns packed size of a TLS method credentials
-    ///
-    /// \param[in] val  Credentials to pack
-    ///
-    /// \returns Size of data when packed (in bytes)
-    ///
-    inline size_t get_pk_size(const eap::credentials_tls &val);
-
-    ///
-    /// Unpacks a TLS method credentials
-    ///
-    /// \param[inout] cursor  Memory cursor
-    /// \param[out]   val     Credentials to unpack to
-    ///
-    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::credentials_tls &val);
-}
-
 #pragma once
 
 #include "../../EAPBase/include/Credentials.h"
@@ -158,6 +130,32 @@ namespace eap
 
         /// @}
 
+        /// \name BLOB management
+        /// @{
+
+        ///
+        /// Packs a configuration
+        ///
+        /// \param[inout] cursor  Memory cursor
+        ///
+        virtual void pack(_Inout_ unsigned char *&cursor) const;
+
+        ///
+        /// Returns packed size of a configuration
+        ///
+        /// \returns Size of data when packed (in bytes)
+        ///
+        virtual size_t get_pk_size() const;
+
+        ///
+        /// Unpacks a configuration
+        ///
+        /// \param[inout] cursor  Memory cursor
+        ///
+        virtual void unpack(_Inout_ const unsigned char *&cursor);
+
+        /// @}
+
         /// \name Storage
         /// @{
 
@@ -216,29 +214,4 @@ namespace eap
         static const unsigned char s_entropy[1024];
         /// \endcond
     };
-}
-
-
-namespace eapserial
-{
-    inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::credentials_tls &val)
-    {
-        pack(cursor, (const eap::credentials&)val);
-        pack(cursor, val.m_cert                  );
-    }
-
-
-    inline size_t get_pk_size(const eap::credentials_tls &val)
-    {
-        return
-            get_pk_size((const eap::credentials&)val) +
-            get_pk_size(val.m_cert                  );
-    }
-
-
-    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::credentials_tls &val)
-    {
-        unpack(cursor, (eap::credentials&)val);
-        unpack(cursor, val.m_cert            );
-    }
 }

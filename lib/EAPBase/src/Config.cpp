@@ -79,3 +79,21 @@ bool eap::config::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapErr
 
     return true;
 }
+
+
+void eap::config::pack(_Inout_ unsigned char *&cursor) const
+{
+    UNREFERENCED_PARAMETER(cursor);
+}
+
+
+size_t eap::config::get_pk_size() const
+{
+    return 0;
+}
+
+
+void eap::config::unpack(_Inout_ const unsigned char *&cursor)
+{
+    UNREFERENCED_PARAMETER(cursor);
+}

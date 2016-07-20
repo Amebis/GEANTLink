@@ -26,34 +26,6 @@ namespace eap
     class credentials_ttls;
 }
 
-namespace eapserial
-{
-    ///
-    /// Packs a TTLS based method credentials
-    ///
-    /// \param[inout] cursor  Memory cursor
-    /// \param[in]    val     Configuration to pack
-    ///
-    inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::credentials_ttls &val);
-
-    ///
-    /// Returns packed size of a TTLS based method credentials
-    ///
-    /// \param[in] val  Configuration to pack
-    ///
-    /// \returns Size of data when packed (in bytes)
-    ///
-    inline size_t get_pk_size(const eap::credentials_ttls &val);
-
-    ///
-    /// Unpacks a TTLS based method credentials
-    ///
-    /// \param[inout] cursor  Memory cursor
-    /// \param[out]   val     Configuration to unpack to
-    ///
-    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::credentials_ttls &val);
-}
-
 #pragma once
 
 #include "../../TLS/include/Credentials.h"
@@ -153,6 +125,30 @@ namespace eap
 
         /// @}
 
+        /// \name BLOB management
+        /// @{
+
+        ///
+        /// Packs a configuration
+        ///
+        /// \param[inout] cursor  Memory cursor
+        ///
+        virtual void pack(_Inout_ unsigned char *&cursor) const;
+
+        ///
+        /// Returns packed size of a configuration
+        ///
+        /// \returns Size of data when packed (in bytes)
+        ///
+        virtual size_t get_pk_size() const;
+
+        ///
+        /// Unpacks a configuration
+        ///
+        /// \param[inout] cursor  Memory cursor
+        ///
+        virtual void unpack(_Inout_ const unsigned char *&cursor);
+
         /// \name Storage
         /// @{
 
@@ -185,62 +181,4 @@ namespace eap
     public:
         std::unique_ptr<credentials> m_inner;   ///< Inner credentials
     };
-}
-
-
-namespace eapserial
-{
-    inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::credentials_ttls &val)
-    {
-        pack(cursor, (const eap::credentials_tls&)val);
-        if (val.m_inner) {
-            if (dynamic_cast<eap::credentials_pap*>(val.m_inner.get())) {
-                pack(cursor, eap::type_pap);
-                pack(cursor, (const eap::credentials_pap&)*val.m_inner);
-            } else {
-                assert(0); // Unsupported inner authentication method type.
-                pack(cursor, eap::type_undefined);
-            }
-        } else
-            pack(cursor, eap::type_undefined);
-    }
-
-
-    inline size_t get_pk_size(const eap::credentials_ttls &val)
-    {
-        size_t size_inner;
-        if (val.m_inner) {
-            if (dynamic_cast<eap::credentials_pap*>(val.m_inner.get())) {
-                size_inner =
-                    get_pk_size(eap::type_pap) +
-                    get_pk_size((const eap::credentials_pap&)*val.m_inner);
-            } else {
-                assert(0); // Unsupported inner authentication method type.
-                size_inner = get_pk_size(eap::type_undefined);
-            }
-        } else
-            size_inner = get_pk_size(eap::type_undefined);
-
-        return
-            get_pk_size((const eap::credentials_tls&)val) +
-            size_inner;
-    }
-
-
-    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::credentials_ttls &val)
-    {
-        unpack(cursor, (eap::credentials_tls&)val);
-
-        eap::type_t eap_type;
-        unpack(cursor, eap_type);
-        switch (eap_type) {
-            case eap::type_pap:
-                val.m_inner.reset(new eap::credentials_pap(val.m_module));
-                unpack(cursor, (eap::credentials_pap&)*val.m_inner);
-                break;
-            default:
-                assert(0); // Unsupported inner authentication method type.
-                val.m_inner.reset(nullptr);
-        }
-    }
 }

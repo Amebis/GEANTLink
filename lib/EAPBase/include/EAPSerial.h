@@ -403,8 +403,7 @@ namespace eapserial
     inline void pack(_Inout_ unsigned char *&cursor, _In_ const std::vector<_Ty, _Ax> &val)
     {
         std::vector<_Ty, _Ax>::size_type count = val.size();
-        *(std::vector<_Ty, _Ax>::size_type*&)cursor = count;
-        cursor += sizeof(std::vector<_Ty, _Ax>::size_type);
+        pack(cursor, count);
 
         // Since we do not know wheter vector elements are primitives or objects, iterate instead of memcpy.
         // For performance critical vectors of flat opaque data types write specialized template instantiation.
@@ -418,8 +417,9 @@ namespace eapserial
     {
         // Since we do not know wheter vector elements are primitives or objects, iterate instead of sizeof().
         // For performance critical vectors of flat opaque data types write specialized template instantiation.
-        size_t size = sizeof(std::vector<_Ty, _Ax>::size_type);
-        for (std::vector<_Ty, _Ax>::size_type i = 0, count = val.size(); i < count; i++)
+        std::vector<_Ty, _Ax>::size_type count = val.size();
+        size_t size = get_pk_size(count);
+        for (std::vector<_Ty, _Ax>::size_type i = 0; i < count; i++)
             size += get_pk_size(val[i]);
         return size;
     }
@@ -428,8 +428,8 @@ namespace eapserial
     template<class _Ty, class _Ax>
     inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ std::vector<_Ty, _Ax> &val)
     {
-        std::vector<_Ty, _Ax>::size_type count = *(const std::vector<_Ty, _Ax>::size_type*&)cursor;
-        cursor += sizeof(std::vector<_Ty, _Ax>::size_type);
+        std::vector<_Ty, _Ax>::size_type count;
+        unpack(cursor, count);
 
         // Since we do not know wheter vector elements are primitives or objects, iterate instead of assign().
         // For performance critical vectors of flat opaque data types write specialized template instantiation.
@@ -447,8 +447,7 @@ namespace eapserial
     inline void pack(_Inout_ unsigned char *&cursor, _In_ const std::list<_Ty, _Ax> &val)
     {
         std::list<_Ty, _Ax>::size_type count = val.size();
-        *(std::list<_Ty, _Ax>::size_type*&)cursor = count;
-        cursor += sizeof(std::list<_Ty, _Ax>::size_type);
+        pack(cursor, count);
 
         // Since we do not know wheter list elements are primitives or objects, iterate instead of memcpy.
         // For performance critical vectors of flat opaque data types write specialized template instantiation.
@@ -462,7 +461,8 @@ namespace eapserial
     {
         // Since we do not know wheter list elements are primitives or objects, iterate instead of sizeof().
         // For performance critical vectors of flat opaque data types write specialized template instantiation.
-        size_t size = sizeof(std::list<_Ty, _Ax>::size_type);
+        std::list<_Ty, _Ax>::size_type count = val.size();
+        size_t size = get_pk_size(count);
         for (std::list<_Ty, _Ax>::const_iterator i = val.cbegin(), i_end = val.cend(); i != i_end; ++i)
             size += get_pk_size(*i);
         return size;
@@ -472,8 +472,8 @@ namespace eapserial
     template<class _Ty, class _Ax>
     inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ std::list<_Ty, _Ax> &val)
     {
-        std::list<_Ty, _Ax>::size_type count = *(const std::list<_Ty, _Ax>::size_type*&)cursor;
-        cursor += sizeof(std::list<_Ty, _Ax>::size_type);
+        std::list<_Ty, _Ax>::size_type count;
+        unpack(cursor, count);
 
         // Since we do not know wheter list elements are primitives or objects, iterate instead of assign().
         // For performance critical vectors of flat opaque data types write specialized template instantiation.
@@ -489,37 +489,36 @@ namespace eapserial
     inline void pack(_Inout_ unsigned char *&cursor, _In_ const winstd::cert_context &val)
     {
         if (val) {
-            *(DWORD*&)cursor = val->dwCertEncodingType;
-            cursor += sizeof(DWORD);
-
-            *(DWORD*&)cursor = val->cbCertEncoded;
-            cursor += sizeof(DWORD);
-
+            pack(cursor, (unsigned int)val->dwCertEncodingType);
+            pack(cursor, (unsigned int)val->cbCertEncoded     );
             memcpy(cursor, val->pbCertEncoded, val->cbCertEncoded);
             cursor += val->cbCertEncoded;
         } else {
-            *(DWORD*&)cursor = 0;
-            cursor += sizeof(DWORD);
-
-            *(DWORD*&)cursor = 0;
-            cursor += sizeof(DWORD);
+            pack(cursor, (unsigned int)0);
+            pack(cursor, (unsigned int)0);
         }
     }
 
 
     inline size_t get_pk_size(const winstd::cert_context &val)
     {
-        return sizeof(DWORD) + sizeof(DWORD) + (val ? val->cbCertEncoded : 0);
+        return
+            val ?
+                get_pk_size((unsigned int)val->dwCertEncodingType) +
+                get_pk_size((unsigned int)val->cbCertEncoded     ) +
+                val->cbCertEncoded :
+                get_pk_size((unsigned int)0) +
+                get_pk_size((unsigned int)0);
     }
 
 
     inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ winstd::cert_context &val)
     {
-        DWORD dwCertEncodingType = *(DWORD*&)cursor;
-        cursor += sizeof(DWORD);
+        DWORD dwCertEncodingType;
+        unpack(cursor, (unsigned int&)dwCertEncodingType);
 
-        DWORD dwCertEncodedSize = *(DWORD*&)cursor;
-        cursor += sizeof(DWORD);
+        DWORD dwCertEncodedSize;
+        unpack(cursor, (unsigned int&)dwCertEncodedSize);
 
         if (dwCertEncodedSize) {
             val.create(dwCertEncodingType, (BYTE*)cursor, dwCertEncodedSize);

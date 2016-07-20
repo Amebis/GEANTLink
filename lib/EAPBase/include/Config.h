@@ -69,81 +69,6 @@ namespace eapserial
     /// \param[out]   val     Configuration to unpack to
     ///
     inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::config &val);
-
-    ///
-    /// Packs a method configuration
-    ///
-    /// \param[inout] cursor  Memory cursor
-    /// \param[in]    val     Configuration to pack
-    ///
-    template <class _Tcred> inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::config_method<_Tcred> &val);
-
-    ///
-    /// Returns packed size of a method configuration
-    ///
-    /// \param[in] val  Configuration to pack
-    ///
-    /// \returns Size of data when packed (in bytes)
-    ///
-    template <class _Tcred> inline size_t get_pk_size(const eap::config_method<_Tcred> &val);
-
-    ///
-    /// Unpacks a method configuration
-    ///
-    /// \param[inout] cursor  Memory cursor
-    /// \param[out]   val     Configuration to unpack to
-    ///
-    template <class _Tcred> inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::config_method<_Tcred> &val);
-
-    ///
-    /// Packs a provider configuration
-    ///
-    /// \param[inout] cursor  Memory cursor
-    /// \param[in]    val     Configuration to pack
-    ///
-    template <class _Tmeth> inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::config_provider<_Tmeth> &val);
-
-    ///
-    /// Returns packed size of a provider configuration
-    ///
-    /// \param[in] val  Configuration to pack
-    ///
-    /// \returns Size of data when packed (in bytes)
-    ///
-    template <class _Tmeth> inline size_t get_pk_size(const eap::config_provider<_Tmeth> &val);
-
-    ///
-    /// Unpacks a provider configuration
-    ///
-    /// \param[inout] cursor  Memory cursor
-    /// \param[out]   val     Configuration to unpack to
-    ///
-    template <class _Tmeth> inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::config_provider<_Tmeth> &val);
-
-    ///
-    /// Packs a providers configuration
-    ///
-    /// \param[inout] cursor  Memory cursor
-    /// \param[in]    val     Configuration to pack
-    ///
-    template <class _Tprov> inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::config_providers<_Tprov> &val);
-
-    ///
-    /// Returns packed size of a providers configuration
-    ///
-    /// \param[in] val  Configuration to pack
-    ///
-    /// \returns Size of data when packed (in bytes)
-    ///
-    template <class _Tprov> inline size_t get_pk_size(const eap::config_providers<_Tprov> &val);
-
-    ///
-    /// Unpacks a providers configuration
-    ///
-    /// \param[inout] cursor  Memory cursor
-    /// \param[out]   val     Configuration to unpack to
-    ///
-    template <class _Tprov> inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::config_providers<_Tprov> &val);
 }
 
 #pragma once
@@ -246,10 +171,37 @@ namespace eap
 
         /// @}
 
+        /// \name BLOB management
+        /// @{
+
+        ///
+        /// Packs a configuration
+        ///
+        /// \param[inout] cursor  Memory cursor
+        ///
+        virtual void pack(_Inout_ unsigned char *&cursor) const;
+
+        ///
+        /// Returns packed size of a configuration
+        ///
+        /// \returns Size of data when packed (in bytes)
+        ///
+        virtual size_t get_pk_size() const;
+
+        ///
+        /// Unpacks a configuration
+        ///
+        /// \param[inout] cursor  Memory cursor
+        ///
+        virtual void unpack(_Inout_ const unsigned char *&cursor);
+
+        /// @}
+
     public:
         module &m_module;   ///< Reference of the EAP module
     };
 
+    class credentials;
 
     template <class _Tcred>
     class config_method : public config
@@ -268,8 +220,6 @@ namespace eap
         ///
         config_method(_In_ module &mod) :
             m_allow_save(true),
-            m_use_preshared(false),
-            m_preshared(mod),
             config(mod)
         {
         }
@@ -283,8 +233,7 @@ namespace eap
         config_method(_In_ const config_method<_Tcred> &other) :
             m_allow_save(other.m_allow_save),
             m_anonymous_identity(other.m_anonymous_identity),
-            m_use_preshared(other.m_use_preshared),
-            m_preshared(other.m_preshared),
+            m_preshared(other.m_preshared ? (credentials*)other.m_preshared->clone() : nullptr),
             config(other)
         {
         }
@@ -298,7 +247,6 @@ namespace eap
         config_method(_Inout_ config_method<_Tcred> &&other) :
             m_allow_save(std::move(other.m_allow_save)),
             m_anonymous_identity(std::move(other.m_anonymous_identity)),
-            m_use_preshared(std::move(other.m_use_preshared)),
             m_preshared(std::move(other.m_preshared)),
             config(std::move(other))
         {
@@ -318,8 +266,7 @@ namespace eap
                 (config&)*this       = other;
                 m_allow_save         = other.m_allow_save;
                 m_anonymous_identity = other.m_anonymous_identity;
-                m_use_preshared      = other.m_use_preshared;
-                m_preshared          = other.m_preshared;
+                m_preshared.reset(other.m_preshared ? (credentials*)other.m_preshared->clone() : nullptr);
             }
 
             return *this;
@@ -339,7 +286,6 @@ namespace eap
                 (config&&)*this      = std::move(other);
                 m_allow_save         = std::move(other.m_allow_save);
                 m_anonymous_identity = std::move(other.m_anonymous_identity);
-                m_use_preshared      = std::move(other.m_use_preshared);
                 m_preshared          = std::move(other.m_preshared);
             }
 
@@ -393,8 +339,8 @@ namespace eap
                     return false;
                 }
 
-            if (m_use_preshared)
-                if (!m_preshared.save(pDoc, pXmlElClientSideCredential, ppEapError))
+            if (m_preshared)
+                if (!m_preshared->save(pDoc, pXmlElClientSideCredential, ppEapError))
                     return false;
 
             return true;
@@ -420,8 +366,7 @@ namespace eap
                 return false;
 
             m_allow_save = true;
-            m_use_preshared = false;
-            m_preshared.clear();
+            m_preshared.reset(nullptr);
             m_anonymous_identity.clear();
 
             // <ClientSideCredential>
@@ -437,20 +382,90 @@ namespace eap
                 eapxml::get_element_value(pXmlElClientSideCredential, winstd::bstr(L"eap-metadata:AnonymousIdentity"), m_anonymous_identity);
                 m_module.log_config((xpath + L"/AnonymousIdentity").c_str(), m_anonymous_identity.c_str());
 
-                if (!m_preshared.load(pXmlElClientSideCredential, ppEapError)) {
+                std::unique_ptr<credentials> preshared(make_credentials());
+                assert(preshared);
+                if (preshared->load(pXmlElClientSideCredential, ppEapError)) {
+                    m_preshared = std::move(preshared);
+                } else {
                     // This is not really an error - merely an indication pre-shared credentials are unavailable.
                     if (*ppEapError) {
                         m_module.free_error_memory(*ppEapError);
                         *ppEapError = NULL;
                     }
-                } else
-                    m_use_preshared = true;
+                }
             }
 
             return true;
         }
 
         /// @}
+
+        /// \name BLOB management
+        /// @{
+
+        ///
+        /// Packs a configuration
+        ///
+        /// \param[inout] cursor  Memory cursor
+        ///
+        virtual void pack(_Inout_ unsigned char *&cursor) const
+        {
+            eap::config::pack(cursor);
+            eapserial::pack(cursor, m_allow_save        );
+            eapserial::pack(cursor, m_anonymous_identity);
+            if (m_preshared) {
+                eapserial::pack(cursor, true);
+                m_preshared->pack(cursor);
+            } else
+                eapserial::pack(cursor, false);
+        }
+
+
+        ///
+        /// Returns packed size of a configuration
+        ///
+        /// \returns Size of data when packed (in bytes)
+        ///
+        virtual size_t get_pk_size() const
+        {
+            return
+                eap::config::get_pk_size()        +
+                eapserial::get_pk_size(m_allow_save        ) +
+                eapserial::get_pk_size(m_anonymous_identity) +
+                (m_preshared ? 
+                    eapserial::get_pk_size(true) +
+                    m_preshared->get_pk_size() :
+                    eapserial::get_pk_size(false));
+        }
+
+
+        ///
+        /// Unpacks a configuration
+        ///
+        /// \param[inout] cursor  Memory cursor
+        ///
+        virtual void unpack(_Inout_ const unsigned char *&cursor)
+        {
+            eap::config::unpack(cursor);
+            eapserial::unpack(cursor, m_allow_save        );
+            eapserial::unpack(cursor, m_anonymous_identity);
+
+            bool use_preshared;
+            eapserial::unpack(cursor, use_preshared);
+            if (use_preshared) {
+                m_preshared.reset(make_credentials());
+                assert(m_preshared);
+                m_preshared->unpack(cursor);
+            } else
+                m_preshared.reset(nullptr);
+        }
+
+        /// @}
+
+        ///
+        /// Makes new set of credentials for the given method type
+        ///
+        virtual credentials* make_credentials() const = 0;
 
         ///
         /// Returns EAP method type of this configuration
@@ -460,10 +475,9 @@ namespace eap
         virtual type_t get_method_id() const = 0;
 
     public:
-        bool m_allow_save;                  ///< Are credentials allowed to be saved to Windows Credential Manager?
-        std::wstring m_anonymous_identity;  ///< Anonymous identity
-        bool m_use_preshared;               ///< Does configuration use pre-shared credentials?
-        _Tcred m_preshared;                 ///< Pre-shared credentials
+        bool m_allow_save;                          ///< Are credentials allowed to be saved to Windows Credential Manager?
+        std::wstring m_anonymous_identity;          ///< Anonymous identity
+        std::unique_ptr<credentials> m_preshared;   ///< Pre-shared credentials
     };
 
 
@@ -830,6 +844,82 @@ namespace eap
 
         /// @}
 
+        /// \name BLOB management
+        /// @{
+
+        ///
+        /// Packs a configuration
+        ///
+        /// \param[inout] cursor  Memory cursor
+        ///
+        virtual void pack(_Inout_ unsigned char *&cursor) const
+        {
+            eap::config::pack(cursor);
+            eapserial::pack(cursor, m_read_only         );
+            eapserial::pack(cursor, m_id                );
+            eapserial::pack(cursor, m_name              );
+            eapserial::pack(cursor, m_help_email        );
+            eapserial::pack(cursor, m_help_web          );
+            eapserial::pack(cursor, m_help_phone        );
+            eapserial::pack(cursor, m_lbl_alt_credential);
+            eapserial::pack(cursor, m_lbl_alt_identity  );
+            eapserial::pack(cursor, m_lbl_alt_password  );
+            eapserial::pack(cursor, m_methods           );
+        }
+
+
+        ///
+        /// Returns packed size of a configuration
+        ///
+        /// \returns Size of data when packed (in bytes)
+        ///
+        virtual size_t get_pk_size() const
+        {
+            return
+                eap::config::get_pk_size()                   +
+                eapserial::get_pk_size(m_read_only         ) +
+                eapserial::get_pk_size(m_id                ) +
+                eapserial::get_pk_size(m_name              ) +
+                eapserial::get_pk_size(m_help_email        ) +
+                eapserial::get_pk_size(m_help_web          ) +
+                eapserial::get_pk_size(m_help_phone        ) +
+                eapserial::get_pk_size(m_lbl_alt_credential) +
+                eapserial::get_pk_size(m_lbl_alt_identity  ) +
+                eapserial::get_pk_size(m_lbl_alt_password  ) +
+                eapserial::get_pk_size(m_methods           );
+        }
+
+
+        ///
+        /// Unpacks a configuration
+        ///
+        /// \param[inout] cursor  Memory cursor
+        ///
+        virtual void unpack(_Inout_ const unsigned char *&cursor)
+        {
+            eap::config::unpack(cursor);
+            eapserial::unpack(cursor, m_read_only         );
+            eapserial::unpack(cursor, m_id                );
+            eapserial::unpack(cursor, m_name              );
+            eapserial::unpack(cursor, m_help_email        );
+            eapserial::unpack(cursor, m_help_web          );
+            eapserial::unpack(cursor, m_help_phone        );
+            eapserial::unpack(cursor, m_lbl_alt_credential);
+            eapserial::unpack(cursor, m_lbl_alt_identity  );
+            eapserial::unpack(cursor, m_lbl_alt_password  );
+
+            std::list<_Tmeth>::size_type count;
+            eapserial::unpack(cursor, count);
+            m_methods.clear();
+            for (std::list<_Tmeth>::size_type i = 0; i < count; i++) {
+                _Tmeth el(m_module);
+                el.unpack(cursor);
+                m_methods.push_back(std::move(el));
+            }
+        }
+
+        /// @}
+
     public:
         bool m_read_only;                       ///< Is profile read-only
         std::wstring m_id;                      ///< Profile ID
@@ -1018,6 +1108,55 @@ namespace eap
 
         /// @}
 
+        /// \name BLOB management
+        /// @{
+
+        ///
+        /// Packs a configuration
+        ///
+        /// \param[inout] cursor  Memory cursor
+        ///
+        virtual void pack(_Inout_ unsigned char *&cursor) const
+        {
+            eap::config::pack(cursor);
+            eapserial::pack(cursor, m_providers);
+        }
+
+
+        ///
+        /// Returns packed size of a configuration
+        ///
+        /// \returns Size of data when packed (in bytes)
+        ///
+        virtual size_t get_pk_size() const
+        {
+            return
+                eap::config::get_pk_size() +
+                eapserial::get_pk_size(m_providers);
+        }
+
+
+        ///
+        /// Unpacks a configuration
+        ///
+        /// \param[inout] cursor  Memory cursor
+        ///
+        virtual void unpack(_Inout_ const unsigned char *&cursor)
+        {
+            eap::config::unpack(cursor);
+
+            std::list<_Tprov>::size_type count = *(const std::list<_Tprov>::size_type*&)cursor;
+            eapserial::unpack(cursor, count);
+            m_providers.clear();
+            for (std::list<_Tprov>::size_type i = 0; i < count; i++) {
+                _Tprov el(m_module);
+                el.unpack(cursor);
+                m_providers.push_back(std::move(el));
+            }
+        }
+
+        /// @}
+
     public:
         std::list<_Tprov> m_providers;  ///< List of provider configurations
     };
@@ -1028,148 +1167,18 @@ namespace eapserial
 {
     inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::config &val)
     {
-        UNREFERENCED_PARAMETER(cursor);
-        UNREFERENCED_PARAMETER(val   );
+        val.pack(cursor);
     }
 
 
     inline size_t get_pk_size(const eap::config &val)
     {
-        UNREFERENCED_PARAMETER(val);
-        return 0;
+        return val.get_pk_size();
     }
 
 
     inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::config &val)
     {
-        UNREFERENCED_PARAMETER(cursor);
-        UNREFERENCED_PARAMETER(val   );
-    }
-
-
-    template <class _Tcred>
-    inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::config_method<_Tcred> &val)
-    {
-        pack(cursor, (const eap::config&)val );
-        pack(cursor, val.m_allow_save        );
-        pack(cursor, val.m_anonymous_identity);
-        pack(cursor, val.m_use_preshared     );
-        pack(cursor, val.m_preshared         );
-    }
-
-
-    template <class _Tcred>
-    inline size_t get_pk_size(const eap::config_method<_Tcred> &val)
-    {
-        return
-            get_pk_size((const eap::config&)val ) +
-            get_pk_size(val.m_allow_save        ) +
-            get_pk_size(val.m_anonymous_identity) +
-            get_pk_size(val.m_use_preshared     ) +
-            get_pk_size(val.m_preshared         );
-    }
-
-
-    template <class _Tcred>
-    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::config_method<_Tcred> &val)
-    {
-        unpack(cursor, (eap::config&)val       );
-        unpack(cursor, val.m_allow_save        );
-        unpack(cursor, val.m_anonymous_identity);
-        unpack(cursor, val.m_use_preshared     );
-        unpack(cursor, val.m_preshared         );
-    }
-
-
-    template <class _Tmeth>
-    inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::config_provider<_Tmeth> &val)
-    {
-        pack(cursor, (const eap::config&)val );
-        pack(cursor, val.m_read_only         );
-        pack(cursor, val.m_id                );
-        pack(cursor, val.m_name              );
-        pack(cursor, val.m_help_email        );
-        pack(cursor, val.m_help_web          );
-        pack(cursor, val.m_help_phone        );
-        pack(cursor, val.m_lbl_alt_credential);
-        pack(cursor, val.m_lbl_alt_identity  );
-        pack(cursor, val.m_lbl_alt_password  );
-        pack(cursor, val.m_methods           );
-    }
-
-
-    template <class _Tmeth>
-    inline size_t get_pk_size(const eap::config_provider<_Tmeth> &val)
-    {
-        return
-            get_pk_size((const eap::config&)val ) +
-            get_pk_size(val.m_read_only         ) +
-            get_pk_size(val.m_id                ) +
-            get_pk_size(val.m_name              ) +
-            get_pk_size(val.m_help_email        ) +
-            get_pk_size(val.m_help_web          ) +
-            get_pk_size(val.m_help_phone        ) +
-            get_pk_size(val.m_lbl_alt_credential) +
-            get_pk_size(val.m_lbl_alt_identity  ) +
-            get_pk_size(val.m_lbl_alt_password  ) +
-            get_pk_size(val.m_methods           );
-    }
-
-
-    template <class _Tmeth>
-    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::config_provider<_Tmeth> &val)
-    {
-        unpack(cursor, (eap::config&)val       );
-        unpack(cursor, val.m_read_only         );
-        unpack(cursor, val.m_id                );
-        unpack(cursor, val.m_name              );
-        unpack(cursor, val.m_help_email        );
-        unpack(cursor, val.m_help_web          );
-        unpack(cursor, val.m_help_phone        );
-        unpack(cursor, val.m_lbl_alt_credential);
-        unpack(cursor, val.m_lbl_alt_identity  );
-        unpack(cursor, val.m_lbl_alt_password  );
-
-        std::list<_Tmeth>::size_type count = *(const std::list<_Tmeth>::size_type*&)cursor;
-        cursor += sizeof(std::list<_Tmeth>::size_type);
-        val.m_methods.clear();
-        for (std::list<_Tmeth>::size_type i = 0; i < count; i++) {
-            _Tmeth el(val.m_module);
-            unpack(cursor, el);
-            val.m_methods.push_back(std::move(el));
-        }
-    }
-
-
-    template <class _Tprov>
-    inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::config_providers<_Tprov> &val)
-    {
-        pack(cursor, (const eap::config&)val);
-        pack(cursor, val.m_providers        );
-    }
-
-
-    template <class _Tprov>
-    inline size_t get_pk_size(const eap::config_providers<_Tprov> &val)
-    {
-        return
-            get_pk_size((const eap::config&)val) +
-            get_pk_size(val.m_providers        );
-    }
-
-
-    template <class _Tprov>
-    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::config_providers<_Tprov> &val)
-    {
-        unpack(cursor, (eap::config&)val);
-
-        std::list<_Tprov>::size_type count = *(const std::list<_Tprov>::size_type*&)cursor;
-        cursor += sizeof(std::list<_Tprov>::size_type);
-        val.m_providers.clear();
-        for (std::list<_Tprov>::size_type i = 0; i < count; i++) {
-            _Tprov el(val.m_module);
-            unpack(cursor, el);
-            val.m_providers.push_back(std::move(el));
-        }
+        val.unpack(cursor);
     }
 }

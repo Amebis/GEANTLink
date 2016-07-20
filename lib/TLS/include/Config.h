@@ -38,34 +38,6 @@ namespace eap
     winstd::tstring get_cert_title(PCCERT_CONTEXT cert);
 }
 
-namespace eapserial
-{
-    ///
-    /// Packs a TLS method configuration
-    ///
-    /// \param[inout] cursor  Memory cursor
-    /// \param[in]    val     Configuration to pack
-    ///
-    inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::config_method_tls &val);
-
-    ///
-    /// Returns packed size of a TLS method configuration
-    ///
-    /// \param[in] val  Configuration to pack
-    ///
-    /// \returns Size of data when packed (in bytes)
-    ///
-    inline size_t get_pk_size(const eap::config_method_tls &val);
-
-    ///
-    /// Unpacks a TLS method configuration
-    ///
-    /// \param[inout] cursor  Memory cursor
-    /// \param[out]   val     Configuration to unpack to
-    ///
-    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::config_method_tls &val);
-}
-
 #pragma once
 
 #include "Credentials.h"
@@ -161,6 +133,37 @@ namespace eap
 
         /// @}
 
+        /// \name BLOB management
+        /// @{
+
+        ///
+        /// Packs a configuration
+        ///
+        /// \param[inout] cursor  Memory cursor
+        ///
+        virtual void pack(_Inout_ unsigned char *&cursor) const;
+
+        ///
+        /// Returns packed size of a configuration
+        ///
+        /// \returns Size of data when packed (in bytes)
+        ///
+        virtual size_t get_pk_size() const;
+
+        ///
+        /// Unpacks a configuration
+        ///
+        /// \param[inout] cursor  Memory cursor
+        ///
+        virtual void unpack(_Inout_ const unsigned char *&cursor);
+
+        /// @}
+
+        ///
+        /// Makes new set of credentials for the given method type
+        ///
+        virtual credentials* make_credentials() const;
+
         ///
         /// Returns EAP method type of this configuration
         ///
@@ -179,32 +182,4 @@ namespace eap
         std::list<winstd::cert_context> m_trusted_root_ca;  ///< Trusted root CAs
         std::list<std::string> m_server_names;              ///< Acceptable authenticating server names
     };
-}
-
-
-namespace eapserial
-{
-    inline void pack(_Inout_ unsigned char *&cursor, _In_ const eap::config_method_tls &val)
-    {
-        pack(cursor, (const eap::config_method<eap::credentials_tls>&)val);
-        pack(cursor, val.m_trusted_root_ca);
-        pack(cursor, val.m_server_names   );
-    }
-
-
-    inline size_t get_pk_size(const eap::config_method_tls &val)
-    {
-        return
-            get_pk_size((const eap::config_method<eap::credentials_tls>&)val) +
-            get_pk_size(val.m_trusted_root_ca) +
-            get_pk_size(val.m_server_names   );
-    }
-
-
-    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ eap::config_method_tls &val)
-    {
-        unpack(cursor, (eap::config_method<eap::credentials_tls>&)val);
-        unpack(cursor, val.m_trusted_root_ca);
-        unpack(cursor, val.m_server_names   );
-    }
 }
