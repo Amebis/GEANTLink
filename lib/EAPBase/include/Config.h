@@ -28,9 +28,9 @@ namespace eap
     class config;
 
     ///
-    /// Base template for method configuration storage
+    /// Base class for method configuration storage
     ///
-    template <class _Tcred> class config_method;
+    class config_method;
 
     ///
     /// Single provider configuration
@@ -201,57 +201,34 @@ namespace eap
         module &m_module;   ///< Reference of the EAP module
     };
 
+
+    // Forward declaration, otherwise we would have to merge Credentials.h here.
     class credentials;
 
-    template <class _Tcred>
+
     class config_method : public config
     {
-    public:
-        ///
-        /// Configuration credentials type
-        ///
-        typedef _Tcred credentials_type;
-
     public:
         ///
         /// Constructs configuration
         ///
         /// \param[in] mod  Reference of the EAP module to use for global services
         ///
-        config_method(_In_ module &mod) :
-            m_allow_save(true),
-            config(mod)
-        {
-        }
-
+        config_method(_In_ module &mod);
 
         ///
         /// Copies configuration
         ///
         /// \param[in] other  Configuration to copy from
         ///
-        config_method(_In_ const config_method<_Tcred> &other) :
-            m_allow_save(other.m_allow_save),
-            m_anonymous_identity(other.m_anonymous_identity),
-            m_preshared(other.m_preshared ? (credentials*)other.m_preshared->clone() : nullptr),
-            config(other)
-        {
-        }
-
+        config_method(_In_ const config_method &other);
 
         ///
         /// Moves configuration
         ///
         /// \param[in] other  Configuration to move from
         ///
-        config_method(_Inout_ config_method<_Tcred> &&other) :
-            m_allow_save(std::move(other.m_allow_save)),
-            m_anonymous_identity(std::move(other.m_anonymous_identity)),
-            m_preshared(std::move(other.m_preshared)),
-            config(std::move(other))
-        {
-        }
-
+        config_method(_Inout_ config_method &&other);
 
         ///
         /// Copies configuration
@@ -260,18 +237,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        config_method& operator=(_In_ const config_method<_Tcred> &other)
-        {
-            if (this != &other) {
-                (config&)*this       = other;
-                m_allow_save         = other.m_allow_save;
-                m_anonymous_identity = other.m_anonymous_identity;
-                m_preshared.reset(other.m_preshared ? (credentials*)other.m_preshared->clone() : nullptr);
-            }
-
-            return *this;
-        }
-
+        config_method& operator=(_In_ const config_method &other);
 
         ///
         /// Moves configuration
@@ -280,18 +246,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        config_method& operator=(_Inout_ config_method<_Tcred> &&other)
-        {
-            if (this != &other) {
-                (config&&)*this      = std::move(other);
-                m_allow_save         = std::move(other.m_allow_save);
-                m_anonymous_identity = std::move(other.m_anonymous_identity);
-                m_preshared          = std::move(other.m_preshared);
-            }
-
-            return *this;
-        }
-
+        config_method& operator=(_Inout_ config_method &&other);
 
         /// \name XML configuration management
         /// @{
@@ -307,45 +262,7 @@ namespace eap
         /// - \c true if succeeded
         /// - \c false otherwise. See \p ppEapError for details.
         ///
-        virtual bool save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
-        {
-            assert(pDoc);
-            assert(pConfigRoot);
-            assert(ppEapError);
-
-            if (!config::save(pDoc, pConfigRoot, ppEapError))
-                return false;
-
-            const winstd::bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
-            DWORD dwResult;
-
-            // <ClientSideCredential>
-            winstd::com_obj<IXMLDOMElement> pXmlElClientSideCredential;
-            if ((dwResult = eapxml::create_element(pDoc, pConfigRoot, winstd::bstr(L"eap-metadata:ClientSideCredential"), winstd::bstr(L"ClientSideCredential"), bstrNamespace, &pXmlElClientSideCredential)) != ERROR_SUCCESS) {
-                *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <ClientSideCredential> element."));
-                return false;
-            }
-
-            // <ClientSideCredential>/<allow-save>
-            if ((dwResult = eapxml::put_element_value(pDoc, pXmlElClientSideCredential, winstd::bstr(L"allow-save"), bstrNamespace, m_allow_save)) != ERROR_SUCCESS) {
-                *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <allow-save> element."));
-                return false;
-            }
-
-            // <ClientSideCredential>/<AnonymousIdentity>
-            if (!m_anonymous_identity.empty())
-                if ((dwResult = eapxml::put_element_value(pDoc, pXmlElClientSideCredential, winstd::bstr(L"AnonymousIdentity"), bstrNamespace, winstd::bstr(m_anonymous_identity))) != ERROR_SUCCESS) {
-                    *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <AnonymousIdentity> element."));
-                    return false;
-                }
-
-            if (m_preshared)
-                if (!m_preshared->save(pDoc, pXmlElClientSideCredential, ppEapError))
-                    return false;
-
-            return true;
-        }
-
+        virtual bool save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const;
 
         ///
         /// Load configuration from XML document
@@ -357,46 +274,7 @@ namespace eap
         /// - \c true if succeeded
         /// - \c false otherwise. See \p ppEapError for details.
         ///
-        virtual bool load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError)
-        {
-            assert(pConfigRoot);
-            assert(ppEapError);
-
-            if (!config::load(pConfigRoot, ppEapError))
-                return false;
-
-            m_allow_save = true;
-            m_preshared.reset(nullptr);
-            m_anonymous_identity.clear();
-
-            // <ClientSideCredential>
-            winstd::com_obj<IXMLDOMElement> pXmlElClientSideCredential;
-            if (eapxml::select_element(pConfigRoot, winstd::bstr(L"eap-metadata:ClientSideCredential"), &pXmlElClientSideCredential) == ERROR_SUCCESS) {
-                std::wstring xpath(eapxml::get_xpath(pXmlElClientSideCredential));
-
-                // <allow-save>
-                eapxml::get_element_value(pXmlElClientSideCredential, winstd::bstr(L"eap-metadata:allow-save"), &m_allow_save);
-                m_module.log_config((xpath + L"/allow-save").c_str(), m_allow_save);
-
-                // <AnonymousIdentity>
-                eapxml::get_element_value(pXmlElClientSideCredential, winstd::bstr(L"eap-metadata:AnonymousIdentity"), m_anonymous_identity);
-                m_module.log_config((xpath + L"/AnonymousIdentity").c_str(), m_anonymous_identity.c_str());
-
-                std::unique_ptr<credentials> preshared(make_credentials());
-                assert(preshared);
-                if (preshared->load(pXmlElClientSideCredential, ppEapError)) {
-                    m_preshared = std::move(preshared);
-                } else {
-                    // This is not really an error - merely an indication pre-shared credentials are unavailable.
-                    if (*ppEapError) {
-                        m_module.free_error_memory(*ppEapError);
-                        *ppEapError = NULL;
-                    }
-                }
-            }
-
-            return true;
-        }
+        virtual bool load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError);
 
         /// @}
 
@@ -408,57 +286,21 @@ namespace eap
         ///
         /// \param[inout] cursor  Memory cursor
         ///
-        virtual void pack(_Inout_ unsigned char *&cursor) const
-        {
-            eap::config::pack(cursor);
-            eapserial::pack(cursor, m_allow_save        );
-            eapserial::pack(cursor, m_anonymous_identity);
-            if (m_preshared) {
-                eapserial::pack(cursor, true);
-                m_preshared->pack(cursor);
-            } else
-                eapserial::pack(cursor, false);
-        }
-
+        virtual void pack(_Inout_ unsigned char *&cursor) const;
 
         ///
         /// Returns packed size of a configuration
         ///
         /// \returns Size of data when packed (in bytes)
         ///
-        virtual size_t get_pk_size() const
-        {
-            return
-                eap::config::get_pk_size()        +
-                eapserial::get_pk_size(m_allow_save        ) +
-                eapserial::get_pk_size(m_anonymous_identity) +
-                (m_preshared ? 
-                    eapserial::get_pk_size(true) +
-                    m_preshared->get_pk_size() :
-                    eapserial::get_pk_size(false));
-        }
-
+        virtual size_t get_pk_size() const;
 
         ///
         /// Unpacks a configuration
         ///
         /// \param[inout] cursor  Memory cursor
         ///
-        virtual void unpack(_Inout_ const unsigned char *&cursor)
-        {
-            eap::config::unpack(cursor);
-            eapserial::unpack(cursor, m_allow_save        );
-            eapserial::unpack(cursor, m_anonymous_identity);
-
-            bool use_preshared;
-            eapserial::unpack(cursor, use_preshared);
-            if (use_preshared) {
-                m_preshared.reset(make_credentials());
-                assert(m_preshared);
-                m_preshared->unpack(cursor);
-            } else
-                m_preshared.reset(nullptr);
-        }
+        virtual void unpack(_Inout_ const unsigned char *&cursor);
 
         /// @}
 

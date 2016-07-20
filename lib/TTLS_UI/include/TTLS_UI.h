@@ -261,13 +261,13 @@ protected:
     /// \endcond
 
 protected:
-    _Tprov &m_prov;                                 ///< EAP provider
-    eap::config_method_ttls &m_cfg;                        ///< TTLS configuration
-    wxStaticText *m_outer_title;                    ///< Outer authentication title
+    _Tprov &m_prov;                              ///< EAP provider
+    eap::config_method_ttls &m_cfg;              ///< TTLS configuration
+    wxStaticText *m_outer_title;                 ///< Outer authentication title
     wxTTLSConfigPanel<_Tprov> *m_outer_identity; ///< Outer identity configuration panel
     wxTLSConfigPanel<_Tprov> *m_tls;             ///< TLS configuration panel
-    wxStaticText *m_inner_title;                    ///< Inner authentication title
-    wxChoicebook *m_inner_type;                     ///< Inner authentication type
+    wxStaticText *m_inner_title;                 ///< Inner authentication title
+    wxChoicebook *m_inner_type;                  ///< Inner authentication type
 
-    eap::config_method_pap m_cfg_pap;                      ///< Temporary PAP configuration
+    eap::config_method_pap m_cfg_pap;            ///< Temporary PAP configuration
 };

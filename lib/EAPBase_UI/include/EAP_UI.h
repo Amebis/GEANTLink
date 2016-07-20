@@ -52,7 +52,7 @@ template <class _Tprov, class _Tmeth, class _wxT> class wxEAPCredentialsConfigPa
 ///
 /// Base template for all credential entry panels
 ///
-template <class _Tcred, class _Tbase> class wxEAPCredentialsPanelBase;
+template <class _Tbase> class wxEAPCredentialsPanelBase;
 
 ///
 /// Generic password credential entry panel
@@ -447,7 +447,7 @@ protected:
 
         wxEAPCredentialsDialog<_Tprov> dlg(m_prov, this);
 
-        _wxT *panel = new _wxT(m_prov, (typename _Tmeth::credentials_type&)*m_cred, m_target.c_str(), &dlg, true);
+        _wxT *panel = new _wxT(m_prov, *m_cred, m_target.c_str(), &dlg, true);
 
         dlg.AddContents((wxPanel**)&panel, 1);
         dlg.ShowModal();
@@ -469,7 +469,7 @@ protected:
 
         wxEAPCredentialsDialog<_Tprov> dlg(m_prov, this);
 
-        _wxT *panel = new _wxT(m_prov, (typename _Tmeth::credentials_type&)*m_cred, _T(""), &dlg, true);
+        _wxT *panel = new _wxT(m_prov, *m_cred, _T(""), &dlg, true);
 
         dlg.AddContents((wxPanel**)&panel, 1);
         dlg.ShowModal();
@@ -489,7 +489,7 @@ private:
 };
 
 
-template <class _Tcred, class _Tbase>
+template <class _Tbase>
 class wxEAPCredentialsPanelBase : public _Tbase
 {
 public:
@@ -501,7 +501,7 @@ public:
     /// \param[in]    parent         Parent window
     /// \param[in]    is_config      Is this panel used to pre-enter credentials? When \c true, the "Remember" checkbox is always selected and disabled.
     ///
-    wxEAPCredentialsPanelBase(_Tcred &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config = false) :
+    wxEAPCredentialsPanelBase(eap::credentials &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config = false) :
         m_cred(cred),
         m_target(pszCredTarget),
         _Tbase(parent)
@@ -560,13 +560,13 @@ protected:
     /// \endcond
 
 protected:
-    _Tcred &m_cred;             ///< Password credentials
+    eap::credentials &m_cred;   ///< Generic credentials
     winstd::tstring m_target;   ///< Credential Manager target
 };
 
 
 template <class _Tprov>
-class wxPasswordCredentialsPanel : public wxEAPCredentialsPanelBase<eap::credentials_pass, wxEAPCredentialsPanelPassBase>
+class wxPasswordCredentialsPanel : public wxEAPCredentialsPanelBase<wxEAPCredentialsPanelPassBase>
 {
 public:
     ///
@@ -578,8 +578,9 @@ public:
     /// \param[in]    parent         Parent window
     /// \param[in]    is_config      Is this panel used to pre-enter credentials? When \c true, the "Remember" checkbox is always selected and disabled.
     ///
-    wxPasswordCredentialsPanel(_Tprov &prov, eap::credentials_pass &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config = false) :
-        wxEAPCredentialsPanelBase<eap::credentials_pass, wxEAPCredentialsPanelPassBase>(cred, pszCredTarget, parent, is_config)
+    wxPasswordCredentialsPanel(_Tprov &prov, eap::credentials &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config = false) :
+        m_cred((eap::credentials_pass&)cred),
+        wxEAPCredentialsPanelBase<wxEAPCredentialsPanelPassBase>(cred, pszCredTarget, parent, is_config)
     {
         // Load and set icon.
         if (m_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
@@ -641,8 +642,9 @@ protected:
     /// \endcond
 
 protected:
-    winstd::library m_shell32;  ///< shell32.dll resource library reference
-    wxIcon m_icon;              ///< Panel icon
+    eap::credentials_pass &m_cred;  ///< Password credentials
+    winstd::library m_shell32;      ///< shell32.dll resource library reference
+    wxIcon m_icon;                  ///< Panel icon
 
 private:
     static const wxStringCharType *s_dummy_password;

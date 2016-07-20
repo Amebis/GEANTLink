@@ -249,14 +249,15 @@ protected:
 
 
 template <class _Tprov>
-class wxTLSCredentialsPanel : public wxEAPCredentialsPanelBase<eap::credentials_tls, wxTLSCredentialsPanelBase>
+class wxTLSCredentialsPanel : public wxEAPCredentialsPanelBase<wxTLSCredentialsPanelBase>
 {
 public:
     ///
     /// Constructs a configuration panel
     ///
-    wxTLSCredentialsPanel(_Tprov &prov, eap::credentials_tls &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config = false) :
-        wxEAPCredentialsPanelBase<eap::credentials_tls, wxTLSCredentialsPanelBase>(cred, pszCredTarget, parent, is_config)
+    wxTLSCredentialsPanel(_Tprov &prov, eap::credentials &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config = false) :
+        m_cred((eap::credentials_tls&)cred),
+        wxEAPCredentialsPanelBase<wxTLSCredentialsPanelBase>(cred, pszCredTarget, parent, is_config)
     {
         UNREFERENCED_PARAMETER(prov);
 
@@ -339,8 +340,9 @@ protected:
     /// \endcond
 
 protected:
-    winstd::library m_shell32;  ///< shell32.dll resource library reference
-    wxIcon m_icon;              ///< Panel icon
+    eap::credentials_tls &m_cred;   ///< TLS credentials
+    winstd::library m_shell32;      ///< shell32.dll resource library reference
+    wxIcon m_icon;                  ///< Panel icon
 };
 
 

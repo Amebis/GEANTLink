@@ -66,7 +66,7 @@ tstring eap::get_cert_title(PCCERT_CONTEXT cert)
 // eap::config_method_tls
 //////////////////////////////////////////////////////////////////////
 
-eap::config_method_tls::config_method_tls(_In_ module &mod) : config_method<credentials_tls>(mod)
+eap::config_method_tls::config_method_tls(_In_ module &mod) : config_method(mod)
 {
 }
 
@@ -74,7 +74,7 @@ eap::config_method_tls::config_method_tls(_In_ module &mod) : config_method<cred
 eap::config_method_tls::config_method_tls(_In_ const config_method_tls &other) :
     m_trusted_root_ca(other.m_trusted_root_ca),
     m_server_names(other.m_server_names),
-    config_method<credentials_tls>(other)
+    config_method(other)
 {
 }
 
@@ -82,7 +82,7 @@ eap::config_method_tls::config_method_tls(_In_ const config_method_tls &other) :
 eap::config_method_tls::config_method_tls(_Inout_ config_method_tls &&other) :
     m_trusted_root_ca(std::move(other.m_trusted_root_ca)),
     m_server_names(std::move(other.m_server_names)),
-    config_method<credentials_tls>(std::move(other))
+    config_method(std::move(other))
 {
 }
 
@@ -90,7 +90,7 @@ eap::config_method_tls::config_method_tls(_Inout_ config_method_tls &&other) :
 eap::config_method_tls& eap::config_method_tls::operator=(_In_ const eap::config_method_tls &other)
 {
     if (this != &other) {
-        (config_method<credentials_tls>&)*this = other;
+        (config_method&)*this = other;
         m_trusted_root_ca = other.m_trusted_root_ca;
         m_server_names    = other.m_server_names;
     }
@@ -102,7 +102,7 @@ eap::config_method_tls& eap::config_method_tls::operator=(_In_ const eap::config
 eap::config_method_tls& eap::config_method_tls::operator=(_Inout_ eap::config_method_tls &&other)
 {
     if (this != &other) {
-        (config_method<credentials_tls>&&)*this = std::move(other);
+        (config_method&&)*this = std::move(other);
         m_trusted_root_ca = std::move(other.m_trusted_root_ca);
         m_server_names    = std::move(other.m_server_names);
     }
@@ -123,7 +123,7 @@ bool eap::config_method_tls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *
     assert(pConfigRoot);
     assert(ppEapError);
 
-    if (!config_method<credentials_tls>::save(pDoc, pConfigRoot, ppEapError))
+    if (!config_method::save(pDoc, pConfigRoot, ppEapError))
         return false;
 
     const bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
@@ -182,7 +182,7 @@ bool eap::config_method_tls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR
 {
     assert(pConfigRoot);
 
-    if (!config_method<credentials_tls>::load(pConfigRoot, ppEapError))
+    if (!config_method::load(pConfigRoot, ppEapError))
         return false;
 
     std::wstring xpath(eapxml::get_xpath(pConfigRoot));
@@ -258,7 +258,7 @@ bool eap::config_method_tls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR
 
 void eap::config_method_tls::pack(_Inout_ unsigned char *&cursor) const
 {
-    eap::config_method<eap::credentials_tls>::pack(cursor);
+    eap::config_method::pack(cursor);
     eapserial::pack(cursor, m_trusted_root_ca);
     eapserial::pack(cursor, m_server_names   );
 }
@@ -267,7 +267,7 @@ void eap::config_method_tls::pack(_Inout_ unsigned char *&cursor) const
 size_t eap::config_method_tls::get_pk_size() const
 {
     return
-        eap::config_method<eap::credentials_tls>::get_pk_size() +
+        eap::config_method::get_pk_size() +
         eapserial::get_pk_size(m_trusted_root_ca) +
         eapserial::get_pk_size(m_server_names   );
 }
@@ -275,7 +275,7 @@ size_t eap::config_method_tls::get_pk_size() const
 
 void eap::config_method_tls::unpack(_Inout_ const unsigned char *&cursor)
 {
-    eap::config_method<eap::credentials_tls>::unpack(cursor);
+    eap::config_method::unpack(cursor);
     eapserial::unpack(cursor, m_trusted_root_ca);
     eapserial::unpack(cursor, m_server_names   );
 }
