@@ -26,7 +26,6 @@
 #include "../include/Session.h"
 
 #include "../include/EAP.h"
-#include "../include/EAPSerial.h"
 #include "../include/EAPXML.h"
 
 #include <WinStd/Cred.h>

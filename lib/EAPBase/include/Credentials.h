@@ -37,7 +37,6 @@ namespace eap
 
 #include "Config.h"
 #include "Module.h"
-#include "EAPSerial.h"
 
 #include "../../../include/Version.h"
 

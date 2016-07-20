@@ -18,9 +18,6 @@
     along with GÉANTLink. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "../../EAPBase/include/EAP.h"
-
-
 namespace eap
 {
     ///

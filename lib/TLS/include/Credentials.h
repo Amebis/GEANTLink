@@ -31,7 +31,6 @@ namespace eap
 #pragma once
 
 #include "../../EAPBase/include/Credentials.h"
-#include "../../EAPBase/include/EAPSerial.h"
 
 #include <WinStd/Crypt.h>
 

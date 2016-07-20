@@ -18,6 +18,8 @@
     along with GÉANTLink. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "EAP.h"
+
 #include <sal.h>
 
 namespace eap
@@ -74,7 +76,6 @@ namespace eapserial
 #pragma once
 
 #include "Module.h"
-#include "EAPSerial.h"
 #include "EAPXML.h"
 
 #include "../../../include/Version.h"

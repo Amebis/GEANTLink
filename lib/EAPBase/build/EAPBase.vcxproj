@@ -82,7 +82,6 @@
     <ClInclude Include="..\include\Config.h" />
     <ClInclude Include="..\include\Credentials.h" />
     <ClInclude Include="..\include\EAP.h" />
-    <ClInclude Include="..\include\EAPSerial.h" />
     <ClInclude Include="..\include\EAPXML.h" />
     <ClInclude Include="..\include\Module.h" />
     <ClInclude Include="..\include\Session.h" />

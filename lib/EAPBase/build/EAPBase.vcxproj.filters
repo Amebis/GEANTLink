@@ -17,9 +17,6 @@
     <ClInclude Include="..\include\EAP.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\EAPSerial.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\EAPXML.h">
       <Filter>Header Files</Filter>
     </ClInclude>
