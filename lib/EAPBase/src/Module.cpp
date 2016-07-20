@@ -93,8 +93,10 @@ BYTE* eap::module::alloc_memory(_In_ size_t size)
 
 void eap::module::free_memory(_In_ BYTE *ptr)
 {
+#if !EAP_ENCRYPT_BLOBS
     // Since we do security here and some of the BLOBs contain credentials, sanitize every memory block before freeing.
     SecureZeroMemory(ptr, HeapSize(m_heap, 0, ptr));
+#endif
     HeapFree(m_heap, 0, ptr);
 }
 

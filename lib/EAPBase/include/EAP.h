@@ -21,6 +21,10 @@
 #define IDR_EAP_KEY_PUBLIC  1
 #define IDR_EAP_KEY_PRIVATE 2
 
+#ifndef EAP_ENCRYPT_BLOBS
+#define EAP_ENCRYPT_BLOBS 1
+#endif
+
 #if !defined(RC_INVOKED) && !defined(MIDL_PASS)
 
 #include <sal.h>

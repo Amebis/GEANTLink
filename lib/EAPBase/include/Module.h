@@ -543,7 +543,7 @@ namespace eap
             _In_                           DWORD dwDataInSize,
             _Out_                          EAP_ERROR **ppEapError)
         {
-#if 1
+#if EAP_ENCRYPT_BLOBS
             // Prepare cryptographics provider.
             winstd::crypt_prov cp;
             if (!cp.create(NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT)) {
@@ -590,7 +590,7 @@ namespace eap
             _Out_       DWORD     *pdwDataOutSize,
             _Out_       EAP_ERROR **ppEapError)
         {
-#if 1
+#if EAP_ENCRYPT_BLOBS
             // Allocate BLOB.
             std::vector<unsigned char, winstd::sanitizing_allocator<unsigned char> > data;
             data.resize(eapserial::get_pk_size(record));
