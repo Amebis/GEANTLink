@@ -28,23 +28,23 @@ using namespace winstd;
 // eap::credentials_ttls
 //////////////////////////////////////////////////////////////////////
 
-eap::credentials_ttls::credentials_ttls(_In_ module &mod) : credentials_tls(mod)
+eap::credentials_ttls::credentials_ttls(_In_ module &mod) :
+    credentials_tls(mod)
 {
 }
 
 
 eap::credentials_ttls::credentials_ttls(_In_ const credentials_ttls &other) :
-    m_inner(other.m_inner ? (credentials*)other.m_inner->clone() : NULL),
+    m_inner(other.m_inner ? (credentials*)other.m_inner->clone() : nullptr),
     credentials_tls(other)
 {
 }
 
 
 eap::credentials_ttls::credentials_ttls(_Inout_ credentials_ttls &&other) :
-    m_inner(other.m_inner),
+    m_inner(std::move(other.m_inner)),
     credentials_tls(std::move(other))
 {
-    other.m_inner = NULL;
 }
 
 
@@ -52,9 +52,7 @@ eap::credentials_ttls& eap::credentials_ttls::operator=(_In_ const credentials_t
 {
     if (this != &other) {
         (credentials_tls&)*this = other;
-
-        if (m_inner) delete m_inner;
-        m_inner = other.m_inner ? (credentials*)other.m_inner->clone() : NULL;
+        m_inner.reset(other.m_inner ? (credentials*)other.m_inner->clone() : nullptr);
     }
 
     return *this;
@@ -65,10 +63,7 @@ eap::credentials_ttls& eap::credentials_ttls::operator=(_Inout_ credentials_ttls
 {
     if (this != &other) {
         (credentials_tls&)*this = std::move(other);
-
-        if (m_inner) delete m_inner;
-        m_inner = other.m_inner;
-        other.m_inner = NULL;
+        m_inner                 = std::move(other.m_inner);
     }
 
     return *this;
@@ -138,6 +133,7 @@ bool eap::credentials_ttls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR 
     if (!credentials_tls::load(pConfigRoot, ppEapError))
         return false;
 
+    // TODO: For the time being, there is no detection what type is inner method. Introduce one!
     if (m_inner) {
         com_obj<IXMLDOMNode> pXmlElInnerAuthenticationMethod;
         if ((dwResult = eapxml::select_node(pConfigRoot, bstr(L"eap-metadata:InnerAuthenticationMethod"), &pXmlElInnerAuthenticationMethod)) != ERROR_SUCCESS) {

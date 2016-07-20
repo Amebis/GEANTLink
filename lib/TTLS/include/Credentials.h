@@ -59,6 +59,8 @@ namespace eapserial
 #include "../../TLS/include/Credentials.h"
 #include "../../PAP/include/Credentials.h"
 
+#include <memory>
+
 
 namespace eap
 {
@@ -181,7 +183,7 @@ namespace eap
         /// @}
 
     public:
-        credentials *m_inner;   ///< Inner credentials
+        std::unique_ptr<credentials> m_inner;   ///< Inner credentials
     };
 }
 
@@ -192,27 +194,32 @@ namespace eapserial
     {
         pack(cursor, (const eap::credentials_tls&)val);
         if (val.m_inner) {
-            if (dynamic_cast<eap::credentials_pap*>(val.m_inner)) {
-                pack(cursor, (unsigned char)eap::type_pap);
+            if (dynamic_cast<eap::credentials_pap*>(val.m_inner.get())) {
+                pack(cursor, eap::type_pap);
                 pack(cursor, (const eap::credentials_pap&)*val.m_inner);
             } else {
                 assert(0); // Unsupported inner authentication method type.
-                pack(cursor, (unsigned char)0);
+                pack(cursor, eap::type_undefined);
             }
         } else
-            pack(cursor, (unsigned char)0);
+            pack(cursor, eap::type_undefined);
     }
 
 
     inline size_t get_pk_size(const eap::credentials_ttls &val)
     {
-        size_t size_inner = sizeof(unsigned char);
+        size_t size_inner;
         if (val.m_inner) {
-            if (dynamic_cast<eap::credentials_pap*>(val.m_inner))
-                size_inner += get_pk_size((const eap::credentials_pap&)*val.m_inner);
-            else
+            if (dynamic_cast<eap::credentials_pap*>(val.m_inner.get())) {
+                size_inner =
+                    get_pk_size(eap::type_pap) +
+                    get_pk_size((const eap::credentials_pap&)*val.m_inner);
+            } else {
                 assert(0); // Unsupported inner authentication method type.
-        }
+                size_inner = get_pk_size(eap::type_undefined);
+            }
+        } else
+            size_inner = get_pk_size(eap::type_undefined);
 
         return
             get_pk_size((const eap::credentials_tls&)val) +
@@ -224,16 +231,16 @@ namespace eapserial
     {
         unpack(cursor, (eap::credentials_tls&)val);
 
-        assert(!val.m_inner);
-        unsigned char eap_type;
+        eap::type_t eap_type;
         unpack(cursor, eap_type);
         switch (eap_type) {
             case eap::type_pap:
-                val.m_inner = new eap::credentials_pap(val.m_module);
+                val.m_inner.reset(new eap::credentials_pap(val.m_module));
                 unpack(cursor, (eap::credentials_pap&)*val.m_inner);
                 break;
-            case 0           : break;
-            default          : assert(0); // Unsupported inner authentication method type.
+            default:
+                assert(0); // Unsupported inner authentication method type.
+                val.m_inner.reset(nullptr);
         }
     }
 }
