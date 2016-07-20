@@ -236,8 +236,8 @@ DWORD APIENTRY EapPeerGetIdentity(
     else if (!ppwszIdentity)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" ppwszIdentity is NULL.")));
     else {
-        _EAPMETHOD_PEER::config_type cfg(g_peer);
-        _EAPMETHOD_PEER::identity_type usr(g_peer);
+        _EAPMETHOD_PEER::config_providers_type cfg(g_peer);
+        _EAPMETHOD_PEER::credentials_type usr(g_peer);
         if (!g_peer.unpack(cfg, pConnectionData, dwConnectionDataSize, ppEapError) ||
             !g_peer.unpack(usr, pUserData, dwUserDataSize, ppEapError) ||
             !g_peer.get_identity(dwFlags, cfg, usr, hTokenImpersonateUser, pfInvokeUI, ppwszIdentity, ppEapError) ||
@@ -302,7 +302,7 @@ DWORD APIENTRY EapPeerBeginSession(
 
         // Begin the session.
         if (!g_peer.unpack(session->m_cfg, pConnectionData, dwConnectionDataSize, ppEapError) ||
-            !g_peer.unpack(session->m_id, pUserData, dwUserDataSize, ppEapError) ||
+            !g_peer.unpack(session->m_cred, pUserData, dwUserDataSize, ppEapError) ||
             !session->begin(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize, ppEapError))
         {
             if (*ppEapError) {
@@ -684,8 +684,8 @@ DWORD WINAPI EapPeerGetMethodProperties(
     else if (!pMethodPropertyArray)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pMethodPropertyArray is NULL.")));
     else {
-        _EAPMETHOD_PEER::config_type cfg(g_peer);
-        _EAPMETHOD_PEER::identity_type usr(g_peer);
+        _EAPMETHOD_PEER::config_providers_type cfg(g_peer);
+        _EAPMETHOD_PEER::credentials_type usr(g_peer);
         if (!g_peer.unpack(cfg, pEapConnData, dwEapConnDataSize, ppEapError) ||
             !g_peer.unpack(usr, pUserData, dwUserDataSize, ppEapError) ||
             !g_peer.get_method_properties(
@@ -762,7 +762,7 @@ DWORD WINAPI EapPeerCredentialsXml2Blob(
 
         // Load credentials.
         pCredentialsDoc->setProperty(bstr(L"SelectionNamespaces"), variant(L"xmlns:eap-metadata=\"urn:ietf:params:xml:ns:yang:ietf-eap-metadata\""));
-        _EAPMETHOD_PEER::identity_type usr(g_peer);
+        _EAPMETHOD_PEER::credentials_type usr(g_peer);
         if (!usr.load(pXmlElCredentials, ppEapError) ||
             !g_peer.pack(usr, ppCredentialsOut, pdwCredentialsOutSize, ppEapError))
         {

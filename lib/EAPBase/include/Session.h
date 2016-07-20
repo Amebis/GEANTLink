@@ -23,7 +23,7 @@ namespace eap
     ///
     /// EAP session
     ///
-    template <class _Tcfg, class _Tid, class _Tint, class _Tintres> class session;
+    template <class _Tmeth, class _Tcred, class _Tint, class _Tintres> class session;
 }
 
 #pragma once
@@ -40,24 +40,29 @@ extern "C" {
 
 namespace eap
 {
-    template <class _Tcfg, class _Tid, class _Tint, class _Tintres>
+    template <class _Tmeth, class _Tcred, class _Tint, class _Tintres>
     class session
     {
     public:
         ///
+        /// Method configuration data type
+        ///
+        typedef _Tmeth config_method_type;
+
+        ///
         /// Provider configuration data type
         ///
-        typedef config_provider<_Tcfg> provider_config_type;
+        typedef config_provider<config_method_type> config_provider_type;
 
         ///
         /// Configuration data type
         ///
-        typedef config_providers<provider_config_type> config_type;
+        typedef config_providers<config_provider_type> config_providers_type;
 
         ///
-        /// Identity data type
+        /// Credentials data type
         ///
-        typedef _Tid identity_type;
+        typedef _Tcred credentials_type;
 
         ///
         /// Interactive request data type
@@ -78,7 +83,7 @@ namespace eap
         session(_In_ module &mod) :
             m_module(mod),
             m_cfg(mod),
-            m_id(mod)
+            m_cred(mod)
         {
         }
 
@@ -91,7 +96,7 @@ namespace eap
         session(_In_ const session &other) :
             m_module(other.m_module),
             m_cfg(other.m_cfg),
-            m_id(other.m_id)
+            m_cred(other.m_cred)
         {
         }
 
@@ -104,7 +109,7 @@ namespace eap
         session(_Inout_ session &&other) :
             m_module(other.m_module),
             m_cfg(std::move(other.m_cfg)),
-            m_id(std::move(other.m_id))
+            m_cred(std::move(other.m_cred))
         {
         }
 
@@ -120,8 +125,8 @@ namespace eap
         {
             if (this != std::addressof(other)) {
                 assert(std::addressof(m_module) ==std::addressof(other.m_module)); // Copy session within same module only!
-                m_cfg = other.m_cfg;
-                m_id  = other.m_id;
+                m_cfg  = other.m_cfg;
+                m_cred = other.m_cred;
             }
             return *this;
         }
@@ -138,8 +143,8 @@ namespace eap
         {
             if (this != std::addressof(other)) {
                 assert(std::addressof(m_module) ==std::addressof(other.m_module)); // Move session within same module only!
-                m_cfg = std::move(other.m_cfg);
-                m_id  = std::move(other.m_id);
+                m_cfg  = std::move(other.m_cfg);
+                m_cred = std::move(other.m_cred);
             }
             return *this;
         }
@@ -360,8 +365,8 @@ namespace eap
         /// @}
 
     public:
-        module &m_module;   ///< Reference of the EAP module
-        config_type m_cfg;  ///< Session configuration
-        identity_type m_id; ///< User identity
+        module &m_module;               ///< Reference of the EAP module
+        config_providers_type m_cfg;    ///< Session configuration
+        credentials_type m_cred;        ///< User credentials
     };
 }

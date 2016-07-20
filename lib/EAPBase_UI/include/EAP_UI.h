@@ -96,7 +96,7 @@ public:
     ///
     /// Configuration data type
     ///
-    typedef eap::config_providers<_Tprov> config_type;
+    typedef eap::config_providers<_Tprov> config_providers_type;
 
     ///
     /// This data type
@@ -107,7 +107,7 @@ public:
     ///
     /// Constructs a configuration dialog
     ///
-    wxEAPConfigDialog(config_type &cfg, wxWindow* parent) :
+    wxEAPConfigDialog(config_providers_type &cfg, wxWindow* parent) :
         m_cfg(cfg),
         wxEAPConfigDialogBase(parent)
     {
@@ -150,7 +150,7 @@ protected:
 
 
 protected:
-    config_type &m_cfg;  ///< EAP providers configuration
+    config_providers_type &m_cfg;  ///< EAP providers configuration
 };
 
 

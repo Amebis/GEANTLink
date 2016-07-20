@@ -32,14 +32,14 @@ namespace eap
     ///
     /// A group of methods all EAP peers must or should implement.
     ///
-    template <class _Tcfg, class _Tid, class _Tint, class _Tintres> class peer_base;
+    template <class _Tmeth, class _Tcred, class _Tint, class _Tintres> class peer_base;
 
     ///
     /// EAP peer base class
     ///
     /// A group of methods all EAP peers must or should implement.
     ///
-    template <class _Tcfg, class _Tid, class _Tint, class _Tintres> class peer;
+    template <class _Tmeth, class _Tcred, class _Tint, class _Tintres> class peer;
 }
 
 #pragma once
@@ -654,24 +654,29 @@ namespace eap
     };
 
 
-    template <class _Tcfg, class _Tid, class _Tint, class _Tintres>
+    template <class _Tmeth, class _Tcred, class _Tint, class _Tintres>
     class peer_base : public module
     {
     public:
         ///
+        /// Method configuration data type
+        ///
+        typedef _Tmeth config_method_type;
+
+        ///
         /// Provider configuration data type
         ///
-        typedef config_provider<_Tcfg> provider_config_type;
+        typedef config_provider<config_method_type> config_provider_type;
 
         ///
         /// Configuration data type
         ///
-        typedef config_providers<provider_config_type> config_type;
+        typedef config_providers<config_provider_type> config_providers_type;
 
         ///
-        /// Identity data type
+        /// Credentials data type
         ///
-        typedef _Tid identity_type;
+        typedef _Tcred credentials_type;
 
         ///
         /// Interactive request data type
@@ -691,14 +696,14 @@ namespace eap
     };
 
 
-    template <class _Tcfg, class _Tid, class _Tint, class _Tintres>
-    class peer : public peer_base<_Tcfg, _Tid, _Tint, _Tintres>
+    template <class _Tmeth, class _Tcred, class _Tint, class _Tintres>
+    class peer : public peer_base<_Tmeth, _Tcred, _Tint, _Tintres>
     {
     public:
         ///
         /// Constructs a EAP peer module for the given EAP type
         ///
-        peer(_In_ type_t eap_method) : peer_base<_Tcfg, _Tid, _Tint, _Tintres>(eap_method) {}
+        peer(_In_ type_t eap_method) : peer_base<_Tmeth, _Tcred, _Tint, _Tintres>(eap_method) {}
 
         ///
         /// Initializes an EAP peer method for EAPHost.
@@ -732,13 +737,13 @@ namespace eap
         /// - \c false otherwise. See \p ppEapError for details.
         ///
         virtual bool get_identity(
-            _In_          DWORD         dwFlags,
-            _In_    const config_type   &cfg,
-            _Inout_       identity_type &usr,
-            _In_          HANDLE        hTokenImpersonateUser,
-            _Out_         BOOL          *pfInvokeUI,
-            _Out_         WCHAR         **ppwszIdentity,
-            _Out_         EAP_ERROR     **ppEapError) = 0;
+            _In_          DWORD                 dwFlags,
+            _In_    const config_providers_type &cfg,
+            _Inout_       credentials_type      &usr,
+            _In_          HANDLE                hTokenImpersonateUser,
+            _Out_         BOOL                  *pfInvokeUI,
+            _Out_         WCHAR                 **ppwszIdentity,
+            _Out_         EAP_ERROR             **ppEapError) = 0;
 
         ///
         /// Defines the implementation of an EAP method-specific function that retrieves the properties of an EAP method given the connection and user data.
@@ -753,8 +758,8 @@ namespace eap
             _In_        DWORD                     dwVersion,
             _In_        DWORD                     dwFlags,
             _In_        HANDLE                    hUserImpersonationToken,
-            _In_  const config_type               &cfg,
-            _In_  const identity_type             &usr,
+            _In_  const config_providers_type     &cfg,
+            _In_  const credentials_type          &usr,
             _Out_       EAP_METHOD_PROPERTY_ARRAY *pMethodPropertyArray,
             _Out_       EAP_ERROR                 **ppEapError) const = 0;
 
