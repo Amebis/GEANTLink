@@ -246,9 +246,8 @@ bool eap::credentials_tls::retrieve(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR 
 std::wstring eap::credentials_tls::get_identity() const
 {
     if (m_cert) {
-        // Generate identity. TODO: Find which CERT_NAME_... constant returns valid identity (username@domain or DOMAIN\Username).
         wstring identity;
-        CertGetNameString(m_cert, CERT_NAME_SIMPLE_DISPLAY_TYPE, 0, NULL, identity);
+        CertGetNameString(m_cert, CERT_NAME_EMAIL_TYPE, 0, NULL, identity);
         return identity;
     } else
         return L"";
