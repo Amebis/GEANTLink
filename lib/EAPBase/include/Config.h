@@ -86,8 +86,9 @@ namespace eapserial
 #include <eaptypes.h> // Must include after <Windows.h>
 #include <tchar.h>
 
-#include <string>
 #include <list>
+#include <string>
+#include <memory>
 
 
 namespace eap
@@ -328,12 +329,6 @@ namespace eap
     {
     public:
         ///
-        /// Provider method configuration type
-        ///
-        typedef _Tmeth config_method_type;
-
-    public:
-        ///
         /// Constructs configuration
         ///
         /// \param[in] mod  Reference of the EAP module to use for global services
@@ -359,9 +354,10 @@ namespace eap
             m_lbl_alt_credential(other.m_lbl_alt_credential),
             m_lbl_alt_identity(other.m_lbl_alt_identity),
             m_lbl_alt_password(other.m_lbl_alt_password),
-            m_methods(other.m_methods),
             config(other)
         {
+            for (std::list<std::unique_ptr<_Tmeth> >::const_iterator method = other.m_methods.cbegin(), method_end = other.m_methods.cend(); method != method_end; ++method)
+                m_methods.push_back(std::move(std::unique_ptr<_Tmeth>(*method ? (_Tmeth*)method->get()->clone() : nullptr)));
         }
 
         ///
@@ -404,7 +400,10 @@ namespace eap
                 m_lbl_alt_credential = other.m_lbl_alt_credential;
                 m_lbl_alt_identity   = other.m_lbl_alt_identity;
                 m_lbl_alt_password   = other.m_lbl_alt_password;
-                m_methods            = other.m_methods;
+
+                m_methods.clear();
+                for (std::list<std::unique_ptr<_Tmeth> >::const_iterator method = other.m_methods.cbegin(), method_end = other.m_methods.cend(); method != method_end; ++method)
+                    m_methods.push_back(std::move(std::unique_ptr<_Tmeth>(*method ? (_Tmeth*)method->get()->clone() : nullptr)));
             }
 
             return *this;
@@ -549,7 +548,7 @@ namespace eap
                 return false;
             }
 
-            for (std::list<_Tmeth>::const_iterator method = m_methods.cbegin(), method_end = m_methods.cend(); method != method_end; ++method) {
+            for (std::list<std::unique_ptr<_Tmeth> >::const_iterator method = m_methods.cbegin(), method_end = m_methods.cend(); method != method_end; ++method) {
                 // <AuthenticationMethod>
                 winstd::com_obj<IXMLDOMElement> pXmlElAuthenticationMethod;
                 if ((dwResult = eapxml::create_element(pDoc, winstd::bstr(L"AuthenticationMethod"), bstrNamespace, &pXmlElAuthenticationMethod))) {
@@ -558,7 +557,7 @@ namespace eap
                 }
 
                 // <AuthenticationMethod>/...
-                if (!method->save(pDoc, pXmlElAuthenticationMethod, ppEapError))
+                if (!method->get()->save(pDoc, pXmlElAuthenticationMethod, ppEapError))
                     return false;
 
                 if (FAILED(hr = pXmlElAuthenticationMethods->appendChild(pXmlElAuthenticationMethod, NULL))) {
@@ -662,19 +661,19 @@ namespace eap
                 winstd::com_obj<IXMLDOMNode> pXmlElMethod;
                 pXmlListMethods->get_item(i, &pXmlElMethod);
 
-                _Tmeth cfg(m_module);
+                std::unique_ptr<_Tmeth> cfg(new _Tmeth(m_module));
 
                 // Check EAP method type (<EAPMethod>).
                 DWORD dwMethodID;
                 if (eapxml::get_element_value(pXmlElMethod, winstd::bstr(L"eap-metadata:EAPMethod"), &dwMethodID) == ERROR_SUCCESS) {
-                    if ((type_t)dwMethodID != cfg.get_method_id()) {
+                    if ((type_t)dwMethodID != cfg->get_method_id()) {
                         // Wrong type.
                         continue;
                     }
                 }
 
                 // Load configuration.
-                if (!cfg.load(pXmlElMethod, ppEapError))
+                if (!cfg->load(pXmlElMethod, ppEapError))
                     return false;
 
                 // Add configuration to the list.
@@ -751,28 +750,33 @@ namespace eap
             eapserial::unpack(cursor, m_lbl_alt_password  );
 
             std::list<_Tmeth>::size_type count;
+            bool is_nonnull;
             eapserial::unpack(cursor, count);
             m_methods.clear();
             for (std::list<_Tmeth>::size_type i = 0; i < count; i++) {
-                _Tmeth el(m_module);
-                el.unpack(cursor);
-                m_methods.push_back(std::move(el));
+                eapserial::unpack(cursor, is_nonnull);
+                if (is_nonnull) {
+                    std::unique_ptr<_Tmeth> el(new _Tmeth(m_module));
+                    el->unpack(cursor);
+                    m_methods.push_back(std::move(el));
+                } else
+                    m_methods.push_back(nullptr);
             }
         }
 
         /// @}
 
     public:
-        bool m_read_only;                       ///< Is profile read-only
-        std::wstring m_id;                      ///< Profile ID
-        winstd::tstring m_name;                 ///< Provider name
-        winstd::tstring m_help_email;           ///< Helpdesk e-mail
-        winstd::tstring m_help_web;             ///< Helpdesk website URL
-        winstd::tstring m_help_phone;           ///< Helpdesk phone
-        winstd::tstring m_lbl_alt_credential;   ///< Alternative label for credential prompt
-        winstd::tstring m_lbl_alt_identity;     ///< Alternative label for identity prompt
-        winstd::tstring m_lbl_alt_password;     ///< Alternative label for password prompt
-        std::list<_Tmeth> m_methods;            ///< List of method configurations
+        bool m_read_only;                               ///< Is profile read-only
+        std::wstring m_id;                              ///< Profile ID
+        winstd::tstring m_name;                         ///< Provider name
+        winstd::tstring m_help_email;                   ///< Helpdesk e-mail
+        winstd::tstring m_help_web;                     ///< Helpdesk website URL
+        winstd::tstring m_help_phone;                   ///< Helpdesk phone
+        winstd::tstring m_lbl_alt_credential;           ///< Alternative label for credential prompt
+        winstd::tstring m_lbl_alt_identity;             ///< Alternative label for identity prompt
+        winstd::tstring m_lbl_alt_password;             ///< Alternative label for password prompt
+        std::list<std::unique_ptr<_Tmeth> > m_methods;  ///< List of method configurations
     };
 
 

@@ -23,6 +23,7 @@
 #include <sal.h>
 
 #include <list>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -229,6 +230,33 @@ namespace eapserial
     /// \param[out]   val     List to unpack to
     ///
     template<class _Ty, class _Ax> inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ std::list<_Ty, _Ax> &val);
+
+    ///
+    /// Packs a std::unique_ptr
+    ///
+    /// \param[inout] cursor  Memory cursor
+    /// \param[in]    val     std::unique_ptr to pack
+    ///
+    template<class _Ty, class _Dx> inline void pack(_Inout_ unsigned char *&cursor, _In_ const std::unique_ptr<_Ty, _Dx> &val);
+
+    ///
+    /// Returns packed size of a std::unique_ptr
+    ///
+    /// \param[in] val  std::unique_ptr to pack
+    ///
+    /// \returns Size of data when packed (in bytes)
+    ///
+    template<class _Ty, class _Dx> inline size_t get_pk_size(const std::unique_ptr<_Ty, _Dx> &val);
+
+    /////
+    ///// Unpacks a std::unique_ptr
+    /////
+    ///// \note Not generally unpackable, since we do not know, how to create a new instance of unique_ptr.
+    /////
+    ///// \param[inout] cursor  Memory cursor
+    ///// \param[out]   val     std::unique_ptr to unpack to
+    /////
+    //template<class _Ty, class _Dx> inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ std::unique_ptr<_Ty, _Dx> &val);
 
     ///
     /// Packs a certificate context
@@ -483,6 +511,28 @@ namespace eapserial
             unpack(cursor, el);
             val.push_back(el);
         }
+    }
+
+
+    template<class _Ty, class _Dx>
+    inline void pack(_Inout_ unsigned char *&cursor, _In_ const std::unique_ptr<_Ty, _Dx> &val)
+    {
+        if (val) {
+            pack(cursor, true);
+            pack(cursor, *val);
+        } else
+            pack(cursor, false);
+    }
+
+
+    template<class _Ty, class _Dx>
+    inline size_t get_pk_size(const std::unique_ptr<_Ty, _Dx> &val)
+    {
+        return
+            val ?
+                get_pk_size(true) +
+                get_pk_size(*val) :
+                get_pk_size(false);
     }
 
 
