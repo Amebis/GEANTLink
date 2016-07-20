@@ -29,29 +29,106 @@
 namespace eapserial
 {
     ///
-    /// Packs a primitive data
+    /// Packs a boolean
     ///
     /// \param[inout] cursor  Memory cursor
     /// \param[in]    val     Variable with data to pack
     ///
-    template <class T> inline void pack(_Inout_ unsigned char *&cursor, _In_ const T &val);
+    inline void pack(_Inout_ unsigned char *&cursor, _In_ const bool &val);
 
     ///
-    /// Returns packed size of a primitive data
+    /// Returns packed size of a boolean
     ///
     /// \param[in] val  Data to pack
     ///
     /// \returns Size of data when packed (in bytes)
     ///
-    template <class T> inline size_t get_pk_size(_In_ const T &val);
+    inline size_t get_pk_size(_In_ const bool &val);
 
     ///
-    /// Unpacks a primitive data
+    /// Unpacks a boolean
     ///
     /// \param[inout] cursor  Memory cursor
     /// \param[out]   val     Variable to receive unpacked value
     ///
-    template <class T> inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ T &val);
+    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ bool &val);
+
+    ///
+    /// Packs a byte
+    ///
+    /// \param[inout] cursor  Memory cursor
+    /// \param[in]    val     Variable with data to pack
+    ///
+    inline void pack(_Inout_ unsigned char *&cursor, _In_ const unsigned char &val);
+
+    ///
+    /// Returns packed size of a byte
+    ///
+    /// \param[in] val  Data to pack
+    ///
+    /// \returns Size of data when packed (in bytes)
+    ///
+    inline size_t get_pk_size(_In_ const unsigned char &val);
+
+    ///
+    /// Unpacks a byte
+    ///
+    /// \param[inout] cursor  Memory cursor
+    /// \param[out]   val     Variable to receive unpacked value
+    ///
+    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ unsigned char &val);
+
+    ///
+    /// Packs an unsigned int
+    ///
+    /// \param[inout] cursor  Memory cursor
+    /// \param[in]    val     Variable with data to pack
+    ///
+    inline void pack(_Inout_ unsigned char *&cursor, _In_ const unsigned int &val);
+
+    ///
+    /// Returns packed size of an unsigned int
+    ///
+    /// \param[in] val  Data to pack
+    ///
+    /// \returns Size of data when packed (in bytes)
+    ///
+    inline size_t get_pk_size(_In_ const unsigned int &val);
+
+    ///
+    /// Unpacks an unsigned int
+    ///
+    /// \param[inout] cursor  Memory cursor
+    /// \param[out]   val     Variable to receive unpacked value
+    ///
+    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ unsigned int &val);
+
+#ifdef _WIN64
+    ///
+    /// Packs a size_t
+    ///
+    /// \param[inout] cursor  Memory cursor
+    /// \param[in]    val     Variable with data to pack
+    ///
+    inline void pack(_Inout_ unsigned char *&cursor, _In_ const size_t &val);
+
+    ///
+    /// Returns packed size of a size_t
+    ///
+    /// \param[in] val  Data to pack
+    ///
+    /// \returns Size of data when packed (in bytes)
+    ///
+    inline size_t get_pk_size(_In_ const size_t &val);
+
+    ///
+    /// Unpacks a size_t
+    ///
+    /// \param[inout] cursor  Memory cursor
+    /// \param[out]   val     Variable to receive unpacked value
+    ///
+    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ size_t &val);
+#endif
 
     ///
     /// Packs a string
@@ -184,28 +261,90 @@ namespace eapserial
 
 namespace eapserial
 {
-    template <class T>
-    inline void pack(_Inout_ unsigned char *&cursor, _In_ const T &val)
+    inline void pack(_Inout_ unsigned char *&cursor, _In_ const bool &val)
     {
-        memcpy(cursor, &val, sizeof(T));
-        cursor += sizeof(T);
+        *cursor = val ? 1 : 0;
+        cursor++;
     }
 
 
-    template <class T>
-    inline size_t get_pk_size(_In_ const T &val)
+    inline size_t get_pk_size(_In_ const bool &val)
     {
         UNREFERENCED_PARAMETER(val);
-        return sizeof(T);
+        return sizeof(unsigned char);
     }
 
 
-    template <class T>
-    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ T &val)
+    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ bool &val)
     {
-        memcpy(&val, cursor, sizeof(T));
-        cursor += sizeof(T);
+        val = *cursor ? true : false;
+        cursor++;
     }
+
+
+    inline void pack(_Inout_ unsigned char *&cursor, _In_ const unsigned char &val)
+    {
+        *cursor = val;
+        cursor++;
+    }
+
+
+    inline size_t get_pk_size(_In_ const unsigned char &val)
+    {
+        UNREFERENCED_PARAMETER(val);
+        return sizeof(unsigned char);
+    }
+
+
+    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ unsigned char &val)
+    {
+        val = *cursor;
+        cursor++;
+    }
+
+
+    inline void pack(_Inout_ unsigned char *&cursor, _In_ const unsigned int &val)
+    {
+        *(unsigned int*)cursor = val;
+        cursor += sizeof(unsigned int);
+    }
+
+
+    inline size_t get_pk_size(_In_ const unsigned int &val)
+    {
+        UNREFERENCED_PARAMETER(val);
+        return sizeof(unsigned int);
+    }
+
+
+    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ unsigned int &val)
+    {
+        val = *(unsigned int*)cursor;
+        cursor += sizeof(unsigned int);
+    }
+
+
+#ifdef _WIN64
+    inline void pack(_Inout_ unsigned char *&cursor, _In_ const size_t &val)
+    {
+        *(size_t*)cursor = val;
+        cursor += sizeof(size_t);
+    }
+
+
+    inline size_t get_pk_size(_In_ const size_t &val)
+    {
+        UNREFERENCED_PARAMETER(val);
+        return sizeof(size_t);
+    }
+
+
+    inline void unpack(_Inout_ const unsigned char *&cursor, _Out_ size_t &val)
+    {
+        val = *(size_t*)cursor;
+        cursor += sizeof(size_t);
+    }
+#endif
 
 
     template<class _Elem, class _Traits, class _Ax>
