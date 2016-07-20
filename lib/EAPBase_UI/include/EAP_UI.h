@@ -122,7 +122,7 @@ public:
                 m_providers->AddPage(
                     new _wxT(
                         *provider,
-                        provider->m_methods.front(),
+                        *method,
                         provider->m_id.c_str(),
                         m_providers),
                     is_single ? provider->m_id : winstd::tstring_printf(_T("%s (%u)"), provider->m_id.c_str(), count));
