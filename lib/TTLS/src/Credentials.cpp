@@ -232,6 +232,13 @@ bool eap::credentials_ttls::retrieve(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR
 }
 
 
+LPCTSTR eap::credentials_ttls::target_suffix() const
+{
+    assert(0); // Not that we would ever store inner&outer credentials to Windows Credential Manager joined, but for completness sake... Here we go:
+    return _T("TTLS");
+}
+
+
 std::wstring eap::credentials_ttls::get_identity() const
 {
     // Outer identity has the right-of-way.
