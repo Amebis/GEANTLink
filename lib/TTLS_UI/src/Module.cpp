@@ -103,6 +103,7 @@ bool eap::peer_ttls_ui::invoke_identity_ui(
         wxEAPCredentialsDialog dlg(cfg_prov, &parent);
         wxTTLSCredentialsPanel *panel = new wxTTLSCredentialsPanel(cfg_prov, *cfg_method, cred, cfg_prov.m_id.c_str(), &dlg);
         dlg.AddContents((wxPanel**)&panel, 1);
+        dlg.Centre(wxBOTH);
         result = dlg.ShowModal();
 
         wxTopLevelWindows.DeleteObject(&parent);
