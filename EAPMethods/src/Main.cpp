@@ -237,11 +237,11 @@ DWORD APIENTRY EapPeerGetIdentity(
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" ppwszIdentity is NULL.")));
     else {
         eap::config_providers cfg(g_peer);
-        _EAPMETHOD_PEER::credentials_type cred(g_peer);
+        _EAPMETHOD_PEER::credentials_type cred_in(g_peer), cred_out(g_peer);
         if (                  !g_peer.unpack(cfg, pConnectionData, dwConnectionDataSize, ppEapError) ||
-            dwUserDataSize && !g_peer.unpack(cred, pUserData, dwUserDataSize, ppEapError) ||
-                              !g_peer.get_identity(dwFlags, cfg, cred, hTokenImpersonateUser, pfInvokeUI, ppwszIdentity, ppEapError) ||
-                              !g_peer.pack(cred, ppUserDataOut, pdwUserDataOutSize, ppEapError))
+            dwUserDataSize && !g_peer.unpack(cred_in, pUserData, dwUserDataSize, ppEapError) ||
+                              !g_peer.get_identity(dwFlags, cfg, dwUserDataSize ? &cred_in : NULL, cred_out, hTokenImpersonateUser, pfInvokeUI, ppwszIdentity, ppEapError) ||
+                              !g_peer.pack(cred_out, ppUserDataOut, pdwUserDataOutSize, ppEapError))
         {
             if (*ppEapError) {
                 g_peer.log_error(*ppEapError);

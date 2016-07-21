@@ -59,13 +59,14 @@ bool eap::peer_ttls::shutdown(_Out_ EAP_ERROR **ppEapError)
 
 
 bool eap::peer_ttls::get_identity(
-    _In_          DWORD            dwFlags,
-    _In_    const config_providers &cfg,
-    _Inout_       credentials_type &cred,
-    _In_          HANDLE           hTokenImpersonateUser,
-    _Out_         BOOL             *pfInvokeUI,
-    _Out_         WCHAR            **ppwszIdentity,
-    _Out_         EAP_ERROR        **ppEapError)
+    _In_           DWORD            dwFlags,
+    _In_     const config_providers &cfg,
+    _In_opt_ const credentials_type *cred_in,
+    _Inout_        credentials_type &cred_out,
+    _In_           HANDLE           hTokenImpersonateUser,
+    _Out_          BOOL             *pfInvokeUI,
+    _Out_          WCHAR            **ppwszIdentity,
+    _Out_          EAP_ERROR        **ppEapError)
 {
     assert(pfInvokeUI);
     assert(ppwszIdentity);
@@ -79,56 +80,55 @@ bool eap::peer_ttls::get_identity(
     const config_provider &cfg_prov(cfg.m_providers.front());
     const config_method_ttls *cfg_method = dynamic_cast<const config_method_ttls*>(cfg_prov.m_methods.front().get());
 
-    bool outer_set = false;
+    bool is_outer_set = false;
     assert(cfg_method);
     if (cfg_method->m_preshared) {
-        // Outer TLS identity: Preshared credentials.
-        (credentials_tls&)cred = (credentials_tls&)*cfg_method->m_preshared;
-        log_event(&EAPMETHOD_TRACE_EVT_CRED_PRESHARED, event_data(cred.credentials_tls::target_suffix()), event_data(cred.credentials_tls::get_name()), event_data::blank);
-        outer_set = true;
+        // Outer TLS: Preshared credentials.
+        (credentials_tls&)cred_out = (credentials_tls&)*cfg_method->m_preshared;
+        log_event(&EAPMETHOD_TRACE_EVT_CRED_PRESHARED, event_data(cred_out.credentials_tls::target_suffix()), event_data(cred_out.credentials_tls::get_name()), event_data::blank);
+        is_outer_set = true;
     }
 
-    bool inner_set = false;
+    bool is_inner_set = false;
     const config_method_pap *cfg_inner_pap = dynamic_cast<const config_method_pap*>(cfg_method->m_inner.get());
     if (cfg_inner_pap) {
         if (cfg_inner_pap->m_preshared) {
-            // Inner PAP identity: Preshared credentials.
-            cred.m_inner.reset((credentials*)cfg_inner_pap->m_preshared->clone());
-            log_event(&EAPMETHOD_TRACE_EVT_CRED_PRESHARED, event_data(cred.m_inner->target_suffix()), event_data(cred.m_inner->get_name()), event_data::blank);
-            inner_set = true;
+            // Inner PAP: Preshared credentials.
+            cred_out.m_inner.reset((credentials*)cfg_inner_pap->m_preshared->clone());
+            log_event(&EAPMETHOD_TRACE_EVT_CRED_PRESHARED, event_data(cred_out.m_inner->target_suffix()), event_data(cred_out.m_inner->get_name()), event_data::blank);
+            is_inner_set = true;
         }
     } else
         assert(0); // Unsupported inner authentication method type.
 
-    if ((dwFlags & EAP_FLAG_GUEST_ACCESS) == 0 && (!outer_set || !inner_set)) {
+    if ((dwFlags & EAP_FLAG_GUEST_ACCESS) == 0 && (!is_outer_set || !is_inner_set)) {
         // Not a guest && some credentials may be missing: Try to load credentials from Windows Credential Manager.
 
         // Change user context. When applicable.
         bool user_ctx_changed = hTokenImpersonateUser && ImpersonateLoggedOnUser(hTokenImpersonateUser);
 
-        if (!outer_set) {
-            if (cred.credentials_tls::retrieve(cfg_prov.m_id.c_str(), ppEapError)) {
-                // Outer TLS identity: Stored credentials.
-                log_event(&EAPMETHOD_TRACE_EVT_CRED_STORED, event_data(cred.credentials_tls::target_suffix()), event_data(cred.credentials_tls::get_name()), event_data::blank);
-                outer_set = true;
+        if (!is_outer_set) {
+            credentials_tls cred_loaded(*this);
+            if (cred_loaded.retrieve(cfg_prov.m_id.c_str(), ppEapError)) {
+                // Outer TLS: Stored credentials.
+                (credentials_tls&&)cred_out = std::move(cred_loaded);
+                log_event(&EAPMETHOD_TRACE_EVT_CRED_STORED, event_data(cred_out.credentials_tls::target_suffix()), event_data(cred_out.credentials_tls::get_name()), event_data::blank);
+                is_outer_set = true;
             } else {
                 // Not actually an error.
                 free_error_memory(*ppEapError);
             }
         }
 
-        if (!inner_set) {
+        if (!is_inner_set) {
             unique_ptr<credentials> cred_loaded;
-            if (cfg_inner_pap)
-                cred_loaded.reset(new credentials_pap(*this));
-            else
-                assert(0); // Unsupported inner authentication method type.
-
+            if (cfg_inner_pap) cred_loaded.reset(new credentials_pap(*this));
+            else               assert(0); // Unsupported inner authentication method type.
             if (cred_loaded->retrieve(cfg_prov.m_id.c_str(), ppEapError)) {
-                // Inner PAP identity: Stored credentials.
-                cred.m_inner = std::move(cred_loaded);
-                log_event(&EAPMETHOD_TRACE_EVT_CRED_STORED, event_data(cred.m_inner->target_suffix()), event_data(cred.m_inner->get_name()), event_data::blank);
-                inner_set = true;
+                // Inner PAP: Stored credentials.
+                cred_out.m_inner = std::move(cred_loaded);
+                log_event(&EAPMETHOD_TRACE_EVT_CRED_STORED, event_data(cred_out.m_inner->target_suffix()), event_data(cred_out.m_inner->get_name()), event_data::blank);
+                is_inner_set = true;
             } else {
                 // Not actually an error.
                 free_error_memory(*ppEapError);
@@ -139,32 +139,41 @@ bool eap::peer_ttls::get_identity(
         if (user_ctx_changed) RevertToSelf();
     }
 
-    // Test if we have credentials available anyway (from before - EAP can cache them).
+    if (cred_in) {
+        // Try cached credentials.
 
-    // Note: Outer TLS credentials can be empty!
-    //if (!cred.credentials_tls::empty())
-    //    outer_set = true;
+        if (!is_outer_set) {
+            // Outer TLS: EAP service cached credentials.
+            (credentials_tls&)cred_out = (const credentials_tls&)cred_in;
+            log_event(&EAPMETHOD_TRACE_EVT_CRED_CACHED, event_data(cred_out.credentials_tls::target_suffix()), event_data(cred_out.credentials_tls::get_name()), event_data::blank);
+            is_outer_set = true;
+        }
 
-    if (cred.m_inner && !cred.m_inner->empty())
-        inner_set = true;
+        if (!is_inner_set && cred_in->m_inner) {
+            // Inner PAP: EAP service cached credentials.
+            cred_out.m_inner.reset((credentials*)cred_in->m_inner->clone());
+            log_event(&EAPMETHOD_TRACE_EVT_CRED_CACHED, event_data(cred_out.m_inner->target_suffix()), event_data(cred_out.m_inner->get_name()), event_data::blank);
+            is_inner_set = true;
+        }
+    }
 
     *pfInvokeUI = FALSE;
     if ((dwFlags & EAP_FLAG_MACHINE_AUTH) == 0) {
         // Per-user authentication
-        if (!outer_set) {
-            log_event(&EAPMETHOD_TRACE_EVT_CRED_INVOKE_UI, event_data(cred.credentials_tls::target_suffix()), event_data::blank);
+        if (!is_outer_set) {
+            log_event(&EAPMETHOD_TRACE_EVT_CRED_INVOKE_UI, event_data(cred_out.credentials_tls::target_suffix()), event_data::blank);
             *pfInvokeUI = TRUE;
             return true;
         }
 
-        if (!inner_set) {
-            log_event(&EAPMETHOD_TRACE_EVT_CRED_INVOKE_UI, event_data(cred.m_inner->target_suffix()), event_data::blank);
+        if (!is_inner_set) {
+            log_event(&EAPMETHOD_TRACE_EVT_CRED_INVOKE_UI, event_data(cred_out.m_inner->target_suffix()), event_data::blank);
             *pfInvokeUI = TRUE;
             return true;
         }
     } else {
         // Per-machine authentication
-        if (!outer_set || !inner_set) {
+        if (!is_outer_set || !is_inner_set) {
             *ppEapError = make_error(ERROR_NO_SUCH_USER, _T(__FUNCTION__) _T(" Credentials for per-machine authentication not available."));
             return false;
         }
@@ -176,10 +185,10 @@ bool eap::peer_ttls::get_identity(
     wstring identity;
     if (cfg_method->m_anonymous_identity.empty()) {
         // Use the true identity. Outer has the right-of-way.
-        identity = std::move(cred.get_identity());
+        identity = std::move(cred_out.get_identity());
     } else if (cfg_method->m_anonymous_identity.compare(L"@") == 0) {
         // Strip username part from identity (RFC 4822).
-        identity = std::move(cred.get_identity());
+        identity = std::move(cred_out.get_identity());
         wstring::size_type offset = identity.find(L'@');
         if (offset != wstring::npos) identity.erase(0, offset);
     } else {
