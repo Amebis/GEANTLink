@@ -238,10 +238,10 @@ DWORD APIENTRY EapPeerGetIdentity(
     else {
         eap::config_providers cfg(g_peer);
         _EAPMETHOD_PEER::credentials_type cred(g_peer);
-        if (!g_peer.unpack(cfg, pConnectionData, dwConnectionDataSize, ppEapError) ||
-            !g_peer.unpack(cred, pUserData, dwUserDataSize, ppEapError) ||
-            !g_peer.get_identity(dwFlags, cfg, cred, hTokenImpersonateUser, pfInvokeUI, ppwszIdentity, ppEapError) ||
-            !g_peer.pack(cred, ppUserDataOut, pdwUserDataOutSize, ppEapError))
+        if (                  !g_peer.unpack(cfg, pConnectionData, dwConnectionDataSize, ppEapError) ||
+            dwUserDataSize && !g_peer.unpack(cred, pUserData, dwUserDataSize, ppEapError) ||
+                              !g_peer.get_identity(dwFlags, cfg, cred, hTokenImpersonateUser, pfInvokeUI, ppwszIdentity, ppEapError) ||
+                              !g_peer.pack(cred, ppUserDataOut, pdwUserDataOutSize, ppEapError))
         {
             if (*ppEapError) {
                 g_peer.log_error(*ppEapError);
