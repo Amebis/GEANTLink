@@ -561,13 +561,13 @@ namespace eap
             if (!decrypt_md5(cp, pDataIn, dwDataInSize, data, ppEapError))
                 return false;
 
-            eapserial::cursor_in cursor = { data.data(), data.data() + data.size() };
-            eapserial::unpack(cursor, record);
+            cursor_in cursor = { data.data(), data.data() + data.size() };
+            cursor >> record;
 #else
             UNREFERENCED_PARAMETER(ppEapError);
 
-            eapserial::cursor_in cursor = { pDataIn, pDataIn + dwDataInSize };
-            eapserial::unpack(cursor, record);
+            cursor_in cursor = { pDataIn, pDataIn + dwDataInSize };
+            cursor >> record;
 #endif
 
             return true;
@@ -596,11 +596,11 @@ namespace eap
 #if EAP_ENCRYPT_BLOBS
             // Allocate BLOB.
             std::vector<unsigned char, winstd::sanitizing_allocator<unsigned char> > data;
-            data.resize(eapserial::get_pk_size(record));
+            data.resize(pksizeof(record));
 
             // Pack to BLOB.
-            eapserial::cursor_out cursor = { data.data(), data.data() + data.size() };
-            eapserial::pack(cursor, record);
+            cursor_out cursor = { data.data(), data.data() + data.size() };
+            cursor << record;
             data.resize(cursor.ptr - &data.front());
 
             // Prepare cryptographics provider.
@@ -629,7 +629,7 @@ namespace eap
             // Allocate BLOB.
             assert(ppDataOut);
             assert(pdwDataOutSize);
-            *pdwDataOutSize = (DWORD)eapserial::get_pk_size(record);
+            *pdwDataOutSize = (DWORD)pksizeof(record);
             *ppDataOut = alloc_memory(*pdwDataOutSize);
             if (!*ppDataOut) {
                 log_error(*ppEapError = g_peer.make_error(ERROR_OUTOFMEMORY, tstring_printf(_T(__FUNCTION__) _T(" Error allocating memory for BLOB (%uB)."), *pdwDataOutSize).c_str()));
@@ -637,8 +637,8 @@ namespace eap
             }
 
             // Pack to BLOB.
-            eapserial::cursor_out cursor = { *ppDataOut, *ppDataOut + *pdwDataOutSize };
-            eapserial::pack(cursor, record);
+            cursor_out cursor = { *ppDataOut, *ppDataOut + *pdwDataOutSize };
+            cursor << record;
             *pdwDataOutSize = cursor.ptr - *ppDataOut;
 #endif
 

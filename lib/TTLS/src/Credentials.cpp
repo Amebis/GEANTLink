@@ -149,19 +149,19 @@ bool eap::credentials_ttls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR 
 }
 
 
-void eap::credentials_ttls::pack(_Inout_ eapserial::cursor_out &cursor) const
+void eap::credentials_ttls::operator<<(_Inout_ cursor_out &cursor) const
 {
-    eap::credentials_tls::pack(cursor);
+    credentials_tls::operator<<(cursor);
     if (m_inner) {
-        if (dynamic_cast<eap::credentials_pap*>(m_inner.get())) {
-            eapserial::pack(cursor, eap::type_pap);
-            m_inner->pack(cursor);
+        if (dynamic_cast<credentials_pap*>(m_inner.get())) {
+            cursor << type_pap;
+            cursor << *m_inner;
         } else {
             assert(0); // Unsupported inner authentication method type.
-            eapserial::pack(cursor, eap::type_undefined);
+            cursor << type_undefined;
         }
     } else
-        eapserial::pack(cursor, eap::type_undefined);
+        cursor << type_undefined;
 }
 
 
@@ -169,33 +169,33 @@ size_t eap::credentials_ttls::get_pk_size() const
 {
     size_t size_inner;
     if (m_inner) {
-        if (dynamic_cast<eap::credentials_pap*>(m_inner.get())) {
+        if (dynamic_cast<credentials_pap*>(m_inner.get())) {
             size_inner =
-                eapserial::get_pk_size(eap::type_pap) +
-                m_inner->get_pk_size();
+                pksizeof(type_pap) +
+                pksizeof(*m_inner);
         } else {
             assert(0); // Unsupported inner authentication method type.
-            size_inner = eapserial::get_pk_size(eap::type_undefined);
+            size_inner = pksizeof(type_undefined);
         }
     } else
-        size_inner = eapserial::get_pk_size(eap::type_undefined);
+        size_inner = pksizeof(type_undefined);
 
     return
-        eap::credentials_tls::get_pk_size() +
+        credentials_tls::get_pk_size() +
         size_inner;
 }
 
 
-void eap::credentials_ttls::unpack(_Inout_ eapserial::cursor_in &cursor)
+void eap::credentials_ttls::operator>>(_Inout_ cursor_in &cursor)
 {
-    eap::credentials_tls::unpack(cursor);
+    credentials_tls::operator>>(cursor);
 
-    eap::type_t eap_type;
-    eapserial::unpack(cursor, eap_type);
+    type_t eap_type;
+    cursor >> eap_type;
     switch (eap_type) {
-        case eap::type_pap:
-            m_inner.reset(new eap::credentials_pap(m_module));
-            m_inner->unpack(cursor);
+        case type_pap:
+            m_inner.reset(new credentials_pap(m_module));
+            cursor >> *m_inner;
             break;
         default:
             assert(0); // Unsupported inner authentication method type.

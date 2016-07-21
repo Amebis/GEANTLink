@@ -167,25 +167,25 @@ bool eap::credentials_tls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR *
 }
 
 
-void eap::credentials_tls::pack(_Inout_ eapserial::cursor_out &cursor) const
+void eap::credentials_tls::operator<<(_Inout_ cursor_out &cursor) const
 {
-    eap::credentials::pack(cursor);
-    eapserial::pack(cursor, m_cert);
+    credentials::operator<<(cursor);
+    cursor << m_cert;
 }
 
 
 size_t eap::credentials_tls::get_pk_size() const
 {
     return
-        eap::credentials::get_pk_size() +
-        eapserial::get_pk_size(m_cert);
+        credentials::get_pk_size() +
+        pksizeof(m_cert);
 }
 
 
-void eap::credentials_tls::unpack(_Inout_ eapserial::cursor_in &cursor)
+void eap::credentials_tls::operator>>(_Inout_ cursor_in &cursor)
 {
-    eap::credentials::unpack(cursor);
-    eapserial::unpack(cursor, m_cert);
+    credentials::operator>>(cursor);
+    cursor >> m_cert;
 }
 
 
@@ -279,7 +279,7 @@ std::wstring eap::credentials_tls::get_identity() const
 
 tstring eap::credentials_tls::get_name() const
 {
-    return m_cert ? std::move(eap::get_cert_title(m_cert)) : L"<blank>";
+    return m_cert ? std::move(get_cert_title(m_cert)) : L"<blank>";
 }
 
 

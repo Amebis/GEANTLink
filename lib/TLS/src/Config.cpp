@@ -87,7 +87,7 @@ eap::config_method_tls::config_method_tls(_Inout_ config_method_tls &&other) :
 }
 
 
-eap::config_method_tls& eap::config_method_tls::operator=(_In_ const eap::config_method_tls &other)
+eap::config_method_tls& eap::config_method_tls::operator=(_In_ const config_method_tls &other)
 {
     if (this != &other) {
         (config_method&)*this = other;
@@ -99,7 +99,7 @@ eap::config_method_tls& eap::config_method_tls::operator=(_In_ const eap::config
 }
 
 
-eap::config_method_tls& eap::config_method_tls::operator=(_Inout_ eap::config_method_tls &&other)
+eap::config_method_tls& eap::config_method_tls::operator=(_Inout_ config_method_tls &&other)
 {
     if (this != &other) {
         (config_method&&)*this = std::move(other);
@@ -226,7 +226,7 @@ bool eap::config_method_tls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR
             // Log loaded CA certificates.
             list<tstring> cert_names;
             for (std::list<winstd::cert_context>::const_iterator cert = m_trusted_root_ca.cbegin(), cert_end = m_trusted_root_ca.cend(); cert != cert_end; ++cert)
-                cert_names.push_back(std::move(eap::get_cert_title(*cert)));
+                cert_names.push_back(std::move(get_cert_title(*cert)));
             m_module.log_config((xpathServerSideCredential + L"/CA").c_str(), cert_names);
         }
 
@@ -256,28 +256,28 @@ bool eap::config_method_tls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR
 }
 
 
-void eap::config_method_tls::pack(_Inout_ eapserial::cursor_out &cursor) const
+void eap::config_method_tls::operator<<(_Inout_ cursor_out &cursor) const
 {
-    eap::config_method::pack(cursor);
-    eapserial::pack(cursor, m_trusted_root_ca);
-    eapserial::pack(cursor, m_server_names   );
+    config_method::operator<<(cursor);
+    cursor << m_trusted_root_ca;
+    cursor << m_server_names   ;
 }
 
 
 size_t eap::config_method_tls::get_pk_size() const
 {
     return
-        eap::config_method::get_pk_size() +
-        eapserial::get_pk_size(m_trusted_root_ca) +
-        eapserial::get_pk_size(m_server_names   );
+        config_method::get_pk_size() +
+        pksizeof(m_trusted_root_ca) +
+        pksizeof(m_server_names   );
 }
 
 
-void eap::config_method_tls::unpack(_Inout_ eapserial::cursor_in &cursor)
+void eap::config_method_tls::operator>>(_Inout_ cursor_in &cursor)
 {
-    eap::config_method::unpack(cursor);
-    eapserial::unpack(cursor, m_trusted_root_ca);
-    eapserial::unpack(cursor, m_server_names   );
+    config_method::operator>>(cursor);
+    cursor >> m_trusted_root_ca;
+    cursor >> m_server_names   ;
 }
 
 
@@ -289,7 +289,7 @@ eap::credentials* eap::config_method_tls::make_credentials() const
 
 eap::type_t eap::config_method_tls::get_method_id() const
 {
-    return eap::type_tls;
+    return type_tls;
 }
 
 

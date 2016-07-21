@@ -45,33 +45,30 @@ namespace eap
     class config_providers;
 }
 
-namespace eapserial
-{
-    ///
-    /// Packs a configuration
-    ///
-    /// \param[inout] cursor  Memory cursor
-    /// \param[in]    val     Configuration to pack
-    ///
-    inline void pack(_Inout_ cursor_out &cursor, _In_ const eap::config &val);
+///
+/// Packs a configuration
+///
+/// \param[inout] cursor  Memory cursor
+/// \param[in]    val     Configuration to pack
+///
+inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const eap::config &val);
 
-    ///
-    /// Returns packed size of a configuration
-    ///
-    /// \param[in] val  Configuration to pack
-    ///
-    /// \returns Size of data when packed (in bytes)
-    ///
-    inline size_t get_pk_size(const eap::config &val);
+///
+/// Returns packed size of a configuration
+///
+/// \param[in] val  Configuration to pack
+///
+/// \returns Size of data when packed (in bytes)
+///
+inline size_t pksizeof(const eap::config &val);
 
-    ///
-    /// Unpacks a configuration
-    ///
-    /// \param[inout] cursor  Memory cursor
-    /// \param[out]   val     Configuration to unpack to
-    ///
-    inline void unpack(_Inout_ cursor_in &cursor, _Out_ eap::config &val);
-}
+///
+/// Unpacks a configuration
+///
+/// \param[inout] cursor  Memory cursor
+/// \param[out]   val     Configuration to unpack to
+///
+inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ eap::config &val);
 
 #pragma once
 
@@ -181,7 +178,7 @@ namespace eap
         ///
         /// \param[inout] cursor  Memory cursor
         ///
-        virtual void pack(_Inout_ eapserial::cursor_out &cursor) const;
+        virtual void operator<<(_Inout_ cursor_out &cursor) const;
 
         ///
         /// Returns packed size of a configuration
@@ -195,7 +192,7 @@ namespace eap
         ///
         /// \param[inout] cursor  Memory cursor
         ///
-        virtual void unpack(_Inout_ eapserial::cursor_in &cursor);
+        virtual void operator>>(_Inout_ cursor_in &cursor);
 
         /// @}
 
@@ -288,7 +285,7 @@ namespace eap
         ///
         /// \param[inout] cursor  Memory cursor
         ///
-        virtual void pack(_Inout_ eapserial::cursor_out &cursor) const;
+        virtual void operator<<(_Inout_ cursor_out &cursor) const;
 
         ///
         /// Returns packed size of a configuration
@@ -302,7 +299,7 @@ namespace eap
         ///
         /// \param[inout] cursor  Memory cursor
         ///
-        virtual void unpack(_Inout_ eapserial::cursor_in &cursor);
+        virtual void operator>>(_Inout_ cursor_in &cursor);
 
         /// @}
 
@@ -412,7 +409,7 @@ namespace eap
         ///
         /// \param[inout] cursor  Memory cursor
         ///
-        virtual void pack(_Inout_ eapserial::cursor_out &cursor) const;
+        virtual void operator<<(_Inout_ cursor_out &cursor) const;
 
         ///
         /// Returns packed size of a configuration
@@ -426,7 +423,7 @@ namespace eap
         ///
         /// \param[inout] cursor  Memory cursor
         ///
-        virtual void unpack(_Inout_ eapserial::cursor_in &cursor);
+        virtual void operator>>(_Inout_ cursor_in &cursor);
 
         /// @}
 
@@ -531,7 +528,7 @@ namespace eap
         ///
         /// \param[inout] cursor  Memory cursor
         ///
-        virtual void pack(_Inout_ eapserial::cursor_out &cursor) const;
+        virtual void operator<<(_Inout_ cursor_out &cursor) const;
 
         ///
         /// Returns packed size of a configuration
@@ -545,7 +542,7 @@ namespace eap
         ///
         /// \param[inout] cursor  Memory cursor
         ///
-        virtual void unpack(_Inout_ eapserial::cursor_in &cursor);
+        virtual void operator>>(_Inout_ cursor_in &cursor);
 
         /// @}
 
@@ -555,22 +552,19 @@ namespace eap
 }
 
 
-namespace eapserial
+inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const eap::config &val)
 {
-    inline void pack(_Inout_ cursor_out &cursor, _In_ const eap::config &val)
-    {
-        val.pack(cursor);
-    }
+    val.operator<<(cursor);
+}
 
 
-    inline size_t get_pk_size(const eap::config &val)
-    {
-        return val.get_pk_size();
-    }
+inline size_t pksizeof(const eap::config &val)
+{
+    return val.get_pk_size();
+}
 
 
-    inline void unpack(_Inout_ cursor_in &cursor, _Out_ eap::config &val)
-    {
-        val.unpack(cursor);
-    }
+inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ eap::config &val)
+{
+    val.operator>>(cursor);
 }

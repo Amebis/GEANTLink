@@ -293,7 +293,7 @@ namespace eap
         ///
         /// \param[inout] cursor  Memory cursor
         ///
-        virtual void pack(_Inout_ eapserial::cursor_out &cursor) const;
+        virtual void operator<<(_Inout_ cursor_out &cursor) const;
 
         ///
         /// Returns packed size of a configuration
@@ -307,7 +307,7 @@ namespace eap
         ///
         /// \param[inout] cursor  Memory cursor
         ///
-        virtual void unpack(_Inout_ eapserial::cursor_in &cursor);
+        virtual void operator>>(_Inout_ cursor_in &cursor);
 
         /// @}
 

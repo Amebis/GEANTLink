@@ -81,7 +81,7 @@ bool eap::config::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapErr
 }
 
 
-void eap::config::pack(_Inout_ eapserial::cursor_out &cursor) const
+void eap::config::operator<<(_Inout_ cursor_out &cursor) const
 {
     UNREFERENCED_PARAMETER(cursor);
 }
@@ -93,7 +93,7 @@ size_t eap::config::get_pk_size() const
 }
 
 
-void eap::config::unpack(_Inout_ eapserial::cursor_in &cursor)
+void eap::config::operator>>(_Inout_ cursor_in &cursor)
 {
     UNREFERENCED_PARAMETER(cursor);
 }
@@ -120,10 +120,10 @@ eap::config_method::config_method(_In_ const config_method &other) :
 
 
 eap::config_method::config_method(_Inout_ config_method &&other) :
-    m_allow_save(move(other.m_allow_save)),
-    m_anonymous_identity(move(other.m_anonymous_identity)),
-    m_preshared(move(other.m_preshared)),
-    config(move(other))
+    m_allow_save(std::move(other.m_allow_save)),
+    m_anonymous_identity(std::move(other.m_anonymous_identity)),
+    m_preshared(std::move(other.m_preshared)),
+    config(std::move(other))
 {
 }
 
@@ -144,10 +144,10 @@ eap::config_method& eap::config_method::operator=(_In_ const config_method &othe
 eap::config_method& eap::config_method::operator=(_Inout_ config_method &&other)
 {
     if (this != &other) {
-        (config&&)*this      = move(other);
-        m_allow_save         = move(other.m_allow_save);
-        m_anonymous_identity = move(other.m_anonymous_identity);
-        m_preshared          = move(other.m_preshared);
+        (config&&)*this      = std::move(other);
+        m_allow_save         = std::move(other.m_allow_save);
+        m_anonymous_identity = std::move(other.m_anonymous_identity);
+        m_preshared          = std::move(other.m_preshared);
     }
 
     return *this;
@@ -222,7 +222,7 @@ bool eap::config_method::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **p
         unique_ptr<credentials> preshared(make_credentials());
         assert(preshared);
         if (preshared->load(pXmlElClientSideCredential, ppEapError)) {
-            m_preshared = move(preshared);
+            m_preshared = std::move(preshared);
         } else {
             // This is not really an error - merely an indication pre-shared credentials are unavailable.
             if (*ppEapError) {
@@ -236,44 +236,44 @@ bool eap::config_method::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **p
 }
 
 
-void eap::config_method::pack(_Inout_ eapserial::cursor_out &cursor) const
+void eap::config_method::operator<<(_Inout_ cursor_out &cursor) const
 {
-    config::pack(cursor);
-    eapserial::pack(cursor, m_allow_save        );
-    eapserial::pack(cursor, m_anonymous_identity);
+    config::operator<<(cursor);
+    cursor << m_allow_save        ;
+    cursor << m_anonymous_identity;
     if (m_preshared) {
-        eapserial::pack(cursor, true);
-        m_preshared->pack(cursor);
+        cursor << true;
+        cursor << *m_preshared;
     } else
-        eapserial::pack(cursor, false);
+        cursor << false;
 }
 
 
 size_t eap::config_method::get_pk_size() const
 {
     return
-        config::get_pk_size()        +
-        eapserial::get_pk_size(m_allow_save        ) +
-        eapserial::get_pk_size(m_anonymous_identity) +
+        config::get_pk_size()          +
+        pksizeof(m_allow_save        ) +
+        pksizeof(m_anonymous_identity) +
         (m_preshared ? 
-            eapserial::get_pk_size(true) +
-            m_preshared->get_pk_size() :
-            eapserial::get_pk_size(false));
+            pksizeof(true        ) +
+            pksizeof(*m_preshared) :
+            pksizeof(false       ));
 }
 
 
-void eap::config_method::unpack(_Inout_ eapserial::cursor_in &cursor)
+void eap::config_method::operator>>(_Inout_ cursor_in &cursor)
 {
-    config::unpack(cursor);
-    eapserial::unpack(cursor, m_allow_save        );
-    eapserial::unpack(cursor, m_anonymous_identity);
+    config::operator>>(cursor);
+    cursor >> m_allow_save        ;
+    cursor >> m_anonymous_identity;
 
     bool use_preshared;
-    eapserial::unpack(cursor, use_preshared);
+    cursor >> use_preshared;
     if (use_preshared) {
         m_preshared.reset(make_credentials());
         assert(m_preshared);
-        m_preshared->unpack(cursor);
+        cursor >> *m_preshared;
     } else
         m_preshared.reset(nullptr);
 }
@@ -303,22 +303,22 @@ eap::config_provider::config_provider(_In_ const config_provider &other) :
     config(other)
 {
     for (list<unique_ptr<config_method> >::const_iterator method = other.m_methods.cbegin(), method_end = other.m_methods.cend(); method != method_end; ++method)
-        m_methods.push_back(move(unique_ptr<config_method>(*method ? (config_method*)method->get()->clone() : nullptr)));
+        m_methods.push_back(std::move(unique_ptr<config_method>(*method ? (config_method*)method->get()->clone() : nullptr)));
 }
 
 
 eap::config_provider::config_provider(_Inout_ config_provider &&other) :
-    m_read_only(move(other.m_read_only)),
-    m_id(move(other.m_id)),
-    m_name(move(other.m_name)),
-    m_help_email(move(other.m_help_email)),
-    m_help_web(move(other.m_help_web)),
-    m_help_phone(move(other.m_help_phone)),
-    m_lbl_alt_credential(move(other.m_lbl_alt_credential)),
-    m_lbl_alt_identity(move(other.m_lbl_alt_identity)),
-    m_lbl_alt_password(move(other.m_lbl_alt_password)),
-    m_methods(move(other.m_methods)),
-    config(move(other))
+    m_read_only(std::move(other.m_read_only)),
+    m_id(std::move(other.m_id)),
+    m_name(std::move(other.m_name)),
+    m_help_email(std::move(other.m_help_email)),
+    m_help_web(std::move(other.m_help_web)),
+    m_help_phone(std::move(other.m_help_phone)),
+    m_lbl_alt_credential(std::move(other.m_lbl_alt_credential)),
+    m_lbl_alt_identity(std::move(other.m_lbl_alt_identity)),
+    m_lbl_alt_password(std::move(other.m_lbl_alt_password)),
+    m_methods(std::move(other.m_methods)),
+    config(std::move(other))
 {
 }
 
@@ -339,7 +339,7 @@ eap::config_provider& eap::config_provider::operator=(_In_ const config_provider
 
         m_methods.clear();
         for (list<unique_ptr<config_method> >::const_iterator method = other.m_methods.cbegin(), method_end = other.m_methods.cend(); method != method_end; ++method)
-            m_methods.push_back(move(unique_ptr<config_method>(*method ? (config_method*)method->get()->clone() : nullptr)));
+            m_methods.push_back(std::move(unique_ptr<config_method>(*method ? (config_method*)method->get()->clone() : nullptr)));
     }
 
     return *this;
@@ -349,17 +349,17 @@ eap::config_provider& eap::config_provider::operator=(_In_ const config_provider
 eap::config_provider& eap::config_provider::operator=(_Inout_ config_provider &&other)
 {
     if (this != &other) {
-        (config&&)*this      = move(other);
-        m_read_only          = move(m_read_only);
-        m_id                 = move(other.m_id);
-        m_name               = move(other.m_name);
-        m_help_email         = move(other.m_help_email);
-        m_help_web           = move(other.m_help_web);
-        m_help_phone         = move(other.m_help_phone);
-        m_lbl_alt_credential = move(other.m_lbl_alt_credential);
-        m_lbl_alt_identity   = move(other.m_lbl_alt_identity);
-        m_lbl_alt_password   = move(other.m_lbl_alt_password);
-        m_methods            = move(other.m_methods);
+        (config&&)*this      = std::move(other);
+        m_read_only          = std::move(m_read_only);
+        m_id                 = std::move(other.m_id);
+        m_name               = std::move(other.m_name);
+        m_help_email         = std::move(other.m_help_email);
+        m_help_web           = std::move(other.m_help_web);
+        m_help_phone         = std::move(other.m_help_phone);
+        m_lbl_alt_credential = std::move(other.m_lbl_alt_credential);
+        m_lbl_alt_identity   = std::move(other.m_lbl_alt_identity);
+        m_lbl_alt_password   = std::move(other.m_lbl_alt_password);
+        m_methods            = std::move(other.m_methods);
     }
 
     return *this;
@@ -583,69 +583,69 @@ bool eap::config_provider::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR *
             return false;
 
         // Add configuration to the list.
-        m_methods.push_back(move(cfg));
+        m_methods.push_back(std::move(cfg));
     }
 
     return true;
 }
 
 
-void eap::config_provider::pack(_Inout_ eapserial::cursor_out &cursor) const
+void eap::config_provider::operator<<(_Inout_ cursor_out &cursor) const
 {
-    config::pack(cursor);
-    eapserial::pack(cursor, m_read_only         );
-    eapserial::pack(cursor, m_id                );
-    eapserial::pack(cursor, m_name              );
-    eapserial::pack(cursor, m_help_email        );
-    eapserial::pack(cursor, m_help_web          );
-    eapserial::pack(cursor, m_help_phone        );
-    eapserial::pack(cursor, m_lbl_alt_credential);
-    eapserial::pack(cursor, m_lbl_alt_identity  );
-    eapserial::pack(cursor, m_lbl_alt_password  );
-    eapserial::pack(cursor, m_methods           );
+    config::operator<<(cursor);
+    cursor << m_read_only         ;
+    cursor << m_id                ;
+    cursor << m_name              ;
+    cursor << m_help_email        ;
+    cursor << m_help_web          ;
+    cursor << m_help_phone        ;
+    cursor << m_lbl_alt_credential;
+    cursor << m_lbl_alt_identity  ;
+    cursor << m_lbl_alt_password  ;
+    cursor << m_methods           ;
 }
 
 
 size_t eap::config_provider::get_pk_size() const
 {
     return
-        config::get_pk_size()                   +
-        eapserial::get_pk_size(m_read_only         ) +
-        eapserial::get_pk_size(m_id                ) +
-        eapserial::get_pk_size(m_name              ) +
-        eapserial::get_pk_size(m_help_email        ) +
-        eapserial::get_pk_size(m_help_web          ) +
-        eapserial::get_pk_size(m_help_phone        ) +
-        eapserial::get_pk_size(m_lbl_alt_credential) +
-        eapserial::get_pk_size(m_lbl_alt_identity  ) +
-        eapserial::get_pk_size(m_lbl_alt_password  ) +
-        eapserial::get_pk_size(m_methods           );
+        config::get_pk_size()          +
+        pksizeof(m_read_only         ) +
+        pksizeof(m_id                ) +
+        pksizeof(m_name              ) +
+        pksizeof(m_help_email        ) +
+        pksizeof(m_help_web          ) +
+        pksizeof(m_help_phone        ) +
+        pksizeof(m_lbl_alt_credential) +
+        pksizeof(m_lbl_alt_identity  ) +
+        pksizeof(m_lbl_alt_password  ) +
+        pksizeof(m_methods           );
 }
 
 
-void eap::config_provider::unpack(_Inout_ eapserial::cursor_in &cursor)
+void eap::config_provider::operator>>(_Inout_ cursor_in &cursor)
 {
-    config::unpack(cursor);
-    eapserial::unpack(cursor, m_read_only         );
-    eapserial::unpack(cursor, m_id                );
-    eapserial::unpack(cursor, m_name              );
-    eapserial::unpack(cursor, m_help_email        );
-    eapserial::unpack(cursor, m_help_web          );
-    eapserial::unpack(cursor, m_help_phone        );
-    eapserial::unpack(cursor, m_lbl_alt_credential);
-    eapserial::unpack(cursor, m_lbl_alt_identity  );
-    eapserial::unpack(cursor, m_lbl_alt_password  );
+    config::operator>>(cursor);
+    cursor >> m_read_only         ;
+    cursor >> m_id                ;
+    cursor >> m_name              ;
+    cursor >> m_help_email        ;
+    cursor >> m_help_web          ;
+    cursor >> m_help_phone        ;
+    cursor >> m_lbl_alt_credential;
+    cursor >> m_lbl_alt_identity  ;
+    cursor >> m_lbl_alt_password  ;
 
     list<config_method>::size_type count;
     bool is_nonnull;
-    eapserial::unpack(cursor, count);
+    cursor >> count;
     m_methods.clear();
     for (list<config_method>::size_type i = 0; i < count; i++) {
-        eapserial::unpack(cursor, is_nonnull);
+        cursor >> is_nonnull;
         if (is_nonnull) {
             unique_ptr<config_method> el(m_module.make_config_method());
-            el->unpack(cursor);
-            m_methods.push_back(move(el));
+            cursor >> *el;
+            m_methods.push_back(std::move(el));
         } else
             m_methods.push_back(nullptr);
     }
@@ -669,8 +669,8 @@ eap::config_providers::config_providers(_In_ const config_providers &other) :
 
 
 eap::config_providers::config_providers(_Inout_ config_providers &&other) :
-    m_providers(move(other.m_providers)),
-    config(move(other))
+    m_providers(std::move(other.m_providers)),
+    config(std::move(other))
 {
 }
 
@@ -689,8 +689,8 @@ eap::config_providers& eap::config_providers::operator=(_In_ const config_provid
 eap::config_providers& eap::config_providers::operator=(_Inout_ config_providers &&other)
 {
     if (this != &other) {
-        (config&&)*this = move(other);
-        m_providers     = move(other.m_providers);
+        (config&&)*this = std::move(other);
+        m_providers     = std::move(other.m_providers);
     }
 
     return *this;
@@ -769,17 +769,17 @@ bool eap::config_providers::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR 
             return false;
 
         // Add provider to the list.
-        m_providers.push_back(move(prov));
+        m_providers.push_back(std::move(prov));
     }
 
     return true;
 }
 
 
-void eap::config_providers::pack(_Inout_ eapserial::cursor_out &cursor) const
+void eap::config_providers::operator<<(_Inout_ cursor_out &cursor) const
 {
-    config::pack(cursor);
-    eapserial::pack(cursor, m_providers);
+    config::operator<<(cursor);
+    cursor << m_providers;
 }
 
 
@@ -787,20 +787,20 @@ size_t eap::config_providers::get_pk_size() const
 {
     return
         config::get_pk_size() +
-        eapserial::get_pk_size(m_providers);
+        pksizeof(m_providers);
 }
 
 
-void eap::config_providers::unpack(_Inout_ eapserial::cursor_in &cursor)
+void eap::config_providers::operator>>(_Inout_ cursor_in &cursor)
 {
-    config::unpack(cursor);
+    config::operator>>(cursor);
 
     list<config_provider>::size_type count;
-    eapserial::unpack(cursor, count);
+    cursor >> count;
     m_providers.clear();
     for (list<config_provider>::size_type i = 0; i < count; i++) {
         config_provider el(m_module);
-        el.unpack(cursor);
-        m_providers.push_back(move(el));
+        cursor >> el;
+        m_providers.push_back(std::move(el));
     }
 }
