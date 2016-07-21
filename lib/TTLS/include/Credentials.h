@@ -176,6 +176,11 @@ namespace eap
         ///
         virtual bool retrieve(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **ppEapError);
 
+        ///
+        /// Returns credential identity.
+        ///
+        virtual std::wstring get_identity() const;
+
         /// @}
 
     public:

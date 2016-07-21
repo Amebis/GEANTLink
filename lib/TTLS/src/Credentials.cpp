@@ -230,3 +230,17 @@ bool eap::credentials_ttls::retrieve(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR
 
     return true;
 }
+
+
+std::wstring eap::credentials_ttls::get_identity() const
+{
+    // Outer identity has the right-of-way.
+    if (!credentials_tls::empty())
+        return credentials_tls::get_identity();
+
+    // Inner identity.
+    if (m_inner)
+        return m_inner->get_identity();
+
+    return L"";
+}
