@@ -562,13 +562,13 @@ namespace eap
                 return false;
 
             cursor_in cursor = { data.data(), data.data() + data.size() };
-            cursor >> record;
 #else
             UNREFERENCED_PARAMETER(ppEapError);
 
             cursor_in cursor = { pDataIn, pDataIn + dwDataInSize };
-            cursor >> record;
 #endif
+            cursor >> record;
+            assert(cursor.ptr == cursor.ptr_end);
 
             return true;
         }
@@ -593,6 +593,9 @@ namespace eap
             _Out_       DWORD     *pdwDataOutSize,
             _Out_       EAP_ERROR **ppEapError)
         {
+            assert(ppDataOut);
+            assert(pdwDataOutSize);
+
 #if EAP_ENCRYPT_BLOBS
             // Allocate BLOB.
             std::vector<unsigned char, winstd::sanitizing_allocator<unsigned char> > data;
@@ -601,7 +604,7 @@ namespace eap
             // Pack to BLOB.
             cursor_out cursor = { data.data(), data.data() + data.size() };
             cursor << record;
-            data.resize(cursor.ptr - &data.front());
+            assert(cursor.ptr == cursor.ptr_end);
 
             // Prepare cryptographics provider.
             winstd::crypt_prov cp;
@@ -616,8 +619,6 @@ namespace eap
                 return false;
 
             // Copy encrypted BLOB to output.
-            assert(ppDataOut);
-            assert(pdwDataOutSize);
             *pdwDataOutSize = (DWORD)data_enc.size();
             *ppDataOut = alloc_memory(*pdwDataOutSize);
             if (!*ppDataOut) {
@@ -627,8 +628,6 @@ namespace eap
             memcpy(*ppDataOut, data_enc.data(), *pdwDataOutSize);
 #else
             // Allocate BLOB.
-            assert(ppDataOut);
-            assert(pdwDataOutSize);
             *pdwDataOutSize = (DWORD)pksizeof(record);
             *ppDataOut = alloc_memory(*pdwDataOutSize);
             if (!*ppDataOut) {
@@ -639,6 +638,7 @@ namespace eap
             // Pack to BLOB.
             cursor_out cursor = { *ppDataOut, *ppDataOut + *pdwDataOutSize };
             cursor << record;
+            assert(cursor.ptr == cursor.ptr_end);
             *pdwDataOutSize = cursor.ptr - *ppDataOut;
 #endif
 

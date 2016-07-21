@@ -28,6 +28,11 @@ class wxTTLSConfigPanel;
 ///
 class wxTTLSConfigWindow;
 
+///
+/// TTLS credential panel
+///
+class wxTTLSCredentialsPanel;
+
 #pragma once
 
 #include "../res/wxTTLS_UI.h"
@@ -102,6 +107,41 @@ protected:
     wxStaticText *m_inner_title;            ///< Inner authentication title
     wxChoicebook *m_inner_type;             ///< Inner authentication type
 
-    // Temprary inner method configurations to hold data until applied
+    // Temporary inner method configurations to hold data until applied
     eap::config_method_pap m_cfg_pap;            ///< PAP configuration
+};
+
+
+class wxTTLSCredentialsPanel : public wxPanel
+{
+public:
+    ///
+    /// Constructs a configuration panel
+    ///
+    /// \param[in]    prov           Provider configuration data
+    /// \param[in]    cfg            Configuration data
+    /// \param[inout] cred           Credentials data
+    /// \param[in]    pszCredTarget  Target name of credentials in Windows Credential Manager. Can be further decorated to create final target name.
+    /// \param[in]    parent         Parent window
+    /// \param[in]    is_config      Is this panel used to pre-enter credentials? When \c true, the "Remember" checkbox is always selected and disabled.
+    ///
+    wxTTLSCredentialsPanel(const eap::config_provider &prov, const eap::config_method &cfg, eap::credentials &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config = false);
+
+    ///
+    /// Destructs the configuration panel
+    ///
+    virtual ~wxTTLSCredentialsPanel();
+
+protected:
+    /// \cond internal
+    virtual void OnInitDialog(wxInitDialogEvent& event);
+    /// \endcond
+
+protected:
+    const eap::config_provider &m_prov;     ///< EAP provider
+    const eap::config_method_ttls &m_cfg;   ///< TTLS configuration
+    wxStaticText *m_outer_title;            ///< Outer authentication title
+    wxTLSCredentialsPanel *m_outer_cred;    ///< Outer credentials panel
+    wxStaticText *m_inner_title;            ///< Inner authentication title
+    wxPanel *m_inner_cred;                  ///< Inner credentials panel
 };

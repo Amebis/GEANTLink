@@ -311,12 +311,10 @@ bool wxFQDNListValidator::Parse(const wxString &val_in, size_t i_start, size_t i
 // wxTLSCredentialsPanel
 //////////////////////////////////////////////////////////////////////
 
-wxTLSCredentialsPanel::wxTLSCredentialsPanel(const eap::config_provider &prov, eap::credentials &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config) :
+wxTLSCredentialsPanel::wxTLSCredentialsPanel(const eap::config_provider &prov, const eap::config_method &cfg, eap::credentials &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config) :
     m_cred((eap::credentials_tls&)cred),
-    wxEAPCredentialsPanelBase<wxTLSCredentialsPanelBase>(cred, pszCredTarget, parent, is_config)
+    wxEAPCredentialsPanelBase<wxTLSCredentialsPanelBase>(prov, cfg, cred, pszCredTarget, parent, is_config)
 {
-    UNREFERENCED_PARAMETER(prov);
-
     // Load and set icon.
     if (m_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
         wxSetIconFromResource(m_credentials_icon, m_icon, m_shell32, MAKEINTRESOURCE(269));

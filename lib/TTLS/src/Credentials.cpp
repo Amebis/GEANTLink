@@ -29,21 +29,24 @@ using namespace winstd;
 //////////////////////////////////////////////////////////////////////
 
 eap::credentials_ttls::credentials_ttls(_In_ module &mod) :
-    credentials_tls(mod)
+    m_outer(mod),
+    credentials(mod)
 {
 }
 
 
 eap::credentials_ttls::credentials_ttls(_In_ const credentials_ttls &other) :
+    m_outer(other.m_outer),
     m_inner(other.m_inner ? (credentials*)other.m_inner->clone() : nullptr),
-    credentials_tls(other)
+    credentials(other)
 {
 }
 
 
 eap::credentials_ttls::credentials_ttls(_Inout_ credentials_ttls &&other) :
+    m_outer(std::move(other.m_outer)),
     m_inner(std::move(other.m_inner)),
-    credentials_tls(std::move(other))
+    credentials(std::move(other))
 {
 }
 
@@ -51,7 +54,8 @@ eap::credentials_ttls::credentials_ttls(_Inout_ credentials_ttls &&other) :
 eap::credentials_ttls& eap::credentials_ttls::operator=(_In_ const credentials_ttls &other)
 {
     if (this != &other) {
-        (credentials_tls&)*this = other;
+        (credentials&)*this = other;
+        m_outer             = other.m_outer;
         m_inner.reset(other.m_inner ? (credentials*)other.m_inner->clone() : nullptr);
     }
 
@@ -62,8 +66,9 @@ eap::credentials_ttls& eap::credentials_ttls::operator=(_In_ const credentials_t
 eap::credentials_ttls& eap::credentials_ttls::operator=(_Inout_ credentials_ttls &&other)
 {
     if (this != &other) {
-        (credentials_tls&)*this = std::move(other);
-        m_inner                 = std::move(other.m_inner);
+        (credentials&)*this = std::move(other);
+        m_outer             = std::move(other.m_outer);
+        m_inner             = std::move(other.m_inner);
     }
 
     return *this;
@@ -78,7 +83,8 @@ eap::config* eap::credentials_ttls::clone() const
 
 void eap::credentials_ttls::clear()
 {
-    credentials_tls::clear();
+    credentials::clear();
+    m_outer.clear();
     if (m_inner)
         m_inner->clear();
 }
@@ -86,7 +92,7 @@ void eap::credentials_ttls::clear()
 
 bool eap::credentials_ttls::empty() const
 {
-    return credentials_tls::empty() && (!m_inner || m_inner->empty());
+    return credentials::empty() && m_outer.empty() && (!m_inner || m_inner->empty());
 }
 
 
@@ -96,7 +102,10 @@ bool eap::credentials_ttls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *p
     assert(pConfigRoot);
     assert(ppEapError);
 
-    if (!credentials_tls::save(pDoc, pConfigRoot, ppEapError))
+    if (!credentials::save(pDoc, pConfigRoot, ppEapError))
+        return false;
+
+    if (!m_outer.save(pDoc, pConfigRoot, ppEapError))
         return false;
 
     const bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
@@ -130,7 +139,10 @@ bool eap::credentials_ttls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR 
     assert(ppEapError);
     DWORD dwResult;
 
-    if (!credentials_tls::load(pConfigRoot, ppEapError))
+    if (!credentials::load(pConfigRoot, ppEapError))
+        return false;
+
+    if (!m_outer.load(pConfigRoot, ppEapError))
         return false;
 
     // TODO: For the time being, there is no detection what type is inner method. Introduce one!
@@ -151,7 +163,8 @@ bool eap::credentials_ttls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR 
 
 void eap::credentials_ttls::operator<<(_Inout_ cursor_out &cursor) const
 {
-    credentials_tls::operator<<(cursor);
+    credentials::operator<<(cursor);
+    cursor << m_outer;
     if (m_inner) {
         if (dynamic_cast<credentials_pap*>(m_inner.get())) {
             cursor << type_pap;
@@ -181,14 +194,16 @@ size_t eap::credentials_ttls::get_pk_size() const
         size_inner = pksizeof(type_undefined);
 
     return
-        credentials_tls::get_pk_size() +
+        credentials::get_pk_size() +
+        pksizeof(m_outer) +
         size_inner;
 }
 
 
 void eap::credentials_ttls::operator>>(_Inout_ cursor_in &cursor)
 {
-    credentials_tls::operator>>(cursor);
+    credentials::operator>>(cursor);
+    cursor >> m_outer;
 
     type_t eap_type;
     cursor >> eap_type;
@@ -206,7 +221,7 @@ void eap::credentials_ttls::operator>>(_Inout_ cursor_in &cursor)
 
 bool eap::credentials_ttls::store(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **ppEapError) const
 {
-    if (!credentials_tls::store(pszTargetName, ppEapError))
+    if (!m_outer.store(pszTargetName, ppEapError))
         return false;
 
     if (m_inner) {
@@ -220,7 +235,7 @@ bool eap::credentials_ttls::store(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **
 
 bool eap::credentials_ttls::retrieve(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **ppEapError)
 {
-    if (!credentials_tls::retrieve(pszTargetName, ppEapError))
+    if (!m_outer.retrieve(pszTargetName, ppEapError))
         return false;
 
     if (m_inner) {
@@ -242,8 +257,8 @@ LPCTSTR eap::credentials_ttls::target_suffix() const
 std::wstring eap::credentials_ttls::get_identity() const
 {
     // Outer identity has the right-of-way.
-    if (!credentials_tls::empty())
-        return credentials_tls::get_identity();
+    if (!m_outer.empty())
+        return m_outer.get_identity();
 
     // Inner identity.
     if (m_inner)

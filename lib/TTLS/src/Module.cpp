@@ -79,15 +79,15 @@ bool eap::peer_ttls::get_identity(
 
     const config_provider &cfg_prov(cfg.m_providers.front());
     const config_method_ttls *cfg_method = dynamic_cast<const config_method_ttls*>(cfg_prov.m_methods.front().get());
-    wstring target_outer(std::move(cred_out.credentials_tls::target_suffix()));
+    assert(cfg_method);
+    wstring target_outer(std::move(cred_out.m_outer.target_suffix()));
     wstring target_inner;
 
     bool is_outer_set = false;
-    assert(cfg_method);
-    if (cfg_method->m_preshared) {
+    if (cfg_method->m_outer.m_use_preshared) {
         // Outer TLS: Preshared credentials.
-        (credentials_tls&)cred_out = (credentials_tls&)*cfg_method->m_preshared;
-        log_event(&EAPMETHOD_TRACE_EVT_CRED_PRESHARED, event_data(target_outer), event_data(cred_out.credentials_tls::get_name()), event_data::blank);
+        cred_out.m_outer = (credentials_tls&)cfg_method->m_outer.m_preshared;
+        log_event(&EAPMETHOD_TRACE_EVT_CRED_PRESHARED, event_data(target_outer), event_data(cred_out.m_outer.get_name()), event_data::blank);
         is_outer_set = true;
     }
 
@@ -95,9 +95,9 @@ bool eap::peer_ttls::get_identity(
     const config_method_pap *cfg_inner_pap = dynamic_cast<const config_method_pap*>(cfg_method->m_inner.get());
     if (cfg_inner_pap) {
         target_inner = L"PAP";
-        if (cfg_inner_pap->m_preshared) {
+        if (cfg_inner_pap->m_use_preshared) {
             // Inner PAP: Preshared credentials.
-            cred_out.m_inner.reset((credentials*)cfg_inner_pap->m_preshared->clone());
+            cred_out.m_inner.reset((credentials*)cfg_inner_pap->m_preshared.clone());
             log_event(&EAPMETHOD_TRACE_EVT_CRED_PRESHARED, event_data(target_inner), event_data(cred_out.m_inner->get_name()), event_data::blank);
             is_inner_set = true;
         }
@@ -114,8 +114,8 @@ bool eap::peer_ttls::get_identity(
             credentials_tls cred_loaded(*this);
             if (cred_loaded.retrieve(cfg_prov.m_id.c_str(), ppEapError)) {
                 // Outer TLS: Stored credentials.
-                (credentials_tls&&)cred_out = std::move(cred_loaded);
-                log_event(&EAPMETHOD_TRACE_EVT_CRED_STORED, event_data(target_outer), event_data(cred_out.credentials_tls::get_name()), event_data::blank);
+                cred_out.m_outer = std::move(cred_loaded);
+                log_event(&EAPMETHOD_TRACE_EVT_CRED_STORED, event_data(target_outer), event_data(cred_out.m_outer.get_name()), event_data::blank);
                 is_outer_set = true;
             } else {
                 // Not actually an error.
@@ -147,8 +147,8 @@ bool eap::peer_ttls::get_identity(
 
         if (!is_outer_set) {
             // Outer TLS: EAP service cached credentials.
-            (credentials_tls&)cred_out = (const credentials_tls&)cred_in;
-            log_event(&EAPMETHOD_TRACE_EVT_CRED_CACHED, event_data(target_outer), event_data(cred_out.credentials_tls::get_name()), event_data::blank);
+            cred_out.m_outer = cred_in->m_outer;
+            log_event(&EAPMETHOD_TRACE_EVT_CRED_CACHED, event_data(target_outer), event_data(cred_out.m_outer.get_name()), event_data::blank);
             is_outer_set = true;
         }
 
@@ -185,23 +185,8 @@ bool eap::peer_ttls::get_identity(
     // If we got here, we have all credentials we need.
 
     // Build our identity. ;)
-    wstring identity;
-    if (cfg_method->m_anonymous_identity.empty()) {
-        // Use the true identity. Outer has the right-of-way.
-        identity = std::move(cred_out.get_identity());
-    } else if (cfg_method->m_anonymous_identity.compare(L"@") == 0) {
-        // Strip username part from identity (RFC 4822).
-        identity = std::move(cred_out.get_identity());
-        wstring::size_type offset = identity.find(L'@');
-        if (offset != wstring::npos) identity.erase(0, offset);
-    } else {
-        // Use configured identity.
-        identity = cfg_method->m_anonymous_identity;
-    }
-
+    wstring identity(std::move(cfg_method->get_public_identity(cred_out)));
     log_event(&EAPMETHOD_TRACE_EVT_CRED_OUTER_ID, event_data(L"TTLS"), event_data(identity), event_data::blank);
-
-    // Save the identity for EAPHost.
     size_t size = sizeof(WCHAR)*(identity.length() + 1);
     *ppwszIdentity = (WCHAR*)alloc_memory(size);
     memcpy(*ppwszIdentity, identity.c_str(), size);

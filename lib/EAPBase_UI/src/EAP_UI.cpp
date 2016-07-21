@@ -155,28 +155,28 @@ bool wxEAPProviderLockedPanel::AcceptsFocusFromKeyboard() const
 // wxPasswordCredentialsPanel
 //////////////////////////////////////////////////////////////////////
 
-wxPasswordCredentialsPanel::wxPasswordCredentialsPanel(const eap::config_provider &prov, eap::credentials &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config) :
+wxPasswordCredentialsPanel::wxPasswordCredentialsPanel(const eap::config_provider &prov, const eap::config_method &cfg, eap::credentials &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config) :
     m_cred((eap::credentials_pass&)cred),
-    wxEAPCredentialsPanelBase<wxEAPCredentialsPanelPassBase>(cred, pszCredTarget, parent, is_config)
+    wxEAPCredentialsPanelBase<wxEAPCredentialsPanelPassBase>(prov, cfg, cred, pszCredTarget, parent, is_config)
 {
     // Load and set icon.
     if (m_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
         wxSetIconFromResource(m_credentials_icon, m_icon, m_shell32, MAKEINTRESOURCE(269));
 
     bool layout = false;
-    if (!prov.m_lbl_alt_credential.empty()) {
-        m_credentials_label->SetLabel(prov.m_lbl_alt_credential);
+    if (!m_prov.m_lbl_alt_credential.empty()) {
+        m_credentials_label->SetLabel(m_prov.m_lbl_alt_credential);
         m_credentials_label->Wrap( 446 );
         layout = true;
     }
 
-    if (!prov.m_lbl_alt_identity.empty()) {
-        m_identity_label->SetLabel(prov.m_lbl_alt_identity);
+    if (!m_prov.m_lbl_alt_identity.empty()) {
+        m_identity_label->SetLabel(m_prov.m_lbl_alt_identity);
         layout = true;
     }
 
-    if (!prov.m_lbl_alt_password.empty()) {
-        m_password_label->SetLabel(prov.m_lbl_alt_password);
+    if (!m_prov.m_lbl_alt_password.empty()) {
+        m_password_label->SetLabel(m_prov.m_lbl_alt_password);
         layout = true;
     }
 

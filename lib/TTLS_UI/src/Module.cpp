@@ -77,13 +77,51 @@ bool eap::peer_ttls_ui::invoke_identity_ui(
             _Out_   EAP_ERROR        **ppEapError)
 {
     UNREFERENCED_PARAMETER(dwFlags);
-    UNREFERENCED_PARAMETER(cfg);
-    UNREFERENCED_PARAMETER(cred);
-    UNREFERENCED_PARAMETER(ppwszIdentity);
-    UNREFERENCED_PARAMETER(ppEapError);
 
-    InitCommonControls();
-    MessageBox(hwndParent, _T(PRODUCT_NAME_STR) _T(" credential prompt goes here!"), _T(PRODUCT_NAME_STR) _T(" Credentials"), MB_OK);
+    if (cfg.m_providers.empty() || cfg.m_providers.front().m_methods.empty()) {
+        *ppEapError = make_error(ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" Configuration has no providers and/or methods."));
+        return false;
+    }
+
+    const config_provider &cfg_prov(cfg.m_providers.front());
+    const config_method_ttls *cfg_method = dynamic_cast<const config_method_ttls*>(cfg_prov.m_methods.front().get());
+    assert(cfg_method);
+
+    // Initialize application.
+    new wxApp();
+    wxEntryStart(m_instance);
+
+    int result;
+    {
+        // Create wxWidget-approved parent window.
+        wxWindow parent;
+        parent.SetHWND((WXHWND)hwndParent);
+        parent.AdoptAttributesFromHWND();
+        wxTopLevelWindows.Append(&parent);
+
+        // Create and launch credentials dialog.
+        wxEAPCredentialsDialog dlg(cfg_prov, &parent);
+        wxTTLSCredentialsPanel *panel = new wxTTLSCredentialsPanel(cfg_prov, *cfg_method, cred, cfg_prov.m_id.c_str(), &dlg, true);
+        dlg.AddContents((wxPanel**)&panel, 1);
+        result = dlg.ShowModal();
+
+        wxTopLevelWindows.DeleteObject(&parent);
+        parent.SetHWND((WXHWND)NULL);
+    }
+
+    // Clean-up and return.
+    wxEntryCleanup();
+    if (result != wxID_OK) {
+        *ppEapError = make_error(ERROR_CANCELLED, _T(__FUNCTION__) _T(" Cancelled."));
+        return false;
+    }
+
+    // Build our identity. ;)
+    std::wstring identity(std::move(cfg_method->get_public_identity(cred)));
+    log_event(&EAPMETHOD_TRACE_EVT_CRED_OUTER_ID, winstd::event_data(L"TTLS"), winstd::event_data(identity), winstd::event_data::blank);
+    size_t size = sizeof(WCHAR)*(identity.length() + 1);
+    *ppwszIdentity = (WCHAR*)alloc_memory(size);
+    memcpy(*ppwszIdentity, identity.c_str(), size);
 
     return true;
 }

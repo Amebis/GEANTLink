@@ -25,12 +25,17 @@
 ///
 /// PAP credential configuration panel
 ///
-typedef wxEAPCredentialsConfigPanel<wxPasswordCredentialsPanel> wxPAPCredentialsConfigPanel;
+typedef wxEAPCredentialsConfigPanel<eap::credentials_pap, wxPasswordCredentialsPanel> wxPAPCredentialsConfigPanel;
 
 ///
 /// PAP configuration panel
 ///
 class wxPAPConfigPanel;
+
+///
+/// PAP credential entry panel
+///
+typedef wxPasswordCredentialsPanel wxPAPCredentialsPanel;
 
 #pragma once
 

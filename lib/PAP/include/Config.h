@@ -40,7 +40,7 @@ namespace eap
 
 namespace eap
 {
-    class config_method_pap : public config_method
+    class config_method_pap : public config_method_with_cred<credentials_pap>
     {
     public:
         ///
@@ -88,11 +88,6 @@ namespace eap
         /// \returns Pointer to cloned configuration
         ///
         virtual config* clone() const;
-
-        ///
-        /// Makes new set of credentials for the given method type
-        ///
-        virtual credentials* make_credentials() const;
 
         ///
         /// Returns EAP method type of this configuration

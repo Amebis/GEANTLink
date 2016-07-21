@@ -40,7 +40,7 @@ namespace eap
 
 
 namespace eap {
-    class config_method_ttls : public config_method_tls
+    class config_method_ttls : public config_method
     {
     public:
         ///
@@ -150,7 +150,14 @@ namespace eap {
         ///
         virtual eap::type_t get_method_id() const;
 
+        ///
+        /// Generates public identity using current configuration and given credentials
+        ///
+        std::wstring get_public_identity(const credentials &cred) const;
+
     public:
+        config_method_tls m_outer;          ///< Outer authentication configuration
         std::unique_ptr<config> m_inner;    ///< Inner authentication configuration
+        std::wstring m_anonymous_identity;  ///< Anonymous identity
     };
 }

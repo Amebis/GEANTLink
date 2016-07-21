@@ -102,8 +102,8 @@ wxTTLSConfigWindow::wxTTLSConfigWindow(const eap::config_provider &prov, eap::co
     wxBoxSizer* sb_content;
     sb_content = new wxBoxSizer( wxVERTICAL );
 
-    if (prov.m_read_only)
-        sb_content->Add(new wxEAPProviderLockedPanel(prov, this), 0, wxALL|wxEXPAND, 5);
+    if (m_prov.m_read_only)
+        sb_content->Add(new wxEAPProviderLockedPanel(m_prov, this), 0, wxALL|wxEXPAND, 5);
 
     m_inner_title = new wxStaticText(this, wxID_ANY, _("Inner Authentication"), wxDefaultPosition, wxDefaultSize, 0);
     m_inner_title->SetFont(wxFont(18, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxEmptyString));
@@ -112,7 +112,7 @@ wxTTLSConfigWindow::wxTTLSConfigWindow(const eap::config_provider &prov, eap::co
 
     m_inner_type = new wxChoicebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxCHB_DEFAULT);
     m_inner_type->SetToolTip( _("Select inner authentication method from the list") );
-    m_inner_type->AddPage(new wxPAPConfigPanel(prov, m_cfg_pap, pszCredTarget, m_inner_type), _("PAP"));
+    m_inner_type->AddPage(new wxPAPConfigPanel(m_prov, m_cfg_pap, pszCredTarget, m_inner_type), _("PAP"));
     sb_content->Add(m_inner_type, 0, wxALL|wxEXPAND, 5);
 
     sb_content->Add(20, 20, 1, wxALL|wxEXPAND, 5);
@@ -122,10 +122,10 @@ wxTTLSConfigWindow::wxTTLSConfigWindow(const eap::config_provider &prov, eap::co
     m_outer_title->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_INACTIVECAPTION ) );
     sb_content->Add(m_outer_title, 0, wxALL|wxALIGN_RIGHT, 5);
 
-    m_outer_identity = new wxTTLSConfigPanel(prov, m_cfg, this);
+    m_outer_identity = new wxTTLSConfigPanel(m_prov, m_cfg, this);
     sb_content->Add(m_outer_identity, 0, wxALL|wxEXPAND, 5);
 
-    m_tls = new wxTLSConfigPanel(prov, m_cfg, pszCredTarget, this);
+    m_tls = new wxTLSConfigPanel(m_prov, m_cfg.m_outer, pszCredTarget, this);
     sb_content->Add(m_tls, 0, wxALL|wxEXPAND, 5);
 
     wxSize size = sb_content->CalcMin();
@@ -204,4 +204,68 @@ void wxTTLSConfigWindow::OnInitDialog(wxInitDialogEvent& event)
     m_tls->GetEventHandler()->ProcessEvent(event);
     for (wxWindowList::compatibility_iterator inner = m_inner_type->GetChildren().GetFirst(); inner; inner = inner->GetNext())
         inner->GetData()->GetEventHandler()->ProcessEvent(event);
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// wxTTLSCredentialsPanel
+//////////////////////////////////////////////////////////////////////
+
+wxTTLSCredentialsPanel::wxTTLSCredentialsPanel(const eap::config_provider &prov, const eap::config_method &cfg, eap::credentials &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config) :
+    m_prov(prov),
+    m_cfg((eap::config_method_ttls&)cfg),
+    wxPanel(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize)
+{
+    wxBoxSizer* sb_content;
+    sb_content = new wxBoxSizer( wxVERTICAL );
+
+    if (m_prov.m_read_only)
+        sb_content->Add(new wxEAPProviderLockedPanel(m_prov, this), 0, wxALL|wxEXPAND, 5);
+
+    m_inner_title = new wxStaticText(this, wxID_ANY, _("Inner Authentication"), wxDefaultPosition, wxDefaultSize, 0);
+    m_inner_title->SetFont(wxFont(18, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxEmptyString));
+    m_inner_title->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_INACTIVECAPTION ) );
+    sb_content->Add(m_inner_title, 0, wxALL|wxALIGN_RIGHT, 5);
+
+    assert(m_cfg.m_inner);
+    const eap::config_method_pap *cfg_inner_pap = dynamic_cast<const eap::config_method_pap*>(m_cfg.m_inner.get());
+    if (cfg_inner_pap) {
+        if (!((eap::credentials_ttls&)cred).m_inner) ((eap::credentials_ttls&)cred).m_inner.reset(new eap::credentials_pap(cred.m_module));
+        m_inner_cred = new wxPAPCredentialsPanel(m_prov, *cfg_inner_pap, *((eap::credentials_ttls&)cred).m_inner.get(), pszCredTarget, this, is_config);
+        sb_content->Add(m_inner_cred, 0, wxALL|wxEXPAND, 5);
+    } else
+        assert(0); // Unsupported inner authentication method type.
+
+    sb_content->Add(20, 20, 1, wxALL|wxEXPAND, 5);
+
+    m_outer_title = new wxStaticText(this, wxID_ANY, _("Outer Authentication"), wxDefaultPosition, wxDefaultSize, 0);
+    m_outer_title->SetFont(wxFont(18, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxEmptyString));
+    m_outer_title->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_INACTIVECAPTION ) );
+    sb_content->Add(m_outer_title, 0, wxALL|wxALIGN_RIGHT, 5);
+
+    m_outer_cred = new wxTLSCredentialsPanel(m_prov, (const eap::config_method_tls&)m_cfg, (eap::credentials_tls&)cred, pszCredTarget, this, is_config);
+    sb_content->Add(m_outer_cred, 0, wxALL|wxEXPAND, 5);
+
+    this->SetSizer(sb_content);
+    this->Layout();
+
+    m_inner_cred->SetFocusFromKbd();
+
+    // Connect Events
+    this->Connect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(wxTTLSCredentialsPanel::OnInitDialog));
+}
+
+
+wxTTLSCredentialsPanel::~wxTTLSCredentialsPanel()
+{
+    // Disconnect Events
+    this->Disconnect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(wxTTLSCredentialsPanel::OnInitDialog));
+}
+
+
+void wxTTLSCredentialsPanel::OnInitDialog(wxInitDialogEvent& event)
+{
+    // Forward the event to child panels.
+    m_outer_cred->GetEventHandler()->ProcessEvent(event);
+    m_inner_cred->GetEventHandler()->ProcessEvent(event);
 }

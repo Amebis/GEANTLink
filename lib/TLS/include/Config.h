@@ -54,7 +54,7 @@ namespace eap
 
 namespace eap
 {
-    class config_method_tls : public config_method
+    class config_method_tls : public config_method_with_cred<credentials_tls>
     {
     public:
         ///
@@ -158,11 +158,6 @@ namespace eap
         virtual void operator>>(_Inout_ cursor_in &cursor);
 
         /// @}
-
-        ///
-        /// Makes new set of credentials for the given method type
-        ///
-        virtual credentials* make_credentials() const;
 
         ///
         /// Returns EAP method type of this configuration

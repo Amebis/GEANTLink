@@ -29,21 +29,26 @@ using namespace winstd;
 //////////////////////////////////////////////////////////////////////
 
 eap::config_method_ttls::config_method_ttls(_In_ module &mod) :
-    config_method_tls(mod)
+    m_outer(mod),
+    config_method(mod)
 {
 }
 
 
 eap::config_method_ttls::config_method_ttls(const _In_ config_method_ttls &other) :
+    m_outer(other.m_outer),
     m_inner(other.m_inner ? (config_method*)other.m_inner->clone() : nullptr),
-    config_method_tls(other)
+    m_anonymous_identity(other.m_anonymous_identity),
+    config_method(other)
 {
 }
 
 
 eap::config_method_ttls::config_method_ttls(_Inout_ config_method_ttls &&other) :
+    m_outer(std::move(other.m_outer)),
     m_inner(std::move(other.m_inner)),
-    config_method_tls(std::move(other))
+    m_anonymous_identity(std::move(other.m_anonymous_identity)),
+    config_method(std::move(other))
 {
 }
 
@@ -51,8 +56,10 @@ eap::config_method_ttls::config_method_ttls(_Inout_ config_method_ttls &&other) 
 eap::config_method_ttls& eap::config_method_ttls::operator=(const _In_ config_method_ttls &other)
 {
     if (this != &other) {
-        (config_method_tls&)*this = other;
+        (config_method&)*this = other;
+        m_outer               = other.m_outer;
         m_inner.reset(other.m_inner ? (config_method*)other.m_inner->clone() : nullptr);
+        m_anonymous_identity  = other.m_anonymous_identity;
     }
 
     return *this;
@@ -62,8 +69,10 @@ eap::config_method_ttls& eap::config_method_ttls::operator=(const _In_ config_me
 eap::config_method_ttls& eap::config_method_ttls::operator=(_Inout_ config_method_ttls &&other)
 {
     if (this != &other) {
-        (config_method_tls&&)*this = std::move(other);
-        m_inner                    = std::move(other.m_inner);
+        (config_method&&)*this = std::move(other);
+        m_outer                = std::move(other.m_outer);
+        m_inner                = std::move(other.m_inner);
+        m_anonymous_identity   = std::move(other.m_anonymous_identity);
     }
 
     return *this;
@@ -82,11 +91,28 @@ bool eap::config_method_ttls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode 
     assert(pConfigRoot);
     assert(ppEapError);
 
-    if (!config_method_tls::save(pDoc, pConfigRoot, ppEapError))
+    if (!config_method::save(pDoc, pConfigRoot, ppEapError))
         return false;
 
     const bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
     DWORD dwResult;
+
+    // <ClientSideCredential>
+    com_obj<IXMLDOMElement> pXmlElClientSideCredential;
+    if ((dwResult = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:ClientSideCredential"), bstr(L"ClientSideCredential"), bstrNamespace, &pXmlElClientSideCredential)) != ERROR_SUCCESS) {
+        *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <ClientSideCredential> element."));
+        return false;
+    }
+
+    // <ClientSideCredential>/<AnonymousIdentity>
+    if (!m_anonymous_identity.empty())
+        if ((dwResult = eapxml::put_element_value(pDoc, pXmlElClientSideCredential, bstr(L"AnonymousIdentity"), bstrNamespace, bstr(m_anonymous_identity))) != ERROR_SUCCESS) {
+            *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <AnonymousIdentity> element."));
+            return false;
+        }
+
+    if (!m_outer.save(pDoc, pConfigRoot, ppEapError))
+        return false;
 
     // <InnerAuthenticationMethod>
     com_obj<IXMLDOMElement> pXmlElInnerAuthenticationMethod;
@@ -120,12 +146,27 @@ bool eap::config_method_ttls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERRO
     assert(ppEapError);
     DWORD dwResult;
 
-    if (!config_method_tls::load(pConfigRoot, ppEapError))
+    if (!config_method::load(pConfigRoot, ppEapError))
         return false;
 
     std::wstring xpath(eapxml::get_xpath(pConfigRoot));
 
-    // Load inner authentication configuration (<InnerAuthenticationMethod>).
+    m_anonymous_identity.clear();
+
+    // <ClientSideCredential>
+    com_obj<IXMLDOMElement> pXmlElClientSideCredential;
+    if (eapxml::select_element(pConfigRoot, bstr(L"eap-metadata:ClientSideCredential"), &pXmlElClientSideCredential) == ERROR_SUCCESS) {
+        wstring xpathClientSideCredential(xpath + L"/ClientSideCredential");
+
+        // <AnonymousIdentity>
+        eapxml::get_element_value(pXmlElClientSideCredential, bstr(L"eap-metadata:AnonymousIdentity"), m_anonymous_identity);
+        m_module.log_config((xpathClientSideCredential + L"/AnonymousIdentity").c_str(), m_anonymous_identity.c_str());
+    }
+
+    if (!m_outer.load(pConfigRoot, ppEapError))
+        return false;
+
+    // <InnerAuthenticationMethod>
     com_obj<IXMLDOMElement> pXmlElInnerAuthenticationMethod;
     if ((dwResult = eapxml::select_element(pConfigRoot, bstr(L"eap-metadata:InnerAuthenticationMethod"), &pXmlElInnerAuthenticationMethod)) != ERROR_SUCCESS) {
         *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error selecting <InnerAuthenticationMethod> element."), _T("Please make sure profile XML is a valid ") _T(PRODUCT_NAME_STR) _T(" profile XML document."));
@@ -160,7 +201,9 @@ bool eap::config_method_ttls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERRO
 
 void eap::config_method_ttls::operator<<(_Inout_ cursor_out &cursor) const
 {
-    config_method_tls::operator<<(cursor);
+    config_method::operator<<(cursor);
+    cursor << m_outer;
+
     if (m_inner) {
         if (dynamic_cast<config_method_pap*>(m_inner.get())) {
             cursor << type_pap;
@@ -171,6 +214,8 @@ void eap::config_method_ttls::operator<<(_Inout_ cursor_out &cursor) const
         }
     } else
         cursor << type_undefined;
+
+    cursor << m_anonymous_identity;
 }
 
 
@@ -190,14 +235,17 @@ size_t eap::config_method_ttls::get_pk_size() const
         size_inner = pksizeof(type_undefined);
 
     return
-        config_method_tls::get_pk_size() +
-        size_inner;
+        config_method::get_pk_size() +
+        pksizeof(m_outer) +
+        size_inner +
+        pksizeof(m_anonymous_identity);
 }
 
 
 void eap::config_method_ttls::operator>>(_Inout_ cursor_in &cursor)
 {
-    config_method_tls::operator>>(cursor);
+    config_method::operator>>(cursor);
+    cursor >> m_outer;
 
     type_t eap_type;
     cursor >> eap_type;
@@ -210,10 +258,30 @@ void eap::config_method_ttls::operator>>(_Inout_ cursor_in &cursor)
             assert(0); // Unsupported inner authentication method type.
             m_inner.reset(nullptr);
     }
+
+    cursor >> m_anonymous_identity;
 }
 
 
 eap::type_t eap::config_method_ttls::get_method_id() const
 {
     return type_ttls;
+}
+
+
+wstring eap::config_method_ttls::get_public_identity(const credentials &cred) const
+{
+    if (m_anonymous_identity.empty()) {
+        // Use the true identity. Outer has the right-of-way.
+        return cred.get_identity();
+    } else if (m_anonymous_identity.compare(L"@") == 0) {
+        // Strip username part from identity (RFC 4822).
+        wstring identity(std::move(cred.get_identity()));
+        wstring::size_type offset = identity.find(L'@');
+        if (offset != wstring::npos) identity.erase(0, offset);
+        return identity;
+    } else {
+        // Use configured identity.
+        return m_anonymous_identity;
+    }
 }
