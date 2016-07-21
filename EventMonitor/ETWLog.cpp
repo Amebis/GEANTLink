@@ -687,7 +687,7 @@ static tstring DataToString(_In_ USHORT InType, _In_ USHORT OutType, _In_count_(
             // on an 8-byte boundary, so its size is 8 bytes on a
             // 32-bit computer and 16 bytes on a 64-bit computer.
             // Doubling the pointer size handles both cases.
-            assert(nDataSize >= nPtrSize * 2);
+            assert(nDataSize >= (SIZE_T)nPtrSize * 2);
             return (PULONG)pData > 0 ? DataToString(TDH_INTYPE_SID, OutType, pData + nPtrSize * 2, nDataSize - nPtrSize * 2, pMapInfo, nPtrSize) : _T("<WBEM SID>");
 
         case TDH_INTYPE_SID: {
