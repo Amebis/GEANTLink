@@ -97,7 +97,7 @@ bool eap::credentials::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppE
 
 tstring eap::credentials::get_name() const
 {
-    return get_identity();
+    return !empty() ? get_identity() : _T("<blank>");
 }
 
 
