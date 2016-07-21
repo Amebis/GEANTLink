@@ -377,10 +377,10 @@ void wxETWListCtrl::OnETWEvent(wxETWEvent& event)
     wxListItem item;
     item.SetId(m_item_id++);
     item.SetTextColour(
-        rec.EventHeader.EventDescriptor.Level >= TRACE_LEVEL_VERBOSE     ? (is_ours ? 0x888888 : 0xaaaaaa) :
-        rec.EventHeader.EventDescriptor.Level >= TRACE_LEVEL_INFORMATION ? (is_ours ? 0x000000 : 0x555555) :
-        rec.EventHeader.EventDescriptor.Level >= TRACE_LEVEL_WARNING     ? (is_ours ? 0x00aacc : 0x55ccdd) :
-                                                                           (is_ours ? 0x0000ff : 0x5555ff));
+        rec.EventHeader.EventDescriptor.Level >= TRACE_LEVEL_VERBOSE     ? (is_ours ? 0x666666 : 0xcccccc) :
+        rec.EventHeader.EventDescriptor.Level >= TRACE_LEVEL_INFORMATION ? (is_ours ? 0x000000 : 0xaaaaaa) :
+        rec.EventHeader.EventDescriptor.Level >= TRACE_LEVEL_WARNING     ? (is_ours ? 0x00aacc : 0xaaeeee) :
+                                                                           (is_ours ? 0x0000ff : 0xaaaaff));
     item.SetBackgroundColour(0xffffff);
 
     {
