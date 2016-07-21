@@ -265,6 +265,12 @@ bool eap::credentials_tls::retrieve(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR 
 }
 
 
+LPCTSTR eap::credentials_tls::target_suffix() const
+{
+    return _T("TLS");
+}
+
+
 std::wstring eap::credentials_tls::get_identity() const
 {
     if (m_cert) {
@@ -276,16 +282,9 @@ std::wstring eap::credentials_tls::get_identity() const
 }
 
 
-
 tstring eap::credentials_tls::get_name() const
 {
     return m_cert ? std::move(get_cert_title(m_cert)) : L"<blank>";
-}
-
-
-LPCTSTR eap::credentials_tls::target_suffix() const
-{
-    return _T("TLS");
 }
 
 

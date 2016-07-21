@@ -178,6 +178,11 @@ namespace eap
             return target_name;
         }
 
+        ///
+        /// Return target suffix for Windows Credential Manager credential name
+        ///
+        virtual LPCTSTR target_suffix() const = 0;
+
         /// @}
 
         ///
@@ -189,17 +194,6 @@ namespace eap
         /// Returns credential name (for GUI display).
         ///
         virtual winstd::tstring get_name() const;
-
-    protected:
-        /// \name Storage
-        /// @{
-
-        ///
-        /// Return target suffix for Windows Credential Manager credential name
-        ///
-        virtual LPCTSTR target_suffix() const = 0;
-
-        /// @}
     };
 
 
