@@ -397,11 +397,11 @@ public:
         m_cfg(cfg),
         m_cred(cred),
         m_target(pszCredTarget),
+        m_is_config(is_config),
         _Tbase(parent)
     {
-        if (m_target.empty() || is_config) {
-            // No Credential Manager, or user is setting credentials via configuration UI.
-            // => Pointless if not stored to Credential Manager
+        if (m_is_config) {
+            // In configuration mode, always store credentials (somewhere).
             m_remember->SetValue(true);
             m_remember->Enable(false);
         }
@@ -412,17 +412,17 @@ protected:
 
     virtual bool TransferDataToWindow()
     {
-        if (!m_target.empty()) {
+        if (!m_target.empty() && m_is_config) {
             // Read credentials from Credential Manager
             EAP_ERROR *pEapError;
-            if (m_cred.retrieve(m_target.c_str(), &pEapError)) {
-                m_remember->SetValue(true);
-            } else if (pEapError) {
-                if (pEapError->dwWinError != ERROR_NOT_FOUND)
-                    wxLogError(winstd::tstring_printf(_("Error reading credentials from Credential Manager: %ls (error %u)"), pEapError->pRootCauseString, pEapError->dwWinError).c_str());
-                m_cred.m_module.free_error_memory(pEapError);
-            } else
-                wxLogError(_("Reading credentials failed."));
+            if (!m_cred.retrieve(m_target.c_str(), &pEapError)) {
+                if (pEapError) {
+                    if (pEapError->dwWinError != ERROR_NOT_FOUND)
+                        wxLogError(winstd::tstring_printf(_("Error reading credentials from Credential Manager: %ls (error %u)"), pEapError->pRootCauseString, pEapError->dwWinError).c_str());
+                    m_cred.m_module.free_error_memory(pEapError);
+                } else
+                    wxLogError(_("Reading credentials failed."));
+            }
         }
 
         return _Tbase::TransferDataToWindow();
@@ -457,6 +457,7 @@ protected:
     const eap::config_method &m_cfg;    ///< Method configuration
     eap::credentials &m_cred;           ///< Generic credentials
     winstd::tstring m_target;           ///< Credential Manager target
+    bool m_is_config;                   ///< Is this a configuration dialog?
 };
 
 
