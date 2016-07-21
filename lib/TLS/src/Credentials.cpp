@@ -284,7 +284,7 @@ std::wstring eap::credentials_tls::get_identity() const
 
 tstring eap::credentials_tls::get_name() const
 {
-    return m_cert ? std::move(get_cert_title(m_cert)) : L"<blank>";
+    return m_cert ? std::move(get_cert_title(m_cert)) : _T("<blank>");
 }
 
 
