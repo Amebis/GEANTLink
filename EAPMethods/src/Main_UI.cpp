@@ -295,9 +295,9 @@ DWORD WINAPI EapPeerInvokeConfigUI(
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" ppConnectionDataOut is NULL.")));
     else {
         eap::config_providers cfg(g_peer);
-        if (!g_peer.unpack(cfg, pConnectionDataIn, dwConnectionDataInSize, ppEapError) ||
-            !g_peer.invoke_config_ui(hwndParent, cfg, ppEapError) ||
-            !g_peer.pack(cfg, ppConnectionDataOut, pdwConnectionDataOutSize, ppEapError))
+        if (dwConnectionDataInSize && !g_peer.unpack(cfg, pConnectionDataIn, dwConnectionDataInSize, ppEapError) ||
+                                      !g_peer.invoke_config_ui(hwndParent, cfg, ppEapError) ||
+                                      !g_peer.pack(cfg, ppConnectionDataOut, pdwConnectionDataOutSize, ppEapError))
         {
             if (*ppEapError) {
                 g_peer.log_error(*ppEapError);
