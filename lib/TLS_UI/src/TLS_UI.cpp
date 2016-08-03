@@ -361,7 +361,7 @@ bool wxTLSCredentialsPanel::TransferDataToWindow()
             m_cert_select_val->SetSelection(0);
     }
 
-    return __super::TransferDataToWindow();
+    return wxEAPCredentialsPanelBase<wxTLSCredentialsPanelBase>::TransferDataToWindow();
 }
 
 
@@ -379,7 +379,7 @@ bool wxTLSCredentialsPanel::TransferDataFromWindow()
 
     // Inherited TransferDataFromWindow() calls m_cred.store().
     // Therefore, call it only now, that m_cred is set.
-    return __super::TransferDataFromWindow();
+    return wxEAPCredentialsPanelBase<wxTLSCredentialsPanelBase>::TransferDataFromWindow();
 }
 
 

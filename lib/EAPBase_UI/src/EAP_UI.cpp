@@ -189,7 +189,7 @@ bool wxPasswordCredentialsPanel::TransferDataToWindow()
 {
     // Inherited TransferDataToWindow() calls m_cred.retrieve().
     // Therefore, call it now, to set m_cred.
-    wxCHECK(__super::TransferDataToWindow(), false);
+    wxCHECK(wxEAPCredentialsPanelBase<wxEAPCredentialsPanelPassBase>::TransferDataToWindow(), false);
 
     m_identity->SetValue(m_cred.m_identity);
     m_identity->SetSelection(0, -1);
@@ -211,7 +211,7 @@ bool wxPasswordCredentialsPanel::TransferDataFromWindow()
 
     // Inherited TransferDataFromWindow() calls m_cred.store().
     // Therefore, call it only now, that m_cred is set.
-    return __super::TransferDataFromWindow();
+    return wxEAPCredentialsPanelBase<wxEAPCredentialsPanelPassBase>::TransferDataFromWindow();
 }
 
 
