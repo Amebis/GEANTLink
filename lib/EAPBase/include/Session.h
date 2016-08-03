@@ -73,7 +73,10 @@ namespace eap
         session(_In_ module &mod) :
             m_module(mod),
             m_cfg(mod),
-            m_cred(mod)
+            m_cred(mod),
+            m_eap_flags(0),
+            m_token(NULL),
+            m_send_packet_size_max((DWORD)-1)
         {
         }
 
@@ -86,7 +89,10 @@ namespace eap
         session(_In_ const session &other) :
             m_module(other.m_module),
             m_cfg(other.m_cfg),
-            m_cred(other.m_cred)
+            m_cred(other.m_cred),
+            m_eap_flags(other.m_eap_flags),
+            m_token(other.m_token),
+            m_send_packet_size_max(other.m_send_packet_size_max)
         {
         }
 
@@ -99,7 +105,10 @@ namespace eap
         session(_Inout_ session &&other) :
             m_module(other.m_module),
             m_cfg(std::move(other.m_cfg)),
-            m_cred(std::move(other.m_cred))
+            m_cred(std::move(other.m_cred)),
+            m_eap_flags(std::move(other.m_eap_flags)),
+            m_token(std::move(other.m_token)),
+            m_send_packet_size_max(std::move(other.m_send_packet_size_max))
         {
         }
 
@@ -115,8 +124,11 @@ namespace eap
         {
             if (this != std::addressof(other)) {
                 assert(std::addressof(m_module) ==std::addressof(other.m_module)); // Copy session within same module only!
-                m_cfg  = other.m_cfg;
-                m_cred = other.m_cred;
+                m_cfg                  = other.m_cfg;
+                m_cred                 = other.m_cred;
+                m_eap_flags            = other.m_eap_flags;
+                m_token                = other.m_token;
+                m_send_packet_size_max = other.m_send_packet_size_max;
             }
             return *this;
         }
@@ -133,8 +145,11 @@ namespace eap
         {
             if (this != std::addressof(other)) {
                 assert(std::addressof(m_module) ==std::addressof(other.m_module)); // Move session within same module only!
-                m_cfg  = std::move(other.m_cfg);
-                m_cred = std::move(other.m_cred);
+                m_cfg                  = std::move(other.m_cfg);
+                m_cred                 = std::move(other.m_cred);
+                m_eap_flags            = std::move(other.m_eap_flags);
+                m_token                = std::move(other.m_token);
+                m_send_packet_size_max = std::move(other.m_send_packet_size_max);
             }
             return *this;
         }
@@ -159,11 +174,13 @@ namespace eap
             _In_        DWORD         dwMaxSendPacketSize,
             _Out_       EAP_ERROR     **ppEapError)
         {
-            UNREFERENCED_PARAMETER(dwFlags);
             UNREFERENCED_PARAMETER(pAttributeArray);
-            UNREFERENCED_PARAMETER(hTokenImpersonateUser);
-            UNREFERENCED_PARAMETER(dwMaxSendPacketSize);
             UNREFERENCED_PARAMETER(ppEapError);
+
+            // Save session parameters.
+            m_eap_flags            = dwFlags;
+            m_token                = hTokenImpersonateUser;
+            m_send_packet_size_max = dwMaxSendPacketSize;
 
             return true;
         }
@@ -358,5 +375,8 @@ namespace eap
         config_providers m_cfg;             ///< Session configuration
         credentials_type m_cred;            ///< User credentials
         interactive_request_type m_intreq;  ///< Interactive UI request data
+        DWORD m_eap_flags;                  ///< A combination of EAP flags that describe the new EAP authentication session behavior
+        HANDLE m_token;                     ///< Specifies a handle to the user impersonation token to use in this session
+        DWORD m_send_packet_size_max;       ///< Specifies the maximum size in bytes of an EAP packet sent during the session. If the method needs to send a packet larger than the maximum size, the method must accommodate fragmentation and reassembly.
     };
 }
