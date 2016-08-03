@@ -100,6 +100,6 @@ namespace eap
             _In_  const config_providers          &cfg,
             _In_  const credentials_type          &cred,
             _Out_       EAP_METHOD_PROPERTY_ARRAY *pMethodPropertyArray,
-            _Out_       EAP_ERROR                 **ppEapError) const;
+            _Out_       EAP_ERROR                 **ppEapError);
     };
 }

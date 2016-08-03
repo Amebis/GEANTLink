@@ -209,16 +209,51 @@ bool eap::peer_ttls::get_method_properties(
     _In_  const config_providers          &cfg,
     _In_  const credentials_type          &cred,
     _Out_       EAP_METHOD_PROPERTY_ARRAY *pMethodPropertyArray,
-    _Out_       EAP_ERROR                 **ppEapError) const
+    _Out_       EAP_ERROR                 **ppEapError)
 {
     UNREFERENCED_PARAMETER(dwVersion);
     UNREFERENCED_PARAMETER(dwFlags);
     UNREFERENCED_PARAMETER(hUserImpersonationToken);
     UNREFERENCED_PARAMETER(cfg);
     UNREFERENCED_PARAMETER(cred);
-    UNREFERENCED_PARAMETER(pMethodPropertyArray);
-    UNREFERENCED_PARAMETER(ppEapError);
+    assert(pMethodPropertyArray);
+    assert(ppEapError);
 
-    *ppEapError = make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
-    return false;
+    vector<EAP_METHOD_PROPERTY> properties;
+    properties.reserve(20);
+
+    properties.push_back(eap::method_property(emptPropCipherSuiteNegotiation,     TRUE));
+    properties.push_back(eap::method_property(emptPropMutualAuth,                 TRUE));
+    properties.push_back(eap::method_property(emptPropIntegrity,                  TRUE));
+    properties.push_back(eap::method_property(emptPropReplayProtection,           TRUE));
+    properties.push_back(eap::method_property(emptPropConfidentiality,            TRUE));
+    properties.push_back(eap::method_property(emptPropKeyDerivation,              TRUE));
+    properties.push_back(eap::method_property(emptPropKeyStrength128,             TRUE));
+    properties.push_back(eap::method_property(emptPropDictionaryAttackResistance, TRUE));
+    properties.push_back(eap::method_property(emptPropFastReconnect,              TRUE));
+    properties.push_back(eap::method_property(emptPropCryptoBinding,              TRUE));
+    properties.push_back(eap::method_property(emptPropSessionIndependence,        TRUE));
+    properties.push_back(eap::method_property(emptPropFragmentation,              TRUE));
+    properties.push_back(eap::method_property(emptPropStandalone,                 TRUE));
+    properties.push_back(eap::method_property(emptPropMppeEncryption,             TRUE));
+    properties.push_back(eap::method_property(emptPropTunnelMethod,               TRUE));
+    properties.push_back(eap::method_property(emptPropSupportsConfig,             TRUE));
+    properties.push_back(eap::method_property(emptPropMachineAuth,                TRUE));
+    properties.push_back(eap::method_property(emptPropUserAuth,                   TRUE));
+    properties.push_back(eap::method_property(emptPropIdentityPrivacy,            TRUE));
+    properties.push_back(eap::method_property(emptPropSharedStateEquivalence,     TRUE));
+
+    // Allocate property array.
+    DWORD dwCount = (DWORD)properties.size();
+    pMethodPropertyArray->pMethodProperty = (EAP_METHOD_PROPERTY*)alloc_memory(sizeof(EAP_METHOD_PROPERTY) * dwCount);
+    if (!pMethodPropertyArray->pMethodProperty) {
+        *ppEapError = make_error(ERROR_OUTOFMEMORY, _T(__FUNCTION__) _T(" Error allocating memory for propery array."));
+        return false;
+    }
+
+    // Copy properties.
+    memcpy(pMethodPropertyArray->pMethodProperty, properties.data(), sizeof(EAP_METHOD_PROPERTY) * dwCount);
+    pMethodPropertyArray->dwNumberOfProperties = dwCount;
+
+    return true;
 }

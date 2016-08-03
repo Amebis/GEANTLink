@@ -296,7 +296,7 @@ DWORD APIENTRY EapPeerBeginSession(
         // Allocate new session.
         unique_ptr<_EAPMETHOD_SESSION> session(new _EAPMETHOD_SESSION(g_peer));
         if (!session) {
-            g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_OUTOFMEMORY, _T(" Error allocating memory for EAP session.")));
+            g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_OUTOFMEMORY, _T(__FUNCTION__) _T(" Error allocating memory for EAP session.")));
             return dwResult;
         }
 
