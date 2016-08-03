@@ -311,9 +311,8 @@ bool wxFQDNListValidator::Parse(const wxString &val_in, size_t i_start, size_t i
 // wxTLSCredentialsPanel
 //////////////////////////////////////////////////////////////////////
 
-wxTLSCredentialsPanel::wxTLSCredentialsPanel(const eap::config_provider &prov, const eap::config_method &cfg, eap::credentials &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config) :
-    m_cred((eap::credentials_tls&)cred),
-    wxEAPCredentialsPanelBase<wxTLSCredentialsPanelBase>(prov, cfg, cred, pszCredTarget, parent, is_config)
+wxTLSCredentialsPanel::wxTLSCredentialsPanel(const eap::config_provider &prov, const eap::config_method_with_cred<eap::credentials_tls> &cfg, eap::credentials_tls &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config) :
+    wxEAPCredentialsPanelBase<eap::credentials_tls, wxTLSCredentialsPanelBase>(prov, cfg, cred, pszCredTarget, parent, is_config)
 {
     // Load and set icon.
     if (m_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
@@ -352,16 +351,14 @@ bool wxTLSCredentialsPanel::TransferDataToWindow()
     }
 
     if (is_found) {
-        m_cert_select    ->SetValue(true);
-        m_cert_select_val->Enable(true);
+        m_cert_select->SetValue(true);
     } else {
-        m_cert_none      ->SetValue(true);
-        m_cert_select_val->Enable(false);
+        m_cert_none->SetValue(true);
         if (!m_cert_select_val->IsEmpty())
             m_cert_select_val->SetSelection(0);
     }
 
-    return wxEAPCredentialsPanelBase<wxTLSCredentialsPanelBase>::TransferDataToWindow();
+    return wxEAPCredentialsPanelBase<eap::credentials_tls, wxTLSCredentialsPanelBase>::TransferDataToWindow();
 }
 
 
@@ -379,14 +376,29 @@ bool wxTLSCredentialsPanel::TransferDataFromWindow()
 
     // Inherited TransferDataFromWindow() calls m_cred.store().
     // Therefore, call it only now, that m_cred is set.
-    return wxEAPCredentialsPanelBase<wxTLSCredentialsPanelBase>::TransferDataFromWindow();
+    return wxEAPCredentialsPanelBase<eap::credentials_tls, wxTLSCredentialsPanelBase>::TransferDataFromWindow();
 }
 
 
-void wxTLSCredentialsPanel::OnCertSelect(wxCommandEvent& event)
+void wxTLSCredentialsPanel::OnUpdateUI(wxUpdateUIEvent& event)
 {
-    UNREFERENCED_PARAMETER(event);
-    m_cert_select_val->Enable(m_cert_select->GetValue());
+    if (!m_is_config && m_cfg.m_use_preshared) {
+        // Credential prompt mode & Using pre-shared credentials
+        // To avoid run-away selection of radio buttons, disable the selected one last.
+        if (m_cert_none->GetValue()) {
+            m_cert_select->Enable(false);
+            m_cert_none  ->Enable(false);
+        } else {
+            m_cert_none  ->Enable(false);
+            m_cert_select->Enable(false);
+        }
+        m_cert_select_val->Enable(false);
+    } else {
+        // Configuration mode or using own credentials. Selectively enable/disable controls.
+        m_cert_select_val->Enable(m_cert_select->GetValue());
+    }
+
+    wxEAPCredentialsPanelBase<eap::credentials_tls, wxTLSCredentialsPanelBase>::OnUpdateUI(event);
 }
 
 

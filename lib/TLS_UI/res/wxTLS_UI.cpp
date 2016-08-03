@@ -175,14 +175,8 @@ wxTLSCredentialsPanelBase::wxTLSCredentialsPanelBase( wxWindow* parent, wxWindow
 	
 	this->SetSizer( sb_credentials );
 	this->Layout();
-	
-	// Connect Events
-	m_cert_select->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( wxTLSCredentialsPanelBase::OnCertSelect ), NULL, this );
 }
 
 wxTLSCredentialsPanelBase::~wxTLSCredentialsPanelBase()
 {
-	// Disconnect Events
-	m_cert_select->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( wxTLSCredentialsPanelBase::OnCertSelect ), NULL, this );
-	
 }

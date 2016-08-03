@@ -81,10 +81,6 @@ class wxTLSCredentialsPanelBase : public wxPanel
 		wxRadioButton* m_cert_select;
 		wxChoice* m_cert_select_val;
 		wxCheckBox* m_remember;
-		
-		// Virtual event handlers, overide them in your derived class
-		virtual void OnCertSelect( wxCommandEvent& event ) { event.Skip(); }
-		
 	
 	public:
 		

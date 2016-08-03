@@ -52,12 +52,12 @@ template <class _Tcred, class _wxT> class wxEAPCredentialsConfigPanel;
 ///
 /// Base template for all credential entry panels
 ///
-template <class _Tbase> class wxEAPCredentialsPanelBase;
+template <class _Tcred, class _Tbase> class wxEAPCredentialsPanelBase;
 
 ///
 /// Generic password credential entry panel
 ///
-class wxPasswordCredentialsPanel;
+template <class _Tcred, class _Tbase> class wxPasswordCredentialsPanel;
 
 ///
 /// Sets icon from resource
@@ -245,14 +245,6 @@ protected:
 
     virtual bool TransferDataToWindow()
     {
-        if (m_prov.m_read_only) {
-            // This is provider-locked configuration. Disable controls.
-            m_own               ->Enable(false);
-            m_preshared         ->Enable(false);
-            m_preshared_identity->Enable(false);
-            m_preshared_set     ->Enable(false);
-        }
-
         if (!m_cfg.m_use_preshared)
             m_own->SetValue(true);
         else
@@ -316,8 +308,22 @@ protected:
 
         m_preshared_identity->SetValue(!m_cred.empty() ? m_cred.get_name() : _("<blank>"));
 
-        if (!m_prov.m_read_only) {
+        if (m_prov.m_read_only) {
+            // This is provider-locked configuration. Disable controls.
+            // To avoid run-away selection of radio buttons, disable the selected one last.
+            if (m_own->GetValue()) {
+                m_preshared->Enable(false);
+                m_own      ->Enable(false);
+            } else {
+                m_own      ->Enable(false);
+                m_preshared->Enable(false);
+            }
+            m_preshared_identity->Enable(false);
+            m_preshared_set     ->Enable(false);
+        } else {
             // This is not a provider-locked configuration. Selectively enable/disable controls.
+            m_own               ->Enable(true);
+            m_preshared         ->Enable(true);
             if (m_own->GetValue()) {
                 m_preshared_identity->Enable(false);
                 m_preshared_set     ->Enable(false);
@@ -378,9 +384,14 @@ private:
 };
 
 
-template <class _Tbase>
+template <class _Tcred, class _Tbase>
 class wxEAPCredentialsPanelBase : public _Tbase
 {
+private:
+    /// \cond internal
+    typedef wxEAPCredentialsPanelBase<_Tcred, _Tbase> _Tthis;
+    /// \endcond
+
 public:
     ///
     /// Constructs a credentials panel
@@ -392,7 +403,7 @@ public:
     /// \param[in]    parent         Parent window
     /// \param[in]    is_config      Is this panel used to pre-enter credentials? When \c true, the "Remember" checkbox is always selected and disabled.
     ///
-    wxEAPCredentialsPanelBase(const eap::config_provider &prov, const eap::config_method &cfg, eap::credentials &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config = false) :
+    wxEAPCredentialsPanelBase(const eap::config_provider &prov, const eap::config_method_with_cred<_Tcred> &cfg, _Tcred &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config = false) :
         m_prov(prov),
         m_cfg(cfg),
         m_cred(cred),
@@ -400,11 +411,12 @@ public:
         m_is_config(is_config),
         _Tbase(parent)
     {
-        if (m_is_config) {
-            // In configuration mode, always store credentials (somewhere).
-            m_remember->SetValue(true);
-            m_remember->Enable(false);
-        }
+        this->Connect(wxEVT_UPDATE_UI, wxUpdateUIEventHandler(_Tthis::OnUpdateUI));
+    }
+
+    virtual ~wxEAPCredentialsPanelBase()
+    {
+        this->Disconnect(wxEVT_UPDATE_UI, wxUpdateUIEventHandler(_Tthis::OnUpdateUI));
     }
 
 protected:
@@ -450,18 +462,39 @@ protected:
         return true;
     }
 
+    virtual void OnUpdateUI(wxUpdateUIEvent& event)
+    {
+        UNREFERENCED_PARAMETER(event);
+
+        if (m_is_config) {
+            // Configuration mode
+            // Always store credentials (somewhere).
+            m_remember->SetValue(true);
+            m_remember->Enable(false);
+        } else if (m_cfg.m_use_preshared) {
+            // Credential prompt mode & Using pre-shared credentials
+            m_remember->SetValue(false);
+            m_remember->Enable(false);
+        } else if (!m_cfg.m_allow_save) {
+            // Credential prompt mode & using own credentials & saving is not allowed
+            m_remember->SetValue(false);
+            m_remember->Enable(false);
+        }
+    }
+
     /// \endcond
 
 protected:
-    const eap::config_provider &m_prov; ///< Provider configuration
-    const eap::config_method &m_cfg;    ///< Method configuration
-    eap::credentials &m_cred;           ///< Generic credentials
-    winstd::tstring m_target;           ///< Credential Manager target
-    bool m_is_config;                   ///< Is this a configuration dialog?
+    const eap::config_provider &m_prov;                 ///< Provider configuration
+    const eap::config_method_with_cred<_Tcred> &m_cfg;  ///< Method configuration
+    _Tcred &m_cred;                                     ///< Credentials
+    winstd::tstring m_target;                           ///< Credential Manager target
+    bool m_is_config;                                   ///< Is this a configuration dialog?
 };
 
 
-class wxPasswordCredentialsPanel : public wxEAPCredentialsPanelBase<wxEAPCredentialsPanelPassBase>
+template <class _Tcred, class _Tbase>
+class wxPasswordCredentialsPanel : public wxEAPCredentialsPanelBase<_Tcred, _Tbase>
 {
 public:
     ///
@@ -474,22 +507,91 @@ public:
     /// \param[in]    parent         Parent window
     /// \param[in]    is_config      Is this panel used to pre-enter credentials? When \c true, the "Remember" checkbox is always selected and disabled.
     ///
-    wxPasswordCredentialsPanel(const eap::config_provider &prov, const eap::config_method &cfg, eap::credentials &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config = false);
+    wxPasswordCredentialsPanel(const eap::config_provider &prov, const eap::config_method_with_cred<_Tcred> &cfg, _Tcred &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config = false) :
+        wxEAPCredentialsPanelBase<_Tcred, _Tbase>(prov, cfg, cred, pszCredTarget, parent, is_config)
+    {
+        // Load and set icon.
+        if (m_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
+            wxSetIconFromResource(m_credentials_icon, m_icon, m_shell32, MAKEINTRESOURCE(269));
+
+        bool layout = false;
+        if (!m_prov.m_lbl_alt_credential.empty()) {
+            m_credentials_label->SetLabel(m_prov.m_lbl_alt_credential);
+            m_credentials_label->Wrap( 446 );
+            layout = true;
+        }
+
+        if (!m_prov.m_lbl_alt_identity.empty()) {
+            m_identity_label->SetLabel(m_prov.m_lbl_alt_identity);
+            layout = true;
+        }
+
+        if (!m_prov.m_lbl_alt_password.empty()) {
+            m_password_label->SetLabel(m_prov.m_lbl_alt_password);
+            layout = true;
+        }
+
+        if (layout)
+            this->Layout();
+    }
 
 protected:
     /// \cond internal
-    virtual bool TransferDataToWindow();
-    virtual bool TransferDataFromWindow();
+
+    virtual bool TransferDataToWindow()
+    {
+        // Inherited TransferDataToWindow() calls m_cred.retrieve().
+        // Therefore, call it now, to set m_cred.
+        if (!wxEAPCredentialsPanelBase<_Tcred, wxEAPCredentialsPanelPassBase>::TransferDataToWindow())
+            return false;
+
+        m_identity->SetValue(m_cred.m_identity);
+        m_identity->SetSelection(0, -1);
+        m_password->SetValue(m_cred.m_password.empty() ? wxEmptyString : s_dummy_password);
+
+        return true;
+    }
+
+    virtual bool TransferDataFromWindow()
+    {
+        m_cred.m_identity = m_identity->GetValue();
+
+        wxString pass = m_password->GetValue();
+        if (pass.compare(s_dummy_password) != 0) {
+            m_cred.m_password = pass;
+            pass.assign(pass.length(), wxT('*'));
+        }
+
+        // Inherited TransferDataFromWindow() calls m_cred.store().
+        // Therefore, call it only now, that m_cred is set.
+        return wxEAPCredentialsPanelBase<_Tcred, wxEAPCredentialsPanelPassBase>::TransferDataFromWindow();
+    }
+
+    virtual void OnUpdateUI(wxUpdateUIEvent& event)
+    {
+        if (!m_is_config && m_cfg.m_use_preshared) {
+            // Credential prompt mode & Using pre-shared credentials
+            m_identity_label->Enable(false);
+            m_identity      ->Enable(false);
+            m_password_label->Enable(false);
+            m_password      ->Enable(false);
+        }
+
+        wxEAPCredentialsPanelBase<_Tcred, wxEAPCredentialsPanelPassBase>::OnUpdateUI(event);
+    }
+
     /// \endcond
 
 protected:
-    eap::credentials_pass &m_cred;  ///< Password credentials
     winstd::library m_shell32;      ///< shell32.dll resource library reference
     wxIcon m_icon;                  ///< Panel icon
 
 private:
     static const wxStringCharType *s_dummy_password;
 };
+
+template <class _Tcred, class _Tbase>
+const wxStringCharType *wxPasswordCredentialsPanel<_Tcred, _Tbase>::s_dummy_password = wxT("dummypass");
 
 
 inline bool wxSetIconFromResource(wxStaticBitmap *bmp, wxIcon &icon, HINSTANCE hinst, PCWSTR pszName)

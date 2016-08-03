@@ -248,7 +248,7 @@ protected:
 };
 
 
-class wxTLSCredentialsPanel : public wxEAPCredentialsPanelBase<wxTLSCredentialsPanelBase>
+class wxTLSCredentialsPanel : public wxEAPCredentialsPanelBase<eap::credentials_tls, wxTLSCredentialsPanelBase>
 {
 public:
     ///
@@ -261,17 +261,16 @@ public:
     /// \param[in]    parent         Parent window
     /// \param[in]    is_config      Is this panel used to pre-enter credentials? When \c true, the "Remember" checkbox is always selected and disabled.
     ///
-    wxTLSCredentialsPanel(const eap::config_provider &prov, const eap::config_method &cfg, eap::credentials &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config = false);
+    wxTLSCredentialsPanel(const eap::config_provider &prov, const eap::config_method_with_cred<eap::credentials_tls> &cfg, eap::credentials_tls &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config = false);
 
 protected:
     /// \cond internal
     virtual bool TransferDataToWindow();
     virtual bool TransferDataFromWindow();
-    virtual void OnCertSelect(wxCommandEvent& event);
+    virtual void OnUpdateUI(wxUpdateUIEvent& event);
     /// \endcond
 
 protected:
-    eap::credentials_tls &m_cred;   ///< TLS credentials
     winstd::library m_shell32;      ///< shell32.dll resource library reference
     wxIcon m_icon;                  ///< Panel icon
 };
