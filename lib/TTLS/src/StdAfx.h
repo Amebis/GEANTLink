@@ -26,3 +26,5 @@
 #include "../include/Session.h"
 
 #include "../../EAPBase/include/EAPXML.h"
+
+#include <WinStd/EAP.h>

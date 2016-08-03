@@ -222,26 +222,26 @@ bool eap::peer_ttls::get_method_properties(
     vector<EAP_METHOD_PROPERTY> properties;
     properties.reserve(20);
 
-    properties.push_back(eap::method_property(emptPropCipherSuiteNegotiation,     TRUE));
-    properties.push_back(eap::method_property(emptPropMutualAuth,                 TRUE));
-    properties.push_back(eap::method_property(emptPropIntegrity,                  TRUE));
-    properties.push_back(eap::method_property(emptPropReplayProtection,           TRUE));
-    properties.push_back(eap::method_property(emptPropConfidentiality,            TRUE));
-    properties.push_back(eap::method_property(emptPropKeyDerivation,              TRUE));
-    properties.push_back(eap::method_property(emptPropKeyStrength128,             TRUE));
-    properties.push_back(eap::method_property(emptPropDictionaryAttackResistance, TRUE));
-    properties.push_back(eap::method_property(emptPropFastReconnect,              TRUE));
-    properties.push_back(eap::method_property(emptPropCryptoBinding,              TRUE));
-    properties.push_back(eap::method_property(emptPropSessionIndependence,        TRUE));
-    properties.push_back(eap::method_property(emptPropFragmentation,              TRUE));
-    properties.push_back(eap::method_property(emptPropStandalone,                 TRUE));
-    properties.push_back(eap::method_property(emptPropMppeEncryption,             TRUE));
-    properties.push_back(eap::method_property(emptPropTunnelMethod,               TRUE));
-    properties.push_back(eap::method_property(emptPropSupportsConfig,             TRUE));
-    properties.push_back(eap::method_property(emptPropMachineAuth,                TRUE));
-    properties.push_back(eap::method_property(emptPropUserAuth,                   TRUE));
-    properties.push_back(eap::method_property(emptPropIdentityPrivacy,            TRUE));
-    properties.push_back(eap::method_property(emptPropSharedStateEquivalence,     TRUE));
+    properties.push_back(eap_method_prop(emptPropCipherSuiteNegotiation,     TRUE));
+    properties.push_back(eap_method_prop(emptPropMutualAuth,                 TRUE));
+    properties.push_back(eap_method_prop(emptPropIntegrity,                  TRUE));
+    properties.push_back(eap_method_prop(emptPropReplayProtection,           TRUE));
+    properties.push_back(eap_method_prop(emptPropConfidentiality,            TRUE));
+    properties.push_back(eap_method_prop(emptPropKeyDerivation,              TRUE));
+    properties.push_back(eap_method_prop(emptPropKeyStrength128,             TRUE));
+    properties.push_back(eap_method_prop(emptPropDictionaryAttackResistance, TRUE));
+    properties.push_back(eap_method_prop(emptPropFastReconnect,              TRUE));
+    properties.push_back(eap_method_prop(emptPropCryptoBinding,              TRUE));
+    properties.push_back(eap_method_prop(emptPropSessionIndependence,        TRUE));
+    properties.push_back(eap_method_prop(emptPropFragmentation,              TRUE));
+    properties.push_back(eap_method_prop(emptPropStandalone,                 TRUE));
+    properties.push_back(eap_method_prop(emptPropMppeEncryption,             TRUE));
+    properties.push_back(eap_method_prop(emptPropTunnelMethod,               TRUE));
+    properties.push_back(eap_method_prop(emptPropSupportsConfig,             TRUE));
+    properties.push_back(eap_method_prop(emptPropMachineAuth,                TRUE));
+    properties.push_back(eap_method_prop(emptPropUserAuth,                   TRUE));
+    properties.push_back(eap_method_prop(emptPropIdentityPrivacy,            TRUE));
+    properties.push_back(eap_method_prop(emptPropSharedStateEquivalence,     TRUE));
 
     // Allocate property array.
     DWORD dwCount = (DWORD)properties.size();

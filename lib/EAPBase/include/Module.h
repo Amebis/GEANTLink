@@ -40,11 +40,6 @@ namespace eap
     /// A group of methods all EAP peers must or should implement.
     ///
     template <class _Tmeth, class _Tcred, class _Tint, class _Tintres> class peer;
-
-    ///
-    /// EAP_METHOD_PROPERTY helper
-    ///
-    class method_property;
 }
 
 #pragma once
@@ -892,55 +887,6 @@ namespace eap
 
             *ppEapError = make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
             return false;
-        }
-    };
-
-
-    class method_property : public EAP_METHOD_PROPERTY
-    {
-    public:
-        ///
-        /// Constructs a BOOL method property
-        ///
-        /// \param[in] type   EAP method property type
-        /// \param[in] value  Property value
-        ///
-        inline method_property(_In_ EAP_METHOD_PROPERTY_TYPE type, _In_ BOOL value)
-        {
-            eapMethodPropertyType                  = type;
-            eapMethodPropertyValueType             = empvtBool;
-            eapMethodPropertyValue.empvBool.length = sizeof(BOOL);
-            eapMethodPropertyValue.empvBool.value  = value;
-        }
-
-
-        ///
-        /// Constructs a DWORD method property
-        ///
-        /// \param[in] type   EAP method property type
-        /// \param[in] value  Property value
-        ///
-        inline method_property(_In_ EAP_METHOD_PROPERTY_TYPE type, _In_ DWORD value)
-        {
-            eapMethodPropertyType                   = type;
-            eapMethodPropertyValueType              = empvtDword;
-            eapMethodPropertyValue.empvDword.length = sizeof(DWORD);
-            eapMethodPropertyValue.empvDword.value  = value;
-        }
-
-
-        ///
-        /// Constructs a Unicode string method property
-        ///
-        /// \param[in] type   EAP method property type
-        /// \param[in] value  Property value
-        ///
-        inline method_property(_In_ EAP_METHOD_PROPERTY_TYPE type, _In_z_ LPCWSTR value)
-        {
-            eapMethodPropertyType                    = type;
-            eapMethodPropertyValueType               = empvtString;
-            eapMethodPropertyValue.empvString.length = (DWORD)(sizeof(WCHAR)*(wcslen(value) + 1));
-            eapMethodPropertyValue.empvString.value  = (BYTE*)value;
         }
     };
 }
