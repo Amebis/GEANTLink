@@ -74,5 +74,53 @@ namespace eap
         /// \returns Reference to this object
         ///
         session_ttls& operator=(_Inout_ session_ttls &&other);
+
+        /// \name Packet processing
+        /// @{
+
+        ///
+        /// Processes a packet received by EAPHost from a supplicant.
+        ///
+        /// \sa [EapPeerProcessRequestPacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363621.aspx)
+        ///
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
+        ///
+        virtual bool process_request_packet(
+            _In_                                       DWORD               dwReceivedPacketSize,
+            _In_bytecount_(dwReceivedPacketSize) const EapPacket           *pReceivedPacket,
+            _Out_                                      EapPeerMethodOutput *pEapOutput,
+            _Out_                                      EAP_ERROR           **ppEapError);
+
+        ///
+        /// Obtains a response packet from the EAP method.
+        ///
+        /// \sa [EapPeerGetResponsePacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363610.aspx)
+        ///
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
+        ///
+        virtual bool get_response_packet(
+            _Inout_                            DWORD     *pdwSendPacketSize,
+            _Inout_bytecap_(*dwSendPacketSize) EapPacket *pSendPacket,
+            _Out_                              EAP_ERROR **ppEapError);
+
+        ///
+        /// Obtains the result of an authentication session from the EAP method.
+        ///
+        /// \sa [EapPeerGetResult function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363611.aspx)
+        ///
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
+        ///
+        virtual bool get_result(
+            _In_  EapPeerMethodResultReason reason,
+            _Out_ EapPeerMethodResult       *ppResult,
+            _Out_ EAP_ERROR                 **ppEapError);
+
+        /// @}
     };
 }

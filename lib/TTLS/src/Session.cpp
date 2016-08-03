@@ -61,3 +61,47 @@ eap::session_ttls& eap::session_ttls::operator=(_Inout_ session_ttls &&other)
 
     return *this;
 }
+
+
+bool eap::session_ttls::process_request_packet(
+    _In_                                       DWORD               dwReceivedPacketSize,
+    _In_bytecount_(dwReceivedPacketSize) const EapPacket           *pReceivedPacket,
+    _Out_                                      EapPeerMethodOutput *pEapOutput,
+    _Out_                                      EAP_ERROR           **ppEapError)
+{
+    UNREFERENCED_PARAMETER(dwReceivedPacketSize);
+    UNREFERENCED_PARAMETER(pReceivedPacket);
+    UNREFERENCED_PARAMETER(pEapOutput);
+    assert(ppEapError);
+
+    *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
+    return false;
+}
+
+
+bool eap::session_ttls::get_response_packet(
+    _Inout_                            DWORD     *pdwSendPacketSize,
+    _Inout_bytecap_(*dwSendPacketSize) EapPacket *pSendPacket,
+    _Out_                              EAP_ERROR **ppEapError)
+{
+    UNREFERENCED_PARAMETER(pdwSendPacketSize);
+    UNREFERENCED_PARAMETER(pSendPacket);
+    assert(ppEapError);
+
+    *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
+    return false;
+}
+
+
+bool eap::session_ttls::get_result(
+    _In_  EapPeerMethodResultReason reason,
+    _Out_ EapPeerMethodResult       *ppResult,
+    _Out_ EAP_ERROR                 **ppEapError)
+{
+    UNREFERENCED_PARAMETER(reason);
+    UNREFERENCED_PARAMETER(ppResult);
+    assert(ppEapError);
+
+    *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
+    return false;
+}

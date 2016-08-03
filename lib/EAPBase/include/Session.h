@@ -220,16 +220,7 @@ namespace eap
             _In_                                       DWORD               dwReceivedPacketSize,
             _In_bytecount_(dwReceivedPacketSize) const EapPacket           *pReceivedPacket,
             _Out_                                      EapPeerMethodOutput *pEapOutput,
-            _Out_                                      EAP_ERROR           **ppEapError)
-        {
-            UNREFERENCED_PARAMETER(dwReceivedPacketSize);
-            UNREFERENCED_PARAMETER(pReceivedPacket);
-            UNREFERENCED_PARAMETER(pEapOutput);
-            assert(ppEapError);
-
-            *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
-            return false;
-        }
+            _Out_                                      EAP_ERROR           **ppEapError) = 0;
 
 
         ///
@@ -242,17 +233,9 @@ namespace eap
         /// - \c false otherwise. See \p ppEapError for details.
         ///
         virtual bool get_response_packet(
-            _Inout_                            DWORD              *pdwSendPacketSize,
-            _Inout_bytecap_(*dwSendPacketSize) EapPacket          *pSendPacket,
-            _Out_                              EAP_ERROR          **ppEapError)
-        {
-            UNREFERENCED_PARAMETER(pdwSendPacketSize);
-            UNREFERENCED_PARAMETER(pSendPacket);
-            assert(ppEapError);
-
-            *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
-            return false;
-        }
+            _Inout_                            DWORD     *pdwSendPacketSize,
+            _Inout_bytecap_(*dwSendPacketSize) EapPacket *pSendPacket,
+            _Out_                              EAP_ERROR **ppEapError) = 0;
 
 
         ///
@@ -264,15 +247,10 @@ namespace eap
         /// - \c true if succeeded
         /// - \c false otherwise. See \p ppEapError for details.
         ///
-        virtual bool get_result(_In_ EapPeerMethodResultReason reason, _Out_ EapPeerMethodResult *ppResult, _Out_ EAP_ERROR **ppEapError)
-        {
-            UNREFERENCED_PARAMETER(reason);
-            UNREFERENCED_PARAMETER(ppResult);
-            assert(ppEapError);
-
-            *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
-            return false;
-        }
+        virtual bool get_result(
+            _In_  EapPeerMethodResultReason reason,
+            _Out_ EapPeerMethodResult       *ppResult,
+            _Out_ EAP_ERROR                 **ppEapError) = 0;
 
         /// @}
 
