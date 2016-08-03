@@ -434,8 +434,8 @@ protected:
         wxCHECK(_Tbase::TransferDataFromWindow(), false);
 
         if (!m_target.empty()) {
-            // Write credentials to credential manager.
             if (m_remember->GetValue()) {
+                // Write credentials to credential manager.
                 EAP_ERROR *pEapError;
                 if (!m_cred.store(m_target.c_str(), &pEapError)) {
                     if (pEapError) {
