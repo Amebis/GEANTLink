@@ -219,9 +219,6 @@ wxTTLSCredentialsPanel::wxTTLSCredentialsPanel(const eap::config_provider &prov,
     wxBoxSizer* sb_content;
     sb_content = new wxBoxSizer( wxVERTICAL );
 
-    if (m_prov.m_read_only)
-        sb_content->Add(new wxEAPProviderLockedPanel(m_prov, this), 0, wxALL|wxEXPAND, 5);
-
     m_inner_title = new wxStaticText(this, wxID_ANY, _("Inner Authentication"), wxDefaultPosition, wxDefaultSize, 0);
     m_inner_title->SetFont(wxFont(18, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxEmptyString));
     m_inner_title->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_INACTIVECAPTION ) );
