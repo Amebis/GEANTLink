@@ -224,7 +224,6 @@ namespace eap
             _Out_                                      EapPeerMethodOutput *pEapOutput,
             _Out_                                      EAP_ERROR           **ppEapError) = 0;
 
-
         ///
         /// Obtains a response packet from the EAP method.
         ///
@@ -237,23 +236,7 @@ namespace eap
         virtual bool get_response_packet(
             _Inout_                            DWORD     *pdwSendPacketSize,
             _Inout_bytecap_(*dwSendPacketSize) EapPacket *pSendPacket,
-            _Out_                              EAP_ERROR **ppEapError)
-        {
-            assert(pdwSendPacketSize);
-            assert(pSendPacket);
-            assert(ppEapError);
-
-            WORD size = m_packet.size();
-            if (size > *pdwSendPacketSize) {
-                *ppEapError = m_module.make_error(ERROR_INSUFFICIENT_BUFFER, winstd::string_printf(_T(__FUNCTION__) _T(" Packet buffer is too small (%uB required, %uB provided)."), m_packet.size(), *pdwSendPacketSize).c_str());
-                return false;
-            }
-            memcpy(pSendPacket, (const EapPacket*)m_packet, size);
-            *pdwSendPacketSize = size;
-
-            return true;
-        }
-
+            _Out_                              EAP_ERROR **ppEapError) = 0;
 
         ///
         /// Obtains the result of an authentication session from the EAP method.
@@ -366,13 +349,12 @@ namespace eap
         /// @}
 
     public:
-        module &m_module;                   ///< Reference of the EAP module
-        config_providers m_cfg;             ///< Session configuration
-        credentials_type m_cred;            ///< User credentials
-        winstd::eap_packet m_packet;        ///< Response packet
-        interactive_request_type m_intreq;  ///< Interactive UI request data
-        DWORD m_eap_flags;                  ///< A combination of EAP flags that describe the new EAP authentication session behavior
-        HANDLE m_token;                     ///< Specifies a handle to the user impersonation token to use in this session
-        DWORD m_send_packet_size_max;       ///< Specifies the maximum size in bytes of an EAP packet sent during the session. If the method needs to send a packet larger than the maximum size, the method must accommodate fragmentation and reassembly.
+        module &m_module;                           ///< Reference of the EAP module
+        config_providers m_cfg;                     ///< Session configuration
+        credentials_type m_cred;                    ///< User credentials
+        interactive_request_type m_intreq;          ///< Interactive UI request data
+        DWORD m_eap_flags;                          ///< A combination of EAP flags that describe the new EAP authentication session behavior
+        HANDLE m_token;                             ///< Specifies a handle to the user impersonation token to use in this session
+        DWORD m_send_packet_size_max;               ///< Specifies the maximum size in bytes of an EAP packet sent during the session. If the method needs to send a packet larger than the maximum size, the method must accommodate fragmentation and reassembly.
     };
 }

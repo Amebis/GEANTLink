@@ -376,11 +376,12 @@ DWORD APIENTRY EapPeerProcessRequestPacket(
 
     if (!hSession)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" hSession is NULL.")));
-    else if (!pReceivedPacket && dwReceivedPacketSize)
-        g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pReceivedPacket is NULL.")));
+    else if (!pReceivedPacket || dwReceivedPacketSize < 4)
+        g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pReceivedPacket is NULL or too short.")));
     else if (!pEapOutput)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pEapOutput is NULL.")));
     else {
+        assert(dwReceivedPacketSize == ntohs(*(WORD*)pReceivedPacket->Length));
         if (!static_cast<_EAPMETHOD_SESSION*>(hSession)->process_request_packet(dwReceivedPacketSize, pReceivedPacket, pEapOutput, ppEapError)) {
             if (*ppEapError) {
                 g_peer.log_error(*ppEapError);

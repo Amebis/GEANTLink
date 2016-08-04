@@ -93,6 +93,7 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)EventsETW.h;$(IntDir)EventsETW.rc;$(IntDir)EventsETW_MSG00001.bin;$(IntDir)EventsETWTEMP.BIN;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)EventsETW.h;$(IntDir)EventsETW.rc;$(IntDir)EventsETW_MSG00001.bin;$(IntDir)EventsETWTEMP.BIN;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)EventsETW.h;$(IntDir)EventsETW.rc;$(IntDir)EventsETW_MSG00001.bin;$(IntDir)EventsETWTEMP.BIN;%(Outputs)</Outputs>
+      <SubType>Designer</SubType>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

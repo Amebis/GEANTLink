@@ -22,6 +22,7 @@
 
 #include "../include/Config.h"
 #include "../include/Credentials.h"
+#include "../include/Session.h"
 
 #include "../../EAPBase/include/EAPXML.h"
 

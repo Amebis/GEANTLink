@@ -28,3 +28,5 @@
 #include "../../EAPBase/include/EAPXML.h"
 
 #include <WinStd/EAP.h>
+
+#include <EapHostError.h>
