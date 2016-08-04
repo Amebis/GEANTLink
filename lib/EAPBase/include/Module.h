@@ -66,7 +66,7 @@ namespace eap
         ///
         /// Constructs a module for the given EAP type
         ///
-        module(_In_ type_t eap_method);
+        module(_In_ winstd::eap_type_t eap_method);
 
         ///
         /// Destructs the module
@@ -649,7 +649,7 @@ namespace eap
 
     public:
         HINSTANCE m_instance;                   ///< Windows module instance
-        const type_t m_eap_method;              ///< EAP method type
+        const winstd::eap_type_t m_eap_method;  ///< EAP method type
 
     protected:
         winstd::heap m_heap;                    ///< Heap
@@ -685,7 +685,7 @@ namespace eap
         ///
         /// Constructs a EAP peer module for the given EAP type
         ///
-        peer_base(_In_ type_t eap_method) : module(eap_method) {}
+        peer_base(_In_ winstd::eap_type_t eap_method) : module(eap_method) {}
 
         ///
         /// Makes a new method config for the given method type
@@ -704,7 +704,7 @@ namespace eap
         ///
         /// Constructs a EAP peer module for the given EAP type
         ///
-        peer(_In_ type_t eap_method) : peer_base<_Tmeth, _Tcred, _Tint, _Tintres>(eap_method) {}
+        peer(_In_ winstd::eap_type_t eap_method) : peer_base<_Tmeth, _Tcred, _Tint, _Tintres>(eap_method) {}
 
         ///
         /// Initializes an EAP peer method for EAPHost.

@@ -42,7 +42,7 @@ namespace eap
         ///
         /// Constructs a EAP UI peer module for the given EAP type
         ///
-        peer_ui(_In_ type_t eap_method) : peer_base<_Tmeth, _Tcred, _Tint, _Tintres>(eap_method) {}
+        peer_ui(_In_ winstd::eap_type_t eap_method) : peer_base<_Tmeth, _Tcred, _Tint, _Tintres>(eap_method) {}
 
         ///
         /// Raises the EAP method's specific connection configuration user interface dialog on the client.

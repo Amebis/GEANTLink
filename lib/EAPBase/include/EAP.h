@@ -28,6 +28,7 @@
 #if !defined(RC_INVOKED) && !defined(MIDL_PASS)
 
 #include <WinStd/Crypt.h>
+#include <WinStd/EAP.h>
 
 #include <sal.h>
 
@@ -38,13 +39,6 @@
 
 namespace eap
 {
-    ///
-    /// EAP method numbers
-    ///
-    /// \sa [Extensible Authentication Protocol (EAP) Registry (Chapter: Method Types)](https://www.iana.org/assignments/eap-numbers/eap-numbers.xhtml#eap-numbers-4)
-    ///
-    enum type_t;
-
     ///
     /// Output BLOB cursor
     ///
@@ -316,7 +310,7 @@ inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ winstd::cert_contex
 /// \param[inout] cursor  Memory cursor
 /// \param[in]    val     EAP method type to pack
 ///
-inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const eap::type_t &val);
+inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const winstd::eap_type_t &val);
 
 ///
 /// Returns packed size of an EAP method type
@@ -325,7 +319,7 @@ inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const eap::type_t &
 ///
 /// \returns Size of data when packed (in bytes)
 ///
-inline size_t pksizeof(const eap::type_t &val);
+inline size_t pksizeof(const winstd::eap_type_t &val);
 
 ///
 /// Unpacks an EAP method type
@@ -333,22 +327,13 @@ inline size_t pksizeof(const eap::type_t &val);
 /// \param[inout] cursor  Memory cursor
 /// \param[out]   val     EAP method type to unpack to
 ///
-inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ eap::type_t &val);
+inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ winstd::eap_type_t &val);
 
 #pragma once
 
 
 namespace eap
 {
-    enum type_t {
-        type_undefined = 0,      ///< Undefined EAP type
-        type_tls       = 13,     ///< EAP-TLS
-        type_ttls      = 21,     ///< EAP-TTLS
-        type_peap      = 25,     ///< EAP-PEAP
-        type_mschapv2  = 26,     ///< EAP-MSCHAPv2
-        type_pap       = 192,    ///< PAP (Not actually an EAP method; Moved to the Unassigned area)
-    };
-
     struct cursor_out
     {
         typedef unsigned char *ptr_type;
@@ -680,23 +665,23 @@ inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ winstd::cert_contex
 }
 
 
-inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const eap::type_t &val)
+inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const winstd::eap_type_t &val)
 {
     cursor << (unsigned char)val;
 }
 
 
-inline size_t pksizeof(_In_ const eap::type_t &val)
+inline size_t pksizeof(_In_ const winstd::eap_type_t &val)
 {
     return pksizeof((unsigned char)val);
 }
 
 
-inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ eap::type_t &val)
+inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ winstd::eap_type_t &val)
 {
     unsigned char t;
     cursor >> t;
-    val = (eap::type_t)t;
+    val = (winstd::eap_type_t)t;
 }
 
 #endif

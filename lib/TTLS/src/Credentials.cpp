@@ -167,14 +167,14 @@ void eap::credentials_ttls::operator<<(_Inout_ cursor_out &cursor) const
     cursor << m_outer;
     if (m_inner) {
         if (dynamic_cast<credentials_pap*>(m_inner.get())) {
-            cursor << type_pap;
+            cursor << eap_type_pap;
             cursor << *m_inner;
         } else {
             assert(0); // Unsupported inner authentication method type.
-            cursor << type_undefined;
+            cursor << eap_type_undefined;
         }
     } else
-        cursor << type_undefined;
+        cursor << eap_type_undefined;
 }
 
 
@@ -184,14 +184,14 @@ size_t eap::credentials_ttls::get_pk_size() const
     if (m_inner) {
         if (dynamic_cast<credentials_pap*>(m_inner.get())) {
             size_inner =
-                pksizeof(type_pap) +
+                pksizeof(eap_type_pap) +
                 pksizeof(*m_inner);
         } else {
             assert(0); // Unsupported inner authentication method type.
-            size_inner = pksizeof(type_undefined);
+            size_inner = pksizeof(eap_type_undefined);
         }
     } else
-        size_inner = pksizeof(type_undefined);
+        size_inner = pksizeof(eap_type_undefined);
 
     return
         credentials::get_pk_size() +
@@ -205,10 +205,10 @@ void eap::credentials_ttls::operator>>(_Inout_ cursor_in &cursor)
     credentials::operator>>(cursor);
     cursor >> m_outer;
 
-    type_t eap_type;
+    eap_type_t eap_type;
     cursor >> eap_type;
     switch (eap_type) {
-        case type_pap:
+        case eap_type_pap:
             m_inner.reset(new credentials_pap(m_module));
             cursor >> *m_inner;
             break;

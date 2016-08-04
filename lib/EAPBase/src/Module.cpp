@@ -28,7 +28,7 @@ using namespace winstd;
 // eap::module
 //////////////////////////////////////////////////////////////////////
 
-eap::module::module(type_t eap_method) :
+eap::module::module(eap_type_t eap_method) :
     m_eap_method(eap_method),
     m_instance(NULL)
 {

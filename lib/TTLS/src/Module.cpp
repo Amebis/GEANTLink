@@ -28,7 +28,7 @@ using namespace winstd;
 // eap::peer_ttls
 //////////////////////////////////////////////////////////////////////
 
-eap::peer_ttls::peer_ttls() : peer<config_method_ttls, credentials_ttls, bool, bool>(type_ttls)
+eap::peer_ttls::peer_ttls() : peer<config_method_ttls, credentials_ttls, bool, bool>(eap_type_ttls)
 {
 }
 

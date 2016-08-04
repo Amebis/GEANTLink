@@ -25,7 +25,7 @@
 // eap::peer_ttls_ui
 //////////////////////////////////////////////////////////////////////
 
-eap::peer_ttls_ui::peer_ttls_ui() : peer_ui<eap::config_method_ttls, eap::credentials_ttls, bool, bool>(type_ttls)
+eap::peer_ttls_ui::peer_ttls_ui() : peer_ui<eap::config_method_ttls, eap::credentials_ttls, bool, bool>(winstd::eap_type_ttls)
 {
 }
 

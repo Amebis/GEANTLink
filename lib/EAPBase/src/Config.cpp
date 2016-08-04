@@ -429,7 +429,7 @@ bool eap::config_provider::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR *
         // Check EAP method type (<EAPMethod>).
         DWORD dwMethodID;
         if (eapxml::get_element_value(pXmlElMethod, bstr(L"eap-metadata:EAPMethod"), &dwMethodID) == ERROR_SUCCESS) {
-            if ((type_t)dwMethodID != cfg->get_method_id()) {
+            if ((eap_type_t)dwMethodID != cfg->get_method_id()) {
                 // Wrong type.
                 continue;
             }

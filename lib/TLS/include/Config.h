@@ -164,7 +164,7 @@ namespace eap
         ///
         /// \returns `eap::type_tls`
         ///
-        virtual eap::type_t get_method_id() const;
+        virtual winstd::eap_type_t get_method_id() const;
 
         ///
         /// Adds CA to the list of trusted root CA's

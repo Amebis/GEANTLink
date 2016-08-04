@@ -20,6 +20,9 @@
 
 #include "StdAfx.h"
 
+using namespace std;
+using namespace winstd;
+
 
 //////////////////////////////////////////////////////////////////////
 // eap::config_method_pap
@@ -66,7 +69,7 @@ eap::config* eap::config_method_pap::clone() const
 }
 
 
-eap::type_t eap::config_method_pap::get_method_id() const
+eap_type_t eap::config_method_pap::get_method_id() const
 {
-    return eap::type_pap;
+    return eap_type_pap;
 }

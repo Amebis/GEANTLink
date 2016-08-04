@@ -281,9 +281,9 @@ void eap::config_method_tls::operator>>(_Inout_ cursor_in &cursor)
 }
 
 
-eap::type_t eap::config_method_tls::get_method_id() const
+eap_type_t eap::config_method_tls::get_method_id() const
 {
-    return type_tls;
+    return eap_type_tls;
 }
 
 

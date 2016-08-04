@@ -148,7 +148,7 @@ namespace eap {
         ///
         /// \returns `eap::type_ttls`
         ///
-        virtual eap::type_t get_method_id() const;
+        virtual winstd::eap_type_t get_method_id() const;
 
         ///
         /// Generates public identity using current configuration and given credentials

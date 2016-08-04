@@ -251,9 +251,9 @@ namespace eap
         ///
         /// Returns EAP method type of this configuration
         ///
-        /// \returns One of `eap::type_t` constants.
+        /// \returns One of `winstd::eap_type_t` constants.
         ///
-        virtual type_t get_method_id() const = 0;
+        virtual winstd::eap_type_t get_method_id() const = 0;
     };
 
 
