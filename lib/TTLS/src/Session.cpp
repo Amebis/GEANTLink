@@ -79,20 +79,6 @@ bool eap::session_ttls::process_request_packet(
 }
 
 
-bool eap::session_ttls::get_response_packet(
-    _Inout_                            DWORD     *pdwSendPacketSize,
-    _Inout_bytecap_(*dwSendPacketSize) EapPacket *pSendPacket,
-    _Out_                              EAP_ERROR **ppEapError)
-{
-    UNREFERENCED_PARAMETER(pdwSendPacketSize);
-    UNREFERENCED_PARAMETER(pSendPacket);
-    assert(ppEapError);
-
-    *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
-    return false;
-}
-
-
 bool eap::session_ttls::get_result(
     _In_  EapPeerMethodResultReason reason,
     _Out_ EapPeerMethodResult       *ppResult,

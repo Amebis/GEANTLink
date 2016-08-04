@@ -23,6 +23,7 @@
 using namespace std;
 using namespace winstd;
 
+#pragma comment(lib, "Ws2_32.lib")
 
 #if EAPMETHOD_TYPE==21
 #define _EAPMETHOD_PEER    eap::peer_ttls

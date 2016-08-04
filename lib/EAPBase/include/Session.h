@@ -30,6 +30,8 @@ namespace eap
 
 #include "Module.h"
 
+#include <WinStd/EAP.h>
+
 #include <Windows.h>
 #include <eaptypes.h> // Must include after <Windows.h>
 extern "C" {
@@ -235,7 +237,22 @@ namespace eap
         virtual bool get_response_packet(
             _Inout_                            DWORD     *pdwSendPacketSize,
             _Inout_bytecap_(*dwSendPacketSize) EapPacket *pSendPacket,
-            _Out_                              EAP_ERROR **ppEapError) = 0;
+            _Out_                              EAP_ERROR **ppEapError)
+        {
+            assert(pdwSendPacketSize);
+            assert(pSendPacket);
+            assert(ppEapError);
+
+            WORD size = m_packet.size();
+            if (size > *pdwSendPacketSize) {
+                *ppEapError = m_module.make_error(ERROR_INSUFFICIENT_BUFFER, winstd::string_printf(_T(__FUNCTION__) _T(" Packet buffer is too small (%uB required, %uB provided)."), m_packet.size(), *pdwSendPacketSize).c_str());
+                return false;
+            }
+            memcpy(pSendPacket, (const EapPacket*)m_packet, size);
+            *pdwSendPacketSize = size;
+
+            return true;
+        }
 
 
         ///
@@ -352,6 +369,7 @@ namespace eap
         module &m_module;                   ///< Reference of the EAP module
         config_providers m_cfg;             ///< Session configuration
         credentials_type m_cred;            ///< User credentials
+        winstd::eap_packet m_packet;        ///< Response packet
         interactive_request_type m_intreq;  ///< Interactive UI request data
         DWORD m_eap_flags;                  ///< A combination of EAP flags that describe the new EAP authentication session behavior
         HANDLE m_token;                     ///< Specifies a handle to the user impersonation token to use in this session
