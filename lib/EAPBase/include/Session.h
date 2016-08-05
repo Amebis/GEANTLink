@@ -349,12 +349,12 @@ namespace eap
         /// @}
 
     public:
-        module &m_module;                           ///< Reference of the EAP module
-        config_providers m_cfg;                     ///< Session configuration
-        credentials_type m_cred;                    ///< User credentials
-        interactive_request_type m_intreq;          ///< Interactive UI request data
-        DWORD m_eap_flags;                          ///< A combination of EAP flags that describe the new EAP authentication session behavior
-        HANDLE m_token;                             ///< Specifies a handle to the user impersonation token to use in this session
-        DWORD m_send_packet_size_max;               ///< Specifies the maximum size in bytes of an EAP packet sent during the session. If the method needs to send a packet larger than the maximum size, the method must accommodate fragmentation and reassembly.
+        module &m_module;                   ///< Reference of the EAP module
+        config_providers m_cfg;             ///< Providers configuration
+        credentials_type m_cred;            ///< User credentials
+        interactive_request_type m_intreq;  ///< Interactive UI request data
+        DWORD m_eap_flags;                  ///< A combination of EAP flags that describe the new EAP authentication session behavior
+        HANDLE m_token;                     ///< Specifies a handle to the user impersonation token to use in this session
+        DWORD m_send_packet_size_max;       ///< Specifies the maximum size in bytes of an EAP packet sent during the session. If the method needs to send a packet larger than the maximum size, the method must accommodate fragmentation and reassembly.
     };
 }

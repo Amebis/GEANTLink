@@ -21,31 +21,31 @@
 namespace eap
 {
     ///
-    /// TTLS session
-    ///
-    class session_ttls;
-
-
-    ///
     /// EAP-TTLS packet flags
     ///
     /// \sa [Extensible Authentication Protocol Tunneled Transport Layer Security Authenticated Protocol Version 0 (EAP-TTLSv0) (Chapter: 9.1 Packet Format)](https://tools.ietf.org/html/rfc5281#section-9.1)
     ///
     enum ttls_flags_t;
+
+    ///
+    /// TTLS session
+    ///
+    class session_ttls;
 }
 
 #pragma once
 
+#include "../../TLS/include/Session.h"
 #include "../../EAPBase/include/Session.h"
 
 
 namespace eap
 {
     enum ttls_flags_t {
-        ttls_flags_length_incl = 0x80,  ///< Length included
-        ttls_flags_more_frag   = 0x40,  ///< More fragments
-        ttls_flags_start       = 0x20,  ///< Start
-        ttls_flags_ver_mask    = 0x07,  ///< Version mask
+        ttls_flags_length_incl = tls_flags_length_incl, ///< Length included
+        ttls_flags_more_frag   = tls_flags_more_frag,   ///< More fragments
+        ttls_flags_start       = tls_flags_start,       ///< Start
+        ttls_flags_ver_mask    = 0x07,                  ///< Version mask
     };
 
 
@@ -90,27 +90,6 @@ namespace eap
         /// \returns Reference to this object
         ///
         session_ttls& operator=(_Inout_ session_ttls &&other);
-
-        /// \name Session start/end
-        /// @{
-
-        ///
-        /// Starts an EAP authentication session on the peer EAPHost using the EAP method.
-        ///
-        /// \sa [EapPeerBeginSession function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363600.aspx)
-        ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool begin(
-            _In_        DWORD         dwFlags,
-            _In_  const EapAttributes *pAttributeArray,
-            _In_        HANDLE        hTokenImpersonateUser,
-            _In_        DWORD         dwMaxSendPacketSize,
-            _Out_       EAP_ERROR     **ppEapError);
-
-        /// @}
 
         /// \name Packet processing
         /// @{
@@ -161,21 +140,8 @@ namespace eap
         /// @}
 
     public:
-        enum phase_t {
-            phase_handshake_start = 0,
-        } m_phase;                                  ///< Session phase
-
         enum version_t {
             version_0 = 0,                          ///< EAP-TTLS v0
         } m_version;                                ///< EAP-TTLS version
-
-        struct {
-            EapCode m_code;                         ///< Packet code
-            BYTE m_id;                              ///< Packet ID
-            BYTE m_flags;                           ///< Packet flags
-            std::vector<BYTE> m_data;               ///< Packet data
-        }
-            m_packet_req,                           ///< Request packet
-            m_packet_res;                           ///< Response packet
     };
 }

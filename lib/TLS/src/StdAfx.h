@@ -27,3 +27,6 @@
 #include "../../EAPBase/include/EAPXML.h"
 
 #include <WinStd/Cred.h>
+#include <WinStd/EAP.h>
+
+#include <EapHostError.h>

@@ -21,6 +21,18 @@
 namespace eap
 {
     ///
+    /// TLS random
+    ///
+    typedef unsigned char tls_random_t[32];
+
+    ///
+    /// EAP-TLS packet flags
+    ///
+    /// \sa [The EAP-TLS Authentication Protocol (Chapter: 3.1 EAP-TLS Request Packet)](https://tools.ietf.org/html/rfc5216#section-3.1)
+    ///
+    enum tls_flags_t;
+
+    ///
     /// TLS session
     ///
     class session_tls;
@@ -33,11 +45,21 @@ namespace eap
 
 #include "../../EAPBase/include/Session.h"
 
+#include <WinStd/Common.h>
 #include <WinStd/Crypt.h>
+
+#include <vector>
 
 
 namespace eap
 {
+    enum tls_flags_t {
+        tls_flags_length_incl = 0x80,  ///< Length included
+        tls_flags_more_frag   = 0x40,  ///< More fragments
+        tls_flags_start       = 0x20,  ///< Start
+    };
+
+
     class session_tls : public session<config_method_tls, credentials_tls, bool, bool>
     {
     public:
@@ -61,6 +83,11 @@ namespace eap
         /// \param[in] other  Session to move from
         ///
         session_tls(_Inout_ session_tls &&other);
+
+        ///
+        /// Destructor
+        ///
+        virtual ~session_tls();
 
         ///
         /// Copies TLS session
@@ -92,12 +119,12 @@ namespace eap
         /// - \c true if succeeded
         /// - \c false otherwise. See \p ppEapError for details.
         ///
-        //virtual bool begin(
-        //    _In_        DWORD         dwFlags,
-        //    _In_  const EapAttributes *pAttributeArray,
-        //    _In_        HANDLE        hTokenImpersonateUser,
-        //    _In_        DWORD         dwMaxSendPacketSize,
-        //    _Out_       EAP_ERROR     **ppEapError);
+        virtual bool begin(
+            _In_        DWORD         dwFlags,
+            _In_  const EapAttributes *pAttributeArray,
+            _In_        HANDLE        hTokenImpersonateUser,
+            _In_        DWORD         dwMaxSendPacketSize,
+            _Out_       EAP_ERROR     **ppEapError);
 
         /// @}
 
@@ -120,6 +147,20 @@ namespace eap
             _Out_                                      EAP_ERROR           **ppEapError);
 
         ///
+        /// Obtains a response packet from the EAP method.
+        ///
+        /// \sa [EapPeerGetResponsePacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363610.aspx)
+        ///
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
+        ///
+        virtual bool get_response_packet(
+            _Inout_                            DWORD     *pdwSendPacketSize,
+            _Inout_bytecap_(*dwSendPacketSize) EapPacket *pSendPacket,
+            _Out_                              EAP_ERROR **ppEapError);
+
+        ///
         /// Obtains the result of an authentication session from the EAP method.
         ///
         /// \sa [EapPeerGetResult function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363611.aspx)
@@ -136,6 +177,24 @@ namespace eap
         /// @}
 
     public:
-        winstd::crypt_prov m_cp;    ///< Cryptography provider
+        enum phase_t {
+            phase_handshake_start = 0,
+        } m_phase;                                  ///< Session phase
+
+        struct {
+            EapCode m_code;                         ///< Packet code
+            BYTE m_id;                              ///< Packet ID
+            BYTE m_flags;                           ///< Packet flags
+            std::vector<BYTE> m_data;               ///< Packet data
+        }
+            m_packet_req,                           ///< Request packet
+            m_packet_res;                           ///< Response packet
+
+        winstd::crypt_prov m_cp;        ///< Cryptography provider
+
+        tls_random_t m_random_client;   ///< Client random
+        tls_random_t m_random_server;   ///< Server random
+
+        std::vector<unsigned char, winstd::sanitizing_allocator<unsigned char> > m_session_id;  ///< TLS session ID
     };
 }
