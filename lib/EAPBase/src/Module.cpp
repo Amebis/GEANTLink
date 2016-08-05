@@ -128,6 +128,12 @@ void eap::module::log_error(_In_ const EAP_ERROR *err) const
 }
 
 
+eap::config_method* eap::module::make_config_method()
+{
+    return NULL;
+}
+
+
 bool eap::module::encrypt(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _Out_ std::vector<unsigned char> &enc, _Out_ EAP_ERROR **ppEapError, _Out_opt_ HCRYPTHASH hHash) const
 {
     assert(ppEapError);

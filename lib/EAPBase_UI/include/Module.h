@@ -42,6 +42,8 @@ namespace eap
         ///
         /// Constructs a EAP UI peer module for the given EAP type
         ///
+        /// \param[in] eap_method  EAP method type ID
+        ///
         peer_ui(_In_ winstd::eap_type_t eap_method) : peer_base<_Tmeth, _Tcred, _Tint, _Tintres>(eap_method) {}
 
         ///

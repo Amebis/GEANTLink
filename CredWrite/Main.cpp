@@ -23,7 +23,7 @@
 using namespace std;
 using namespace winstd;
 
-eap::peer_base<eap::config_method_pap, eap::credentials_pap, void, void> g_module(eap_type_undefined);
+eap::module g_module;
 
 
 static int CredWrite()

@@ -66,7 +66,9 @@ namespace eap
         ///
         /// Constructs a module for the given EAP type
         ///
-        module(_In_ winstd::eap_type_t eap_method);
+        /// \param[in] eap_method  EAP method type ID
+        ///
+        module(_In_ winstd::eap_type_t eap_method = winstd::eap_type_undefined);
 
         ///
         /// Destructs the module
@@ -99,7 +101,7 @@ namespace eap
         ///
         /// Makes a new method config for the given method type
         ///
-        virtual config_method* make_config_method() = 0;
+        virtual config_method* make_config_method();
 
         /// @}
 
@@ -685,6 +687,8 @@ namespace eap
         ///
         /// Constructs a EAP peer module for the given EAP type
         ///
+        /// \param[in] eap_method  EAP method type ID
+        ///
         peer_base(_In_ winstd::eap_type_t eap_method) : module(eap_method) {}
 
         ///
@@ -703,6 +707,8 @@ namespace eap
     public:
         ///
         /// Constructs a EAP peer module for the given EAP type
+        ///
+        /// \param[in] eap_method  EAP method type ID
         ///
         peer(_In_ winstd::eap_type_t eap_method) : peer_base<_Tmeth, _Tcred, _Tint, _Tintres>(eap_method) {}
 
