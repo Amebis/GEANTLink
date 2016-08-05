@@ -49,7 +49,7 @@ namespace eap
     };
 
 
-    class session_ttls : public session<config_method_ttls, credentials_ttls, bool, bool>
+    class session_ttls : public session<credentials_ttls, bool, bool>
     {
     public:
         ///

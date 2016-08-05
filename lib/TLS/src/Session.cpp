@@ -30,7 +30,7 @@ using namespace winstd;
 
 eap::session_tls::session_tls(_In_ module *mod) :
     m_phase(phase_handshake_start),
-    session<config_method_tls, credentials_tls, bool, bool>(mod)
+    session<credentials_tls, bool, bool>(mod)
 {
     m_packet_req.m_code  = (EapCode)0;
     m_packet_req.m_id    = 0;
@@ -48,7 +48,7 @@ eap::session_tls::session_tls(_In_ module *mod) :
 eap::session_tls::session_tls(_In_ const session_tls &other) :
     m_phase(other.m_phase),
     m_session_id(other.m_session_id),
-    session<config_method_tls, credentials_tls, bool, bool>(other)
+    session<credentials_tls, bool, bool>(other)
 {
     m_packet_req.m_code  = other.m_packet_req.m_code ;
     m_packet_req.m_id    = other.m_packet_req.m_id   ;
@@ -68,7 +68,7 @@ eap::session_tls::session_tls(_In_ const session_tls &other) :
 eap::session_tls::session_tls(_Inout_ session_tls &&other) :
     m_phase(std::move(other.m_phase)),
     m_session_id(std::move(other.m_session_id)),
-    session<config_method_tls, credentials_tls, bool, bool>(std::move(other))
+    session<credentials_tls, bool, bool>(std::move(other))
 {
     m_packet_req.m_code  = std::move(other.m_packet_req.m_code );
     m_packet_req.m_id    = std::move(other.m_packet_req.m_id   );
@@ -95,7 +95,7 @@ eap::session_tls::~session_tls()
 eap::session_tls& eap::session_tls::operator=(_In_ const session_tls &other)
 {
     if (this != &other) {
-        (session<config_method_tls, credentials_tls, bool, bool>&)*this = other;
+        (session<credentials_tls, bool, bool>&)*this = other;
         m_phase              = other.m_phase;
 
         m_packet_req.m_code  = other.m_packet_req.m_code ;
@@ -121,7 +121,7 @@ eap::session_tls& eap::session_tls::operator=(_In_ const session_tls &other)
 eap::session_tls& eap::session_tls::operator=(_Inout_ session_tls &&other)
 {
     if (this != &other) {
-        (session<config_method_tls, credentials_tls, bool, bool>&)*this = std::move(other);
+        (session<credentials_tls, bool, bool>&)*this = std::move(other);
         m_phase              = std::move(other.m_phase);
 
         m_packet_req.m_code  = std::move(other.m_packet_req.m_code );
@@ -156,7 +156,7 @@ bool eap::session_tls::begin(
         return false;
     }
 
-    return session<config_method_tls, credentials_tls, bool, bool>::begin(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize, ppEapError);
+    return session<credentials_tls, bool, bool>::begin(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize, ppEapError);
 }
 
 

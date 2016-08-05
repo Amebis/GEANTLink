@@ -32,7 +32,7 @@ namespace eap
     ///
     /// A group of methods all EAP peers must or should implement.
     ///
-    template <class _Tmeth, class _Tcred, class _Tint, class _Tintres> class peer;
+    template <class _Tcred, class _Tint, class _Tintres> class peer;
 }
 
 #pragma once
@@ -652,15 +652,10 @@ namespace eap
     };
 
 
-    template <class _Tmeth, class _Tcred, class _Tint, class _Tintres>
+    template <class _Tcred, class _Tint, class _Tintres>
     class peer : public module
     {
     public:
-        ///
-        /// Method configuration data type
-        ///
-        typedef _Tmeth config_method_type;
-
         ///
         /// Credentials data type
         ///

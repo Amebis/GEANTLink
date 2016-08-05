@@ -60,7 +60,7 @@ namespace eap
     };
 
 
-    class session_tls : public session<config_method_tls, credentials_tls, bool, bool>
+    class session_tls : public session<credentials_tls, bool, bool>
     {
     public:
         ///

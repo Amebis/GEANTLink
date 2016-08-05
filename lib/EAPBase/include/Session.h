@@ -23,7 +23,7 @@ namespace eap
     ///
     /// EAP session
     ///
-    template <class _Tmeth, class _Tcred, class _Tint, class _Tintres> class session;
+    template <class _Tcred, class _Tint, class _Tintres> class session;
 }
 
 #pragma once
@@ -42,15 +42,10 @@ extern "C" {
 
 namespace eap
 {
-    template <class _Tmeth, class _Tcred, class _Tint, class _Tintres>
+    template <class _Tcred, class _Tint, class _Tintres>
     class session
     {
     public:
-        ///
-        /// Method configuration data type
-        ///
-        typedef _Tmeth config_method_type;
-
         ///
         /// Credentials data type
         ///

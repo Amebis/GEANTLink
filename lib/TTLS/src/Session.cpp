@@ -30,21 +30,21 @@ using namespace winstd;
 
 eap::session_ttls::session_ttls(_In_ module *mod) :
     m_version(version_0),
-    session<config_method_ttls, credentials_ttls, bool, bool>(mod)
+    session<credentials_ttls, bool, bool>(mod)
 {
 }
 
 
 eap::session_ttls::session_ttls(_In_ const session_ttls &other) :
     m_version(other.m_version),
-    session<config_method_ttls, credentials_ttls, bool, bool>(other)
+    session<credentials_ttls, bool, bool>(other)
 {
 }
 
 
 eap::session_ttls::session_ttls(_Inout_ session_ttls &&other) :
     m_version(std::move(other.m_version)),
-    session<config_method_ttls, credentials_ttls, bool, bool>(std::move(other))
+    session<credentials_ttls, bool, bool>(std::move(other))
 {
 }
 
@@ -52,7 +52,7 @@ eap::session_ttls::session_ttls(_Inout_ session_ttls &&other) :
 eap::session_ttls& eap::session_ttls::operator=(_In_ const session_ttls &other)
 {
     if (this != &other) {
-        (session<config_method_ttls, credentials_ttls, bool, bool>&)*this = other;
+        (session<credentials_ttls, bool, bool>&)*this = other;
         m_version = other.m_version;
     }
 
@@ -63,7 +63,7 @@ eap::session_ttls& eap::session_ttls::operator=(_In_ const session_ttls &other)
 eap::session_ttls& eap::session_ttls::operator=(_Inout_ session_ttls &&other)
 {
     if (this != &other) {
-        (session<config_method_ttls, credentials_ttls, bool, bool>&)*this = std::move(other);
+        (session<credentials_ttls, bool, bool>&)*this = std::move(other);
         m_version = std::move(other.m_version);
     }
 
