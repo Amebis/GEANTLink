@@ -66,9 +66,9 @@ namespace eap
         ///
         /// Constructor
         ///
-        /// \param[in] mod  Reference of the EAP module to use for global services
+        /// \param[in] mod  EAP module to use for global services
         ///
-        session_tls(_In_ module &mod);
+        session_tls(_In_ module *mod);
 
         ///
         /// Copies TLS session

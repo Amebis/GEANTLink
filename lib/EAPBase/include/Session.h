@@ -70,9 +70,9 @@ namespace eap
         ///
         /// Constructs a session
         ///
-        /// \param[in] mod  Reference of the EAP module to use for global services
+        /// \param[in] mod  EAP module to use for global services
         ///
-        session(_In_ module &mod) :
+        session(_In_ module *mod) :
             m_module(mod),
             m_cfg(mod),
             m_cred(mod),
@@ -299,7 +299,7 @@ namespace eap
             UNREFERENCED_PARAMETER(pEapOutput);
             assert(ppEapError);
 
-            *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
+            *ppEapError = m_module->make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
             return false;
         }
 
@@ -322,7 +322,7 @@ namespace eap
             UNREFERENCED_PARAMETER(pAttribs);
             assert(ppEapError);
 
-            *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
+            *ppEapError = m_module->make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
             return false;
         }
 
@@ -342,14 +342,14 @@ namespace eap
             UNREFERENCED_PARAMETER(pEapOutput);
             assert(ppEapError);
 
-            *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
+            *ppEapError = m_module->make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
             return false;
         }
 
         /// @}
 
     public:
-        module &m_module;                   ///< Reference of the EAP module
+        module *m_module;                   ///< EAP module
         config_providers m_cfg;             ///< Providers configuration
         credentials_type m_cred;            ///< User credentials
         interactive_request_type m_intreq;  ///< Interactive UI request data

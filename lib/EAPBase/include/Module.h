@@ -692,7 +692,7 @@ namespace eap
         ///
         virtual config_method* make_config_method()
         {
-            return new config_method_type(*this);
+            return new config_method_type(this);
         }
     };
 

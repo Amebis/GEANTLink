@@ -40,7 +40,7 @@ static int CredWrite()
         return -1;
     }
 
-    eap::credentials_pap cred(g_module);
+    eap::credentials_pap cred(&g_module);
 
     // Prepare identity (user name).
     {
@@ -84,7 +84,7 @@ static int CredWrite()
     EAP_ERROR *pEapError = NULL;
 #ifdef _DEBUG
     {
-        eap::credentials_pap cred_stored(g_module);
+        eap::credentials_pap cred_stored(&g_module);
         if (!cred_stored.retrieve(target_name.c_str(), &pEapError)) {
             if (pEapError) {
                 OutputDebugStr(_T("%ls (error %u)\n"), pEapError->pRootCauseString, pEapError->dwWinError);

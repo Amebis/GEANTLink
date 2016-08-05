@@ -25,7 +25,7 @@
 // eap::credentials_pap
 //////////////////////////////////////////////////////////////////////
 
-eap::credentials_pap::credentials_pap(_In_ module &mod) : credentials_pass(mod)
+eap::credentials_pap::credentials_pap(_In_ module *mod) : credentials_pass(mod)
 {
 }
 

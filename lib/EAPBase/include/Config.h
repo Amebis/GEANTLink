@@ -102,9 +102,9 @@ namespace eap
         ///
         /// Constructs configuration
         ///
-        /// \param[in] mod  Reference of the EAP module to use for global services
+        /// \param[in] mod  EAP module to use for global services
         ///
-        config(_In_ module &mod);
+        config(_In_ module *mod);
 
         ///
         /// Copies configuration
@@ -202,7 +202,7 @@ namespace eap
         /// @}
 
     public:
-        module &m_module;   ///< Reference of the EAP module
+        module *m_module;   ///< EAP module
     };
 
 
@@ -212,9 +212,9 @@ namespace eap
         ///
         /// Constructs configuration
         ///
-        /// \param[in] mod  Reference of the EAP module to use for global services
+        /// \param[in] mod  EAP module to use for global services
         ///
-        config_method(_In_ module &mod);
+        config_method(_In_ module *mod);
 
         ///
         /// Copies configuration
@@ -264,9 +264,9 @@ namespace eap
         ///
         /// Constructs configuration
         ///
-        /// \param[in] mod  Reference of the EAP module to use for global services
+        /// \param[in] mod  EAP module to use for global services
         ///
-        config_method_with_cred(_In_ module &mod) :
+        config_method_with_cred(_In_ module *mod) :
             m_allow_save(true),
             m_use_preshared(false),
             m_preshared(mod),
@@ -369,13 +369,13 @@ namespace eap
             // <ClientSideCredential>
             winstd::com_obj<IXMLDOMElement> pXmlElClientSideCredential;
             if ((dwResult = eapxml::create_element(pDoc, pConfigRoot, winstd::bstr(L"eap-metadata:ClientSideCredential"), winstd::bstr(L"ClientSideCredential"), bstrNamespace, &pXmlElClientSideCredential)) != ERROR_SUCCESS) {
-                *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <ClientSideCredential> element."));
+                *ppEapError = m_module->make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <ClientSideCredential> element."));
                 return false;
             }
 
             // <ClientSideCredential>/<allow-save>
             if ((dwResult = eapxml::put_element_value(pDoc, pXmlElClientSideCredential, winstd::bstr(L"allow-save"), bstrNamespace, m_allow_save)) != ERROR_SUCCESS) {
-                *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <allow-save> element."));
+                *ppEapError = m_module->make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <allow-save> element."));
                 return false;
             }
 
@@ -411,7 +411,7 @@ namespace eap
 
                 // <allow-save>
                 eapxml::get_element_value(pXmlElClientSideCredential, winstd::bstr(L"eap-metadata:allow-save"), &m_allow_save);
-                m_module.log_config((xpath + L"/allow-save").c_str(), m_allow_save);
+                m_module->log_config((xpath + L"/allow-save").c_str(), m_allow_save);
 
                 _Tcred preshared(m_module);
                 if (preshared.load(pXmlElClientSideCredential, ppEapError)) {
@@ -420,7 +420,7 @@ namespace eap
                 } else {
                     // This is not really an error - merely an indication pre-shared credentials are unavailable.
                     if (*ppEapError) {
-                        m_module.free_error_memory(*ppEapError);
+                        m_module->free_error_memory(*ppEapError);
                         *ppEapError = NULL;
                     }
                 }
@@ -491,9 +491,9 @@ namespace eap
         ///
         /// Constructs configuration
         ///
-        /// \param[in] mod  Reference of the EAP module to use for global services
+        /// \param[in] mod  EAP module to use for global services
         ///
-        config_provider(_In_ module &mod);
+        config_provider(_In_ module *mod);
 
         ///
         /// Copies configuration
@@ -610,9 +610,9 @@ namespace eap
         ///
         /// Constructs configuration
         ///
-        /// \param[in] mod  Reference of the EAP module to use for global services
+        /// \param[in] mod  EAP module to use for global services
         ///
-        config_providers(_In_ module &mod);
+        config_providers(_In_ module *mod);
 
         ///
         /// Copies configuration

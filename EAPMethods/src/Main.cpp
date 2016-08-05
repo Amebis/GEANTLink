@@ -237,8 +237,8 @@ DWORD APIENTRY EapPeerGetIdentity(
     else if (!ppwszIdentity)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" ppwszIdentity is NULL.")));
     else {
-        eap::config_providers cfg(g_peer);
-        _EAPMETHOD_PEER::credentials_type cred_in(g_peer), cred_out(g_peer);
+        eap::config_providers cfg(&g_peer);
+        _EAPMETHOD_PEER::credentials_type cred_in(&g_peer), cred_out(&g_peer);
         if (                  !g_peer.unpack(cfg, pConnectionData, dwConnectionDataSize, ppEapError) ||
             dwUserDataSize && !g_peer.unpack(cred_in, pUserData, dwUserDataSize, ppEapError) ||
                               !g_peer.get_identity(dwFlags, cfg, dwUserDataSize ? &cred_in : NULL, cred_out, hTokenImpersonateUser, pfInvokeUI, ppwszIdentity, ppEapError) ||
@@ -295,7 +295,7 @@ DWORD APIENTRY EapPeerBeginSession(
         *phSession = NULL;
 
         // Allocate new session.
-        unique_ptr<_EAPMETHOD_SESSION> session(new _EAPMETHOD_SESSION(g_peer));
+        unique_ptr<_EAPMETHOD_SESSION> session(new _EAPMETHOD_SESSION(&g_peer));
         if (!session) {
             g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_OUTOFMEMORY, _T(__FUNCTION__) _T(" Error allocating memory for EAP session.")));
             return dwResult;
@@ -686,8 +686,8 @@ DWORD WINAPI EapPeerGetMethodProperties(
     else if (!pMethodPropertyArray)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pMethodPropertyArray is NULL.")));
     else {
-        eap::config_providers cfg(g_peer);
-        _EAPMETHOD_PEER::credentials_type cred(g_peer);
+        eap::config_providers cfg(&g_peer);
+        _EAPMETHOD_PEER::credentials_type cred(&g_peer);
         if (!g_peer.unpack(cfg, pEapConnData, dwEapConnDataSize, ppEapError) ||
             !g_peer.unpack(cred, pUserData, dwUserDataSize, ppEapError) ||
             !g_peer.get_method_properties(
@@ -764,7 +764,7 @@ DWORD WINAPI EapPeerCredentialsXml2Blob(
 
         // Load credentials.
         pCredentialsDoc->setProperty(bstr(L"SelectionNamespaces"), variant(L"xmlns:eap-metadata=\"urn:ietf:params:xml:ns:yang:ietf-eap-metadata\""));
-        _EAPMETHOD_PEER::credentials_type cred(g_peer);
+        _EAPMETHOD_PEER::credentials_type cred(&g_peer);
         if (!cred.load(pXmlElCredentials, ppEapError) ||
             !g_peer.pack(cred, ppCredentialsOut, pdwCredentialsOutSize, ppEapError))
         {

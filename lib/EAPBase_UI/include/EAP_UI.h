@@ -434,7 +434,7 @@ protected:
                 if (pEapError) {
                     if (pEapError->dwWinError != ERROR_NOT_FOUND)
                         wxLogError(winstd::tstring_printf(_("Error reading credentials from Credential Manager: %ls (error %u)"), pEapError->pRootCauseString, pEapError->dwWinError).c_str());
-                    m_cred.m_module.free_error_memory(pEapError);
+                    m_cred.m_module->free_error_memory(pEapError);
                 } else
                     wxLogError(_("Reading credentials failed."));
             }
@@ -455,7 +455,7 @@ protected:
                 if (!m_cred.store(m_target.c_str(), &pEapError)) {
                     if (pEapError) {
                         wxLogError(winstd::tstring_printf(_("Error writing credentials to Credential Manager: %ls (error %u)"), pEapError->pRootCauseString, pEapError->dwWinError).c_str());
-                        m_cred.m_module.free_error_memory(pEapError);
+                        m_cred.m_module->free_error_memory(pEapError);
                     } else
                         wxLogError(_("Writing credentials failed."));
                 }

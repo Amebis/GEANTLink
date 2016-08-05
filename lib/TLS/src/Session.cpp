@@ -28,7 +28,7 @@ using namespace winstd;
 // eap::session_tls
 //////////////////////////////////////////////////////////////////////
 
-eap::session_tls::session_tls(_In_ module &mod) :
+eap::session_tls::session_tls(_In_ module *mod) :
     m_phase(phase_handshake_start),
     session<config_method_tls, credentials_tls, bool, bool>(mod)
 {
@@ -152,7 +152,7 @@ bool eap::session_tls::begin(
     _Out_       EAP_ERROR     **ppEapError)
 {
     if (dwMaxSendPacketSize <= 10) {
-        *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, wstring_printf(_T(__FUNCTION__) _T(" Maximum send packet size too small (expected: >%u, received: %u)."), 10, dwMaxSendPacketSize).c_str());
+        *ppEapError = m_module->make_error(ERROR_NOT_SUPPORTED, wstring_printf(_T(__FUNCTION__) _T(" Maximum send packet size too small (expected: >%u, received: %u)."), 10, dwMaxSendPacketSize).c_str());
         return false;
     }
 
@@ -176,10 +176,10 @@ bool eap::session_tls::process_request_packet(
 
     // Is this a valid EAP-TLS packet?
     if (dwReceivedPacketSize < 6) {
-        *ppEapError = m_module.make_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, _T(__FUNCTION__) _T(" Packet is too small. EAP-%s packets should be at least 6B."));
+        *ppEapError = m_module->make_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, _T(__FUNCTION__) _T(" Packet is too small. EAP-%s packets should be at least 6B."));
         return false;
     }/* else if (pReceivedPacket->Data[0] != eap_type_tls) {
-        *ppEapError = m_module.make_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, wstring_printf(_T(__FUNCTION__) _T(" Packet is not EAP-TLS (expected: %u, received: %u)."), eap_type_tls, pReceivedPacket->Data[0]).c_str());
+        *ppEapError = m_module->make_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, wstring_printf(_T(__FUNCTION__) _T(" Packet is not EAP-TLS (expected: %u, received: %u)."), eap_type_tls, pReceivedPacket->Data[0]).c_str());
         return false;
     }*/
 
@@ -187,7 +187,7 @@ bool eap::session_tls::process_request_packet(
         if (pReceivedPacket->Data[1] & tls_flags_length_incl) {
             // First fragment received.
             if (dwReceivedPacketSize < 10) {
-                *ppEapError = m_module.make_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, _T(__FUNCTION__) _T(" Packet is too small. EAP-TLS first fragmented packet should be at least 10B."));
+                *ppEapError = m_module->make_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, _T(__FUNCTION__) _T(" Packet is too small. EAP-TLS first fragmented packet should be at least 10B."));
                 return false;
             }
 
@@ -232,17 +232,17 @@ bool eap::session_tls::process_request_packet(
         case phase_handshake_start: {
             // Is this an EAP-TLS Start packet?
             if (m_packet_req.m_code != EapCodeRequest) {
-                *ppEapError = m_module.make_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, wstring_printf(_T(__FUNCTION__) _T(" Packet is not a request (expected: %x, received: %x)."), EapCodeRequest, m_packet_req.m_code).c_str());
+                *ppEapError = m_module->make_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, wstring_printf(_T(__FUNCTION__) _T(" Packet is not a request (expected: %x, received: %x)."), EapCodeRequest, m_packet_req.m_code).c_str());
                 return false;
             } else if (!(m_packet_req.m_flags & tls_flags_start)) {
-                *ppEapError = m_module.make_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, wstring_printf(_T(__FUNCTION__) _T(" Packet is not EAP-TLS Start (expected: %x, received: %x)."), tls_flags_start, m_packet_req.m_flags).c_str());
+                *ppEapError = m_module->make_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, wstring_printf(_T(__FUNCTION__) _T(" Packet is not EAP-TLS Start (expected: %x, received: %x)."), tls_flags_start, m_packet_req.m_flags).c_str());
                 return false;
             }
 
             //// Determine minimum EAP-TLS version supported by server and us.
             //version_t ver_remote = (version_t)(m_packet_req.m_flags & tls_flags_ver_mask);
             //m_version = std::min<version_t>(ver_remote, version_0);
-            //m_module.log_event(&EAPMETHOD_HANDSHAKE_START, event_data(m_cred.target_suffix()), event_data((unsigned char)m_version), event_data((unsigned char)ver_remote), event_data::blank);
+            //m_module->log_event(&EAPMETHOD_HANDSHAKE_START, event_data(m_cred.target_suffix()), event_data((unsigned char)m_version), event_data((unsigned char)ver_remote), event_data::blank);
 
             // Build response packet.
             m_packet_res.m_code  = EapCodeResponse;
@@ -251,14 +251,14 @@ bool eap::session_tls::process_request_packet(
 
 
             //if (!m_packet_res.create(EapCodeResponse, pReceivedPacket->Id, eap_type_tls, (BYTE)m_version)) {
-            //    *ppEapError = m_module.make_error(GetLastError(), _T(__FUNCTION__) _T(" Error creating packet."));
+            //    *ppEapError = m_module->make_error(GetLastError(), _T(__FUNCTION__) _T(" Error creating packet."));
             //    return false;
             //}
             break;
         }
 
         default:
-            *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
+            *ppEapError = m_module->make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
             return false;
     }
 
@@ -330,6 +330,6 @@ bool eap::session_tls::get_result(
     UNREFERENCED_PARAMETER(ppResult);
     assert(ppEapError);
 
-    *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
+    *ppEapError = m_module->make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
     return false;
 }

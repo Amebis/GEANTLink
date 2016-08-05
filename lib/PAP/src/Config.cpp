@@ -28,7 +28,7 @@ using namespace winstd;
 // eap::config_method_pap
 //////////////////////////////////////////////////////////////////////
 
-eap::config_method_pap::config_method_pap(_In_ module &mod) : config_method_with_cred<credentials_pap>(mod)
+eap::config_method_pap::config_method_pap(_In_ module *mod) : config_method_with_cred<credentials_pap>(mod)
 {
 }
 

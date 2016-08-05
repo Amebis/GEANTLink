@@ -136,7 +136,7 @@ bool eap::peer_ttls::get_identity(
         bool user_ctx_changed = hTokenImpersonateUser && ImpersonateLoggedOnUser(hTokenImpersonateUser);
 
         if (!is_outer_set) {
-            credentials_tls cred_loaded(*this);
+            credentials_tls cred_loaded(this);
             if (cred_loaded.retrieve(cfg_prov.m_id.c_str(), ppEapError)) {
                 // Outer TLS: Using stored credentials.
                 cred_out.m_outer = std::move(cred_loaded);
@@ -150,7 +150,7 @@ bool eap::peer_ttls::get_identity(
 
         if (!is_inner_set) {
             unique_ptr<credentials> cred_loaded;
-            if (cfg_inner_pap) cred_loaded.reset(new credentials_pap(*this));
+            if (cfg_inner_pap) cred_loaded.reset(new credentials_pap(this));
             else               assert(0); // Unsupported inner authentication method type.
             if (cred_loaded->retrieve(cfg_prov.m_id.c_str(), ppEapError)) {
                 // Inner PAP: Using stored credentials.

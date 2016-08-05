@@ -60,9 +60,9 @@ namespace eap
         ///
         /// Constructs configuration
         ///
-        /// \param[in] mod  Reference of the EAP module to use for global services
+        /// \param[in] mod  EAP module to use for global services
         ///
-        config_method_tls(_In_ module &mod);
+        config_method_tls(_In_ module *mod);
 
         ///
         /// Copies configuration
