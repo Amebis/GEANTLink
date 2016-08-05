@@ -53,6 +53,10 @@ namespace eap
         ///
         /// \sa [EapPeerConfigXml2Blob function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363602.aspx)
         ///
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
+        ///
         virtual bool config_xml2blob(
             _In_  DWORD       dwFlags,
             _In_  IXMLDOMNode *pConfigRoot,
@@ -63,9 +67,13 @@ namespace eap
         ///
         /// Converts the configuration BLOB to XML.
         ///
-        /// The configuration BLOB is returned in the ppConnectionDataOut parameter of the EapPeerInvokeConfigUI function.
+        /// The configuration BLOB is returned in the `ppConnectionDataOut` parameter of the `EapPeerInvokeConfigUI` function.
         ///
         /// \sa [EapPeerConfigBlob2Xml function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363601.aspx)
+        ///
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
         ///
         virtual bool config_blob2xml(
             _In_                                   DWORD           dwFlags,

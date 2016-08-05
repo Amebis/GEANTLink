@@ -117,6 +117,10 @@ namespace eap
         ///
         /// \sa [EapPeerCredentialsXml2Blob function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363603.aspx)
         ///
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
+        ///
         virtual bool credentials_xml2blob(
             _In_                                   DWORD       dwFlags,
             _In_                                   IXMLDOMNode *pConfigRoot,

@@ -93,6 +93,10 @@ namespace eap
         ///
         /// Test credentials if blank
         ///
+        /// \returns
+        /// - \c true if blank
+        /// - \c false otherwise
+        ///
         virtual bool empty() const;
 
         /// \name XML credentials management
