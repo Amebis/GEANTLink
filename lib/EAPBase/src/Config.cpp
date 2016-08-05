@@ -153,7 +153,7 @@ eap::config_method_with_cred::config_method_with_cred(_In_ module *mod) :
 eap::config_method_with_cred::config_method_with_cred(_In_ const config_method_with_cred &other) :
     m_allow_save(other.m_allow_save),
     m_use_preshared(other.m_use_preshared),
-    m_preshared((credentials*)other.m_preshared->clone()),
+    m_preshared(other.m_preshared ? (credentials*)other.m_preshared->clone() : nullptr),
     config_method(other)
 {
 }
@@ -174,7 +174,7 @@ eap::config_method_with_cred& eap::config_method_with_cred::operator=(_In_ const
         (config_method&)*this = other;
         m_allow_save          = other.m_allow_save;
         m_use_preshared       = other.m_use_preshared;
-        m_preshared.reset((credentials*)other.m_preshared->clone());
+        m_preshared.reset(other.m_preshared ? (credentials*)other.m_preshared->clone() : nullptr);
     }
 
     return *this;

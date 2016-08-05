@@ -136,7 +136,7 @@ bool eap::peer_ttls::get_identity(
 
     if (!is_outer_set && cfg_method->m_outer.m_use_preshared) {
         // Outer TLS: Using preshared credentials.
-        cred_out.m_outer = (credentials_tls&)cfg_method->m_outer.m_preshared;
+        cred_out.m_outer = *(credentials_tls*)cfg_method->m_outer.m_preshared.get();
         log_event(&EAPMETHOD_TRACE_EVT_CRED_PRESHARED1, event_data((DWORD)eap_type_tls), event_data(cred_out.m_outer.get_name()), event_data::blank);
         is_outer_set = true;
     }
