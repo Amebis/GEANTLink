@@ -106,6 +106,9 @@ public:
     ///
     /// Constructs a configuration dialog
     ///
+    /// \param[inout] cfg     Providers configuration data
+    /// \param[in]    parent  Parent window
+    ///
     wxEAPConfigDialog(eap::config_providers &cfg, wxWindow* parent) :
         m_cfg(cfg),
         wxEAPConfigDialogBase(parent)
