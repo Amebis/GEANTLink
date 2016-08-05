@@ -212,3 +212,104 @@ bool eap::module::encrypt_md5(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const 
     enc.insert(enc.end(), hash_bin.begin(), hash_bin.end());
     return true;
 }
+
+
+//////////////////////////////////////////////////////////////////////
+// eap::peer
+//////////////////////////////////////////////////////////////////////
+
+eap::peer::peer(_In_ eap_type_t eap_method) : module(eap_method)
+{
+}
+
+
+bool eap::peer::query_credential_input_fields(
+    _In_                                   HANDLE                       hUserImpersonationToken,
+    _In_                                   DWORD                        dwFlags,
+    _In_                                   DWORD                        dwConnectionDataSize,
+    _In_count_(dwConnectionDataSize) const BYTE                         *pConnectionData,
+    _Out_                                  EAP_CONFIG_INPUT_FIELD_ARRAY *pEapConfigInputFieldsArray,
+    _Out_                                  EAP_ERROR                    **ppEapError) const
+{
+    UNREFERENCED_PARAMETER(hUserImpersonationToken);
+    UNREFERENCED_PARAMETER(dwFlags);
+    UNREFERENCED_PARAMETER(dwConnectionDataSize);
+    UNREFERENCED_PARAMETER(pConnectionData);
+    UNREFERENCED_PARAMETER(pEapConfigInputFieldsArray);
+    UNREFERENCED_PARAMETER(ppEapError);
+
+    *ppEapError = make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
+    return false;
+}
+
+
+bool eap::peer::query_user_blob_from_credential_input_fields(
+    _In_                                   HANDLE                       hUserImpersonationToken,
+    _In_                                   DWORD                        dwFlags,
+    _In_                                   DWORD                        dwConnectionDataSize,
+    _In_count_(dwConnectionDataSize) const BYTE                         *pConnectionData,
+    _In_                             const EAP_CONFIG_INPUT_FIELD_ARRAY *pEapConfigInputFieldArray,
+    _Inout_                                DWORD                        *pdwUsersBlobSize,
+    _Inout_                                BYTE                         **ppUserBlob,
+    _Out_                                  EAP_ERROR                    **ppEapError) const
+{
+    UNREFERENCED_PARAMETER(hUserImpersonationToken);
+    UNREFERENCED_PARAMETER(dwFlags);
+    UNREFERENCED_PARAMETER(dwConnectionDataSize);
+    UNREFERENCED_PARAMETER(pConnectionData);
+    UNREFERENCED_PARAMETER(pEapConfigInputFieldArray);
+    UNREFERENCED_PARAMETER(pdwUsersBlobSize);
+    UNREFERENCED_PARAMETER(ppUserBlob);
+    UNREFERENCED_PARAMETER(ppEapError);
+
+    *ppEapError = make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
+    return false;
+}
+
+
+bool eap::peer::query_interactive_ui_input_fields(
+    _In_                                  DWORD                   dwVersion,
+    _In_                                  DWORD                   dwFlags,
+    _In_                                  DWORD                   dwUIContextDataSize,
+    _In_count_(dwUIContextDataSize) const BYTE                    *pUIContextData,
+    _Out_                                 EAP_INTERACTIVE_UI_DATA *pEapInteractiveUIData,
+    _Out_                                 EAP_ERROR               **ppEapError,
+    _Inout_                               LPVOID                  *pvReserved) const
+{
+    UNREFERENCED_PARAMETER(dwVersion);
+    UNREFERENCED_PARAMETER(dwFlags);
+    UNREFERENCED_PARAMETER(dwUIContextDataSize);
+    UNREFERENCED_PARAMETER(pUIContextData);
+    UNREFERENCED_PARAMETER(pEapInteractiveUIData);
+    UNREFERENCED_PARAMETER(ppEapError);
+    UNREFERENCED_PARAMETER(pvReserved);
+
+    *ppEapError = make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
+    return false;
+}
+
+
+bool eap::peer::query_ui_blob_from_interactive_ui_input_fields(
+    _In_                                  DWORD                   dwVersion,
+    _In_                                  DWORD                   dwFlags,
+    _In_                                  DWORD                   dwUIContextDataSize,
+    _In_count_(dwUIContextDataSize) const BYTE                    *pUIContextData,
+    _In_                            const EAP_INTERACTIVE_UI_DATA *pEapInteractiveUIData,
+    _Out_                                 DWORD                   *pdwDataFromInteractiveUISize,
+    _Out_                                 BYTE                    **ppDataFromInteractiveUI,
+    _Out_                                 EAP_ERROR               **ppEapError,
+    _Inout_                               LPVOID                  *ppvReserved) const
+{
+    UNREFERENCED_PARAMETER(dwVersion);
+    UNREFERENCED_PARAMETER(dwFlags);
+    UNREFERENCED_PARAMETER(dwUIContextDataSize);
+    UNREFERENCED_PARAMETER(pUIContextData);
+    UNREFERENCED_PARAMETER(pEapInteractiveUIData);
+    UNREFERENCED_PARAMETER(pdwDataFromInteractiveUISize);
+    UNREFERENCED_PARAMETER(ppDataFromInteractiveUI);
+    UNREFERENCED_PARAMETER(ppEapError);
+    UNREFERENCED_PARAMETER(ppvReserved);
+
+    *ppEapError = make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
+    return false;
+}

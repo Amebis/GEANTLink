@@ -56,11 +56,6 @@ namespace eap
         ///
         typedef _Tint interactive_request_type;
 
-        ///
-        /// Interactive response data type
-        ///
-        typedef _Tintres interactive_response_type;
-
     public:
         ///
         /// Constructs a session
@@ -264,13 +259,11 @@ namespace eap
         /// - \c false otherwise. See \p ppEapError for details.
         ///
         virtual bool get_ui_context(
-            _Out_ interactive_request_type &req,
+            _Out_ BYTE      **ppUIContextData,
+            _Out_ DWORD     *pdwUIContextDataSize,
             _Out_ EAP_ERROR **ppEapError)
         {
-            UNREFERENCED_PARAMETER(ppEapError);
-
-            req = m_intreq;
-            return true;
+            return m_module->pack(m_intreq, ppUIContextData, pdwUIContextDataSize, ppEapError);
         }
 
 
@@ -286,11 +279,13 @@ namespace eap
         /// - \c false otherwise. See \p ppEapError for details.
         ///
         virtual bool set_ui_context(
-            _In_ const interactive_response_type &res,
-            _In_ const EapPeerMethodOutput       *pEapOutput,
-            _Out_      EAP_ERROR                 **ppEapError)
+            _In_count_(dwUIContextDataSize) const BYTE                *pUIContextData,
+            _In_                                  DWORD               dwUIContextDataSize,
+            _In_                            const EapPeerMethodOutput *pEapOutput,
+            _Out_                                 EAP_ERROR           **ppEapError)
         {
-            UNREFERENCED_PARAMETER(res);
+            UNREFERENCED_PARAMETER(pUIContextData);
+            UNREFERENCED_PARAMETER(dwUIContextDataSize);
             UNREFERENCED_PARAMETER(pEapOutput);
             assert(ppEapError);
 

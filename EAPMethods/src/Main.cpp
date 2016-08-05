@@ -236,20 +236,12 @@ DWORD APIENTRY EapPeerGetIdentity(
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" ppUserDataOut is NULL.")));
     else if (!ppwszIdentity)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" ppwszIdentity is NULL.")));
-    else {
-        eap::config_providers cfg(&g_peer);
-        _EAPMETHOD_PEER::credentials_type cred_in(&g_peer), cred_out(&g_peer);
-        if (                  !g_peer.unpack(cfg, pConnectionData, dwConnectionDataSize, ppEapError) ||
-            dwUserDataSize && !g_peer.unpack(cred_in, pUserData, dwUserDataSize, ppEapError) ||
-                              !g_peer.get_identity(dwFlags, cfg, dwUserDataSize ? &cred_in : NULL, cred_out, hTokenImpersonateUser, pfInvokeUI, ppwszIdentity, ppEapError) ||
-                              !g_peer.pack(cred_out, ppUserDataOut, pdwUserDataOutSize, ppEapError))
-        {
-            if (*ppEapError) {
-                g_peer.log_error(*ppEapError);
-                dwResult = (*ppEapError)->dwWinError;
-            } else
-                dwResult = ERROR_INVALID_DATA;
-        }
+    else if (!g_peer.get_identity(dwFlags, pConnectionData, dwConnectionDataSize, pUserData, dwUserDataSize, ppUserDataOut, pdwUserDataOutSize, hTokenImpersonateUser, pfInvokeUI, ppwszIdentity, ppEapError)) {
+        if (*ppEapError) {
+            g_peer.log_error(*ppEapError);
+            dwResult = (*ppEapError)->dwWinError;
+        } else
+            dwResult = ERROR_INVALID_DATA;
     }
 
     return dwResult;
@@ -506,17 +498,12 @@ DWORD APIENTRY EapPeerGetUIContext(
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pdwUIContextDataSize is NULL.")));
     else if (!ppUIContextData)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" ppUIContextData is NULL.")));
-    else {
-        _EAPMETHOD_SESSION::interactive_request_type req;
-        if (!static_cast<_EAPMETHOD_SESSION*>(hSession)->get_ui_context(req, ppEapError) ||
-            !g_peer.pack(req, ppUIContextData, pdwUIContextDataSize, ppEapError))
-        {
-            if (*ppEapError) {
-                g_peer.log_error(*ppEapError);
-                dwResult = (*ppEapError)->dwWinError;
-            } else
-                dwResult = ERROR_INVALID_DATA;
-        }
+    else if (!static_cast<_EAPMETHOD_SESSION*>(hSession)->get_ui_context(ppUIContextData, pdwUIContextDataSize, ppEapError)) {
+        if (*ppEapError) {
+            g_peer.log_error(*ppEapError);
+            dwResult = (*ppEapError)->dwWinError;
+        } else
+            dwResult = ERROR_INVALID_DATA;
     }
 
     return dwResult;
@@ -555,17 +542,12 @@ DWORD APIENTRY EapPeerSetUIContext(
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pUIContextData is NULL.")));
     else if (!pEapOutput)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pEapOutput is NULL.")));
-    else {
-        _EAPMETHOD_SESSION::interactive_response_type res;
-        if (!g_peer.unpack(res, pUIContextData, dwUIContextDataSize, ppEapError) ||
-            !static_cast<_EAPMETHOD_SESSION*>(hSession)->set_ui_context(res, pEapOutput, ppEapError))
-        {
-            if (*ppEapError) {
-                g_peer.log_error(*ppEapError);
-                dwResult = (*ppEapError)->dwWinError;
-            } else
-                dwResult = ERROR_INVALID_DATA;
-        }
+    else if (!static_cast<_EAPMETHOD_SESSION*>(hSession)->set_ui_context(pUIContextData, dwUIContextDataSize, pEapOutput, ppEapError)) {
+        if (*ppEapError) {
+            g_peer.log_error(*ppEapError);
+            dwResult = (*ppEapError)->dwWinError;
+        } else
+            dwResult = ERROR_INVALID_DATA;
     }
 
     return dwResult;
@@ -652,16 +634,16 @@ DWORD APIENTRY EapPeerSetResponseAttributes(_In_ EAP_SESSION_HANDLE hSession, _I
 /// \sa [EapPeerGetMethodProperties function](https://msdn.microsoft.com/en-us/library/windows/desktop/hh706636.aspx)
 ///
 DWORD WINAPI EapPeerGetMethodProperties(
-    _In_                                DWORD                     dwVersion,
-    _In_                                DWORD                     dwFlags,
-    _In_                                EAP_METHOD_TYPE           eapMethodType,
-    _In_                                HANDLE                    hUserImpersonationToken,
-    _In_                                DWORD                     dwEapConnDataSize,
-    _In_count_(dwEapConnDataSize) const BYTE                      *pEapConnData,
-    _In_                                DWORD                     dwUserDataSize,
-    _In_count_(dwUserDataSize)    const BYTE                      *pUserData,
-    _Out_                               EAP_METHOD_PROPERTY_ARRAY *pMethodPropertyArray,
-    _Out_                               EAP_ERROR                 **ppEapError)
+    _In_                                   DWORD                     dwVersion,
+    _In_                                   DWORD                     dwFlags,
+    _In_                                   EAP_METHOD_TYPE           eapMethodType,
+    _In_                                   HANDLE                    hUserImpersonationToken,
+    _In_                                   DWORD                     dwConnectionDataSize,
+    _In_count_(dwConnectionDataSize) const BYTE                      *pConnectionData,
+    _In_                                   DWORD                     dwUserDataSize,
+    _In_count_(dwUserDataSize)       const BYTE                      *pUserData,
+    _Out_                                  EAP_METHOD_PROPERTY_ARRAY *pMethodPropertyArray,
+    _Out_                                  EAP_ERROR                 **ppEapError)
 {
     DWORD dwResult = ERROR_SUCCESS;
     event_fn_auto_ret<DWORD> event_auto(g_peer.get_event_fn_auto(__FUNCTION__, dwResult));
@@ -679,32 +661,18 @@ DWORD WINAPI EapPeerGetMethodProperties(
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_NOT_SUPPORTED, wstring_printf(_T(__FUNCTION__) _T(" Input EAP type (%d) does not match the supported EAP type (%d)."), (int)eapMethodType.eapType.type, (int)EAPMETHOD_TYPE).c_str()));
     else if (eapMethodType.dwAuthorId != 67532)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_NOT_SUPPORTED, wstring_printf(_T(__FUNCTION__) _T(" EAP author (%d) does not match the supported author (%d)."), (int)eapMethodType.dwAuthorId, (int)67532).c_str()));
-    else if (!pEapConnData && dwEapConnDataSize)
-        g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pEapConnData is NULL.")));
+    else if (!pConnectionData && dwConnectionDataSize)
+        g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pConnectionData is NULL.")));
     else if (!pUserData && dwUserDataSize)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pUserData is NULL.")));
     else if (!pMethodPropertyArray)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pMethodPropertyArray is NULL.")));
-    else {
-        eap::config_providers cfg(&g_peer);
-        _EAPMETHOD_PEER::credentials_type cred(&g_peer);
-        if (!g_peer.unpack(cfg, pEapConnData, dwEapConnDataSize, ppEapError) ||
-            !g_peer.unpack(cred, pUserData, dwUserDataSize, ppEapError) ||
-            !g_peer.get_method_properties(
-                dwVersion,
-                dwFlags,
-                hUserImpersonationToken,
-                cfg,
-                cred,
-                pMethodPropertyArray,
-                ppEapError))
-        {
-            if (*ppEapError) {
-                g_peer.log_error(*ppEapError);
-                dwResult = (*ppEapError)->dwWinError;
-            } else
-                dwResult = ERROR_INVALID_DATA;
-        }
+    else if (!g_peer.get_method_properties(dwVersion, dwFlags, hUserImpersonationToken, pConnectionData, dwConnectionDataSize, pUserData, dwUserDataSize, pMethodPropertyArray, ppEapError)) {
+        if (*ppEapError) {
+            g_peer.log_error(*ppEapError);
+            dwResult = (*ppEapError)->dwWinError;
+        } else
+            dwResult = ERROR_INVALID_DATA;
     }
 
     return dwResult;
@@ -717,14 +685,14 @@ DWORD WINAPI EapPeerGetMethodProperties(
 /// \sa [EapPeerCredentialsXml2Blob function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363603.aspx)
 ///
 DWORD WINAPI EapPeerCredentialsXml2Blob(
-    _In_                             DWORD            dwFlags,
-    _In_                             EAP_METHOD_TYPE  eapMethodType,
-    _In_                             IXMLDOMDocument2 *pCredentialsDoc,
-    _In_count_(dwConfigInSize) const BYTE             *pConfigIn,
-    _In_                             DWORD            dwConfigInSize,
-    _Out_                            BYTE             **ppCredentialsOut,
-    _Out_                            DWORD            *pdwCredentialsOutSize,
-    _Out_                            EAP_ERROR        **ppEapError)
+    _In_                                   DWORD            dwFlags,
+    _In_                                   EAP_METHOD_TYPE  eapMethodType,
+    _In_                                   IXMLDOMDocument2 *pCredentialsDoc,
+    _In_count_(dwConnectionDataSize) const BYTE             *pConnectionData,
+    _In_                                   DWORD            dwConnectionDataSize,
+    _Out_                                  BYTE             **ppCredentialsOut,
+    _Out_                                  DWORD            *pdwCredentialsOutSize,
+    _Out_                                  EAP_ERROR        **ppEapError)
 {
     DWORD dwResult = ERROR_SUCCESS;
     event_fn_auto_ret<DWORD> event_auto(g_peer.get_event_fn_auto(__FUNCTION__, dwResult));
@@ -744,17 +712,13 @@ DWORD WINAPI EapPeerCredentialsXml2Blob(
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_NOT_SUPPORTED, wstring_printf(_T(__FUNCTION__) _T(" EAP author (%d) does not match the supported author (%d)."), (int)eapMethodType.dwAuthorId, (int)67532).c_str()));
     else if (!pCredentialsDoc)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pCredentialsDoc is NULL.")));
-    else if (!pConfigIn && dwConfigInSize)
-        g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pConfigIn is NULL.")));
+    else if (!pConnectionData && dwConnectionDataSize)
+        g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pConnectionData is NULL.")));
     else if (!ppCredentialsOut)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" ppCredentialsOut is NULL.")));
     else if (!pdwCredentialsOutSize)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pdwCredentialsOutSize is NULL.")));
     else {
-        UNREFERENCED_PARAMETER(dwFlags);
-        UNREFERENCED_PARAMETER(pConfigIn);
-        UNREFERENCED_PARAMETER(dwConfigInSize);
-
         // <Credentials>
         com_obj<IXMLDOMNode> pXmlElCredentials;
         if ((dwResult = eapxml::select_node(pCredentialsDoc, bstr(L"//EapHostUserCredentials/Credentials"), &pXmlElCredentials)) != ERROR_SUCCESS) {
@@ -764,10 +728,7 @@ DWORD WINAPI EapPeerCredentialsXml2Blob(
 
         // Load credentials.
         pCredentialsDoc->setProperty(bstr(L"SelectionNamespaces"), variant(L"xmlns:eap-metadata=\"urn:ietf:params:xml:ns:yang:ietf-eap-metadata\""));
-        _EAPMETHOD_PEER::credentials_type cred(&g_peer);
-        if (!cred.load(pXmlElCredentials, ppEapError) ||
-            !g_peer.pack(cred, ppCredentialsOut, pdwCredentialsOutSize, ppEapError))
-        {
+        if (!g_peer.credentials_xml2blob(dwFlags, pXmlElCredentials, pConnectionData, dwConnectionDataSize, ppCredentialsOut, pdwCredentialsOutSize, ppEapError)) {
             if (*ppEapError) {
                 g_peer.log_error(*ppEapError);
                 return dwResult = (*ppEapError)->dwWinError;
@@ -786,13 +747,13 @@ DWORD WINAPI EapPeerCredentialsXml2Blob(
 /// \sa [EapPeerQueryCredentialInputFields function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363622.aspx)
 ///
 DWORD WINAPI EapPeerQueryCredentialInputFields(
-    _In_                                HANDLE                       hUserImpersonationToken,
-    _In_                                EAP_METHOD_TYPE              eapMethodType,
-    _In_                                DWORD                        dwFlags,
-    _In_                                DWORD                        dwEapConnDataSize,
-    _In_count_(dwEapConnDataSize) const BYTE                         *pEapConnData,
-    _Out_                               EAP_CONFIG_INPUT_FIELD_ARRAY *pEapConfigInputFieldsArray,
-    _Out_                               EAP_ERROR                    **ppEapError)
+    _In_                                   HANDLE                       hUserImpersonationToken,
+    _In_                                   EAP_METHOD_TYPE              eapMethodType,
+    _In_                                   DWORD                        dwFlags,
+    _In_                                   DWORD                        dwConnectionDataSize,
+    _In_count_(dwConnectionDataSize) const BYTE                         *pConnectionData,
+    _Out_                                  EAP_CONFIG_INPUT_FIELD_ARRAY *pEapConfigInputFieldsArray,
+    _Out_                                  EAP_ERROR                    **ppEapError)
 {
     DWORD dwResult = ERROR_SUCCESS;
     event_fn_auto_ret<DWORD> event_auto(g_peer.get_event_fn_auto(__FUNCTION__, dwResult));
@@ -810,16 +771,16 @@ DWORD WINAPI EapPeerQueryCredentialInputFields(
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_NOT_SUPPORTED, wstring_printf(_T(__FUNCTION__) _T(" Input EAP type (%d) does not match the supported EAP type (%d)."), (int)eapMethodType.eapType.type, (int)EAPMETHOD_TYPE).c_str()));
     else if (eapMethodType.dwAuthorId != 67532)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_NOT_SUPPORTED, wstring_printf(_T(__FUNCTION__) _T(" EAP author (%d) does not match the supported author (%d)."), (int)eapMethodType.dwAuthorId, (int)67532).c_str()));
-    else if (!pEapConnData && dwEapConnDataSize)
-        g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pEapConnData is NULL.")));
+    else if (!pConnectionData && dwConnectionDataSize)
+        g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pConnectionData is NULL.")));
     else if (!pEapConfigInputFieldsArray)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pEapConfigInputFieldsArray is NULL.")));
     else {
         if (!g_peer.query_credential_input_fields(
             hUserImpersonationToken,
             dwFlags,
-            dwEapConnDataSize,
-            pEapConnData,
+            dwConnectionDataSize,
+            pConnectionData,
             pEapConfigInputFieldsArray,
             ppEapError))
         {
@@ -841,15 +802,15 @@ DWORD WINAPI EapPeerQueryCredentialInputFields(
 /// \sa [EapPeerQueryUserBlobFromCredentialInputFields function](https://msdn.microsoft.com/en-us/library/windows/desktop/bb204697.aspx)
 ///
 DWORD WINAPI EapPeerQueryUserBlobFromCredentialInputFields(
-    _In_                                HANDLE                       hUserImpersonationToken,
-    _In_                                EAP_METHOD_TYPE              eapMethodType,
-    _In_                                DWORD                        dwFlags,
-    _In_                                DWORD                        dwEapConnDataSize,
-    _In_count_(dwEapConnDataSize) const BYTE                         *pEapConnData,
-    _In_                          const EAP_CONFIG_INPUT_FIELD_ARRAY *pEapConfigInputFieldArray,
-    _Inout_                             DWORD                        *pdwUsersBlobSize,
-    _Inout_                             BYTE                         **ppUserBlob,
-    _Out_                               EAP_ERROR                    **ppEapError)
+    _In_                                   HANDLE                       hUserImpersonationToken,
+    _In_                                   EAP_METHOD_TYPE              eapMethodType,
+    _In_                                   DWORD                        dwFlags,
+    _In_                                   DWORD                        dwConnectionDataSize,
+    _In_count_(dwConnectionDataSize) const BYTE                         *pConnectionData,
+    _In_                             const EAP_CONFIG_INPUT_FIELD_ARRAY *pEapConfigInputFieldArray,
+    _Inout_                                DWORD                        *pdwUsersBlobSize,
+    _Inout_                                BYTE                         **ppUserBlob,
+    _Out_                                  EAP_ERROR                    **ppEapError)
 {
     DWORD dwResult = ERROR_SUCCESS;
     event_fn_auto_ret<DWORD> event_auto(g_peer.get_event_fn_auto(__FUNCTION__, dwResult));
@@ -867,8 +828,8 @@ DWORD WINAPI EapPeerQueryUserBlobFromCredentialInputFields(
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_NOT_SUPPORTED, wstring_printf(_T(__FUNCTION__) _T(" Input EAP type (%d) does not match the supported EAP type (%d)."), (int)eapMethodType.eapType.type, (int)EAPMETHOD_TYPE).c_str()));
     else if (eapMethodType.dwAuthorId != 67532)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_NOT_SUPPORTED, wstring_printf(_T(__FUNCTION__) _T(" EAP author (%d) does not match the supported author (%d)."), (int)eapMethodType.dwAuthorId, (int)67532).c_str()));
-    else if (!pEapConnData && dwEapConnDataSize)
-        g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pEapConnData is NULL.")));
+    else if (!pConnectionData && dwConnectionDataSize)
+        g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pConnectionData is NULL.")));
     else if (!pEapConfigInputFieldArray)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pEapConfigInputFieldArray is NULL.")));
     else if (!pdwUsersBlobSize)
@@ -879,8 +840,8 @@ DWORD WINAPI EapPeerQueryUserBlobFromCredentialInputFields(
         if (!g_peer.query_user_blob_from_credential_input_fields(
             hUserImpersonationToken,
             dwFlags,
-            dwEapConnDataSize,
-            pEapConnData,
+            dwConnectionDataSize,
+            pConnectionData,
             pEapConfigInputFieldArray,
             pdwUsersBlobSize,
             ppUserBlob,

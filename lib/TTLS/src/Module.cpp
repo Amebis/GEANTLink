@@ -28,7 +28,7 @@ using namespace winstd;
 // eap::peer_ttls
 //////////////////////////////////////////////////////////////////////
 
-eap::peer_ttls::peer_ttls() : peer<credentials_ttls, bool, bool>(eap_type_ttls)
+eap::peer_ttls::peer_ttls() : peer(eap_type_ttls)
 {
 }
 
@@ -65,29 +65,43 @@ bool eap::peer_ttls::shutdown(_Out_ EAP_ERROR **ppEapError)
 
 
 bool eap::peer_ttls::get_identity(
-    _In_           DWORD            dwFlags,
-    _In_     const config_providers &cfg,
-    _In_opt_ const credentials_type *cred_in,
-    _Inout_        credentials_type &cred_out,
-    _In_           HANDLE           hTokenImpersonateUser,
-    _Out_          BOOL             *pfInvokeUI,
-    _Out_          WCHAR            **ppwszIdentity,
-    _Out_          EAP_ERROR        **ppEapError)
+    _In_                                   DWORD     dwFlags,
+    _In_count_(dwConnectionDataSize) const BYTE      *pConnectionData,
+    _In_                                   DWORD     dwConnectionDataSize,
+    _In_count_(dwUserDataSize)       const BYTE      *pUserData,
+    _In_                                   DWORD     dwUserDataSize,
+    _Out_                                  BYTE      **ppUserDataOut,
+    _Out_                                  DWORD     *pdwUserDataOutSize,
+    _In_                                   HANDLE    hTokenImpersonateUser,
+    _Out_                                  BOOL      *pfInvokeUI,
+    _Out_                                  WCHAR     **ppwszIdentity,
+    _Out_                                  EAP_ERROR **ppEapError)
 {
     assert(pfInvokeUI);
     assert(ppwszIdentity);
     assert(ppEapError);
 
-    if (cfg.m_providers.empty() || cfg.m_providers.front().m_methods.empty()) {
+    // Unpack configuration.
+    eap::config_providers cfg(this);
+    if (!unpack(cfg, pConnectionData, dwConnectionDataSize, ppEapError))
+        return false;
+    else if (cfg.m_providers.empty() || cfg.m_providers.front().m_methods.empty()) {
         *ppEapError = make_error(ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" Configuration has no providers and/or methods."));
         return false;
     }
+
+    // Unpack cached credentials.
+    credentials_ttls cred_in(this);
+    if (dwUserDataSize && !unpack(cred_in, pUserData, dwUserDataSize, ppEapError))
+        return false;
 
     // Get method configuration.
     const config_provider &cfg_prov(cfg.m_providers.front());
     const config_method_ttls *cfg_method = dynamic_cast<const config_method_ttls*>(cfg_prov.m_methods.front().get());
     assert(cfg_method);
     const config_method_pap *cfg_inner_pap = dynamic_cast<const config_method_pap*>(cfg_method->m_inner.get());
+
+    credentials_ttls cred_out(this);
 
     // Determine credential storage target(s). Also used as user-friendly method name for logging.
     wstring target_outer(std::move(cred_out.m_outer.target_suffix()));
@@ -97,19 +111,19 @@ bool eap::peer_ttls::get_identity(
         is_outer_set = false,
         is_inner_set = false;
 
-    if (cred_in) {
+    if (dwUserDataSize) {
         // Try cached credentials.
 
         if (!is_outer_set) {
             // Outer TLS: Using EAP service cached credentials.
-            cred_out.m_outer = cred_in->m_outer;
+            cred_out.m_outer = cred_in.m_outer;
             log_event(&EAPMETHOD_TRACE_EVT_CRED_CACHED, event_data(target_outer), event_data(cred_out.m_outer.get_name()), event_data::blank);
             is_outer_set = true;
         }
 
-        if (!is_inner_set && cred_in->m_inner) {
+        if (!is_inner_set && cred_in.m_inner) {
             // Inner PAP: Using EAP service cached credentials.
-            cred_out.m_inner.reset((credentials*)cred_in->m_inner->clone());
+            cred_out.m_inner.reset((credentials*)cred_in.m_inner->clone());
             log_event(&EAPMETHOD_TRACE_EVT_CRED_CACHED, event_data(target_inner), event_data(cred_out.m_inner->get_name()), event_data::blank);
             is_inner_set = true;
         }
@@ -204,24 +218,29 @@ bool eap::peer_ttls::get_identity(
     *ppwszIdentity = (WCHAR*)alloc_memory(size);
     memcpy(*ppwszIdentity, identity.c_str(), size);
 
-    return true;
+    // Pack credentials.
+    return pack(cred_out, ppUserDataOut, pdwUserDataOutSize, ppEapError);
 }
 
 
 bool eap::peer_ttls::get_method_properties(
-    _In_        DWORD                     dwVersion,
-    _In_        DWORD                     dwFlags,
-    _In_        HANDLE                    hUserImpersonationToken,
-    _In_  const config_providers          &cfg,
-    _In_  const credentials_type          &cred,
-    _Out_       EAP_METHOD_PROPERTY_ARRAY *pMethodPropertyArray,
-    _Out_       EAP_ERROR                 **ppEapError)
+    _In_                                   DWORD                     dwVersion,
+    _In_                                   DWORD                     dwFlags,
+    _In_                                   HANDLE                    hUserImpersonationToken,
+    _In_count_(dwConnectionDataSize) const BYTE                      *pConnectionData,
+    _In_                                   DWORD                     dwConnectionDataSize,
+    _In_count_(dwUserDataSize)       const BYTE                      *pUserData,
+    _In_                                   DWORD                     dwUserDataSize,
+    _Out_                                  EAP_METHOD_PROPERTY_ARRAY *pMethodPropertyArray,
+    _Out_                                  EAP_ERROR                 **ppEapError)
 {
     UNREFERENCED_PARAMETER(dwVersion);
     UNREFERENCED_PARAMETER(dwFlags);
     UNREFERENCED_PARAMETER(hUserImpersonationToken);
-    UNREFERENCED_PARAMETER(cfg);
-    UNREFERENCED_PARAMETER(cred);
+    UNREFERENCED_PARAMETER(pConnectionData);
+    UNREFERENCED_PARAMETER(dwConnectionDataSize);
+    UNREFERENCED_PARAMETER(pUserData);
+    UNREFERENCED_PARAMETER(dwUserDataSize);
     assert(pMethodPropertyArray);
     assert(ppEapError);
 
@@ -262,4 +281,27 @@ bool eap::peer_ttls::get_method_properties(
     pMethodPropertyArray->dwNumberOfProperties = dwCount;
 
     return true;
+}
+
+
+bool eap::peer_ttls::credentials_xml2blob(
+    _In_                                   DWORD       dwFlags,
+    _In_                                   IXMLDOMNode *pConfigRoot,
+    _In_count_(dwConnectionDataSize) const BYTE        *pConnectionData,
+    _In_                                   DWORD       dwConnectionDataSize,
+    _Out_                                  BYTE        **ppCredentialsOut,
+    _Out_                                  DWORD       *pdwCredentialsOutSize,
+    _Out_                                  EAP_ERROR   **ppEapError)
+{
+    UNREFERENCED_PARAMETER(dwFlags);
+    UNREFERENCED_PARAMETER(pConnectionData);
+    UNREFERENCED_PARAMETER(dwConnectionDataSize);
+
+    // Load credentials from XML.
+    credentials_ttls cred(this);
+    if (!cred.load(pConfigRoot, ppEapError))
+        return false;
+
+    // Pack credentials.
+    return pack(cred, ppCredentialsOut, pdwCredentialsOutSize, ppEapError);
 }

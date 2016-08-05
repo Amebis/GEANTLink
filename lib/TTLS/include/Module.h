@@ -35,7 +35,7 @@ namespace eap
 
 namespace eap
 {
-    class peer_ttls : public peer<credentials_ttls, bool, bool>
+    class peer_ttls : public peer
     {
     public:
         ///
@@ -80,14 +80,17 @@ namespace eap
         /// - \c false otherwise. See \p ppEapError for details.
         ///
         virtual bool get_identity(
-            _In_           DWORD            dwFlags,
-            _In_     const config_providers &cfg,
-            _In_opt_ const credentials_type *cred_in,
-            _Inout_        credentials_type &cred_out,
-            _In_           HANDLE           hTokenImpersonateUser,
-            _Out_          BOOL             *pfInvokeUI,
-            _Out_          WCHAR            **ppwszIdentity,
-            _Out_          EAP_ERROR        **ppEapError);
+            _In_                                   DWORD     dwFlags,
+            _In_count_(dwConnectionDataSize) const BYTE      *pConnectionData,
+            _In_                                   DWORD     dwConnectionDataSize,
+            _In_count_(dwUserDataSize)       const BYTE      *pUserData,
+            _In_                                   DWORD     dwUserDataSize,
+            _Out_                                  BYTE      **ppUserDataOut,
+            _Out_                                  DWORD     *pdwUserDataOutSize,
+            _In_                                   HANDLE    hTokenImpersonateUser,
+            _Out_                                  BOOL      *pfInvokeUI,
+            _Out_                                  WCHAR     **ppwszIdentity,
+            _Out_                                  EAP_ERROR **ppEapError);
 
         ///
         /// Defines the implementation of an EAP method-specific function that retrieves the properties of an EAP method given the connection and user data.
@@ -99,12 +102,28 @@ namespace eap
         /// - \c false otherwise. See \p ppEapError for details.
         ///
         virtual bool get_method_properties(
-            _In_        DWORD                     dwVersion,
-            _In_        DWORD                     dwFlags,
-            _In_        HANDLE                    hUserImpersonationToken,
-            _In_  const config_providers          &cfg,
-            _In_  const credentials_type          &cred,
-            _Out_       EAP_METHOD_PROPERTY_ARRAY *pMethodPropertyArray,
-            _Out_       EAP_ERROR                 **ppEapError);
+            _In_                                   DWORD                     dwVersion,
+            _In_                                   DWORD                     dwFlags,
+            _In_                                   HANDLE                    hUserImpersonationToken,
+            _In_count_(dwConnectionDataSize) const BYTE                      *pConnectionData,
+            _In_                                   DWORD                     dwConnectionDataSize,
+            _In_count_(dwUserDataSize)       const BYTE                      *pUserData,
+            _In_                                   DWORD                     dwUserDataSize,
+            _Out_                                  EAP_METHOD_PROPERTY_ARRAY *pMethodPropertyArray,
+            _Out_                                  EAP_ERROR                 **ppEapError);
+
+        ///
+        /// Converts XML into the configuration BLOB. The XML based credentials can come from group policy or from a system administrator.
+        ///
+        /// \sa [EapPeerCredentialsXml2Blob function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363603.aspx)
+        ///
+        virtual bool credentials_xml2blob(
+            _In_                                   DWORD       dwFlags,
+            _In_                                   IXMLDOMNode *pConfigRoot,
+            _In_count_(dwConnectionDataSize) const BYTE        *pConnectionData,
+            _In_                                   DWORD       dwConnectionDataSize,
+            _Out_                                  BYTE        **ppCredentialsOut,
+            _Out_                                  DWORD       *pdwCredentialsOutSize,
+            _Out_                                  EAP_ERROR   **ppEapError);
     };
 }

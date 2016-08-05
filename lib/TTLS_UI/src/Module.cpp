@@ -25,7 +25,7 @@
 // eap::peer_ttls_ui
 //////////////////////////////////////////////////////////////////////
 
-eap::peer_ttls_ui::peer_ttls_ui() : peer_ui<eap::credentials_ttls, bool, bool>(winstd::eap_type_ttls)
+eap::peer_ttls_ui::peer_ttls_ui() : peer_ui(winstd::eap_type_ttls)
 {
 }
 
@@ -36,12 +36,57 @@ eap::config_method* eap::peer_ttls_ui::make_config_method()
 }
 
 
-bool eap::peer_ttls_ui::invoke_config_ui(
-    _In_    HWND             hwndParent,
-    _Inout_ config_providers &cfg,
-    _Out_   EAP_ERROR        **ppEapError)
+bool eap::peer_ttls_ui::config_xml2blob(
+    _In_  DWORD       dwFlags,
+    _In_  IXMLDOMNode *pConfigRoot,
+    _Out_ BYTE        **pConnectionDataOut,
+    _Out_ DWORD       *pdwConnectionDataOutSize,
+    _Out_ EAP_ERROR   **ppEapError)
 {
-    UNREFERENCED_PARAMETER(ppEapError);
+    UNREFERENCED_PARAMETER(dwFlags);
+
+    // Load configuration from XML.
+    eap::config_providers cfg(this);
+    if (!cfg.load(pConfigRoot, ppEapError))
+        return false;
+
+    // Pack configuration.
+    return pack(cfg, pConnectionDataOut, pdwConnectionDataOutSize, ppEapError);
+}
+
+
+bool eap::peer_ttls_ui::config_blob2xml(
+    _In_                                   DWORD           dwFlags,
+    _In_count_(dwConnectionDataSize) const BYTE            *pConnectionData,
+    _In_                                   DWORD           dwConnectionDataSize,
+    _In_                                   IXMLDOMDocument *pDoc,
+    _In_                                   IXMLDOMNode     *pConfigRoot,
+    _Out_                                  EAP_ERROR       **ppEapError)
+{
+    UNREFERENCED_PARAMETER(dwFlags);
+
+    // Unpack configuration.
+    eap::config_providers cfg(this);
+    if (!unpack(cfg, pConnectionData, dwConnectionDataSize, ppEapError))
+        return false;
+
+    // Save configuration to XML.
+    return cfg.save(pDoc, pConfigRoot, ppEapError);
+}
+
+
+bool eap::peer_ttls_ui::invoke_config_ui(
+    _In_                                     HWND      hwndParent,
+    _In_count_(dwConnectionDataInSize) const BYTE      *pConnectionDataIn,
+    _In_                                     DWORD     dwConnectionDataInSize,
+    _Out_                                    BYTE      **ppConnectionDataOut,
+    _Out_                                    DWORD     *pdwConnectionDataOutSize,
+    _Out_                                    EAP_ERROR **ppEapError)
+{
+    // Unpack configuration.
+    eap::config_providers cfg(this);
+    if (dwConnectionDataInSize && !unpack(cfg, pConnectionDataIn, dwConnectionDataInSize, ppEapError))
+        return false;
 
     // Initialize application.
     new wxApp();
@@ -70,22 +115,34 @@ bool eap::peer_ttls_ui::invoke_config_ui(
         return false;
     }
 
-    return true;
+    // Pack new configuration.
+    return pack(cfg, ppConnectionDataOut, pdwConnectionDataOutSize, ppEapError);
 }
 
 
 bool eap::peer_ttls_ui::invoke_identity_ui(
-            _In_    HWND             hwndParent,
-            _In_    DWORD            dwFlags,
-            _Inout_ config_providers &cfg,
-            _Inout_ credentials_type &cred,
-            _Out_   LPWSTR           *ppwszIdentity,
-            _Out_   EAP_ERROR        **ppEapError)
+    _In_                                   HWND      hwndParent,
+    _In_                                   DWORD     dwFlags,
+    _In_count_(dwConnectionDataSize) const BYTE      *pConnectionData,
+    _In_                                   DWORD     dwConnectionDataSize,
+    _In_count_(dwUserDataSize)       const BYTE      *pUserData,
+    _In_                                   DWORD     dwUserDataSize,
+    _Out_                                  BYTE      **ppUserDataOut,
+    _Out_                                  DWORD     *pdwUserDataOutSize,
+    _Out_                                  LPWSTR    *ppwszIdentity,
+    _Out_                                  EAP_ERROR **ppEapError)
 {
-    if (cfg.m_providers.empty() || cfg.m_providers.front().m_methods.empty()) {
+    eap::config_providers cfg(this);
+    if (!unpack(cfg, pConnectionData, dwConnectionDataSize, ppEapError))
+        return false;
+    else if (cfg.m_providers.empty() || cfg.m_providers.front().m_methods.empty()) {
         *ppEapError = make_error(ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" Configuration has no providers and/or methods."));
         return false;
     }
+
+    credentials_ttls cred(this);
+    if (dwUserDataSize && !unpack(cred, pUserData, dwUserDataSize, ppEapError))
+        return false;
 
     const config_provider &cfg_prov(cfg.m_providers.front());
     config_method_ttls *cfg_method = dynamic_cast<config_method_ttls*>(cfg_prov.m_methods.front().get());
@@ -138,18 +195,23 @@ bool eap::peer_ttls_ui::invoke_identity_ui(
     *ppwszIdentity = (WCHAR*)alloc_memory(size);
     memcpy(*ppwszIdentity, identity.c_str(), size);
 
-    return true;
+    // Pack credentials.
+    return pack(cred, ppUserDataOut, pdwUserDataOutSize, ppEapError);
 }
 
 
 bool eap::peer_ttls_ui::invoke_interactive_ui(
-            _In_        HWND                      hwndParent,
-            _In_  const interactive_request_type  &req,
-            _Out_       interactive_response_type &res,
-            _Out_       EAP_ERROR                 **ppEapError)
+    _In_                                  HWND      hwndParent,
+    _In_count_(dwUIContextDataSize) const BYTE      *pUIContextData,
+    _In_                                  DWORD     dwUIContextDataSize,
+    _Out_                                 BYTE      **ppDataFromInteractiveUI,
+    _Out_                                 DWORD     *pdwDataFromInteractiveUISize,
+    _Out_                                 EAP_ERROR **ppEapError)
 {
-    UNREFERENCED_PARAMETER(req);
-    UNREFERENCED_PARAMETER(res);
+    UNREFERENCED_PARAMETER(pUIContextData);
+    UNREFERENCED_PARAMETER(dwUIContextDataSize);
+    UNREFERENCED_PARAMETER(ppDataFromInteractiveUI);
+    UNREFERENCED_PARAMETER(pdwDataFromInteractiveUISize);
     UNREFERENCED_PARAMETER(ppEapError);
 
     InitCommonControls();

@@ -32,7 +32,7 @@ namespace eap
     ///
     /// A group of methods all EAP peers must or should implement.
     ///
-    template <class _Tcred, class _Tint, class _Tintres> class peer;
+    class peer;
 }
 
 #pragma once
@@ -337,8 +337,8 @@ namespace eap
             assert(res);
             HGLOBAL res_handle = LoadResource(m_instance, res);
             assert(res_handle);
-            crypt_key key_rsa;
-            unique_ptr<unsigned char[], LocalFree_delete<unsigned char[]> > keyinfo_data;
+            winstd::crypt_key key_rsa;
+            std::unique_ptr<unsigned char[], winstd::LocalFree_delete<unsigned char[]> > keyinfo_data;
             DWORD keyinfo_size = 0;
             if (!CryptDecodeObjectEx(X509_ASN_ENCODING, PKCS_RSA_PRIVATE_KEY, (const BYTE*)::LockResource(res_handle), ::SizeofResource(m_instance, res), CRYPT_DECODE_ALLOC_FLAG, NULL, &keyinfo_data, &keyinfo_size)) {
                 *ppEapError = make_error(GetLastError(), _T(__FUNCTION__) _T(" CryptDecodeObjectEx failed."));
@@ -350,14 +350,14 @@ namespace eap
             }
 
             // Import the 256-bit AES session key.
-            crypt_key key_aes;
+            winstd::crypt_key key_aes;
             if (!CryptImportKey(hProv, (LPCBYTE)data, 268, key_rsa, 0, &key_aes)) {
                 *ppEapError = make_error(GetLastError(), _T(__FUNCTION__) _T(" CryptImportKey failed."));
                 return false;
             }
 
             // Decrypt the data using AES session key.
-            vector<unsigned char, sanitizing_allocator<unsigned char> > buf;
+            std::vector<unsigned char, winstd::sanitizing_allocator<unsigned char> > buf;
             buf.assign((const unsigned char*)data + 268, (const unsigned char*)data + size);
             if (!CryptDecrypt(key_aes, hHash, TRUE, 0, buf)) {
                 *ppEapError = make_error(GetLastError(), _T(__FUNCTION__) _T(" CryptDecrypt failed."));
@@ -438,7 +438,7 @@ namespace eap
         bool decrypt_md5(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _Out_ std::vector<_Ty, _Ax> &dec, _Out_ EAP_ERROR **ppEapError) const
         {
             // Create hash.
-            crypt_hash hash;
+            winstd::crypt_hash hash;
             if (!hash.create(hProv, CALG_MD5)) {
                 *ppEapError = make_error(GetLastError(), _T(__FUNCTION__) _T(" Creating MD5 hash failed."));
                 return false;
@@ -456,7 +456,7 @@ namespace eap
                 return false;
 
             // Calculate MD5 hash and verify it.
-            vector<unsigned char> hash_bin;
+            std::vector<unsigned char> hash_bin;
             if (!CryptGetHashParam(hash, HP_HASHVAL, hash_bin, 0)) {
                 *ppEapError = make_error(GetLastError(), _T(__FUNCTION__) _T(" Calculating MD5 hash failed."));
                 return false;
@@ -552,7 +552,7 @@ namespace eap
             }
 
             // Decrypt data.
-            vector<unsigned char, sanitizing_allocator<unsigned char> > data;
+            std::vector<unsigned char, winstd::sanitizing_allocator<unsigned char> > data;
             if (!decrypt_md5(cp, pDataIn, dwDataInSize, data, ppEapError))
                 return false;
 
@@ -617,7 +617,7 @@ namespace eap
             *pdwDataOutSize = (DWORD)data_enc.size();
             *ppDataOut = alloc_memory(*pdwDataOutSize);
             if (!*ppDataOut) {
-                log_error(*ppEapError = g_peer.make_error(ERROR_OUTOFMEMORY, wstring_printf(_T(__FUNCTION__) _T(" Error allocating memory for BLOB (%uB)."), *pdwDataOutSize).c_str()));
+                log_error(*ppEapError = make_error(ERROR_OUTOFMEMORY, winstd::wstring_printf(_T(__FUNCTION__) _T(" Error allocating memory for BLOB (%uB)."), *pdwDataOutSize).c_str()));
                 return false;
             }
             memcpy(*ppDataOut, data_enc.data(), *pdwDataOutSize);
@@ -626,7 +626,7 @@ namespace eap
             *pdwDataOutSize = (DWORD)pksizeof(record);
             *ppDataOut = alloc_memory(*pdwDataOutSize);
             if (!*ppDataOut) {
-                log_error(*ppEapError = g_peer.make_error(ERROR_OUTOFMEMORY, wstring_printf(_T(__FUNCTION__) _T(" Error allocating memory for BLOB (%uB)."), *pdwDataOutSize).c_str()));
+                log_error(*ppEapError = make_error(ERROR_OUTOFMEMORY, winstd::wstring_printf(_T(__FUNCTION__) _T(" Error allocating memory for BLOB (%uB)."), *pdwDataOutSize).c_str()));
                 return false;
             }
 
@@ -652,32 +652,15 @@ namespace eap
     };
 
 
-    template <class _Tcred, class _Tint, class _Tintres>
     class peer : public module
     {
-    public:
-        ///
-        /// Credentials data type
-        ///
-        typedef _Tcred credentials_type;
-
-        ///
-        /// Interactive request data type
-        ///
-        typedef _Tint interactive_request_type;
-
-        ///
-        /// Interactive response data type
-        ///
-        typedef _Tintres interactive_response_type;
-
     public:
         ///
         /// Constructs a EAP peer module for the given EAP type
         ///
         /// \param[in] eap_method  EAP method type ID
         ///
-        peer(_In_ winstd::eap_type_t eap_method) : module(eap_method) {}
+        peer(_In_ winstd::eap_type_t eap_method);
 
         ///
         /// Initializes an EAP peer method for EAPHost.
@@ -711,14 +694,17 @@ namespace eap
         /// - \c false otherwise. See \p ppEapError for details.
         ///
         virtual bool get_identity(
-            _In_           DWORD            dwFlags,
-            _In_     const config_providers &cfg,
-            _In_opt_ const credentials_type *cred_in,
-            _Inout_        credentials_type &cred_out,
-            _In_           HANDLE           hTokenImpersonateUser,
-            _Out_          BOOL             *pfInvokeUI,
-            _Out_          WCHAR            **ppwszIdentity,
-            _Out_          EAP_ERROR        **ppEapError) = 0;
+            _In_                                   DWORD     dwFlags,
+            _In_count_(dwConnectionDataSize) const BYTE      *pConnectionData,
+            _In_                                   DWORD     dwConnectionDataSize,
+            _In_count_(dwUserDataSize)       const BYTE      *pUserData,
+            _In_                                   DWORD     dwUserDataSize,
+            _Out_                                  BYTE      **ppUserDataOut,
+            _Out_                                  DWORD     *pdwUserDataOutSize,
+            _In_                                   HANDLE    hTokenImpersonateUser,
+            _Out_                                  BOOL      *pfInvokeUI,
+            _Out_                                  WCHAR     **ppwszIdentity,
+            _Out_                                  EAP_ERROR **ppEapError) = 0;
 
         ///
         /// Defines the implementation of an EAP method-specific function that retrieves the properties of an EAP method given the connection and user data.
@@ -730,13 +716,29 @@ namespace eap
         /// - \c false otherwise. See \p ppEapError for details.
         ///
         virtual bool get_method_properties(
-            _In_        DWORD                     dwVersion,
-            _In_        DWORD                     dwFlags,
-            _In_        HANDLE                    hUserImpersonationToken,
-            _In_  const config_providers          &cfg,
-            _In_  const credentials_type          &cred,
-            _Out_       EAP_METHOD_PROPERTY_ARRAY *pMethodPropertyArray,
-            _Out_       EAP_ERROR                 **ppEapError) = 0;
+            _In_                                   DWORD                     dwVersion,
+            _In_                                   DWORD                     dwFlags,
+            _In_                                   HANDLE                    hUserImpersonationToken,
+            _In_count_(dwConnectionDataSize) const BYTE                      *pConnectionData,
+            _In_                                   DWORD                     dwConnectionDataSize,
+            _In_count_(dwUserDataSize)       const BYTE                      *pUserData,
+            _In_                                   DWORD                     dwUserDataSize,
+            _Out_                                  EAP_METHOD_PROPERTY_ARRAY *pMethodPropertyArray,
+            _Out_                                  EAP_ERROR                 **ppEapError) = 0;
+
+        ///
+        /// Converts XML into the configuration BLOB. The XML based credentials can come from group policy or from a system administrator.
+        ///
+        /// \sa [EapPeerCredentialsXml2Blob function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363603.aspx)
+        ///
+        virtual bool credentials_xml2blob(
+            _In_                                   DWORD       dwFlags,
+            _In_                                   IXMLDOMNode *pConfigRoot,
+            _In_count_(dwConnectionDataSize) const BYTE        *pConnectionData,
+            _In_                                   DWORD       dwConnectionDataSize,
+            _Out_                                  BYTE        **ppCredentialsOut,
+            _Out_                                  DWORD       *pdwCredentialsOutSize,
+            _Out_                                  EAP_ERROR   **ppEapError) = 0;
 
         ///
         /// Defines the implementation of an EAP method-specific function that obtains the EAP Single-Sign-On (SSO) credential input fields for an EAP method.
@@ -748,23 +750,12 @@ namespace eap
         /// - \c false otherwise. See \p ppEapError for details.
         ///
         virtual bool query_credential_input_fields(
-            _In_                                HANDLE                       hUserImpersonationToken,
-            _In_                                DWORD                        dwFlags,
-            _In_                                DWORD                        dwEapConnDataSize,
-            _In_count_(dwEapConnDataSize) const BYTE                         *pEapConnData,
-            _Out_                               EAP_CONFIG_INPUT_FIELD_ARRAY *pEapConfigInputFieldsArray,
-            _Out_                               EAP_ERROR                    **ppEapError) const
-        {
-            UNREFERENCED_PARAMETER(hUserImpersonationToken);
-            UNREFERENCED_PARAMETER(dwFlags);
-            UNREFERENCED_PARAMETER(dwEapConnDataSize);
-            UNREFERENCED_PARAMETER(pEapConnData);
-            UNREFERENCED_PARAMETER(pEapConfigInputFieldsArray);
-            UNREFERENCED_PARAMETER(ppEapError);
-
-            *ppEapError = make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
-            return false;
-        }
+            _In_                                   HANDLE                       hUserImpersonationToken,
+            _In_                                   DWORD                        dwFlags,
+            _In_                                   DWORD                        dwConnectionDataSize,
+            _In_count_(dwConnectionDataSize) const BYTE                         *pConnectionData,
+            _Out_                                  EAP_CONFIG_INPUT_FIELD_ARRAY *pEapConfigInputFieldsArray,
+            _Out_                                  EAP_ERROR                    **ppEapError) const;
 
         ///
         /// Defines the implementation of an EAP method function that obtains the user BLOB data provided in an interactive Single-Sign-On (SSO) UI raised on the supplicant.
@@ -776,27 +767,14 @@ namespace eap
         /// - \c false otherwise. See \p ppEapError for details.
         ///
         virtual bool query_user_blob_from_credential_input_fields(
-            _In_                                HANDLE                       hUserImpersonationToken,
-            _In_                                DWORD                        dwFlags,
-            _In_                                DWORD                        dwEapConnDataSize,
-            _In_count_(dwEapConnDataSize) const BYTE                         *pEapConnData,
-            _In_                          const EAP_CONFIG_INPUT_FIELD_ARRAY *pEapConfigInputFieldArray,
-            _Inout_                             DWORD                        *pdwUsersBlobSize,
-            _Inout_                             BYTE                         **ppUserBlob,
-            _Out_                               EAP_ERROR                    **ppEapError) const
-        {
-            UNREFERENCED_PARAMETER(hUserImpersonationToken);
-            UNREFERENCED_PARAMETER(dwFlags);
-            UNREFERENCED_PARAMETER(dwEapConnDataSize);
-            UNREFERENCED_PARAMETER(pEapConnData);
-            UNREFERENCED_PARAMETER(pEapConfigInputFieldArray);
-            UNREFERENCED_PARAMETER(pdwUsersBlobSize);
-            UNREFERENCED_PARAMETER(ppUserBlob);
-            UNREFERENCED_PARAMETER(ppEapError);
-
-            *ppEapError = make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
-            return false;
-        }
+            _In_                                   HANDLE                       hUserImpersonationToken,
+            _In_                                   DWORD                        dwFlags,
+            _In_                                   DWORD                        dwConnectionDataSize,
+            _In_count_(dwConnectionDataSize) const BYTE                         *pConnectionData,
+            _In_                             const EAP_CONFIG_INPUT_FIELD_ARRAY *pEapConfigInputFieldArray,
+            _Inout_                                DWORD                        *pdwUsersBlobSize,
+            _Inout_                                BYTE                         **ppUserBlob,
+            _Out_                                  EAP_ERROR                    **ppEapError) const;
 
         ///
         /// Defines the implementation of an EAP method API that provides the input fields for interactive UI components to be raised on the supplicant.
@@ -814,19 +792,7 @@ namespace eap
             _In_count_(dwUIContextDataSize) const BYTE                    *pUIContextData,
             _Out_                                 EAP_INTERACTIVE_UI_DATA *pEapInteractiveUIData,
             _Out_                                 EAP_ERROR               **ppEapError,
-            _Inout_                               LPVOID                  *pvReserved) const
-        {
-            UNREFERENCED_PARAMETER(dwVersion);
-            UNREFERENCED_PARAMETER(dwFlags);
-            UNREFERENCED_PARAMETER(dwUIContextDataSize);
-            UNREFERENCED_PARAMETER(pUIContextData);
-            UNREFERENCED_PARAMETER(pEapInteractiveUIData);
-            UNREFERENCED_PARAMETER(ppEapError);
-            UNREFERENCED_PARAMETER(pvReserved);
-
-            *ppEapError = make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
-            return false;
-        }
+            _Inout_                               LPVOID                  *pvReserved) const;
 
         ///
         /// Converts user information into a user BLOB that can be consumed by EAPHost run-time functions.
@@ -846,20 +812,6 @@ namespace eap
             _Out_                                 DWORD                   *pdwDataFromInteractiveUISize,
             _Out_                                 BYTE                    **ppDataFromInteractiveUI,
             _Out_                                 EAP_ERROR               **ppEapError,
-            _Inout_                               LPVOID                  *ppvReserved) const
-        {
-            UNREFERENCED_PARAMETER(dwVersion);
-            UNREFERENCED_PARAMETER(dwFlags);
-            UNREFERENCED_PARAMETER(dwUIContextDataSize);
-            UNREFERENCED_PARAMETER(pUIContextData);
-            UNREFERENCED_PARAMETER(pEapInteractiveUIData);
-            UNREFERENCED_PARAMETER(pdwDataFromInteractiveUISize);
-            UNREFERENCED_PARAMETER(ppDataFromInteractiveUI);
-            UNREFERENCED_PARAMETER(ppEapError);
-            UNREFERENCED_PARAMETER(ppvReserved);
-
-            *ppEapError = make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
-            return false;
-        }
+            _Inout_                               LPVOID                  *ppvReserved) const;
     };
 }

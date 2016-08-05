@@ -87,6 +87,7 @@
   <ItemGroup>
     <ClCompile Include="..\res\wxEAP_UI.cpp" />
     <ClCompile Include="..\src\EAP_UI.cpp" />
+    <ClCompile Include="..\src\Module.cpp" />
     <ClCompile Include="..\src\StdAfx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
