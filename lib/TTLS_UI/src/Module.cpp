@@ -20,12 +20,15 @@
 
 #include "StdAfx.h"
 
+using namespace std;
+using namespace winstd;
+
 
 //////////////////////////////////////////////////////////////////////
 // eap::peer_ttls_ui
 //////////////////////////////////////////////////////////////////////
 
-eap::peer_ttls_ui::peer_ttls_ui() : peer_ui(winstd::eap_type_ttls)
+eap::peer_ttls_ui::peer_ttls_ui() : peer_ui(eap_type_ttls)
 {
 }
 
@@ -46,7 +49,7 @@ bool eap::peer_ttls_ui::config_xml2blob(
     UNREFERENCED_PARAMETER(dwFlags);
 
     // Load configuration from XML.
-    eap::config_providers cfg(this);
+    config_providers cfg(this);
     if (!cfg.load(pConfigRoot, ppEapError))
         return false;
 
@@ -66,7 +69,7 @@ bool eap::peer_ttls_ui::config_blob2xml(
     UNREFERENCED_PARAMETER(dwFlags);
 
     // Unpack configuration.
-    eap::config_providers cfg(this);
+    config_providers cfg(this);
     if (!unpack(cfg, pConnectionData, dwConnectionDataSize, ppEapError))
         return false;
 
@@ -84,7 +87,7 @@ bool eap::peer_ttls_ui::invoke_config_ui(
     _Out_                                    EAP_ERROR **ppEapError)
 {
     // Unpack configuration.
-    eap::config_providers cfg(this);
+    config_providers cfg(this);
     if (dwConnectionDataInSize && !unpack(cfg, pConnectionDataIn, dwConnectionDataInSize, ppEapError))
         return false;
 
@@ -132,7 +135,7 @@ bool eap::peer_ttls_ui::invoke_identity_ui(
     _Out_                                  LPWSTR    *ppwszIdentity,
     _Out_                                  EAP_ERROR **ppEapError)
 {
-    eap::config_providers cfg(this);
+    config_providers cfg(this);
     if (!unpack(cfg, pConnectionData, dwConnectionDataSize, ppEapError))
         return false;
     else if (cfg.m_providers.empty() || cfg.m_providers.front().m_methods.empty()) {
@@ -189,8 +192,8 @@ bool eap::peer_ttls_ui::invoke_identity_ui(
     }
 
     // Build our identity. ;)
-    std::wstring identity(std::move(cfg_method->get_public_identity(cred)));
-    log_event(&EAPMETHOD_TRACE_EVT_CRED_OUTER_ID, winstd::event_data(L"TTLS"), winstd::event_data(identity), winstd::event_data::blank);
+    wstring identity(move(cfg_method->get_public_identity(cred)));
+    log_event(&EAPMETHOD_TRACE_EVT_CRED_OUTER_ID1, event_data((DWORD)eap_type_ttls), event_data(identity), event_data::blank);
     size_t size = sizeof(WCHAR)*(identity.length() + 1);
     *ppwszIdentity = (WCHAR*)alloc_memory(size);
     memcpy(*ppwszIdentity, identity.c_str(), size);

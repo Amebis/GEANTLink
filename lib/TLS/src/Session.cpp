@@ -242,7 +242,7 @@ bool eap::session_tls::process_request_packet(
             //// Determine minimum EAP-TLS version supported by server and us.
             //version_t ver_remote = (version_t)(m_packet_req.m_flags & tls_flags_ver_mask);
             //m_version = std::min<version_t>(ver_remote, version_0);
-            //m_module->log_event(&EAPMETHOD_HANDSHAKE_START, event_data(m_cred.target_suffix()), event_data((unsigned char)m_version), event_data((unsigned char)ver_remote), event_data::blank);
+            //m_module->log_event(&EAPMETHOD_HANDSHAKE_START1, event_data((DWORD)pReceivedPacket->Data[0]), event_data((unsigned char)m_version), event_data((unsigned char)ver_remote), event_data::blank);
 
             // Build response packet.
             m_packet_res.m_code  = EapCodeResponse;
