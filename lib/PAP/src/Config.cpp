@@ -28,19 +28,20 @@ using namespace winstd;
 // eap::config_method_pap
 //////////////////////////////////////////////////////////////////////
 
-eap::config_method_pap::config_method_pap(_In_ module *mod) : config_method_with_cred<credentials_pap>(mod)
+eap::config_method_pap::config_method_pap(_In_ module *mod) : config_method_with_cred(mod)
 {
+    m_preshared.reset(new credentials_pap(mod));
 }
 
 
 eap::config_method_pap::config_method_pap(_In_ const config_method_pap &other) :
-    config_method_with_cred<credentials_pap>(other)
+    config_method_with_cred(other)
 {
 }
 
 
 eap::config_method_pap::config_method_pap(_Inout_ config_method_pap &&other) :
-    config_method_with_cred<credentials_pap>(std::move(other))
+    config_method_with_cred(std::move(other))
 {
 }
 
@@ -48,7 +49,7 @@ eap::config_method_pap::config_method_pap(_Inout_ config_method_pap &&other) :
 eap::config_method_pap& eap::config_method_pap::operator=(_In_ const config_method_pap &other)
 {
     if (this != &other)
-        (config_method_with_cred<credentials_pap>&)*this = other;
+        (config_method_with_cred&)*this = other;
 
     return *this;
 }
@@ -57,7 +58,7 @@ eap::config_method_pap& eap::config_method_pap::operator=(_In_ const config_meth
 eap::config_method_pap& eap::config_method_pap::operator=(_Inout_ config_method_pap &&other)
 {
     if (this != &other)
-        (config_method_with_cred<credentials_pap>&&)*this = std::move(other);
+        (config_method_with_cred&&)*this = std::move(other);
 
     return *this;
 }

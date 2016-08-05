@@ -311,7 +311,7 @@ bool wxFQDNListValidator::Parse(const wxString &val_in, size_t i_start, size_t i
 // wxTLSCredentialsPanel
 //////////////////////////////////////////////////////////////////////
 
-wxTLSCredentialsPanel::wxTLSCredentialsPanel(const eap::config_provider &prov, const eap::config_method_with_cred<eap::credentials_tls> &cfg, eap::credentials_tls &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config) :
+wxTLSCredentialsPanel::wxTLSCredentialsPanel(const eap::config_provider &prov, const eap::config_method_with_cred &cfg, eap::credentials_tls &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config) :
     wxEAPCredentialsPanelBase<eap::credentials_tls, wxTLSCredentialsPanelBase>(prov, cfg, cred, pszCredTarget, parent, is_config)
 {
     // Load and set icon.

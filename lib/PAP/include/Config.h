@@ -40,7 +40,7 @@ namespace eap
 
 namespace eap
 {
-    class config_method_pap : public config_method_with_cred<credentials_pap>
+    class config_method_pap : public config_method_with_cred
     {
     public:
         ///

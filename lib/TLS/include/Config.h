@@ -54,7 +54,7 @@ namespace eap
 
 namespace eap
 {
-    class config_method_tls : public config_method_with_cred<credentials_tls>
+    class config_method_tls : public config_method_with_cred
     {
     public:
         ///

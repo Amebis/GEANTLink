@@ -261,7 +261,7 @@ public:
     /// \param[in]    parent         Parent window
     /// \param[in]    is_config      Is this panel used to pre-enter credentials? When \c true, the "Remember" checkbox is always selected and disabled.
     ///
-    wxTLSCredentialsPanel(const eap::config_provider &prov, const eap::config_method_with_cred<eap::credentials_tls> &cfg, eap::credentials_tls &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config = false);
+    wxTLSCredentialsPanel(const eap::config_provider &prov, const eap::config_method_with_cred &cfg, eap::credentials_tls &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config = false);
 
 protected:
     /// \cond internal

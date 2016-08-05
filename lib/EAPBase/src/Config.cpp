@@ -139,6 +139,152 @@ eap::config_method& eap::config_method::operator=(_Inout_ config_method &&other)
 
 
 //////////////////////////////////////////////////////////////////////
+// eap::config_method_with_cred
+//////////////////////////////////////////////////////////////////////
+
+eap::config_method_with_cred::config_method_with_cred(_In_ module *mod) :
+    m_allow_save(true),
+    m_use_preshared(false),
+    config_method(mod)
+{
+}
+
+
+eap::config_method_with_cred::config_method_with_cred(_In_ const config_method_with_cred &other) :
+    m_allow_save(other.m_allow_save),
+    m_use_preshared(other.m_use_preshared),
+    m_preshared((credentials*)other.m_preshared->clone()),
+    config_method(other)
+{
+}
+
+
+eap::config_method_with_cred::config_method_with_cred(_Inout_ config_method_with_cred &&other) :
+    m_allow_save(std::move(other.m_allow_save)),
+    m_use_preshared(std::move(other.m_use_preshared)),
+    m_preshared(std::move(other.m_preshared)),
+    config_method(std::move(other))
+{
+}
+
+
+eap::config_method_with_cred& eap::config_method_with_cred::operator=(_In_ const config_method_with_cred &other)
+{
+    if (this != &other) {
+        (config_method&)*this = other;
+        m_allow_save          = other.m_allow_save;
+        m_use_preshared       = other.m_use_preshared;
+        m_preshared.reset((credentials*)other.m_preshared->clone());
+    }
+
+    return *this;
+}
+
+
+eap::config_method_with_cred& eap::config_method_with_cred::operator=(_Inout_ config_method_with_cred &&other)
+{
+    if (this != &other) {
+        (config_method&)*this = std::move(other                );
+        m_allow_save          = std::move(other.m_allow_save   );
+        m_use_preshared       = std::move(other.m_use_preshared);
+        m_preshared           = std::move(other.m_preshared    );
+    }
+
+    return *this;
+}
+
+
+bool eap::config_method_with_cred::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
+{
+    assert(pDoc);
+    assert(pConfigRoot);
+    assert(ppEapError);
+
+    const winstd::bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
+    DWORD dwResult;
+
+    // <ClientSideCredential>
+    winstd::com_obj<IXMLDOMElement> pXmlElClientSideCredential;
+    if ((dwResult = eapxml::create_element(pDoc, pConfigRoot, winstd::bstr(L"eap-metadata:ClientSideCredential"), winstd::bstr(L"ClientSideCredential"), bstrNamespace, &pXmlElClientSideCredential)) != ERROR_SUCCESS) {
+        *ppEapError = m_module->make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <ClientSideCredential> element."));
+        return false;
+    }
+
+    // <ClientSideCredential>/<allow-save>
+    if ((dwResult = eapxml::put_element_value(pDoc, pXmlElClientSideCredential, winstd::bstr(L"allow-save"), bstrNamespace, m_allow_save)) != ERROR_SUCCESS) {
+        *ppEapError = m_module->make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <allow-save> element."));
+        return false;
+    }
+
+    if (m_use_preshared && !m_preshared->save(pDoc, pXmlElClientSideCredential, ppEapError))
+        return false;
+
+    return true;
+}
+
+
+bool eap::config_method_with_cred::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError)
+{
+    assert(pConfigRoot);
+    assert(ppEapError);
+
+    m_allow_save    = true;
+    m_use_preshared = false;
+    m_preshared->clear();
+
+    // <ClientSideCredential>
+    winstd::com_obj<IXMLDOMElement> pXmlElClientSideCredential;
+    if (eapxml::select_element(pConfigRoot, winstd::bstr(L"eap-metadata:ClientSideCredential"), &pXmlElClientSideCredential) == ERROR_SUCCESS) {
+        std::wstring xpath(eapxml::get_xpath(pXmlElClientSideCredential));
+
+        // <allow-save>
+        eapxml::get_element_value(pXmlElClientSideCredential, winstd::bstr(L"eap-metadata:allow-save"), &m_allow_save);
+        m_module->log_config((xpath + L"/allow-save").c_str(), m_allow_save);
+
+        if (m_preshared->load(pXmlElClientSideCredential, ppEapError)) {
+            m_use_preshared = true;
+        } else {
+            // This is not really an error - merely an indication pre-shared credentials are unavailable.
+            if (*ppEapError) {
+                m_module->free_error_memory(*ppEapError);
+                *ppEapError = NULL;
+            }
+        }
+    }
+
+    return true;
+}
+
+
+void eap::config_method_with_cred::operator<<(_Inout_ cursor_out &cursor) const
+{
+    config_method::operator<<(cursor);
+    cursor << m_allow_save;
+    cursor << m_use_preshared;
+    cursor << *m_preshared;
+}
+
+
+size_t eap::config_method_with_cred::get_pk_size() const
+{
+    return
+        config_method::get_pk_size() +
+        pksizeof(m_allow_save   ) +
+        pksizeof(m_use_preshared) +
+        pksizeof(*m_preshared   );
+}
+
+
+void eap::config_method_with_cred::operator>>(_Inout_ cursor_in &cursor)
+{
+    config_method::operator>>(cursor);
+    cursor >> m_allow_save;
+    cursor >> m_use_preshared;
+    cursor >> *m_preshared;
+}
+
+
+//////////////////////////////////////////////////////////////////////
 // eap::config_provider
 //////////////////////////////////////////////////////////////////////
 

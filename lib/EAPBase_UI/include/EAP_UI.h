@@ -231,7 +231,7 @@ public:
     /// \param[in]    pszCredTarget  Target name of credentials in Windows Credential Manager. Can be further decorated to create final target name.
     /// \param[in]    parent         Parent window
     ///
-    wxEAPCredentialsConfigPanel(const eap::config_provider &prov, eap::config_method_with_cred<_Tcred> &cfg, LPCTSTR pszCredTarget, wxWindow *parent) :
+    wxEAPCredentialsConfigPanel(const eap::config_provider &prov, eap::config_method_with_cred &cfg, LPCTSTR pszCredTarget, wxWindow *parent) :
         m_prov(prov),
         m_cfg(cfg),
         m_target(pszCredTarget),
@@ -253,7 +253,7 @@ protected:
         else
             m_preshared->SetValue(true);
 
-        m_cred = *m_cfg.m_preshared;
+        m_cred = *(_Tcred*)m_cfg.m_preshared.get();
 
         return wxEAPCredentialsConfigPanelBase::TransferDataToWindow();
     }
@@ -377,7 +377,7 @@ protected:
 
 protected:
     const eap::config_provider &m_prov;             ///< EAP provider
-    eap::config_method_with_cred<_Tcred> &m_cfg;    ///< EAP method configuration
+    eap::config_method_with_cred &m_cfg;    ///< EAP method configuration
     winstd::library m_shell32;                      ///< shell32.dll resource library reference
     wxIcon m_icon;                                  ///< Panel icon
     winstd::tstring m_target;                       ///< Credential Manager target
@@ -406,7 +406,7 @@ public:
     /// \param[in]    parent         Parent window
     /// \param[in]    is_config      Is this panel used to pre-enter credentials? When \c true, the "Remember" checkbox is always selected and disabled.
     ///
-    wxEAPCredentialsPanelBase(const eap::config_provider &prov, const eap::config_method_with_cred<_Tcred> &cfg, _Tcred &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config = false) :
+    wxEAPCredentialsPanelBase(const eap::config_provider &prov, const eap::config_method_with_cred &cfg, _Tcred &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config = false) :
         m_prov(prov),
         m_cfg(cfg),
         m_cred(cred),
@@ -489,7 +489,7 @@ protected:
 
 protected:
     const eap::config_provider &m_prov;                 ///< Provider configuration
-    const eap::config_method_with_cred<_Tcred> &m_cfg;  ///< Method configuration
+    const eap::config_method_with_cred &m_cfg;  ///< Method configuration
     _Tcred &m_cred;                                     ///< Credentials
     winstd::tstring m_target;                           ///< Credential Manager target
     bool m_is_config;                                   ///< Is this a configuration dialog?
@@ -510,7 +510,7 @@ public:
     /// \param[in]    parent         Parent window
     /// \param[in]    is_config      Is this panel used to pre-enter credentials? When \c true, the "Remember" checkbox is always selected and disabled.
     ///
-    wxPasswordCredentialsPanel(const eap::config_provider &prov, const eap::config_method_with_cred<_Tcred> &cfg, _Tcred &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config = false) :
+    wxPasswordCredentialsPanel(const eap::config_provider &prov, const eap::config_method_with_cred &cfg, _Tcred &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config = false) :
         wxEAPCredentialsPanelBase<_Tcred, _Tbase>(prov, cfg, cred, pszCredTarget, parent, is_config)
     {
         // Load and set icon.
