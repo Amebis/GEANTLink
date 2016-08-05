@@ -30,6 +30,12 @@ eap::peer_ttls_ui::peer_ttls_ui() : peer_ui<eap::config_method_ttls, eap::creden
 }
 
 
+eap::config_method* eap::peer_ttls_ui::make_config_method()
+{
+    return new config_method_ttls(this);
+}
+
+
 bool eap::peer_ttls_ui::invoke_config_ui(
     _In_    HWND             hwndParent,
     _Inout_ config_providers &cfg,

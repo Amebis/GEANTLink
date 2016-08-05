@@ -44,6 +44,11 @@ namespace eap
         peer_ttls_ui();
 
         ///
+        /// Makes a new method config
+        ///
+        virtual config_method* make_config_method();
+
+        ///
         /// Raises the EAP method's specific connection configuration user interface dialog on the client.
         ///
         /// \sa [EapPeerInvokeConfigUI function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363614.aspx)

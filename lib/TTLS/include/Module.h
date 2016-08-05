@@ -44,6 +44,11 @@ namespace eap
         peer_ttls();
 
         ///
+        /// Makes a new method config
+        ///
+        virtual config_method* make_config_method();
+
+        ///
         /// Initializes an EAP peer method for EAPHost.
         ///
         /// \sa [EapPeerGetInfo function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363613.aspx)

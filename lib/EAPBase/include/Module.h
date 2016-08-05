@@ -32,13 +32,6 @@ namespace eap
     ///
     /// A group of methods all EAP peers must or should implement.
     ///
-    template <class _Tmeth, class _Tcred, class _Tint, class _Tintres> class peer_base;
-
-    ///
-    /// EAP peer base class
-    ///
-    /// A group of methods all EAP peers must or should implement.
-    ///
     template <class _Tmeth, class _Tcred, class _Tint, class _Tintres> class peer;
 }
 
@@ -99,7 +92,7 @@ namespace eap
         void free_error_memory(_In_ EAP_ERROR *err);
 
         ///
-        /// Makes a new method config for the given method type
+        /// Makes a new method config
         ///
         virtual config_method* make_config_method();
 
@@ -660,7 +653,7 @@ namespace eap
 
 
     template <class _Tmeth, class _Tcred, class _Tint, class _Tintres>
-    class peer_base : public module
+    class peer : public module
     {
     public:
         ///
@@ -689,28 +682,7 @@ namespace eap
         ///
         /// \param[in] eap_method  EAP method type ID
         ///
-        peer_base(_In_ winstd::eap_type_t eap_method) : module(eap_method) {}
-
-        ///
-        /// Makes a new method config for the given method type
-        ///
-        virtual config_method* make_config_method()
-        {
-            return new config_method_type(this);
-        }
-    };
-
-
-    template <class _Tmeth, class _Tcred, class _Tint, class _Tintres>
-    class peer : public peer_base<_Tmeth, _Tcred, _Tint, _Tintres>
-    {
-    public:
-        ///
-        /// Constructs a EAP peer module for the given EAP type
-        ///
-        /// \param[in] eap_method  EAP method type ID
-        ///
-        peer(_In_ winstd::eap_type_t eap_method) : peer_base<_Tmeth, _Tcred, _Tint, _Tintres>(eap_method) {}
+        peer(_In_ winstd::eap_type_t eap_method) : module(eap_method) {}
 
         ///
         /// Initializes an EAP peer method for EAPHost.

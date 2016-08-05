@@ -36,15 +36,36 @@ namespace eap
 namespace eap
 {
     template <class _Tmeth, class _Tcred, class _Tint, class _Tintres>
-    class peer_ui : public peer_base<_Tmeth, _Tcred, _Tint, _Tintres>
+    class peer_ui : public module
     {
+    public:
+        ///
+        /// Method configuration data type
+        ///
+        typedef _Tmeth config_method_type;
+
+        ///
+        /// Credentials data type
+        ///
+        typedef _Tcred credentials_type;
+
+        ///
+        /// Interactive request data type
+        ///
+        typedef _Tint interactive_request_type;
+
+        ///
+        /// Interactive response data type
+        ///
+        typedef _Tintres interactive_response_type;
+
     public:
         ///
         /// Constructs a EAP UI peer module for the given EAP type
         ///
         /// \param[in] eap_method  EAP method type ID
         ///
-        peer_ui(_In_ winstd::eap_type_t eap_method) : peer_base<_Tmeth, _Tcred, _Tint, _Tintres>(eap_method) {}
+        peer_ui(_In_ winstd::eap_type_t eap_method) : module(eap_method) {}
 
         ///
         /// Raises the EAP method's specific connection configuration user interface dialog on the client.

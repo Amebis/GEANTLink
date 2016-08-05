@@ -33,6 +33,12 @@ eap::peer_ttls::peer_ttls() : peer<config_method_ttls, credentials_ttls, bool, b
 }
 
 
+eap::config_method* eap::peer_ttls::make_config_method()
+{
+    return new config_method_ttls(this);
+}
+
+
 bool eap::peer_ttls::initialize(_Out_ EAP_ERROR **ppEapError)
 {
     UNREFERENCED_PARAMETER(ppEapError);
