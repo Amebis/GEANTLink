@@ -257,6 +257,9 @@ namespace eap
     };
 
 
+    class credentials;
+
+
     template <class _Tcred>
     class config_method_with_cred : public config_method
     {
@@ -269,7 +272,7 @@ namespace eap
         config_method_with_cred(_In_ module *mod) :
             m_allow_save(true),
             m_use_preshared(false),
-            m_preshared(mod),
+            m_preshared(new _Tcred(mod)),
             config_method(mod)
         {
         }
@@ -283,7 +286,7 @@ namespace eap
         config_method_with_cred(_In_ const config_method_with_cred<_Tcred> &other) :
             m_allow_save(other.m_allow_save),
             m_use_preshared(other.m_use_preshared),
-            m_preshared(other.m_preshared),
+            m_preshared((_Tcred*)other.m_preshared->clone()),
             config_method(other)
         {
         }
@@ -316,7 +319,7 @@ namespace eap
                 (config_method&)*this = other;
                 m_allow_save          = other.m_allow_save;
                 m_use_preshared       = other.m_use_preshared;
-                m_preshared           = other.m_preshared;
+                m_preshared.reset((_Tcred*)other.m_preshared->clone());
             }
 
             return *this;
@@ -379,7 +382,7 @@ namespace eap
                 return false;
             }
 
-            if (m_use_preshared && !m_preshared.save(pDoc, pXmlElClientSideCredential, ppEapError))
+            if (m_use_preshared && !m_preshared->save(pDoc, pXmlElClientSideCredential, ppEapError))
                 return false;
 
             return true;
@@ -402,7 +405,7 @@ namespace eap
 
             m_allow_save    = true;
             m_use_preshared = false;
-            m_preshared.clear();
+            m_preshared->clear();
 
             // <ClientSideCredential>
             winstd::com_obj<IXMLDOMElement> pXmlElClientSideCredential;
@@ -416,7 +419,7 @@ namespace eap
                 _Tcred preshared(m_module);
                 if (preshared.load(pXmlElClientSideCredential, ppEapError)) {
                     m_use_preshared = true;
-                    m_preshared = std::move(preshared);
+                    *m_preshared = std::move(preshared);
                 } else {
                     // This is not really an error - merely an indication pre-shared credentials are unavailable.
                     if (*ppEapError) {
@@ -444,7 +447,7 @@ namespace eap
             config_method::operator<<(cursor);
             cursor << m_allow_save;
             cursor << m_use_preshared;
-            cursor << m_preshared;
+            cursor << *m_preshared;
         }
 
 
@@ -459,7 +462,7 @@ namespace eap
                 config_method::get_pk_size() +
                 pksizeof(m_allow_save   ) +
                 pksizeof(m_use_preshared) +
-                pksizeof(m_preshared    );
+                pksizeof(*m_preshared   );
         }
 
 
@@ -473,15 +476,15 @@ namespace eap
             config_method::operator>>(cursor);
             cursor >> m_allow_save;
             cursor >> m_use_preshared;
-            cursor >> m_preshared;
+            cursor >> *m_preshared;
         }
 
         /// @}
 
     public:
-        bool m_allow_save;      ///< Are credentials allowed to be saved to Windows Credential Manager?
-        bool m_use_preshared;   ///< Use pre-shared credentials
-        _Tcred m_preshared;     ///< Pre-shared credentials
+        bool m_allow_save;                     ///< Are credentials allowed to be saved to Windows Credential Manager?
+        bool m_use_preshared;                  ///< Use pre-shared credentials
+        std::unique_ptr<_Tcred> m_preshared;   ///< Pre-shared credentials
     };
 
 

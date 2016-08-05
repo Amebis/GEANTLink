@@ -121,7 +121,7 @@ bool eap::peer_ttls::get_identity(
             target_inner = L"PAP";
             if (cfg_inner_pap->m_use_preshared) {
                 // Inner PAP: Using preshared credentials.
-                cred_out.m_inner.reset((credentials*)cfg_inner_pap->m_preshared.clone());
+                cred_out.m_inner.reset((credentials*)cfg_inner_pap->m_preshared->clone());
                 log_event(&EAPMETHOD_TRACE_EVT_CRED_PRESHARED, event_data(target_inner), event_data(cred_out.m_inner->get_name()), event_data::blank);
                 is_inner_set = true;
             }

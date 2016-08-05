@@ -253,7 +253,7 @@ protected:
         else
             m_preshared->SetValue(true);
 
-        m_cred = m_cfg.m_preshared;
+        m_cred = *m_cfg.m_preshared;
 
         return wxEAPCredentialsConfigPanelBase::TransferDataToWindow();
     }
@@ -266,7 +266,7 @@ protected:
         if (!m_prov.m_read_only) {
             // This is not a provider-locked configuration. Save the data.
             m_cfg.m_use_preshared = !m_own->GetValue();
-            m_cfg.m_preshared     = m_cred;
+            *m_cfg.m_preshared    = m_cred;
         }
 
         return true;
