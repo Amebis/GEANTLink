@@ -45,10 +45,10 @@ namespace eap
 namespace eap
 {
     enum ttls_flags_t {
-        ttls_flags_length_incl = tls_flags_length_incl, ///< Length included
-        ttls_flags_more_frag   = tls_flags_more_frag,   ///< More fragments
-        ttls_flags_start       = tls_flags_start,       ///< Start
-        ttls_flags_ver_mask    = 0x07,                  ///< Version mask
+        ttls_flags_length_incl = tls_req_flags_length_incl, ///< Length included
+        ttls_flags_more_frag   = tls_req_flags_more_frag,   ///< More fragments
+        ttls_flags_start       = tls_req_flags_start,       ///< Start
+        ttls_flags_ver_mask    = 0x07,                      ///< Version mask
     };
 
 
@@ -97,6 +97,22 @@ namespace eap
 
         /// \name Packet processing
         /// @{
+
+        ///
+        /// Starts an EAP authentication session on the peer EAPHost using the EAP method.
+        ///
+        /// \sa [EapPeerBeginSession function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363600.aspx)
+        ///
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
+        ///
+        virtual bool begin_session(
+            _In_        DWORD         dwFlags,
+            _In_  const EapAttributes *pAttributeArray,
+            _In_        HANDLE        hTokenImpersonateUser,
+            _In_        DWORD         dwMaxSendPacketSize,
+            _Out_       EAP_ERROR     **ppEapError);
 
         ///
         /// Processes a packet received by EAPHost from a supplicant.

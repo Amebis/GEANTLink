@@ -23,14 +23,21 @@ namespace eap
     ///
     /// TLS random
     ///
-    typedef unsigned char tls_random_t[32];
+    struct tls_random_t;
 
     ///
-    /// EAP-TLS packet flags
+    /// EAP-TLS request packet flags
     ///
     /// \sa [The EAP-TLS Authentication Protocol (Chapter: 3.1 EAP-TLS Request Packet)](https://tools.ietf.org/html/rfc5216#section-3.1)
     ///
-    enum tls_flags_t;
+    enum tls_req_flags_t;
+
+    ///
+    /// EAP-TLS response packet flags
+    ///
+    /// \sa [The EAP-TLS Authentication Protocol (Chapter: 3.2 EAP-TLS Response Packet)](https://tools.ietf.org/html/rfc5216#section-3.2)
+    ///
+    enum tls_res_flags_t;
 
     ///
     /// EAP-TLS method
@@ -45,18 +52,31 @@ namespace eap
 
 #include "../../EAPBase/include/Method.h"
 
-#include <WinStd/Common.h>
 #include <WinStd/Crypt.h>
 
+#include <list>
 #include <vector>
 
 
 namespace eap
 {
-    enum tls_flags_t {
-        tls_flags_length_incl = 0x80,  ///< Length included
-        tls_flags_more_frag   = 0x40,  ///< More fragments
-        tls_flags_start       = 0x20,  ///< Start
+#pragma pack(push)
+#pragma pack(1)
+    struct tls_random_t {
+        unsigned long time;
+        unsigned char data[28];
+    };
+#pragma pack(pop)
+
+    enum tls_req_flags_t {
+        tls_req_flags_length_incl = 0x80,   ///< Length included
+        tls_req_flags_more_frag   = 0x40,   ///< More fragments
+        tls_req_flags_start       = 0x20,   ///< Start
+    };
+
+    enum tls_res_flags_t {
+        tls_res_flags_length_incl = 0x80,   ///< Length included
+        tls_res_flags_more_frag   = 0x40,   ///< More fragments
     };
 
 
@@ -112,6 +132,22 @@ namespace eap
         /// @{
 
         ///
+        /// Starts an EAP authentication session on the peer EAPHost using the EAP method.
+        ///
+        /// \sa [EapPeerBeginSession function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363600.aspx)
+        ///
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
+        ///
+        virtual bool begin_session(
+            _In_        DWORD         dwFlags,
+            _In_  const EapAttributes *pAttributeArray,
+            _In_        HANDLE        hTokenImpersonateUser,
+            _In_        DWORD         dwMaxSendPacketSize,
+            _Out_       EAP_ERROR     **ppEapError);
+
+        ///
         /// Processes a packet received by EAPHost from a supplicant.
         ///
         /// \returns
@@ -142,25 +178,66 @@ namespace eap
 
         /// @}
 
+    protected:
+        ///
+        /// Makes a TLS client hello message
+        ///
+        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter 7.4.1.2. Client Hello](https://tools.ietf.org/html/rfc5246#section-7.4.1.2)
+        ///
+        /// \returns Client Hello message
+        ///
+        sanitizing_blob make_client_hello() const;
+
+        ///
+        /// Makes a TLS handshake
+        ///
+        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter 7.4. Handshake Protocol](https://tools.ietf.org/html/rfc5246#section-7.4)
+        ///
+        /// \param[in] msg      Handshake data contents
+        /// \param[in] encrypt  Should make an encrypted handshake message?
+        ///
+        /// \returns TLS handshake message
+        ///
+        sanitizing_blob make_handshake(_In_ const sanitizing_blob &msg, _In_ bool encrypt);
+
+        ///
+        /// Encrypt block of data
+        ///
+        /// \param[in] msg  TLS message to encrypt
+        ///
+        /// \returns Encrypted message
+        ///
+        std::vector<unsigned char> encrypt_message(_In_ const sanitizing_blob &msg);
+
     public:
         enum phase_t {
-            phase_handshake_start = 0,
-        } m_phase;                                  ///< Session phase
+            phase_client_hello = 0,
+            phase_server_hello = 1,
+        } m_phase;                                      ///< Session phase
 
         struct {
-            EapCode m_code;                         ///< Packet code
-            BYTE m_id;                              ///< Packet ID
-            BYTE m_flags;                           ///< Packet flags
-            std::vector<BYTE> m_data;               ///< Packet data
+            EapCode m_code;                             ///< Packet code
+            BYTE m_id;                                  ///< Packet ID
+            BYTE m_flags;                               ///< Packet flags
+            std::vector<BYTE> m_data;                   ///< Packet data
         }
-            m_packet_req,                           ///< Request packet
-            m_packet_res;                           ///< Response packet
+            m_packet_req,                               ///< Request packet
+            m_packet_res;                               ///< Response packet
 
-        winstd::crypt_prov m_cp;        ///< Cryptography provider
+        winstd::crypt_prov m_cp;                        ///< Cryptography provider
+        winstd::crypt_key m_key_hmac;                   ///< Symmetric key for HMAC calculation
 
-        tls_random_t m_random_client;   ///< Client random
-        tls_random_t m_random_server;   ///< Server random
+        winstd::crypt_key m_key_write;                  ///< Key for encrypting messages
 
-        std::vector<unsigned char, winstd::sanitizing_allocator<unsigned char> > m_session_id;  ///< TLS session ID
+        tls_random_t m_random_client;                   ///< Client random
+        tls_random_t m_random_server;                   ///< Server random
+
+        sanitizing_blob m_session_id;                   ///< TLS session ID
+
+        winstd::crypt_hash m_hash_handshake_msgs_md5;   ///< Running MD5 hash of handshake messages sent
+        winstd::crypt_hash m_hash_handshake_msgs_sha1;  ///< Running SHA-1 hash of handshake messages sent
+
+    protected:
+        unsigned __int64 m_seq_num;                     ///< Sequence number for encryption
     };
 }

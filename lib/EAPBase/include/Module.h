@@ -835,7 +835,7 @@ namespace eap
         ///
         virtual bool begin_session(
             _In_                                   DWORD              dwFlags,
-            _In_                           const   EapAttributes      *pAttributeArray,
+            _In_                             const EapAttributes      *pAttributeArray,
             _In_                                   HANDLE             hTokenImpersonateUser,
             _In_count_(dwConnectionDataSize) const BYTE               *pConnectionData,
             _In_                                   DWORD              dwConnectionDataSize,

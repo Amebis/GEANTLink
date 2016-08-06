@@ -27,6 +27,7 @@
 
 #if !defined(RC_INVOKED) && !defined(MIDL_PASS)
 
+#include <WinStd/Common.h>
 #include <WinStd/Crypt.h>
 #include <WinStd/EAP.h>
 
@@ -48,6 +49,11 @@ namespace eap
     /// Input BLOB cursor
     ///
     struct cursor_in;
+
+    ///
+    /// Sanitizing dynamically allocated BLOB
+    ///
+    typedef std::vector<unsigned char, winstd::sanitizing_allocator<unsigned char> > sanitizing_blob;
 }
 
 ///
@@ -328,6 +334,17 @@ inline size_t pksizeof(const winstd::eap_type_t &val);
 /// \param[out]   val     EAP method type to unpack to
 ///
 inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ winstd::eap_type_t &val);
+
+#ifndef htonll
+///
+/// Convert host converts an unsigned __int64 from host to TCP/IP network byte order.
+///
+/// \param[in] val  A 64-bit unsigned number in host byte order.
+///
+/// \returns The value in TCP/IP's network byte order.
+///
+inline unsigned __int64 htonll(unsigned __int64 val);
+#endif
 
 #pragma once
 
@@ -683,5 +700,17 @@ inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ winstd::eap_type_t 
     cursor >> t;
     val = (winstd::eap_type_t)t;
 }
+
+
+#ifndef htonll
+
+inline unsigned __int64 htonll(unsigned __int64 val)
+{
+    return
+        (unsigned __int64)htonl((u_long)((val >> 32) & 0xffffffff))       |
+        (unsigned __int64)htonl((u_long)((val      ) & 0xffffffff)) << 32;
+}
+
+#endif
 
 #endif

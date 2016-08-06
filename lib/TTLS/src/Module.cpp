@@ -90,16 +90,16 @@ bool eap::peer_ttls::get_identity(
         return false;
     }
 
-    // Unpack cached credentials.
-    credentials_ttls cred_in(*this);
-    if (dwUserDataSize && !unpack(cred_in, pUserData, dwUserDataSize, ppEapError))
-        return false;
-
     // Get method configuration.
     const config_provider &cfg_prov(cfg.m_providers.front());
     const config_method_ttls *cfg_method = dynamic_cast<const config_method_ttls*>(cfg_prov.m_methods.front().get());
     assert(cfg_method);
     const config_method_pap *cfg_inner_pap = dynamic_cast<const config_method_pap*>(cfg_method->m_inner.get());
+
+    // Unpack cached credentials.
+    credentials_ttls cred_in(*this);
+    if (dwUserDataSize && !unpack(cred_in, pUserData, dwUserDataSize, ppEapError))
+        return false;
 
     credentials_ttls cred_out(*this);
 
@@ -323,11 +323,6 @@ bool eap::peer_ttls::begin_session(
     _Out_                                  EAP_SESSION_HANDLE *phSession,
     _Out_                                  EAP_ERROR          **ppEapError)
 {
-    UNREFERENCED_PARAMETER(dwFlags);
-    UNREFERENCED_PARAMETER(pAttributeArray);
-    UNREFERENCED_PARAMETER(hTokenImpersonateUser);
-    UNREFERENCED_PARAMETER(dwMaxSendPacketSize);
-
     *phSession = NULL;
 
     // Allocate new session.
@@ -337,10 +332,25 @@ bool eap::peer_ttls::begin_session(
         return false;
     }
 
-    // Begin the session.
-    if (!unpack(s->m_cfg, pConnectionData, dwConnectionDataSize, ppEapError) ||
-        !unpack(s->m_cred, pUserData, dwUserDataSize, ppEapError)/* ||
-        !s->begin(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize, ppEapError)*/)
+    // Unpack configuration.
+    config_provider_list cfg(*this);
+    if (!unpack(cfg, pConnectionData, dwConnectionDataSize, ppEapError))
+        return false;
+    else if (cfg.m_providers.empty() || cfg.m_providers.front().m_methods.empty()) {
+        *ppEapError = make_error(ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" Configuration has no providers and/or methods."));
+        return false;
+    }
+
+    // Copy method configuration.
+    const config_provider &cfg_prov(cfg.m_providers.front());
+    s->m_cfg = *dynamic_cast<const config_method_ttls*>(cfg_prov.m_methods.front().get());
+
+    // Unpack credentials.
+    if (!unpack(s->m_cred, pUserData, dwUserDataSize, ppEapError))
+        return false;
+
+    // Initialize method.
+    if (!s->m_method.begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize, ppEapError))
         return false;
 
     *phSession = s.release();

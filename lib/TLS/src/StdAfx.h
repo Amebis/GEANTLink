@@ -30,3 +30,6 @@
 #include <WinStd/EAP.h>
 
 #include <EapHostError.h>
+#include <time.h>
+
+#include <algorithm>

@@ -91,6 +91,33 @@ namespace eap
         /// @{
 
         ///
+        /// Starts an EAP authentication session on the peer EAPHost using the EAP method.
+        ///
+        /// \sa [EapPeerBeginSession function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363600.aspx)
+        ///
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
+        ///
+        virtual bool begin_session(
+            _In_        DWORD         dwFlags,
+            _In_  const EapAttributes *pAttributeArray,
+            _In_        HANDLE        hTokenImpersonateUser,
+            _In_        DWORD         dwMaxSendPacketSize,
+            _Out_       EAP_ERROR     **ppEapError);
+
+        ///
+        /// Ends an EAP authentication session for the EAP method.
+        ///
+        /// \sa [EapPeerEndSession function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363604.aspx)
+        ///
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
+        ///
+        virtual bool end_session(_Out_ EAP_ERROR **ppEapError);
+
+        ///
         /// Processes a packet received by EAPHost from a supplicant.
         ///
         /// \returns

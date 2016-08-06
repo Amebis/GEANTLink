@@ -71,16 +71,26 @@ eap::method_ttls& eap::method_ttls::operator=(_Inout_ method_ttls &&other)
 }
 
 
+bool eap::method_ttls::begin_session(
+    _In_        DWORD         dwFlags,
+    _In_  const EapAttributes *pAttributeArray,
+    _In_        HANDLE        hTokenImpersonateUser,
+    _In_        DWORD         dwMaxSendPacketSize,
+    _Out_       EAP_ERROR     **ppEapError)
+{
+    if (!m_outer.begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize, ppEapError))
+        return false;
+
+    return true;
+}
+
+
 bool eap::method_ttls::process_request_packet(
     _In_bytecount_(dwReceivedPacketSize) const EapPacket           *pReceivedPacket,
     _In_                                       DWORD               dwReceivedPacketSize,
     _Out_                                      EapPeerMethodOutput *pEapOutput,
     _Out_                                      EAP_ERROR           **ppEapError)
 {
-    // Initialize output.
-    pEapOutput->fAllowNotifications = TRUE;
-    pEapOutput->action              = EapPeerMethodResponseActionDiscard;
-
     // Is this a valid EAP-TTLS packet?
     if (dwReceivedPacketSize < 6) {
         *ppEapError = m_module.make_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, _T(__FUNCTION__) _T(" Packet is too small. EAP-%s packets should be at least 6B."));
@@ -88,6 +98,15 @@ bool eap::method_ttls::process_request_packet(
     } else if (pReceivedPacket->Data[0] != eap_type_ttls) {
         *ppEapError = m_module.make_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, wstring_printf(_T(__FUNCTION__) _T(" Packet is not EAP-TTLS (expected: %u, received: %u)."), eap_type_ttls, pReceivedPacket->Data[0]).c_str());
         return false;
+    }
+
+    if (pReceivedPacket->Code == EapCodeRequest && (pReceivedPacket->Data[1] & ttls_flags_start)) {
+        // This is a start EAP-TTLS packet.
+
+        // Determine minimum EAP-TTLS version supported by server and us.
+        version_t ver_remote = (version_t)(pReceivedPacket->Data[1] & ttls_flags_ver_mask);
+        m_version = std::min<version_t>(ver_remote, version_0);
+        m_module.log_event(&EAPMETHOD_HANDSHAKE_START1, event_data((DWORD)eap_type_ttls), event_data((unsigned char)m_version), event_data((unsigned char)ver_remote), event_data::blank);
     }
 
     return m_outer.process_request_packet(pReceivedPacket, dwReceivedPacketSize, pEapOutput, ppEapError);
@@ -99,5 +118,13 @@ bool eap::method_ttls::get_response_packet(
     _Inout_                            DWORD     *pdwSendPacketSize,
     _Out_                              EAP_ERROR **ppEapError)
 {
-    return m_outer.get_response_packet(pSendPacket, pdwSendPacketSize, ppEapError);
+    if (!m_outer.get_response_packet(pSendPacket, pdwSendPacketSize, ppEapError))
+        return false;
+
+    // Change packet type to EAP-TTLS, and add EAP-TTLS version.
+    pSendPacket->Data[0]  = (BYTE)eap_type_ttls;
+    pSendPacket->Data[1] &= ~ttls_flags_ver_mask;
+    pSendPacket->Data[1] |= m_version;
+
+    return true;
 }
