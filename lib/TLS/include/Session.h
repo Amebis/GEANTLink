@@ -33,6 +33,11 @@ namespace eap
     enum tls_flags_t;
 
     ///
+    /// TLS method
+    ///
+    class method_tls;
+
+    ///
     /// TLS session
     ///
     class session_tls;
@@ -60,73 +65,53 @@ namespace eap
     };
 
 
-    class session_tls : public session<credentials_tls, bool, bool>
+    class method_tls : public method
     {
     public:
         ///
-        /// Constructor
+        /// Constructs an EAP method
         ///
         /// \param[in] mod  EAP module to use for global services
+        /// \param[in] cfg  Method configuration
         ///
-        session_tls(_In_ module &mod);
+        method_tls(_In_ module &module, _In_ config_method &cfg, _In_ credentials &cred);
 
         ///
-        /// Copies TLS session
+        /// Copies an EAP method
         ///
-        /// \param[in] other  Session to copy from
+        /// \param[in] other  EAP method to copy from
         ///
-        session_tls(_In_ const session_tls &other);
+        method_tls(_In_ const method_tls &other);
 
         ///
-        /// Moves TLS session
+        /// Moves an EAP method
         ///
-        /// \param[in] other  Session to move from
+        /// \param[in] other  EAP method to move from
         ///
-        session_tls(_Inout_ session_tls &&other);
+        method_tls(_Inout_ method_tls &&other);
 
         ///
         /// Destructor
         ///
-        virtual ~session_tls();
+        virtual ~method_tls();
 
         ///
-        /// Copies TLS session
+        /// Copies an EAP method
         ///
-        /// \param[in] other  Session to copy from
+        /// \param[in] other  EAP method to copy from
         ///
         /// \returns Reference to this object
         ///
-        session_tls& operator=(_In_ const session_tls &other);
+        method_tls& operator=(_In_ const method_tls &other);
 
         ///
-        /// Moves TLS session
+        /// Moves an EAP method
         ///
-        /// \param[in] other  Session to move from
+        /// \param[in] other  EAP method to move from
         ///
         /// \returns Reference to this object
         ///
-        session_tls& operator=(_Inout_ session_tls &&other);
-
-        /// \name Session start/end
-        /// @{
-
-        ///
-        /// Starts an EAP authentication session on the peer EAPHost using the EAP method.
-        ///
-        /// \sa [EapPeerBeginSession function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363600.aspx)
-        ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool begin(
-            _In_        DWORD         dwFlags,
-            _In_  const EapAttributes *pAttributeArray,
-            _In_        HANDLE        hTokenImpersonateUser,
-            _In_        DWORD         dwMaxSendPacketSize,
-            _Out_       EAP_ERROR     **ppEapError);
-
-        /// @}
+        method_tls& operator=(_Inout_ method_tls &&other);
 
         /// \name Packet processing
         /// @{
@@ -134,15 +119,15 @@ namespace eap
         ///
         /// Processes a packet received by EAPHost from a supplicant.
         ///
-        /// \sa [EapPeerProcessRequestPacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363621.aspx)
-        ///
         /// \returns
         /// - \c true if succeeded
         /// - \c false otherwise. See \p ppEapError for details.
         ///
+        /// \sa [EapPeerProcessRequestPacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363621.aspx)
+        ///
         virtual bool process_request_packet(
-            _In_                                       DWORD               dwReceivedPacketSize,
             _In_bytecount_(dwReceivedPacketSize) const EapPacket           *pReceivedPacket,
+            _In_                                       DWORD               dwReceivedPacketSize,
             _Out_                                      EapPeerMethodOutput *pEapOutput,
             _Out_                                      EAP_ERROR           **ppEapError);
 
@@ -156,23 +141,9 @@ namespace eap
         /// - \c false otherwise. See \p ppEapError for details.
         ///
         virtual bool get_response_packet(
-            _Inout_                            DWORD     *pdwSendPacketSize,
             _Inout_bytecap_(*dwSendPacketSize) EapPacket *pSendPacket,
+            _Inout_                            DWORD     *pdwSendPacketSize,
             _Out_                              EAP_ERROR **ppEapError);
-
-        ///
-        /// Obtains the result of an authentication session from the EAP method.
-        ///
-        /// \sa [EapPeerGetResult function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363611.aspx)
-        ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool get_result(
-            _In_  EapPeerMethodResultReason reason,
-            _Out_ EapPeerMethodResult       *ppResult,
-            _Out_ EAP_ERROR                 **ppEapError);
 
         /// @}
 

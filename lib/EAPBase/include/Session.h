@@ -21,6 +21,11 @@
 namespace eap
 {
     ///
+    /// EAP method base class
+    ///
+    class method;
+
+    ///
     /// EAP session
     ///
     template <class _Tcred, class _Tint, class _Tintres> class session;
@@ -28,6 +33,8 @@ namespace eap
 
 #pragma once
 
+#include "Config.h"
+#include "Credentials.h"
 #include "Module.h"
 
 #include <WinStd/EAP.h>
@@ -42,6 +49,90 @@ extern "C" {
 
 namespace eap
 {
+    class method
+    {
+    public:
+        ///
+        /// Constructs an EAP method
+        ///
+        /// \param[in] mod  EAP module to use for global services
+        /// \param[in] cfg  Method configuration
+        ///
+        method(_In_ module &module, _In_ config_method &cfg, _In_ credentials &cred);
+
+        ///
+        /// Copies an EAP method
+        ///
+        /// \param[in] other  EAP method to copy from
+        ///
+        method(_In_ const method &other);
+
+        ///
+        /// Moves an EAP method
+        ///
+        /// \param[in] other  EAP method to move from
+        ///
+        method(_Inout_ method &&other);
+
+        ///
+        /// Copies an EAP method
+        ///
+        /// \param[in] other  EAP method to copy from
+        ///
+        /// \returns Reference to this object
+        ///
+        method& operator=(_In_ const method &other);
+
+        ///
+        /// Moves an EAP method
+        ///
+        /// \param[in] other  EAP method to move from
+        ///
+        /// \returns Reference to this object
+        ///
+        method& operator=(_Inout_ method &&other);
+
+        /// \name Packet processing
+        /// @{
+
+        ///
+        /// Processes a packet received by EAPHost from a supplicant.
+        ///
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
+        ///
+        /// \sa [EapPeerProcessRequestPacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363621.aspx)
+        ///
+        virtual bool process_request_packet(
+            _In_bytecount_(dwReceivedPacketSize) const EapPacket           *pReceivedPacket,
+            _In_                                       DWORD               dwReceivedPacketSize,
+            _Out_                                      EapPeerMethodOutput *pEapOutput,
+            _Out_                                      EAP_ERROR           **ppEapError) = 0;
+
+        ///
+        /// Obtains a response packet from the EAP method.
+        ///
+        /// \sa [EapPeerGetResponsePacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363610.aspx)
+        ///
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
+        ///
+        virtual bool get_response_packet(
+            _Inout_bytecap_(*dwSendPacketSize) EapPacket *pSendPacket,
+            _Inout_                            DWORD     *pdwSendPacketSize,
+            _Out_                              EAP_ERROR **ppEapError) = 0;
+
+        /// @}
+
+    public:
+        module &m_module;       ///< EAP module
+        config_method &m_cfg;   ///< Method configuration
+        credentials &m_cred;    ///< User credentials
+    };
+
+
     template <class _Tcred, class _Tint, class _Tintres>
     class session
     {
@@ -340,7 +431,7 @@ namespace eap
 
     public:
         module &m_module;                   ///< EAP module
-        config_provider_list m_cfg;             ///< Providers configuration
+        config_provider_list m_cfg;         ///< Providers configuration
         credentials_type m_cred;            ///< User credentials
         interactive_request_type m_intreq;  ///< Interactive UI request data
         DWORD m_eap_flags;                  ///< A combination of EAP flags that describe the new EAP authentication session behavior
