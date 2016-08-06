@@ -323,22 +323,27 @@ bool eap::peer_ttls::begin_session(
     _Out_                                  EAP_SESSION_HANDLE *phSession,
     _Out_                                  EAP_ERROR          **ppEapError)
 {
+    UNREFERENCED_PARAMETER(dwFlags);
+    UNREFERENCED_PARAMETER(pAttributeArray);
+    UNREFERENCED_PARAMETER(hTokenImpersonateUser);
+    UNREFERENCED_PARAMETER(dwMaxSendPacketSize);
+
     *phSession = NULL;
 
     // Allocate new session.
-    unique_ptr<session_ttls> session(new session_ttls(*this));
-    if (!session) {
+    unique_ptr<session> s(new session(*this));
+    if (!s) {
         *ppEapError = make_error(ERROR_OUTOFMEMORY, _T(__FUNCTION__) _T(" Error allocating memory for EAP-TTLS session."));
         return false;
     }
 
     // Begin the session.
-    if (!unpack(session->m_cfg, pConnectionData, dwConnectionDataSize, ppEapError) ||
-        !unpack(session->m_cred, pUserData, dwUserDataSize, ppEapError) ||
-        !session->begin(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize, ppEapError))
+    if (!unpack(s->m_cfg, pConnectionData, dwConnectionDataSize, ppEapError) ||
+        !unpack(s->m_cred, pUserData, dwUserDataSize, ppEapError)/* ||
+        !s->begin(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize, ppEapError)*/)
         return false;
 
-    *phSession = session.release();
+    *phSession = s.release();
     return true;
 }
 
@@ -346,11 +351,12 @@ bool eap::peer_ttls::begin_session(
 bool eap::peer_ttls::end_session(_In_ EAP_SESSION_HANDLE hSession, _Out_ EAP_ERROR **ppEapError)
 {
     assert(hSession);
+    UNREFERENCED_PARAMETER(ppEapError); // What could possibly go wrong when destroying!? ;)
 
     // End the session.
-    session_ttls *session = static_cast<session_ttls*>(hSession);
-    session->end(ppEapError);
-    delete session;
+    session *s = static_cast<session*>(hSession);
+    //s->end(ppEapError);
+    delete s;
 
     return true;
 }
@@ -364,7 +370,7 @@ bool eap::peer_ttls::process_request_packet(
     _Out_                                      EAP_ERROR           **ppEapError)
 {
     assert(dwReceivedPacketSize == ntohs(*(WORD*)pReceivedPacket->Length));
-    return static_cast<session_ttls*>(hSession)->process_request_packet(dwReceivedPacketSize, pReceivedPacket, pEapOutput, ppEapError);
+    return static_cast<session*>(hSession)->m_method.process_request_packet(pReceivedPacket, dwReceivedPacketSize, pEapOutput, ppEapError);
 }
 
 
@@ -374,7 +380,7 @@ bool eap::peer_ttls::get_response_packet(
     _Inout_                            DWORD              *pdwSendPacketSize,
     _Out_                              EAP_ERROR          **ppEapError)
 {
-    return static_cast<session_ttls*>(hSession)->get_response_packet(pdwSendPacketSize, pSendPacket, ppEapError);
+    return static_cast<session*>(hSession)->m_method.get_response_packet(pSendPacket, pdwSendPacketSize, ppEapError);
 }
 
 
@@ -384,7 +390,13 @@ bool eap::peer_ttls::get_result(
     _Out_ EapPeerMethodResult       *ppResult,
     _Out_ EAP_ERROR                 **ppEapError)
 {
-    return static_cast<session_ttls*>(hSession)->get_result(reason, ppResult, ppEapError);
+    UNREFERENCED_PARAMETER(hSession);
+    UNREFERENCED_PARAMETER(reason);
+    UNREFERENCED_PARAMETER(ppResult);
+    assert(ppEapError);
+
+    *ppEapError = make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
+    return false;
 }
 
 
@@ -394,7 +406,13 @@ bool eap::peer_ttls::get_ui_context(
     _Out_ DWORD              *pdwUIContextDataSize,
     _Out_ EAP_ERROR          **ppEapError)
 {
-    return static_cast<session_ttls*>(hSession)->get_ui_context(ppUIContextData, pdwUIContextDataSize, ppEapError);
+    UNREFERENCED_PARAMETER(hSession);
+    UNREFERENCED_PARAMETER(ppUIContextData);
+    UNREFERENCED_PARAMETER(pdwUIContextDataSize);
+    assert(ppEapError);
+
+    *ppEapError = make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
+    return false;
 }
 
 
@@ -405,7 +423,14 @@ bool eap::peer_ttls::set_ui_context(
     _In_                            const EapPeerMethodOutput *pEapOutput,
     _Out_                                 EAP_ERROR           **ppEapError)
 {
-    return static_cast<session_ttls*>(hSession)->set_ui_context(pUIContextData, dwUIContextDataSize, pEapOutput, ppEapError);
+    UNREFERENCED_PARAMETER(hSession);
+    UNREFERENCED_PARAMETER(pUIContextData);
+    UNREFERENCED_PARAMETER(dwUIContextDataSize);
+    UNREFERENCED_PARAMETER(pEapOutput);
+    assert(ppEapError);
+
+    *ppEapError = make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
+    return false;
 }
 
 
@@ -414,7 +439,13 @@ bool eap::peer_ttls::get_response_attributes(
     _Out_ EapAttributes      *pAttribs,
     _Out_ EAP_ERROR          **ppEapError)
 {
-    return static_cast<session_ttls*>(hSession)->get_response_attributes(pAttribs, ppEapError);
+    UNREFERENCED_PARAMETER(hSession);
+    UNREFERENCED_PARAMETER(pAttribs);
+    UNREFERENCED_PARAMETER(ppEapError);
+    assert(ppEapError);
+
+    *ppEapError = make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
+    return false;
 }
 
 
@@ -424,5 +455,12 @@ bool eap::peer_ttls::set_response_attributes(
     _Out_      EapPeerMethodOutput *pEapOutput,
     _Out_      EAP_ERROR           **ppEapError)
 {
-    return static_cast<session_ttls*>(hSession)->set_response_attributes(pAttribs, pEapOutput, ppEapError);
+    UNREFERENCED_PARAMETER(hSession);
+    UNREFERENCED_PARAMETER(pAttribs);
+    UNREFERENCED_PARAMETER(pEapOutput);
+    UNREFERENCED_PARAMETER(ppEapError);
+    assert(ppEapError);
+
+    *ppEapError = make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
+    return false;
 }

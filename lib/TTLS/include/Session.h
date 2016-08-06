@@ -28,9 +28,9 @@ namespace eap
     enum ttls_flags_t;
 
     ///
-    /// TTLS session
+    /// EAP-TTLS method
     ///
-    class session_ttls;
+    class method_ttls;
 }
 
 #pragma once
@@ -49,47 +49,48 @@ namespace eap
     };
 
 
-    class session_ttls : public session<credentials_ttls, bool, bool>
+    class method_ttls : public method
     {
     public:
         ///
-        /// Constructor
+        /// Constructs an EAP method
         ///
         /// \param[in] mod  EAP module to use for global services
+        /// \param[in] cfg  Method configuration
         ///
-        session_ttls(_In_ module &mod);
+        method_ttls(_In_ module &module, _In_ config_method_ttls &cfg, _In_ credentials_ttls &cred);
 
         ///
-        /// Copies TTLS session
+        /// Copies an EAP method
         ///
-        /// \param[in] other  Session to copy from
+        /// \param[in] other  EAP method to copy from
         ///
-        session_ttls(_In_ const session_ttls &other);
+        method_ttls(_In_ const method_ttls &other);
 
         ///
-        /// Moves TTLS session
+        /// Moves an EAP method
         ///
-        /// \param[in] other  Session to move from
+        /// \param[in] other  EAP method to move from
         ///
-        session_ttls(_Inout_ session_ttls &&other);
+        method_ttls(_Inout_ method_ttls &&other);
 
         ///
-        /// Copies TTLS session
+        /// Copies an EAP method
         ///
-        /// \param[in] other  Session to copy from
+        /// \param[in] other  EAP method to copy from
         ///
         /// \returns Reference to this object
         ///
-        session_ttls& operator=(_In_ const session_ttls &other);
+        method_ttls& operator=(_In_ const method_ttls &other);
 
         ///
-        /// Moves TTLS session
+        /// Moves an EAP method
         ///
-        /// \param[in] other  Session to move from
+        /// \param[in] other  EAP method to move from
         ///
         /// \returns Reference to this object
         ///
-        session_ttls& operator=(_Inout_ session_ttls &&other);
+        method_ttls& operator=(_Inout_ method_ttls &&other);
 
         /// \name Packet processing
         /// @{
@@ -97,15 +98,15 @@ namespace eap
         ///
         /// Processes a packet received by EAPHost from a supplicant.
         ///
-        /// \sa [EapPeerProcessRequestPacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363621.aspx)
-        ///
         /// \returns
         /// - \c true if succeeded
         /// - \c false otherwise. See \p ppEapError for details.
         ///
+        /// \sa [EapPeerProcessRequestPacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363621.aspx)
+        ///
         virtual bool process_request_packet(
-            _In_                                       DWORD               dwReceivedPacketSize,
             _In_bytecount_(dwReceivedPacketSize) const EapPacket           *pReceivedPacket,
+            _In_                                       DWORD               dwReceivedPacketSize,
             _Out_                                      EapPeerMethodOutput *pEapOutput,
             _Out_                                      EAP_ERROR           **ppEapError);
 
@@ -119,29 +120,16 @@ namespace eap
         /// - \c false otherwise. See \p ppEapError for details.
         ///
         virtual bool get_response_packet(
-            _Inout_                            DWORD     *pdwSendPacketSize,
             _Inout_bytecap_(*dwSendPacketSize) EapPacket *pSendPacket,
+            _Inout_                            DWORD     *pdwSendPacketSize,
             _Out_                              EAP_ERROR **ppEapError);
-
-        ///
-        /// Obtains the result of an authentication session from the EAP method.
-        ///
-        /// \sa [EapPeerGetResult function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363611.aspx)
-        ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool get_result(
-            _In_  EapPeerMethodResultReason reason,
-            _Out_ EapPeerMethodResult       *ppResult,
-            _Out_ EAP_ERROR                 **ppEapError);
 
         /// @}
 
     public:
+        method_tls m_outer; ///< EAP-TLS method
         enum version_t {
-            version_0 = 0,                          ///< EAP-TTLS v0
-        } m_version;                                ///< EAP-TTLS version
+            version_0 = 0,  ///< EAP-TTLS v0
+        } m_version;        ///< EAP-TTLS version
     };
 }

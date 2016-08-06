@@ -28,7 +28,7 @@ using namespace winstd;
 // eap::method_tls
 //////////////////////////////////////////////////////////////////////
 
-eap::method_tls::method_tls(_In_ module &module, _In_ config_method &cfg, _In_ credentials &cred) :
+eap::method_tls::method_tls(_In_ module &module, _In_ config_method_tls &cfg, _In_ credentials_tls &cred) :
     m_phase(phase_handshake_start),
     method(module, cfg, cred)
 {

@@ -25,91 +25,79 @@ using namespace winstd;
 
 
 //////////////////////////////////////////////////////////////////////
-// eap::session_ttls
+// eap::method_ttls
 //////////////////////////////////////////////////////////////////////
 
-eap::session_ttls::session_ttls(_In_ module &mod) :
-    m_version(version_0),
-    session<credentials_ttls, bool, bool>(mod)
+eap::method_ttls::method_ttls(_In_ module &module, _In_ config_method_ttls &cfg, _In_ credentials_ttls &cred) :
+    m_outer(module, cfg.m_outer, cred.m_outer),
+    method(module, cfg, cred)
 {
 }
 
 
-eap::session_ttls::session_ttls(_In_ const session_ttls &other) :
-    m_version(other.m_version),
-    session<credentials_ttls, bool, bool>(other)
+eap::method_ttls::method_ttls(_In_ const method_ttls &other) :
+    m_outer(other.m_outer),
+    method(other)
 {
 }
 
 
-eap::session_ttls::session_ttls(_Inout_ session_ttls &&other) :
-    m_version(std::move(other.m_version)),
-    session<credentials_ttls, bool, bool>(std::move(other))
+eap::method_ttls::method_ttls(_Inout_ method_ttls &&other) :
+    m_outer(std::move(other.m_outer)),
+    method(std::move(other))
 {
 }
 
 
-eap::session_ttls& eap::session_ttls::operator=(_In_ const session_ttls &other)
+eap::method_ttls& eap::method_ttls::operator=(_In_ const method_ttls &other)
 {
-    if (this != &other) {
-        (session<credentials_ttls, bool, bool>&)*this = other;
-        m_version = other.m_version;
+    if (this != std::addressof(other)) {
+        (method&)*this = other;
+        m_outer        = other.m_outer;
     }
 
     return *this;
 }
 
 
-eap::session_ttls& eap::session_ttls::operator=(_Inout_ session_ttls &&other)
+eap::method_ttls& eap::method_ttls::operator=(_Inout_ method_ttls &&other)
 {
-    if (this != &other) {
-        (session<credentials_ttls, bool, bool>&)*this = std::move(other);
-        m_version = std::move(other.m_version);
+    if (this != std::addressof(other)) {
+        (method&)*this = std::move(other);
+        m_outer        = std::move(other.m_outer);
     }
 
     return *this;
 }
 
 
-bool eap::session_ttls::process_request_packet(
-    _In_                                       DWORD               dwReceivedPacketSize,
+bool eap::method_ttls::process_request_packet(
     _In_bytecount_(dwReceivedPacketSize) const EapPacket           *pReceivedPacket,
+    _In_                                       DWORD               dwReceivedPacketSize,
     _Out_                                      EapPeerMethodOutput *pEapOutput,
     _Out_                                      EAP_ERROR           **ppEapError)
 {
-    UNREFERENCED_PARAMETER(dwReceivedPacketSize);
-    UNREFERENCED_PARAMETER(pReceivedPacket);
-    UNREFERENCED_PARAMETER(pEapOutput);
-    assert(ppEapError);
+    // Initialize output.
+    pEapOutput->fAllowNotifications = TRUE;
+    pEapOutput->action              = EapPeerMethodResponseActionDiscard;
 
-    *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
-    return false;
+    // Is this a valid EAP-TTLS packet?
+    if (dwReceivedPacketSize < 6) {
+        *ppEapError = m_module.make_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, _T(__FUNCTION__) _T(" Packet is too small. EAP-%s packets should be at least 6B."));
+        return false;
+    } else if (pReceivedPacket->Data[0] != eap_type_ttls) {
+        *ppEapError = m_module.make_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, wstring_printf(_T(__FUNCTION__) _T(" Packet is not EAP-TTLS (expected: %u, received: %u)."), eap_type_ttls, pReceivedPacket->Data[0]).c_str());
+        return false;
+    }
+
+    return m_outer.process_request_packet(pReceivedPacket, dwReceivedPacketSize, pEapOutput, ppEapError);
 }
 
 
-bool eap::session_ttls::get_response_packet(
-    _Inout_                            DWORD     *pdwSendPacketSize,
+bool eap::method_ttls::get_response_packet(
     _Inout_bytecap_(*dwSendPacketSize) EapPacket *pSendPacket,
+    _Inout_                            DWORD     *pdwSendPacketSize,
     _Out_                              EAP_ERROR **ppEapError)
 {
-    UNREFERENCED_PARAMETER(pdwSendPacketSize);
-    UNREFERENCED_PARAMETER(pSendPacket);
-    assert(ppEapError);
-
-    *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
-    return false;
-}
-
-
-bool eap::session_ttls::get_result(
-    _In_  EapPeerMethodResultReason reason,
-    _Out_ EapPeerMethodResult       *ppResult,
-    _Out_ EAP_ERROR                 **ppEapError)
-{
-    UNREFERENCED_PARAMETER(reason);
-    UNREFERENCED_PARAMETER(ppResult);
-    assert(ppEapError);
-
-    *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
-    return false;
+    return m_outer.get_response_packet(pSendPacket, pdwSendPacketSize, ppEapError);
 }

@@ -33,14 +33,9 @@ namespace eap
     enum tls_flags_t;
 
     ///
-    /// TLS method
+    /// EAP-TLS method
     ///
     class method_tls;
-
-    ///
-    /// TLS session
-    ///
-    class session_tls;
 }
 
 #pragma once
@@ -74,7 +69,7 @@ namespace eap
         /// \param[in] mod  EAP module to use for global services
         /// \param[in] cfg  Method configuration
         ///
-        method_tls(_In_ module &module, _In_ config_method &cfg, _In_ credentials &cred);
+        method_tls(_In_ module &module, _In_ config_method_tls &cfg, _In_ credentials_tls &cred);
 
         ///
         /// Copies an EAP method

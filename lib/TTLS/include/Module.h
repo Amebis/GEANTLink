@@ -30,7 +30,7 @@ namespace eap
 
 #include "Config.h"
 #include "Credentials.h"
-#include "../../EAPBase/include/Module.h"
+#include "Session.h"
 
 
 namespace eap
@@ -278,5 +278,20 @@ namespace eap
             _Out_      EAP_ERROR           **ppEapError);
 
         /// @}
+
+    protected:
+        class session {
+        public:
+            inline session(_In_ module &mod) :
+                m_cfg(mod),
+                m_cred(mod),
+                m_method(mod, m_cfg, m_cred)
+            {}
+
+        public:
+            config_method_ttls m_cfg;   ///< Method configuration
+            credentials_ttls m_cred;    ///< User credentials
+            method_ttls m_method;       ///< EAP-TTLS method
+        };
     };
 }
