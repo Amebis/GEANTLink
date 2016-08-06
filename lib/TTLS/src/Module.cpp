@@ -82,7 +82,7 @@ bool eap::peer_ttls::get_identity(
     assert(ppEapError);
 
     // Unpack configuration.
-    config_providers cfg(*this);
+    config_provider_list cfg(*this);
     if (!unpack(cfg, pConnectionData, dwConnectionDataSize, ppEapError))
         return false;
     else if (cfg.m_providers.empty() || cfg.m_providers.front().m_methods.empty()) {

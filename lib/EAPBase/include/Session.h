@@ -340,7 +340,7 @@ namespace eap
 
     public:
         module &m_module;                   ///< EAP module
-        config_providers m_cfg;             ///< Providers configuration
+        config_provider_list m_cfg;             ///< Providers configuration
         credentials_type m_cred;            ///< User credentials
         interactive_request_type m_intreq;  ///< Interactive UI request data
         DWORD m_eap_flags;                  ///< A combination of EAP flags that describe the new EAP authentication session behavior

@@ -47,7 +47,7 @@ namespace eap
     ///
     /// Base class for the list of providers configuration storage
     ///
-    class config_providers;
+    class config_provider_list;
 }
 
 ///
@@ -484,7 +484,7 @@ namespace eap
     };
 
 
-    class config_providers : public config
+    class config_provider_list : public config
     {
     public:
         ///
@@ -492,21 +492,21 @@ namespace eap
         ///
         /// \param[in] mod  EAP module to use for global services
         ///
-        config_providers(_In_ module &mod);
+        config_provider_list(_In_ module &mod);
 
         ///
         /// Copies configuration
         ///
         /// \param[in] other  Configuration to copy from
         ///
-        config_providers(_In_ const config_providers &other);
+        config_provider_list(_In_ const config_provider_list &other);
 
         ///
         /// Moves configuration
         ///
         /// \param[in] other  Configuration to move from
         ///
-        config_providers(_Inout_ config_providers &&other);
+        config_provider_list(_Inout_ config_provider_list &&other);
 
         ///
         /// Copies configuration
@@ -515,7 +515,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        config_providers& operator=(_In_ const config_providers &other);
+        config_provider_list& operator=(_In_ const config_provider_list &other);
 
         ///
         /// Moves configuration
@@ -524,7 +524,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        config_providers& operator=(_Inout_ config_providers &&other);
+        config_provider_list& operator=(_Inout_ config_provider_list &&other);
 
         ///
         /// Clones configuration

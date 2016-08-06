@@ -109,7 +109,7 @@ public:
     /// \param[inout] cfg     Providers configuration data
     /// \param[in]    parent  Parent window
     ///
-    wxEAPConfigDialog(eap::config_providers &cfg, wxWindow* parent) :
+    wxEAPConfigDialog(eap::config_provider_list &cfg, wxWindow* parent) :
         m_cfg(cfg),
         wxEAPConfigDialogBase(parent)
     {
@@ -152,7 +152,7 @@ protected:
 
 
 protected:
-    eap::config_providers &m_cfg;  ///< EAP providers configuration
+    eap::config_provider_list &m_cfg;  ///< EAP providers configuration
 };
 
 

@@ -658,29 +658,29 @@ void eap::config_provider::operator>>(_Inout_ cursor_in &cursor)
 
 
 //////////////////////////////////////////////////////////////////////
-// eap::config_providers
+// eap::config_provider_list
 //////////////////////////////////////////////////////////////////////
 
-eap::config_providers::config_providers(_In_ module &mod) : config(mod)
+eap::config_provider_list::config_provider_list(_In_ module &mod) : config(mod)
 {
 }
 
 
-eap::config_providers::config_providers(_In_ const config_providers &other) :
+eap::config_provider_list::config_provider_list(_In_ const config_provider_list &other) :
     m_providers(other.m_providers),
     config(other)
 {
 }
 
 
-eap::config_providers::config_providers(_Inout_ config_providers &&other) :
+eap::config_provider_list::config_provider_list(_Inout_ config_provider_list &&other) :
     m_providers(std::move(other.m_providers)),
     config(std::move(other))
 {
 }
 
 
-eap::config_providers& eap::config_providers::operator=(_In_ const config_providers &other)
+eap::config_provider_list& eap::config_provider_list::operator=(_In_ const config_provider_list &other)
 {
     if (this != &other) {
         (config&)*this = other;
@@ -691,7 +691,7 @@ eap::config_providers& eap::config_providers::operator=(_In_ const config_provid
 }
 
 
-eap::config_providers& eap::config_providers::operator=(_Inout_ config_providers &&other)
+eap::config_provider_list& eap::config_provider_list::operator=(_Inout_ config_provider_list &&other)
 {
     if (this != &other) {
         (config&&)*this = std::move(other);
@@ -702,13 +702,13 @@ eap::config_providers& eap::config_providers::operator=(_Inout_ config_providers
 }
 
 
-eap::config* eap::config_providers::clone() const
+eap::config* eap::config_provider_list::clone() const
 {
-    return new config_providers(*this);
+    return new config_provider_list(*this);
 }
 
 
-bool eap::config_providers::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
+bool eap::config_provider_list::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
 {
     if (!config::save(pDoc, pConfigRoot, ppEapError))
         return false;
@@ -746,7 +746,7 @@ bool eap::config_providers::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *p
 }
 
 
-bool eap::config_providers::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError)
+bool eap::config_provider_list::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError)
 {
     assert(pConfigRoot);
     assert(ppEapError);
@@ -781,14 +781,14 @@ bool eap::config_providers::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR 
 }
 
 
-void eap::config_providers::operator<<(_Inout_ cursor_out &cursor) const
+void eap::config_provider_list::operator<<(_Inout_ cursor_out &cursor) const
 {
     config::operator<<(cursor);
     cursor << m_providers;
 }
 
 
-size_t eap::config_providers::get_pk_size() const
+size_t eap::config_provider_list::get_pk_size() const
 {
     return
         config::get_pk_size() +
@@ -796,7 +796,7 @@ size_t eap::config_providers::get_pk_size() const
 }
 
 
-void eap::config_providers::operator>>(_Inout_ cursor_in &cursor)
+void eap::config_provider_list::operator>>(_Inout_ cursor_in &cursor)
 {
     config::operator>>(cursor);
 
