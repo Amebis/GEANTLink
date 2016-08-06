@@ -20,7 +20,7 @@
     <ClInclude Include="..\include\Credentials.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\Session.h">
+    <ClInclude Include="..\include\Method.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\Module.h">
@@ -37,10 +37,10 @@
     <ClCompile Include="..\src\Credentials.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Module.cpp">
+    <ClCompile Include="..\src\Method.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Session.cpp">
+    <ClCompile Include="..\src\Module.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -43,7 +43,7 @@ namespace eap
 #include "../include/Config.h"
 #include "../include/Credentials.h"
 
-#include "../../EAPBase/include/Session.h"
+#include "../../EAPBase/include/Method.h"
 
 #include <WinStd/Common.h>
 #include <WinStd/Crypt.h>

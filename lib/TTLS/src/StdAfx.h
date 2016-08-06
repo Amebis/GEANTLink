@@ -22,8 +22,8 @@
 
 #include "../include/Config.h"
 #include "../include/Credentials.h"
+#include "../include/Method.h"
 #include "../include/Module.h"
-#include "../include/Session.h"
 
 #include "../../EAPBase/include/EAPXML.h"
 

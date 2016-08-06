@@ -35,8 +35,11 @@ namespace eap
 
 #pragma once
 
-#include "../../TLS/include/Session.h"
-#include "../../EAPBase/include/Session.h"
+#include "Config.h"
+#include "Credentials.h"
+
+#include "../../TLS/include/Method.h"
+#include "../../EAPBase/include/Method.h"
 
 
 namespace eap

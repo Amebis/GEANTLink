@@ -20,5 +20,5 @@
 
 #pragma once
 
+#include "../../lib/TTLS/include/Method.h"
 #include "../../lib/TTLS/include/Module.h"
-#include "../../lib/TTLS/include/Session.h"

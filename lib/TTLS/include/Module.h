@@ -30,7 +30,7 @@ namespace eap
 
 #include "Config.h"
 #include "Credentials.h"
-#include "Session.h"
+#include "Method.h"
 
 
 namespace eap
