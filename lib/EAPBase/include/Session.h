@@ -62,7 +62,7 @@ namespace eap
         ///
         /// \param[in] mod  EAP module to use for global services
         ///
-        session(_In_ module *mod) :
+        session(_In_ module &mod) :
             m_module(mod),
             m_cfg(mod),
             m_cred(mod),
@@ -263,7 +263,7 @@ namespace eap
             _Out_ DWORD     *pdwUIContextDataSize,
             _Out_ EAP_ERROR **ppEapError)
         {
-            return m_module->pack(m_intreq, ppUIContextData, pdwUIContextDataSize, ppEapError);
+            return m_module.pack(m_intreq, ppUIContextData, pdwUIContextDataSize, ppEapError);
         }
 
 
@@ -289,7 +289,7 @@ namespace eap
             UNREFERENCED_PARAMETER(pEapOutput);
             assert(ppEapError);
 
-            *ppEapError = m_module->make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
+            *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
             return false;
         }
 
@@ -312,7 +312,7 @@ namespace eap
             UNREFERENCED_PARAMETER(pAttribs);
             assert(ppEapError);
 
-            *ppEapError = m_module->make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
+            *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
             return false;
         }
 
@@ -332,14 +332,14 @@ namespace eap
             UNREFERENCED_PARAMETER(pEapOutput);
             assert(ppEapError);
 
-            *ppEapError = m_module->make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
+            *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
             return false;
         }
 
         /// @}
 
     public:
-        module *m_module;                   ///< EAP module
+        module &m_module;                   ///< EAP module
         config_providers m_cfg;             ///< Providers configuration
         credentials_type m_cred;            ///< User credentials
         interactive_request_type m_intreq;  ///< Interactive UI request data

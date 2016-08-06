@@ -48,7 +48,7 @@ namespace eap
         ///
         /// \param[in] mod  EAP module to use for global services
         ///
-        credentials_tls(_In_ module *mod);
+        credentials_tls(_In_ module &mod);
 
         ///
         /// Copies credentials

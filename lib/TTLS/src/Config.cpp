@@ -28,7 +28,7 @@ using namespace winstd;
 // eap::config_method_ttls
 //////////////////////////////////////////////////////////////////////
 
-eap::config_method_ttls::config_method_ttls(_In_ module *mod) :
+eap::config_method_ttls::config_method_ttls(_In_ module &mod) :
     m_outer(mod),
     config_method(mod)
 {
@@ -100,14 +100,14 @@ bool eap::config_method_ttls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode 
     // <ClientSideCredential>
     com_obj<IXMLDOMElement> pXmlElClientSideCredential;
     if ((dwResult = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:ClientSideCredential"), bstr(L"ClientSideCredential"), bstrNamespace, &pXmlElClientSideCredential)) != ERROR_SUCCESS) {
-        *ppEapError = m_module->make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <ClientSideCredential> element."));
+        *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <ClientSideCredential> element."));
         return false;
     }
 
     // <ClientSideCredential>/<AnonymousIdentity>
     if (!m_anonymous_identity.empty())
         if ((dwResult = eapxml::put_element_value(pDoc, pXmlElClientSideCredential, bstr(L"AnonymousIdentity"), bstrNamespace, bstr(m_anonymous_identity))) != ERROR_SUCCESS) {
-            *ppEapError = m_module->make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <AnonymousIdentity> element."));
+            *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <AnonymousIdentity> element."));
             return false;
         }
 
@@ -117,14 +117,14 @@ bool eap::config_method_ttls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode 
     // <InnerAuthenticationMethod>
     com_obj<IXMLDOMElement> pXmlElInnerAuthenticationMethod;
     if ((dwResult = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:InnerAuthenticationMethod"), bstr(L"InnerAuthenticationMethod"), bstrNamespace, &pXmlElInnerAuthenticationMethod)) != ERROR_SUCCESS) {
-        *ppEapError = m_module->make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <InnerAuthenticationMethod> element."));
+        *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <InnerAuthenticationMethod> element."));
         return false;
     }
 
     if (dynamic_cast<const config_method_pap*>(m_inner.get())) {
         // <InnerAuthenticationMethod>/<NonEAPAuthMethod>
         if ((dwResult = eapxml::put_element_value(pDoc, pXmlElInnerAuthenticationMethod, bstr(L"NonEAPAuthMethod"), bstrNamespace, bstr(L"PAP"))) != ERROR_SUCCESS) {
-            *ppEapError = m_module->make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <NonEAPAuthMethod> element."));
+            *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <NonEAPAuthMethod> element."));
             return false;
         }
 
@@ -132,7 +132,7 @@ bool eap::config_method_ttls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode 
         if (!m_inner->save(pDoc, pXmlElInnerAuthenticationMethod, ppEapError))
             return false;
     } else {
-        *ppEapError = m_module->make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Unsupported inner authentication method."));
+        *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Unsupported inner authentication method."));
         return false;
     }
 
@@ -160,7 +160,7 @@ bool eap::config_method_ttls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERRO
 
         // <AnonymousIdentity>
         eapxml::get_element_value(pXmlElClientSideCredential, bstr(L"eap-metadata:AnonymousIdentity"), m_anonymous_identity);
-        m_module->log_config((xpathClientSideCredential + L"/AnonymousIdentity").c_str(), m_anonymous_identity.c_str());
+        m_module.log_config((xpathClientSideCredential + L"/AnonymousIdentity").c_str(), m_anonymous_identity.c_str());
     }
 
     if (!m_outer.load(pConfigRoot, ppEapError))
@@ -169,7 +169,7 @@ bool eap::config_method_ttls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERRO
     // <InnerAuthenticationMethod>
     com_obj<IXMLDOMElement> pXmlElInnerAuthenticationMethod;
     if ((dwResult = eapxml::select_element(pConfigRoot, bstr(L"eap-metadata:InnerAuthenticationMethod"), &pXmlElInnerAuthenticationMethod)) != ERROR_SUCCESS) {
-        *ppEapError = m_module->make_error(dwResult, _T(__FUNCTION__) _T(" Error selecting <InnerAuthenticationMethod> element."), _T("Please make sure profile XML is a valid ") _T(PRODUCT_NAME_STR) _T(" profile XML document."));
+        *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error selecting <InnerAuthenticationMethod> element."), _T("Please make sure profile XML is a valid ") _T(PRODUCT_NAME_STR) _T(" profile XML document."));
         return false;
     }
 
@@ -186,12 +186,12 @@ bool eap::config_method_ttls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERRO
         CompareStringEx(LOCALE_NAME_INVARIANT, NORM_IGNORECASE, bstrMethod, bstrMethod.length(), L"PAP", -1, NULL, NULL, 0) == CSTR_EQUAL)
     {
         // PAP
-        m_module->log_config((xpath + L"/NonEAPAuthMethod").c_str(), L"PAP");
+        m_module.log_config((xpath + L"/NonEAPAuthMethod").c_str(), L"PAP");
         m_inner.reset(new config_method_pap(m_module));
         if (!m_inner->load(pXmlElInnerAuthenticationMethod, ppEapError))
             return false;
     } else {
-        *ppEapError = m_module->make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Unsupported inner authentication method."));
+        *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Unsupported inner authentication method."));
         return false;
     }
 

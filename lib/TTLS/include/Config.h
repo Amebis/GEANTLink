@@ -48,7 +48,7 @@ namespace eap {
         ///
         /// \param[in] mod  EAP module to use for global services
         ///
-        config_method_ttls(_In_ module *mod);
+        config_method_ttls(_In_ module &mod);
 
         ///
         /// Copies configuration

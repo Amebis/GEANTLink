@@ -60,7 +60,7 @@ namespace eap
         ///
         /// \param[in] mod  EAP module to use for global services
         ///
-        credentials(_In_ module *mod);
+        credentials(_In_ module &mod);
 
         ///
         /// Copies credentials
@@ -209,7 +209,7 @@ namespace eap
         ///
         /// \param[in] mod  EAP module to use for global services
         ///
-        credentials_pass(_In_ module *mod);
+        credentials_pass(_In_ module &mod);
 
         ///
         /// Copies credentials

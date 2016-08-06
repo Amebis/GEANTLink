@@ -104,7 +104,7 @@ namespace eap
         ///
         /// \param[in] mod  EAP module to use for global services
         ///
-        config(_In_ module *mod);
+        config(_In_ module &mod);
 
         ///
         /// Copies configuration
@@ -202,7 +202,7 @@ namespace eap
         /// @}
 
     public:
-        module *m_module;   ///< EAP module
+        module &m_module;   ///< EAP module
     };
 
 
@@ -214,7 +214,7 @@ namespace eap
         ///
         /// \param[in] mod  EAP module to use for global services
         ///
-        config_method(_In_ module *mod);
+        config_method(_In_ module &mod);
 
         ///
         /// Copies configuration
@@ -268,7 +268,7 @@ namespace eap
         ///
         /// \param[in] mod  EAP module to use for global services
         ///
-        config_method_with_cred(_In_ module *mod);
+        config_method_with_cred(_In_ module &mod);
 
         ///
         /// Copies configuration
@@ -373,7 +373,7 @@ namespace eap
         ///
         /// \param[in] mod  EAP module to use for global services
         ///
-        config_provider(_In_ module *mod);
+        config_provider(_In_ module &mod);
 
         ///
         /// Copies configuration
@@ -492,7 +492,7 @@ namespace eap
         ///
         /// \param[in] mod  EAP module to use for global services
         ///
-        config_providers(_In_ module *mod);
+        config_providers(_In_ module &mod);
 
         ///
         /// Copies configuration

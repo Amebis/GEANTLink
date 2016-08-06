@@ -45,7 +45,7 @@ namespace eap
         ///
         /// \param[in] mod  EAP module to use for global services
         ///
-        credentials_pap(_In_ module *mod);
+        credentials_pap(_In_ module &mod);
 
         ///
         /// Copies credentials

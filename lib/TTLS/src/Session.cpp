@@ -28,7 +28,7 @@ using namespace winstd;
 // eap::session_ttls
 //////////////////////////////////////////////////////////////////////
 
-eap::session_ttls::session_ttls(_In_ module *mod) :
+eap::session_ttls::session_ttls(_In_ module &mod) :
     m_version(version_0),
     session<credentials_ttls, bool, bool>(mod)
 {
@@ -82,7 +82,7 @@ bool eap::session_ttls::process_request_packet(
     UNREFERENCED_PARAMETER(pEapOutput);
     assert(ppEapError);
 
-    *ppEapError = m_module->make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
+    *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
     return false;
 }
 
@@ -96,7 +96,7 @@ bool eap::session_ttls::get_response_packet(
     UNREFERENCED_PARAMETER(pSendPacket);
     assert(ppEapError);
 
-    *ppEapError = m_module->make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
+    *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
     return false;
 }
 
@@ -110,6 +110,6 @@ bool eap::session_ttls::get_result(
     UNREFERENCED_PARAMETER(ppResult);
     assert(ppEapError);
 
-    *ppEapError = m_module->make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
+    *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
     return false;
 }

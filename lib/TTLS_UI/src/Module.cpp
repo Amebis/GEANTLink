@@ -35,7 +35,7 @@ eap::peer_ttls_ui::peer_ttls_ui() : peer_ui(eap_type_ttls)
 
 eap::config_method* eap::peer_ttls_ui::make_config_method()
 {
-    return new config_method_ttls(this);
+    return new config_method_ttls(*this);
 }
 
 
@@ -49,7 +49,7 @@ bool eap::peer_ttls_ui::config_xml2blob(
     UNREFERENCED_PARAMETER(dwFlags);
 
     // Load configuration from XML.
-    config_providers cfg(this);
+    config_providers cfg(*this);
     if (!cfg.load(pConfigRoot, ppEapError))
         return false;
 
@@ -69,7 +69,7 @@ bool eap::peer_ttls_ui::config_blob2xml(
     UNREFERENCED_PARAMETER(dwFlags);
 
     // Unpack configuration.
-    config_providers cfg(this);
+    config_providers cfg(*this);
     if (!unpack(cfg, pConnectionData, dwConnectionDataSize, ppEapError))
         return false;
 
@@ -87,7 +87,7 @@ bool eap::peer_ttls_ui::invoke_config_ui(
     _Out_                                    EAP_ERROR **ppEapError)
 {
     // Unpack configuration.
-    config_providers cfg(this);
+    config_providers cfg(*this);
     if (dwConnectionDataInSize && !unpack(cfg, pConnectionDataIn, dwConnectionDataInSize, ppEapError))
         return false;
 
@@ -135,7 +135,7 @@ bool eap::peer_ttls_ui::invoke_identity_ui(
     _Out_                                  LPWSTR    *ppwszIdentity,
     _Out_                                  EAP_ERROR **ppEapError)
 {
-    config_providers cfg(this);
+    config_providers cfg(*this);
     if (!unpack(cfg, pConnectionData, dwConnectionDataSize, ppEapError))
         return false;
     else if (cfg.m_providers.empty() || cfg.m_providers.front().m_methods.empty()) {
@@ -143,7 +143,7 @@ bool eap::peer_ttls_ui::invoke_identity_ui(
         return false;
     }
 
-    credentials_ttls cred(this);
+    credentials_ttls cred(*this);
     if (dwUserDataSize && !unpack(cred, pUserData, dwUserDataSize, ppEapError))
         return false;
 

@@ -35,7 +35,7 @@ eap::peer_ttls::peer_ttls() : peer(eap_type_ttls)
 
 eap::config_method* eap::peer_ttls::make_config_method()
 {
-    return new config_method_ttls(this);
+    return new config_method_ttls(*this);
 }
 
 
@@ -82,7 +82,7 @@ bool eap::peer_ttls::get_identity(
     assert(ppEapError);
 
     // Unpack configuration.
-    config_providers cfg(this);
+    config_providers cfg(*this);
     if (!unpack(cfg, pConnectionData, dwConnectionDataSize, ppEapError))
         return false;
     else if (cfg.m_providers.empty() || cfg.m_providers.front().m_methods.empty()) {
@@ -91,7 +91,7 @@ bool eap::peer_ttls::get_identity(
     }
 
     // Unpack cached credentials.
-    credentials_ttls cred_in(this);
+    credentials_ttls cred_in(*this);
     if (dwUserDataSize && !unpack(cred_in, pUserData, dwUserDataSize, ppEapError))
         return false;
 
@@ -101,7 +101,7 @@ bool eap::peer_ttls::get_identity(
     assert(cfg_method);
     const config_method_pap *cfg_inner_pap = dynamic_cast<const config_method_pap*>(cfg_method->m_inner.get());
 
-    credentials_ttls cred_out(this);
+    credentials_ttls cred_out(*this);
 
     // Determine credential storage target(s). Also used as user-friendly method name for logging.
     eap_type_t type_inner;
@@ -160,7 +160,7 @@ bool eap::peer_ttls::get_identity(
         bool user_ctx_changed = hTokenImpersonateUser && ImpersonateLoggedOnUser(hTokenImpersonateUser);
 
         if (!is_outer_set) {
-            credentials_tls cred_loaded(this);
+            credentials_tls cred_loaded(*this);
             if (cred_loaded.retrieve(cfg_prov.m_id.c_str(), ppEapError)) {
                 // Outer TLS: Using stored credentials.
                 cred_out.m_outer = std::move(cred_loaded);
@@ -174,7 +174,7 @@ bool eap::peer_ttls::get_identity(
 
         if (!is_inner_set) {
             unique_ptr<credentials> cred_loaded;
-            if (cfg_inner_pap) cred_loaded.reset(new credentials_pap(this));
+            if (cfg_inner_pap) cred_loaded.reset(new credentials_pap(*this));
             else               assert(0); // Unsupported inner authentication method type.
             if (cred_loaded->retrieve(cfg_prov.m_id.c_str(), ppEapError)) {
                 // Inner PAP: Using stored credentials.
@@ -302,7 +302,7 @@ bool eap::peer_ttls::credentials_xml2blob(
     UNREFERENCED_PARAMETER(dwConnectionDataSize);
 
     // Load credentials from XML.
-    credentials_ttls cred(this);
+    credentials_ttls cred(*this);
     if (!cred.load(pConfigRoot, ppEapError))
         return false;
 
