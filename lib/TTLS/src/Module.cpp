@@ -328,7 +328,7 @@ bool eap::peer_ttls::begin_session(
     // Allocate new session.
     unique_ptr<session_ttls> session(new session_ttls(*this));
     if (!session) {
-        log_error(*ppEapError = make_error(ERROR_OUTOFMEMORY, _T(__FUNCTION__) _T(" Error allocating memory for EAP-TTLS session.")));
+        *ppEapError = make_error(ERROR_OUTOFMEMORY, _T(__FUNCTION__) _T(" Error allocating memory for EAP-TTLS session."));
         return false;
     }
 

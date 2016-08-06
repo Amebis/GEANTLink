@@ -620,7 +620,7 @@ namespace eap
             *pdwDataOutSize = (DWORD)data_enc.size();
             *ppDataOut = alloc_memory(*pdwDataOutSize);
             if (!*ppDataOut) {
-                log_error(*ppEapError = make_error(ERROR_OUTOFMEMORY, winstd::wstring_printf(_T(__FUNCTION__) _T(" Error allocating memory for BLOB (%uB)."), *pdwDataOutSize).c_str()));
+                *ppEapError = make_error(ERROR_OUTOFMEMORY, winstd::wstring_printf(_T(__FUNCTION__) _T(" Error allocating memory for BLOB (%uB)."), *pdwDataOutSize).c_str());
                 return false;
             }
             memcpy(*ppDataOut, data_enc.data(), *pdwDataOutSize);
@@ -629,7 +629,7 @@ namespace eap
             *pdwDataOutSize = (DWORD)pksizeof(record);
             *ppDataOut = alloc_memory(*pdwDataOutSize);
             if (!*ppDataOut) {
-                log_error(*ppEapError = make_error(ERROR_OUTOFMEMORY, winstd::wstring_printf(_T(__FUNCTION__) _T(" Error allocating memory for BLOB (%uB)."), *pdwDataOutSize).c_str()));
+                *ppEapError = make_error(ERROR_OUTOFMEMORY, winstd::wstring_printf(_T(__FUNCTION__) _T(" Error allocating memory for BLOB (%uB)."), *pdwDataOutSize).c_str());
                 return false;
             }
 
