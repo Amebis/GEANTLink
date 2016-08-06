@@ -27,7 +27,6 @@ using namespace winstd;
 
 #if EAPMETHOD_TYPE==21
 #define _EAPMETHOD_PEER    eap::peer_ttls
-#define _EAPMETHOD_SESSION eap::session_ttls
 #else
 #error Unknown EAP Method type.
 #endif
@@ -283,29 +282,12 @@ DWORD APIENTRY EapPeerBeginSession(
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pUserData is NULL.")));
     else if (!phSession)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" phSession is NULL.")));
-    else {
-        *phSession = NULL;
-
-        // Allocate new session.
-        unique_ptr<_EAPMETHOD_SESSION> session(new _EAPMETHOD_SESSION(g_peer));
-        if (!session) {
-            g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_OUTOFMEMORY, _T(__FUNCTION__) _T(" Error allocating memory for EAP session.")));
-            return dwResult;
-        }
-
-        // Begin the session.
-        if (!g_peer.unpack(session->m_cfg, pConnectionData, dwConnectionDataSize, ppEapError) ||
-            !g_peer.unpack(session->m_cred, pUserData, dwUserDataSize, ppEapError) ||
-            !session->begin(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize, ppEapError))
-        {
-            if (*ppEapError) {
-                g_peer.log_error(*ppEapError);
-                return dwResult = (*ppEapError)->dwWinError;
-            } else
-                return dwResult = ERROR_INVALID_DATA;
-        }
-
-        *phSession = session.release();
+    else if (!g_peer.begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, pConnectionData, dwConnectionDataSize, pUserData, dwUserDataSize, dwMaxSendPacketSize, phSession, ppEapError)) {
+        if (*ppEapError) {
+            g_peer.log_error(*ppEapError);
+            return dwResult = (*ppEapError)->dwWinError;
+        } else
+            return dwResult = ERROR_INVALID_DATA;
     }
 
     return dwResult;
@@ -317,7 +299,9 @@ DWORD APIENTRY EapPeerBeginSession(
 ///
 /// \sa [EapPeerEndSession function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363604.aspx)
 ///
-DWORD APIENTRY EapPeerEndSession(_In_ EAP_SESSION_HANDLE hSession, _Out_ EAP_ERROR **ppEapError)
+DWORD APIENTRY EapPeerEndSession(
+    _In_  EAP_SESSION_HANDLE hSession,
+    _Out_ EAP_ERROR          **ppEapError)
 {
     DWORD dwResult = ERROR_SUCCESS;
     event_fn_auto_ret<DWORD> event_auto(g_peer.get_event_fn_auto(__FUNCTION__, dwResult));
@@ -333,9 +317,12 @@ DWORD APIENTRY EapPeerEndSession(_In_ EAP_SESSION_HANDLE hSession, _Out_ EAP_ERR
 
     if (!hSession)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" hSession is NULL.")));
-    else {
-        static_cast<_EAPMETHOD_SESSION*>(hSession)->end(ppEapError);
-        delete static_cast<_EAPMETHOD_SESSION*>(hSession);
+    else if (!g_peer.end_session(hSession, ppEapError)) {
+        if (*ppEapError) {
+            g_peer.log_error(*ppEapError);
+            return dwResult = (*ppEapError)->dwWinError;
+        } else
+            return dwResult = ERROR_INVALID_DATA;
     }
 
     return dwResult;
@@ -372,15 +359,12 @@ DWORD APIENTRY EapPeerProcessRequestPacket(
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pReceivedPacket is NULL or too short.")));
     else if (!pEapOutput)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pEapOutput is NULL.")));
-    else {
-        assert(dwReceivedPacketSize == ntohs(*(WORD*)pReceivedPacket->Length));
-        if (!static_cast<_EAPMETHOD_SESSION*>(hSession)->process_request_packet(dwReceivedPacketSize, pReceivedPacket, pEapOutput, ppEapError)) {
-            if (*ppEapError) {
-                g_peer.log_error(*ppEapError);
-                dwResult = (*ppEapError)->dwWinError;
-            } else
-                dwResult = ERROR_INVALID_DATA;
-        }
+    else if (!g_peer.process_request_packet(hSession, pReceivedPacket, dwReceivedPacketSize, pEapOutput, ppEapError)) {
+        if (*ppEapError) {
+            g_peer.log_error(*ppEapError);
+            dwResult = (*ppEapError)->dwWinError;
+        } else
+            dwResult = ERROR_INVALID_DATA;
     }
 
     return dwResult;
@@ -416,14 +400,12 @@ DWORD APIENTRY EapPeerGetResponsePacket(
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pdwSendPacketSize is NULL.")));
     else if (!pSendPacket && *pdwSendPacketSize)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pSendPacket is NULL.")));
-    else {
-        if (!static_cast<_EAPMETHOD_SESSION*>(hSession)->get_response_packet(pdwSendPacketSize, pSendPacket, ppEapError)) {
-            if (*ppEapError) {
-                g_peer.log_error(*ppEapError);
-                dwResult = (*ppEapError)->dwWinError;
-            } else
-                dwResult = ERROR_INVALID_DATA;
-        }
+    else if (!g_peer.get_response_packet(hSession, pSendPacket, pdwSendPacketSize, ppEapError)) {
+        if (*ppEapError) {
+            g_peer.log_error(*ppEapError);
+            dwResult = (*ppEapError)->dwWinError;
+        } else
+            dwResult = ERROR_INVALID_DATA;
     }
 
     return dwResult;
@@ -435,7 +417,11 @@ DWORD APIENTRY EapPeerGetResponsePacket(
 ///
 /// \sa [EapPeerGetResult function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363611.aspx)
 ///
-DWORD APIENTRY EapPeerGetResult(_In_ EAP_SESSION_HANDLE hSession, _In_ EapPeerMethodResultReason reason, _Out_ EapPeerMethodResult *ppResult, _Out_ EAP_ERROR **ppEapError)
+DWORD APIENTRY EapPeerGetResult(
+    _In_  EAP_SESSION_HANDLE        hSession,
+    _In_  EapPeerMethodResultReason reason,
+    _Out_ EapPeerMethodResult       *ppResult,
+    _Out_ EAP_ERROR                 **ppEapError)
 {
     DWORD dwResult = ERROR_SUCCESS;
     event_fn_auto_ret<DWORD> event_auto(g_peer.get_event_fn_auto(__FUNCTION__, dwResult));
@@ -453,14 +439,12 @@ DWORD APIENTRY EapPeerGetResult(_In_ EAP_SESSION_HANDLE hSession, _In_ EapPeerMe
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" hSession is NULL.")));
     else if (!ppResult)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" ppResult is NULL.")));
-    else {
-        if (!static_cast<_EAPMETHOD_SESSION*>(hSession)->get_result(reason, ppResult, ppEapError)) {
-            if (*ppEapError) {
-                g_peer.log_error(*ppEapError);
-                dwResult = (*ppEapError)->dwWinError;
-            } else
-                dwResult = ERROR_INVALID_DATA;
-        }
+    else if (!g_peer.get_result(hSession, reason, ppResult, ppEapError)) {
+        if (*ppEapError) {
+            g_peer.log_error(*ppEapError);
+            dwResult = (*ppEapError)->dwWinError;
+        } else
+            dwResult = ERROR_INVALID_DATA;
     }
 
     return dwResult;
@@ -498,7 +482,7 @@ DWORD APIENTRY EapPeerGetUIContext(
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pdwUIContextDataSize is NULL.")));
     else if (!ppUIContextData)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" ppUIContextData is NULL.")));
-    else if (!static_cast<_EAPMETHOD_SESSION*>(hSession)->get_ui_context(ppUIContextData, pdwUIContextDataSize, ppEapError)) {
+    else if (!g_peer.get_ui_context(hSession, ppUIContextData, pdwUIContextDataSize, ppEapError)) {
         if (*ppEapError) {
             g_peer.log_error(*ppEapError);
             dwResult = (*ppEapError)->dwWinError;
@@ -542,7 +526,7 @@ DWORD APIENTRY EapPeerSetUIContext(
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pUIContextData is NULL.")));
     else if (!pEapOutput)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pEapOutput is NULL.")));
-    else if (!static_cast<_EAPMETHOD_SESSION*>(hSession)->set_ui_context(pUIContextData, dwUIContextDataSize, pEapOutput, ppEapError)) {
+    else if (!g_peer.set_ui_context(hSession, pUIContextData, dwUIContextDataSize, pEapOutput, ppEapError)) {
         if (*ppEapError) {
             g_peer.log_error(*ppEapError);
             dwResult = (*ppEapError)->dwWinError;
@@ -559,7 +543,10 @@ DWORD APIENTRY EapPeerSetUIContext(
 ///
 /// \sa [EapPeerGetResponseAttributes function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363609.aspx)
 ///
-DWORD APIENTRY EapPeerGetResponseAttributes(_In_ EAP_SESSION_HANDLE hSession, _Out_ EapAttributes *pAttribs, _Out_ EAP_ERROR **ppEapError)
+DWORD APIENTRY EapPeerGetResponseAttributes(
+    _In_  EAP_SESSION_HANDLE hSession,
+    _Out_ EapAttributes      *pAttribs,
+    _Out_ EAP_ERROR          **ppEapError)
 {
     DWORD dwResult = ERROR_SUCCESS;
     event_fn_auto_ret<DWORD> event_auto(g_peer.get_event_fn_auto(__FUNCTION__, dwResult));
@@ -577,14 +564,12 @@ DWORD APIENTRY EapPeerGetResponseAttributes(_In_ EAP_SESSION_HANDLE hSession, _O
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" hSession is NULL.")));
     else if (!pAttribs)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pAttribs is NULL.")));
-    else {
-        if (!static_cast<_EAPMETHOD_SESSION*>(hSession)->get_response_attributes(pAttribs, ppEapError)) {
-            if (*ppEapError) {
-                g_peer.log_error(*ppEapError);
-                dwResult = (*ppEapError)->dwWinError;
-            } else
-                dwResult = ERROR_INVALID_DATA;
-        }
+    else if (!g_peer.get_response_attributes(hSession, pAttribs, ppEapError)) {
+        if (*ppEapError) {
+            g_peer.log_error(*ppEapError);
+            dwResult = (*ppEapError)->dwWinError;
+        } else
+            dwResult = ERROR_INVALID_DATA;
     }
 
     return dwResult;
@@ -596,7 +581,11 @@ DWORD APIENTRY EapPeerGetResponseAttributes(_In_ EAP_SESSION_HANDLE hSession, _O
 ///
 /// \sa [EapPeerSetResponseAttributes function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363625.aspx)
 ///
-DWORD APIENTRY EapPeerSetResponseAttributes(_In_ EAP_SESSION_HANDLE hSession, _In_ /*const*/ EapAttributes *pAttribs, _Out_ EapPeerMethodOutput *pEapOutput, _Out_ EAP_ERROR **ppEapError)
+DWORD APIENTRY EapPeerSetResponseAttributes(
+    _In_            EAP_SESSION_HANDLE  hSession,
+    _In_  /*const*/ EapAttributes       *pAttribs,
+    _Out_           EapPeerMethodOutput *pEapOutput,
+    _Out_           EAP_ERROR           **ppEapError)
 {
     DWORD dwResult = ERROR_SUCCESS;
     event_fn_auto_ret<DWORD> event_auto(g_peer.get_event_fn_auto(__FUNCTION__, dwResult));
@@ -614,14 +603,12 @@ DWORD APIENTRY EapPeerSetResponseAttributes(_In_ EAP_SESSION_HANDLE hSession, _I
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" hSession is NULL.")));
     else if (!pEapOutput)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pEapOutput is NULL.")));
-    else {
-        if (!static_cast<_EAPMETHOD_SESSION*>(hSession)->set_response_attributes(pAttribs, pEapOutput, ppEapError)) {
-            if (*ppEapError) {
-                g_peer.log_error(*ppEapError);
-                dwResult = (*ppEapError)->dwWinError;
-            } else
-                dwResult = ERROR_INVALID_DATA;
-        }
+    else if (!g_peer.set_response_attributes(hSession, pAttribs, pEapOutput, ppEapError)) {
+        if (*ppEapError) {
+            g_peer.log_error(*ppEapError);
+            dwResult = (*ppEapError)->dwWinError;
+        } else
+            dwResult = ERROR_INVALID_DATA;
     }
 
     return dwResult;
@@ -775,21 +762,19 @@ DWORD WINAPI EapPeerQueryCredentialInputFields(
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pConnectionData is NULL.")));
     else if (!pEapConfigInputFieldsArray)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pEapConfigInputFieldsArray is NULL.")));
-    else {
-        if (!g_peer.query_credential_input_fields(
-            hUserImpersonationToken,
-            dwFlags,
-            dwConnectionDataSize,
-            pConnectionData,
-            pEapConfigInputFieldsArray,
-            ppEapError))
-        {
-            if (*ppEapError) {
-                g_peer.log_error(*ppEapError);
-                dwResult = (*ppEapError)->dwWinError;
-            } else
-                dwResult = ERROR_INVALID_DATA;
-        }
+    else if (!g_peer.query_credential_input_fields(
+        hUserImpersonationToken,
+        dwFlags,
+        dwConnectionDataSize,
+        pConnectionData,
+        pEapConfigInputFieldsArray,
+        ppEapError))
+    {
+        if (*ppEapError) {
+            g_peer.log_error(*ppEapError);
+            dwResult = (*ppEapError)->dwWinError;
+        } else
+            dwResult = ERROR_INVALID_DATA;
     }
 
     return dwResult;
@@ -836,23 +821,21 @@ DWORD WINAPI EapPeerQueryUserBlobFromCredentialInputFields(
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pdwUsersBlobSize is NULL.")));
     else if (!ppUserBlob)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" ppUserBlob is NULL.")));
-    else {
-        if (!g_peer.query_user_blob_from_credential_input_fields(
-            hUserImpersonationToken,
-            dwFlags,
-            dwConnectionDataSize,
-            pConnectionData,
-            pEapConfigInputFieldArray,
-            pdwUsersBlobSize,
-            ppUserBlob,
-            ppEapError))
-        {
-            if (*ppEapError) {
-                g_peer.log_error(*ppEapError);
-                dwResult = (*ppEapError)->dwWinError;
-            } else
-                dwResult = ERROR_INVALID_DATA;
-        }
+    else if (!g_peer.query_user_blob_from_credential_input_fields(
+        hUserImpersonationToken,
+        dwFlags,
+        dwConnectionDataSize,
+        pConnectionData,
+        pEapConfigInputFieldArray,
+        pdwUsersBlobSize,
+        ppUserBlob,
+        ppEapError))
+    {
+        if (*ppEapError) {
+            g_peer.log_error(*ppEapError);
+            dwResult = (*ppEapError)->dwWinError;
+        } else
+            dwResult = ERROR_INVALID_DATA;
     }
 
     return dwResult;
@@ -891,22 +874,20 @@ DWORD WINAPI EapPeerQueryInteractiveUIInputFields(
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pUIContextData is NULL.")));
     else if (!pEapInteractiveUIData)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pEapInteractiveUIData is NULL.")));
-    else {
-        if (!g_peer.query_interactive_ui_input_fields(
-            dwVersion,
-            dwFlags,
-            dwUIContextDataSize,
-            pUIContextData,
-            pEapInteractiveUIData,
-            ppEapError,
-            pvReserved))
-        {
-            if (*ppEapError) {
-                g_peer.log_error(*ppEapError);
-                dwResult = (*ppEapError)->dwWinError;
-            } else
-                dwResult = ERROR_INVALID_DATA;
-        }
+    else if (!g_peer.query_interactive_ui_input_fields(
+        dwVersion,
+        dwFlags,
+        dwUIContextDataSize,
+        pUIContextData,
+        pEapInteractiveUIData,
+        ppEapError,
+        pvReserved))
+    {
+        if (*ppEapError) {
+            g_peer.log_error(*ppEapError);
+            dwResult = (*ppEapError)->dwWinError;
+        } else
+            dwResult = ERROR_INVALID_DATA;
     }
 
     return dwResult;
@@ -949,24 +930,22 @@ DWORD WINAPI EapPeerQueryUIBlobFromInteractiveUIInputFields(
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pdwDataFromInteractiveUISize is NULL.")));
     else if (!ppDataFromInteractiveUI)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" ppDataFromInteractiveUI is NULL.")));
-    else {
-        if (!g_peer.query_ui_blob_from_interactive_ui_input_fields(
-            dwVersion,
-            dwFlags,
-            dwUIContextDataSize,
-            pUIContextData,
-            pEapInteractiveUIData,
-            pdwDataFromInteractiveUISize,
-            ppDataFromInteractiveUI,
-            ppEapError,
-            ppvReserved))
-        {
-            if (*ppEapError) {
-                g_peer.log_error(*ppEapError);
-                dwResult = (*ppEapError)->dwWinError;
-            } else
-                dwResult = ERROR_INVALID_DATA;
-        }
+    else if (!g_peer.query_ui_blob_from_interactive_ui_input_fields(
+        dwVersion,
+        dwFlags,
+        dwUIContextDataSize,
+        pUIContextData,
+        pEapInteractiveUIData,
+        pdwDataFromInteractiveUISize,
+        ppDataFromInteractiveUI,
+        ppEapError,
+        ppvReserved))
+    {
+        if (*ppEapError) {
+            g_peer.log_error(*ppEapError);
+            dwResult = (*ppEapError)->dwWinError;
+        } else
+            dwResult = ERROR_INVALID_DATA;
     }
 
     return dwResult;

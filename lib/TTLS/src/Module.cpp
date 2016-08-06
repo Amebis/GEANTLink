@@ -309,3 +309,120 @@ bool eap::peer_ttls::credentials_xml2blob(
     // Pack credentials.
     return pack(cred, ppCredentialsOut, pdwCredentialsOutSize, ppEapError);
 }
+
+
+bool eap::peer_ttls::begin_session(
+    _In_                                   DWORD              dwFlags,
+    _In_                           const   EapAttributes      *pAttributeArray,
+    _In_                                   HANDLE             hTokenImpersonateUser,
+    _In_count_(dwConnectionDataSize) const BYTE               *pConnectionData,
+    _In_                                   DWORD              dwConnectionDataSize,
+    _In_count_(dwUserDataSize)       const BYTE               *pUserData,
+    _In_                                   DWORD              dwUserDataSize,
+    _In_                                   DWORD              dwMaxSendPacketSize,
+    _Out_                                  EAP_SESSION_HANDLE *phSession,
+    _Out_                                  EAP_ERROR          **ppEapError)
+{
+    *phSession = NULL;
+
+    // Allocate new session.
+    unique_ptr<session_ttls> session(new session_ttls(*this));
+    if (!session) {
+        log_error(*ppEapError = make_error(ERROR_OUTOFMEMORY, _T(__FUNCTION__) _T(" Error allocating memory for EAP-TTLS session.")));
+        return false;
+    }
+
+    // Begin the session.
+    if (!unpack(session->m_cfg, pConnectionData, dwConnectionDataSize, ppEapError) ||
+        !unpack(session->m_cred, pUserData, dwUserDataSize, ppEapError) ||
+        !session->begin(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize, ppEapError))
+        return false;
+
+    *phSession = session.release();
+    return true;
+}
+
+
+bool eap::peer_ttls::end_session(_In_ EAP_SESSION_HANDLE hSession, _Out_ EAP_ERROR **ppEapError)
+{
+    assert(hSession);
+
+    // End the session.
+    session_ttls *session = static_cast<session_ttls*>(hSession);
+    session->end(ppEapError);
+    delete session;
+
+    return true;
+}
+
+
+bool eap::peer_ttls::process_request_packet(
+    _In_                                       EAP_SESSION_HANDLE  hSession,
+    _In_bytecount_(dwReceivedPacketSize) const EapPacket           *pReceivedPacket,
+    _In_                                       DWORD               dwReceivedPacketSize,
+    _Out_                                      EapPeerMethodOutput *pEapOutput,
+    _Out_                                      EAP_ERROR           **ppEapError)
+{
+    assert(dwReceivedPacketSize == ntohs(*(WORD*)pReceivedPacket->Length));
+    return static_cast<session_ttls*>(hSession)->process_request_packet(dwReceivedPacketSize, pReceivedPacket, pEapOutput, ppEapError);
+}
+
+
+bool eap::peer_ttls::get_response_packet(
+    _In_                               EAP_SESSION_HANDLE hSession,
+    _Inout_bytecap_(*dwSendPacketSize) EapPacket          *pSendPacket,
+    _Inout_                            DWORD              *pdwSendPacketSize,
+    _Out_                              EAP_ERROR          **ppEapError)
+{
+    return static_cast<session_ttls*>(hSession)->get_response_packet(pdwSendPacketSize, pSendPacket, ppEapError);
+}
+
+
+bool eap::peer_ttls::get_result(
+    _In_  EAP_SESSION_HANDLE        hSession,
+    _In_  EapPeerMethodResultReason reason,
+    _Out_ EapPeerMethodResult       *ppResult,
+    _Out_ EAP_ERROR                 **ppEapError)
+{
+    return static_cast<session_ttls*>(hSession)->get_result(reason, ppResult, ppEapError);
+}
+
+
+bool eap::peer_ttls::get_ui_context(
+    _In_  EAP_SESSION_HANDLE hSession,
+    _Out_ BYTE               **ppUIContextData,
+    _Out_ DWORD              *pdwUIContextDataSize,
+    _Out_ EAP_ERROR          **ppEapError)
+{
+    return static_cast<session_ttls*>(hSession)->get_ui_context(ppUIContextData, pdwUIContextDataSize, ppEapError);
+}
+
+
+bool eap::peer_ttls::set_ui_context(
+    _In_                                  EAP_SESSION_HANDLE  hSession,
+    _In_count_(dwUIContextDataSize) const BYTE                *pUIContextData,
+    _In_                                  DWORD               dwUIContextDataSize,
+    _In_                            const EapPeerMethodOutput *pEapOutput,
+    _Out_                                 EAP_ERROR           **ppEapError)
+{
+    return static_cast<session_ttls*>(hSession)->set_ui_context(pUIContextData, dwUIContextDataSize, pEapOutput, ppEapError);
+}
+
+
+bool eap::peer_ttls::get_response_attributes(
+    _In_  EAP_SESSION_HANDLE hSession,
+    _Out_ EapAttributes      *pAttribs,
+    _Out_ EAP_ERROR          **ppEapError)
+{
+    return static_cast<session_ttls*>(hSession)->get_response_attributes(pAttribs, ppEapError);
+}
+
+
+bool eap::peer_ttls::set_response_attributes(
+    _In_       EAP_SESSION_HANDLE  hSession,
+    _In_ const EapAttributes       *pAttribs,
+    _Out_      EapPeerMethodOutput *pEapOutput,
+    _Out_      EAP_ERROR           **ppEapError)
+{
+    return static_cast<session_ttls*>(hSession)->set_response_attributes(pAttribs, pEapOutput, ppEapError);
+}

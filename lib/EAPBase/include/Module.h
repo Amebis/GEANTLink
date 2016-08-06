@@ -45,6 +45,9 @@ namespace eap
 
 #include <Windows.h>
 #include <eaptypes.h> // Must include after <Windows.h>
+extern "C" {
+#include <eapmethodpeerapis.h>
+}
 #include <sal.h>
 #include <tchar.h>
 
@@ -817,5 +820,154 @@ namespace eap
             _Out_                                 BYTE                    **ppDataFromInteractiveUI,
             _Out_                                 EAP_ERROR               **ppEapError,
             _Inout_                               LPVOID                  *ppvReserved) const;
+
+        /// \name Session management
+        /// @{
+
+        ///
+        /// Starts an EAP authentication session on the peer EAPHost using the EAP method.
+        ///
+        /// \sa [EapPeerBeginSession function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363600.aspx)
+        ///
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
+        ///
+        virtual bool begin_session(
+            _In_                                   DWORD              dwFlags,
+            _In_                           const   EapAttributes      *pAttributeArray,
+            _In_                                   HANDLE             hTokenImpersonateUser,
+            _In_count_(dwConnectionDataSize) const BYTE               *pConnectionData,
+            _In_                                   DWORD              dwConnectionDataSize,
+            _In_count_(dwUserDataSize)       const BYTE               *pUserData,
+            _In_                                   DWORD              dwUserDataSize,
+            _In_                                   DWORD              dwMaxSendPacketSize,
+            _Out_                                  EAP_SESSION_HANDLE *phSession,
+            _Out_                                  EAP_ERROR          **ppEapError) = 0;
+
+        ///
+        /// Ends an EAP authentication session for the EAP method.
+        ///
+        /// \sa [EapPeerEndSession function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363604.aspx)
+        ///
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
+        ///
+        virtual bool end_session(
+            _In_  EAP_SESSION_HANDLE hSession,
+            _Out_ EAP_ERROR          **ppEapError) = 0;
+
+        ///
+        /// Processes a packet received by EAPHost from a supplicant.
+        ///
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
+        ///
+        /// \sa [EapPeerProcessRequestPacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363621.aspx)
+        ///
+        virtual bool process_request_packet(
+            _In_                                       EAP_SESSION_HANDLE  hSession,
+            _In_bytecount_(dwReceivedPacketSize) const EapPacket           *pReceivedPacket,
+            _In_                                       DWORD               dwReceivedPacketSize,
+            _Out_                                      EapPeerMethodOutput *pEapOutput,
+            _Out_                                      EAP_ERROR           **ppEapError) = 0;
+
+        ///
+        /// Obtains a response packet from the EAP method.
+        ///
+        /// \sa [EapPeerGetResponsePacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363610.aspx)
+        ///
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
+        ///
+        virtual bool get_response_packet(
+            _In_                               EAP_SESSION_HANDLE hSession,
+            _Inout_bytecap_(*dwSendPacketSize) EapPacket          *pSendPacket,
+            _Inout_                            DWORD              *pdwSendPacketSize,
+            _Out_                              EAP_ERROR          **ppEapError) = 0;
+
+        ///
+        /// Obtains the result of an authentication session from the EAP method.
+        ///
+        /// \sa [EapPeerGetResult function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363611.aspx)
+        ///
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
+        ///
+        virtual bool get_result(
+            _In_  EAP_SESSION_HANDLE        hSession,
+            _In_  EapPeerMethodResultReason reason,
+            _Out_ EapPeerMethodResult       *ppResult,
+            _Out_ EAP_ERROR                 **ppEapError) = 0;
+
+        ///
+        /// Obtains the user interface context from the EAP method.
+        ///
+        /// \note This function is always followed by the `EapPeerInvokeInteractiveUI()` function, which is followed by the `EapPeerSetUIContext()` function.
+        ///
+        /// \sa [EapPeerGetUIContext function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363612.aspx)
+        ///
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
+        ///
+        virtual bool get_ui_context(
+            _In_  EAP_SESSION_HANDLE hSession,
+            _Out_ BYTE               **ppUIContextData,
+            _Out_ DWORD              *pdwUIContextDataSize,
+            _Out_ EAP_ERROR          **ppEapError) = 0;
+
+        ///
+        /// Provides a user interface context to the EAP method.
+        ///
+        /// \note This function is called after the UI has been raised through the `EapPeerGetUIContext()` function.
+        ///
+        /// \sa [EapPeerSetUIContext function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363626.aspx)
+        ///
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
+        ///
+        virtual bool set_ui_context(
+            _In_                                  EAP_SESSION_HANDLE  hSession,
+            _In_count_(dwUIContextDataSize) const BYTE                *pUIContextData,
+            _In_                                  DWORD               dwUIContextDataSize,
+            _In_                            const EapPeerMethodOutput *pEapOutput,
+            _Out_                                 EAP_ERROR           **ppEapError) = 0;
+
+        ///
+        /// Obtains an array of EAP response attributes from the EAP method.
+        ///
+        /// \sa [EapPeerGetResponseAttributes function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363609.aspx)
+        ///
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
+        ///
+        virtual bool get_response_attributes(
+            _In_  EAP_SESSION_HANDLE hSession,
+            _Out_ EapAttributes      *pAttribs,
+            _Out_ EAP_ERROR          **ppEapError) = 0;
+
+        ///
+        /// Provides an updated array of EAP response attributes to the EAP method.
+        ///
+        /// \sa [EapPeerSetResponseAttributes function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363625.aspx)
+        ///
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
+        ///
+        virtual bool set_response_attributes(
+            _In_       EAP_SESSION_HANDLE  hSession,
+            _In_ const EapAttributes       *pAttribs,
+            _Out_      EapPeerMethodOutput *pEapOutput,
+            _Out_      EAP_ERROR           **ppEapError) = 0;
+
+        /// @}
     };
 }
