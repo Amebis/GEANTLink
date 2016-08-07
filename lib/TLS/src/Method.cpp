@@ -225,35 +225,44 @@ bool eap::method_tls::process_request_packet(
         return false;
     }*/
 
-    size_t size_data = dwReceivedPacketSize - ((pReceivedPacket->Data[1] & tls_req_flags_length_incl) ? 10 : 6);
+    // Get packet data pointer and size for more readable code later on.
+    const unsigned char *packet_data_ptr;
+    size_t packet_data_size;
+    if (pReceivedPacket->Data[1] & tls_req_flags_length_incl) {
+        // Length field is included.
+        packet_data_ptr  = pReceivedPacket->Data + 6;
+        packet_data_size = dwReceivedPacketSize - 10;
+    } else {
+        // Length field not included.
+        packet_data_ptr  = pReceivedPacket->Data + 2;
+        packet_data_size = dwReceivedPacketSize - 6;
+    }
 
+    // Do the TLS defragmentation.
     if (pReceivedPacket->Data[1] & tls_req_flags_more_frag) {
-        if (pReceivedPacket->Data[1] & tls_req_flags_length_incl) {
-            // First fragment received.
-            if (dwReceivedPacketSize < 10) {
-                *ppEapError = m_module.make_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, _T(__FUNCTION__) _T(" Packet is too small. EAP-TLS first fragmented packet should be at least 10B."));
-                return false;
-            }
-
+        if (m_packet_req.m_data.empty()) {
             // Start a new packet.
             m_packet_req.m_code  = (EapCode)pReceivedPacket->Code;
             m_packet_req.m_id    = pReceivedPacket->Id;
             m_packet_req.m_flags = pReceivedPacket->Data[1];
-            size_t size_tot  = *(unsigned int*)(pReceivedPacket->Data + 2);
-            m_packet_req.m_data.reserve(size_tot);
-            m_packet_req.m_data.assign(pReceivedPacket->Data + 6, pReceivedPacket->Data + dwReceivedPacketSize - 4);
-
-            m_module.log_event(&EAPMETHOD_PACKET_RECV_FRAG_FIRST, event_data((unsigned int)eap_type_tls), event_data(size_tot), event_data(size_data), event_data::blank);
+            if (pReceivedPacket->Data[1] & tls_req_flags_length_incl) {
+                // Preallocate data according to the Length field.
+                size_t size_tot  = ntohl(*(unsigned int*)(pReceivedPacket->Data + 2));
+                m_packet_req.m_data.reserve(size_tot);
+                m_module.log_event(&EAPMETHOD_PACKET_RECV_FRAG_FIRST, event_data((unsigned int)eap_type_tls), event_data((unsigned int)packet_data_size), event_data((unsigned int)size_tot), event_data::blank);
+            } else {
+                // The Length field was not included. Odd. Nevermind, no pre-allocation then.
+                m_module.log_event(&EAPMETHOD_PACKET_RECV_FRAG_FIRST1, event_data((unsigned int)eap_type_tls), event_data((unsigned int)packet_data_size), event_data::blank);
+            }
         } else {
-            // Mid fragment received. Append data.
-            m_packet_req.m_data.insert(m_packet_req.m_data.end(), pReceivedPacket->Data + 2, pReceivedPacket->Data + dwReceivedPacketSize - 4);
-
-            m_module.log_event(&EAPMETHOD_PACKET_RECV_FRAG_MID, event_data((unsigned int)eap_type_tls), event_data(size_data), event_data(m_packet_req.m_data.size()), event_data::blank);
+            // Mid fragment received.
+            m_module.log_event(&EAPMETHOD_PACKET_RECV_FRAG_MID, event_data((unsigned int)eap_type_tls), event_data((unsigned int)packet_data_size), event_data((unsigned int)m_packet_req.m_data.size()), event_data::blank);
         }
+        m_packet_req.m_data.insert(m_packet_req.m_data.end(), packet_data_ptr, packet_data_ptr + packet_data_size);
 
         // Reply with ACK packet.
         m_packet_res.m_code  = EapCodeResponse;
-        m_packet_res.m_id    = m_packet_req.m_id;
+        m_packet_res.m_id    = pReceivedPacket->Id;
         m_packet_res.m_flags = 0;
         m_packet_res.m_data.clear();
         pEapOutput->fAllowNotifications = FALSE;
@@ -261,21 +270,15 @@ bool eap::method_tls::process_request_packet(
         return true;
     } else if (!m_packet_req.m_data.empty()) {
         // Last fragment received. Append data.
-        m_packet_req.m_data.insert(m_packet_req.m_data.end(),
-            pReceivedPacket->Data + (!(pReceivedPacket->Data[1] & tls_req_flags_length_incl) ? 2 : 6), // Should not include "Length" field (by RFC 5281: https://tools.ietf.org/html/rfc5281#section-9.2.2). Tolerate.
-            pReceivedPacket->Data + dwReceivedPacketSize - 4);
-
-        m_module.log_event(&EAPMETHOD_PACKET_RECV_FRAG_LAST, event_data((unsigned int)eap_type_tls), event_data(size_data), event_data(m_packet_req.m_data.size()), event_data::blank);
+        m_packet_req.m_data.insert(m_packet_req.m_data.end(), packet_data_ptr, packet_data_ptr + packet_data_size);
+        m_module.log_event(&EAPMETHOD_PACKET_RECV_FRAG_LAST, event_data((unsigned int)eap_type_tls), event_data((unsigned int)packet_data_size), event_data((unsigned int)m_packet_req.m_data.size()), event_data::blank);
     } else {
         // This is a complete non-fragmented packet.
         m_packet_req.m_code  = (EapCode)pReceivedPacket->Code;
         m_packet_req.m_id    = pReceivedPacket->Id;
         m_packet_req.m_flags = pReceivedPacket->Data[1];
-        m_packet_req.m_data.assign(
-            pReceivedPacket->Data + (!(pReceivedPacket->Data[1] & tls_req_flags_length_incl) ? 2 : 6),
-            pReceivedPacket->Data + dwReceivedPacketSize - 4);
-
-        m_module.log_event(&EAPMETHOD_PACKET_RECV, event_data((unsigned int)eap_type_tls), event_data(size_data), event_data::blank);
+        m_packet_req.m_data.assign(packet_data_ptr, packet_data_ptr + packet_data_size);
+        m_module.log_event(&EAPMETHOD_PACKET_RECV, event_data((unsigned int)eap_type_tls), event_data((unsigned int)packet_data_size), event_data::blank);
     }
 
     if (  m_packet_req.m_code == EapCodeRequest                                                               &&
@@ -330,6 +333,9 @@ bool eap::method_tls::process_request_packet(
             return false;
     }
 
+    // Request packet was processed. Clear its data since we use the absence of data to detect first of fragmented message packages.
+    m_packet_req.m_data.clear();
+
     return true;
 }
 
@@ -355,7 +361,7 @@ bool eap::method_tls::get_response_packet(
             // No need to fragment the packet.
             m_packet_res.m_flags &= ~tls_res_flags_length_incl; // No need to explicitly include the Length field either.
             data_dst = pSendPacket->Data + 2;
-            m_module.log_event(&EAPMETHOD_PACKET_SEND, event_data((unsigned int)eap_type_tls), event_data(size_data), event_data::blank);
+            m_module.log_event(&EAPMETHOD_PACKET_SEND, event_data((unsigned int)eap_type_tls), event_data((unsigned int)size_data), event_data::blank);
         } else {
             // But it should be fragmented.
             m_packet_res.m_flags |= tls_res_flags_length_incl | tls_res_flags_more_frag;
@@ -363,7 +369,7 @@ bool eap::method_tls::get_response_packet(
             data_dst = pSendPacket->Data + 6;
             size_data   = size_packet_limit - 10;
             size_packet = size_packet_limit;
-            m_module.log_event(&EAPMETHOD_PACKET_SEND_FRAG_FIRST, event_data((unsigned int)eap_type_tls), event_data(m_packet_res.m_data.size() - size_data), event_data(size_data), event_data::blank);
+            m_module.log_event(&EAPMETHOD_PACKET_SEND_FRAG_FIRST, event_data((unsigned int)eap_type_tls), event_data((unsigned int)size_data), event_data((unsigned int)(m_packet_res.m_data.size() - size_data)), event_data::blank);
         }
     } else {
         // Continuing the fragmented packet...
@@ -372,11 +378,11 @@ bool eap::method_tls::get_response_packet(
             m_packet_res.m_flags &= ~tls_res_flags_length_incl;
             size_data   = size_packet_limit - 6;
             size_packet = size_packet_limit;
-            m_module.log_event(&EAPMETHOD_PACKET_SEND_FRAG_MID, event_data((unsigned int)eap_type_tls), event_data(m_packet_res.m_data.size() - size_data), event_data(size_data), event_data::blank);
+            m_module.log_event(&EAPMETHOD_PACKET_SEND_FRAG_MID, event_data((unsigned int)eap_type_tls), event_data((unsigned int)size_data), event_data((unsigned int)(m_packet_res.m_data.size() - size_data)), event_data::blank);
         } else {
             // This is the last fragment.
             m_packet_res.m_flags &= ~(tls_res_flags_length_incl | tls_res_flags_more_frag);
-            m_module.log_event(&EAPMETHOD_PACKET_SEND_FRAG_LAST, event_data((unsigned int)eap_type_tls), event_data(m_packet_res.m_data.size() - size_data), event_data(size_data), event_data::blank);
+            m_module.log_event(&EAPMETHOD_PACKET_SEND_FRAG_LAST, event_data((unsigned int)eap_type_tls), event_data((unsigned int)size_data), event_data((unsigned int)(m_packet_res.m_data.size() - size_data)), event_data::blank);
         }
         data_dst = pSendPacket->Data + 2;
     }
