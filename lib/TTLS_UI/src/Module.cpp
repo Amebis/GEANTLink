@@ -193,7 +193,7 @@ bool eap::peer_ttls_ui::invoke_identity_ui(
 
     // Build our identity. ;)
     wstring identity(move(cfg_method->get_public_identity(cred)));
-    log_event(&EAPMETHOD_TRACE_EVT_CRED_OUTER_ID1, event_data((DWORD)eap_type_ttls), event_data(identity), event_data::blank);
+    log_event(&EAPMETHOD_TRACE_EVT_CRED_OUTER_ID1, event_data((unsigned int)eap_type_ttls), event_data(identity), event_data::blank);
     size_t size = sizeof(WCHAR)*(identity.length() + 1);
     *ppwszIdentity = (WCHAR*)alloc_memory(size);
     memcpy(*ppwszIdentity, identity.c_str(), size);

@@ -33,7 +33,7 @@ eap::module::module(eap_type_t eap_method) :
     m_instance(NULL)
 {
     m_ep.create(&EAPMETHOD_TRACE_EVENT_PROVIDER);
-    m_ep.write(&EAPMETHOD_TRACE_EVT_MODULE_LOAD, event_data((DWORD)m_eap_method), event_data::blank);
+    m_ep.write(&EAPMETHOD_TRACE_EVT_MODULE_LOAD, event_data((unsigned int)m_eap_method), event_data::blank);
 
     m_heap.create(0, 0, 0);
 }
@@ -41,7 +41,7 @@ eap::module::module(eap_type_t eap_method) :
 
 eap::module::~module()
 {
-    m_ep.write(&EAPMETHOD_TRACE_EVT_MODULE_UNLOAD, event_data((DWORD)m_eap_method), event_data::blank);
+    m_ep.write(&EAPMETHOD_TRACE_EVT_MODULE_UNLOAD, event_data((unsigned int)m_eap_method), event_data::blank);
 }
 
 

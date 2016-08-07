@@ -63,8 +63,8 @@ namespace eap
 #pragma pack(push)
 #pragma pack(1)
     struct tls_random_t {
-        unsigned long time;
-        unsigned char data[28];
+        unsigned int time;      ///< Unix time-stamp
+        unsigned char data[28]; ///< Randomness
     };
 #pragma pack(pop)
 
@@ -175,6 +175,20 @@ namespace eap
             _Inout_bytecap_(*dwSendPacketSize) EapPacket *pSendPacket,
             _Inout_                            DWORD     *pdwSendPacketSize,
             _Out_                              EAP_ERROR **ppEapError);
+
+        ///
+        /// Obtains the result of an authentication session from the EAP method.
+        ///
+        /// \sa [EapPeerGetResult function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363611.aspx)
+        ///
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
+        ///
+        virtual bool get_result(
+            _In_  EapPeerMethodResultReason reason,
+            _Out_ EapPeerMethodResult       *ppResult,
+            _Out_ EAP_ERROR                 **ppEapError);
 
         /// @}
 

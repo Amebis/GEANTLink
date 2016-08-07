@@ -146,6 +146,20 @@ namespace eap
             _Inout_                            DWORD     *pdwSendPacketSize,
             _Out_                              EAP_ERROR **ppEapError) = 0;
 
+        ///
+        /// Obtains the result of an authentication session from the EAP method.
+        ///
+        /// \sa [EapPeerGetResult function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363611.aspx)
+        ///
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
+        ///
+        virtual bool get_result(
+            _In_  EapPeerMethodResultReason reason,
+            _Out_ EapPeerMethodResult       *ppResult,
+            _Out_ EAP_ERROR                 **ppEapError) = 0;
+
         /// @}
 
     public:

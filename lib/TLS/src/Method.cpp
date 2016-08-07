@@ -180,7 +180,7 @@ bool eap::method_tls::begin_session(
     }
 
     // Generate client randomness.
-    m_random_client.time = (unsigned long)time(NULL);
+    m_random_client.time = (unsigned int)time(NULL);
     if (!CryptGenRandom(m_cp, sizeof(m_random_client.data), m_random_client.data)) {
         *ppEapError = m_module.make_error(GetLastError(), _T(__FUNCTION__) _T(" Error creating client randomness."));
         return false;
@@ -225,6 +225,8 @@ bool eap::method_tls::process_request_packet(
         return false;
     }*/
 
+    size_t size_data = dwReceivedPacketSize - ((pReceivedPacket->Data[1] & tls_req_flags_length_incl) ? 10 : 6);
+
     if (pReceivedPacket->Data[1] & tls_req_flags_more_frag) {
         if (pReceivedPacket->Data[1] & tls_req_flags_length_incl) {
             // First fragment received.
@@ -237,11 +239,16 @@ bool eap::method_tls::process_request_packet(
             m_packet_req.m_code  = (EapCode)pReceivedPacket->Code;
             m_packet_req.m_id    = pReceivedPacket->Id;
             m_packet_req.m_flags = pReceivedPacket->Data[1];
-            m_packet_req.m_data.reserve(*(unsigned long*)(pReceivedPacket->Data + 2));
+            size_t size_tot  = *(unsigned int*)(pReceivedPacket->Data + 2);
+            m_packet_req.m_data.reserve(size_tot);
             m_packet_req.m_data.assign(pReceivedPacket->Data + 6, pReceivedPacket->Data + dwReceivedPacketSize - 4);
+
+            m_module.log_event(&EAPMETHOD_PACKET_RECV_FRAG_FIRST, event_data((unsigned int)eap_type_tls), event_data(size_tot), event_data(size_data), event_data::blank);
         } else {
             // Mid fragment received. Append data.
             m_packet_req.m_data.insert(m_packet_req.m_data.end(), pReceivedPacket->Data + 2, pReceivedPacket->Data + dwReceivedPacketSize - 4);
+
+            m_module.log_event(&EAPMETHOD_PACKET_RECV_FRAG_MID, event_data((unsigned int)eap_type_tls), event_data(size_data), event_data(m_packet_req.m_data.size()), event_data::blank);
         }
 
         // Reply with ACK packet.
@@ -257,6 +264,8 @@ bool eap::method_tls::process_request_packet(
         m_packet_req.m_data.insert(m_packet_req.m_data.end(),
             pReceivedPacket->Data + (!(pReceivedPacket->Data[1] & tls_req_flags_length_incl) ? 2 : 6), // Should not include "Length" field (by RFC 5281: https://tools.ietf.org/html/rfc5281#section-9.2.2). Tolerate.
             pReceivedPacket->Data + dwReceivedPacketSize - 4);
+
+        m_module.log_event(&EAPMETHOD_PACKET_RECV_FRAG_LAST, event_data((unsigned int)eap_type_tls), event_data(size_data), event_data(m_packet_req.m_data.size()), event_data::blank);
     } else {
         // This is a complete non-fragmented packet.
         m_packet_req.m_code  = (EapCode)pReceivedPacket->Code;
@@ -265,6 +274,8 @@ bool eap::method_tls::process_request_packet(
         m_packet_req.m_data.assign(
             pReceivedPacket->Data + (!(pReceivedPacket->Data[1] & tls_req_flags_length_incl) ? 2 : 6),
             pReceivedPacket->Data + dwReceivedPacketSize - 4);
+
+        m_module.log_event(&EAPMETHOD_PACKET_RECV, event_data((unsigned int)eap_type_tls), event_data(size_data), event_data::blank);
     }
 
     if (  m_packet_req.m_code == EapCodeRequest                                                               &&
@@ -291,6 +302,8 @@ bool eap::method_tls::process_request_packet(
                 return false;
             }
 
+            m_module.log_event(&EAPMETHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_tls), event_data::blank);
+
             // Build response packet.
             m_packet_res.m_code  = EapCodeResponse;
             m_packet_res.m_id    = m_packet_req.m_id;
@@ -302,7 +315,7 @@ bool eap::method_tls::process_request_packet(
             pEapOutput->fAllowNotifications = FALSE;
             pEapOutput->action = EapPeerMethodResponseActionSend;
 
-            // Save the client_hello message.
+            // Hash the client_hello message.
             CryptHashData(m_hash_handshake_msgs_md5 , hello.data(), (DWORD)hello.size(), 0);
             CryptHashData(m_hash_handshake_msgs_sha1, hello.data(), (DWORD)hello.size(), 0);
 
@@ -330,10 +343,10 @@ bool eap::method_tls::get_response_packet(
     assert(pSendPacket);
     UNREFERENCED_PARAMETER(ppEapError);
 
-    unsigned long
-        size_data   = (unsigned long)m_packet_res.m_data.size(),
+    unsigned int
+        size_data   = (unsigned int)m_packet_res.m_data.size(),
         size_packet = size_data + 6;
-    unsigned short size_packet_limit = (unsigned short)std::min<unsigned long>(*pdwSendPacketSize, USHRT_MAX);
+    unsigned short size_packet_limit = (unsigned short)std::min<unsigned int>(*pdwSendPacketSize, USHRT_MAX);
     unsigned char *data_dst;
 
     if (!(m_packet_res.m_flags & tls_res_flags_more_frag)) {
@@ -342,24 +355,28 @@ bool eap::method_tls::get_response_packet(
             // No need to fragment the packet.
             m_packet_res.m_flags &= ~tls_res_flags_length_incl; // No need to explicitly include the Length field either.
             data_dst = pSendPacket->Data + 2;
+            m_module.log_event(&EAPMETHOD_PACKET_SEND, event_data((unsigned int)eap_type_tls), event_data(size_data), event_data::blank);
         } else {
             // But it should be fragmented.
             m_packet_res.m_flags |= tls_res_flags_length_incl | tls_res_flags_more_frag;
-            *(unsigned long*)(pSendPacket->Data + 2) = (unsigned long)size_packet;
+            *(unsigned int*)(pSendPacket->Data + 2) = (unsigned int)size_packet;
             data_dst = pSendPacket->Data + 6;
             size_data   = size_packet_limit - 10;
             size_packet = size_packet_limit;
+            m_module.log_event(&EAPMETHOD_PACKET_SEND_FRAG_FIRST, event_data((unsigned int)eap_type_tls), event_data(m_packet_res.m_data.size() - size_data), event_data(size_data), event_data::blank);
         }
     } else {
         // Continuing the fragmented packet...
-        if (size_packet <= size_packet_limit) {
-            // This is the last fragment.
-            m_packet_res.m_flags &= ~(tls_res_flags_length_incl | tls_res_flags_more_frag);
-        } else {
+        if (size_packet > size_packet_limit) {
             // This is a mid fragment.
             m_packet_res.m_flags &= ~tls_res_flags_length_incl;
             size_data   = size_packet_limit - 6;
             size_packet = size_packet_limit;
+            m_module.log_event(&EAPMETHOD_PACKET_SEND_FRAG_MID, event_data((unsigned int)eap_type_tls), event_data(m_packet_res.m_data.size() - size_data), event_data(size_data), event_data::blank);
+        } else {
+            // This is the last fragment.
+            m_packet_res.m_flags &= ~(tls_res_flags_length_incl | tls_res_flags_more_frag);
+            m_module.log_event(&EAPMETHOD_PACKET_SEND_FRAG_LAST, event_data((unsigned int)eap_type_tls), event_data(m_packet_res.m_data.size() - size_data), event_data(size_data), event_data::blank);
         }
         data_dst = pSendPacket->Data + 2;
     }
@@ -376,6 +393,20 @@ bool eap::method_tls::get_response_packet(
 }
 
 
+bool eap::method_tls::get_result(
+    _In_  EapPeerMethodResultReason reason,
+    _Out_ EapPeerMethodResult       *ppResult,
+    _Out_ EAP_ERROR                 **ppEapError)
+{
+    UNREFERENCED_PARAMETER(reason);
+    UNREFERENCED_PARAMETER(ppResult);
+    assert(ppEapError);
+
+    *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
+    return false;
+}
+
+
 eap::sanitizing_blob eap::method_tls::make_client_hello() const
 {
     size_t size_data;
@@ -386,23 +417,23 @@ eap::sanitizing_blob eap::method_tls::make_client_hello() const
         2                    + // SSL version
         sizeof(tls_random_t) + // Client random
         1                    + // Session ID size
-        m_session_id.size()) + // Session ID
+        m_session_id.size()  + // Session ID
         2                    + // Length of cypher suite list
         2                    + // Cyper suite list
         1                    + // Length of compression suite
-        1);                    // Compression suite
+        1));                   // Compression suite
 
     // SSL header
     assert(size_data <= 0xffffff);
-    unsigned long ssl_header = htonl(0x01000000 | (unsigned long)size_data); // client_hello (0x01)
+    unsigned int ssl_header = htonl(0x01000000 | (unsigned int)size_data); // client_hello (0x01)
     msg.insert(msg.end(), (unsigned char*)&ssl_header, (unsigned char*)(&ssl_header + 1));
 
-    // SSL version
+    // SSL version: TLS 1.0
     msg.push_back(3); // SSL major version
-    msg.push_back(3); // SSL minor version
+    msg.push_back(1); // SSL minor version
 
     // Client random
-    unsigned long time = htonl(m_random_client.time);
+    unsigned int time = htonl(m_random_client.time);
     msg.insert(msg.end(), (unsigned char*)&time, (unsigned char*)(&time + 1));
     msg.insert(msg.end(), m_random_client.data, m_random_client.data + _countof(m_random_client.data)); // TODO: Check if byte order should be changed!
 
@@ -439,11 +470,11 @@ bool eap::method_tls::make_handshake(_In_ const sanitizing_blob &msg, _In_ bool 
         // Encrypt it.
         if (!encrypt_message(msg_h_unenc, msg_enc, ppEapError)) return false;
 
-        size_msg = msg_enc.size();
         msg_ptr  = msg_enc.data();
+        size_msg = msg_enc.size();
     } else {
-        size_msg = msg.size();
         msg_ptr  = msg.data();
+        size_msg = msg.size();
     }
 
     // Create a handshake.
@@ -457,9 +488,9 @@ bool eap::method_tls::make_handshake(_In_ const sanitizing_blob &msg, _In_ bool 
     // SSL record type
     msg_h.push_back(22); // handshake (22)
 
-    // SSL version
+    // SSL version: TLS 1.0
     msg_h.push_back(3); // SSL major version
-    msg_h.push_back(3); // SSL minor version
+    msg_h.push_back(1); // SSL minor version
 
     // Message
     assert(size_msg <= 0xffff);

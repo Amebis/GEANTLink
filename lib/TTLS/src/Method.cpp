@@ -106,7 +106,7 @@ bool eap::method_ttls::process_request_packet(
         // Determine minimum EAP-TTLS version supported by server and us.
         version_t ver_remote = (version_t)(pReceivedPacket->Data[1] & ttls_flags_ver_mask);
         m_version = std::min<version_t>(ver_remote, version_0);
-        m_module.log_event(&EAPMETHOD_HANDSHAKE_START1, event_data((DWORD)eap_type_ttls), event_data((unsigned char)m_version), event_data((unsigned char)ver_remote), event_data::blank);
+        m_module.log_event(&EAPMETHOD_HANDSHAKE_START1, event_data((unsigned int)eap_type_ttls), event_data((unsigned char)m_version), event_data((unsigned char)ver_remote), event_data::blank);
     }
 
     return m_outer.process_request_packet(pReceivedPacket, dwReceivedPacketSize, pEapOutput, ppEapError);
@@ -127,4 +127,13 @@ bool eap::method_ttls::get_response_packet(
     pSendPacket->Data[1] |= m_version;
 
     return true;
+}
+
+
+bool eap::method_ttls::get_result(
+    _In_  EapPeerMethodResultReason reason,
+    _Out_ EapPeerMethodResult       *ppResult,
+    _Out_ EAP_ERROR                 **ppEapError)
+{
+    return m_outer.get_result(reason, ppResult, ppEapError);
 }
