@@ -25,6 +25,8 @@
 #define EAP_ENCRYPT_BLOBS 1
 #endif
 
+#define _HOST_LOW_ENDIAN
+
 #if !defined(RC_INVOKED) && !defined(MIDL_PASS)
 
 #include <WinStd/Common.h>

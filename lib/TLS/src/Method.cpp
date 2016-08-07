@@ -296,7 +296,8 @@ bool eap::method_tls::process_request_packet(
             m_packet_res.m_id    = m_packet_req.m_id;
             m_packet_res.m_flags = 0;
             sanitizing_blob hello(make_client_hello());
-            sanitizing_blob handshake(make_handshake(hello, false));
+            sanitizing_blob handshake;
+            if (!make_handshake(hello, false, handshake, ppEapError)) return false;
             m_packet_res.m_data.assign(handshake.begin(), handshake.end());
             pEapOutput->fAllowNotifications = FALSE;
             pEapOutput->action = EapPeerMethodResponseActionSend;
@@ -308,6 +309,8 @@ bool eap::method_tls::process_request_packet(
             m_phase = phase_server_hello;
             break;
         }
+
+        case phase_server_hello:
 
         default:
             *ppEapError = m_module.make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
@@ -375,27 +378,28 @@ bool eap::method_tls::get_response_packet(
 
 eap::sanitizing_blob eap::method_tls::make_client_hello() const
 {
-    unsigned long size_data;
+    size_t size_data;
     sanitizing_blob msg;
     msg.reserve(
-        4                                   + // SSL header
+        4                    + // SSL header
         (size_data =
-        2                                   + // SSL version
-        sizeof(tls_random_t)                + // Client random
-        1                                   + // Session ID size
-        (unsigned long)m_session_id.size()) + // Session ID
-        2                                   + // Length of cypher suite list
-        2                                   + // Cyper suite list
-        1                                   + // Length of compression suite
-        1);                                   // Compression suite
+        2                    + // SSL version
+        sizeof(tls_random_t) + // Client random
+        1                    + // Session ID size
+        m_session_id.size()) + // Session ID
+        2                    + // Length of cypher suite list
+        2                    + // Cyper suite list
+        1                    + // Length of compression suite
+        1);                    // Compression suite
 
     // SSL header
-    unsigned long ssl_header = htonl(0x01000000 | size_data); // client_hello (0x01)
+    assert(size_data <= 0xffffff);
+    unsigned long ssl_header = htonl(0x01000000 | (unsigned long)size_data); // client_hello (0x01)
     msg.insert(msg.end(), (unsigned char*)&ssl_header, (unsigned char*)(&ssl_header + 1));
 
     // SSL version
-    msg.push_back(0x03); // SSL major version
-    msg.push_back(0x01); // SSL minor version
+    msg.push_back(3); // SSL major version
+    msg.push_back(3); // SSL minor version
 
     // Client random
     unsigned long time = htonl(m_random_client.time);
@@ -403,6 +407,7 @@ eap::sanitizing_blob eap::method_tls::make_client_hello() const
     msg.insert(msg.end(), m_random_client.data, m_random_client.data + _countof(m_random_client.data)); // TODO: Check if byte order should be changed!
 
     // Session ID
+    assert(m_session_id.size() <= 32);
     msg.push_back((unsigned char)m_session_id.size());
     msg.insert(msg.end(), m_session_id.begin(), m_session_id.end());
 
@@ -420,24 +425,29 @@ eap::sanitizing_blob eap::method_tls::make_client_hello() const
 }
 
 
-eap::sanitizing_blob eap::method_tls::make_handshake(_In_ const sanitizing_blob &msg, _In_ bool encrypt)
+bool eap::method_tls::make_handshake(_In_ const sanitizing_blob &msg, _In_ bool encrypt, _Out_ eap::sanitizing_blob &msg_h, _Out_ EAP_ERROR **ppEapError)
 {
     const unsigned char *msg_ptr;
-    unsigned short size_msg;
+    size_t size_msg;
     vector<unsigned char> msg_enc;
 
     if (encrypt) {
         // Create an unencrypted handshake first.
-        msg_enc = encrypt_message(make_handshake(msg, false));
-        size_msg = (unsigned short)msg_enc.size();
+        eap::sanitizing_blob msg_h_unenc;
+        if (!make_handshake(msg, false, msg_h_unenc, ppEapError)) return false;
+
+        // Encrypt it.
+        if (!encrypt_message(msg_h_unenc, msg_enc, ppEapError)) return false;
+
+        size_msg = msg_enc.size();
         msg_ptr  = msg_enc.data();
     } else {
-        size_msg = (unsigned short)msg.size();
+        size_msg = msg.size();
         msg_ptr  = msg.data();
     }
 
     // Create a handshake.
-    sanitizing_blob msg_h;
+    msg_h.clear();
     msg_h.reserve(
         1        + // SSL record type
         2        + // SSL version
@@ -445,44 +455,62 @@ eap::sanitizing_blob eap::method_tls::make_handshake(_In_ const sanitizing_blob 
         size_msg); // Message
 
     // SSL record type
-    msg_h.push_back(0x16); // handshake (0x16)
+    msg_h.push_back(22); // handshake (22)
 
     // SSL version
-    msg_h.push_back(0x03); // SSL major version
-    msg_h.push_back(0x01); // SSL minor version
+    msg_h.push_back(3); // SSL major version
+    msg_h.push_back(3); // SSL minor version
 
     // Message
-    unsigned short size_msg_n = htons(size_msg);
+    assert(size_msg <= 0xffff);
+    unsigned short size_msg_n = htons((unsigned short)size_msg);
     msg_h.insert(msg_h.end(), (unsigned char*)&size_msg_n, (unsigned char*)(&size_msg_n + 1));
     msg_h.insert(msg_h.end(), msg_ptr, msg_ptr + size_msg);
 
-    return msg_h;
+    return true;
 }
 
 
-std::vector<unsigned char> eap::method_tls::encrypt_message(_In_ const sanitizing_blob &msg)
+bool eap::method_tls::encrypt_message(_In_ const sanitizing_blob &msg, _Out_ std::vector<unsigned char> &msg_enc, _Out_ EAP_ERROR **ppEapError)
 {
+    assert(ppEapError);
+
     // Create a HMAC hash.
     crypt_hash hash_hmac;
-    hash_hmac.create(m_cp, CALG_HMAC, m_key_hmac, 0);
+    if (!hash_hmac.create(m_cp, CALG_HMAC, m_key_hmac, 0)) {
+        *ppEapError = m_module.make_error(GetLastError(), _T(__FUNCTION__) _T(" Error creating HMAC hash."));
+        return false;
+    }
     static const HMAC_INFO s_hmac_info = { CALG_SHA1 };
-    CryptSetHashParam(hash_hmac, HP_HMAC_INFO, (const BYTE*)&s_hmac_info, 0);
+    if (!CryptSetHashParam(hash_hmac, HP_HMAC_INFO, (const BYTE*)&s_hmac_info, 0)) {
+        *ppEapError = m_module.make_error(GetLastError(), _T(__FUNCTION__) _T(" Error setting hash parameter."));
+        return false;
+    }
 
     // Hash sequence number.
     unsigned __int64 seq_num = htonll(m_seq_num);
-    CryptHashData(hash_hmac, (const BYTE*)&seq_num, sizeof(seq_num), 0);
+    if (!CryptHashData(hash_hmac, (const BYTE*)&seq_num, sizeof(seq_num), 0)) {
+        *ppEapError = m_module.make_error(GetLastError(), _T(__FUNCTION__) _T(" Error hashing data."));
+        return false;
+    }
 
-    // Hash data.
-    CryptHashData(hash_hmac, msg.data(), (DWORD)msg.size(), 0);
+    // Hash message.
+    if (!CryptHashData(hash_hmac, msg.data(), (DWORD)msg.size(), 0)) {
+        *ppEapError = m_module.make_error(GetLastError(), _T(__FUNCTION__) _T(" Error hashing data."));
+        return false;
+    }
 
     // Calculate hash.
     vector<unsigned char> hmac;
-    CryptGetHashParam(hash_hmac, HP_HASHVAL, hmac, 0);
+    if (!CryptGetHashParam(hash_hmac, HP_HASHVAL, hmac, 0)) {
+        *ppEapError = m_module.make_error(GetLastError(), _T(__FUNCTION__) _T(" Error finishing hash calculation."));
+        return false;
+    }
 
-    unsigned long size = 
-        (unsigned long)msg.size() - 5 + // TLS message without SSL header (SSL record type, SSL version, Message size)
-        20                            + // SHA-1
-        1;                              // Padding length
+    size_t size =
+        msg.size() - 5 + // TLS message without SSL header (SSL record type, SSL version, Message size)
+        20             + // SHA-1
+        1;               // Padding length
     unsigned char padding = (8 - size) % 8;
     size += padding;
 
@@ -491,19 +519,27 @@ std::vector<unsigned char> eap::method_tls::encrypt_message(_In_ const sanitizin
     enc.reserve(size);
     enc.assign(msg.begin() + 5, msg.end());
 
-    // Append HMAC hash (in reversed byte order).
+    // Append HMAC hash.
+#ifdef _HOST_LOW_ENDIAN
     std::reverse(hmac.begin(), hmac.end());
+#endif
     enc.insert(enc.end(), hmac.begin(), hmac.end());
 
     // Append padding.
     enc.insert(enc.end(), padding + 1, padding);
-    DWORD size2 = size;
-    CryptEncrypt(m_key_write, NULL, FALSE, 0, enc.data(), &size2, size);
+
+    // Encrypt.
+    assert(size < 0xffffffff);
+    DWORD size2 = (DWORD)size;
+    if (!CryptEncrypt(m_key_write, NULL, FALSE, 0, enc.data(), &size2, (DWORD)size)) {
+        *ppEapError = m_module.make_error(GetLastError(), _T(__FUNCTION__) _T(" Error encrypting message."));
+        return false;
+    }
 
     // Increment sequence number.
     m_seq_num++;
 
-    // Move to regular vector, now the data is encrypted.
-    std::vector<unsigned char> enc2(std::move((std::vector<unsigned char>&)enc));
-    return enc2;
+    // Copy to output.
+    msg_enc.assign(enc.begin(), enc.end());
+    return true;
 }

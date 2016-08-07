@@ -191,23 +191,31 @@ namespace eap
         ///
         /// Makes a TLS handshake
         ///
-        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter 7.4. Handshake Protocol](https://tools.ietf.org/html/rfc5246#section-7.4)
+        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter A.1. Record Layer](https://tools.ietf.org/html/rfc5246#appendix-A.1)
         ///
-        /// \param[in] msg      Handshake data contents
-        /// \param[in] encrypt  Should make an encrypted handshake message?
+        /// \param[in]  msg         Handshake data contents
+        /// \param[in]  encrypt     Should make an encrypted handshake message?
+        /// \param[out] msg_h       TLS handshake message
+        /// \param[out] ppEapError  Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
         ///
-        /// \returns TLS handshake message
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
         ///
-        sanitizing_blob make_handshake(_In_ const sanitizing_blob &msg, _In_ bool encrypt);
+        bool make_handshake(_In_ const sanitizing_blob &msg, _In_ bool encrypt, _Out_ eap::sanitizing_blob &msg_h, _Out_ EAP_ERROR **ppEapError);
 
         ///
         /// Encrypt block of data
         ///
-        /// \param[in] msg  TLS message to encrypt
+        /// \param[in]  msg         TLS message to encrypt
+        /// \param[out] msg_enc     Encrypted \p msg
+        /// \param[out] ppEapError  Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
         ///
-        /// \returns Encrypted message
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
         ///
-        std::vector<unsigned char> encrypt_message(_In_ const sanitizing_blob &msg);
+        bool encrypt_message(_In_ const sanitizing_blob &msg, _Out_ std::vector<unsigned char> &msg_enc, _Out_ EAP_ERROR **ppEapError);
 
     public:
         enum phase_t {
