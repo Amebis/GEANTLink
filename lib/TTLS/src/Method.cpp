@@ -100,11 +100,11 @@ bool eap::method_ttls::process_request_packet(
         return false;
     }
 
-    if (pReceivedPacket->Code == EapCodeRequest && (pReceivedPacket->Data[1] & ttls_flags_start)) {
+    if (pReceivedPacket->Code == EapCodeRequest && (pReceivedPacket->Data[1] & flags_start)) {
         // This is a start EAP-TTLS packet.
 
         // Determine minimum EAP-TTLS version supported by server and us.
-        version_t ver_remote = (version_t)(pReceivedPacket->Data[1] & ttls_flags_ver_mask);
+        version_t ver_remote = (version_t)(pReceivedPacket->Data[1] & flags_ver_mask);
         m_version = std::min<version_t>(ver_remote, version_0);
         m_module.log_event(&EAPMETHOD_HANDSHAKE_START1, event_data((unsigned int)eap_type_ttls), event_data((unsigned char)m_version), event_data((unsigned char)ver_remote), event_data::blank);
     }
@@ -123,7 +123,7 @@ bool eap::method_ttls::get_response_packet(
 
     // Change packet type to EAP-TTLS, and add EAP-TTLS version.
     pSendPacket->Data[0]  = (BYTE)eap_type_ttls;
-    pSendPacket->Data[1] &= ~ttls_flags_ver_mask;
+    pSendPacket->Data[1] &= ~flags_ver_mask;
     pSendPacket->Data[1] |= m_version;
 
     return true;

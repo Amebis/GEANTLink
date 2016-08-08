@@ -33,69 +33,36 @@ eap::method_tls::method_tls(_In_ module &module, _In_ config_method_tls &cfg, _I
     m_seq_num(0),
     method(module, cfg, cred)
 {
-    m_packet_req.m_code  = (EapCode)0;
-    m_packet_req.m_id    = 0;
-    m_packet_req.m_flags = 0;
-
-    m_packet_res.m_code  = (EapCode)0;
-    m_packet_res.m_id    = 0;
-    m_packet_res.m_flags = 0;
-
-    memset(&m_random_client, 0, sizeof(tls_random_t));
-    memset(&m_random_server, 0, sizeof(tls_random_t));
 }
 
 
 eap::method_tls::method_tls(_In_ const method_tls &other) :
     m_phase(other.m_phase),
+    m_packet_req(other.m_packet_req),
+    m_packet_res(other.m_packet_res),
+    m_random_client(other.m_random_client),
+    m_random_server(other.m_random_server),
     m_session_id(other.m_session_id),
     m_hash_handshake_msgs_md5(other.m_hash_handshake_msgs_md5),
     m_hash_handshake_msgs_sha1(other.m_hash_handshake_msgs_sha1),
     m_seq_num(other.m_seq_num),
     method(other)
 {
-    m_packet_req.m_code  = other.m_packet_req.m_code ;
-    m_packet_req.m_id    = other.m_packet_req.m_id   ;
-    m_packet_req.m_flags = other.m_packet_req.m_flags;
-    m_packet_req.m_data  = other.m_packet_req.m_data ;
-
-    m_packet_res.m_code  = other.m_packet_res.m_code ;
-    m_packet_res.m_id    = other.m_packet_res.m_id   ;
-    m_packet_res.m_flags = other.m_packet_res.m_flags;
-    m_packet_res.m_data  = other.m_packet_res.m_data ;
-
-    memcpy(&m_random_client, &other.m_random_client, sizeof(tls_random_t));
-    memcpy(&m_random_server, &other.m_random_server, sizeof(tls_random_t));
 }
 
 
 eap::method_tls::method_tls(_Inout_ method_tls &&other) :
     m_phase(std::move(other.m_phase)),
+    m_packet_req(std::move(other.m_packet_req)),
+    m_packet_res(std::move(other.m_packet_res)),
+    m_random_client(std::move(other.m_random_client)),
+    m_random_server(std::move(other.m_random_server)),
     m_session_id(std::move(other.m_session_id)),
     m_hash_handshake_msgs_md5(std::move(other.m_hash_handshake_msgs_md5)),
     m_hash_handshake_msgs_sha1(std::move(other.m_hash_handshake_msgs_sha1)),
     m_seq_num(std::move(other.m_seq_num)),
     method(std::move(other))
 {
-    m_packet_req.m_code  = std::move(other.m_packet_req.m_code );
-    m_packet_req.m_id    = std::move(other.m_packet_req.m_id   );
-    m_packet_req.m_flags = std::move(other.m_packet_req.m_flags);
-    m_packet_req.m_data  = std::move(other.m_packet_req.m_data );
-
-    m_packet_res.m_code  = std::move(other.m_packet_res.m_code );
-    m_packet_res.m_id    = std::move(other.m_packet_res.m_id   );
-    m_packet_res.m_flags = std::move(other.m_packet_res.m_flags);
-    m_packet_res.m_data  = std::move(other.m_packet_res.m_data );
-
-    memcpy(&m_random_client, &other.m_random_client, sizeof(tls_random_t));
-    memcpy(&m_random_server, &other.m_random_server, sizeof(tls_random_t));
-}
-
-
-eap::method_tls::~method_tls()
-{
-    SecureZeroMemory(&m_random_client, sizeof(tls_random_t));
-    SecureZeroMemory(&m_random_server, sizeof(tls_random_t));
 }
 
 
@@ -103,27 +70,14 @@ eap::method_tls& eap::method_tls::operator=(_In_ const method_tls &other)
 {
     if (this != std::addressof(other)) {
         (method&)*this             = other;
-
         m_phase                    = other.m_phase;
-
-        m_packet_req.m_code        = other.m_packet_req.m_code ;
-        m_packet_req.m_id          = other.m_packet_req.m_id   ;
-        m_packet_req.m_flags       = other.m_packet_req.m_flags;
-        m_packet_req.m_data        = other.m_packet_req.m_data ;
-
-        m_packet_res.m_code        = other.m_packet_res.m_code ;
-        m_packet_res.m_id          = other.m_packet_res.m_id   ;
-        m_packet_res.m_flags       = other.m_packet_res.m_flags;
-        m_packet_res.m_data        = other.m_packet_res.m_data ;
-
-        memcpy(&m_random_client, &other.m_random_client, sizeof(tls_random_t));
-        memcpy(&m_random_server, &other.m_random_server, sizeof(tls_random_t));
-
+        m_packet_req               = other.m_packet_req;
+        m_packet_res               = other.m_packet_res;
+        m_random_client            = other.m_random_client;
+        m_random_server            = other.m_random_server;
         m_session_id               = other.m_session_id;
-
         m_hash_handshake_msgs_md5  = other.m_hash_handshake_msgs_md5;
         m_hash_handshake_msgs_sha1 = other.m_hash_handshake_msgs_sha1;
-
         m_seq_num                  = other.m_seq_num;
     }
 
@@ -135,27 +89,14 @@ eap::method_tls& eap::method_tls::operator=(_Inout_ method_tls &&other)
 {
     if (this != std::addressof(other)) {
         (method&)*this             = std::move(other);
-
         m_phase                    = std::move(other.m_phase);
-
-        m_packet_req.m_code        = std::move(other.m_packet_req.m_code );
-        m_packet_req.m_id          = std::move(other.m_packet_req.m_id   );
-        m_packet_req.m_flags       = std::move(other.m_packet_req.m_flags);
-        m_packet_req.m_data        = std::move(other.m_packet_req.m_data );
-
-        m_packet_res.m_code        = std::move(other.m_packet_res.m_code );
-        m_packet_res.m_id          = std::move(other.m_packet_res.m_id   );
-        m_packet_res.m_flags       = std::move(other.m_packet_res.m_flags);
-        m_packet_res.m_data        = std::move(other.m_packet_res.m_data );
-
-        memcpy(&m_random_client, &other.m_random_client, sizeof(tls_random_t));
-        memcpy(&m_random_server, &other.m_random_server, sizeof(tls_random_t));
-
+        m_packet_req               = std::move(other.m_packet_req);
+        m_packet_res               = std::move(other.m_packet_res);
+        m_random_client            = std::move(other.m_random_client);
+        m_random_server            = std::move(other.m_random_server);
         m_session_id               = std::move(other.m_session_id);
-
         m_hash_handshake_msgs_md5  = std::move(other.m_hash_handshake_msgs_md5);
         m_hash_handshake_msgs_sha1 = std::move(other.m_hash_handshake_msgs_sha1);
-
         m_seq_num                  = std::move(other.m_seq_num);
     }
 
@@ -228,7 +169,7 @@ bool eap::method_tls::process_request_packet(
     // Get packet data pointer and size for more readable code later on.
     const unsigned char *packet_data_ptr;
     size_t packet_data_size;
-    if (pReceivedPacket->Data[1] & tls_req_flags_length_incl) {
+    if (pReceivedPacket->Data[1] & flags_req_length_incl) {
         // Length field is included.
         packet_data_ptr  = pReceivedPacket->Data + 6;
         packet_data_size = dwReceivedPacketSize - 10;
@@ -239,10 +180,10 @@ bool eap::method_tls::process_request_packet(
     }
 
     // Do the TLS defragmentation.
-    if (pReceivedPacket->Data[1] & tls_req_flags_more_frag) {
+    if (pReceivedPacket->Data[1] & flags_req_more_frag) {
         if (m_packet_req.m_data.empty()) {
             // Start a new packet.
-            if (pReceivedPacket->Data[1] & tls_req_flags_length_incl) {
+            if (pReceivedPacket->Data[1] & flags_req_length_incl) {
                 // Preallocate data according to the Length field.
                 size_t size_tot  = ntohl(*(unsigned int*)(pReceivedPacket->Data + 2));
                 m_packet_req.m_data.reserve(size_tot);
@@ -278,12 +219,12 @@ bool eap::method_tls::process_request_packet(
     m_packet_req.m_id    = pReceivedPacket->Id;
     m_packet_req.m_flags = pReceivedPacket->Data[1];
 
-    if (m_packet_res.m_flags & tls_res_flags_more_frag) {
+    if (m_packet_res.m_flags & flags_res_more_frag) {
         // We are sending a fragmented message.
-        if (  m_packet_req.m_code == EapCodeRequest                                                               &&
-              m_packet_req.m_id   == m_packet_res.m_id                                                            &&
-              m_packet_req.m_data.empty()                                                                         &&
-            !(m_packet_req.m_flags & (tls_req_flags_length_incl | tls_req_flags_more_frag | tls_req_flags_start)))
+        if (  m_packet_req.m_code == EapCodeRequest    &&
+              m_packet_req.m_id   == m_packet_res.m_id &&
+              m_packet_req.m_data.empty()              &&
+            !(m_packet_req.m_flags & (flags_req_length_incl | flags_req_more_frag | flags_req_start)))
         {
             // This is the ACK of our fragmented message packet. Send the next fragment.
             m_packet_res.m_id++;
@@ -302,8 +243,8 @@ bool eap::method_tls::process_request_packet(
             if (m_packet_req.m_code != EapCodeRequest) {
                 *ppEapError = m_module.make_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, wstring_printf(_T(__FUNCTION__) _T(" Packet is not a request (expected: %x, received: %x)."), EapCodeRequest, m_packet_req.m_code).c_str());
                 return false;
-            } else if (!(m_packet_req.m_flags & tls_req_flags_start)) {
-                *ppEapError = m_module.make_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, wstring_printf(_T(__FUNCTION__) _T(" Packet is not EAP-TLS Start (expected: %x, received: %x)."), tls_req_flags_start, m_packet_req.m_flags).c_str());
+            } else if (!(m_packet_req.m_flags & flags_req_start)) {
+                *ppEapError = m_module.make_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, wstring_printf(_T(__FUNCTION__) _T(" Packet is not EAP-TLS Start (expected: %x, received: %x)."), flags_req_start, m_packet_req.m_flags).c_str());
                 return false;
             }
 
@@ -357,16 +298,16 @@ bool eap::method_tls::get_response_packet(
     unsigned short size_packet_limit = (unsigned short)std::min<unsigned int>(*pdwSendPacketSize, USHRT_MAX);
     unsigned char *data_dst;
 
-    if (!(m_packet_res.m_flags & tls_res_flags_more_frag)) {
+    if (!(m_packet_res.m_flags & flags_res_more_frag)) {
         // Not fragmented.
         if (size_packet <= size_packet_limit) {
             // No need to fragment the packet.
-            m_packet_res.m_flags &= ~tls_res_flags_length_incl; // No need to explicitly include the Length field either.
+            m_packet_res.m_flags &= ~flags_res_length_incl; // No need to explicitly include the Length field either.
             data_dst = pSendPacket->Data + 2;
             m_module.log_event(&EAPMETHOD_PACKET_SEND, event_data((unsigned int)eap_type_tls), event_data((unsigned int)size_data), event_data::blank);
         } else {
             // But it should be fragmented.
-            m_packet_res.m_flags |= tls_res_flags_length_incl | tls_res_flags_more_frag;
+            m_packet_res.m_flags |= flags_res_length_incl | flags_res_more_frag;
             *(unsigned int*)(pSendPacket->Data + 2) = (unsigned int)size_packet;
             data_dst = pSendPacket->Data + 6;
             size_data   = size_packet_limit - 10;
@@ -377,13 +318,13 @@ bool eap::method_tls::get_response_packet(
         // Continuing the fragmented packet...
         if (size_packet > size_packet_limit) {
             // This is a mid fragment.
-            m_packet_res.m_flags &= ~tls_res_flags_length_incl;
+            m_packet_res.m_flags &= ~flags_res_length_incl;
             size_data   = size_packet_limit - 6;
             size_packet = size_packet_limit;
             m_module.log_event(&EAPMETHOD_PACKET_SEND_FRAG_MID, event_data((unsigned int)eap_type_tls), event_data((unsigned int)size_data), event_data((unsigned int)(m_packet_res.m_data.size() - size_data)), event_data::blank);
         } else {
             // This is the last fragment.
-            m_packet_res.m_flags &= ~(tls_res_flags_length_incl | tls_res_flags_more_frag);
+            m_packet_res.m_flags &= ~(flags_res_length_incl | flags_res_more_frag);
             m_module.log_event(&EAPMETHOD_PACKET_SEND_FRAG_LAST, event_data((unsigned int)eap_type_tls), event_data((unsigned int)size_data), event_data((unsigned int)(m_packet_res.m_data.size() - size_data)), event_data::blank);
         }
         data_dst = pSendPacket->Data + 2;
@@ -423,7 +364,7 @@ eap::sanitizing_blob eap::method_tls::make_client_hello() const
         4                    + // SSL header
         (size_data =
         2                    + // SSL version
-        sizeof(tls_random_t) + // Client random
+        sizeof(random)       + // Client random
         1                    + // Session ID size
         m_session_id.size()  + // Session ID
         2                    + // Length of cypher suite list
@@ -581,4 +522,95 @@ bool eap::method_tls::encrypt_message(_In_ const sanitizing_blob &msg, _Out_ std
     // Copy to output.
     msg_enc.assign(enc.begin(), enc.end());
     return true;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// eap::method_tls::packet
+//////////////////////////////////////////////////////////////////////
+
+eap::method_tls::packet::packet() :
+    m_code((EapCode)0),
+    m_id(0),
+    m_flags(0)
+{
+}
+
+
+eap::method_tls::packet::packet(_In_ const packet &other) :
+    m_code (other.m_code ),
+    m_id   (other.m_id   ),
+    m_flags(other.m_flags),
+    m_data (other.m_data )
+{
+}
+
+
+eap::method_tls::packet::packet(_Inout_ packet &&other) :
+    m_code (std::move(other.m_code )),
+    m_id   (std::move(other.m_id   )),
+    m_flags(std::move(other.m_flags)),
+    m_data (std::move(other.m_data ))
+{
+}
+
+
+eap::method_tls::packet& eap::method_tls::packet::operator=(_In_ const packet &other)
+{
+    if (this != std::addressof(other)) {
+        m_code  = other.m_code ;
+        m_id    = other.m_id   ;
+        m_flags = other.m_flags;
+        m_data  = other.m_data ;
+    }
+
+    return *this;
+}
+
+
+eap::method_tls::packet& eap::method_tls::packet::operator=(_Inout_ packet &&other)
+{
+    if (this != std::addressof(other)) {
+        m_code  = std::move(other.m_code );
+        m_id    = std::move(other.m_id   );
+        m_flags = std::move(other.m_flags);
+        m_data  = std::move(other.m_data );
+    }
+
+    return *this;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// eap::method_tls::random
+//////////////////////////////////////////////////////////////////////
+
+eap::method_tls::random::random() :
+    time(0)
+{
+    memset(data, 0, sizeof(data));
+}
+
+
+eap::method_tls::random::random(_In_ const random &other) :
+    time(other.time)
+{
+    memcpy(data, other.data, sizeof(data));
+}
+
+
+eap::method_tls::random::~random()
+{
+    SecureZeroMemory(data, sizeof(data));
+}
+
+
+eap::method_tls::random& eap::method_tls::random::operator=(_In_ const random &other)
+{
+    if (this != std::addressof(other)) {
+        time = other.time;
+        memcpy(data, other.data, sizeof(data));
+    }
+
+    return *this;
 }

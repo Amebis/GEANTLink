@@ -21,25 +21,6 @@
 namespace eap
 {
     ///
-    /// TLS random
-    ///
-    struct tls_random_t;
-
-    ///
-    /// EAP-TLS request packet flags
-    ///
-    /// \sa [The EAP-TLS Authentication Protocol (Chapter: 3.1 EAP-TLS Request Packet)](https://tools.ietf.org/html/rfc5216#section-3.1)
-    ///
-    enum tls_req_flags_t;
-
-    ///
-    /// EAP-TLS response packet flags
-    ///
-    /// \sa [The EAP-TLS Authentication Protocol (Chapter: 3.2 EAP-TLS Response Packet)](https://tools.ietf.org/html/rfc5216#section-3.2)
-    ///
-    enum tls_res_flags_t;
-
-    ///
     /// EAP-TLS method
     ///
     class method_tls;
@@ -60,28 +41,30 @@ namespace eap
 
 namespace eap
 {
-#pragma pack(push)
-#pragma pack(1)
-    struct tls_random_t {
-        unsigned int time;      ///< Unix time-stamp
-        unsigned char data[28]; ///< Randomness
-    };
-#pragma pack(pop)
-
-    enum tls_req_flags_t {
-        tls_req_flags_length_incl = 0x80,   ///< Length included
-        tls_req_flags_more_frag   = 0x40,   ///< More fragments
-        tls_req_flags_start       = 0x20,   ///< Start
-    };
-
-    enum tls_res_flags_t {
-        tls_res_flags_length_incl = 0x80,   ///< Length included
-        tls_res_flags_more_frag   = 0x40,   ///< More fragments
-    };
-
-
     class method_tls : public method
     {
+    public:
+        ///
+        /// EAP-TLS request packet flags
+        ///
+        /// \sa [The EAP-TLS Authentication Protocol (Chapter: 3.1 EAP-TLS Request Packet)](https://tools.ietf.org/html/rfc5216#section-3.1)
+        ///
+        enum flags_req_t {
+            flags_req_length_incl = 0x80,   ///< Length included
+            flags_req_more_frag   = 0x40,   ///< More fragments
+            flags_req_start       = 0x20,   ///< Start
+        };
+
+        ///
+        /// EAP-TLS response packet flags
+        ///
+        /// \sa [The EAP-TLS Authentication Protocol (Chapter: 3.2 EAP-TLS Response Packet)](https://tools.ietf.org/html/rfc5216#section-3.2)
+        ///
+        enum flags_res_t {
+            flags_res_length_incl = 0x80,   ///< Length included
+            flags_res_more_frag   = 0x40,   ///< More fragments
+        };
+
     public:
         ///
         /// Constructs an EAP method
@@ -104,11 +87,6 @@ namespace eap
         /// \param[in] other  EAP method to move from
         ///
         method_tls(_Inout_ method_tls &&other);
-
-        ///
-        /// Destructor
-        ///
-        virtual ~method_tls();
 
         ///
         /// Copies an EAP method
@@ -237,11 +215,49 @@ namespace eap
             phase_server_hello = 1,
         } m_phase;                                      ///< Session phase
 
-        struct {
+        struct packet
+        {
             EapCode m_code;                             ///< Packet code
             BYTE m_id;                                  ///< Packet ID
             BYTE m_flags;                               ///< Packet flags
             std::vector<BYTE> m_data;                   ///< Packet data
+
+            ///
+            /// Constructs an empty packet
+            ///
+            packet();
+
+            ///
+            /// Copies a packet
+            ///
+            /// \param[in] other  Packet to copy from
+            ///
+            packet(_In_ const packet &other);
+
+            ///
+            /// Moves a packet
+            ///
+            /// \param[in] other  Packet to move from
+            ///
+            packet(_Inout_ packet &&other);
+
+            ///
+            /// Copies a packet
+            ///
+            /// \param[in] other  Packet to copy from
+            ///
+            /// \returns Reference to this object
+            ///
+            packet& operator=(_In_ const packet &other);
+
+            ///
+            /// Moves a packet
+            ///
+            /// \param[in] other  Packet to move from
+            ///
+            /// \returns Reference to this object
+            ///
+            packet& operator=(_Inout_ packet &&other);
         }
             m_packet_req,                               ///< Request packet
             m_packet_res;                               ///< Response packet
@@ -251,8 +267,42 @@ namespace eap
 
         winstd::crypt_key m_key_write;                  ///< Key for encrypting messages
 
-        tls_random_t m_random_client;                   ///< Client random
-        tls_random_t m_random_server;                   ///< Server random
+#pragma pack(push)
+#pragma pack(1)
+        struct random
+        {
+            unsigned int time;      ///< Unix time-stamp
+            unsigned char data[28]; ///< Randomness
+
+            ///
+            /// Constructs a all-zero random
+            ///
+            random();
+
+            ///
+            /// Copies a random
+            ///
+            /// \param[in] other  Random to copy from
+            ///
+            random(_In_ const random &other);
+
+            ///
+            /// Destructor
+            ///
+            ~random();
+
+            ///
+            /// Copies a random
+            ///
+            /// \param[in] other  Random to copy from
+            ///
+            /// \returns Reference to this object
+            ///
+            random& operator=(_In_ const random &other);
+        }
+#pragma pack(pop)
+            m_random_client,                            ///< Client random
+            m_random_server;                            ///< Server random
 
         sanitizing_blob m_session_id;                   ///< TLS session ID
 

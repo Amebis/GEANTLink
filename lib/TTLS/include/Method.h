@@ -21,13 +21,6 @@
 namespace eap
 {
     ///
-    /// EAP-TTLS packet flags
-    ///
-    /// \sa [Extensible Authentication Protocol Tunneled Transport Layer Security Authenticated Protocol Version 0 (EAP-TTLSv0) (Chapter: 9.1 Packet Format)](https://tools.ietf.org/html/rfc5281#section-9.1)
-    ///
-    enum ttls_flags_t;
-
-    ///
     /// EAP-TTLS method
     ///
     class method_ttls;
@@ -44,16 +37,21 @@ namespace eap
 
 namespace eap
 {
-    enum ttls_flags_t {
-        ttls_flags_length_incl = tls_req_flags_length_incl, ///< Length included
-        ttls_flags_more_frag   = tls_req_flags_more_frag,   ///< More fragments
-        ttls_flags_start       = tls_req_flags_start,       ///< Start
-        ttls_flags_ver_mask    = 0x07,                      ///< Version mask
-    };
-
-
     class method_ttls : public method
     {
+    public:
+        ///
+        /// EAP-TTLS packet flags
+        ///
+        /// \sa [Extensible Authentication Protocol Tunneled Transport Layer Security Authenticated Protocol Version 0 (EAP-TTLSv0) (Chapter: 9.1 Packet Format)](https://tools.ietf.org/html/rfc5281#section-9.1)
+        ///
+        enum flags_t {
+            flags_length_incl = method_tls::flags_req_length_incl,  ///< Length included
+            flags_more_frag   = method_tls::flags_req_more_frag,    ///< More fragments
+            flags_start       = method_tls::flags_req_start,        ///< Start
+            flags_ver_mask    = 0x07,                               ///< Version mask
+        };
+
     public:
         ///
         /// Constructs an EAP method
