@@ -86,8 +86,8 @@ static int CredWrite()
         eap::credentials_pap cred_stored(g_module);
         try {
             cred_stored.retrieve(target_name.c_str());
-        } catch(eap::win_runtime_error &err) {
-            OutputDebugStr(_T("%ls (error %u)\n"), err.m_msg.c_str(), err.m_error);
+        } catch(win_runtime_error &err) {
+            OutputDebugStr(_T("%hs (error %u)\n"), err.what(), err.number());
         } catch(...) {
             OutputDebugStr(_T("Reading credentials failed.\n"));
         }
@@ -95,8 +95,8 @@ static int CredWrite()
 #endif
     try {
         cred.store(target_name.c_str());
-    } catch(eap::win_runtime_error &err) {
-        OutputDebugStr(_T("%ls (error %u)\n"), err.m_msg.c_str(), err.m_error);
+    } catch(win_runtime_error &err) {
+        OutputDebugStr(_T("%hs (error %u)\n"), err.what(), err.number());
         return 2;
     } catch(...) {
         OutputDebugStr(_T("Writing credentials failed.\n"));

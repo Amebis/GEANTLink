@@ -230,7 +230,7 @@ void eap::method_tls::begin_session(
 
     // Create cryptographics provider.
     if (!m_cp.create(NULL, MS_ENHANCED_PROV, PROV_RSA_FULL, 0))
-        throw win_runtime_error(_T(__FUNCTION__) _T(" Error creating cryptographics provider."));
+        throw win_runtime_error(__FUNCTION__ " Error creating cryptographics provider.");
 
     // HMAC symmetric key generation sample. To be used later...
     //crypt_hash hash_key;
@@ -250,7 +250,7 @@ void eap::method_tls::process_request_packet(
 
     // Is this a valid EAP-TLS packet?
     if (dwReceivedPacketSize < 6)
-        throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, _T(__FUNCTION__) _T(" Packet is too small. EAP-%s packets should be at least 6B."));
+        throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Packet is too small. EAP-%s packets should be at least 6B.");
     //else if (pReceivedPacket->Data[0] != eap_type_tls) // Skip method check, to allow TTLS extension.
     //    throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, wstring_printf(_T(__FUNCTION__) _T(" Packet is not EAP-TLS (expected: %u, received: %u)."), eap_type_tls, pReceivedPacket->Data[0]).c_str());
 
@@ -315,7 +315,7 @@ void eap::method_tls::process_request_packet(
         // Generate client randomness.
         _time32(&m_random_client.time);
         if (!CryptGenRandom(m_cp, sizeof(m_random_client.data), m_random_client.data))
-            throw win_runtime_error(_T(__FUNCTION__) _T(" Error creating client randomness."));
+            throw win_runtime_error(__FUNCTION__ " Error creating client randomness.");
         m_random_server.clear();
         m_server_cert_chain.clear();
         m_send_client_cert = false;
@@ -323,11 +323,11 @@ void eap::method_tls::process_request_packet(
 
         // Create MD5 hash object.
         if (!m_hash_handshake_msgs_md5.create(m_cp, CALG_MD5, NULL, 0))
-            throw win_runtime_error(_T(__FUNCTION__) _T(" Error creating MD5 hashing object."));
+            throw win_runtime_error(__FUNCTION__ " Error creating MD5 hashing object.");
 
         // Create SHA-1 hash object.
         if (!m_hash_handshake_msgs_sha1.create(m_cp, CALG_SHA1, NULL, 0))
-            throw win_runtime_error(_T(__FUNCTION__) _T(" Error creating SHA-1 hashing object."));
+            throw win_runtime_error(__FUNCTION__ " Error creating SHA-1 hashing object.");
 
         m_seq_num = 0;
     }
@@ -349,7 +349,7 @@ void eap::method_tls::process_request_packet(
             pEapOutput->action = EapPeerMethodResponseActionSend;
             return;
         } else
-            throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, wstring_printf(_T(__FUNCTION__) _T(" ACK expected, received %u-%u-%x."), m_packet_req.m_code, m_packet_req.m_id, m_packet_req.m_flags).c_str());
+            throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, string_printf(__FUNCTION__ " ACK expected, received %u-%u-%x.", m_packet_req.m_code, m_packet_req.m_id, m_packet_req.m_flags));
     }
 
     switch (m_phase) {
@@ -376,10 +376,10 @@ void eap::method_tls::process_request_packet(
 
         case phase_server_hello: {
             if (m_packet_req.m_data.size() < 5)
-                throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, wstring_printf(_T(__FUNCTION__) _T(" TLS message too small (expected >=5, received %uB)."), m_packet_req.m_data.size()).c_str());
+                throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, string_printf(__FUNCTION__ " TLS message too small (expected >=5, received %uB).", m_packet_req.m_data.size()));
             const message *msg = (const message*)m_packet_req.m_data.data();
             if (msg->type != message_type_handshake)
-                throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, wstring_printf(_T(__FUNCTION__) _T(" Wrong TLS message (expected %u, received %uB)."), message_type_handshake, msg->type).c_str());
+                throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, string_printf(__FUNCTION__ " Wrong TLS message (expected %u, received %uB).", message_type_handshake, msg->type));
 
             process_handshake(msg->data, std::min<size_t>(ntohs(*(unsigned short*)msg->length), m_packet_req.m_data.size() - 5));
 
@@ -387,7 +387,7 @@ void eap::method_tls::process_request_packet(
         }
 
         default:
-            throw win_runtime_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
+            throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Not supported.");
     }
 
     // Request packet was processed. Clear its data since we use the absence of data to detect first of fragmented message packages.
@@ -458,7 +458,7 @@ void eap::method_tls::get_result(
     UNREFERENCED_PARAMETER(reason);
     UNREFERENCED_PARAMETER(ppResult);
 
-    throw win_runtime_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
+    throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Not supported.");
 }
 
 
@@ -542,70 +542,70 @@ void eap::method_tls::process_handshake(_In_bytecount_(msg_size) const void *_ms
     for (const unsigned char *msg = (const unsigned char*)_msg, *msg_end = msg + msg_size; msg < msg_end; ) {
         // Parse record header.
         if (msg + sizeof(unsigned int) > msg_end)
-            throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, _T(__FUNCTION__) _T(" Incomplete record header."));
+            throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Incomplete record header.");
         unsigned int hdr = ntohl(*(unsigned int*)msg);
         const unsigned char
             *rec     = msg + sizeof(unsigned int),
             *rec_end = rec + (hdr & 0xffffff);
         if (rec_end > msg_end)
-            throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, _T(__FUNCTION__) _T(" Incomplete record rec."));
+            throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Incomplete record rec.");
 
         // Process record.
         switch (hdr >> 24) {
             case server_hello:
                 // TLS version
                 if (rec + 2 > rec_end)
-                    throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, _T(__FUNCTION__) _T(" Server SSL/TLS version missing or incomplete."));
+                    throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Server SSL/TLS version missing or incomplete.");
                 else if (rec[0] != 3 || rec[1] != 1)
-                    throw win_runtime_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Unsupported SSL/TLS version."));
+                    throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Unsupported SSL/TLS version.");
                 rec += 2;
 
                 // Server random
                 if (rec + sizeof(m_random_server) > rec_end)
-                    throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, _T(__FUNCTION__) _T(" Server random missing or incomplete."));
+                    throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Server random missing or incomplete.");
                 memcpy(&m_random_server, rec, sizeof(m_random_server));
                 rec += sizeof(m_random_server);
 
                 // Session ID
                 if (rec + 1 > rec_end || rec + 1 + rec[0] > rec_end)
-                    throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, _T(__FUNCTION__) _T(" Session ID missing or incomplete."));
+                    throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Session ID missing or incomplete.");
                 assert(rec[0] <= 32); // According to RFC 5246 session IDs should not be longer than 32B.
                 m_session_id.assign(rec + 1, rec + 1 + rec[0]);
                 rec += rec[0] + 1;
 
                 // Cipher
                 if (rec + 2 > rec_end)
-                    throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, _T(__FUNCTION__) _T(" Cipher or incomplete."));
+                    throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Cipher or incomplete.");
                 if (rec[0] != 0x00 || rec[1] != 0x0a)
-                    throw win_runtime_error(ERROR_NOT_SUPPORTED, wstring_printf(_T(__FUNCTION__) _T(" Other than requested cipher selected (expected 0x000a, received 0x%02x%02x)."), rec[0], rec[1]).c_str());
+                    throw win_runtime_error(ERROR_NOT_SUPPORTED, string_printf(__FUNCTION__ " Other than requested cipher selected (expected 0x000a, received 0x%02x%02x).", rec[0], rec[1]));
 
                 break;
 
             case certificate: {
                 // Certificate list size
                 if (rec + 3 > rec_end)
-                    throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, _T(__FUNCTION__) _T(" Certificate list size missing or incomplete."));
+                    throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Certificate list size missing or incomplete.");
                 const unsigned char
                     *list     = rec  + 3,
                     *list_end = list + ((rec[0] << 16) | (rec[1] << 8) | rec[2]);
                 if (list_end > rec_end)
-                    throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, _T(__FUNCTION__) _T(" Certificate list missing or incomplete."));
+                    throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Certificate list missing or incomplete.");
 
                 m_server_cert_chain.clear();
                 while (list < list_end) {
                     // Certificate size
                     if (list + 3 > list_end)
-                        throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, _T(__FUNCTION__) _T(" Certificate size missing or incomplete."));
+                        throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Certificate size missing or incomplete.");
                     const unsigned char
                         *cert     = list + 3,
                         *cert_end = cert + ((list[0] << 16) | (list[1] << 8) | list[2]);
                     if (cert_end > list_end)
-                        throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, _T(__FUNCTION__) _T(" Certificate rec missing or incomplete."));
+                        throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Certificate rec missing or incomplete.");
 
                     // Certificate
                     cert_context c;
                     if (!c.create(X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, cert, (DWORD)(cert_end - cert)))
-                        throw win_runtime_error(_T(__FUNCTION__) _T(" Error reading certificate."));
+                        throw win_runtime_error(__FUNCTION__ " Error reading certificate.");
                     m_server_cert_chain.push_back(std::move(c));
 
                     list = cert_end;
@@ -620,13 +620,13 @@ void eap::method_tls::process_handshake(_In_bytecount_(msg_size) const void *_ms
 
             case finished:
                 if (rec_end - rec != 12)
-                    throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, wstring_printf(_T(__FUNCTION__) _T(" \"finished\" size incorrect (expected 12B, received %u)."), rec_end - rec).c_str());
+                    throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, string_printf(__FUNCTION__ " \"finished\" size incorrect (expected 12B, received %u).", rec_end - rec));
 
                 vector<unsigned char> hash, hash_sha1;
                 if (!CryptGetHashParam(m_hash_handshake_msgs_md5, HP_HASHVAL, hash, 0))
-                    throw win_runtime_error(_T(__FUNCTION__) _T(" Error finishing MD5 hash calculation."));
+                    throw win_runtime_error(__FUNCTION__ " Error finishing MD5 hash calculation.");
                 if (!CryptGetHashParam(m_hash_handshake_msgs_sha1, HP_HASHVAL, hash_sha1, 0))
-                    throw win_runtime_error(_T(__FUNCTION__) _T(" Error finishing SHA-1 hash calculation."));
+                    throw win_runtime_error(__FUNCTION__ " Error finishing SHA-1 hash calculation.");
                 hash.insert(hash.end(), hash_sha1.begin(), hash_sha1.end());
         }
 
@@ -642,18 +642,18 @@ void eap::method_tls::encrypt_message(_Inout_ sanitizing_blob &msg)
     static const HMAC_INFO s_hmac_info = { CALG_SHA1 };
     if (!hash_hmac.create(m_cp, CALG_HMAC, m_key_hmac, 0) ||
         !CryptSetHashParam(hash_hmac, HP_HMAC_INFO, (const BYTE*)&s_hmac_info, 0))
-        throw win_runtime_error(_T(__FUNCTION__) _T(" Error creating HMAC hash."));
+        throw win_runtime_error(__FUNCTION__ " Error creating HMAC hash.");
 
     // Hash sequence number and message.
     unsigned __int64 seq_num = htonll(m_seq_num);
     if (!CryptHashData(hash_hmac, (const BYTE*)&seq_num, sizeof(seq_num), 0) ||
         !CryptHashData(hash_hmac, msg.data(), (DWORD)msg.size(), 0))
-        throw win_runtime_error(_T(__FUNCTION__) _T(" Error hashing data."));
+        throw win_runtime_error(__FUNCTION__ " Error hashing data.");
 
     // Calculate hash.
     vector<unsigned char> hmac;
     if (!CryptGetHashParam(hash_hmac, HP_HASHVAL, hmac, 0))
-        throw win_runtime_error(_T(__FUNCTION__) _T(" Error finishing hash calculation."));
+        throw win_runtime_error(__FUNCTION__ " Error finishing hash calculation.");
 
     // Remove SSL/TLS header (record type, version, message size).
     msg.erase(msg.begin(), msg.begin() + 5);
@@ -679,7 +679,7 @@ void eap::method_tls::encrypt_message(_Inout_ sanitizing_blob &msg)
     assert(size < 0xffffffff);
     DWORD size2 = (DWORD)size;
     if (!CryptEncrypt(m_key_encrypt, NULL, FALSE, 0, msg.data(), &size2, (DWORD)size))
-        throw win_runtime_error(_T(__FUNCTION__) _T(" Error encrypting message."));
+        throw win_runtime_error(__FUNCTION__ " Error encrypting message.");
 
     // Increment sequence number.
     m_seq_num++;
@@ -691,7 +691,7 @@ void eap::method_tls::decrypt_message(_Inout_ sanitizing_blob &msg)
     // Decrypt.
     DWORD size = (DWORD)msg.size();
     if (!CryptDecrypt(m_key_decrypt, NULL, FALSE, 0, msg.data(), &size))
-        throw win_runtime_error(_T(__FUNCTION__) _T(" Error decrypting message."));
+        throw win_runtime_error(__FUNCTION__ " Error decrypting message.");
 
     // Remove padding.
     msg.resize(size - msg.back() - 1);
@@ -709,9 +709,9 @@ vector<unsigned char> eap::method_tls::p_hash(
     // HMAC symmetric key generation.
     crypt_hash hash_key;
     if (!hash_key.create(m_cp, alg, 0, 0))
-        throw win_runtime_error(_T(__FUNCTION__) _T(" Error creating key hash."));
+        throw win_runtime_error(__FUNCTION__ " Error creating key hash.");
     if (!CryptHashData(hash_key, (const BYTE*)secret, (DWORD)size_secret, 0))
-        throw win_runtime_error(_T(__FUNCTION__) _T(" Error hashing secret."));
+        throw win_runtime_error(__FUNCTION__ " Error hashing secret.");
     crypt_key key_hmac;
     key_hmac.derive(m_cp, CALG_RC4, hash_key, 0);
     vector<unsigned char> block;
@@ -739,22 +739,22 @@ vector<unsigned char> eap::method_tls::p_hash(
         crypt_hash hash_hmac1;
         if (!hash_hmac1.create(m_cp, CALG_HMAC, key_hmac, 0) ||
             !CryptSetHashParam(hash_hmac1, HP_HMAC_INFO, (const BYTE*)&hmac_info, 0))
-            throw win_runtime_error(_T(__FUNCTION__) _T(" Error creating HMAC hash."));
+            throw win_runtime_error(__FUNCTION__ " Error creating HMAC hash.");
         if (!CryptHashData(hash_hmac1, A.data(), (DWORD)A.size(), 0))
-            throw win_runtime_error(_T(__FUNCTION__) _T(" Error hashing A."));
+            throw win_runtime_error(__FUNCTION__ " Error hashing A.");
         if (!CryptGetHashParam(hash_hmac1, HP_HASHVAL, A, 0))
-            throw win_runtime_error(_T(__FUNCTION__) _T(" Error finishing hash A calculation."));
+            throw win_runtime_error(__FUNCTION__ " Error finishing hash A calculation.");
 
         // Hash A and seed.
         crypt_hash hash_hmac2;
         if (!hash_hmac2.create(m_cp, CALG_HMAC, key_hmac, 0) ||
             !CryptSetHashParam(hash_hmac2, HP_HMAC_INFO, (const BYTE*)&hmac_info, 0))
-            throw win_runtime_error(_T(__FUNCTION__) _T(" Error creating A+seed hash."));
+            throw win_runtime_error(__FUNCTION__ " Error creating A+seed hash.");
         if (!CryptHashData(hash_hmac2, A.data(), (DWORD)A.size(), 0) ||
             !CryptHashData(hash_hmac2, (const BYTE*)seed, (DWORD)size_seed, 0))
-            throw win_runtime_error(_T(__FUNCTION__) _T(" Error hashing seed."));
+            throw win_runtime_error(__FUNCTION__ " Error hashing seed.");
         if (!CryptGetHashParam(hash_hmac2, HP_HASHVAL, block, 0))
-            throw win_runtime_error(_T(__FUNCTION__) _T(" Error finishing hash A+seed calculation."));
+            throw win_runtime_error(__FUNCTION__ " Error finishing hash A+seed calculation.");
 
         // Append to output data.
         data.insert(data.end(), block.begin(), block.end());

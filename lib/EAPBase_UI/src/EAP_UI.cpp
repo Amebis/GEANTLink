@@ -87,13 +87,13 @@ wxEAPProviderLockedPanel::wxEAPProviderLockedPanel(const eap::config_provider &p
 
     m_provider_locked_label->SetLabel(wxString::Format(_("%s has pre-set parts of this configuration. Those parts are locked to prevent accidental modification."),
         !m_prov.m_name.empty() ? m_prov.m_name.c_str() :
-        !m_prov.m_id  .empty() ? winstd::string_printf(_("Your %ls provider"), m_prov.m_id.c_str()).c_str() : _("Your provider")));
+        !m_prov.m_id  .empty() ? winstd::tstring_printf(_("Your %ls provider"), m_prov.m_id.c_str()).c_str() : _("Your provider")));
     m_provider_locked_label->Wrap(452);
 
     if (!m_prov.m_help_email.empty() || !m_prov.m_help_web.empty() || !m_prov.m_help_phone.empty()) {
         wxStaticText *provider_notice = new wxStaticText(this, wxID_ANY, wxString::Format(_("For additional help and instructions, please contact %s at:"),
             !m_prov.m_name.empty() ? m_prov.m_name.c_str() :
-            !m_prov.m_id  .empty() ? winstd::string_printf(_("your %ls provider"), m_prov.m_id.c_str()).c_str() : _("your provider")), wxDefaultPosition, wxDefaultSize, 0);
+            !m_prov.m_id  .empty() ? winstd::tstring_printf(_("your %ls provider"), m_prov.m_id.c_str()).c_str() : _("your provider")), wxDefaultPosition, wxDefaultSize, 0);
         provider_notice->Wrap(452);
         m_provider_locked_vert->Add(provider_notice, 0, wxUP|wxLEFT|wxRIGHT|wxEXPAND, 5);
 

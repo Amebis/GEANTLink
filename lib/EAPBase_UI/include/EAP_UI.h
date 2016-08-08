@@ -431,8 +431,8 @@ protected:
             // Read credentials from Credential Manager
             try {
                 m_cred.retrieve(m_target.c_str());
-            } catch (eap::win_runtime_error &err) {
-                wxLogError(winstd::tstring_printf(_("Error reading credentials from Credential Manager: %ls (error %u)"), err.m_msg.c_str(), err.m_error).c_str());
+            } catch (winstd::win_runtime_error &err) {
+                wxLogError(winstd::tstring_printf(_("Error reading credentials from Credential Manager: %hs (error %u)"), err.what(), err.number()).c_str());
             } catch (...) {
                 wxLogError(_("Reading credentials failed."));
             }
@@ -451,8 +451,8 @@ protected:
                 // Write credentials to credential manager.
                 try {
                     m_cred.store(m_target.c_str());
-                } catch (eap::win_runtime_error &err) {
-                    wxLogError(winstd::tstring_printf(_("Error writing credentials to Credential Manager: %ls (error %u)"), err.m_msg.c_str(), err.m_error).c_str());
+                } catch (winstd::win_runtime_error &err) {
+                    wxLogError(winstd::tstring_printf(_("Error writing credentials to Credential Manager: %hs (error %u)"), err.what(), err.number()).c_str());
                 } catch (...) {
                     wxLogError(_("Writing credentials failed."));
                 }

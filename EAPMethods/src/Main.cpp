@@ -743,7 +743,7 @@ DWORD WINAPI EapPeerCredentialsXml2Blob(
     else {
         // <Credentials>
         com_obj<IXMLDOMNode> pXmlElCredentials;
-        if ((dwResult = eapxml::select_node(pCredentialsDoc, bstr(L"//EapHostUserCredentials/Credentials"), &pXmlElCredentials)) != ERROR_SUCCESS) {
+        if (FAILED(eapxml::select_node(pCredentialsDoc, bstr(L"//EapHostUserCredentials/Credentials"), &pXmlElCredentials))) {
             g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_NOT_FOUND, _T(__FUNCTION__) _T(" Error selecting <EapHostUserCredentials><Credentials> element.")));
             return dwResult;
         }
@@ -880,7 +880,7 @@ DWORD WINAPI EapPeerQueryInteractiveUIInputFields(
     _In_count_(dwUIContextDataSize) const BYTE                    *pUIContextData,
     _Out_                                 EAP_INTERACTIVE_UI_DATA *pEapInteractiveUIData,
     _Out_                                 EAP_ERROR               **ppEapError,
-    _Inout_                               LPVOID                  *pvReserved)
+    _Inout_                               LPVOID                  *ppvReserved)
 {
     DWORD dwResult = ERROR_SUCCESS;
     event_fn_auto_ret<DWORD> event_auto(g_peer.get_event_fn_auto(__FUNCTION__, dwResult));
@@ -901,6 +901,8 @@ DWORD WINAPI EapPeerQueryInteractiveUIInputFields(
     else if (!pEapInteractiveUIData)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pEapInteractiveUIData is NULL.")));
     else {
+        UNREFERENCED_PARAMETER(ppvReserved);
+
         try {
             g_peer.query_interactive_ui_input_fields(dwVersion, dwFlags, dwUIContextDataSize, pUIContextData, pEapInteractiveUIData);
         } catch (std::exception &err) {
@@ -952,6 +954,8 @@ DWORD WINAPI EapPeerQueryUIBlobFromInteractiveUIInputFields(
     else if (!ppDataFromInteractiveUI)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" ppDataFromInteractiveUI is NULL.")));
     else {
+        UNREFERENCED_PARAMETER(ppvReserved);
+
         try {
             g_peer.query_ui_blob_from_interactive_ui_input_fields(dwVersion, dwFlags, dwUIContextDataSize, pUIContextData, pEapInteractiveUIData, pdwDataFromInteractiveUISize, ppDataFromInteractiveUI);
         } catch (std::exception &err) {

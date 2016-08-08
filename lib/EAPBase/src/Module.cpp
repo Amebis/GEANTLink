@@ -87,26 +87,41 @@ EAP_ERROR* eap::module::make_error(_In_ DWORD dwErrorCode, _In_opt_z_ LPCWSTR ps
 
 EAP_ERROR* eap::module::make_error(_In_ std::exception &err) const
 {
-    win_runtime_error &err_rt(dynamic_cast<win_runtime_error&>(err));
-    if (&err_rt)
-        return make_error(err_rt.m_error, err_rt.m_msg.c_str());
+    wstring what;
+    MultiByteToWideChar(CP_ACP, 0, err.what(), -1, what);
 
-    invalid_argument &err_ia(dynamic_cast<invalid_argument&>(err));
-    if (&err_ia) {
-        wstring str;
-        MultiByteToWideChar(CP_ACP, 0, err_ia.what(), -1, str);
-        return make_error(ERROR_INVALID_PARAMETER, str.c_str());
+    {
+        win_runtime_error &e(dynamic_cast<win_runtime_error&>(err));
+        if (&e)
+            return make_error(e.number(), what.c_str());
     }
 
-    wstring str;
-    MultiByteToWideChar(CP_ACP, 0, err.what(), -1, str);
-    return make_error(ERROR_INVALID_DATA, str.c_str());
+    {
+        com_runtime_error &e(dynamic_cast<com_runtime_error&>(err));
+        if (&e)
+            return make_error(HRESULT_CODE(e.number()), what.c_str());
+    }
+
+    {
+        invalid_argument &e(dynamic_cast<invalid_argument&>(err));
+        if (&e)
+            return make_error(ERROR_INVALID_PARAMETER, what.c_str());
+    }
+
+    wstring name;
+    MultiByteToWideChar(CP_ACP, 0, typeid(err).name(), -1, name);
+    name += L": ";
+    name += what;
+    return make_error(ERROR_INVALID_DATA, name.c_str());
 }
 
 
 BYTE* eap::module::alloc_memory(_In_ size_t size)
 {
-    return (BYTE*)HeapAlloc(m_heap, 0, size);
+    BYTE *p = (BYTE*)HeapAlloc(m_heap, 0, size);
+    if (!p)
+        throw win_runtime_error(winstd::string_printf(__FUNCTION__ " Error allocating memory for BLOB (%uB).", size));
+    return p;
 }
 
 
@@ -158,7 +173,7 @@ std::vector<unsigned char> eap::module::encrypt(_In_ HCRYPTPROV hProv, _In_bytec
     // Generate 256-bit AES session key.
     crypt_key key_aes;
     if (!CryptGenKey(hProv, CALG_AES_256, MAKELONG(CRYPT_EXPORTABLE, 256), &key_aes))
-        throw win_runtime_error(_T(__FUNCTION__) _T(" CryptGenKey failed."));
+        throw win_runtime_error(__FUNCTION__ " CryptGenKey failed.");
 
     // Import the public RSA key.
     HRSRC res = FindResource(m_instance, MAKEINTRESOURCE(IDR_EAP_KEY_PUBLIC), RT_RCDATA);
@@ -169,14 +184,14 @@ std::vector<unsigned char> eap::module::encrypt(_In_ HCRYPTPROV hProv, _In_bytec
     unique_ptr<CERT_PUBLIC_KEY_INFO, LocalFree_delete<CERT_PUBLIC_KEY_INFO> > keyinfo_data;
     DWORD keyinfo_size = 0;
     if (!CryptDecodeObjectEx(X509_ASN_ENCODING, X509_PUBLIC_KEY_INFO, (const BYTE*)::LockResource(res_handle), ::SizeofResource(m_instance, res), CRYPT_DECODE_ALLOC_FLAG, NULL, &keyinfo_data, &keyinfo_size))
-        throw win_runtime_error(_T(__FUNCTION__) _T(" CryptDecodeObjectEx failed."));
+        throw win_runtime_error(__FUNCTION__ " CryptDecodeObjectEx failed.");
     if (!key_rsa.import_public(hProv, X509_ASN_ENCODING, keyinfo_data.get()))
-        throw win_runtime_error(_T(__FUNCTION__) _T(" Public key import failed."));
+        throw win_runtime_error(__FUNCTION__ " Public key import failed.");
 
     // Export AES session key encrypted with public RSA key.
     vector<unsigned char, sanitizing_allocator<unsigned char> > buf;
     if (!CryptExportKey(key_aes, key_rsa, SIMPLEBLOB, 0, buf))
-        throw win_runtime_error(_T(__FUNCTION__) _T(" CryptExportKey failed."));
+        throw win_runtime_error(__FUNCTION__ " CryptExportKey failed.");
     std::vector<unsigned char> enc(buf.begin(), buf.end());
 
     // Pre-allocate memory to allow space, as encryption will grow the data.
@@ -187,7 +202,7 @@ std::vector<unsigned char> eap::module::encrypt(_In_ HCRYPTPROV hProv, _In_bytec
 
     // Encrypt the data using AES key.
     if (!CryptEncrypt(key_aes, hHash, TRUE, 0, buf))
-        throw win_runtime_error(_T(__FUNCTION__) _T(" CryptEncrypt failed."));
+        throw win_runtime_error(__FUNCTION__ " CryptEncrypt failed.");
 
     // Append encrypted data.
     enc.insert(enc.cend(), buf.begin(), buf.end());
@@ -200,7 +215,7 @@ std::vector<unsigned char> eap::module::encrypt_md5(_In_ HCRYPTPROV hProv, _In_b
     // Create hash.
     crypt_hash hash;
     if (!hash.create(hProv, CALG_MD5))
-        throw win_runtime_error(_T(__FUNCTION__) _T(" Creating MD5 hash failed."));
+        throw win_runtime_error(__FUNCTION__ " Creating MD5 hash failed.");
 
     // Encrypt data.
     std::vector<unsigned char> enc(std::move(encrypt(hProv, data, size, hash)));
@@ -238,7 +253,7 @@ void eap::peer::query_credential_input_fields(
     UNREFERENCED_PARAMETER(pConnectionData);
     UNREFERENCED_PARAMETER(pEapConfigInputFieldsArray);
 
-    throw win_runtime_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
+    throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Not supported.");
 }
 
 
@@ -259,7 +274,7 @@ void eap::peer::query_user_blob_from_credential_input_fields(
     UNREFERENCED_PARAMETER(pdwUsersBlobSize);
     UNREFERENCED_PARAMETER(ppUserBlob);
 
-    throw win_runtime_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
+    throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Not supported.");
 }
 
 
@@ -276,7 +291,7 @@ void eap::peer::query_interactive_ui_input_fields(
     UNREFERENCED_PARAMETER(pUIContextData);
     UNREFERENCED_PARAMETER(pEapInteractiveUIData);
 
-    throw win_runtime_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
+    throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Not supported.");
 }
 
 
@@ -297,5 +312,5 @@ void eap::peer::query_ui_blob_from_interactive_ui_input_fields(
     UNREFERENCED_PARAMETER(pdwDataFromInteractiveUISize);
     UNREFERENCED_PARAMETER(ppDataFromInteractiveUI);
 
-    throw win_runtime_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
+    throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Not supported.");
 }

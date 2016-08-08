@@ -322,20 +322,20 @@ namespace eap
             std::unique_ptr<unsigned char[], winstd::LocalFree_delete<unsigned char[]> > keyinfo_data;
             DWORD keyinfo_size = 0;
             if (!CryptDecodeObjectEx(X509_ASN_ENCODING, PKCS_RSA_PRIVATE_KEY, (const BYTE*)::LockResource(res_handle), ::SizeofResource(m_instance, res), CRYPT_DECODE_ALLOC_FLAG, NULL, &keyinfo_data, &keyinfo_size))
-                throw win_runtime_error(_T(__FUNCTION__) _T(" CryptDecodeObjectEx failed."));
+                throw win_runtime_error(__FUNCTION__ " CryptDecodeObjectEx failed.");
             if (!key_rsa.import(hProv, keyinfo_data.get(), keyinfo_size, NULL, 0))
-                throw win_runtime_error(_T(__FUNCTION__) _T(" Private key import failed."));
+                throw win_runtime_error(__FUNCTION__ " Private key import failed.");
 
             // Import the 256-bit AES session key.
             winstd::crypt_key key_aes;
             if (!CryptImportKey(hProv, (LPCBYTE)data, 268, key_rsa, 0, &key_aes))
-                throw win_runtime_error(_T(__FUNCTION__) _T(" CryptImportKey failed."));
+                throw win_runtime_error(__FUNCTION__ " CryptImportKey failed.");
 
             // Decrypt the data using AES session key.
             std::vector<unsigned char, winstd::sanitizing_allocator<unsigned char> > buf;
             buf.assign((const unsigned char*)data + 268, (const unsigned char*)data + size);
             if (!CryptDecrypt(key_aes, hHash, TRUE, 0, buf))
-                throw win_runtime_error(_T(__FUNCTION__) _T(" CryptDecrypt failed."));
+                throw win_runtime_error(__FUNCTION__ " CryptDecrypt failed.");
 
             return std::vector<_Ty, _Ax>(buf);
         }
@@ -394,7 +394,7 @@ namespace eap
             // Create hash.
             winstd::crypt_hash hash;
             if (!hash.create(hProv, CALG_MD5))
-                throw win_runtime_error(_T(__FUNCTION__) _T(" Creating MD5 hash failed."));
+                throw win_runtime_error(__FUNCTION__ " Creating MD5 hash failed.");
             DWORD dwHashSize;
             CryptGetHashParam(hash, HP_HASHSIZE, dwHashSize, 0);
             if (size < dwHashSize)
@@ -407,7 +407,7 @@ namespace eap
             // Calculate MD5 hash and verify it.
             std::vector<unsigned char> hash_bin;
             if (!CryptGetHashParam(hash, HP_HASHVAL, hash_bin, 0))
-                throw win_runtime_error(_T(__FUNCTION__) _T(" Calculating MD5 hash failed."));
+                throw win_runtime_error(__FUNCTION__ " Calculating MD5 hash failed.");
             if (memcmp((unsigned char*)data + enc_size, hash_bin.data(), dwHashSize) != 0)
                 throw invalid_argument(__FUNCTION__ " Invalid encrypted data.");
 
@@ -477,7 +477,7 @@ namespace eap
             // Prepare cryptographics provider.
             winstd::crypt_prov cp;
             if (!cp.create(NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
-                throw win_runtime_error(_T(__FUNCTION__) _T(" CryptAcquireContext failed."));
+                throw win_runtime_error(__FUNCTION__ " CryptAcquireContext failed.");
 
             // Decrypt data.
             std::vector<unsigned char, winstd::sanitizing_allocator<unsigned char> > data(std::move(decrypt_md5<unsigned char, winstd::sanitizing_allocator<unsigned char> >(cp, pDataIn, dwDataInSize)));
@@ -520,7 +520,7 @@ namespace eap
             // Prepare cryptographics provider.
             winstd::crypt_prov cp;
             if (!cp.create(NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
-                throw win_runtime_error(_T(__FUNCTION__) _T(" CryptAcquireContext failed."));
+                throw win_runtime_error(__FUNCTION__ " CryptAcquireContext failed.");
 
             // Encrypt BLOB.
             std::vector<unsigned char> data_enc(std::move(encrypt_md5(cp, data.data(), data.size())));
@@ -528,15 +528,11 @@ namespace eap
             // Copy encrypted BLOB to output.
             *pdwDataOutSize = (DWORD)data_enc.size();
             *ppDataOut = alloc_memory(*pdwDataOutSize);
-            if (!*ppDataOut)
-                throw win_runtime_error(ERROR_OUTOFMEMORY, winstd::wstring_printf(_T(__FUNCTION__) _T(" Error allocating memory for BLOB (%uB)."), *pdwDataOutSize).c_str());
             memcpy(*ppDataOut, data_enc.data(), *pdwDataOutSize);
 #else
             // Allocate BLOB.
             *pdwDataOutSize = (DWORD)pksizeof(record);
             *ppDataOut = alloc_memory(*pdwDataOutSize);
-            if (!*ppDataOut)
-                throw win_runtime_error(ERROR_OUTOFMEMORY, winstd::wstring_printf(_T(__FUNCTION__) _T(" Error allocating memory for BLOB (%uB)."), *pdwDataOutSize).c_str());
 
             // Pack to BLOB.
             cursor_out cursor = { *ppDataOut, *ppDataOut + *pdwDataOutSize };

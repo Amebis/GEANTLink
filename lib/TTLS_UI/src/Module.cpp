@@ -109,7 +109,7 @@ void eap::peer_ttls_ui::invoke_config_ui(
     // Clean-up and return.
     wxEntryCleanup();
     if (result != wxID_OK)
-        throw win_runtime_error(ERROR_CANCELLED, _T(__FUNCTION__) _T(" Cancelled."));
+        throw win_runtime_error(ERROR_CANCELLED, __FUNCTION__ " Cancelled.");
 
     // Pack new configuration.
     pack(cfg, ppConnectionDataOut, pdwConnectionDataOutSize);
@@ -176,7 +176,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
     // Clean-up and return.
     wxEntryCleanup();
     if (result != wxID_OK)
-        throw win_runtime_error(ERROR_CANCELLED, _T(__FUNCTION__) _T(" Cancelled."));
+        throw win_runtime_error(ERROR_CANCELLED, __FUNCTION__ " Cancelled.");
 
     // Build our identity. ;)
     wstring identity(move(cfg_method->get_public_identity(cred)));

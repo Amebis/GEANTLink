@@ -199,7 +199,7 @@ void eap::peer_ttls::get_identity(
     } else {
         // Per-machine authentication
         if (!is_outer_set || !is_inner_set)
-            throw win_runtime_error(ERROR_NO_SUCH_USER, _T(__FUNCTION__) _T(" Credentials for per-machine authentication not available."));
+            throw win_runtime_error(ERROR_NO_SUCH_USER, __FUNCTION__ " Credentials for per-machine authentication not available.");
     }
 
     // If we got here, we have all credentials we need.
@@ -262,8 +262,6 @@ void eap::peer_ttls::get_method_properties(
     // Allocate property array.
     DWORD dwCount = (DWORD)properties.size();
     pMethodPropertyArray->pMethodProperty = (EAP_METHOD_PROPERTY*)alloc_memory(sizeof(EAP_METHOD_PROPERTY) * dwCount);
-    if (!pMethodPropertyArray->pMethodProperty)
-        throw win_runtime_error(ERROR_OUTOFMEMORY, _T(__FUNCTION__) _T(" Error allocating memory for propery array."));
 
     // Copy properties.
     memcpy(pMethodPropertyArray->pMethodProperty, properties.data(), sizeof(EAP_METHOD_PROPERTY) * dwCount);
@@ -374,7 +372,7 @@ void eap::peer_ttls::get_ui_context(
     UNREFERENCED_PARAMETER(ppUIContextData);
     UNREFERENCED_PARAMETER(pdwUIContextDataSize);
 
-    throw win_runtime_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
+    throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Not supported.");
 }
 
 
@@ -389,7 +387,7 @@ void eap::peer_ttls::set_ui_context(
     UNREFERENCED_PARAMETER(dwUIContextDataSize);
     UNREFERENCED_PARAMETER(pEapOutput);
 
-    throw win_runtime_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
+    throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Not supported.");
 }
 
 
@@ -400,7 +398,7 @@ void eap::peer_ttls::get_response_attributes(
     UNREFERENCED_PARAMETER(hSession);
     UNREFERENCED_PARAMETER(pAttribs);
 
-    throw win_runtime_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
+    throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Not supported.");
 }
 
 
@@ -413,5 +411,5 @@ void eap::peer_ttls::set_response_attributes(
     UNREFERENCED_PARAMETER(pAttribs);
     UNREFERENCED_PARAMETER(pEapOutput);
 
-    throw win_runtime_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
+    throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Not supported.");
 }

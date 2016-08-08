@@ -93,41 +93,41 @@ void eap::config_method_ttls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode 
     config_method::save(pDoc, pConfigRoot);
 
     const bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
-    DWORD dwResult;
+    HRESULT hr;
 
     // <ClientSideCredential>
     com_obj<IXMLDOMElement> pXmlElClientSideCredential;
-    if ((dwResult = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:ClientSideCredential"), bstr(L"ClientSideCredential"), bstrNamespace, &pXmlElClientSideCredential)) != ERROR_SUCCESS)
-        throw win_runtime_error(dwResult, _T(__FUNCTION__) _T(" Error creating <ClientSideCredential> element."));
+    if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:ClientSideCredential"), bstr(L"ClientSideCredential"), bstrNamespace, &pXmlElClientSideCredential)))
+        throw com_runtime_error(hr, __FUNCTION__ " Error creating <ClientSideCredential> element.");
 
     // <ClientSideCredential>/<AnonymousIdentity>
     if (!m_anonymous_identity.empty())
-        if ((dwResult = eapxml::put_element_value(pDoc, pXmlElClientSideCredential, bstr(L"AnonymousIdentity"), bstrNamespace, bstr(m_anonymous_identity))) != ERROR_SUCCESS)
-            throw win_runtime_error(dwResult, _T(__FUNCTION__) _T(" Error creating <AnonymousIdentity> element."));
+        if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElClientSideCredential, bstr(L"AnonymousIdentity"), bstrNamespace, bstr(m_anonymous_identity))))
+            throw com_runtime_error(hr, __FUNCTION__ " Error creating <AnonymousIdentity> element.");
 
     m_outer.save(pDoc, pConfigRoot);
 
     // <InnerAuthenticationMethod>
     com_obj<IXMLDOMElement> pXmlElInnerAuthenticationMethod;
-    if ((dwResult = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:InnerAuthenticationMethod"), bstr(L"InnerAuthenticationMethod"), bstrNamespace, &pXmlElInnerAuthenticationMethod)) != ERROR_SUCCESS)
-        throw win_runtime_error(dwResult, _T(__FUNCTION__) _T(" Error creating <InnerAuthenticationMethod> element."));
+    if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:InnerAuthenticationMethod"), bstr(L"InnerAuthenticationMethod"), bstrNamespace, &pXmlElInnerAuthenticationMethod)))
+        throw com_runtime_error(hr, __FUNCTION__ " Error creating <InnerAuthenticationMethod> element.");
 
     if (dynamic_cast<const config_method_pap*>(m_inner.get())) {
         // <InnerAuthenticationMethod>/<NonEAPAuthMethod>
-        if ((dwResult = eapxml::put_element_value(pDoc, pXmlElInnerAuthenticationMethod, bstr(L"NonEAPAuthMethod"), bstrNamespace, bstr(L"PAP"))) != ERROR_SUCCESS)
-            throw win_runtime_error(dwResult, _T(__FUNCTION__) _T(" Error creating <NonEAPAuthMethod> element."));
+        if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElInnerAuthenticationMethod, bstr(L"NonEAPAuthMethod"), bstrNamespace, bstr(L"PAP"))))
+            throw com_runtime_error(hr, __FUNCTION__ " Error creating <NonEAPAuthMethod> element.");
 
         // <InnerAuthenticationMethod>/...
         m_inner->save(pDoc, pXmlElInnerAuthenticationMethod);
     } else
-        throw win_runtime_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Unsupported inner authentication method."));
+        throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Unsupported inner authentication method.");
 }
 
 
 void eap::config_method_ttls::load(_In_ IXMLDOMNode *pConfigRoot)
 {
     assert(pConfigRoot);
-    DWORD dwResult;
+    HRESULT hr;
 
     config_method::load(pConfigRoot);
 
@@ -137,7 +137,7 @@ void eap::config_method_ttls::load(_In_ IXMLDOMNode *pConfigRoot)
 
     // <ClientSideCredential>
     com_obj<IXMLDOMElement> pXmlElClientSideCredential;
-    if (eapxml::select_element(pConfigRoot, bstr(L"eap-metadata:ClientSideCredential"), &pXmlElClientSideCredential) == ERROR_SUCCESS) {
+    if (SUCCEEDED(eapxml::select_element(pConfigRoot, bstr(L"eap-metadata:ClientSideCredential"), &pXmlElClientSideCredential))) {
         wstring xpathClientSideCredential(xpath + L"/ClientSideCredential");
 
         // <AnonymousIdentity>
@@ -149,19 +149,19 @@ void eap::config_method_ttls::load(_In_ IXMLDOMNode *pConfigRoot)
 
     // <InnerAuthenticationMethod>
     com_obj<IXMLDOMElement> pXmlElInnerAuthenticationMethod;
-    if ((dwResult = eapxml::select_element(pConfigRoot, bstr(L"eap-metadata:InnerAuthenticationMethod"), &pXmlElInnerAuthenticationMethod)) != ERROR_SUCCESS)
-        throw win_runtime_error(dwResult, _T(__FUNCTION__) _T(" Error selecting <InnerAuthenticationMethod> element."));
+    if (FAILED(hr = eapxml::select_element(pConfigRoot, bstr(L"eap-metadata:InnerAuthenticationMethod"), &pXmlElInnerAuthenticationMethod)))
+        throw com_runtime_error(hr, __FUNCTION__ " Error selecting <InnerAuthenticationMethod> element.");
 
     // Determine inner authentication type (<EAPMethod> and <NonEAPAuthMethod>).
     //DWORD dwMethodID;
     bstr bstrMethod;
-    /*if (eapxml::get_element_value(pXmlElInnerAuthenticationMethod, bstr(L"eap-metadata:EAPMethod"), &dwMethodID) == ERROR_SUCCESS &&
+    /*if (SUCCEEDED(eapxml::get_element_value(pXmlElInnerAuthenticationMethod, bstr(L"eap-metadata:EAPMethod"), &dwMethodID)) &&
         dwMethodID == EAP_TYPE_MSCHAPV2)
     {
         // MSCHAPv2
         // TODO: Add MSCHAPv2 support.
-        return ERROR_NOT_SUPPORTED;
-    } else*/ if (eapxml::get_element_value(pXmlElInnerAuthenticationMethod, bstr(L"eap-metadata:NonEAPAuthMethod"), &bstrMethod) == ERROR_SUCCESS &&
+        throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " MSCHAPv2 not supported yet.");
+    } else*/ if (SUCCEEDED(eapxml::get_element_value(pXmlElInnerAuthenticationMethod, bstr(L"eap-metadata:NonEAPAuthMethod"), &bstrMethod)) &&
         CompareStringEx(LOCALE_NAME_INVARIANT, NORM_IGNORECASE, bstrMethod, bstrMethod.length(), L"PAP", -1, NULL, NULL, 0) == CSTR_EQUAL)
     {
         // PAP
@@ -169,7 +169,7 @@ void eap::config_method_ttls::load(_In_ IXMLDOMNode *pConfigRoot)
         m_inner.reset(new config_method_pap(m_module));
         m_inner->load(pXmlElInnerAuthenticationMethod);
     } else
-        throw win_runtime_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Unsupported inner authentication method."));
+        throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Unsupported inner authentication method.");
 }
 
 

@@ -126,39 +126,38 @@ void eap::config_method_tls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *
     config_method_with_cred::save(pDoc, pConfigRoot);
 
     const bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
-    DWORD dwResult;
     HRESULT hr;
 
     // <ServerSideCredential>
     com_obj<IXMLDOMElement> pXmlElServerSideCredential;
-    if ((dwResult = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:ServerSideCredential"), bstr(L"ServerSideCredential"), bstrNamespace, &pXmlElServerSideCredential)) != ERROR_SUCCESS)
-        throw win_runtime_error(dwResult, _T(__FUNCTION__) _T(" Error creating <ServerSideCredential> element."));
+    if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:ServerSideCredential"), bstr(L"ServerSideCredential"), bstrNamespace, &pXmlElServerSideCredential)))
+        throw com_runtime_error(hr, __FUNCTION__ " Error creating <ServerSideCredential> element.");
 
     for (list<cert_context>::const_iterator i = m_trusted_root_ca.begin(), i_end = m_trusted_root_ca.end(); i != i_end; ++i) {
         // <CA>
         com_obj<IXMLDOMElement> pXmlElCA;
-        if ((dwResult = eapxml::create_element(pDoc, bstr(L"CA"), bstrNamespace, &pXmlElCA)))
-            throw win_runtime_error(dwResult, _T(__FUNCTION__) _T(" Error creating <CA> element."));
+        if (FAILED(hr = eapxml::create_element(pDoc, bstr(L"CA"), bstrNamespace, &pXmlElCA)))
+            throw com_runtime_error(hr, __FUNCTION__ " Error creating <CA> element.");
 
         // <CA>/<format>
-        if ((dwResult = eapxml::put_element_value(pDoc, pXmlElCA, bstr(L"format"), bstrNamespace, bstr(L"PEM"))) != ERROR_SUCCESS)
-            throw win_runtime_error(dwResult, _T(__FUNCTION__) _T(" Error creating <format> element."));
+        if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElCA, bstr(L"format"), bstrNamespace, bstr(L"PEM"))))
+            throw com_runtime_error(hr, __FUNCTION__ " Error creating <format> element.");
 
         // <CA>/<cert-data>
         const cert_context &cc = *i;
-        if ((dwResult = eapxml::put_element_base64(pDoc, pXmlElCA, bstr(L"cert-data"), bstrNamespace, cc->pbCertEncoded, cc->cbCertEncoded)) != ERROR_SUCCESS)
-            throw win_runtime_error(dwResult, _T(__FUNCTION__) _T(" Error creating <cert-data> element."));
+        if (FAILED(hr = eapxml::put_element_base64(pDoc, pXmlElCA, bstr(L"cert-data"), bstrNamespace, cc->pbCertEncoded, cc->cbCertEncoded)))
+            throw com_runtime_error(hr, __FUNCTION__ " Error creating <cert-data> element.");
 
         if (FAILED(hr = pXmlElServerSideCredential->appendChild(pXmlElCA, NULL)))
-            throw win_runtime_error(HRESULT_CODE(hr), _T(__FUNCTION__) _T(" Error appending <CA> element."));
+            throw com_runtime_error(hr, __FUNCTION__ " Error appending <CA> element.");
     }
 
     // <ServerName>
     for (list<string>::const_iterator i = m_server_names.begin(), i_end = m_server_names.end(); i != i_end; ++i) {
         wstring str;
         MultiByteToWideChar(CP_UTF8, 0, i->c_str(), (int)i->length(), str);
-        if ((dwResult = eapxml::put_element_value(pDoc, pXmlElServerSideCredential, bstr(L"ServerName"), bstrNamespace, bstr(str))) != ERROR_SUCCESS)
-            throw win_runtime_error(dwResult, _T(__FUNCTION__) _T(" Error creating <ServerName> element."));
+        if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElServerSideCredential, bstr(L"ServerName"), bstrNamespace, bstr(str))))
+            throw com_runtime_error(hr, __FUNCTION__ " Error creating <ServerName> element.");
     }
 }
 
@@ -176,19 +175,19 @@ void eap::config_method_tls::load(_In_ IXMLDOMNode *pConfigRoot)
 
     // <ServerSideCredential>
     com_obj<IXMLDOMElement> pXmlElServerSideCredential;
-    if (eapxml::select_element(pConfigRoot, bstr(L"eap-metadata:ServerSideCredential"), &pXmlElServerSideCredential) == ERROR_SUCCESS) {
+    if (SUCCEEDED(eapxml::select_element(pConfigRoot, bstr(L"eap-metadata:ServerSideCredential"), &pXmlElServerSideCredential))) {
         std::wstring xpathServerSideCredential(xpath + L"/ServerSideCredential");
 
         // <CA>
         com_obj<IXMLDOMNodeList> pXmlListCAs;
         long lCACount = 0;
-        if (eapxml::select_nodes(pXmlElServerSideCredential, bstr(L"eap-metadata:CA"), &pXmlListCAs) == ERROR_SUCCESS && SUCCEEDED(pXmlListCAs->get_length(&lCACount))) {
+        if (SUCCEEDED(eapxml::select_nodes(pXmlElServerSideCredential, bstr(L"eap-metadata:CA"), &pXmlListCAs)) && SUCCEEDED(pXmlListCAs->get_length(&lCACount))) {
             for (long j = 0; j < lCACount; j++) {
                 // Load CA certificate.
                 com_obj<IXMLDOMNode> pXmlElCA;
                 pXmlListCAs->get_item(j, &pXmlElCA);
                 bstr bstrFormat;
-                if (eapxml::get_element_value(pXmlElCA, bstr(L"eap-metadata:format"), &bstrFormat) != ERROR_SUCCESS) {
+                if (FAILED(eapxml::get_element_value(pXmlElCA, bstr(L"eap-metadata:format"), &bstrFormat))) {
                     // <format> not specified.
                     continue;
                 }
@@ -199,7 +198,7 @@ void eap::config_method_tls::load(_In_ IXMLDOMNode *pConfigRoot)
                 }
 
                 vector<unsigned char> aData;
-                if (eapxml::get_element_base64(pXmlElCA, bstr(L"eap-metadata:cert-data"), aData) != ERROR_SUCCESS) {
+                if (FAILED(eapxml::get_element_base64(pXmlElCA, bstr(L"eap-metadata:cert-data"), aData))) {
                     // Error reading <cert-data> element.
                     continue;
                 }
@@ -217,7 +216,7 @@ void eap::config_method_tls::load(_In_ IXMLDOMNode *pConfigRoot)
         // <ServerName>
         com_obj<IXMLDOMNodeList> pXmlListServerIDs;
         long lServerIDCount = 0;
-        if (eapxml::select_nodes(pXmlElServerSideCredential, bstr(L"eap-metadata:ServerName"), &pXmlListServerIDs) == ERROR_SUCCESS && SUCCEEDED(pXmlListServerIDs->get_length(&lServerIDCount))) {
+        if (SUCCEEDED(eapxml::select_nodes(pXmlElServerSideCredential, bstr(L"eap-metadata:ServerName"), &pXmlListServerIDs)) && SUCCEEDED(pXmlListServerIDs->get_length(&lServerIDCount))) {
             for (long j = 0; j < lServerIDCount; j++) {
                 // Load server name (<ServerName>).
                 com_obj<IXMLDOMNode> pXmlElServerID;

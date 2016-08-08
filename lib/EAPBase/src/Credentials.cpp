@@ -154,38 +154,38 @@ void eap::credentials_pass::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *p
     credentials::save(pDoc, pConfigRoot);
 
     const bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
-    DWORD dwResult;
+    HRESULT hr;
 
     // <UserName>
-    if ((dwResult = eapxml::put_element_value(pDoc, pConfigRoot, bstr(L"UserName"), bstrNamespace, bstr(m_identity))) != ERROR_SUCCESS)
-        throw win_runtime_error(dwResult, _T(__FUNCTION__) _T(" Error creating <UserName> element."));
+    if (FAILED(hr = eapxml::put_element_value(pDoc, pConfigRoot, bstr(L"UserName"), bstrNamespace, bstr(m_identity))))
+        throw com_runtime_error(hr, __FUNCTION__ " Error creating <UserName> element.");
 
     // <Password>
     bstr pass(m_password);
-    dwResult = eapxml::put_element_value(pDoc, pConfigRoot, bstr(L"Password"), bstrNamespace, pass);
+    hr = eapxml::put_element_value(pDoc, pConfigRoot, bstr(L"Password"), bstrNamespace, pass);
     SecureZeroMemory((BSTR)pass, sizeof(OLECHAR)*pass.length());
-    if (dwResult != ERROR_SUCCESS)
-        throw win_runtime_error(dwResult, _T(__FUNCTION__) _T(" Error creating <Password> element."));
+    if (FAILED(hr))
+        throw com_runtime_error(hr, __FUNCTION__ " Error creating <Password> element.");
 }
 
 
 void eap::credentials_pass::load(_In_ IXMLDOMNode *pConfigRoot)
 {
     assert(pConfigRoot);
-    DWORD dwResult;
+    HRESULT hr;
 
     credentials::load(pConfigRoot);
 
     std::wstring xpath(eapxml::get_xpath(pConfigRoot));
 
-    if ((dwResult = eapxml::get_element_value(pConfigRoot, bstr(L"eap-metadata:UserName"), m_identity)) != ERROR_SUCCESS)
-        throw win_runtime_error(dwResult, _T(__FUNCTION__) _T(" Error reading <UserName> element."));
+    if (FAILED(hr = eapxml::get_element_value(pConfigRoot, bstr(L"eap-metadata:UserName"), m_identity)))
+        throw com_runtime_error(hr, __FUNCTION__ " Error reading <UserName> element.");
 
     m_module.log_config((xpath + L"/UserName").c_str(), m_identity.c_str());
 
     bstr pass;
-    if ((dwResult = eapxml::get_element_value(pConfigRoot, bstr(L"eap-metadata:Password"), &pass)) != ERROR_SUCCESS)
-        throw win_runtime_error(dwResult, _T(__FUNCTION__) _T(" Error reading <Password> element."));
+    if (FAILED(hr = eapxml::get_element_value(pConfigRoot, bstr(L"eap-metadata:Password"), &pass)))
+        throw com_runtime_error(hr, __FUNCTION__ " Error reading <Password> element.");
     m_password = pass;
     SecureZeroMemory((BSTR)pass, sizeof(OLECHAR)*pass.length());
 
@@ -237,7 +237,7 @@ void eap::credentials_pass::store(_In_ LPCTSTR pszTargetName) const
     DATA_BLOB entropy_blob = {        sizeof(s_entropy), (LPBYTE)s_entropy        };
     data_blob cred_enc;
     if (!CryptProtectData(&cred_blob, NULL, &entropy_blob, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN, &cred_enc))
-        throw win_runtime_error(_T(__FUNCTION__) _T(" CryptProtectData failed."));
+        throw win_runtime_error(__FUNCTION__ " CryptProtectData failed.");
 
     tstring target(target_name(pszTargetName));
 
@@ -259,7 +259,7 @@ void eap::credentials_pass::store(_In_ LPCTSTR pszTargetName) const
         (LPTSTR)m_identity.c_str()  // UserName
     };
     if (!CredWrite(&cred, 0))
-        throw win_runtime_error(_T(__FUNCTION__) _T(" CredWrite failed."));
+        throw win_runtime_error(__FUNCTION__ " CredWrite failed.");
 }
 
 
@@ -270,14 +270,14 @@ void eap::credentials_pass::retrieve(_In_ LPCTSTR pszTargetName)
     // Read credentials.
     unique_ptr<CREDENTIAL, CredFree_delete<CREDENTIAL> > cred;
     if (!CredRead(target_name(pszTargetName).c_str(), CRED_TYPE_GENERIC, 0, (PCREDENTIAL*)&cred))
-        throw win_runtime_error(_T(__FUNCTION__) _T(" CredRead failed."));
+        throw win_runtime_error(__FUNCTION__ " CredRead failed.");
 
     // Decrypt the password using user's key.
     DATA_BLOB cred_enc     = { cred->CredentialBlobSize,         cred->CredentialBlob };
     DATA_BLOB entropy_blob = { sizeof(s_entropy)       , (LPBYTE)s_entropy            };
     data_blob cred_int;
     if (!CryptUnprotectData(&cred_enc, NULL, &entropy_blob, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN | CRYPTPROTECT_VERIFY_PROTECTION, &cred_int))
-        throw win_runtime_error(_T(__FUNCTION__) _T(" CryptUnprotectData failed."));
+        throw win_runtime_error(__FUNCTION__ " CryptUnprotectData failed.");
 
     // Convert password from UTF-8.
     MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)cred_int.pbData, (int)cred_int.cbData, m_password);
