@@ -77,24 +77,6 @@ bool eap::credentials::empty() const
 }
 
 
-bool eap::credentials::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
-{
-    if (!config::save(pDoc, pConfigRoot, ppEapError))
-        return false;
-
-    return true;
-}
-
-
-bool eap::credentials::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError)
-{
-    if (!config::load(pConfigRoot, ppEapError))
-        return false;
-
-    return true;
-}
-
-
 tstring eap::credentials::get_name() const
 {
     return !empty() ? get_identity() : _T("<blank>");
@@ -164,60 +146,46 @@ bool eap::credentials_pass::empty() const
 }
 
 
-bool eap::credentials_pass::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
+void eap::credentials_pass::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot) const
 {
     assert(pDoc);
     assert(pConfigRoot);
-    assert(ppEapError);
 
-    if (!credentials::save(pDoc, pConfigRoot, ppEapError))
-        return false;
+    credentials::save(pDoc, pConfigRoot);
 
     const bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
     DWORD dwResult;
 
     // <UserName>
-    if ((dwResult = eapxml::put_element_value(pDoc, pConfigRoot, bstr(L"UserName"), bstrNamespace, bstr(m_identity))) != ERROR_SUCCESS) {
-        *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <UserName> element."));
-        return false;
-    }
+    if ((dwResult = eapxml::put_element_value(pDoc, pConfigRoot, bstr(L"UserName"), bstrNamespace, bstr(m_identity))) != ERROR_SUCCESS)
+        throw win_runtime_error(dwResult, _T(__FUNCTION__) _T(" Error creating <UserName> element."));
 
     // <Password>
     bstr pass(m_password);
     dwResult = eapxml::put_element_value(pDoc, pConfigRoot, bstr(L"Password"), bstrNamespace, pass);
     SecureZeroMemory((BSTR)pass, sizeof(OLECHAR)*pass.length());
-    if (dwResult != ERROR_SUCCESS) {
-        *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <Password> element."));
-        return false;
-    }
-
-    return true;
+    if (dwResult != ERROR_SUCCESS)
+        throw win_runtime_error(dwResult, _T(__FUNCTION__) _T(" Error creating <Password> element."));
 }
 
 
-bool eap::credentials_pass::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError)
+void eap::credentials_pass::load(_In_ IXMLDOMNode *pConfigRoot)
 {
     assert(pConfigRoot);
-    assert(ppEapError);
     DWORD dwResult;
 
-    if (!credentials::load(pConfigRoot, ppEapError))
-        return false;
+    credentials::load(pConfigRoot);
 
     std::wstring xpath(eapxml::get_xpath(pConfigRoot));
 
-    if ((dwResult = eapxml::get_element_value(pConfigRoot, bstr(L"eap-metadata:UserName"), m_identity)) != ERROR_SUCCESS) {
-        *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error reading <UserName> element."), _T("Please make sure profile XML is a valid ") _T(PRODUCT_NAME_STR) _T(" profile XML document."));
-        return false;
-    }
+    if ((dwResult = eapxml::get_element_value(pConfigRoot, bstr(L"eap-metadata:UserName"), m_identity)) != ERROR_SUCCESS)
+        throw win_runtime_error(dwResult, _T(__FUNCTION__) _T(" Error reading <UserName> element."));
 
     m_module.log_config((xpath + L"/UserName").c_str(), m_identity.c_str());
 
     bstr pass;
-    if ((dwResult = eapxml::get_element_value(pConfigRoot, bstr(L"eap-metadata:Password"), &pass)) != ERROR_SUCCESS) {
-        *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error reading <Password> element."), _T("Please make sure profile XML is a valid ") _T(PRODUCT_NAME_STR) _T(" profile XML document."));
-        return false;
-    }
+    if ((dwResult = eapxml::get_element_value(pConfigRoot, bstr(L"eap-metadata:Password"), &pass)) != ERROR_SUCCESS)
+        throw win_runtime_error(dwResult, _T(__FUNCTION__) _T(" Error reading <Password> element."));
     m_password = pass;
     SecureZeroMemory((BSTR)pass, sizeof(OLECHAR)*pass.length());
 
@@ -228,8 +196,6 @@ bool eap::credentials_pass::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR 
         L"********"
 #endif
         );
-
-    return true;
 }
 
 
@@ -258,10 +224,9 @@ void eap::credentials_pass::operator>>(_Inout_ cursor_in &cursor)
 }
 
 
-bool eap::credentials_pass::store(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **ppEapError) const
+void eap::credentials_pass::store(_In_ LPCTSTR pszTargetName) const
 {
     assert(pszTargetName);
-    assert(ppEapError);
 
     // Convert password to UTF-8.
     sanitizing_string cred_utf8;
@@ -271,10 +236,8 @@ bool eap::credentials_pass::store(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **
     DATA_BLOB cred_blob    = { (DWORD)cred_utf8.size() , (LPBYTE)cred_utf8.data() };
     DATA_BLOB entropy_blob = {        sizeof(s_entropy), (LPBYTE)s_entropy        };
     data_blob cred_enc;
-    if (!CryptProtectData(&cred_blob, NULL, &entropy_blob, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN, &cred_enc)) {
-        *ppEapError = m_module.make_error(GetLastError(), _T(__FUNCTION__) _T(" CryptProtectData failed."));
-        return false;
-    }
+    if (!CryptProtectData(&cred_blob, NULL, &entropy_blob, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN, &cred_enc))
+        throw win_runtime_error(_T(__FUNCTION__) _T(" CryptProtectData failed."));
 
     tstring target(target_name(pszTargetName));
 
@@ -295,34 +258,26 @@ bool eap::credentials_pass::store(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **
         NULL,                       // TargetAlias
         (LPTSTR)m_identity.c_str()  // UserName
     };
-    if (!CredWrite(&cred, 0)) {
-        *ppEapError = m_module.make_error(GetLastError(), _T(__FUNCTION__) _T(" CredWrite failed."));
-        return false;
-    }
-
-    return true;
+    if (!CredWrite(&cred, 0))
+        throw win_runtime_error(_T(__FUNCTION__) _T(" CredWrite failed."));
 }
 
 
-bool eap::credentials_pass::retrieve(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **ppEapError)
+void eap::credentials_pass::retrieve(_In_ LPCTSTR pszTargetName)
 {
     assert(pszTargetName);
 
     // Read credentials.
     unique_ptr<CREDENTIAL, CredFree_delete<CREDENTIAL> > cred;
-    if (!CredRead(target_name(pszTargetName).c_str(), CRED_TYPE_GENERIC, 0, (PCREDENTIAL*)&cred)) {
-        *ppEapError = m_module.make_error(GetLastError(), _T(__FUNCTION__) _T(" CredRead failed."));
-        return false;
-    }
+    if (!CredRead(target_name(pszTargetName).c_str(), CRED_TYPE_GENERIC, 0, (PCREDENTIAL*)&cred))
+        throw win_runtime_error(_T(__FUNCTION__) _T(" CredRead failed."));
 
     // Decrypt the password using user's key.
     DATA_BLOB cred_enc     = { cred->CredentialBlobSize,         cred->CredentialBlob };
     DATA_BLOB entropy_blob = { sizeof(s_entropy)       , (LPBYTE)s_entropy            };
     data_blob cred_int;
-    if (!CryptUnprotectData(&cred_enc, NULL, &entropy_blob, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN | CRYPTPROTECT_VERIFY_PROTECTION, &cred_int)) {
-        *ppEapError = m_module.make_error(GetLastError(), _T(__FUNCTION__) _T(" CryptUnprotectData failed."));
-        return false;
-    }
+    if (!CryptUnprotectData(&cred_enc, NULL, &entropy_blob, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN | CRYPTPROTECT_VERIFY_PROTECTION, &cred_int))
+        throw win_runtime_error(_T(__FUNCTION__) _T(" CryptUnprotectData failed."));
 
     // Convert password from UTF-8.
     MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)cred_int.pbData, (int)cred_int.cbData, m_password);
@@ -342,8 +297,6 @@ bool eap::credentials_pass::retrieve(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR
         L"********"
 #endif
         );
-
-    return true;
 }
 
 

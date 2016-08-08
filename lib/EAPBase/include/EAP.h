@@ -37,6 +37,7 @@
 
 #include <list>
 #include <memory>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -56,6 +57,11 @@ namespace eap
     /// Sanitizing dynamically allocated BLOB
     ///
     typedef std::vector<unsigned char, winstd::sanitizing_allocator<unsigned char> > sanitizing_blob;
+
+    ///
+    /// Windows runtime error
+    ///
+    class win_runtime_error;
 }
 
 ///
@@ -361,12 +367,66 @@ namespace eap
         ptr_type ptr_end;   ///< Pointer to the end of available memory
     };
 
+
     struct cursor_in
     {
         typedef const unsigned char *ptr_type;
 
         ptr_type ptr;       ///< Pointer to first data unread
         ptr_type ptr_end;   ///< Pointer to the end of BLOB
+    };
+
+
+    class win_runtime_error : public std::runtime_error
+    {
+    public:
+        ///
+        /// Constructs an exception
+        ///
+        /// \param[in] error  Windows error code
+        /// \param[in] msg    Error message
+        ///
+        win_runtime_error(_In_ DWORD error, _In_ const winstd::tstring& msg);
+
+        ///
+        /// Constructs an exception
+        ///
+        /// \param[in] error  Windows error code
+        /// \param[in] msg    Error message
+        ///
+        win_runtime_error(_In_ DWORD error, _In_z_ const TCHAR *msg);
+
+        ///
+        /// Constructs an exception using `GetLastError()`
+        ///
+        /// \param[in] msg  Error message
+        ///
+        win_runtime_error(_In_ const winstd::tstring& msg);
+
+        ///
+        /// Constructs an exception using `GetLastError()`
+        ///
+        /// \param[in] msg  Error message
+        ///
+        win_runtime_error(_In_z_ const TCHAR *msg);
+
+        ///
+        /// Copies an exception
+        ///
+        /// \param[in] other  Exception to copy from
+        ///
+        win_runtime_error(const win_runtime_error &other);
+
+        ///
+        /// Copies an exception
+        ///
+        /// \param[in] other  Exception to copy from
+        ///
+        win_runtime_error& operator=(const win_runtime_error &other);
+
+    public:
+        DWORD m_error;          ///< Windows error code
+        winstd::tstring m_msg;  ///< Error description
     };
 }
 

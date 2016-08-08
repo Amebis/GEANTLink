@@ -429,14 +429,12 @@ protected:
     {
         if (!m_target.empty() && m_is_config) {
             // Read credentials from Credential Manager
-            EAP_ERROR *pEapError;
-            if (!m_cred.retrieve(m_target.c_str(), &pEapError)) {
-                if (pEapError) {
-                    if (pEapError->dwWinError != ERROR_NOT_FOUND)
-                        wxLogError(winstd::tstring_printf(_("Error reading credentials from Credential Manager: %ls (error %u)"), pEapError->pRootCauseString, pEapError->dwWinError).c_str());
-                    m_cred.m_module.free_error_memory(pEapError);
-                } else
-                    wxLogError(_("Reading credentials failed."));
+            try {
+                m_cred.retrieve(m_target.c_str());
+            } catch (eap::win_runtime_error &err) {
+                wxLogError(winstd::tstring_printf(_("Error reading credentials from Credential Manager: %ls (error %u)"), err.m_msg.c_str(), err.m_error).c_str());
+            } catch (...) {
+                wxLogError(_("Reading credentials failed."));
             }
         }
 
@@ -451,13 +449,12 @@ protected:
         if (!m_target.empty()) {
             if (m_remember->GetValue()) {
                 // Write credentials to credential manager.
-                EAP_ERROR *pEapError;
-                if (!m_cred.store(m_target.c_str(), &pEapError)) {
-                    if (pEapError) {
-                        wxLogError(winstd::tstring_printf(_("Error writing credentials to Credential Manager: %ls (error %u)"), pEapError->pRootCauseString, pEapError->dwWinError).c_str());
-                        m_cred.m_module.free_error_memory(pEapError);
-                    } else
-                        wxLogError(_("Writing credentials failed."));
+                try {
+                    m_cred.store(m_target.c_str());
+                } catch (eap::win_runtime_error &err) {
+                    wxLogError(winstd::tstring_printf(_("Error writing credentials to Credential Manager: %ls (error %u)"), err.m_msg.c_str(), err.m_error).c_str());
+                } catch (...) {
+                    wxLogError(_("Writing credentials failed."));
                 }
             }
         }

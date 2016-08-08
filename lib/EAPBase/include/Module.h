@@ -53,6 +53,8 @@ extern "C" {
 
 #include <EventsETW.h> // Must include after <Windows.h>
 
+#include <exception>
+
 
 namespace eap
 {
@@ -78,6 +80,11 @@ namespace eap
         /// Allocate a EAP_ERROR and fill it according to dwErrorCode
         ///
         EAP_ERROR* make_error(_In_ DWORD dwErrorCode, _In_opt_z_ LPCWSTR pszRootCauseString = NULL, _In_opt_z_ LPCWSTR pszRepairString = NULL, _In_opt_ DWORD dwReasonCode = 0, _In_opt_ LPCGUID pRootCauseGuid = NULL, _In_opt_ LPCGUID pRepairGuid = NULL, _In_opt_ LPCGUID pHelpLinkGuid = NULL) const;
+
+        ///
+        /// Allocate a EAP_ERROR and fill it according to exception
+        ///
+        EAP_ERROR* make_error(_In_ std::exception &err) const;
 
         ///
         /// Allocate BLOB
@@ -204,137 +211,108 @@ namespace eap
         ///
         /// Encrypts data
         ///
-        /// \param[in ] hProv       Handle of cryptographics provider
-        /// \param[in ] data        Pointer to data to encrypt
-        /// \param[in ] size        Size of \p data in bytes
-        /// \param[out] enc         Encrypted data
-        /// \param[out] ppEapError  Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
-        /// \param[out] hHash       Handle of hashing object
+        /// \param[in ] hProv  Handle of cryptographics provider
+        /// \param[in ] data   Pointer to data to encrypt
+        /// \param[in ] size   Size of \p data in bytes
+        /// \param[out] enc    Encrypted data
+        /// \param[out] hHash  Handle of hashing object
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
+        /// \returns Encrypted data
         ///
-        bool encrypt(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _Out_ std::vector<unsigned char> &enc, _Out_ EAP_ERROR **ppEapError, _Out_opt_ HCRYPTHASH hHash = NULL) const;
+        std::vector<unsigned char> encrypt(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _Out_opt_ HCRYPTHASH hHash = NULL) const;
 
 
         ///
         /// Encrypts a string
         ///
-        /// \param[in ] hProv       Handle of cryptographics provider
-        /// \param[in ] val         String to encrypt
-        /// \param[out] enc         Encrypted data
-        /// \param[out] ppEapError  Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
-        /// \param[out] hHash       Handle of hashing object
+        /// \param[in ] hProv  Handle of cryptographics provider
+        /// \param[in ] val    String to encrypt
+        /// \param[out] hHash  Handle of hashing object
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
+        /// \returns Encrypted data
         ///
         template<class _Elem, class _Traits, class _Ax>
-        bool encrypt(_In_ HCRYPTPROV hProv, _In_ const std::basic_string<_Elem, _Traits, _Ax> &val, _Out_ std::vector<unsigned char> &enc, _Out_ EAP_ERROR **ppEapError, _Out_opt_ HCRYPTHASH hHash = NULL) const
+        std::vector<unsigned char> encrypt(_In_ HCRYPTPROV hProv, _In_ const std::basic_string<_Elem, _Traits, _Ax> &val, _Out_opt_ HCRYPTHASH hHash = NULL) const
         {
-            return encrypt(hProv, val.c_str(), val.length()*sizeof(_Elem), enc, ppEapError, hHash);
+            return encrypt(hProv, val.c_str(), val.length()*sizeof(_Elem), hHash);
         }
 
 
         ///
         /// Encrypts a wide string
         ///
-        /// \param[in ] hProv       Handle of cryptographics provider
-        /// \param[in ] val         String to encrypt
-        /// \param[out] enc         Encrypted data
-        /// \param[out] ppEapError  Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
-        /// \param[out] hHash       Handle of hashing object
+        /// \param[in ] hProv  Handle of cryptographics provider
+        /// \param[in ] val    String to encrypt
+        /// \param[out] hHash  Handle of hashing object
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
+        /// \returns Encrypted data
         ///
         template<class _Traits, class _Ax>
-        bool encrypt(_In_ HCRYPTPROV hProv, _In_ const std::basic_string<wchar_t, _Traits, _Ax> &val, _Out_ std::vector<unsigned char> &enc, _Out_ EAP_ERROR **ppEapError, _Out_opt_ HCRYPTHASH hHash = NULL) const
+        std::vector<unsigned char> encrypt(_In_ HCRYPTPROV hProv, _In_ const std::basic_string<wchar_t, _Traits, _Ax> &val, _Out_opt_ HCRYPTHASH hHash = NULL) const
         {
             winstd::sanitizing_string val_utf8;
             WideCharToMultiByte(CP_UTF8, 0, val.c_str(), (int)val.length(), val_utf8, NULL, NULL);
-            return encrypt(hProv, val_utf8, enc, ppEapError, hHash);
+            return encrypt(hProv, val_utf8, hHash);
         }
 
 
         ///
         /// Encrypts data and add MD5 hash for integrity check
         ///
-        /// \param[in ] hProv       Handle of cryptographics provider
-        /// \param[in ] data        Pointer to data to encrypt
-        /// \param[in ] size        Size of \p data in bytes
-        /// \param[out] enc         Encrypted data with 16B MD5 hash appended
-        /// \param[out] ppEapError  Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
+        /// \param[in ] hProv  Handle of cryptographics provider
+        /// \param[in ] data   Pointer to data to encrypt
+        /// \param[in ] size   Size of \p data in bytes
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
+        /// \returns Encrypted data with 16B MD5 hash appended
         ///
-        bool encrypt_md5(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _Out_ std::vector<unsigned char> &enc, _Out_ EAP_ERROR **ppEapError) const;
+        std::vector<unsigned char> encrypt_md5(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size) const;
 
 
         ///
         /// Encrypts a string and add MD5 hash for integrity check
         ///
-        /// \param[in ] hProv       Handle of cryptographics provider
-        /// \param[in ] val         String to encrypt
-        /// \param[out] enc         Encrypted data with 16B MD5 hash appended
-        /// \param[out] ppEapError  Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
+        /// \param[in ] hProv  Handle of cryptographics provider
+        /// \param[in ] val    String to encrypt
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
+        /// \returns Encrypted data with 16B MD5 hash appended
         ///
         template<class _Elem, class _Traits, class _Ax>
-        bool encrypt_md5(_In_ HCRYPTPROV hProv, _In_ const std::basic_string<_Elem, _Traits, _Ax> &val, _Out_ std::vector<unsigned char> &enc, _Out_ EAP_ERROR **ppEapError) const
+        std::vector<unsigned char> encrypt_md5(_In_ HCRYPTPROV hProv, _In_ const std::basic_string<_Elem, _Traits, _Ax> &val) const
         {
-            return encrypt_md5(hProv, val.c_str(), val.length()*sizeof(_Elem), enc, ppEapError);
+            return encrypt_md5(hProv, val.c_str(), val.length()*sizeof(_Elem));
         }
 
 
         ///
         /// Encrypts a wide string and add MD5 hash for integrity check
         ///
-        /// \param[in ] hProv       Handle of cryptographics provider
-        /// \param[in ] val         String to encrypt
-        /// \param[out] enc         Encrypted data with 16B MD5 hash appended
-        /// \param[out] ppEapError  Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
+        /// \param[in ] hProv  Handle of cryptographics provider
+        /// \param[in ] val    String to encrypt
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
+        /// \returns Encrypted data with 16B MD5 hash appended
         ///
         template<class _Traits, class _Ax>
-        bool encrypt_md5(_In_ HCRYPTPROV hProv, _In_ const std::basic_string<wchar_t, _Traits, _Ax> &val, _Out_ std::vector<unsigned char> &enc, _Out_ EAP_ERROR **ppEapError) const
+        std::vector<unsigned char> encrypt_md5(_In_ HCRYPTPROV hProv, _In_ const std::basic_string<wchar_t, _Traits, _Ax> &val) const
         {
             winstd::sanitizing_string val_utf8;
             WideCharToMultiByte(CP_UTF8, 0, val.c_str(), (int)val.length(), val_utf8, NULL, NULL);
-            return encrypt_md5(hProv, val_utf8, enc, ppEapError);
+            return encrypt_md5(hProv, val_utf8);
         }
 
 
         ///
         /// Decrypts data
         ///
-        /// \param[in ] hProv       Handle of cryptographics provider
-        /// \param[in ] data        Pointer to data to decrypt
-        /// \param[in ] size        Size of \p data in bytes
-        /// \param[out] dec         Decrypted data
-        /// \param[out] ppEapError  Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
-        /// \param[out] hHash       Handle of hashing object
+        /// \param[in ] hProv  Handle of cryptographics provider
+        /// \param[in ] data   Pointer to data to decrypt
+        /// \param[in ] size   Size of \p data in bytes
+        /// \param[out] hHash  Handle of hashing object
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
+        /// \returns Decrypted data
         ///
         template<class _Ty, class _Ax>
-        bool decrypt(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _Out_ std::vector<_Ty, _Ax> &dec, _Out_ EAP_ERROR **ppEapError, _Out_opt_ HCRYPTHASH hHash = NULL) const
+        std::vector<_Ty, _Ax> decrypt(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _Out_opt_ HCRYPTHASH hHash = NULL) const
         {
-            assert(ppEapError);
-
             // Import the private RSA key.
             HRSRC res = FindResource(m_instance, MAKEINTRESOURCE(IDR_EAP_KEY_PRIVATE), RT_RCDATA);
             assert(res);
@@ -343,183 +321,133 @@ namespace eap
             winstd::crypt_key key_rsa;
             std::unique_ptr<unsigned char[], winstd::LocalFree_delete<unsigned char[]> > keyinfo_data;
             DWORD keyinfo_size = 0;
-            if (!CryptDecodeObjectEx(X509_ASN_ENCODING, PKCS_RSA_PRIVATE_KEY, (const BYTE*)::LockResource(res_handle), ::SizeofResource(m_instance, res), CRYPT_DECODE_ALLOC_FLAG, NULL, &keyinfo_data, &keyinfo_size)) {
-                *ppEapError = make_error(GetLastError(), _T(__FUNCTION__) _T(" CryptDecodeObjectEx failed."));
-                return false;
-            }
-            if (!key_rsa.import(hProv, keyinfo_data.get(), keyinfo_size, NULL, 0)) {
-                *ppEapError = make_error(GetLastError(), _T(__FUNCTION__) _T(" Private key import failed."));
-                return false;
-            }
+            if (!CryptDecodeObjectEx(X509_ASN_ENCODING, PKCS_RSA_PRIVATE_KEY, (const BYTE*)::LockResource(res_handle), ::SizeofResource(m_instance, res), CRYPT_DECODE_ALLOC_FLAG, NULL, &keyinfo_data, &keyinfo_size))
+                throw win_runtime_error(_T(__FUNCTION__) _T(" CryptDecodeObjectEx failed."));
+            if (!key_rsa.import(hProv, keyinfo_data.get(), keyinfo_size, NULL, 0))
+                throw win_runtime_error(_T(__FUNCTION__) _T(" Private key import failed."));
 
             // Import the 256-bit AES session key.
             winstd::crypt_key key_aes;
-            if (!CryptImportKey(hProv, (LPCBYTE)data, 268, key_rsa, 0, &key_aes)) {
-                *ppEapError = make_error(GetLastError(), _T(__FUNCTION__) _T(" CryptImportKey failed."));
-                return false;
-            }
+            if (!CryptImportKey(hProv, (LPCBYTE)data, 268, key_rsa, 0, &key_aes))
+                throw win_runtime_error(_T(__FUNCTION__) _T(" CryptImportKey failed."));
 
             // Decrypt the data using AES session key.
             std::vector<unsigned char, winstd::sanitizing_allocator<unsigned char> > buf;
             buf.assign((const unsigned char*)data + 268, (const unsigned char*)data + size);
-            if (!CryptDecrypt(key_aes, hHash, TRUE, 0, buf)) {
-                *ppEapError = make_error(GetLastError(), _T(__FUNCTION__) _T(" CryptDecrypt failed."));
-                return false;
-            }
-            dec.assign(buf.begin(), buf.end());
+            if (!CryptDecrypt(key_aes, hHash, TRUE, 0, buf))
+                throw win_runtime_error(_T(__FUNCTION__) _T(" CryptDecrypt failed."));
 
-            return true;
+            return std::vector<_Ty, _Ax>(buf);
         }
 
 
         ///
         /// Decrypts a string
         ///
-        /// \param[in ] hProv       Handle of cryptographics provider
-        /// \param[in ] data        Pointer to data to decrypt
-        /// \param[in ] size        Size of \p data in bytes
-        /// \param[out] dec         Decrypted string
-        /// \param[out] ppEapError  Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
-        /// \param[out] hHash       Handle of hashing object
+        /// \param[in ] hProv  Handle of cryptographics provider
+        /// \param[in ] data   Pointer to data to decrypt
+        /// \param[in ] size   Size of \p data in bytes
+        /// \param[out] hHash  Handle of hashing object
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
+        /// \returns Decrypted string
         ///
         template<class _Elem, class _Traits, class _Ax>
-        bool decrypt(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _Out_ std::basic_string<_Elem, _Traits, _Ax> &dec, _Out_ EAP_ERROR **ppEapError, _Out_opt_ HCRYPTHASH hHash = NULL) const
+        std::basic_string<_Elem, _Traits, _Ax> decrypt_str(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _Out_opt_ HCRYPTHASH hHash = NULL) const
         {
-            std::vector<_Elem, sanitizing_allocator<_Elem> > buf;
-            if (!decrypt(hProv, data, size, buf, ppEapError, hHash))
-                return false;
-            dec.assign(buf.data(), buf.size());
-
-            return true;
+            std::vector<_Elem, sanitizing_allocator<_Elem> > buf(std::move(decrypt(hProv, data, size, hHash)));
+            return std::basic_string<_Elem, _Traits, _Ax>(buf.data(), buf.size());
         }
 
 
         ///
         /// Decrypts a wide string
         ///
-        /// \param[in ] hProv       Handle of cryptographics provider
-        /// \param[in ] data        Pointer to data to decrypt
-        /// \param[in ] size        Size of \p data in bytes
-        /// \param[out] dec         Decrypted string
-        /// \param[out] ppEapError  Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
-        /// \param[out] hHash       Handle of hashing object
+        /// \param[in ] hProv  Handle of cryptographics provider
+        /// \param[in ] data   Pointer to data to decrypt
+        /// \param[in ] size   Size of \p data in bytes
+        /// \param[out] hHash  Handle of hashing object
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
+        /// \returns Decrypted string
         ///
         template<class _Traits, class _Ax>
-        bool decrypt(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _Out_ std::basic_string<wchar_t, _Traits, _Ax> &dec, _Out_ EAP_ERROR **ppEapError, _Out_opt_ HCRYPTHASH hHash = NULL) const
+        std::basic_string<wchar_t, _Traits, _Ax> decrypt_str(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _Out_opt_ HCRYPTHASH hHash = NULL) const
         {
-            winstd::sanitizing_string buf;
-            if (!decrypt(hProv, data, size, buf, ppEapError, hHash))
-                return false;
+            winstd::sanitizing_string buf(std::move(decrypt_str(hProv, data, size, hHash)));
+            std::basic_string<wchar_t, _Traits, _Ax> dec;
             MultiByteToWideChar(CP_UTF8, 0, buf.data(), (int)buf.size(), dec);
-
-            return true;
+            return dec;
         }
 
 
         ///
         /// Decrypts data with MD5 integrity check
         ///
-        /// \param[in ] hProv       Handle of cryptographics provider
-        /// \param[in ] data        Pointer to data with 16B MD5 hash appended to decrypt
-        /// \param[in ] size        Size of \p data in bytes
-        /// \param[out] dec         Decrypted data
-        /// \param[out] ppEapError  Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
+        /// \param[in ] hProv  Handle of cryptographics provider
+        /// \param[in ] data   Pointer to data with 16B MD5 hash appended to decrypt
+        /// \param[in ] size   Size of \p data in bytes
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
+        /// \returns Decrypted data
         ///
         template<class _Ty, class _Ax>
-        bool decrypt_md5(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _Out_ std::vector<_Ty, _Ax> &dec, _Out_ EAP_ERROR **ppEapError) const
+        std::vector<_Ty, _Ax> decrypt_md5(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size) const
         {
             // Create hash.
             winstd::crypt_hash hash;
-            if (!hash.create(hProv, CALG_MD5)) {
-                *ppEapError = make_error(GetLastError(), _T(__FUNCTION__) _T(" Creating MD5 hash failed."));
-                return false;
-            }
-            DWORD dwHashSize, dwHashSizeSize = sizeof(dwHashSize);
-            CryptGetHashParam(hash, HP_HASHSIZE, (LPBYTE)&dwHashSize, &dwHashSizeSize, 0);
-            if (size < dwHashSize) {
-                *ppEapError = make_error(ERROR_INVALID_DATA, _T(__FUNCTION__) _T(" Encrypted data too short."));
-                return false;
-            }
+            if (!hash.create(hProv, CALG_MD5))
+                throw win_runtime_error(_T(__FUNCTION__) _T(" Creating MD5 hash failed."));
+            DWORD dwHashSize;
+            CryptGetHashParam(hash, HP_HASHSIZE, dwHashSize, 0);
+            if (size < dwHashSize)
+                throw invalid_argument(__FUNCTION__ " Encrypted data too short.");
             size_t enc_size = size - dwHashSize;
 
             // Decrypt data.
-            if (!decrypt(hProv, data, enc_size, dec, ppEapError, hash))
-                return false;
+            std::vector<_Ty, _Ax> dec(std::move(decrypt<_Ty, _Ax>(hProv, data, enc_size, hash)));
 
             // Calculate MD5 hash and verify it.
             std::vector<unsigned char> hash_bin;
-            if (!CryptGetHashParam(hash, HP_HASHVAL, hash_bin, 0)) {
-                *ppEapError = make_error(GetLastError(), _T(__FUNCTION__) _T(" Calculating MD5 hash failed."));
-                return false;
-            }
-            if (memcmp((unsigned char*)data + enc_size, hash_bin.data(), dwHashSize) != 0) {
-                *ppEapError = make_error(ERROR_INVALID_DATA, _T(__FUNCTION__) _T(" Invalid encrypted data."));
-                return false;
-            }
+            if (!CryptGetHashParam(hash, HP_HASHVAL, hash_bin, 0))
+                throw win_runtime_error(_T(__FUNCTION__) _T(" Calculating MD5 hash failed."));
+            if (memcmp((unsigned char*)data + enc_size, hash_bin.data(), dwHashSize) != 0)
+                throw invalid_argument(__FUNCTION__ " Invalid encrypted data.");
 
-            return true;
+            return dec;
         }
 
 
         ///
         /// Decrypts a string with MD5 integrity check
         ///
-        /// \param[in ] hProv       Handle of cryptographics provider
-        /// \param[in ] data        Pointer to data with 16B MD5 hash appended to decrypt
-        /// \param[in ] size        Size of \p data in bytes
-        /// \param[out] dec         Decrypted string
-        /// \param[out] ppEapError  Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
+        /// \param[in ] hProv  Handle of cryptographics provider
+        /// \param[in ] data   Pointer to data with 16B MD5 hash appended to decrypt
+        /// \param[in ] size   Size of \p data in bytes
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
+        /// \returns Decrypted string
         ///
         template<class _Elem, class _Traits, class _Ax>
-        bool decrypt_md5(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _Out_ std::basic_string<_Elem, _Traits, _Ax> &dec, _Out_ EAP_ERROR **ppEapError) const
+        std::basic_string<_Elem, _Traits, _Ax> decrypt_str_md5(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size) const
         {
-            std::vector<_Elem, sanitizing_allocator<_Elem> > buf;
-            if (!decrypt_md5(hProv, data, size, buf, ppEapError))
-                return false;
-            dec.assign(buf.data(), buf.size());
-
-            return true;
+            std::vector<_Elem, sanitizing_allocator<_Elem> > buf(std::move(decrypt_md5(hProv, data, size)));
+            return std::basic_string<_Elem, _Traits, _Ax>(buf.data(), buf.size());
         }
 
 
         ///
         /// Decrypts a wide string with MD5 integrity check
         ///
-        /// \param[in ] hProv       Handle of cryptographics provider
-        /// \param[in ] data        Pointer to data with 16B MD5 hash appended to decrypt
-        /// \param[in ] size        Size of \p data in bytes
-        /// \param[out] dec         Decrypted string
-        /// \param[out] ppEapError  Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
+        /// \param[in ] hProv  Handle of cryptographics provider
+        /// \param[in ] data   Pointer to data with 16B MD5 hash appended to decrypt
+        /// \param[in ] size   Size of \p data in bytes
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
+        /// \returns Decrypted string
         ///
         template<class _Traits, class _Ax>
-        bool decrypt_md5(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _Out_ std::basic_string<wchar_t, _Traits, _Ax> &dec, _Out_ EAP_ERROR **ppEapError) const
+        std::basic_string<wchar_t, _Traits, _Ax> decrypt_str_md5(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size) const
         {
-            winstd::sanitizing_string buf;
-            if (!decrypt_md5(hProv, data, size, buf, ppEapError))
-                return false;
+            winstd::sanitizing_string buf(std::move(decrypt_str_md5(hProv, data, size)));
+            std::basic_string<wchar_t, _Traits, _Ax> dec;
             MultiByteToWideChar(CP_UTF8, 0, buf.data(), (int)buf.size(), dec);
-
-            return true;
+            return dec;
         }
 
         /// @}
@@ -540,35 +468,26 @@ namespace eap
         /// - \c false otherwise. See \p ppEapError for details.
         ///
         template<class T>
-        bool unpack(
+        void unpack(
             _Inout_                        T     &record,
             _In_count_(dwDataInSize) const BYTE  *pDataIn,
-            _In_                           DWORD dwDataInSize,
-            _Out_                          EAP_ERROR **ppEapError)
+            _In_                           DWORD dwDataInSize)
         {
 #if EAP_ENCRYPT_BLOBS
             // Prepare cryptographics provider.
             winstd::crypt_prov cp;
-            if (!cp.create(NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT)) {
-                *ppEapError = make_error(GetLastError(), _T(__FUNCTION__) _T(" CryptAcquireContext failed."));
-                return false;
-            }
+            if (!cp.create(NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
+                throw win_runtime_error(_T(__FUNCTION__) _T(" CryptAcquireContext failed."));
 
             // Decrypt data.
-            std::vector<unsigned char, winstd::sanitizing_allocator<unsigned char> > data;
-            if (!decrypt_md5(cp, pDataIn, dwDataInSize, data, ppEapError))
-                return false;
+            std::vector<unsigned char, winstd::sanitizing_allocator<unsigned char> > data(std::move(decrypt_md5<unsigned char, winstd::sanitizing_allocator<unsigned char> >(cp, pDataIn, dwDataInSize)));
 
             cursor_in cursor = { data.data(), data.data() + data.size() };
 #else
-            UNREFERENCED_PARAMETER(ppEapError);
-
             cursor_in cursor = { pDataIn, pDataIn + dwDataInSize };
 #endif
             cursor >> record;
             assert(cursor.ptr == cursor.ptr_end);
-
-            return true;
         }
 
 
@@ -578,18 +497,12 @@ namespace eap
         /// \param[in ] record          Object to pack
         /// \param[out] ppDataOut       Pointer to pointer to receive encrypted BLOB. Pointer must be freed using `module::free_memory()`.
         /// \param[out] pdwDataOutSize  Pointer to \p ppDataOut size
-        /// \param[out] ppEapError      Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
-        ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
         ///
         template<class T>
-        bool pack(
-            _In_  const T         &record,
-            _Out_       BYTE      **ppDataOut,
-            _Out_       DWORD     *pdwDataOutSize,
-            _Out_       EAP_ERROR **ppEapError)
+        void pack(
+            _In_  const T     &record,
+            _Out_       BYTE  **ppDataOut,
+            _Out_       DWORD *pdwDataOutSize)
         {
             assert(ppDataOut);
             assert(pdwDataOutSize);
@@ -606,32 +519,24 @@ namespace eap
 
             // Prepare cryptographics provider.
             winstd::crypt_prov cp;
-            if (!cp.create(NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT)) {
-                *ppEapError = make_error(GetLastError(), _T(__FUNCTION__) _T(" CryptAcquireContext failed."));
-                return false;
-            }
+            if (!cp.create(NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
+                throw win_runtime_error(_T(__FUNCTION__) _T(" CryptAcquireContext failed."));
 
             // Encrypt BLOB.
-            std::vector<unsigned char> data_enc;
-            if (!encrypt_md5(cp, data.data(), data.size(), data_enc, ppEapError))
-                return false;
+            std::vector<unsigned char> data_enc(std::move(encrypt_md5(cp, data.data(), data.size())));
 
             // Copy encrypted BLOB to output.
             *pdwDataOutSize = (DWORD)data_enc.size();
             *ppDataOut = alloc_memory(*pdwDataOutSize);
-            if (!*ppDataOut) {
-                *ppEapError = make_error(ERROR_OUTOFMEMORY, winstd::wstring_printf(_T(__FUNCTION__) _T(" Error allocating memory for BLOB (%uB)."), *pdwDataOutSize).c_str());
-                return false;
-            }
+            if (!*ppDataOut)
+                throw win_runtime_error(ERROR_OUTOFMEMORY, winstd::wstring_printf(_T(__FUNCTION__) _T(" Error allocating memory for BLOB (%uB)."), *pdwDataOutSize).c_str());
             memcpy(*ppDataOut, data_enc.data(), *pdwDataOutSize);
 #else
             // Allocate BLOB.
             *pdwDataOutSize = (DWORD)pksizeof(record);
             *ppDataOut = alloc_memory(*pdwDataOutSize);
-            if (!*ppDataOut) {
-                *ppEapError = make_error(ERROR_OUTOFMEMORY, winstd::wstring_printf(_T(__FUNCTION__) _T(" Error allocating memory for BLOB (%uB)."), *pdwDataOutSize).c_str());
-                return false;
-            }
+            if (!*ppDataOut)
+                throw win_runtime_error(ERROR_OUTOFMEMORY, winstd::wstring_printf(_T(__FUNCTION__) _T(" Error allocating memory for BLOB (%uB)."), *pdwDataOutSize).c_str());
 
             // Pack to BLOB.
             cursor_out cursor = { *ppDataOut, *ppDataOut + *pdwDataOutSize };
@@ -639,8 +544,6 @@ namespace eap
             assert(cursor.ptr == cursor.ptr_end);
             *pdwDataOutSize = cursor.ptr - *ppDataOut;
 #endif
-
-            return true;
         }
 
         /// @}
@@ -670,55 +573,38 @@ namespace eap
         ///
         /// \sa [EapPeerGetInfo function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363613.aspx)
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool initialize(_Out_ EAP_ERROR **ppEapError) = 0;
+        virtual void initialize() = 0;
 
         ///
         /// Shuts down the EAP method and prepares to unload its corresponding DLL.
         ///
         /// \sa [EapPeerShutdown function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363627.aspx)
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool shutdown(_Out_ EAP_ERROR **ppEapError) = 0;
+        virtual void shutdown() = 0;
 
         ///
         /// Returns the user data and user identity after being called by EAPHost.
         ///
         /// \sa [EapPeerGetIdentity function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363607.aspx)
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool get_identity(
-            _In_                                   DWORD     dwFlags,
-            _In_count_(dwConnectionDataSize) const BYTE      *pConnectionData,
-            _In_                                   DWORD     dwConnectionDataSize,
-            _In_count_(dwUserDataSize)       const BYTE      *pUserData,
-            _In_                                   DWORD     dwUserDataSize,
-            _Out_                                  BYTE      **ppUserDataOut,
-            _Out_                                  DWORD     *pdwUserDataOutSize,
-            _In_                                   HANDLE    hTokenImpersonateUser,
-            _Out_                                  BOOL      *pfInvokeUI,
-            _Out_                                  WCHAR     **ppwszIdentity,
-            _Out_                                  EAP_ERROR **ppEapError) = 0;
+        virtual void get_identity(
+            _In_                                   DWORD  dwFlags,
+            _In_count_(dwConnectionDataSize) const BYTE   *pConnectionData,
+            _In_                                   DWORD  dwConnectionDataSize,
+            _In_count_(dwUserDataSize)       const BYTE   *pUserData,
+            _In_                                   DWORD  dwUserDataSize,
+            _Inout_                                BYTE   **ppUserDataOut,
+            _Inout_                                DWORD  *pdwUserDataOutSize,
+            _In_                                   HANDLE hTokenImpersonateUser,
+            _Inout_                                BOOL   *pfInvokeUI,
+            _Inout_                                WCHAR  **ppwszIdentity) = 0;
 
         ///
         /// Defines the implementation of an EAP method-specific function that retrieves the properties of an EAP method given the connection and user data.
         ///
         /// \sa [EapPeerGetMethodProperties function](https://msdn.microsoft.com/en-us/library/windows/desktop/hh706636.aspx)
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool get_method_properties(
+        virtual void get_method_properties(
             _In_                                   DWORD                     dwVersion,
             _In_                                   DWORD                     dwFlags,
             _In_                                   HANDLE                    hUserImpersonationToken,
@@ -726,100 +612,72 @@ namespace eap
             _In_                                   DWORD                     dwConnectionDataSize,
             _In_count_(dwUserDataSize)       const BYTE                      *pUserData,
             _In_                                   DWORD                     dwUserDataSize,
-            _Out_                                  EAP_METHOD_PROPERTY_ARRAY *pMethodPropertyArray,
-            _Out_                                  EAP_ERROR                 **ppEapError) = 0;
+            _Inout_                                EAP_METHOD_PROPERTY_ARRAY *pMethodPropertyArray) = 0;
 
         ///
         /// Converts XML into the configuration BLOB. The XML based credentials can come from group policy or from a system administrator.
         ///
         /// \sa [EapPeerCredentialsXml2Blob function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363603.aspx)
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool credentials_xml2blob(
+        virtual void credentials_xml2blob(
             _In_                                   DWORD       dwFlags,
             _In_                                   IXMLDOMNode *pConfigRoot,
             _In_count_(dwConnectionDataSize) const BYTE        *pConnectionData,
             _In_                                   DWORD       dwConnectionDataSize,
-            _Out_                                  BYTE        **ppCredentialsOut,
-            _Out_                                  DWORD       *pdwCredentialsOutSize,
-            _Out_                                  EAP_ERROR   **ppEapError) = 0;
+            _Inout_                                BYTE        **ppCredentialsOut,
+            _Inout_                                DWORD       *pdwCredentialsOutSize) = 0;
 
         ///
         /// Defines the implementation of an EAP method-specific function that obtains the EAP Single-Sign-On (SSO) credential input fields for an EAP method.
         ///
         /// \sa [EapPeerQueryCredentialInputFields function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363622.aspx)
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool query_credential_input_fields(
+        virtual void query_credential_input_fields(
             _In_                                   HANDLE                       hUserImpersonationToken,
             _In_                                   DWORD                        dwFlags,
             _In_                                   DWORD                        dwConnectionDataSize,
             _In_count_(dwConnectionDataSize) const BYTE                         *pConnectionData,
-            _Out_                                  EAP_CONFIG_INPUT_FIELD_ARRAY *pEapConfigInputFieldsArray,
-            _Out_                                  EAP_ERROR                    **ppEapError) const;
+            _Inout_                                EAP_CONFIG_INPUT_FIELD_ARRAY *pEapConfigInputFieldsArray) const;
 
         ///
         /// Defines the implementation of an EAP method function that obtains the user BLOB data provided in an interactive Single-Sign-On (SSO) UI raised on the supplicant.
         ///
         /// \sa [EapPeerQueryUserBlobFromCredentialInputFields function](https://msdn.microsoft.com/en-us/library/windows/desktop/bb204697.aspx)
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool query_user_blob_from_credential_input_fields(
+        virtual void query_user_blob_from_credential_input_fields(
             _In_                                   HANDLE                       hUserImpersonationToken,
             _In_                                   DWORD                        dwFlags,
             _In_                                   DWORD                        dwConnectionDataSize,
             _In_count_(dwConnectionDataSize) const BYTE                         *pConnectionData,
             _In_                             const EAP_CONFIG_INPUT_FIELD_ARRAY *pEapConfigInputFieldArray,
             _Inout_                                DWORD                        *pdwUsersBlobSize,
-            _Inout_                                BYTE                         **ppUserBlob,
-            _Out_                                  EAP_ERROR                    **ppEapError) const;
+            _Inout_                                BYTE                         **ppUserBlob) const;
 
         ///
         /// Defines the implementation of an EAP method API that provides the input fields for interactive UI components to be raised on the supplicant.
         ///
         /// \sa [EapPeerQueryInteractiveUIInputFields function](https://msdn.microsoft.com/en-us/library/windows/desktop/bb204695.aspx)
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool query_interactive_ui_input_fields(
+        virtual void query_interactive_ui_input_fields(
             _In_                                  DWORD                   dwVersion,
             _In_                                  DWORD                   dwFlags,
             _In_                                  DWORD                   dwUIContextDataSize,
             _In_count_(dwUIContextDataSize) const BYTE                    *pUIContextData,
-            _Out_                                 EAP_INTERACTIVE_UI_DATA *pEapInteractiveUIData,
-            _Out_                                 EAP_ERROR               **ppEapError,
-            _Inout_                               LPVOID                  *pvReserved) const;
+            _Inout_                               EAP_INTERACTIVE_UI_DATA *pEapInteractiveUIData) const;
 
         ///
         /// Converts user information into a user BLOB that can be consumed by EAPHost run-time functions.
         ///
         /// \sa [EapPeerQueryUIBlobFromInteractiveUIInputFields function](https://msdn.microsoft.com/en-us/library/windows/desktop/bb204696.aspx)
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool query_ui_blob_from_interactive_ui_input_fields(
+        virtual void query_ui_blob_from_interactive_ui_input_fields(
             _In_                                  DWORD                   dwVersion,
             _In_                                  DWORD                   dwFlags,
             _In_                                  DWORD                   dwUIContextDataSize,
             _In_count_(dwUIContextDataSize) const BYTE                    *pUIContextData,
             _In_                            const EAP_INTERACTIVE_UI_DATA *pEapInteractiveUIData,
-            _Out_                                 DWORD                   *pdwDataFromInteractiveUISize,
-            _Out_                                 BYTE                    **ppDataFromInteractiveUI,
-            _Out_                                 EAP_ERROR               **ppEapError,
-            _Inout_                               LPVOID                  *ppvReserved) const;
+            _Inout_                               DWORD                   *pdwDataFromInteractiveUISize,
+            _Inout_                               BYTE                    **ppDataFromInteractiveUI) const;
 
         /// \name Session management
         /// @{
@@ -829,80 +687,55 @@ namespace eap
         ///
         /// \sa [EapPeerBeginSession function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363600.aspx)
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
+        /// \returns Session handle
         ///
-        virtual bool begin_session(
-            _In_                                   DWORD              dwFlags,
-            _In_                             const EapAttributes      *pAttributeArray,
-            _In_                                   HANDLE             hTokenImpersonateUser,
-            _In_count_(dwConnectionDataSize) const BYTE               *pConnectionData,
-            _In_                                   DWORD              dwConnectionDataSize,
-            _In_count_(dwUserDataSize)       const BYTE               *pUserData,
-            _In_                                   DWORD              dwUserDataSize,
-            _In_                                   DWORD              dwMaxSendPacketSize,
-            _Out_                                  EAP_SESSION_HANDLE *phSession,
-            _Out_                                  EAP_ERROR          **ppEapError) = 0;
+        virtual EAP_SESSION_HANDLE begin_session(
+            _In_                                   DWORD         dwFlags,
+            _In_                             const EapAttributes *pAttributeArray,
+            _In_                                   HANDLE        hTokenImpersonateUser,
+            _In_count_(dwConnectionDataSize) const BYTE          *pConnectionData,
+            _In_                                   DWORD         dwConnectionDataSize,
+            _In_count_(dwUserDataSize)       const BYTE          *pUserData,
+            _In_                                   DWORD         dwUserDataSize,
+            _In_                                   DWORD         dwMaxSendPacketSize) = 0;
 
         ///
         /// Ends an EAP authentication session for the EAP method.
         ///
         /// \sa [EapPeerEndSession function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363604.aspx)
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool end_session(
-            _In_  EAP_SESSION_HANDLE hSession,
-            _Out_ EAP_ERROR          **ppEapError) = 0;
+        virtual void end_session(_In_ EAP_SESSION_HANDLE hSession) = 0;
 
         ///
         /// Processes a packet received by EAPHost from a supplicant.
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
         /// \sa [EapPeerProcessRequestPacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363621.aspx)
         ///
-        virtual bool process_request_packet(
+        virtual void process_request_packet(
             _In_                                       EAP_SESSION_HANDLE  hSession,
             _In_bytecount_(dwReceivedPacketSize) const EapPacket           *pReceivedPacket,
             _In_                                       DWORD               dwReceivedPacketSize,
-            _Out_                                      EapPeerMethodOutput *pEapOutput,
-            _Out_                                      EAP_ERROR           **ppEapError) = 0;
+            _Inout_                                    EapPeerMethodOutput *pEapOutput) = 0;
 
         ///
         /// Obtains a response packet from the EAP method.
         ///
         /// \sa [EapPeerGetResponsePacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363610.aspx)
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool get_response_packet(
+        virtual void get_response_packet(
             _In_                               EAP_SESSION_HANDLE hSession,
             _Inout_bytecap_(*dwSendPacketSize) EapPacket          *pSendPacket,
-            _Inout_                            DWORD              *pdwSendPacketSize,
-            _Out_                              EAP_ERROR          **ppEapError) = 0;
+            _Inout_                            DWORD              *pdwSendPacketSize) = 0;
 
         ///
         /// Obtains the result of an authentication session from the EAP method.
         ///
         /// \sa [EapPeerGetResult function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363611.aspx)
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool get_result(
-            _In_  EAP_SESSION_HANDLE        hSession,
-            _In_  EapPeerMethodResultReason reason,
-            _Out_ EapPeerMethodResult       *ppResult,
-            _Out_ EAP_ERROR                 **ppEapError) = 0;
+        virtual void get_result(
+            _In_    EAP_SESSION_HANDLE        hSession,
+            _In_    EapPeerMethodResultReason reason,
+            _Inout_ EapPeerMethodResult       *ppResult) = 0;
 
         ///
         /// Obtains the user interface context from the EAP method.
@@ -911,15 +744,10 @@ namespace eap
         ///
         /// \sa [EapPeerGetUIContext function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363612.aspx)
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool get_ui_context(
-            _In_  EAP_SESSION_HANDLE hSession,
-            _Out_ BYTE               **ppUIContextData,
-            _Out_ DWORD              *pdwUIContextDataSize,
-            _Out_ EAP_ERROR          **ppEapError) = 0;
+        virtual void get_ui_context(
+            _In_    EAP_SESSION_HANDLE hSession,
+            _Inout_ BYTE               **ppUIContextData,
+            _Inout_ DWORD              *pdwUIContextDataSize) = 0;
 
         ///
         /// Provides a user interface context to the EAP method.
@@ -928,45 +756,30 @@ namespace eap
         ///
         /// \sa [EapPeerSetUIContext function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363626.aspx)
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool set_ui_context(
+        virtual void set_ui_context(
             _In_                                  EAP_SESSION_HANDLE  hSession,
             _In_count_(dwUIContextDataSize) const BYTE                *pUIContextData,
             _In_                                  DWORD               dwUIContextDataSize,
-            _In_                            const EapPeerMethodOutput *pEapOutput,
-            _Out_                                 EAP_ERROR           **ppEapError) = 0;
+            _In_                            const EapPeerMethodOutput *pEapOutput) = 0;
 
         ///
         /// Obtains an array of EAP response attributes from the EAP method.
         ///
         /// \sa [EapPeerGetResponseAttributes function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363609.aspx)
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool get_response_attributes(
-            _In_  EAP_SESSION_HANDLE hSession,
-            _Out_ EapAttributes      *pAttribs,
-            _Out_ EAP_ERROR          **ppEapError) = 0;
+        virtual void get_response_attributes(
+            _In_    EAP_SESSION_HANDLE hSession,
+            _Inout_ EapAttributes      *pAttribs) = 0;
 
         ///
         /// Provides an updated array of EAP response attributes to the EAP method.
         ///
         /// \sa [EapPeerSetResponseAttributes function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363625.aspx)
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool set_response_attributes(
+        virtual void set_response_attributes(
             _In_       EAP_SESSION_HANDLE  hSession,
             _In_ const EapAttributes       *pAttribs,
-            _Out_      EapPeerMethodOutput *pEapOutput,
-            _Out_      EAP_ERROR           **ppEapError) = 0;
+            _Inout_    EapPeerMethodOutput *pEapOutput) = 0;
 
         /// @}
     };

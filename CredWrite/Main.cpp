@@ -81,28 +81,25 @@ static int CredWrite()
     }
 
     // Write credentials.
-    EAP_ERROR *pEapError = NULL;
 #ifdef _DEBUG
     {
         eap::credentials_pap cred_stored(g_module);
-        if (!cred_stored.retrieve(target_name.c_str(), &pEapError)) {
-            if (pEapError) {
-                OutputDebugStr(_T("%ls (error %u)\n"), pEapError->pRootCauseString, pEapError->dwWinError);
-                g_module.free_error_memory(pEapError);
-                pEapError = NULL;
-            } else
-                OutputDebugStr(_T("Reading credentials failed.\n"));
+        try {
+            cred_stored.retrieve(target_name.c_str());
+        } catch(eap::win_runtime_error &err) {
+            OutputDebugStr(_T("%ls (error %u)\n"), err.m_msg.c_str(), err.m_error);
+        } catch(...) {
+            OutputDebugStr(_T("Reading credentials failed.\n"));
         }
     }
 #endif
-    if (!cred.store(target_name.c_str(), &pEapError)) {
-        if (pEapError) {
-            OutputDebugStr(_T("%ls (error %u)\n"), pEapError->pRootCauseString, pEapError->dwWinError);
-            g_module.free_error_memory(pEapError);
-            pEapError = NULL;
-        } else
-            OutputDebugStr(_T("Writing credentials failed.\n"));
-
+    try {
+        cred.store(target_name.c_str());
+    } catch(eap::win_runtime_error &err) {
+        OutputDebugStr(_T("%ls (error %u)\n"), err.m_msg.c_str(), err.m_error);
+        return 2;
+    } catch(...) {
+        OutputDebugStr(_T("Writing credentials failed.\n"));
         return 2;
     }
 

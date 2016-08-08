@@ -71,34 +71,26 @@ eap::method_ttls& eap::method_ttls::operator=(_Inout_ method_ttls &&other)
 }
 
 
-bool eap::method_ttls::begin_session(
+void eap::method_ttls::begin_session(
     _In_        DWORD         dwFlags,
     _In_  const EapAttributes *pAttributeArray,
     _In_        HANDLE        hTokenImpersonateUser,
-    _In_        DWORD         dwMaxSendPacketSize,
-    _Out_       EAP_ERROR     **ppEapError)
+    _In_        DWORD         dwMaxSendPacketSize)
 {
-    if (!m_outer.begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize, ppEapError))
-        return false;
-
-    return true;
+    m_outer.begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
 }
 
 
-bool eap::method_ttls::process_request_packet(
+void eap::method_ttls::process_request_packet(
     _In_bytecount_(dwReceivedPacketSize) const EapPacket           *pReceivedPacket,
     _In_                                       DWORD               dwReceivedPacketSize,
-    _Out_                                      EapPeerMethodOutput *pEapOutput,
-    _Out_                                      EAP_ERROR           **ppEapError)
+    _Inout_                                    EapPeerMethodOutput *pEapOutput)
 {
     // Is this a valid EAP-TTLS packet?
-    if (dwReceivedPacketSize < 6) {
-        *ppEapError = m_module.make_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, _T(__FUNCTION__) _T(" Packet is too small. EAP-%s packets should be at least 6B."));
-        return false;
-    } else if (pReceivedPacket->Data[0] != eap_type_ttls) {
-        *ppEapError = m_module.make_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, wstring_printf(_T(__FUNCTION__) _T(" Packet is not EAP-TTLS (expected: %u, received: %u)."), eap_type_ttls, pReceivedPacket->Data[0]).c_str());
-        return false;
-    }
+    if (dwReceivedPacketSize < 6)
+        throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, _T(__FUNCTION__) _T(" Packet is too small. EAP-%s packets should be at least 6B."));
+    else if (pReceivedPacket->Data[0] != eap_type_ttls)
+        throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, wstring_printf(_T(__FUNCTION__) _T(" Packet is not EAP-TTLS (expected: %u, received: %u)."), eap_type_ttls, pReceivedPacket->Data[0]).c_str());
 
     if (pReceivedPacket->Code == EapCodeRequest && (pReceivedPacket->Data[1] & flags_start)) {
         // This is a start EAP-TTLS packet.
@@ -109,31 +101,26 @@ bool eap::method_ttls::process_request_packet(
         m_module.log_event(&EAPMETHOD_HANDSHAKE_START1, event_data((unsigned int)eap_type_ttls), event_data((unsigned char)m_version), event_data((unsigned char)ver_remote), event_data::blank);
     }
 
-    return m_outer.process_request_packet(pReceivedPacket, dwReceivedPacketSize, pEapOutput, ppEapError);
+    m_outer.process_request_packet(pReceivedPacket, dwReceivedPacketSize, pEapOutput);
 }
 
 
-bool eap::method_ttls::get_response_packet(
+void eap::method_ttls::get_response_packet(
     _Inout_bytecap_(*dwSendPacketSize) EapPacket *pSendPacket,
-    _Inout_                            DWORD     *pdwSendPacketSize,
-    _Out_                              EAP_ERROR **ppEapError)
+    _Inout_                            DWORD     *pdwSendPacketSize)
 {
-    if (!m_outer.get_response_packet(pSendPacket, pdwSendPacketSize, ppEapError))
-        return false;
+    m_outer.get_response_packet(pSendPacket, pdwSendPacketSize);
 
     // Change packet type to EAP-TTLS, and add EAP-TTLS version.
     pSendPacket->Data[0]  = (BYTE)eap_type_ttls;
     pSendPacket->Data[1] &= ~flags_ver_mask;
     pSendPacket->Data[1] |= m_version;
-
-    return true;
 }
 
 
-bool eap::method_ttls::get_result(
-    _In_  EapPeerMethodResultReason reason,
-    _Out_ EapPeerMethodResult       *ppResult,
-    _Out_ EAP_ERROR                 **ppEapError)
+void eap::method_ttls::get_result(
+    _In_    EapPeerMethodResultReason reason,
+    _Inout_ EapPeerMethodResult       *ppResult)
 {
-    return m_outer.get_result(reason, ppResult, ppEapError);
+    m_outer.get_result(reason, ppResult);
 }

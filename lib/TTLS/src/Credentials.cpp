@@ -96,17 +96,14 @@ bool eap::credentials_ttls::empty() const
 }
 
 
-bool eap::credentials_ttls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
+void eap::credentials_ttls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot) const
 {
     assert(pDoc);
     assert(pConfigRoot);
-    assert(ppEapError);
 
-    if (!credentials::save(pDoc, pConfigRoot, ppEapError))
-        return false;
+    credentials::save(pDoc, pConfigRoot);
 
-    if (!m_outer.save(pDoc, pConfigRoot, ppEapError))
-        return false;
+    m_outer.save(pDoc, pConfigRoot);
 
     const bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
     DWORD dwResult;
@@ -115,49 +112,34 @@ bool eap::credentials_ttls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *p
     if (m_inner) {
         // <InnerAuthenticationMethod>
         winstd::com_obj<IXMLDOMElement> pXmlElInnerAuthenticationMethod;
-        if ((dwResult = eapxml::create_element(pDoc, winstd::bstr(L"InnerAuthenticationMethod"), bstrNamespace, &pXmlElInnerAuthenticationMethod))) {
-            *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <InnerAuthenticationMethod> element."));
-            return false;
-        }
+        if ((dwResult = eapxml::create_element(pDoc, winstd::bstr(L"InnerAuthenticationMethod"), bstrNamespace, &pXmlElInnerAuthenticationMethod)))
+            throw win_runtime_error(dwResult, _T(__FUNCTION__) _T(" Error creating <InnerAuthenticationMethod> element."));
 
-        if (!m_inner->save(pDoc, pXmlElInnerAuthenticationMethod, ppEapError))
-            return false;
+        m_inner->save(pDoc, pXmlElInnerAuthenticationMethod);
 
-        if (FAILED(hr = pConfigRoot->appendChild(pXmlElInnerAuthenticationMethod, NULL))) {
-            *ppEapError = m_module.make_error(HRESULT_CODE(hr), _T(__FUNCTION__) _T(" Error appending <InnerAuthenticationMethod> element."));
-            return false;
-        }
+        if (FAILED(hr = pConfigRoot->appendChild(pXmlElInnerAuthenticationMethod, NULL)))
+            throw win_runtime_error(HRESULT_CODE(hr), _T(__FUNCTION__) _T(" Error appending <InnerAuthenticationMethod> element."));
     }
-
-    return true;
 }
 
 
-bool eap::credentials_ttls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError)
+void eap::credentials_ttls::load(_In_ IXMLDOMNode *pConfigRoot)
 {
     assert(pConfigRoot);
-    assert(ppEapError);
     DWORD dwResult;
 
-    if (!credentials::load(pConfigRoot, ppEapError))
-        return false;
+    credentials::load(pConfigRoot);
 
-    if (!m_outer.load(pConfigRoot, ppEapError))
-        return false;
+    m_outer.load(pConfigRoot);
 
     // TODO: For the time being, there is no detection what type is inner method. Introduce one!
     if (m_inner) {
         com_obj<IXMLDOMNode> pXmlElInnerAuthenticationMethod;
-        if ((dwResult = eapxml::select_node(pConfigRoot, bstr(L"eap-metadata:InnerAuthenticationMethod"), &pXmlElInnerAuthenticationMethod)) != ERROR_SUCCESS) {
-            *ppEapError = m_module.make_error(ERROR_NOT_FOUND, _T(__FUNCTION__) _T(" Error selecting <InnerAuthenticationMethod> element."), _T("Please make sure profile XML is a valid ") _T(PRODUCT_NAME_STR) _T(" profile XML document."));
-            return false;
-        }
+        if ((dwResult = eapxml::select_node(pConfigRoot, bstr(L"eap-metadata:InnerAuthenticationMethod"), &pXmlElInnerAuthenticationMethod)) != ERROR_SUCCESS)
+            throw invalid_argument(__FUNCTION__ " Error selecting <InnerAuthenticationMethod> element.");
 
-        if (!m_inner->load(pXmlElInnerAuthenticationMethod, ppEapError))
-            return false;
+        m_inner->load(pXmlElInnerAuthenticationMethod);
     }
-
-    return true;
 }
 
 
@@ -219,31 +201,21 @@ void eap::credentials_ttls::operator>>(_Inout_ cursor_in &cursor)
 }
 
 
-bool eap::credentials_ttls::store(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **ppEapError) const
+void eap::credentials_ttls::store(_In_ LPCTSTR pszTargetName) const
 {
-    if (!m_outer.store(pszTargetName, ppEapError))
-        return false;
+    m_outer.store(pszTargetName);
 
-    if (m_inner) {
-        if (!m_inner->store(pszTargetName, ppEapError))
-            return false;
-    }
-
-    return true;
+    if (m_inner)
+        m_inner->store(pszTargetName);
 }
 
 
-bool eap::credentials_ttls::retrieve(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **ppEapError)
+void eap::credentials_ttls::retrieve(_In_ LPCTSTR pszTargetName)
 {
-    if (!m_outer.retrieve(pszTargetName, ppEapError))
-        return false;
+    m_outer.retrieve(pszTargetName);
 
-    if (m_inner) {
-        if (!m_inner->retrieve(pszTargetName, ppEapError))
-            return false;
-    }
-
-    return true;
+    if (m_inner)
+        m_inner->retrieve(pszTargetName);
 }
 
 

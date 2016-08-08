@@ -101,59 +101,39 @@ namespace eap
         ///
         /// \sa [EapPeerBeginSession function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363600.aspx)
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool begin_session(
+        virtual void begin_session(
             _In_        DWORD         dwFlags,
             _In_  const EapAttributes *pAttributeArray,
             _In_        HANDLE        hTokenImpersonateUser,
-            _In_        DWORD         dwMaxSendPacketSize,
-            _Out_       EAP_ERROR     **ppEapError);
+            _In_        DWORD         dwMaxSendPacketSize);
 
         ///
         /// Processes a packet received by EAPHost from a supplicant.
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
         /// \sa [EapPeerProcessRequestPacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363621.aspx)
         ///
-        virtual bool process_request_packet(
+        virtual void process_request_packet(
             _In_bytecount_(dwReceivedPacketSize) const EapPacket           *pReceivedPacket,
             _In_                                       DWORD               dwReceivedPacketSize,
-            _Out_                                      EapPeerMethodOutput *pEapOutput,
-            _Out_                                      EAP_ERROR           **ppEapError);
+            _Inout_                                    EapPeerMethodOutput *pEapOutput);
 
         ///
         /// Obtains a response packet from the EAP method.
         ///
         /// \sa [EapPeerGetResponsePacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363610.aspx)
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool get_response_packet(
+        virtual void get_response_packet(
             _Inout_bytecap_(*dwSendPacketSize) EapPacket *pSendPacket,
-            _Inout_                            DWORD     *pdwSendPacketSize,
-            _Out_                              EAP_ERROR **ppEapError);
+            _Inout_                            DWORD     *pdwSendPacketSize);
 
         ///
         /// Obtains the result of an authentication session from the EAP method.
         ///
         /// \sa [EapPeerGetResult function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363611.aspx)
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool get_result(
-            _In_  EapPeerMethodResultReason reason,
-            _Out_ EapPeerMethodResult       *ppResult,
-            _Out_ EAP_ERROR                 **ppEapError);
+        virtual void get_result(
+            _In_    EapPeerMethodResultReason reason,
+            _Inout_ EapPeerMethodResult       *ppResult);
 
         /// @}
 

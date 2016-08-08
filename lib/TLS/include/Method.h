@@ -259,59 +259,39 @@ namespace eap
         ///
         /// \sa [EapPeerBeginSession function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363600.aspx)
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool begin_session(
+        virtual void begin_session(
             _In_        DWORD         dwFlags,
             _In_  const EapAttributes *pAttributeArray,
             _In_        HANDLE        hTokenImpersonateUser,
-            _In_        DWORD         dwMaxSendPacketSize,
-            _Out_       EAP_ERROR     **ppEapError);
+            _In_        DWORD         dwMaxSendPacketSize);
 
         ///
         /// Processes a packet received by EAPHost from a supplicant.
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
         /// \sa [EapPeerProcessRequestPacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363621.aspx)
         ///
-        virtual bool process_request_packet(
+        virtual void process_request_packet(
             _In_bytecount_(dwReceivedPacketSize) const EapPacket           *pReceivedPacket,
             _In_                                       DWORD               dwReceivedPacketSize,
-            _Out_                                      EapPeerMethodOutput *pEapOutput,
-            _Out_                                      EAP_ERROR           **ppEapError);
+            _Inout_                                    EapPeerMethodOutput *pEapOutput);
 
         ///
         /// Obtains a response packet from the EAP method.
         ///
         /// \sa [EapPeerGetResponsePacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363610.aspx)
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool get_response_packet(
+        virtual void get_response_packet(
             _Inout_bytecap_(*dwSendPacketSize) EapPacket *pSendPacket,
-            _Inout_                            DWORD     *pdwSendPacketSize,
-            _Out_                              EAP_ERROR **ppEapError);
+            _Inout_                            DWORD     *pdwSendPacketSize);
 
         ///
         /// Obtains the result of an authentication session from the EAP method.
         ///
         /// \sa [EapPeerGetResult function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363611.aspx)
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool get_result(
-            _In_  EapPeerMethodResultReason reason,
-            _Out_ EapPeerMethodResult       *ppResult,
-            _Out_ EAP_ERROR                 **ppEapError);
+        virtual void get_result(
+            _In_    EapPeerMethodResultReason reason,
+            _Inout_ EapPeerMethodResult       *ppResult);
 
         /// @}
 
@@ -334,46 +314,31 @@ namespace eap
         ///
         /// \returns TLS handshake message
         ///
-        eap::sanitizing_blob make_handshake(_In_ const sanitizing_blob &msg);
+        static eap::sanitizing_blob make_handshake(_In_ const sanitizing_blob &msg);
 
         ///
         /// Processes a TLS handshake
         ///
         /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter A.1. Record Layer)](https://tools.ietf.org/html/rfc5246#appendix-A.1)
         ///
-        /// \param[in]  msg         TLS handshake message data
-        /// \param[in]  msg_size    TLS handshake message data size
-        /// \param[out] ppEapError  Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
+        /// \param[in] msg      TLS handshake message data
+        /// \param[in] msg_size TLS handshake message data size
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        bool process_handshake(_In_bytecount_(msg_size) const void *msg, _In_ size_t msg_size, _Out_ EAP_ERROR **ppEapError);
+        void process_handshake(_In_bytecount_(msg_size) const void *msg, _In_ size_t msg_size);
 
         ///
         /// Encrypt TLS message
         ///
         /// \param[inout] msg         TLS message to encrypt
-        /// \param[out]   ppEapError  Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        bool encrypt_message(_Inout_ sanitizing_blob &msg, _Out_ EAP_ERROR **ppEapError);
+        void encrypt_message(_Inout_ sanitizing_blob &msg);
 
         ///
         /// Decrypt TLS message
         ///
-        /// \param[inout] msg         TLS message to decrypt
-        /// \param[out]   ppEapError  Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
+        /// \param[inout] msg  TLS message to decrypt
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        bool decrypt_message(_Inout_ sanitizing_blob &msg, _Out_ EAP_ERROR **ppEapError);
+        void decrypt_message(_Inout_ sanitizing_blob &msg);
 
         ///
         /// Calculates pseudo-random P_hash data defined in RFC 5246
@@ -386,22 +351,16 @@ namespace eap
         /// \param[in]  seed         Hashing seed
         /// \param[in]  size_seed    \p seed size
         /// \param[in]  size         Minimum number of bytes of pseudo-random data required
-        /// \param[out] data         Generated pseudo-random data (\p size or longer)
-        /// \param[out] ppEapError   Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
+        /// \returns Generated pseudo-random data (\p size or longer)
         ///
-        bool p_hash(
+        std::vector<unsigned char> p_hash(
             _In_                              ALG_ID                     alg,
             _In_bytecount_(size_secret) const void                       *secret,
             _In_                              size_t                     size_secret,
             _In_bytecount_(size_seed)   const void                       *seed,
             _In_                              size_t                     size_seed,
-            _In_                              size_t                     size,
-            _Out_                             std::vector<unsigned char> data,
-            _Out_                             EAP_ERROR                  **ppEapError);
+            _In_                              size_t                     size);
 
     public:
         enum phase_t {

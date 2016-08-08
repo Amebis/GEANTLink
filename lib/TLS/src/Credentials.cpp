@@ -88,14 +88,12 @@ bool eap::credentials_tls::empty() const
 }
 
 
-bool eap::credentials_tls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
+void eap::credentials_tls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot) const
 {
     assert(pDoc);
     assert(pConfigRoot);
-    assert(ppEapError);
 
-    if (!credentials::save(pDoc, pConfigRoot, ppEapError))
-        return false;
+    credentials::save(pDoc, pConfigRoot);
 
     const bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
     DWORD dwResult;
@@ -103,42 +101,30 @@ bool eap::credentials_tls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pC
 
     // <ClientCertificate>
     com_obj<IXMLDOMElement> pXmlElClientCertificate;
-    if ((dwResult = eapxml::create_element(pDoc, bstr(L"ClientCertificate"), bstrNamespace, &pXmlElClientCertificate))) {
-        *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <ClientCertificate> element."));
-        return false;
-    }
+    if ((dwResult = eapxml::create_element(pDoc, bstr(L"ClientCertificate"), bstrNamespace, &pXmlElClientCertificate)))
+        throw win_runtime_error(dwResult, _T(__FUNCTION__) _T(" Error creating <ClientCertificate> element."));
 
     if (m_cert) {
         // <ClientCertificate>/<format>
-        if ((dwResult = eapxml::put_element_value(pDoc, pXmlElClientCertificate, bstr(L"format"), bstrNamespace, bstr(L"PEM"))) != ERROR_SUCCESS) {
-            *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <format> element."));
-            return false;
-        }
+        if ((dwResult = eapxml::put_element_value(pDoc, pXmlElClientCertificate, bstr(L"format"), bstrNamespace, bstr(L"PEM"))) != ERROR_SUCCESS)
+            throw win_runtime_error(dwResult, _T(__FUNCTION__) _T(" Error creating <format> element."));
 
         // <ClientCertificate>/<cert-data>
-        if ((dwResult = eapxml::put_element_base64(pDoc, pXmlElClientCertificate, bstr(L"cert-data"), bstrNamespace, m_cert->pbCertEncoded, m_cert->cbCertEncoded)) != ERROR_SUCCESS) {
-            *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <cert-data> element."));
-            return false;
-        }
+        if ((dwResult = eapxml::put_element_base64(pDoc, pXmlElClientCertificate, bstr(L"cert-data"), bstrNamespace, m_cert->pbCertEncoded, m_cert->cbCertEncoded)) != ERROR_SUCCESS)
+            throw win_runtime_error(dwResult, _T(__FUNCTION__) _T(" Error creating <cert-data> element."));
     }
 
-    if (FAILED(hr = pConfigRoot->appendChild(pXmlElClientCertificate, NULL))) {
-        *ppEapError = m_module.make_error(HRESULT_CODE(hr), _T(__FUNCTION__) _T(" Error appending <ClientCertificate> element."));
-        return false;
-    }
-
-    return true;
+    if (FAILED(hr = pConfigRoot->appendChild(pXmlElClientCertificate, NULL)))
+        throw win_runtime_error(HRESULT_CODE(hr), _T(__FUNCTION__) _T(" Error appending <ClientCertificate> element."));
 }
 
 
-bool eap::credentials_tls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError)
+void eap::credentials_tls::load(_In_ IXMLDOMNode *pConfigRoot)
 {
     assert(pConfigRoot);
-    assert(ppEapError);
     DWORD dwResult;
 
-    if (!credentials::load(pConfigRoot, ppEapError))
-        return false;
+    credentials::load(pConfigRoot);
 
     std::wstring xpath(eapxml::get_xpath(pConfigRoot));
 
@@ -146,10 +132,8 @@ bool eap::credentials_tls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR *
 
     // <ClientCertificate>
     com_obj<IXMLDOMElement> pXmlElClientCertificate;
-    if ((dwResult = eapxml::select_element(pConfigRoot, bstr(L"eap-metadata:ClientCertificate"), &pXmlElClientCertificate)) != ERROR_SUCCESS) {
-        *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error reading <ClientCertificate> element."), _T("Please make sure profile XML is a valid ") _T(PRODUCT_NAME_STR) _T(" profile XML document."));
-        return false;
-    }
+    if ((dwResult = eapxml::select_element(pConfigRoot, bstr(L"eap-metadata:ClientCertificate"), &pXmlElClientCertificate)) != ERROR_SUCCESS)
+        throw win_runtime_error(dwResult, _T(__FUNCTION__) _T(" Error reading <ClientCertificate> element."));
 
     // <ClientCertificate>/<format>
     bstr bstrFormat;
@@ -162,8 +146,6 @@ bool eap::credentials_tls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR *
         }
     }
     m_module.log_config((xpath + L"/ClientCertificate").c_str(), get_name().c_str());
-
-    return true;
 }
 
 
@@ -189,19 +171,16 @@ void eap::credentials_tls::operator>>(_Inout_ cursor_in &cursor)
 }
 
 
-bool eap::credentials_tls::store(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **ppEapError) const
+void eap::credentials_tls::store(_In_ LPCTSTR pszTargetName) const
 {
     assert(pszTargetName);
-    assert(ppEapError);
 
     // Encrypt the certificate using user's key.
     DATA_BLOB cred_blob    = { m_cert->cbCertEncoded,         m_cert->pbCertEncoded };
     DATA_BLOB entropy_blob = { sizeof(s_entropy)    , (LPBYTE)s_entropy             };
     data_blob cred_enc;
-    if (!CryptProtectData(&cred_blob, NULL, &entropy_blob, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN, &cred_enc)) {
-        *ppEapError = m_module.make_error(GetLastError(), _T(__FUNCTION__) _T(" CryptProtectData failed."));
-        return false;
-    }
+    if (!CryptProtectData(&cred_blob, NULL, &entropy_blob, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN, &cred_enc))
+        throw win_runtime_error(_T(__FUNCTION__) _T(" CryptProtectData failed."));
 
     tstring target(target_name(pszTargetName));
     wstring name(std::move(get_name()));
@@ -223,45 +202,33 @@ bool eap::credentials_tls::store(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **p
         NULL,                       // TargetAlias
         (LPTSTR)name.c_str()        // UserName
     };
-    if (!CredWrite(&cred, 0)) {
-        *ppEapError = m_module.make_error(GetLastError(), _T(__FUNCTION__) _T(" CredWrite failed."));
-        return false;
-    }
-
-    return true;
+    if (!CredWrite(&cred, 0))
+        throw win_runtime_error(_T(__FUNCTION__) _T(" CredWrite failed."));
 }
 
 
-bool eap::credentials_tls::retrieve(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **ppEapError)
+void eap::credentials_tls::retrieve(_In_ LPCTSTR pszTargetName)
 {
     assert(pszTargetName);
 
     // Read credentials.
     unique_ptr<CREDENTIAL, CredFree_delete<CREDENTIAL> > cred;
-    if (!CredRead(target_name(pszTargetName).c_str(), CRED_TYPE_GENERIC, 0, (PCREDENTIAL*)&cred)) {
-        *ppEapError = m_module.make_error(GetLastError(), _T(__FUNCTION__) _T(" CredRead failed."));
-        return false;
-    }
+    if (!CredRead(target_name(pszTargetName).c_str(), CRED_TYPE_GENERIC, 0, (PCREDENTIAL*)&cred))
+        throw win_runtime_error(_T(__FUNCTION__) _T(" CredRead failed."));
 
     // Decrypt the certificate using user's key.
     DATA_BLOB cred_enc     = { cred->CredentialBlobSize, cred->CredentialBlob };
     DATA_BLOB entropy_blob = { sizeof(s_entropy)       , (LPBYTE)s_entropy    };
     data_blob cred_int;
-    if (!CryptUnprotectData(&cred_enc, NULL, &entropy_blob, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN | CRYPTPROTECT_VERIFY_PROTECTION, &cred_int)) {
-        *ppEapError = m_module.make_error(GetLastError(), _T(__FUNCTION__) _T(" CryptUnprotectData failed."));
-        return false;
-    }
+    if (!CryptUnprotectData(&cred_enc, NULL, &entropy_blob, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN | CRYPTPROTECT_VERIFY_PROTECTION, &cred_int))
+        throw win_runtime_error(_T(__FUNCTION__) _T(" CryptUnprotectData failed."));
 
     bool bResult = m_cert.create(X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, cred_int.pbData, cred_int.cbData);
     SecureZeroMemory(cred_int.pbData, cred_int.cbData);
-    if (!bResult) {
-        *ppEapError = m_module.make_error(GetLastError(), _T(__FUNCTION__) _T(" Error loading certificate."));
-        return false;
-    }
+    if (!bResult)
+        throw win_runtime_error(_T(__FUNCTION__) _T(" Error loading certificate."));
 
     m_module.log_config((wstring(pszTargetName) + L"/Certificate").c_str(), get_name().c_str());
-
-    return true;
 }
 
 

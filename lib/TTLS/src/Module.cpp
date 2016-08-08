@@ -39,10 +39,8 @@ eap::config_method* eap::peer_ttls::make_config_method()
 }
 
 
-bool eap::peer_ttls::initialize(_Out_ EAP_ERROR **ppEapError)
+void eap::peer_ttls::initialize()
 {
-    UNREFERENCED_PARAMETER(ppEapError);
-
     // MSI's feature completeness check removed: It might invoke UI (prompt user for missing MSI),
     // which would be disasterous in EapHost system service.
 #if 0
@@ -52,43 +50,34 @@ bool eap::peer_ttls::initialize(_Out_ EAP_ERROR **ppEapError)
     if (MsiQueryFeatureState(_T(PRODUCT_VERSION_GUID), _T("featEAPTTLS")) != INSTALLSTATE_UNKNOWN)
         MsiUseFeature(_T(PRODUCT_VERSION_GUID), _T("featEAPTTLS"));
 #endif
-
-    return true;
 }
 
 
-bool eap::peer_ttls::shutdown(_Out_ EAP_ERROR **ppEapError)
+void eap::peer_ttls::shutdown()
 {
-    UNREFERENCED_PARAMETER(ppEapError);
-    return true;
 }
 
 
-bool eap::peer_ttls::get_identity(
-    _In_                                   DWORD     dwFlags,
-    _In_count_(dwConnectionDataSize) const BYTE      *pConnectionData,
-    _In_                                   DWORD     dwConnectionDataSize,
-    _In_count_(dwUserDataSize)       const BYTE      *pUserData,
-    _In_                                   DWORD     dwUserDataSize,
-    _Out_                                  BYTE      **ppUserDataOut,
-    _Out_                                  DWORD     *pdwUserDataOutSize,
-    _In_                                   HANDLE    hTokenImpersonateUser,
-    _Out_                                  BOOL      *pfInvokeUI,
-    _Out_                                  WCHAR     **ppwszIdentity,
-    _Out_                                  EAP_ERROR **ppEapError)
+void eap::peer_ttls::get_identity(
+    _In_                                   DWORD  dwFlags,
+    _In_count_(dwConnectionDataSize) const BYTE   *pConnectionData,
+    _In_                                   DWORD  dwConnectionDataSize,
+    _In_count_(dwUserDataSize)       const BYTE   *pUserData,
+    _In_                                   DWORD  dwUserDataSize,
+    _Inout_                                BYTE   **ppUserDataOut,
+    _Inout_                                DWORD  *pdwUserDataOutSize,
+    _In_                                   HANDLE hTokenImpersonateUser,
+    _Inout_                                BOOL   *pfInvokeUI,
+    _Inout_                                WCHAR  **ppwszIdentity)
 {
     assert(pfInvokeUI);
     assert(ppwszIdentity);
-    assert(ppEapError);
 
     // Unpack configuration.
     config_provider_list cfg(*this);
-    if (!unpack(cfg, pConnectionData, dwConnectionDataSize, ppEapError))
-        return false;
-    else if (cfg.m_providers.empty() || cfg.m_providers.front().m_methods.empty()) {
-        *ppEapError = make_error(ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" Configuration has no providers and/or methods."));
-        return false;
-    }
+    unpack(cfg, pConnectionData, dwConnectionDataSize);
+    if (cfg.m_providers.empty() || cfg.m_providers.front().m_methods.empty())
+        throw invalid_argument(__FUNCTION__ " Configuration has no providers and/or methods.");
 
     // Get method configuration.
     const config_provider &cfg_prov(cfg.m_providers.front());
@@ -98,8 +87,8 @@ bool eap::peer_ttls::get_identity(
 
     // Unpack cached credentials.
     credentials_ttls cred_in(*this);
-    if (dwUserDataSize && !unpack(cred_in, pUserData, dwUserDataSize, ppEapError))
-        return false;
+    if (dwUserDataSize)
+        unpack(cred_in, pUserData, dwUserDataSize);
 
     credentials_ttls cred_out(*this);
 
@@ -160,15 +149,16 @@ bool eap::peer_ttls::get_identity(
         bool user_ctx_changed = hTokenImpersonateUser && ImpersonateLoggedOnUser(hTokenImpersonateUser);
 
         if (!is_outer_set) {
-            credentials_tls cred_loaded(*this);
-            if (cred_loaded.retrieve(cfg_prov.m_id.c_str(), ppEapError)) {
+            try {
+                credentials_tls cred_loaded(*this);
+                cred_loaded.retrieve(cfg_prov.m_id.c_str());
+
                 // Outer TLS: Using stored credentials.
                 cred_out.m_outer = std::move(cred_loaded);
                 log_event(&EAPMETHOD_TRACE_EVT_CRED_STORED1, event_data((unsigned int)eap_type_tls), event_data(cred_out.m_outer.get_name()), event_data::blank);
                 is_outer_set = true;
-            } else {
+            } catch (...) {
                 // Not actually an error.
-                free_error_memory(*ppEapError);
             }
         }
 
@@ -176,14 +166,15 @@ bool eap::peer_ttls::get_identity(
             unique_ptr<credentials> cred_loaded;
             if (cfg_inner_pap) cred_loaded.reset(new credentials_pap(*this));
             else               assert(0); // Unsupported inner authentication method type.
-            if (cred_loaded->retrieve(cfg_prov.m_id.c_str(), ppEapError)) {
+            try {
+                cred_loaded->retrieve(cfg_prov.m_id.c_str());
+
                 // Inner PAP: Using stored credentials.
                 cred_out.m_inner = std::move(cred_loaded);
                 log_event(&EAPMETHOD_TRACE_EVT_CRED_STORED1, event_data((unsigned int)type_inner), event_data(cred_out.m_inner->get_name()), event_data::blank);
                 is_inner_set = true;
-            } else {
+            } catch(...) {
                 // Not actually an error.
-                free_error_memory(*ppEapError);
             }
         }
 
@@ -197,20 +188,18 @@ bool eap::peer_ttls::get_identity(
         if (!is_outer_set) {
             log_event(&EAPMETHOD_TRACE_EVT_CRED_INVOKE_UI1, event_data((unsigned int)eap_type_tls), event_data::blank);
             *pfInvokeUI = TRUE;
-            return true;
+            return;
         }
 
         if (!is_inner_set) {
             log_event(&EAPMETHOD_TRACE_EVT_CRED_INVOKE_UI1, event_data((unsigned int)type_inner), event_data::blank);
             *pfInvokeUI = TRUE;
-            return true;
+            return;
         }
     } else {
         // Per-machine authentication
-        if (!is_outer_set || !is_inner_set) {
-            *ppEapError = make_error(ERROR_NO_SUCH_USER, _T(__FUNCTION__) _T(" Credentials for per-machine authentication not available."));
-            return false;
-        }
+        if (!is_outer_set || !is_inner_set)
+            throw win_runtime_error(ERROR_NO_SUCH_USER, _T(__FUNCTION__) _T(" Credentials for per-machine authentication not available."));
     }
 
     // If we got here, we have all credentials we need.
@@ -223,11 +212,11 @@ bool eap::peer_ttls::get_identity(
     memcpy(*ppwszIdentity, identity.c_str(), size);
 
     // Pack credentials.
-    return pack(cred_out, ppUserDataOut, pdwUserDataOutSize, ppEapError);
+    pack(cred_out, ppUserDataOut, pdwUserDataOutSize);
 }
 
 
-bool eap::peer_ttls::get_method_properties(
+void eap::peer_ttls::get_method_properties(
     _In_                                   DWORD                     dwVersion,
     _In_                                   DWORD                     dwFlags,
     _In_                                   HANDLE                    hUserImpersonationToken,
@@ -235,8 +224,7 @@ bool eap::peer_ttls::get_method_properties(
     _In_                                   DWORD                     dwConnectionDataSize,
     _In_count_(dwUserDataSize)       const BYTE                      *pUserData,
     _In_                                   DWORD                     dwUserDataSize,
-    _Out_                                  EAP_METHOD_PROPERTY_ARRAY *pMethodPropertyArray,
-    _Out_                                  EAP_ERROR                 **ppEapError)
+    _Inout_                                EAP_METHOD_PROPERTY_ARRAY *pMethodPropertyArray)
 {
     UNREFERENCED_PARAMETER(dwVersion);
     UNREFERENCED_PARAMETER(dwFlags);
@@ -246,7 +234,6 @@ bool eap::peer_ttls::get_method_properties(
     UNREFERENCED_PARAMETER(pUserData);
     UNREFERENCED_PARAMETER(dwUserDataSize);
     assert(pMethodPropertyArray);
-    assert(ppEapError);
 
     vector<EAP_METHOD_PROPERTY> properties;
     properties.reserve(20);
@@ -275,27 +262,22 @@ bool eap::peer_ttls::get_method_properties(
     // Allocate property array.
     DWORD dwCount = (DWORD)properties.size();
     pMethodPropertyArray->pMethodProperty = (EAP_METHOD_PROPERTY*)alloc_memory(sizeof(EAP_METHOD_PROPERTY) * dwCount);
-    if (!pMethodPropertyArray->pMethodProperty) {
-        *ppEapError = make_error(ERROR_OUTOFMEMORY, _T(__FUNCTION__) _T(" Error allocating memory for propery array."));
-        return false;
-    }
+    if (!pMethodPropertyArray->pMethodProperty)
+        throw win_runtime_error(ERROR_OUTOFMEMORY, _T(__FUNCTION__) _T(" Error allocating memory for propery array."));
 
     // Copy properties.
     memcpy(pMethodPropertyArray->pMethodProperty, properties.data(), sizeof(EAP_METHOD_PROPERTY) * dwCount);
     pMethodPropertyArray->dwNumberOfProperties = dwCount;
-
-    return true;
 }
 
 
-bool eap::peer_ttls::credentials_xml2blob(
+void eap::peer_ttls::credentials_xml2blob(
     _In_                                   DWORD       dwFlags,
     _In_                                   IXMLDOMNode *pConfigRoot,
     _In_count_(dwConnectionDataSize) const BYTE        *pConnectionData,
     _In_                                   DWORD       dwConnectionDataSize,
-    _Out_                                  BYTE        **ppCredentialsOut,
-    _Out_                                  DWORD       *pdwCredentialsOutSize,
-    _Out_                                  EAP_ERROR   **ppEapError)
+    _Inout_                                BYTE        **ppCredentialsOut,
+    _Inout_                                DWORD       *pdwCredentialsOutSize)
 {
     UNREFERENCED_PARAMETER(dwFlags);
     UNREFERENCED_PARAMETER(pConnectionData);
@@ -303,15 +285,14 @@ bool eap::peer_ttls::credentials_xml2blob(
 
     // Load credentials from XML.
     credentials_ttls cred(*this);
-    if (!cred.load(pConfigRoot, ppEapError))
-        return false;
+    cred.load(pConfigRoot);
 
     // Pack credentials.
-    return pack(cred, ppCredentialsOut, pdwCredentialsOutSize, ppEapError);
+    pack(cred, ppCredentialsOut, pdwCredentialsOutSize);
 }
 
 
-bool eap::peer_ttls::begin_session(
+EAP_SESSION_HANDLE eap::peer_ttls::begin_session(
     _In_                                   DWORD              dwFlags,
     _In_                           const   EapAttributes      *pAttributeArray,
     _In_                                   HANDLE             hTokenImpersonateUser,
@@ -319,152 +300,118 @@ bool eap::peer_ttls::begin_session(
     _In_                                   DWORD              dwConnectionDataSize,
     _In_count_(dwUserDataSize)       const BYTE               *pUserData,
     _In_                                   DWORD              dwUserDataSize,
-    _In_                                   DWORD              dwMaxSendPacketSize,
-    _Out_                                  EAP_SESSION_HANDLE *phSession,
-    _Out_                                  EAP_ERROR          **ppEapError)
+    _In_                                   DWORD              dwMaxSendPacketSize)
 {
-    *phSession = NULL;
-
-    // Allocate new session.
+    // Create new session.
     unique_ptr<session> s(new session(*this));
-    if (!s) {
-        *ppEapError = make_error(ERROR_OUTOFMEMORY, _T(__FUNCTION__) _T(" Error allocating memory for EAP-TTLS session."));
-        return false;
-    }
 
     // Unpack configuration.
     config_provider_list cfg(*this);
-    if (!unpack(cfg, pConnectionData, dwConnectionDataSize, ppEapError))
-        return false;
-    else if (cfg.m_providers.empty() || cfg.m_providers.front().m_methods.empty()) {
-        *ppEapError = make_error(ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" Configuration has no providers and/or methods."));
-        return false;
-    }
+    unpack(cfg, pConnectionData, dwConnectionDataSize);
+    if (cfg.m_providers.empty() || cfg.m_providers.front().m_methods.empty())
+        throw invalid_argument(__FUNCTION__ " Configuration has no providers and/or methods.");
 
     // Copy method configuration.
     const config_provider &cfg_prov(cfg.m_providers.front());
     s->m_cfg = *dynamic_cast<const config_method_ttls*>(cfg_prov.m_methods.front().get());
 
     // Unpack credentials.
-    if (!unpack(s->m_cred, pUserData, dwUserDataSize, ppEapError))
-        return false;
+    unpack(s->m_cred, pUserData, dwUserDataSize);
 
     // Initialize method.
-    if (!s->m_method.begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize, ppEapError))
-        return false;
+    s->m_method.begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
 
-    *phSession = s.release();
-    return true;
+    return s.release();
 }
 
 
-bool eap::peer_ttls::end_session(_In_ EAP_SESSION_HANDLE hSession, _Out_ EAP_ERROR **ppEapError)
+void eap::peer_ttls::end_session(_In_ EAP_SESSION_HANDLE hSession)
 {
     assert(hSession);
-    UNREFERENCED_PARAMETER(ppEapError); // What could possibly go wrong when destroying!? ;)
 
     // End the session.
     session *s = static_cast<session*>(hSession);
     //s->end(ppEapError);
     delete s;
-
-    return true;
 }
 
 
-bool eap::peer_ttls::process_request_packet(
+void eap::peer_ttls::process_request_packet(
     _In_                                       EAP_SESSION_HANDLE  hSession,
     _In_bytecount_(dwReceivedPacketSize) const EapPacket           *pReceivedPacket,
     _In_                                       DWORD               dwReceivedPacketSize,
-    _Out_                                      EapPeerMethodOutput *pEapOutput,
-    _Out_                                      EAP_ERROR           **ppEapError)
+    _Inout_                                    EapPeerMethodOutput *pEapOutput)
 {
     assert(dwReceivedPacketSize == ntohs(*(WORD*)pReceivedPacket->Length));
-    return static_cast<session*>(hSession)->m_method.process_request_packet(pReceivedPacket, dwReceivedPacketSize, pEapOutput, ppEapError);
+    static_cast<session*>(hSession)->m_method.process_request_packet(pReceivedPacket, dwReceivedPacketSize, pEapOutput);
 }
 
 
-bool eap::peer_ttls::get_response_packet(
+void eap::peer_ttls::get_response_packet(
     _In_                               EAP_SESSION_HANDLE hSession,
     _Inout_bytecap_(*dwSendPacketSize) EapPacket          *pSendPacket,
-    _Inout_                            DWORD              *pdwSendPacketSize,
-    _Out_                              EAP_ERROR          **ppEapError)
+    _Inout_                            DWORD              *pdwSendPacketSize)
 {
-    return static_cast<session*>(hSession)->m_method.get_response_packet(pSendPacket, pdwSendPacketSize, ppEapError);
+    static_cast<session*>(hSession)->m_method.get_response_packet(pSendPacket, pdwSendPacketSize);
 }
 
 
-bool eap::peer_ttls::get_result(
-    _In_  EAP_SESSION_HANDLE        hSession,
-    _In_  EapPeerMethodResultReason reason,
-    _Out_ EapPeerMethodResult       *ppResult,
-    _Out_ EAP_ERROR                 **ppEapError)
+void eap::peer_ttls::get_result(
+    _In_    EAP_SESSION_HANDLE        hSession,
+    _In_    EapPeerMethodResultReason reason,
+    _Inout_ EapPeerMethodResult       *ppResult)
 {
-    return static_cast<session*>(hSession)->m_method.get_result(reason, ppResult, ppEapError);
+    static_cast<session*>(hSession)->m_method.get_result(reason, ppResult);
 }
 
 
-bool eap::peer_ttls::get_ui_context(
-    _In_  EAP_SESSION_HANDLE hSession,
-    _Out_ BYTE               **ppUIContextData,
-    _Out_ DWORD              *pdwUIContextDataSize,
-    _Out_ EAP_ERROR          **ppEapError)
+void eap::peer_ttls::get_ui_context(
+    _In_    EAP_SESSION_HANDLE hSession,
+    _Inout_ BYTE               **ppUIContextData,
+    _Inout_ DWORD              *pdwUIContextDataSize)
 {
     UNREFERENCED_PARAMETER(hSession);
     UNREFERENCED_PARAMETER(ppUIContextData);
     UNREFERENCED_PARAMETER(pdwUIContextDataSize);
-    assert(ppEapError);
 
-    *ppEapError = make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
-    return false;
+    throw win_runtime_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
 }
 
 
-bool eap::peer_ttls::set_ui_context(
+void eap::peer_ttls::set_ui_context(
     _In_                                  EAP_SESSION_HANDLE  hSession,
     _In_count_(dwUIContextDataSize) const BYTE                *pUIContextData,
     _In_                                  DWORD               dwUIContextDataSize,
-    _In_                            const EapPeerMethodOutput *pEapOutput,
-    _Out_                                 EAP_ERROR           **ppEapError)
+    _In_                            const EapPeerMethodOutput *pEapOutput)
 {
     UNREFERENCED_PARAMETER(hSession);
     UNREFERENCED_PARAMETER(pUIContextData);
     UNREFERENCED_PARAMETER(dwUIContextDataSize);
     UNREFERENCED_PARAMETER(pEapOutput);
-    assert(ppEapError);
 
-    *ppEapError = make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
-    return false;
+    throw win_runtime_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
 }
 
 
-bool eap::peer_ttls::get_response_attributes(
-    _In_  EAP_SESSION_HANDLE hSession,
-    _Out_ EapAttributes      *pAttribs,
-    _Out_ EAP_ERROR          **ppEapError)
+void eap::peer_ttls::get_response_attributes(
+    _In_    EAP_SESSION_HANDLE hSession,
+    _Inout_ EapAttributes      *pAttribs)
 {
     UNREFERENCED_PARAMETER(hSession);
     UNREFERENCED_PARAMETER(pAttribs);
-    UNREFERENCED_PARAMETER(ppEapError);
-    assert(ppEapError);
 
-    *ppEapError = make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
-    return false;
+    throw win_runtime_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
 }
 
 
-bool eap::peer_ttls::set_response_attributes(
-    _In_       EAP_SESSION_HANDLE  hSession,
-    _In_ const EapAttributes       *pAttribs,
-    _Out_      EapPeerMethodOutput *pEapOutput,
-    _Out_      EAP_ERROR           **ppEapError)
+void eap::peer_ttls::set_response_attributes(
+            _In_       EAP_SESSION_HANDLE  hSession,
+            _In_ const EapAttributes       *pAttribs,
+            _Inout_    EapPeerMethodOutput *pEapOutput)
 {
     UNREFERENCED_PARAMETER(hSession);
     UNREFERENCED_PARAMETER(pAttribs);
     UNREFERENCED_PARAMETER(pEapOutput);
-    UNREFERENCED_PARAMETER(ppEapError);
-    assert(ppEapError);
 
-    *ppEapError = make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
-    return false;
+    throw win_runtime_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
 }

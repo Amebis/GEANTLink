@@ -50,16 +50,11 @@ namespace eap
         ///
         /// \sa [EapPeerConfigXml2Blob function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363602.aspx)
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool config_xml2blob(
-            _In_  DWORD       dwFlags,
-            _In_  IXMLDOMNode *pConfigRoot,
-            _Out_ BYTE        **pConnectionDataOut,
-            _Out_ DWORD       *pdwConnectionDataOutSize,
-            _Out_ EAP_ERROR   **ppEapError) = 0;
+        virtual void config_xml2blob(
+            _In_    DWORD       dwFlags,
+            _In_    IXMLDOMNode *pConfigRoot,
+            _Inout_ BYTE        **pConnectionDataOut,
+            _Inout_ DWORD       *pdwConnectionDataOutSize) = 0;
 
         ///
         /// Converts the configuration BLOB to XML.
@@ -68,71 +63,51 @@ namespace eap
         ///
         /// \sa [EapPeerConfigBlob2Xml function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363601.aspx)
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool config_blob2xml(
+        virtual void config_blob2xml(
             _In_                                   DWORD           dwFlags,
             _In_count_(dwConnectionDataSize) const BYTE            *pConnectionData,
             _In_                                   DWORD           dwConnectionDataSize,
             _In_                                   IXMLDOMDocument *pDoc,
-            _In_                                   IXMLDOMNode     *pConfigRoot,
-            _Out_                                  EAP_ERROR       **ppEapError) = 0;
+            _In_                                   IXMLDOMNode     *pConfigRoot) = 0;
 
         ///
         /// Raises the EAP method's specific connection configuration user interface dialog on the client.
         ///
         /// \sa [EapPeerInvokeConfigUI function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363614.aspx)
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool invoke_config_ui(
-            _In_                                     HWND      hwndParent,
-            _In_count_(dwConnectionDataInSize) const BYTE      *pConnectionDataIn,
-            _In_                                     DWORD     dwConnectionDataInSize,
-            _Out_                                    BYTE      **ppConnectionDataOut,
-            _Out_                                    DWORD     *pdwConnectionDataOutSize,
-            _Out_                                    EAP_ERROR **ppEapError) = 0;
+        virtual void invoke_config_ui(
+            _In_                                     HWND  hwndParent,
+            _In_count_(dwConnectionDataInSize) const BYTE  *pConnectionDataIn,
+            _In_                                     DWORD dwConnectionDataInSize,
+            _Inout_                                  BYTE  **ppConnectionDataOut,
+            _Inout_                                  DWORD *pdwConnectionDataOutSize) = 0;
 
         ///
         /// Raises a custom interactive user interface dialog to obtain user identity information for the EAP method on the client.
         ///
         /// \sa [EapPeerInvokeIdentityUI function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363615.aspx)
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool invoke_identity_ui(
-            _In_                                   HWND      hwndParent,
-            _In_                                   DWORD     dwFlags,
-            _In_count_(dwConnectionDataSize) const BYTE      *pConnectionData,
-            _In_                                   DWORD     dwConnectionDataSize,
-            _In_count_(dwUserDataSize)       const BYTE      *pUserData,
-            _In_                                   DWORD     dwUserDataSize,
-            _Out_                                  BYTE      **ppUserDataOut,
-            _Out_                                  DWORD     *pdwUserDataOutSize,
-            _Out_                                  LPWSTR    *ppwszIdentity,
-            _Out_                                  EAP_ERROR **ppEapError) = 0;
+        virtual void invoke_identity_ui(
+            _In_                                   HWND   hwndParent,
+            _In_                                   DWORD  dwFlags,
+            _In_count_(dwConnectionDataSize) const BYTE   *pConnectionData,
+            _In_                                   DWORD  dwConnectionDataSize,
+            _In_count_(dwUserDataSize)       const BYTE   *pUserData,
+            _In_                                   DWORD  dwUserDataSize,
+            _Inout_                                BYTE   **ppUserDataOut,
+            _Inout_                                DWORD  *pdwUserDataOutSize,
+            _Inout_                                LPWSTR *ppwszIdentity) = 0;
 
         ///
         /// Raises a custom interactive user interface dialog for the EAP method on the client.
         ///
         /// \sa [EapPeerInvokeInteractiveUI function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363616.aspx)
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool invoke_interactive_ui(
-            _In_                                  HWND      hwndParent,
-            _In_count_(dwUIContextDataSize) const BYTE      *pUIContextData,
-            _In_                                  DWORD     dwUIContextDataSize,
-            _Out_                                 BYTE      **ppDataFromInteractiveUI,
-            _Out_                                 DWORD     *pdwDataFromInteractiveUISize,
-            _Out_                                 EAP_ERROR **ppEapError) = 0;
+        virtual void invoke_interactive_ui(
+            _In_                                  HWND  hwndParent,
+            _In_count_(dwUIContextDataSize) const BYTE  *pUIContextData,
+            _In_                                  DWORD dwUIContextDataSize,
+            _Inout_                               BYTE  **ppDataFromInteractiveUI,
+            _Inout_                               DWORD *pdwDataFromInteractiveUISize) = 0;
     };
 }

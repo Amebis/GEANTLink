@@ -118,14 +118,12 @@ eap::config* eap::config_method_tls::clone() const
 }
 
 
-bool eap::config_method_tls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const
+void eap::config_method_tls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot) const
 {
     assert(pDoc);
     assert(pConfigRoot);
-    assert(ppEapError);
 
-    if (!config_method_with_cred::save(pDoc, pConfigRoot, ppEapError))
-        return false;
+    config_method_with_cred::save(pDoc, pConfigRoot);
 
     const bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
     DWORD dwResult;
@@ -133,58 +131,43 @@ bool eap::config_method_tls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *
 
     // <ServerSideCredential>
     com_obj<IXMLDOMElement> pXmlElServerSideCredential;
-    if ((dwResult = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:ServerSideCredential"), bstr(L"ServerSideCredential"), bstrNamespace, &pXmlElServerSideCredential)) != ERROR_SUCCESS) {
-        *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <ServerSideCredential> element."));
-        return false;
-    }
+    if ((dwResult = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:ServerSideCredential"), bstr(L"ServerSideCredential"), bstrNamespace, &pXmlElServerSideCredential)) != ERROR_SUCCESS)
+        throw win_runtime_error(dwResult, _T(__FUNCTION__) _T(" Error creating <ServerSideCredential> element."));
 
     for (list<cert_context>::const_iterator i = m_trusted_root_ca.begin(), i_end = m_trusted_root_ca.end(); i != i_end; ++i) {
         // <CA>
         com_obj<IXMLDOMElement> pXmlElCA;
-        if ((dwResult = eapxml::create_element(pDoc, bstr(L"CA"), bstrNamespace, &pXmlElCA))) {
-            *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <CA> element."));
-            return false;
-        }
+        if ((dwResult = eapxml::create_element(pDoc, bstr(L"CA"), bstrNamespace, &pXmlElCA)))
+            throw win_runtime_error(dwResult, _T(__FUNCTION__) _T(" Error creating <CA> element."));
 
         // <CA>/<format>
-        if ((dwResult = eapxml::put_element_value(pDoc, pXmlElCA, bstr(L"format"), bstrNamespace, bstr(L"PEM"))) != ERROR_SUCCESS) {
-            *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <format> element."));
-            return false;
-        }
+        if ((dwResult = eapxml::put_element_value(pDoc, pXmlElCA, bstr(L"format"), bstrNamespace, bstr(L"PEM"))) != ERROR_SUCCESS)
+            throw win_runtime_error(dwResult, _T(__FUNCTION__) _T(" Error creating <format> element."));
 
         // <CA>/<cert-data>
         const cert_context &cc = *i;
-        if ((dwResult = eapxml::put_element_base64(pDoc, pXmlElCA, bstr(L"cert-data"), bstrNamespace, cc->pbCertEncoded, cc->cbCertEncoded)) != ERROR_SUCCESS) {
-            *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <cert-data> element."));
-            return false;
-        }
+        if ((dwResult = eapxml::put_element_base64(pDoc, pXmlElCA, bstr(L"cert-data"), bstrNamespace, cc->pbCertEncoded, cc->cbCertEncoded)) != ERROR_SUCCESS)
+            throw win_runtime_error(dwResult, _T(__FUNCTION__) _T(" Error creating <cert-data> element."));
 
-        if (FAILED(hr = pXmlElServerSideCredential->appendChild(pXmlElCA, NULL))) {
-            *ppEapError = m_module.make_error(HRESULT_CODE(hr), _T(__FUNCTION__) _T(" Error appending <CA> element."));
-            return false;
-        }
+        if (FAILED(hr = pXmlElServerSideCredential->appendChild(pXmlElCA, NULL)))
+            throw win_runtime_error(HRESULT_CODE(hr), _T(__FUNCTION__) _T(" Error appending <CA> element."));
     }
 
     // <ServerName>
     for (list<string>::const_iterator i = m_server_names.begin(), i_end = m_server_names.end(); i != i_end; ++i) {
         wstring str;
         MultiByteToWideChar(CP_UTF8, 0, i->c_str(), (int)i->length(), str);
-        if ((dwResult = eapxml::put_element_value(pDoc, pXmlElServerSideCredential, bstr(L"ServerName"), bstrNamespace, bstr(str))) != ERROR_SUCCESS) {
-            *ppEapError = m_module.make_error(dwResult, _T(__FUNCTION__) _T(" Error creating <ServerName> element."));
-            return false;
-        }
+        if ((dwResult = eapxml::put_element_value(pDoc, pXmlElServerSideCredential, bstr(L"ServerName"), bstrNamespace, bstr(str))) != ERROR_SUCCESS)
+            throw win_runtime_error(dwResult, _T(__FUNCTION__) _T(" Error creating <ServerName> element."));
     }
-
-    return true;
 }
 
 
-bool eap::config_method_tls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError)
+void eap::config_method_tls::load(_In_ IXMLDOMNode *pConfigRoot)
 {
     assert(pConfigRoot);
 
-    if (!config_method_with_cred::load(pConfigRoot, ppEapError))
-        return false;
+    config_method_with_cred::load(pConfigRoot);
 
     std::wstring xpath(eapxml::get_xpath(pConfigRoot));
 
@@ -252,8 +235,6 @@ bool eap::config_method_tls::load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR
             m_module.log_config((xpathServerSideCredential + L"/ServerName").c_str(), m_server_names);
         }
     }
-
-    return true;
 }
 
 

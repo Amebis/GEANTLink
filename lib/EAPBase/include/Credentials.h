@@ -108,36 +108,6 @@ namespace eap
         ///
         virtual bool empty() const;
 
-        /// \name XML configuration management
-        /// @{
-
-        ///
-        /// Save credentials to XML document
-        ///
-        /// \param[in]  pDoc         XML document
-        /// \param[in]  pConfigRoot  Suggested root element for saving credentials
-        /// \param[out] ppEapError   Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
-        ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const;
-
-        ///
-        /// Load credentials from XML document
-        ///
-        /// \param[in]  pConfigRoot  Root element for loading credentials
-        /// \param[out] ppEapError   Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
-        ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError);
-
-        /// @}
-
         /// \name Storage
         /// @{
 
@@ -145,25 +115,15 @@ namespace eap
         /// Save credentials to Windows Credential Manager
         ///
         /// \param[in]  pszTargetName  The name in Windows Credential Manager to store credentials as
-        /// \param[out] ppEapError     Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool store(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **ppEapError) const = 0;
+        virtual void store(_In_ LPCTSTR pszTargetName) const = 0;
 
         ///
         /// Retrieve credentials from Windows Credential Manager
         ///
         /// \param[in]  pszTargetName  The name in Windows Credential Manager to retrieve credentials from
-        /// \param[out] ppEapError     Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool retrieve(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **ppEapError) = 0;
+        virtual void retrieve(_In_ LPCTSTR pszTargetName) = 0;
 
         ///
         /// Returns target name for Windows Credential Manager credential name
@@ -261,29 +221,19 @@ namespace eap
         /// @{
 
         ///
-        /// Save credentials to XML document
+        /// Save to XML document
         ///
         /// \param[in]  pDoc         XML document
-        /// \param[in]  pConfigRoot  Suggested root element for saving credentials
-        /// \param[out] ppEapError   Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
+        /// \param[in]  pConfigRoot  Suggested root element for saving
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const;
+        virtual void save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot) const;
 
         ///
-        /// Load credentials from XML document
+        /// Load from XML document
         ///
-        /// \param[in]  pConfigRoot  Root element for loading credentials
-        /// \param[out] ppEapError   Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
+        /// \param[in]  pConfigRoot  Root element for loading
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError);
+        virtual void load(_In_ IXMLDOMNode *pConfigRoot);
 
         /// @}
 
@@ -320,25 +270,15 @@ namespace eap
         /// Save credentials to Windows Credential Manager
         ///
         /// \param[in]  pszTargetName  The name in Windows Credential Manager to store credentials as
-        /// \param[out] ppEapError     Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool store(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **ppEapError) const;
+        virtual void store(_In_ LPCTSTR pszTargetName) const;
 
         ///
         /// Retrieve credentials from Windows Credential Manager
         ///
         /// \param[in]  pszTargetName  The name in Windows Credential Manager to retrieve credentials from
-        /// \param[out] ppEapError     Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool retrieve(_In_ LPCTSTR pszTargetName, _Out_ EAP_ERROR **ppEapError);
+        virtual void retrieve(_In_ LPCTSTR pszTargetName);
 
         /// @}
 

@@ -149,29 +149,19 @@ namespace eap
         /// @{
 
         ///
-        /// Save configuration to XML document
+        /// Save to XML document
         ///
         /// \param[in]  pDoc         XML document
-        /// \param[in]  pConfigRoot  Suggested root element for saving configuration
-        /// \param[out] ppEapError   Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
+        /// \param[in]  pConfigRoot  Suggested root element for saving
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const;
+        virtual void save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot) const;
 
         ///
-        /// Load configuration from XML document
+        /// Load from XML document
         ///
-        /// \param[in]  pConfigRoot  Root element for loading configuration
-        /// \param[out] ppEapError   Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
+        /// \param[in]  pConfigRoot  Root element for loading
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError);
+        virtual void load(_In_ IXMLDOMNode *pConfigRoot);
 
         /// @}
 
@@ -306,29 +296,19 @@ namespace eap
         /// @{
 
         ///
-        /// Save configuration to XML document
+        /// Save to XML document
         ///
         /// \param[in]  pDoc         XML document
-        /// \param[in]  pConfigRoot  Suggested root element for saving configuration
-        /// \param[out] ppEapError   Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
+        /// \param[in]  pConfigRoot  Suggested root element for saving
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const;
+        virtual void save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot) const;
 
         ///
-        /// Load configuration from XML document
+        /// Load from XML document
         ///
-        /// \param[in]  pConfigRoot  Root element for loading configuration
-        /// \param[out] ppEapError   Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
+        /// \param[in]  pConfigRoot  Root element for loading
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError);
+        virtual void load(_In_ IXMLDOMNode *pConfigRoot);
 
         /// @}
 
@@ -418,29 +398,19 @@ namespace eap
         /// @{
 
         ///
-        /// Save configuration to XML document
+        /// Save to XML document
         ///
         /// \param[in]  pDoc         XML document
-        /// \param[in]  pConfigRoot  Suggested root element for saving configuration
-        /// \param[out] ppEapError   Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
+        /// \param[in]  pConfigRoot  Suggested root element for saving
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const;
+        virtual void save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot) const;
 
         ///
-        /// Load configuration from XML document
+        /// Load from XML document
         ///
-        /// \param[in]  pConfigRoot  Root element for loading configuration
-        /// \param[out] ppEapError   Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
+        /// \param[in]  pConfigRoot  Root element for loading
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError);
+        virtual void load(_In_ IXMLDOMNode *pConfigRoot);
 
         /// @}
 
@@ -537,29 +507,19 @@ namespace eap
         /// @{
 
         ///
-        /// Save configuration to XML document
+        /// Save to XML document
         ///
         /// \param[in]  pDoc         XML document
-        /// \param[in]  pConfigRoot  Suggested root element for saving configuration
-        /// \param[out] ppEapError   Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
+        /// \param[in]  pConfigRoot  Suggested root element for saving
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError) const;
+        virtual void save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot) const;
 
         ///
-        /// Load configuration from XML document
+        /// Load from XML document
         ///
-        /// \param[in]  pConfigRoot  Root element for loading configuration
-        /// \param[out] ppEapError   Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
+        /// \param[in]  pConfigRoot  Root element for loading
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool load(_In_ IXMLDOMNode *pConfigRoot, _Out_ EAP_ERROR **ppEapError);
+        virtual void load(_In_ IXMLDOMNode *pConfigRoot);
 
         /// @}
 

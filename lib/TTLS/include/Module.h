@@ -53,55 +53,38 @@ namespace eap
         ///
         /// \sa [EapPeerGetInfo function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363613.aspx)
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool initialize(_Out_ EAP_ERROR **ppEapError);
+        virtual void initialize();
 
         ///
         /// Shuts down the EAP method and prepares to unload its corresponding DLL.
         ///
         /// \sa [EapPeerShutdown function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363627.aspx)
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool shutdown(_Out_ EAP_ERROR **ppEapError);
+        virtual void shutdown();
 
         ///
         /// Returns the user data and user identity after being called by EAPHost.
         ///
         /// \sa [EapPeerGetIdentity function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363607.aspx)
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool get_identity(
-            _In_                                   DWORD     dwFlags,
-            _In_count_(dwConnectionDataSize) const BYTE      *pConnectionData,
-            _In_                                   DWORD     dwConnectionDataSize,
-            _In_count_(dwUserDataSize)       const BYTE      *pUserData,
-            _In_                                   DWORD     dwUserDataSize,
-            _Out_                                  BYTE      **ppUserDataOut,
-            _Out_                                  DWORD     *pdwUserDataOutSize,
-            _In_                                   HANDLE    hTokenImpersonateUser,
-            _Out_                                  BOOL      *pfInvokeUI,
-            _Out_                                  WCHAR     **ppwszIdentity,
-            _Out_                                  EAP_ERROR **ppEapError);
+        virtual void get_identity(
+            _In_                                   DWORD  dwFlags,
+            _In_count_(dwConnectionDataSize) const BYTE   *pConnectionData,
+            _In_                                   DWORD  dwConnectionDataSize,
+            _In_count_(dwUserDataSize)       const BYTE   *pUserData,
+            _In_                                   DWORD  dwUserDataSize,
+            _Inout_                                BYTE   **ppUserDataOut,
+            _Inout_                                DWORD  *pdwUserDataOutSize,
+            _In_                                   HANDLE hTokenImpersonateUser,
+            _Inout_                                BOOL   *pfInvokeUI,
+            _Inout_                                WCHAR  **ppwszIdentity);
 
         ///
         /// Defines the implementation of an EAP method-specific function that retrieves the properties of an EAP method given the connection and user data.
         ///
         /// \sa [EapPeerGetMethodProperties function](https://msdn.microsoft.com/en-us/library/windows/desktop/hh706636.aspx)
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool get_method_properties(
+        virtual void get_method_properties(
             _In_                                   DWORD                     dwVersion,
             _In_                                   DWORD                     dwFlags,
             _In_                                   HANDLE                    hUserImpersonationToken,
@@ -109,26 +92,20 @@ namespace eap
             _In_                                   DWORD                     dwConnectionDataSize,
             _In_count_(dwUserDataSize)       const BYTE                      *pUserData,
             _In_                                   DWORD                     dwUserDataSize,
-            _Out_                                  EAP_METHOD_PROPERTY_ARRAY *pMethodPropertyArray,
-            _Out_                                  EAP_ERROR                 **ppEapError);
+            _Inout_                                EAP_METHOD_PROPERTY_ARRAY *pMethodPropertyArray);
 
         ///
         /// Converts XML into the configuration BLOB. The XML based credentials can come from group policy or from a system administrator.
         ///
         /// \sa [EapPeerCredentialsXml2Blob function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363603.aspx)
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool credentials_xml2blob(
+        virtual void credentials_xml2blob(
             _In_                                   DWORD       dwFlags,
             _In_                                   IXMLDOMNode *pConfigRoot,
             _In_count_(dwConnectionDataSize) const BYTE        *pConnectionData,
             _In_                                   DWORD       dwConnectionDataSize,
-            _Out_                                  BYTE        **ppCredentialsOut,
-            _Out_                                  DWORD       *pdwCredentialsOutSize,
-            _Out_                                  EAP_ERROR   **ppEapError);
+            _Inout_                                BYTE        **ppCredentialsOut,
+            _Inout_                                DWORD       *pdwCredentialsOutSize);
 
         /// \name Session management
         /// @{
@@ -138,11 +115,9 @@ namespace eap
         ///
         /// \sa [EapPeerBeginSession function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363600.aspx)
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
+        /// \returns Session handle
         ///
-        virtual bool begin_session(
+        virtual EAP_SESSION_HANDLE begin_session(
             _In_                                   DWORD              dwFlags,
             _In_                           const   EapAttributes      *pAttributeArray,
             _In_                                   HANDLE             hTokenImpersonateUser,
@@ -150,68 +125,45 @@ namespace eap
             _In_                                   DWORD              dwConnectionDataSize,
             _In_count_(dwUserDataSize)       const BYTE               *pUserData,
             _In_                                   DWORD              dwUserDataSize,
-            _In_                                   DWORD              dwMaxSendPacketSize,
-            _Out_                                  EAP_SESSION_HANDLE *phSession,
-            _Out_                                  EAP_ERROR          **ppEapError);
+            _In_                                   DWORD              dwMaxSendPacketSize);
 
         ///
         /// Ends an EAP authentication session for the EAP method.
         ///
         /// \sa [EapPeerEndSession function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363604.aspx)
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool end_session(
-            _In_ EAP_SESSION_HANDLE hSession,
-            _Out_ EAP_ERROR **ppEapError);
+        virtual void end_session(_In_ EAP_SESSION_HANDLE hSession);
 
         ///
         /// Processes a packet received by EAPHost from a supplicant.
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
         /// \sa [EapPeerProcessRequestPacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363621.aspx)
         ///
-        virtual bool process_request_packet(
+        virtual void process_request_packet(
             _In_                                       EAP_SESSION_HANDLE  hSession,
             _In_bytecount_(dwReceivedPacketSize) const EapPacket           *pReceivedPacket,
             _In_                                       DWORD               dwReceivedPacketSize,
-            _Out_                                      EapPeerMethodOutput *pEapOutput,
-            _Out_                                      EAP_ERROR           **ppEapError);
+            _Inout_                                    EapPeerMethodOutput *pEapOutput);
 
         ///
         /// Obtains a response packet from the EAP method.
         ///
         /// \sa [EapPeerGetResponsePacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363610.aspx)
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool get_response_packet(
+        virtual void get_response_packet(
             _In_                               EAP_SESSION_HANDLE hSession,
             _Inout_bytecap_(*dwSendPacketSize) EapPacket          *pSendPacket,
-            _Inout_                            DWORD              *pdwSendPacketSize,
-            _Out_                              EAP_ERROR          **ppEapError);
+            _Inout_                            DWORD              *pdwSendPacketSize);
 
         ///
         /// Obtains the result of an authentication session from the EAP method.
         ///
         /// \sa [EapPeerGetResult function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363611.aspx)
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool get_result(
-            _In_  EAP_SESSION_HANDLE        hSession,
-            _In_  EapPeerMethodResultReason reason,
-            _Out_ EapPeerMethodResult       *ppResult,
-            _Out_ EAP_ERROR                 **ppEapError);
+        virtual void get_result(
+            _In_    EAP_SESSION_HANDLE        hSession,
+            _In_    EapPeerMethodResultReason reason,
+            _Inout_ EapPeerMethodResult       *ppResult);
 
         ///
         /// Obtains the user interface context from the EAP method.
@@ -220,15 +172,10 @@ namespace eap
         ///
         /// \sa [EapPeerGetUIContext function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363612.aspx)
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool get_ui_context(
-            _In_  EAP_SESSION_HANDLE hSession,
-            _Out_ BYTE               **ppUIContextData,
-            _Out_ DWORD              *pdwUIContextDataSize,
-            _Out_ EAP_ERROR          **ppEapError);
+        virtual void get_ui_context(
+            _In_    EAP_SESSION_HANDLE hSession,
+            _Inout_ BYTE               **ppUIContextData,
+            _Inout_ DWORD              *pdwUIContextDataSize);
 
         ///
         /// Provides a user interface context to the EAP method.
@@ -237,45 +184,30 @@ namespace eap
         ///
         /// \sa [EapPeerSetUIContext function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363626.aspx)
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool set_ui_context(
+        virtual void set_ui_context(
             _In_                                  EAP_SESSION_HANDLE  hSession,
             _In_count_(dwUIContextDataSize) const BYTE                *pUIContextData,
             _In_                                  DWORD               dwUIContextDataSize,
-            _In_                            const EapPeerMethodOutput *pEapOutput,
-            _Out_                                 EAP_ERROR           **ppEapError);
+            _In_                            const EapPeerMethodOutput *pEapOutput);
 
         ///
         /// Obtains an array of EAP response attributes from the EAP method.
         ///
         /// \sa [EapPeerGetResponseAttributes function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363609.aspx)
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool get_response_attributes(
-            _In_  EAP_SESSION_HANDLE hSession,
-            _Out_ EapAttributes      *pAttribs,
-            _Out_ EAP_ERROR          **ppEapError);
+        virtual void get_response_attributes(
+            _In_    EAP_SESSION_HANDLE hSession,
+            _Inout_ EapAttributes      *pAttribs);
 
         ///
         /// Provides an updated array of EAP response attributes to the EAP method.
         ///
         /// \sa [EapPeerSetResponseAttributes function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363625.aspx)
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
-        ///
-        virtual bool set_response_attributes(
+        virtual void set_response_attributes(
             _In_       EAP_SESSION_HANDLE  hSession,
             _In_ const EapAttributes       *pAttribs,
-            _Out_      EapPeerMethodOutput *pEapOutput,
-            _Out_      EAP_ERROR           **ppEapError);
+            _Inout_    EapPeerMethodOutput *pEapOutput);
 
         /// @}
 

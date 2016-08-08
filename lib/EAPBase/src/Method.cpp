@@ -76,26 +76,19 @@ eap::method& eap::method::operator=(_Inout_ method &&other)
 }
 
 
-bool eap::method::begin_session(
+void eap::method::begin_session(
     _In_        DWORD         dwFlags,
     _In_  const EapAttributes *pAttributeArray,
     _In_        HANDLE        hTokenImpersonateUser,
-    _In_        DWORD         dwMaxSendPacketSize,
-    _Out_       EAP_ERROR     **ppEapError)
+    _In_        DWORD         dwMaxSendPacketSize)
 {
     UNREFERENCED_PARAMETER(dwFlags);
     UNREFERENCED_PARAMETER(pAttributeArray);
     UNREFERENCED_PARAMETER(hTokenImpersonateUser);
     UNREFERENCED_PARAMETER(dwMaxSendPacketSize);
-    UNREFERENCED_PARAMETER(ppEapError);
-
-    return true;
 }
 
 
-bool eap::method::end_session(_Out_ EAP_ERROR **ppEapError)
+void eap::method::end_session()
 {
-    UNREFERENCED_PARAMETER(ppEapError);
-
-    return true;
 }

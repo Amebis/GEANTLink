@@ -85,6 +85,25 @@ EAP_ERROR* eap::module::make_error(_In_ DWORD dwErrorCode, _In_opt_z_ LPCWSTR ps
 }
 
 
+EAP_ERROR* eap::module::make_error(_In_ std::exception &err) const
+{
+    win_runtime_error &err_rt(dynamic_cast<win_runtime_error&>(err));
+    if (&err_rt)
+        return make_error(err_rt.m_error, err_rt.m_msg.c_str());
+
+    invalid_argument &err_ia(dynamic_cast<invalid_argument&>(err));
+    if (&err_ia) {
+        wstring str;
+        MultiByteToWideChar(CP_ACP, 0, err_ia.what(), -1, str);
+        return make_error(ERROR_INVALID_PARAMETER, str.c_str());
+    }
+
+    wstring str;
+    MultiByteToWideChar(CP_ACP, 0, err.what(), -1, str);
+    return make_error(ERROR_INVALID_DATA, str.c_str());
+}
+
+
 BYTE* eap::module::alloc_memory(_In_ size_t size)
 {
     return (BYTE*)HeapAlloc(m_heap, 0, size);
@@ -134,16 +153,12 @@ eap::config_method* eap::module::make_config_method()
 }
 
 
-bool eap::module::encrypt(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _Out_ std::vector<unsigned char> &enc, _Out_ EAP_ERROR **ppEapError, _Out_opt_ HCRYPTHASH hHash) const
+std::vector<unsigned char> eap::module::encrypt(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _Out_opt_ HCRYPTHASH hHash) const
 {
-    assert(ppEapError);
-
     // Generate 256-bit AES session key.
     crypt_key key_aes;
-    if (!CryptGenKey(hProv, CALG_AES_256, MAKELONG(CRYPT_EXPORTABLE, 256), &key_aes)) {
-        *ppEapError = make_error(GetLastError(), _T(__FUNCTION__) _T(" CryptGenKey failed."));
-        return false;
-    }
+    if (!CryptGenKey(hProv, CALG_AES_256, MAKELONG(CRYPT_EXPORTABLE, 256), &key_aes))
+        throw win_runtime_error(_T(__FUNCTION__) _T(" CryptGenKey failed."));
 
     // Import the public RSA key.
     HRSRC res = FindResource(m_instance, MAKEINTRESOURCE(IDR_EAP_KEY_PUBLIC), RT_RCDATA);
@@ -153,22 +168,16 @@ bool eap::module::encrypt(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void
     crypt_key key_rsa;
     unique_ptr<CERT_PUBLIC_KEY_INFO, LocalFree_delete<CERT_PUBLIC_KEY_INFO> > keyinfo_data;
     DWORD keyinfo_size = 0;
-    if (!CryptDecodeObjectEx(X509_ASN_ENCODING, X509_PUBLIC_KEY_INFO, (const BYTE*)::LockResource(res_handle), ::SizeofResource(m_instance, res), CRYPT_DECODE_ALLOC_FLAG, NULL, &keyinfo_data, &keyinfo_size)) {
-        *ppEapError = make_error(GetLastError(), _T(__FUNCTION__) _T(" CryptDecodeObjectEx failed."));
-        return false;
-    }
-    if (!key_rsa.import_public(hProv, X509_ASN_ENCODING, keyinfo_data.get())) {
-        *ppEapError = make_error(GetLastError(), _T(__FUNCTION__) _T(" Public key import failed."));
-        return false;
-    }
+    if (!CryptDecodeObjectEx(X509_ASN_ENCODING, X509_PUBLIC_KEY_INFO, (const BYTE*)::LockResource(res_handle), ::SizeofResource(m_instance, res), CRYPT_DECODE_ALLOC_FLAG, NULL, &keyinfo_data, &keyinfo_size))
+        throw win_runtime_error(_T(__FUNCTION__) _T(" CryptDecodeObjectEx failed."));
+    if (!key_rsa.import_public(hProv, X509_ASN_ENCODING, keyinfo_data.get()))
+        throw win_runtime_error(_T(__FUNCTION__) _T(" Public key import failed."));
 
     // Export AES session key encrypted with public RSA key.
     vector<unsigned char, sanitizing_allocator<unsigned char> > buf;
-    if (!CryptExportKey(key_aes, key_rsa, SIMPLEBLOB, 0, buf)) {
-        *ppEapError = make_error(GetLastError(), _T(__FUNCTION__) _T(" CryptExportKey failed."));
-        return false;
-    }
-    enc.assign(buf.begin(), buf.end());
+    if (!CryptExportKey(key_aes, key_rsa, SIMPLEBLOB, 0, buf))
+        throw win_runtime_error(_T(__FUNCTION__) _T(" CryptExportKey failed."));
+    std::vector<unsigned char> enc(buf.begin(), buf.end());
 
     // Pre-allocate memory to allow space, as encryption will grow the data.
     buf.assign((const unsigned char*)data, (const unsigned char*)data + size);
@@ -177,40 +186,33 @@ bool eap::module::encrypt(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void
     buf.reserve((size + dwBlockLen) / dwBlockLen * dwBlockLen);
 
     // Encrypt the data using AES key.
-    if (!CryptEncrypt(key_aes, hHash, TRUE, 0, buf)) {
-        *ppEapError = make_error(GetLastError(), _T(__FUNCTION__) _T(" CryptEncrypt failed."));
-        return false;
-    }
+    if (!CryptEncrypt(key_aes, hHash, TRUE, 0, buf))
+        throw win_runtime_error(_T(__FUNCTION__) _T(" CryptEncrypt failed."));
 
     // Append encrypted data.
     enc.insert(enc.cend(), buf.begin(), buf.end());
-    return true;
+    return enc;
 }
 
 
-bool eap::module::encrypt_md5(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _Out_ std::vector<unsigned char> &enc, _Out_ EAP_ERROR **ppEapError) const
+std::vector<unsigned char> eap::module::encrypt_md5(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size) const
 {
     // Create hash.
     crypt_hash hash;
-    if (!hash.create(hProv, CALG_MD5)) {
-        *ppEapError = make_error(GetLastError(), _T(__FUNCTION__) _T(" Creating MD5 hash failed."));
-        return false;
-    }
+    if (!hash.create(hProv, CALG_MD5))
+        throw win_runtime_error(_T(__FUNCTION__) _T(" Creating MD5 hash failed."));
 
     // Encrypt data.
-    if (!encrypt(hProv, data, size, enc, ppEapError, hash))
-        return false;
+    std::vector<unsigned char> enc(std::move(encrypt(hProv, data, size, hash)));
 
     // Calculate MD5 hash.
     vector<unsigned char> hash_bin;
-    if (!CryptGetHashParam(hash, HP_HASHVAL, hash_bin, 0)) {
-        *ppEapError = make_error(GetLastError(), _T(__FUNCTION__) _T(" Calculating MD5 hash failed."));
-        return false;
-    }
+    if (!CryptGetHashParam(hash, HP_HASHVAL, hash_bin, 0))
+        throw invalid_argument(__FUNCTION__ " Calculating MD5 hash failed.");
 
     // Append hash.
     enc.insert(enc.end(), hash_bin.begin(), hash_bin.end());
-    return true;
+    return enc;
 }
 
 
@@ -223,35 +225,31 @@ eap::peer::peer(_In_ eap_type_t eap_method) : module(eap_method)
 }
 
 
-bool eap::peer::query_credential_input_fields(
+void eap::peer::query_credential_input_fields(
     _In_                                   HANDLE                       hUserImpersonationToken,
     _In_                                   DWORD                        dwFlags,
     _In_                                   DWORD                        dwConnectionDataSize,
     _In_count_(dwConnectionDataSize) const BYTE                         *pConnectionData,
-    _Out_                                  EAP_CONFIG_INPUT_FIELD_ARRAY *pEapConfigInputFieldsArray,
-    _Out_                                  EAP_ERROR                    **ppEapError) const
+    _Inout_                                EAP_CONFIG_INPUT_FIELD_ARRAY *pEapConfigInputFieldsArray) const
 {
     UNREFERENCED_PARAMETER(hUserImpersonationToken);
     UNREFERENCED_PARAMETER(dwFlags);
     UNREFERENCED_PARAMETER(dwConnectionDataSize);
     UNREFERENCED_PARAMETER(pConnectionData);
     UNREFERENCED_PARAMETER(pEapConfigInputFieldsArray);
-    UNREFERENCED_PARAMETER(ppEapError);
 
-    *ppEapError = make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
-    return false;
+    throw win_runtime_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
 }
 
 
-bool eap::peer::query_user_blob_from_credential_input_fields(
+void eap::peer::query_user_blob_from_credential_input_fields(
     _In_                                   HANDLE                       hUserImpersonationToken,
     _In_                                   DWORD                        dwFlags,
     _In_                                   DWORD                        dwConnectionDataSize,
     _In_count_(dwConnectionDataSize) const BYTE                         *pConnectionData,
     _In_                             const EAP_CONFIG_INPUT_FIELD_ARRAY *pEapConfigInputFieldArray,
     _Inout_                                DWORD                        *pdwUsersBlobSize,
-    _Inout_                                BYTE                         **ppUserBlob,
-    _Out_                                  EAP_ERROR                    **ppEapError) const
+    _Inout_                                BYTE                         **ppUserBlob) const
 {
     UNREFERENCED_PARAMETER(hUserImpersonationToken);
     UNREFERENCED_PARAMETER(dwFlags);
@@ -260,45 +258,36 @@ bool eap::peer::query_user_blob_from_credential_input_fields(
     UNREFERENCED_PARAMETER(pEapConfigInputFieldArray);
     UNREFERENCED_PARAMETER(pdwUsersBlobSize);
     UNREFERENCED_PARAMETER(ppUserBlob);
-    UNREFERENCED_PARAMETER(ppEapError);
 
-    *ppEapError = make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
-    return false;
+    throw win_runtime_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
 }
 
 
-bool eap::peer::query_interactive_ui_input_fields(
+void eap::peer::query_interactive_ui_input_fields(
     _In_                                  DWORD                   dwVersion,
     _In_                                  DWORD                   dwFlags,
     _In_                                  DWORD                   dwUIContextDataSize,
     _In_count_(dwUIContextDataSize) const BYTE                    *pUIContextData,
-    _Out_                                 EAP_INTERACTIVE_UI_DATA *pEapInteractiveUIData,
-    _Out_                                 EAP_ERROR               **ppEapError,
-    _Inout_                               LPVOID                  *pvReserved) const
+    _Inout_                               EAP_INTERACTIVE_UI_DATA *pEapInteractiveUIData) const
 {
     UNREFERENCED_PARAMETER(dwVersion);
     UNREFERENCED_PARAMETER(dwFlags);
     UNREFERENCED_PARAMETER(dwUIContextDataSize);
     UNREFERENCED_PARAMETER(pUIContextData);
     UNREFERENCED_PARAMETER(pEapInteractiveUIData);
-    UNREFERENCED_PARAMETER(ppEapError);
-    UNREFERENCED_PARAMETER(pvReserved);
 
-    *ppEapError = make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
-    return false;
+    throw win_runtime_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
 }
 
 
-bool eap::peer::query_ui_blob_from_interactive_ui_input_fields(
+void eap::peer::query_ui_blob_from_interactive_ui_input_fields(
     _In_                                  DWORD                   dwVersion,
     _In_                                  DWORD                   dwFlags,
     _In_                                  DWORD                   dwUIContextDataSize,
     _In_count_(dwUIContextDataSize) const BYTE                    *pUIContextData,
     _In_                            const EAP_INTERACTIVE_UI_DATA *pEapInteractiveUIData,
-    _Out_                                 DWORD                   *pdwDataFromInteractiveUISize,
-    _Out_                                 BYTE                    **ppDataFromInteractiveUI,
-    _Out_                                 EAP_ERROR               **ppEapError,
-    _Inout_                               LPVOID                  *ppvReserved) const
+    _Inout_                               DWORD                   *pdwDataFromInteractiveUISize,
+    _Inout_                               BYTE                    **ppDataFromInteractiveUI) const
 {
     UNREFERENCED_PARAMETER(dwVersion);
     UNREFERENCED_PARAMETER(dwFlags);
@@ -307,9 +296,6 @@ bool eap::peer::query_ui_blob_from_interactive_ui_input_fields(
     UNREFERENCED_PARAMETER(pEapInteractiveUIData);
     UNREFERENCED_PARAMETER(pdwDataFromInteractiveUISize);
     UNREFERENCED_PARAMETER(ppDataFromInteractiveUI);
-    UNREFERENCED_PARAMETER(ppEapError);
-    UNREFERENCED_PARAMETER(ppvReserved);
 
-    *ppEapError = make_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
-    return false;
+    throw win_runtime_error(ERROR_NOT_SUPPORTED, _T(__FUNCTION__) _T(" Not supported."));
 }
