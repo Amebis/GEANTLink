@@ -242,9 +242,6 @@ bool eap::method_tls::process_request_packet(
     if (pReceivedPacket->Data[1] & tls_req_flags_more_frag) {
         if (m_packet_req.m_data.empty()) {
             // Start a new packet.
-            m_packet_req.m_code  = (EapCode)pReceivedPacket->Code;
-            m_packet_req.m_id    = pReceivedPacket->Id;
-            m_packet_req.m_flags = pReceivedPacket->Data[1];
             if (pReceivedPacket->Data[1] & tls_req_flags_length_incl) {
                 // Preallocate data according to the Length field.
                 size_t size_tot  = ntohl(*(unsigned int*)(pReceivedPacket->Data + 2));
@@ -274,24 +271,29 @@ bool eap::method_tls::process_request_packet(
         m_module.log_event(&EAPMETHOD_PACKET_RECV_FRAG_LAST, event_data((unsigned int)eap_type_tls), event_data((unsigned int)packet_data_size), event_data((unsigned int)m_packet_req.m_data.size()), event_data::blank);
     } else {
         // This is a complete non-fragmented packet.
-        m_packet_req.m_code  = (EapCode)pReceivedPacket->Code;
-        m_packet_req.m_id    = pReceivedPacket->Id;
-        m_packet_req.m_flags = pReceivedPacket->Data[1];
         m_packet_req.m_data.assign(packet_data_ptr, packet_data_ptr + packet_data_size);
         m_module.log_event(&EAPMETHOD_PACKET_RECV, event_data((unsigned int)eap_type_tls), event_data((unsigned int)packet_data_size), event_data::blank);
     }
+    m_packet_req.m_code  = (EapCode)pReceivedPacket->Code;
+    m_packet_req.m_id    = pReceivedPacket->Id;
+    m_packet_req.m_flags = pReceivedPacket->Data[1];
 
-    if (  m_packet_req.m_code == EapCodeRequest                                                               &&
-          m_packet_req.m_id   == m_packet_res.m_id                                                            &&
-          m_packet_req.m_data.empty()                                                                         &&
-        !(m_packet_req.m_flags & (tls_req_flags_length_incl | tls_req_flags_more_frag | tls_req_flags_start)) &&
-         (m_packet_res.m_flags &                              tls_res_flags_more_frag                      ))
-    {
-        // This is an ACK of our fragmented packet response. Send the next fragment.
-        m_packet_res.m_id++;
-        pEapOutput->fAllowNotifications = FALSE;
-        pEapOutput->action = EapPeerMethodResponseActionSend;
-        return true;
+    if (m_packet_res.m_flags & tls_res_flags_more_frag) {
+        // We are sending a fragmented message.
+        if (  m_packet_req.m_code == EapCodeRequest                                                               &&
+              m_packet_req.m_id   == m_packet_res.m_id                                                            &&
+              m_packet_req.m_data.empty()                                                                         &&
+            !(m_packet_req.m_flags & (tls_req_flags_length_incl | tls_req_flags_more_frag | tls_req_flags_start)))
+        {
+            // This is the ACK of our fragmented message packet. Send the next fragment.
+            m_packet_res.m_id++;
+            pEapOutput->fAllowNotifications = FALSE;
+            pEapOutput->action = EapPeerMethodResponseActionSend;
+            return true;
+        } else {
+            *ppEapError = m_module.make_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, wstring_printf(_T(__FUNCTION__) _T(" ACK expected, received %u-%u-%x."), m_packet_req.m_code, m_packet_req.m_id, m_packet_req.m_flags).c_str());
+            return false;
+        }
     }
 
     switch (m_phase) {
