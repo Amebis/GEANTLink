@@ -211,8 +211,9 @@ namespace eap
 
     public:
         enum phase_t {
-            phase_client_hello = 0,
-            phase_server_hello = 1,
+            phase_unknown      = -1,
+            phase_client_hello =  0,
+            phase_server_hello =  1,
         } m_phase;                                      ///< Session phase
 
         struct packet
@@ -258,6 +259,11 @@ namespace eap
             /// \returns Reference to this object
             ///
             packet& operator=(_Inout_ packet &&other);
+
+            ///
+            /// Empty the packet
+            ///
+            void clear();
         }
             m_packet_req,                               ///< Request packet
             m_packet_res;                               ///< Response packet

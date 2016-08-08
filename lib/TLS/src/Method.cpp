@@ -29,7 +29,7 @@ using namespace winstd;
 //////////////////////////////////////////////////////////////////////
 
 eap::method_tls::method_tls(_In_ module &module, _In_ config_method_tls &cfg, _In_ credentials_tls &cred) :
-    m_phase(phase_client_hello),
+    m_phase(phase_unknown),
     m_seq_num(0),
     method(module, cfg, cred)
 {
@@ -120,23 +120,6 @@ bool eap::method_tls::begin_session(
         return false;
     }
 
-    // Generate client randomness.
-    m_random_client.time = (unsigned int)time(NULL);
-    if (!CryptGenRandom(m_cp, sizeof(m_random_client.data), m_random_client.data)) {
-        *ppEapError = m_module.make_error(GetLastError(), _T(__FUNCTION__) _T(" Error creating client randomness."));
-        return false;
-    }
-
-    if (!m_hash_handshake_msgs_md5.create(m_cp, CALG_MD5, NULL, 0)) {
-        *ppEapError = m_module.make_error(GetLastError(), _T(__FUNCTION__) _T(" Error creating MD5 hashing object."));
-        return false;
-    }
-
-    if (!m_hash_handshake_msgs_sha1.create(m_cp, CALG_SHA1, NULL, 0)) {
-        *ppEapError = m_module.make_error(GetLastError(), _T(__FUNCTION__) _T(" Error creating SHA-1 hashing object."));
-        return false;
-    }
-
     // HMAC symmetric key generation sample. To be used later...
     //crypt_hash hash_key;
     //hash_key.create(m_cp, CALG_SHA1, 0, 0);
@@ -215,6 +198,34 @@ bool eap::method_tls::process_request_packet(
         m_packet_req.m_data.assign(packet_data_ptr, packet_data_ptr + packet_data_size);
         m_module.log_event(&EAPMETHOD_PACKET_RECV, event_data((unsigned int)eap_type_tls), event_data((unsigned int)packet_data_size), event_data::blank);
     }
+
+    if (pReceivedPacket->Code == EapCodeRequest && pReceivedPacket->Data[1] & flags_req_start) {
+        // This is the TLS start message: initialize method.
+        m_phase = phase_client_hello;
+        m_packet_res.clear();
+
+        // Generate client randomness.
+        m_random_client.time = (unsigned int)time(NULL);
+        if (!CryptGenRandom(m_cp, sizeof(m_random_client.data), m_random_client.data)) {
+            *ppEapError = m_module.make_error(GetLastError(), _T(__FUNCTION__) _T(" Error creating client randomness."));
+            return false;
+        }
+
+        // Create MD5 hash object.
+        if (!m_hash_handshake_msgs_md5.create(m_cp, CALG_MD5, NULL, 0)) {
+            *ppEapError = m_module.make_error(GetLastError(), _T(__FUNCTION__) _T(" Error creating MD5 hashing object."));
+            return false;
+        }
+
+        // Create SHA-1 hash object.
+        if (!m_hash_handshake_msgs_sha1.create(m_cp, CALG_SHA1, NULL, 0)) {
+            *ppEapError = m_module.make_error(GetLastError(), _T(__FUNCTION__) _T(" Error creating SHA-1 hashing object."));
+            return false;
+        }
+
+        m_seq_num = 0;
+    }
+
     m_packet_req.m_code  = (EapCode)pReceivedPacket->Code;
     m_packet_req.m_id    = pReceivedPacket->Id;
     m_packet_req.m_flags = pReceivedPacket->Data[1];
@@ -239,15 +250,6 @@ bool eap::method_tls::process_request_packet(
 
     switch (m_phase) {
         case phase_client_hello: {
-            // Is this an EAP-TLS Start packet?
-            if (m_packet_req.m_code != EapCodeRequest) {
-                *ppEapError = m_module.make_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, wstring_printf(_T(__FUNCTION__) _T(" Packet is not a request (expected: %x, received: %x)."), EapCodeRequest, m_packet_req.m_code).c_str());
-                return false;
-            } else if (!(m_packet_req.m_flags & flags_req_start)) {
-                *ppEapError = m_module.make_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, wstring_printf(_T(__FUNCTION__) _T(" Packet is not EAP-TLS Start (expected: %x, received: %x)."), flags_req_start, m_packet_req.m_flags).c_str());
-                return false;
-            }
-
             m_module.log_event(&EAPMETHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_tls), event_data::blank);
 
             // Build response packet.
@@ -578,6 +580,15 @@ eap::method_tls::packet& eap::method_tls::packet::operator=(_Inout_ packet &&oth
     }
 
     return *this;
+}
+
+
+void eap::method_tls::packet::clear()
+{
+    m_code  = (EapCode)0;
+    m_id    = 0;
+    m_flags = 0;
+    m_data.clear();
 }
 
 
