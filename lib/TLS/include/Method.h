@@ -65,6 +65,151 @@ namespace eap
             flags_res_more_frag   = 0x40,   ///< More fragments
         };
 
+        ///
+        /// TLS packet type
+        ///
+        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter: A.1. Record Layer](https://tools.ietf.org/html/rfc5246#appendix-A.1)
+        ///
+        enum message_type_t  {
+            message_type_change_cipher_spec = 20,
+            message_type_alert              = 21,
+            message_type_handshake          = 22,
+            message_type_application_data   = 23,
+        };
+
+        ///
+        /// TLS handshake type
+        ///
+        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter: A.4. Handshake Protocol](https://tools.ietf.org/html/rfc5246#appendix-A.4)
+        ///
+        enum handshake_type_t {
+            hello_request       =  0,
+            client_hello        =  1,
+            server_hello        =  2,
+            certificate         = 11,
+            server_key_exchange = 12,
+            certificate_request = 13,
+            server_hello_done   = 14,
+            certificate_verify  = 15,
+            client_key_exchange = 16,
+            finished            = 20
+        };
+
+        ///
+        /// EAP-TLS packet (data)
+        ///
+        class packet
+        {
+        public:
+            ///
+            /// Constructs an empty packet
+            ///
+            packet();
+
+            ///
+            /// Copies a packet
+            ///
+            /// \param[in] other  Packet to copy from
+            ///
+            packet(_In_ const packet &other);
+
+            ///
+            /// Moves a packet
+            ///
+            /// \param[in] other  Packet to move from
+            ///
+            packet(_Inout_ packet &&other);
+
+            ///
+            /// Copies a packet
+            ///
+            /// \param[in] other  Packet to copy from
+            ///
+            /// \returns Reference to this object
+            ///
+            packet& operator=(_In_ const packet &other);
+
+            ///
+            /// Moves a packet
+            ///
+            /// \param[in] other  Packet to move from
+            ///
+            /// \returns Reference to this object
+            ///
+            packet& operator=(_Inout_ packet &&other);
+
+            ///
+            /// Empty the packet
+            ///
+            void clear();
+
+        public:
+            EapCode m_code;                             ///< Packet code
+            unsigned char m_id;                         ///< Packet ID
+            unsigned char m_flags;                      ///< Packet flags
+            std::vector<unsigned char> m_data;          ///< Packet data
+        };
+
+#pragma pack(push)
+#pragma pack(1)
+        ///
+        /// TLS client/server random
+        ///
+        struct random
+        {
+            __time32_t time;        ///< Unix time-stamp
+            unsigned char data[28]; ///< Randomness
+
+            ///
+            /// Constructs a all-zero random
+            ///
+            random();
+
+            ///
+            /// Copies a random
+            ///
+            /// \param[in] other  Random to copy from
+            ///
+            random(_In_ const random &other);
+
+            ///
+            /// Destructor
+            ///
+            ~random();
+
+            ///
+            /// Copies a random
+            ///
+            /// \param[in] other  Random to copy from
+            ///
+            /// \returns Reference to this object
+            ///
+            random& operator=(_In_ const random &other);
+
+            ///
+            /// Empty the random
+            ///
+            void clear();
+        };
+#pragma pack(pop)
+
+#pragma pack(push)
+#pragma pack(1)
+        ///
+        /// TLS message
+        ///
+        struct message
+        {
+            unsigned char type;         ///< Message type (one of `message_type_t` constants)
+            struct {
+                unsigned char major;    ///< Major version
+                unsigned char minor;    ///< Minor version
+            } version;                  ///< SSL/TLS version
+            unsigned char length[2];    ///< Message length (in network byte order)
+            unsigned char data[1];      ///< Message data
+        };
+#pragma pack(pop)
+
     public:
         ///
         /// Constructs an EAP method
@@ -174,7 +319,7 @@ namespace eap
         ///
         /// Makes a TLS client hello message
         ///
-        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter 7.4.1.2. Client Hello](https://tools.ietf.org/html/rfc5246#section-7.4.1.2)
+        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter 7.4.1.2. Client Hello)](https://tools.ietf.org/html/rfc5246#section-7.4.1.2)
         ///
         /// \returns Client Hello message
         ///
@@ -183,139 +328,110 @@ namespace eap
         ///
         /// Makes a TLS handshake
         ///
-        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter A.1. Record Layer](https://tools.ietf.org/html/rfc5246#appendix-A.1)
+        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter A.1. Record Layer)](https://tools.ietf.org/html/rfc5246#appendix-A.1)
         ///
         /// \param[in]  msg         Handshake data contents
-        /// \param[in]  encrypt     Should make an encrypted handshake message?
-        /// \param[out] msg_h       TLS handshake message
-        /// \param[out] ppEapError  Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
         ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
+        /// \returns TLS handshake message
         ///
-        bool make_handshake(_In_ const sanitizing_blob &msg, _In_ bool encrypt, _Out_ eap::sanitizing_blob &msg_h, _Out_ EAP_ERROR **ppEapError);
+        eap::sanitizing_blob make_handshake(_In_ const sanitizing_blob &msg);
 
         ///
-        /// Encrypt block of data
+        /// Processes a TLS handshake
         ///
-        /// \param[in]  msg         TLS message to encrypt
-        /// \param[out] msg_enc     Encrypted \p msg
+        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter A.1. Record Layer)](https://tools.ietf.org/html/rfc5246#appendix-A.1)
+        ///
+        /// \param[in]  msg         TLS handshake message data
+        /// \param[in]  msg_size    TLS handshake message data size
         /// \param[out] ppEapError  Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
         ///
         /// \returns
         /// - \c true if succeeded
         /// - \c false otherwise. See \p ppEapError for details.
         ///
-        bool encrypt_message(_In_ const sanitizing_blob &msg, _Out_ std::vector<unsigned char> &msg_enc, _Out_ EAP_ERROR **ppEapError);
+        bool process_handshake(_In_bytecount_(msg_size) const void *msg, _In_ size_t msg_size, _Out_ EAP_ERROR **ppEapError);
+
+        ///
+        /// Encrypt TLS message
+        ///
+        /// \param[inout] msg         TLS message to encrypt
+        /// \param[out]   ppEapError  Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
+        ///
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
+        ///
+        bool encrypt_message(_Inout_ sanitizing_blob &msg, _Out_ EAP_ERROR **ppEapError);
+
+        ///
+        /// Decrypt TLS message
+        ///
+        /// \param[inout] msg         TLS message to decrypt
+        /// \param[out]   ppEapError  Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
+        ///
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
+        ///
+        bool decrypt_message(_Inout_ sanitizing_blob &msg, _Out_ EAP_ERROR **ppEapError);
+
+        ///
+        /// Calculates pseudo-random P_hash data defined in RFC 5246
+        ///
+        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter: 5. HMAC and the Pseudorandom Function)](https://tools.ietf.org/html/rfc5246#section-5)
+        ///
+        /// \param[in]  alg          Hashing algorithm to use (CALG_MD5 or CALG_SHA1)
+        /// \param[in]  secret       Hashing secret key
+        /// \param[in]  size_secret  \p secret size
+        /// \param[in]  seed         Hashing seed
+        /// \param[in]  size_seed    \p seed size
+        /// \param[in]  size         Minimum number of bytes of pseudo-random data required
+        /// \param[out] data         Generated pseudo-random data (\p size or longer)
+        /// \param[out] ppEapError   Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
+        ///
+        /// \returns
+        /// - \c true if succeeded
+        /// - \c false otherwise. See \p ppEapError for details.
+        ///
+        bool p_hash(
+            _In_                              ALG_ID                     alg,
+            _In_bytecount_(size_secret) const void                       *secret,
+            _In_                              size_t                     size_secret,
+            _In_bytecount_(size_seed)   const void                       *seed,
+            _In_                              size_t                     size_seed,
+            _In_                              size_t                     size,
+            _Out_                             std::vector<unsigned char> data,
+            _Out_                             EAP_ERROR                  **ppEapError);
 
     public:
         enum phase_t {
             phase_unknown      = -1,
             phase_client_hello =  0,
             phase_server_hello =  1,
-        } m_phase;                                      ///< Session phase
+        } m_phase;                                              ///< Session phase
 
-        struct packet
-        {
-            EapCode m_code;                             ///< Packet code
-            BYTE m_id;                                  ///< Packet ID
-            BYTE m_flags;                               ///< Packet flags
-            std::vector<BYTE> m_data;                   ///< Packet data
+        packet m_packet_req;                                    ///< Request packet
+        packet m_packet_res;                                    ///< Response packet
 
-            ///
-            /// Constructs an empty packet
-            ///
-            packet();
+        winstd::crypt_prov m_cp;                                ///< Cryptography provider
+        winstd::crypt_key m_key_hmac;                           ///< Symmetric key for HMAC calculation
 
-            ///
-            /// Copies a packet
-            ///
-            /// \param[in] other  Packet to copy from
-            ///
-            packet(_In_ const packet &other);
+        winstd::crypt_key m_key_encrypt;                        ///< Key for encrypting messages
+        winstd::crypt_key m_key_decrypt;                        ///< Key for decrypting messages
 
-            ///
-            /// Moves a packet
-            ///
-            /// \param[in] other  Packet to move from
-            ///
-            packet(_Inout_ packet &&other);
+        random m_random_client;                                 ///< Client random
+        random m_random_server;                                 ///< Server random
 
-            ///
-            /// Copies a packet
-            ///
-            /// \param[in] other  Packet to copy from
-            ///
-            /// \returns Reference to this object
-            ///
-            packet& operator=(_In_ const packet &other);
+        sanitizing_blob m_session_id;                           ///< TLS session ID
 
-            ///
-            /// Moves a packet
-            ///
-            /// \param[in] other  Packet to move from
-            ///
-            /// \returns Reference to this object
-            ///
-            packet& operator=(_Inout_ packet &&other);
+        std::list<winstd::cert_context> m_server_cert_chain;    ///< Server certificate chain
 
-            ///
-            /// Empty the packet
-            ///
-            void clear();
-        }
-            m_packet_req,                               ///< Request packet
-            m_packet_res;                               ///< Response packet
+        bool m_send_client_cert;                                ///< Did server request client certificate?
 
-        winstd::crypt_prov m_cp;                        ///< Cryptography provider
-        winstd::crypt_key m_key_hmac;                   ///< Symmetric key for HMAC calculation
-
-        winstd::crypt_key m_key_write;                  ///< Key for encrypting messages
-
-#pragma pack(push)
-#pragma pack(1)
-        struct random
-        {
-            unsigned int time;      ///< Unix time-stamp
-            unsigned char data[28]; ///< Randomness
-
-            ///
-            /// Constructs a all-zero random
-            ///
-            random();
-
-            ///
-            /// Copies a random
-            ///
-            /// \param[in] other  Random to copy from
-            ///
-            random(_In_ const random &other);
-
-            ///
-            /// Destructor
-            ///
-            ~random();
-
-            ///
-            /// Copies a random
-            ///
-            /// \param[in] other  Random to copy from
-            ///
-            /// \returns Reference to this object
-            ///
-            random& operator=(_In_ const random &other);
-        }
-#pragma pack(pop)
-            m_random_client,                            ///< Client random
-            m_random_server;                            ///< Server random
-
-        sanitizing_blob m_session_id;                   ///< TLS session ID
-
-        winstd::crypt_hash m_hash_handshake_msgs_md5;   ///< Running MD5 hash of handshake messages sent
-        winstd::crypt_hash m_hash_handshake_msgs_sha1;  ///< Running SHA-1 hash of handshake messages sent
+        winstd::crypt_hash m_hash_handshake_msgs_md5;           ///< Running MD5 hash of handshake messages sent
+        winstd::crypt_hash m_hash_handshake_msgs_sha1;          ///< Running SHA-1 hash of handshake messages sent
 
     protected:
-        unsigned __int64 m_seq_num;                     ///< Sequence number for encryption
+        unsigned __int64 m_seq_num;                             ///< Sequence number for encryption
     };
 }
