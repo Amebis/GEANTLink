@@ -355,12 +355,56 @@ namespace eap
         /// \returns Generated pseudo-random data (\p size or longer)
         ///
         std::vector<unsigned char> p_hash(
-            _In_                              ALG_ID                     alg,
-            _In_bytecount_(size_secret) const void                       *secret,
-            _In_                              size_t                     size_secret,
-            _In_bytecount_(size_seed)   const void                       *seed,
-            _In_                              size_t                     size_seed,
-            _In_                              size_t                     size);
+            _In_                              ALG_ID alg,
+            _In_bytecount_(size_secret) const void   *secret,
+            _In_                              size_t size_secret,
+            _In_bytecount_(size_seed)   const void   *seed,
+            _In_                              size_t size_seed,
+            _In_                              size_t size);
+
+        ///
+        /// HMAC symmetric key generation
+        ///
+        /// \param[in]  alg          Hashing algorithm to use (CALG_MD5 or CALG_SHA1)
+        /// \param[in]  secret       Hashing secret key
+        /// \param[in]  size_secret  \p secret size
+        ///
+        /// \returns Key
+        ///
+        inline HCRYPTKEY derive_hmac_key(
+            _In_                              ALG_ID alg,
+            _In_bytecount_(size_secret) const void   *secret,
+            _In_                              size_t size_secret)
+        {
+            winstd::crypt_hash hash;
+            if (!hash.create(m_cp, alg, 0, 0))
+                throw winstd::win_runtime_error(__FUNCTION__ " Error creating key hash.");
+            if (!CryptHashData(hash, (const BYTE*)secret, (DWORD)size_secret, 0))
+                throw winstd::win_runtime_error(__FUNCTION__ " Error hashing secret.");
+            winstd::crypt_key key;
+            key.derive(m_cp, CALG_RC4, hash, 0);
+            return key.detach();
+        }
+
+        ///
+        /// Creates HMAC hash
+        ///
+        /// \param[in] key   HMAC key
+        /// \param[in] info  Additional HMAC parameters
+        ///
+        /// \returns Hash
+        ///
+        inline HCRYPTHASH create_hmac_hash(
+            _In_       HCRYPTKEY key,
+            _In_ const HMAC_INFO info)
+        {
+            winstd::crypt_hash hash;
+            if (!hash.create(m_cp, CALG_HMAC, key, 0))
+                throw winstd::win_runtime_error(__FUNCTION__ " Error creating HMAC hash.");
+            if (!CryptSetHashParam(hash, HP_HMAC_INFO, (const BYTE*)&info, 0))
+                throw winstd::win_runtime_error(__FUNCTION__ " Error setting HMAC hash parameters.");
+            return hash.detach();
+        }
 
     public:
         enum phase_t {

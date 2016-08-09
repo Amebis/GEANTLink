@@ -231,12 +231,6 @@ void eap::method_tls::begin_session(
     // Create cryptographics provider.
     if (!m_cp.create(NULL, MS_ENHANCED_PROV, PROV_RSA_FULL, 0))
         throw win_runtime_error(__FUNCTION__ " Error creating cryptographics provider.");
-
-    // HMAC symmetric key generation sample. To be used later...
-    //crypt_hash hash_key;
-    //hash_key.create(m_cp, CALG_SHA1, 0, 0);
-    //CryptHashData(hash_key, Data1, sizeof(Data1), 0);
-    //m_key_hmac.derive(m_cp, CALG_RC4, hash_key, 0);
 }
 
 
@@ -638,11 +632,8 @@ void eap::method_tls::process_handshake(_In_bytecount_(msg_size) const void *_ms
 void eap::method_tls::encrypt_message(_Inout_ sanitizing_blob &msg)
 {
     // Create a HMAC hash.
-    crypt_hash hash_hmac;
     static const HMAC_INFO s_hmac_info = { CALG_SHA1 };
-    if (!hash_hmac.create(m_cp, CALG_HMAC, m_key_hmac, 0) ||
-        !CryptSetHashParam(hash_hmac, HP_HMAC_INFO, (const BYTE*)&s_hmac_info, 0))
-        throw win_runtime_error(__FUNCTION__ " Error creating HMAC hash.");
+    crypt_hash hash_hmac(create_hmac_hash(m_key_hmac, s_hmac_info));
 
     // Hash sequence number and message.
     unsigned __int64 seq_num = htonll(m_seq_num);
@@ -699,21 +690,15 @@ void eap::method_tls::decrypt_message(_Inout_ sanitizing_blob &msg)
 
 
 vector<unsigned char> eap::method_tls::p_hash(
-    _In_                              ALG_ID                alg,
-    _In_bytecount_(size_secret) const void                  *secret,
-    _In_                              size_t                size_secret,
-    _In_bytecount_(size_seed)   const void                  *seed,
-    _In_                              size_t                size_seed,
-    _In_                              size_t                size)
+    _In_                              ALG_ID alg,
+    _In_bytecount_(size_secret) const void   *secret,
+    _In_                              size_t size_secret,
+    _In_bytecount_(size_seed)   const void   *seed,
+    _In_                              size_t size_seed,
+    _In_                              size_t size)
 {
     // HMAC symmetric key generation.
-    crypt_hash hash_key;
-    if (!hash_key.create(m_cp, alg, 0, 0))
-        throw win_runtime_error(__FUNCTION__ " Error creating key hash.");
-    if (!CryptHashData(hash_key, (const BYTE*)secret, (DWORD)size_secret, 0))
-        throw win_runtime_error(__FUNCTION__ " Error hashing secret.");
-    crypt_key key_hmac;
-    key_hmac.derive(m_cp, CALG_RC4, hash_key, 0);
+    crypt_key key_hmac(derive_hmac_key(alg, secret, size_secret));
     vector<unsigned char> block;
     const HMAC_INFO hmac_info = { alg };
 
@@ -736,20 +721,14 @@ vector<unsigned char> eap::method_tls::p_hash(
     vector<unsigned char> A((unsigned char*)seed, (unsigned char*)seed + size_seed);
     while (data.size() < size) {
         // Hash A.
-        crypt_hash hash_hmac1;
-        if (!hash_hmac1.create(m_cp, CALG_HMAC, key_hmac, 0) ||
-            !CryptSetHashParam(hash_hmac1, HP_HMAC_INFO, (const BYTE*)&hmac_info, 0))
-            throw win_runtime_error(__FUNCTION__ " Error creating HMAC hash.");
+        crypt_hash hash_hmac1(create_hmac_hash(key_hmac, hmac_info));
         if (!CryptHashData(hash_hmac1, A.data(), (DWORD)A.size(), 0))
             throw win_runtime_error(__FUNCTION__ " Error hashing A.");
         if (!CryptGetHashParam(hash_hmac1, HP_HASHVAL, A, 0))
             throw win_runtime_error(__FUNCTION__ " Error finishing hash A calculation.");
 
         // Hash A and seed.
-        crypt_hash hash_hmac2;
-        if (!hash_hmac2.create(m_cp, CALG_HMAC, key_hmac, 0) ||
-            !CryptSetHashParam(hash_hmac2, HP_HMAC_INFO, (const BYTE*)&hmac_info, 0))
-            throw win_runtime_error(__FUNCTION__ " Error creating A+seed hash.");
+        crypt_hash hash_hmac2(create_hmac_hash(key_hmac, hmac_info));
         if (!CryptHashData(hash_hmac2, A.data(), (DWORD)A.size(), 0) ||
             !CryptHashData(hash_hmac2, (const BYTE*)seed, (DWORD)size_seed, 0))
             throw win_runtime_error(__FUNCTION__ " Error hashing seed.");
