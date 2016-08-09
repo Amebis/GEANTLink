@@ -67,9 +67,9 @@ eap::method& eap::method::operator=(_In_ const method &other)
 eap::method& eap::method::operator=(_Inout_ method &&other)
 {
     if (this != std::addressof(other)) {
-        assert(std::addressof(m_module) == std::addressof(other.m_module)); // Copy method within same module only!
-        assert(std::addressof(m_cfg   ) == std::addressof(other.m_cfg   )); // Copy method with same configuration only!
-        assert(std::addressof(m_cred  ) == std::addressof(other.m_cred  )); // Copy method with same credentials only!
+        assert(std::addressof(m_module) == std::addressof(other.m_module)); // Move method within same module only!
+        assert(std::addressof(m_cfg   ) == std::addressof(other.m_cfg   )); // Move method with same configuration only!
+        assert(std::addressof(m_cred  ) == std::addressof(other.m_cred  )); // Move method with same credentials only!
     }
 
     return *this;
