@@ -565,27 +565,36 @@ namespace eap
             _In_                              size_t size);
 
         ///
-        /// HMAC symmetric key generation
+        /// Creates HMAC key
         ///
-        /// \param[in]  alg          Hashing algorithm to use (CALG_MD5 or CALG_SHA1)
-        /// \param[in]  secret       Hashing secret key
+        /// \param[in]  secret       Hashing secret
         /// \param[in]  size_secret  \p secret size
         ///
         /// \returns Key
         ///
-        inline HCRYPTKEY derive_hmac_key(
-            _In_                              ALG_ID alg,
+        inline HCRYPTKEY create_hmac_key(
             _In_bytecount_(size_secret) const void   *secret,
             _In_                              size_t size_secret)
         {
-            winstd::crypt_hash hash;
-            if (!hash.create(m_cp, alg, 0, 0))
-                throw winstd::win_runtime_error(__FUNCTION__ " Error creating key hash.");
-            if (!CryptHashData(hash, (const BYTE*)secret, (DWORD)size_secret, 0))
-                throw winstd::win_runtime_error(__FUNCTION__ " Error hashing secret.");
+            // Prepare exported key BLOB.
+            static const PUBLICKEYSTRUC s_key_data_struct = {
+                PLAINTEXTKEYBLOB,
+                CUR_BLOB_VERSION,
+                0,
+                CALG_RC4,
+            };
+            std::vector<unsigned char> key_blob;
+            key_blob.reserve(sizeof(PUBLICKEYSTRUC) + sizeof(DWORD) + size_secret);
+            key_blob.assign((const unsigned char*)&s_key_data_struct, (const unsigned char*)(&s_key_data_struct + 1));
+            assert(size_secret <= 0xffffffff);
+            DWORD _size_secret = (DWORD)size_secret;
+            key_blob.insert(key_blob.end(), (const unsigned char*)&_size_secret, (const unsigned char*)(&_size_secret + 1));
+            key_blob.insert(key_blob.end(), (const unsigned char*)secret, (const unsigned char*)secret + _size_secret);
+
+            // Import the key.
             winstd::crypt_key key;
-            if (!key.derive(m_cp, CALG_RC4, hash, 0))
-                throw winstd::win_runtime_error(__FUNCTION__ " Error deriving key.");
+            if (!key.import(m_cp, key_blob.data(), (DWORD)key_blob.size(), NULL, 0))
+                throw winstd::win_runtime_error(__FUNCTION__ " Error importing key.");
             return key.detach();
         }
 

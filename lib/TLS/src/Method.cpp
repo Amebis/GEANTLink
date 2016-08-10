@@ -809,7 +809,7 @@ void eap::method_tls::derive_keys()
     vector<unsigned char> key;
     key.assign((const unsigned char*)&s_key_struct, (const unsigned char*)(&s_key_struct + 1));
     key.insert(key.end(), data, data + 20);
-    if (!m_key_hmac.import(m_cp, key.data(), key.size(), NULL, 0))
+    if (!m_key_hmac.import(m_cp, key.data(), (DWORD)key.size(), NULL, 0))
         throw win_runtime_error(__FUNCTION__ " Error importing client_write_MAC_secret key.");
 
 
@@ -1187,8 +1187,8 @@ vector<unsigned char> eap::method_tls::p_hash(
     _In_                              size_t size_seed,
     _In_                              size_t size)
 {
-    // HMAC symmetric key generation.
-    crypt_key key_hmac(derive_hmac_key(alg, secret, size_secret));
+    // HMAC symmetric key creation.
+    crypt_key key_hmac(create_hmac_key(secret, size_secret));
     vector<unsigned char> block;
     const HMAC_INFO hmac_info = { alg };
 
