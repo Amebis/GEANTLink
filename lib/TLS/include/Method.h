@@ -260,7 +260,8 @@ namespace eap
         ///
         /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (8.1. Computing the Master Secret)](https://tools.ietf.org/html/rfc5246#section-8.1)
         ///
-        struct master_secret {
+        struct master_secret
+        {
             unsigned char data[48];
 
             ///
@@ -304,6 +305,93 @@ namespace eap
             void clear();
         };
 #pragma pack(pop)
+
+        ///
+        /// Our own implementation of HMAC hashing
+        /// Microsoft's implementation ([MSDN](https://msdn.microsoft.com/en-us/library/windows/desktop/aa382379.aspx)) is flaky.
+        ///
+        /// \sa [HMAC: Keyed-Hashing for Message Authentication](https://tools.ietf.org/html/rfc2104)
+        ///
+        class hash_hmac
+        {
+        public:
+            ///
+            /// Construct new HMAC hashing object
+            ///
+            /// \param[in] cp           Handle of the cryptographics provider
+            /// \param[in] alg          Hashing algorithm
+            /// \param[in] secret       HMAC secret
+            /// \param[in] size_secret  \p secret size
+            ///
+            hash_hmac(
+                _In_                               HCRYPTPROV hProv,
+                _In_                               ALG_ID     alg,
+                _In_bytecount_(size_secret ) const void       *secret,
+                _In_                               size_t     size_secret);
+
+            ///
+            /// Construct new HMAC hashing object using already prepared inner padding
+            ///
+            /// \param[in] cp           Handle of the cryptographics provider
+            /// \param[in] alg          Hashing algorithm
+            /// \param[in] padding      HMAC secret XOR inner padding
+            ///
+            hash_hmac(
+                _In_       HCRYPTPROV    hProv,
+                _In_       ALG_ID        alg,
+                _In_ const unsigned char padding[64]);
+
+            ///
+            /// Provides access to inner hash object to hash data at will.
+            ///
+            /// \returns Inner hashing object handle
+            ///
+            inline operator HCRYPTHASH()
+            {
+                return m_hash_inner;
+            }
+
+            ///
+            /// Completes hashing and returns hashed data.
+            ///
+            /// \param[out] val  Calculated hash value
+            ///
+            template<class _Ty, class _Ax>
+            inline void calculate(_Out_ std::vector<_Ty, _Ax> &val)
+            {
+                // Calculate inner hash.
+                if (!CryptGetHashParam(m_hash_inner, HP_HASHVAL, val, 0))
+                    throw win_runtime_error(__FUNCTION__ " Error calculating inner hash.");
+
+                // Hash inner hash with outer hash.
+                if (!CryptHashData(m_hash_outer, (const BYTE*)val.data(), (DWORD)(val.size() * sizeof(_Ty)), 0))
+                    throw win_runtime_error(__FUNCTION__ " Error hashing inner hash.");
+
+                // Calculate outer hash.
+                if (!CryptGetHashParam(m_hash_outer, HP_HASHVAL, val, 0))
+                    throw win_runtime_error(__FUNCTION__ " Error calculating outer hash.");
+            }
+
+            ///
+            /// Helper method to pre-derive inner padding for frequent reuse
+            ///
+            /// \param[in]  cp           Handle of the cryptographics provider
+            /// \param[in]  alg          Hashing algorithm
+            /// \param[in]  secret       HMAC secret
+            /// \param[in]  size_secret  \p secret size
+            /// \param[out] padding      HMAC secret XOR inner padding
+            ///
+            static void inner_padding(
+                _In_                               HCRYPTPROV    hProv,
+                _In_                               ALG_ID        alg,
+                _In_bytecount_(size_secret ) const void          *secret,
+                _In_                               size_t        size_secret,
+                _Out_                              unsigned char padding[64]);
+
+        protected:
+            winstd::crypt_hash m_hash_inner; ///< Inner hashing object
+            winstd::crypt_hash m_hash_outer; ///< Outer hashing object
+        };
 
     public:
         ///
@@ -535,29 +623,7 @@ namespace eap
         ///
         /// \returns Generated pseudo-random data (\p size bytes)
         ///
-        std::vector<unsigned char> prf(
-            _In_bytecount_(size_secret ) const void   *secret,
-            _In_                               size_t size_secret,
-            _In_bytecount_(size_lblseed) const void   *lblseed,
-            _In_                               size_t size_lblseed,
-            _In_                               size_t size);
-
-        ///
-        /// Calculates pseudo-random P_hash data defined in RFC 5246
-        ///
-        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter 5: HMAC and the Pseudorandom Function)](https://tools.ietf.org/html/rfc5246#section-5)
-        ///
-        /// \param[in] alg          Hashing algorithm to use (CALG_MD5 or CALG_SHA1)
-        /// \param[in] secret       Hashing secret key
-        /// \param[in] size_secret  \p secret size
-        /// \param[in] seed         Hashing seed
-        /// \param[in] size_seed    \p seed size
-        /// \param[in] size         Minimum number of bytes of pseudo-random data required
-        ///
-        /// \returns Generated pseudo-random data (\p size or longer)
-        ///
-        std::vector<unsigned char> p_hash(
-            _In_                              ALG_ID alg,
+        sanitizing_blob prf(
             _In_bytecount_(size_secret) const void   *secret,
             _In_                              size_t size_secret,
             _In_bytecount_(size_seed)   const void   *seed,
@@ -565,57 +631,44 @@ namespace eap
             _In_                              size_t size);
 
         ///
-        /// Creates HMAC key
+        /// Creates a key
         ///
-        /// \param[in]  secret       Hashing secret
-        /// \param[in]  size_secret  \p secret size
+        /// \param[in] alg          Key algorithm
+        /// \param[in] secret       Raw key data
+        /// \param[in] size_secret  \p secret size
         ///
         /// \returns Key
         ///
-        inline HCRYPTKEY create_hmac_key(
+        inline HCRYPTKEY create_key(
+            _In_                              ALG_ID alg,
             _In_bytecount_(size_secret) const void   *secret,
             _In_                              size_t size_secret)
         {
-            // Prepare exported key BLOB.
-            static const PUBLICKEYSTRUC s_key_data_struct = {
-                PLAINTEXTKEYBLOB,
-                CUR_BLOB_VERSION,
-                0,
-                CALG_RC4,
-            };
-            std::vector<unsigned char> key_blob;
-            key_blob.reserve(sizeof(PUBLICKEYSTRUC) + sizeof(DWORD) + size_secret);
-            key_blob.assign((const unsigned char*)&s_key_data_struct, (const unsigned char*)(&s_key_data_struct + 1));
             assert(size_secret <= 0xffffffff);
-            DWORD _size_secret = (DWORD)size_secret;
-            key_blob.insert(key_blob.end(), (const unsigned char*)&_size_secret, (const unsigned char*)(&_size_secret + 1));
-            key_blob.insert(key_blob.end(), (const unsigned char*)secret, (const unsigned char*)secret + _size_secret);
+
+            // Prepare exported key BLOB.
+            struct key_blob_prefix {
+                PUBLICKEYSTRUC header;
+                DWORD size;
+            } const prefix = {
+                {
+                    PLAINTEXTKEYBLOB,
+                    CUR_BLOB_VERSION,
+                    0,
+                    alg,
+                },
+                (DWORD)size_secret,
+            };
+            sanitizing_blob key_blob;
+            key_blob.reserve(sizeof(key_blob_prefix) + size_secret);
+            key_blob.assign((const unsigned char*)&prefix, (const unsigned char*)(&prefix + 1));
+            key_blob.insert(key_blob.end(), (const unsigned char*)secret, (const unsigned char*)secret + size_secret);
 
             // Import the key.
             winstd::crypt_key key;
             if (!key.import(m_cp, key_blob.data(), (DWORD)key_blob.size(), NULL, 0))
                 throw winstd::win_runtime_error(__FUNCTION__ " Error importing key.");
             return key.detach();
-        }
-
-        ///
-        /// Creates HMAC hash
-        ///
-        /// \param[in] key   HMAC key
-        /// \param[in] info  Additional HMAC parameters
-        ///
-        /// \returns Hash
-        ///
-        inline HCRYPTHASH create_hmac_hash(
-            _In_       HCRYPTKEY key,
-            _In_ const HMAC_INFO info)
-        {
-            winstd::crypt_hash hash;
-            if (!hash.create(m_cp, CALG_HMAC, key, 0))
-                throw winstd::win_runtime_error(__FUNCTION__ " Error creating HMAC hash.");
-            if (!CryptSetHashParam(hash, HP_HMAC_INFO, (const BYTE*)&info, 0))
-                throw winstd::win_runtime_error(__FUNCTION__ " Error setting HMAC hash parameters.");
-            return hash.detach();
         }
 
     public:
@@ -633,9 +686,9 @@ namespace eap
         packet m_packet_res;                                    ///< Response packet
 
         winstd::crypt_prov m_cp;                                ///< Cryptography provider
-        winstd::crypt_key m_key_hmac;                           ///< Symmetric key for HMAC calculation
-        winstd::crypt_key m_key_encrypt;                        ///< Key for encrypting messages
-        winstd::crypt_key m_key_decrypt;                        ///< Key for decrypting messages
+        sanitizing_blob m_padding_hmac_client;                  ///< Padding (key) for HMAC calculation
+        winstd::crypt_key m_key_client;                         ///< Key for encrypting messages
+        winstd::crypt_key m_key_server;                         ///< Key for decrypting messages
 
         random m_random_client;                                 ///< Client random
         random m_random_server;                                 ///< Server random

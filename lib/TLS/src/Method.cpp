@@ -179,6 +179,79 @@ void eap::method_tls::master_secret::clear()
 
 
 //////////////////////////////////////////////////////////////////////
+// eap::method_tls::hash_hmac
+//////////////////////////////////////////////////////////////////////
+
+eap::method_tls::hash_hmac::hash_hmac(
+    _In_                               HCRYPTPROV hProv,
+    _In_                               ALG_ID     alg,
+    _In_bytecount_(size_secret ) const void       *secret,
+    _In_                               size_t     size_secret)
+{
+    // Prepare padding.
+    sanitizing_blob padding(64);
+    inner_padding(hProv, alg, secret, size_secret, padding.data());
+
+    // Continue with the other constructor.
+    this->hash_hmac::hash_hmac(hProv, alg, padding.data());
+}
+
+
+eap::method_tls::hash_hmac::hash_hmac(
+    _In_       HCRYPTPROV    hProv,
+    _In_       ALG_ID        alg,
+    _In_ const unsigned char padding[64])
+{
+    // Create inner hash.
+    if (!m_hash_inner.create(hProv, alg))
+        throw win_runtime_error(__FUNCTION__ " Error creating inner hash.");
+
+    // Initialize it with the inner padding.
+    if (!CryptHashData(m_hash_inner, padding, 64, 0))
+        throw win_runtime_error(__FUNCTION__ " Error hashing secret XOR inner padding.");
+
+    // Convert inner padding to outer padding for final calculation.
+    unsigned char padding_out[64];
+    for (size_t i = 0; i < 64; i++)
+        padding_out[i] = padding[i] ^ (0x36 ^ 0x5c);
+
+    // Create outer hash.
+    if (!m_hash_outer.create(hProv, alg))
+        throw win_runtime_error(__FUNCTION__ " Error creating outer hash.");
+
+    // Initialize it with the outer padding.
+    if (!CryptHashData(m_hash_outer, padding_out, 64, 0))
+        throw win_runtime_error(__FUNCTION__ " Error hashing secret XOR inner padding.");
+}
+
+
+void eap::method_tls::hash_hmac::inner_padding(
+    _In_                               HCRYPTPROV    hProv,
+    _In_                               ALG_ID        alg,
+    _In_bytecount_(size_secret ) const void          *secret,
+    _In_                               size_t        size_secret,
+    _Out_                              unsigned char padding[64])
+{
+    if (size_secret > 64) {
+        // If the secret is longer than padding, use secret's hash instead.
+        crypt_hash hash;
+        if (!hash.create(hProv, alg))
+            throw win_runtime_error(__FUNCTION__ " Error creating hash.");
+        if (!CryptHashData(hash, (const BYTE*)secret, (DWORD)size_secret, 0))
+            throw win_runtime_error(__FUNCTION__ " Error hashing.");
+        DWORD size_hash = 64;
+        if (!CryptGetHashParam(hash, HP_HASHVAL, padding, &size_hash, 0))
+            throw win_runtime_error(__FUNCTION__ " Error finishing hash.");
+        size_secret = size_hash;
+    } else
+        memcpy(padding, secret, size_secret);
+    for (size_t i = 0; i < size_secret; i++)
+        padding[i] ^= 0x36;
+    memset(padding + size_secret, 0x36, 64 - size_secret);
+}
+
+
+//////////////////////////////////////////////////////////////////////
 // eap::method_tls
 //////////////////////////////////////////////////////////////////////
 
@@ -378,9 +451,9 @@ void eap::method_tls::process_request_packet(
         // This is the TLS start message: initialize method.
         m_phase = phase_client_hello;
         m_packet_res.clear();
-        m_key_hmac.free();
-        m_key_encrypt.free();
-        m_key_decrypt.free();
+        m_padding_hmac_client.clear();
+        m_key_client.free();
+        m_key_server.free();
 
         // Generate client randomness.
         _time32(&m_random_client.time);
@@ -482,7 +555,7 @@ void eap::method_tls::process_request_packet(
                     throw win_runtime_error(__FUNCTION__ " Error encrypting PMS.");
 
                 // Derive master secret.
-                vector<unsigned char> lblseed, hash;
+                sanitizing_blob lblseed;
                 const unsigned char s_label[] = "master secret";
                 lblseed.assign(s_label, s_label + _countof(s_label) - 1);
                 lblseed.insert(lblseed.end(), (const unsigned char*)&m_random_client, (const unsigned char*)(&m_random_client + 1));
@@ -743,7 +816,7 @@ eap::sanitizing_blob eap::method_tls::make_finished()
     msg.insert(msg.end(), (unsigned char*)&ssl_header, (unsigned char*)(&ssl_header + 1));
 
     // Create label + hash MD5 + hash SHA-1 seed.
-    vector<unsigned char> lblseed, hash;
+    sanitizing_blob lblseed, hash;
     const unsigned char s_label[] = "client finished";
     lblseed.assign(s_label, s_label + _countof(s_label) - 1);
     if (!CryptGetHashParam(m_hash_handshake_msgs_md5, HP_HASHVAL, hash, 0))
@@ -752,7 +825,7 @@ eap::sanitizing_blob eap::method_tls::make_finished()
     if (!CryptGetHashParam(m_hash_handshake_msgs_sha1, HP_HASHVAL, hash, 0))
         throw win_runtime_error(__FUNCTION__ " Error finishing SHA-1 hash calculation.");
     lblseed.insert(lblseed.end(), hash.begin(), hash.end());
-    vector<unsigned char> verify(prf(&m_master_secret, sizeof(m_master_secret), lblseed.data(), lblseed.size(), 12));
+    sanitizing_blob verify(prf(&m_master_secret, sizeof(m_master_secret), lblseed.data(), lblseed.size(), 12));
     msg.insert(msg.end(), verify.begin(), verify.end());
 
     return msg;
@@ -788,32 +861,44 @@ eap::sanitizing_blob eap::method_tls::make_handshake(_In_ const sanitizing_blob 
 
 void eap::method_tls::derive_keys()
 {
-    vector<unsigned char> lblseed;
+    sanitizing_blob lblseed;
     const unsigned char s_label[] = "key expansion";
     lblseed.assign(s_label, s_label + _countof(s_label) - 1);
     lblseed.insert(lblseed.end(), (const unsigned char*)&m_random_server, (const unsigned char*)(&m_random_server + 1));
     lblseed.insert(lblseed.end(), (const unsigned char*)&m_random_client, (const unsigned char*)(&m_random_client + 1));
 
-    vector<unsigned char> key_block(prf(&m_master_secret, sizeof(m_master_secret), lblseed.data(), lblseed.size(),
+    sanitizing_blob key_block(prf(&m_master_secret, sizeof(m_master_secret), lblseed.data(), lblseed.size(),
         2*20 +  // client_write_MAC_secret & server_write_MAC_secret (SHA1)
         2*24 +  // client_write_key        & server_write_key        (3DES)
         2* 8)); // client_write_IV         & server_write_IV
+    const unsigned char *_key_block = key_block.data();
 
-    const unsigned char *data = key_block.data();
-    static const BLOBHEADER s_key_struct = {
-        OPAQUEKEYBLOB,
-        CUR_BLOB_VERSION,
-        0,
-        CALG_RC4
-    };
-    vector<unsigned char> key;
-    key.assign((const unsigned char*)&s_key_struct, (const unsigned char*)(&s_key_struct + 1));
-    key.insert(key.end(), data, data + 20);
-    if (!m_key_hmac.import(m_cp, key.data(), (DWORD)key.size(), NULL, 0))
-        throw win_runtime_error(__FUNCTION__ " Error importing client_write_MAC_secret key.");
+    // client_write_MAC_secret
+    m_padding_hmac_client.resize(64);
+    hash_hmac::inner_padding(m_cp, CALG_SHA1, _key_block, 20, m_padding_hmac_client.data());
+    _key_block += 20;
 
+    // server_write_MAC_secret
+    // Skip!
+    _key_block += 20;
 
-    // TODO: Derive rest of the keys.
+    // client_write_key
+    m_key_client = create_key(CALG_3DES, _key_block, 24);
+    _key_block += 24;
+
+    // server_write_key
+    m_key_server = create_key(CALG_3DES, _key_block, 24);
+    _key_block += 24;
+
+    // client_write_IV
+    if (!CryptSetKeyParam(m_key_client, KP_IV, _key_block, 0))
+        throw win_runtime_error(__FUNCTION__ " Error setting client_write_IV.");
+    _key_block += 8;
+
+    // server_write_IV
+    if (!CryptSetKeyParam(m_key_server, KP_IV, _key_block, 0))
+        throw win_runtime_error(__FUNCTION__ " Error setting server_write_IV.");
+    _key_block += 8;
 }
 
 
@@ -960,7 +1045,7 @@ void eap::method_tls::process_handshake(_In_bytecount_(msg_size) const void *_ms
                     throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, string_printf(__FUNCTION__ " Finished record size incorrect (expected 12B, received %uB).", rec_end - rec));
 
                 // Create label + hash MD5 + hash SHA-1 seed.
-                vector<unsigned char> lblseed, hash;
+                sanitizing_blob lblseed, hash;
                 const unsigned char s_label[] = "server finished";
                 lblseed.assign(s_label, s_label + _countof(s_label) - 1);
                 if (!CryptGetHashParam(m_hash_handshake_msgs_md5, HP_HASHVAL, hash, 0))
@@ -1095,8 +1180,7 @@ void eap::method_tls::verify_server_trust()
 void eap::method_tls::encrypt_message(_Inout_ sanitizing_blob &msg)
 {
     // Create a HMAC hash.
-    static const HMAC_INFO s_hmac_info = { CALG_SHA1 };
-    crypt_hash hash_hmac(create_hmac_hash(m_key_hmac, s_hmac_info));
+    hash_hmac hash_hmac(m_cp, CALG_SHA1, m_padding_hmac_client.data());
 
     // Hash sequence number and message.
     unsigned __int64 seq_num = htonll(m_seq_num);
@@ -1105,9 +1189,8 @@ void eap::method_tls::encrypt_message(_Inout_ sanitizing_blob &msg)
         throw win_runtime_error(__FUNCTION__ " Error hashing data.");
 
     // Calculate hash.
-    vector<unsigned char> hmac;
-    if (!CryptGetHashParam(hash_hmac, HP_HASHVAL, hmac, 0))
-        throw win_runtime_error(__FUNCTION__ " Error finishing hash calculation.");
+    sanitizing_blob hmac;
+    hash_hmac.calculate(hmac);
 
     // Remove SSL/TLS header (record type, version, message size).
     msg.erase(msg.begin(), msg.begin() + 5);
@@ -1132,7 +1215,7 @@ void eap::method_tls::encrypt_message(_Inout_ sanitizing_blob &msg)
     // Encrypt.
     assert(size < 0xffffffff);
     DWORD size2 = (DWORD)size;
-    if (!CryptEncrypt(m_key_encrypt, NULL, FALSE, 0, msg.data(), &size2, (DWORD)size))
+    if (!CryptEncrypt(m_key_client, NULL, FALSE, 0, msg.data(), &size2, (DWORD)size))
         throw win_runtime_error(__FUNCTION__ " Error encrypting message.");
 
     // Increment sequence number.
@@ -1144,7 +1227,7 @@ void eap::method_tls::decrypt_message(_Inout_ sanitizing_blob &msg)
 {
     // Decrypt.
     DWORD size = (DWORD)msg.size();
-    if (!CryptDecrypt(m_key_decrypt, NULL, FALSE, 0, msg.data(), &size))
+    if (!CryptDecrypt(m_key_server, NULL, FALSE, 0, msg.data(), &size))
         throw win_runtime_error(__FUNCTION__ " Error decrypting message.");
 
     // Remove padding.
@@ -1152,81 +1235,74 @@ void eap::method_tls::decrypt_message(_Inout_ sanitizing_blob &msg)
 }
 
 
-vector<unsigned char> eap::method_tls::prf(
-    _In_bytecount_(size_secret ) const void   *secret,
-    _In_                               size_t size_secret,
-    _In_bytecount_(size_lblseed) const void   *lblseed,
-    _In_                               size_t size_lblseed,
-    _In_                               size_t size)
-{
-    size_t
-        L_S1 = (size_secret + 1) / 2,
-        L_S2 = L_S1;
-
-    const void
-        *S1 = secret,
-        *S2 = (const unsigned char*)secret + (size_secret - L_S2);
-
-    vector<unsigned char>
-        p_md5 (p_hash(CALG_MD5 , S1, L_S1, lblseed, size_lblseed, size)),
-        p_sha1(p_hash(CALG_SHA1, S2, L_S2, lblseed, size_lblseed, size)),
-        p(size);
-
-    for (size_t i = 0; i < size; i++)
-        p[i] = p_md5[i] ^ p_sha1[i];
-
-    return p;
-}
-
-
-vector<unsigned char> eap::method_tls::p_hash(
-    _In_                              ALG_ID alg,
+eap::sanitizing_blob eap::method_tls::prf(
     _In_bytecount_(size_secret) const void   *secret,
     _In_                              size_t size_secret,
     _In_bytecount_(size_seed)   const void   *seed,
     _In_                              size_t size_seed,
     _In_                              size_t size)
 {
-    // HMAC symmetric key creation.
-    crypt_key key_hmac(create_hmac_key(secret, size_secret));
-    vector<unsigned char> block;
-    const HMAC_INFO hmac_info = { alg };
+    // Split secret in two halves.
+    size_t
+        size_S1 = (size_secret + 1) / 2,
+        size_S2 = size_S1;
+    const void
+        *S1 = secret,
+        *S2 = (const unsigned char*)secret + (size_secret - size_S2);
 
-    vector<unsigned char> data;
-    data.reserve(size);
+    // Precalculate HMAC padding for speed.
+    sanitizing_blob
+        hmac_padding1(64),
+        hmac_padding2(64);
+    hash_hmac::inner_padding(m_cp, CALG_MD5 , S1, size_S1, hmac_padding1.data());
+    hash_hmac::inner_padding(m_cp, CALG_SHA1, S2, size_S2, hmac_padding2.data());
 
-    // https://tools.ietf.org/html/rfc5246#section-5:
-    //
-    // P_hash(secret, seed) = HMAC_hash(secret, A(1) + seed) +
-    //                        HMAC_hash(secret, A(2) + seed) +
-    //                        HMAC_hash(secret, A(3) + seed) + ...
-    // 
-    // where + indicates concatenation.
-    // 
-    // A() is defined as:
-    // 
-    //    A(0) = seed
-    //    A(i) = HMAC_hash(secret, A(i-1))
+    // Prepare A for p_hash.
+    sanitizing_blob
+        A1((unsigned char*)seed, (unsigned char*)seed + size_seed),
+        A2((unsigned char*)seed, (unsigned char*)seed + size_seed);
 
-    vector<unsigned char> A((unsigned char*)seed, (unsigned char*)seed + size_seed);
-    while (data.size() < size) {
-        // Hash A.
-        crypt_hash hash_hmac1(create_hmac_hash(key_hmac, hmac_info));
-        if (!CryptHashData(hash_hmac1, A.data(), (DWORD)A.size(), 0))
-            throw win_runtime_error(__FUNCTION__ " Error hashing A.");
-        if (!CryptGetHashParam(hash_hmac1, HP_HASHVAL, A, 0))
-            throw win_runtime_error(__FUNCTION__ " Error finishing hash A calculation.");
+    sanitizing_blob
+        hmac1,
+        hmac2;
+    sanitizing_blob data(size);
+    for (size_t i = 0, off1 = 0, off2 = 0; i < size; ) {
+        if (off1 >= hmac1.size()) {
+            // Rehash A.
+            hash_hmac hash1(m_cp, CALG_MD5 , hmac_padding1.data());
+            if (!CryptHashData(hash1, A1.data(), (DWORD)A1.size(), 0))
+                throw win_runtime_error(__FUNCTION__ " Error hashing A1.");
+            hash1.calculate(A1);
 
-        // Hash A and seed.
-        crypt_hash hash_hmac2(create_hmac_hash(key_hmac, hmac_info));
-        if (!CryptHashData(hash_hmac2, A.data(), (DWORD)A.size(), 0) ||
-            !CryptHashData(hash_hmac2, (const BYTE*)seed, (DWORD)size_seed, 0))
-            throw win_runtime_error(__FUNCTION__ " Error hashing seed.");
-        if (!CryptGetHashParam(hash_hmac2, HP_HASHVAL, block, 0))
-            throw win_runtime_error(__FUNCTION__ " Error finishing hash A+seed calculation.");
+            // Hash A and seed.
+            hash_hmac hash2(m_cp, CALG_MD5 , hmac_padding1.data());
+            if (!CryptHashData(hash2,              A1.data(), (DWORD)A1.size(), 0) ||
+                !CryptHashData(hash2, (const BYTE*)seed     , (DWORD)size_seed, 0))
+                throw win_runtime_error(__FUNCTION__ " Error hashing seed,label or data.");
+            hash2.calculate(hmac1);
+            off1 = 0;
+        }
 
-        // Append to output data.
-        data.insert(data.end(), block.begin(), block.end());
+        if (off2 >= hmac2.size()) {
+            // Rehash A.
+            hash_hmac hash1(m_cp, CALG_SHA1 , hmac_padding2.data());
+            if (!CryptHashData(hash1, A2.data(), (DWORD)A2.size(), 0))
+                throw win_runtime_error(__FUNCTION__ " Error hashing A2.");
+            hash1.calculate(A2);
+
+            // Hash A and seed.
+            hash_hmac hash2(m_cp, CALG_SHA1 , hmac_padding2.data());
+            if (!CryptHashData(hash2,              A2.data(), (DWORD)A2.size(), 0) ||
+                !CryptHashData(hash2, (const BYTE*)seed     , (DWORD)size_seed, 0))
+                throw win_runtime_error(__FUNCTION__ " Error hashing seed,label or data.");
+            hash2.calculate(hmac2);
+            off2 = 0;
+        }
+
+        // XOR combine amount of data we have (and need).
+        size_t i_end = std::min<size_t>(i + std::min<size_t>(hmac1.size() - off1, hmac2.size() - off2), size);
+        while (i < i_end)
+            data[i++] = hmac1[off1++] ^ hmac2[off2++];
     }
 
     return data;
