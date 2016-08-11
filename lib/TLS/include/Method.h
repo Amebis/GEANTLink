@@ -642,17 +642,17 @@ namespace eap
         void process_packet(_In_bytecount_(size_pck) const void *pck, _In_ size_t size_pck);
 
         ///
-        /// Processes a TLS handshake
+        /// Processes a TLS change_cipher_spec message
         ///
-        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter A.1. Record Layer)](https://tools.ietf.org/html/rfc5246#appendix-A.1)
+        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter 7.1. Change Cipher Spec Protocol)](https://tools.ietf.org/html/rfc5246#section-7.1)
         ///
-        /// \param[in] msg      TLS handshake message data
-        /// \param[in] msg_size TLS handshake message data size
+        /// \param[in] msg      TLS change_cipher_spec message data
+        /// \param[in] msg_size TLS change_cipher_spec message data size
         ///
-        void process_handshake(_In_bytecount_(msg_size) const void *msg, _In_ size_t msg_size);
+        void process_change_cipher_spec(_In_bytecount_(msg_size) const void *msg, _In_ size_t msg_size);
 
         ///
-        /// Processes a TLS handshake
+        /// Processes a TLS alert message
         ///
         /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter 7.2. Alert Protocol)](https://tools.ietf.org/html/rfc5246#section-7.2)
         ///
@@ -660,6 +660,26 @@ namespace eap
         /// \param[in] msg_size TLS alert message data size
         ///
         void process_alert(_In_bytecount_(msg_size) const void *msg, _In_ size_t msg_size);
+
+        ///
+        /// Processes a TLS handshake message
+        ///
+        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter 7.4. Handshake Protocol)](https://tools.ietf.org/html/rfc5246#section-7.4)
+        ///
+        /// \param[in] msg      TLS handshake message data
+        /// \param[in] msg_size TLS handshake message data size
+        ///
+        void process_handshake(_In_bytecount_(msg_size) const void *msg, _In_ size_t msg_size);
+
+        ///
+        /// Processes a TLS application_data message
+        ///
+        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter 10. Application Data Protocol)](https://tools.ietf.org/html/rfc5246#section-10)
+        ///
+        /// \param[in] msg      TLS application_data message data
+        /// \param[in] msg_size TLS application_data message data size
+        ///
+        void process_application_data(_In_bytecount_(msg_size) const void *msg, _In_ size_t msg_size);
 
         ///
         /// Verifies server's certificate if trusted by configuration
@@ -773,7 +793,7 @@ namespace eap
         winstd::crypt_hash m_hash_handshake_msgs_sha1;          ///< Running SHA-1 hash of handshake messages sent
 
         bool m_send_client_cert;                                ///< Did server request client certificate?
-        //bool m_server_hello_done;                               ///< Is server hello done?
+        bool m_server_hello_done;                               ///< Is server hello done?
         bool m_server_finished;                                 ///< Did server send a valid finish message?
         bool m_cipher_spec;                                     ///< Did server specify cipher?
 

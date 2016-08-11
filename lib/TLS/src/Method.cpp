@@ -325,7 +325,7 @@ eap::method_tls::method_tls(_In_ module &module, _In_ config_method_tls &cfg, _I
     m_cred(cred),
     m_phase(phase_unknown),
     m_send_client_cert(false),
-    //m_server_hello_done(false),
+    m_server_hello_done(false),
     m_server_finished(false),
     m_cipher_spec(false),
     m_seq_num(0),
@@ -346,7 +346,7 @@ eap::method_tls::method_tls(_In_ const method_tls &other) :
     m_hash_handshake_msgs_md5(other.m_hash_handshake_msgs_md5),
     m_hash_handshake_msgs_sha1(other.m_hash_handshake_msgs_sha1),
     m_send_client_cert(other.m_send_client_cert),
-    //m_server_hello_done(other.m_server_hello_done),
+    m_server_hello_done(other.m_server_hello_done),
     m_server_finished(other.m_server_finished),
     m_cipher_spec(other.m_cipher_spec),
     m_seq_num(other.m_seq_num),
@@ -367,7 +367,7 @@ eap::method_tls::method_tls(_Inout_ method_tls &&other) :
     m_hash_handshake_msgs_md5(std::move(other.m_hash_handshake_msgs_md5)),
     m_hash_handshake_msgs_sha1(std::move(other.m_hash_handshake_msgs_sha1)),
     m_send_client_cert(std::move(other.m_send_client_cert)),
-    //m_server_hello_done(std::move(other.m_server_hello_done)),
+    m_server_hello_done(std::move(other.m_server_hello_done)),
     m_server_finished(std::move(other.m_server_finished)),
     m_cipher_spec(std::move(other.m_cipher_spec)),
     m_seq_num(std::move(other.m_seq_num)),
@@ -391,7 +391,7 @@ eap::method_tls& eap::method_tls::operator=(_In_ const method_tls &other)
         m_hash_handshake_msgs_md5  = other.m_hash_handshake_msgs_md5;
         m_hash_handshake_msgs_sha1 = other.m_hash_handshake_msgs_sha1;
         m_send_client_cert         = other.m_send_client_cert;
-        //m_server_hello_done        = other.m_server_hello_done;
+        m_server_hello_done        = other.m_server_hello_done;
         m_server_finished          = other.m_server_finished;
         m_cipher_spec              = other.m_cipher_spec;
         m_seq_num                  = other.m_seq_num;
@@ -416,7 +416,7 @@ eap::method_tls& eap::method_tls::operator=(_Inout_ method_tls &&other)
         m_hash_handshake_msgs_md5  = std::move(other.m_hash_handshake_msgs_md5);
         m_hash_handshake_msgs_sha1 = std::move(other.m_hash_handshake_msgs_sha1);
         m_send_client_cert         = std::move(other.m_send_client_cert);
-        //m_server_hello_done        = std::move(other.m_server_hello_done);
+        m_server_hello_done        = std::move(other.m_server_hello_done);
         m_server_finished          = std::move(other.m_server_finished);
         m_cipher_spec              = std::move(other.m_cipher_spec);
         m_seq_num                  = std::move(other.m_seq_num);
@@ -475,14 +475,14 @@ void eap::method_tls::process_request_packet(
                 // Preallocate data according to the Length field.
                 size_t size_tot  = ntohl(*(unsigned int*)(pReceivedPacket->Data + 2));
                 m_packet_req.m_data.reserve(size_tot);
-                m_module.log_event(&EAPMETHOD_PACKET_RECV_FRAG_FIRST, event_data((unsigned int)eap_type_tls), event_data((unsigned int)packet_data_size), event_data((unsigned int)size_tot), event_data::blank);
+                m_module.log_event(&EAPMETHOD_TLS_PACKET_RECV_FRAG_FIRST, event_data((unsigned int)eap_type_tls), event_data((unsigned int)packet_data_size), event_data((unsigned int)size_tot), event_data::blank);
             } else {
                 // The Length field was not included. Odd. Nevermind, no pre-allocation then.
-                m_module.log_event(&EAPMETHOD_PACKET_RECV_FRAG_FIRST1, event_data((unsigned int)eap_type_tls), event_data((unsigned int)packet_data_size), event_data::blank);
+                m_module.log_event(&EAPMETHOD_TLS_PACKET_RECV_FRAG_FIRST1, event_data((unsigned int)eap_type_tls), event_data((unsigned int)packet_data_size), event_data::blank);
             }
         } else {
             // Mid fragment received.
-            m_module.log_event(&EAPMETHOD_PACKET_RECV_FRAG_MID, event_data((unsigned int)eap_type_tls), event_data((unsigned int)packet_data_size), event_data((unsigned int)m_packet_req.m_data.size()), event_data::blank);
+            m_module.log_event(&EAPMETHOD_TLS_PACKET_RECV_FRAG_MID, event_data((unsigned int)eap_type_tls), event_data((unsigned int)packet_data_size), event_data((unsigned int)m_packet_req.m_data.size()), event_data::blank);
         }
         m_packet_req.m_data.insert(m_packet_req.m_data.end(), packet_data_ptr, packet_data_ptr + packet_data_size);
 
@@ -497,40 +497,11 @@ void eap::method_tls::process_request_packet(
     } else if (!m_packet_req.m_data.empty()) {
         // Last fragment received. Append data.
         m_packet_req.m_data.insert(m_packet_req.m_data.end(), packet_data_ptr, packet_data_ptr + packet_data_size);
-        m_module.log_event(&EAPMETHOD_PACKET_RECV_FRAG_LAST, event_data((unsigned int)eap_type_tls), event_data((unsigned int)packet_data_size), event_data((unsigned int)m_packet_req.m_data.size()), event_data::blank);
+        m_module.log_event(&EAPMETHOD_TLS_PACKET_RECV_FRAG_LAST, event_data((unsigned int)eap_type_tls), event_data((unsigned int)packet_data_size), event_data((unsigned int)m_packet_req.m_data.size()), event_data::blank);
     } else {
         // This is a complete non-fragmented packet.
         m_packet_req.m_data.assign(packet_data_ptr, packet_data_ptr + packet_data_size);
-        m_module.log_event(&EAPMETHOD_PACKET_RECV, event_data((unsigned int)eap_type_tls), event_data((unsigned int)packet_data_size), event_data::blank);
-    }
-
-    if (pReceivedPacket->Code == EapCodeRequest && pReceivedPacket->Data[1] & flags_req_start) {
-        // This is the TLS start message: initialize method.
-        m_phase = phase_client_hello;
-        m_packet_res.clear();
-        m_padding_hmac_client.clear();
-        //m_padding_hmac_server.clear();
-        m_key_client.free();
-        m_key_server.free();
-
-        // Generate client randomness.
-        m_state.m_random_client.reset(m_cp);
-        m_server_cert_chain.clear();
-        m_session_id.clear();
-
-        // Create MD5 hash object.
-        if (!m_hash_handshake_msgs_md5.create(m_cp, CALG_MD5))
-            throw win_runtime_error(__FUNCTION__ " Error creating MD5 hashing object.");
-
-        // Create SHA-1 hash object.
-        if (!m_hash_handshake_msgs_sha1.create(m_cp, CALG_SHA1))
-            throw win_runtime_error(__FUNCTION__ " Error creating SHA-1 hashing object.");
-
-        m_send_client_cert = false;
-        //m_server_hello_done = false;
-        m_server_finished = false;
-        m_cipher_spec = false;
-        m_seq_num = 0;
+        m_module.log_event(&EAPMETHOD_TLS_PACKET_RECV, event_data((unsigned int)eap_type_tls), event_data((unsigned int)packet_data_size), event_data::blank);
     }
 
     m_packet_req.m_code  = (EapCode)pReceivedPacket->Code;
@@ -553,10 +524,39 @@ void eap::method_tls::process_request_packet(
             throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, string_printf(__FUNCTION__ " ACK expected, received %u-%u-%x.", m_packet_req.m_code, m_packet_req.m_id, m_packet_req.m_flags));
     }
 
+    if (pReceivedPacket->Code == EapCodeRequest && m_packet_req.m_flags & flags_req_start) {
+        // This is the TLS start message: initialize method.
+        m_module.log_event(&EAPMETHOD_TLS_HANDSHAKE_START2, event_data((unsigned int)eap_type_tls), event_data::blank);
+
+        m_phase = phase_client_hello;
+        m_packet_res.clear();
+        m_padding_hmac_client.clear();
+        //m_padding_hmac_server.clear();
+        m_key_client.free();
+        m_key_server.free();
+
+        // Generate client randomness.
+        m_state.m_random_client.reset(m_cp);
+        m_server_cert_chain.clear();
+        m_session_id.clear();
+
+        // Create MD5 hash object.
+        if (!m_hash_handshake_msgs_md5.create(m_cp, CALG_MD5))
+            throw win_runtime_error(__FUNCTION__ " Error creating MD5 hashing object.");
+
+        // Create SHA-1 hash object.
+        if (!m_hash_handshake_msgs_sha1.create(m_cp, CALG_SHA1))
+            throw win_runtime_error(__FUNCTION__ " Error creating SHA-1 hashing object.");
+
+        m_send_client_cert = false;
+        m_server_hello_done = false;
+        m_server_finished = false;
+        m_cipher_spec = false;
+        m_seq_num = 0;
+    }
+
     switch (m_phase) {
         case phase_client_hello: {
-            m_module.log_event(&EAPMETHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_tls), event_data::blank);
-
             // Build response packet.
             m_packet_res.m_code  = EapCodeResponse;
             m_packet_res.m_id    = m_packet_req.m_id;
@@ -576,6 +576,17 @@ void eap::method_tls::process_request_packet(
 
         case phase_server_hello: {
             process_packet(m_packet_req.m_data.data(), m_packet_req.m_data.size());
+
+            if (!m_server_hello_done) {
+                // Reply with ACK packet and wait for the next packet.
+                m_packet_res.m_code  = EapCodeResponse;
+                m_packet_res.m_id    = pReceivedPacket->Id;
+                m_packet_res.m_flags = 0;
+                m_packet_res.m_data.clear();
+                pEapOutput->fAllowNotifications = FALSE;
+                pEapOutput->action = EapPeerMethodResponseActionSend;
+                break;
+            }
 
             // Do we trust this server?
             if (m_server_cert_chain.empty())
@@ -623,6 +634,10 @@ void eap::method_tls::process_request_packet(
                 m_packet_res.m_data.insert(m_packet_res.m_data.end(), handshake.begin(), handshake.end());
                 CryptHashData(m_hash_handshake_msgs_md5 , client_key_exchange.data(), (DWORD)client_key_exchange.size(), 0);
                 CryptHashData(m_hash_handshake_msgs_sha1, client_key_exchange.data(), (DWORD)client_key_exchange.size(), 0);
+
+                if (m_send_client_cert) {
+                    // TODO: Create and append certificate_verify message!
+                }
             }
 
             // Append change cipher spec to packet.
@@ -637,6 +652,7 @@ void eap::method_tls::process_request_packet(
             } else
                 m_phase = phase_finished;
 
+            // Create finished message, and append to packet.
             sanitizing_blob finished(make_finished());
             sanitizing_blob handshake(make_handshake(finished, m_cipher_spec));
             m_packet_res.m_data.insert(m_packet_res.m_data.end(), handshake.begin(), handshake.end());
@@ -694,7 +710,7 @@ void eap::method_tls::get_response_packet(
             // No need to fragment the packet.
             m_packet_res.m_flags &= ~flags_res_length_incl; // No need to explicitly include the Length field either.
             data_dst = pSendPacket->Data + 2;
-            m_module.log_event(&EAPMETHOD_PACKET_SEND, event_data((unsigned int)eap_type_tls), event_data((unsigned int)size_data), event_data::blank);
+            m_module.log_event(&EAPMETHOD_TLS_PACKET_SEND, event_data((unsigned int)eap_type_tls), event_data((unsigned int)size_data), event_data::blank);
         } else {
             // But it should be fragmented.
             m_packet_res.m_flags |= flags_res_length_incl | flags_res_more_frag;
@@ -702,7 +718,7 @@ void eap::method_tls::get_response_packet(
             data_dst = pSendPacket->Data + 6;
             size_data   = size_packet_limit - 10;
             size_packet = size_packet_limit;
-            m_module.log_event(&EAPMETHOD_PACKET_SEND_FRAG_FIRST, event_data((unsigned int)eap_type_tls), event_data((unsigned int)size_data), event_data((unsigned int)(m_packet_res.m_data.size() - size_data)), event_data::blank);
+            m_module.log_event(&EAPMETHOD_TLS_PACKET_SEND_FRAG_FIRST, event_data((unsigned int)eap_type_tls), event_data((unsigned int)size_data), event_data((unsigned int)(m_packet_res.m_data.size() - size_data)), event_data::blank);
         }
     } else {
         // Continuing the fragmented packet...
@@ -711,11 +727,11 @@ void eap::method_tls::get_response_packet(
             m_packet_res.m_flags &= ~flags_res_length_incl;
             size_data   = size_packet_limit - 6;
             size_packet = size_packet_limit;
-            m_module.log_event(&EAPMETHOD_PACKET_SEND_FRAG_MID, event_data((unsigned int)eap_type_tls), event_data((unsigned int)size_data), event_data((unsigned int)(m_packet_res.m_data.size() - size_data)), event_data::blank);
+            m_module.log_event(&EAPMETHOD_TLS_PACKET_SEND_FRAG_MID, event_data((unsigned int)eap_type_tls), event_data((unsigned int)size_data), event_data((unsigned int)(m_packet_res.m_data.size() - size_data)), event_data::blank);
         } else {
             // This is the last fragment.
             m_packet_res.m_flags &= ~(flags_res_length_incl | flags_res_more_frag);
-            m_module.log_event(&EAPMETHOD_PACKET_SEND_FRAG_LAST, event_data((unsigned int)eap_type_tls), event_data((unsigned int)size_data), event_data((unsigned int)(m_packet_res.m_data.size() - size_data)), event_data::blank);
+            m_module.log_event(&EAPMETHOD_TLS_PACKET_SEND_FRAG_LAST, event_data((unsigned int)eap_type_tls), event_data((unsigned int)size_data), event_data((unsigned int)(m_packet_res.m_data.size() - size_data)), event_data::blank);
         }
         data_dst = pSendPacket->Data + 2;
     }
@@ -992,16 +1008,7 @@ void eap::method_tls::process_packet(_In_bytecount_(size_pck) const void *_pck, 
             // Process TLS 1.0 message.
             switch (hdr->type) {
             case message_type_change_cipher_spec:
-                if (msg + 1 > msg_end)
-                    throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Incomplete change cipher spec message.");
-                else if (msg[0] != 1)
-                    throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, string_printf(__FUNCTION__ " Invalid change cipher spec message (expected 1, received %u).", msg[0]));
-
-                if (!m_cipher_spec) {
-                    // Resuming previous session.
-                    derive_keys();
-                    m_cipher_spec = true;
-                }
+                process_change_cipher_spec(msg, msg_end - msg);
                 break;
 
             case message_type_alert:
@@ -1021,11 +1028,55 @@ void eap::method_tls::process_packet(_In_bytecount_(size_pck) const void *_pck, 
                 } else
                     process_handshake(msg, msg_end - msg);
                 break;
+
+            case message_type_application_data:
+                if (!m_cipher_spec)
+                    throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Application data should be encrypted.");
+
+                sanitizing_blob msg_dec(msg, msg_end);
+                decrypt_message(msg_dec);
+                process_application_data(msg_dec.data(), msg_dec.size());
+                break;
             }
         }
 
         pck = msg_end;
     }
+}
+
+
+void eap::method_tls::process_change_cipher_spec(_In_bytecount_(msg_size) const void *_msg, _In_ size_t msg_size)
+{
+    if (msg_size < 1)
+        throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Incomplete change cipher spec.");
+
+    const unsigned char *msg = (const unsigned char*)_msg;
+    if (msg[0] != 1)
+        throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, string_printf(__FUNCTION__ " Invalid change cipher spec message (expected 1, received %u).", msg[0]));
+
+    m_module.log_event(&EAPMETHOD_TLS_CHANGE_CIPHER_SPEC, event_data((unsigned int)eap_type_tls), event_data::blank);
+
+    if (!m_cipher_spec) {
+        // Resuming previous session.
+        derive_keys();
+        m_cipher_spec = true;
+    }
+}
+
+
+void eap::method_tls::process_alert(_In_bytecount_(msg_size) const void *_msg, _In_ size_t msg_size)
+{
+    if (msg_size < 2)
+        throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Incomplete alert.");
+
+    const unsigned char *msg = (const unsigned char*)_msg;
+
+    m_module.log_event(&EAPMETHOD_TLS_ALERT, event_data((unsigned int)eap_type_tls), event_data((unsigned char)msg[0]), event_data((unsigned char)msg[1]), event_data::blank);
+
+    //if (msg[0] == alert_level_fatal) {
+    //    // Clear session ID to avoid reconnection attempts.
+    //    m_session_id.clear();
+    //}
 }
 
 
@@ -1043,7 +1094,8 @@ void eap::method_tls::process_handshake(_In_bytecount_(msg_size) const void *_ms
             throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Incomplete record data.");
 
         // Process record.
-        switch (hdr >> 24) {
+        unsigned char type = hdr >> 24;
+        switch (type) {
             case handshake_type_server_hello:
                 // TLS version
                 if (rec + 2 > rec_end)
@@ -1071,6 +1123,7 @@ void eap::method_tls::process_handshake(_In_bytecount_(msg_size) const void *_ms
                 if (rec[0] != 0x00 || rec[1] != 0x0a)
                     throw win_runtime_error(ERROR_NOT_SUPPORTED, string_printf(__FUNCTION__ " Other than requested cipher selected (expected 0x000a, received 0x%02x%02x).", rec[0], rec[1]));
 
+                m_module.log_event(&EAPMETHOD_TLS_SERVER_HELLO, event_data((unsigned int)eap_type_tls), event_data((unsigned int)m_session_id.size()), event_data(m_session_id.data(), (ULONG)m_session_id.size()), event_data::blank);
                 break;
 
             case handshake_type_certificate: {
@@ -1103,15 +1156,20 @@ void eap::method_tls::process_handshake(_In_bytecount_(msg_size) const void *_ms
                     list = cert_end;
                 }
 
+                wstring cert_name(!m_server_cert_chain.empty() ? get_cert_title(m_server_cert_chain.front()) : L"<blank>");
+                m_module.log_event(&EAPMETHOD_TLS_CERTIFICATE, event_data((unsigned int)eap_type_tls), event_data(cert_name), event_data::blank);
                 break;
             }
 
             case handshake_type_certificate_request:
                 m_send_client_cert = true;
+                m_module.log_event(&EAPMETHOD_TLS_CERTIFICATE_REQUEST, event_data((unsigned int)eap_type_tls), event_data::blank);
                 break;
 
-            //case handshake_type_server_hello_done:
-            //    m_server_hello_done = true;
+            case handshake_type_server_hello_done:
+                m_server_hello_done = true;
+                m_module.log_event(&EAPMETHOD_TLS_SERVER_HELLO_DONE, event_data((unsigned int)eap_type_tls), event_data::blank);
+                break;
 
             case handshake_type_finished: {
                 // According to https://tools.ietf.org/html/rfc5246#section-7.4.9 all verify_data is 12B.
@@ -1133,8 +1191,12 @@ void eap::method_tls::process_handshake(_In_bytecount_(msg_size) const void *_ms
                     throw win_runtime_error(ERROR_ENCRYPTION_FAILED, __FUNCTION__ " Integrity check failed.");
 
                 m_server_finished = true;
+                m_module.log_event(&EAPMETHOD_TLS_FINISHED, event_data((unsigned int)eap_type_tls), event_data::blank);
                 break;
             }
+
+            default:
+                m_module.log_event(&EAPMETHOD_TLS_HANDSHAKE_IGNORE, event_data((unsigned int)eap_type_tls), event_data(type), event_data::blank);
         }
 
         msg = rec_end;
@@ -1142,17 +1204,10 @@ void eap::method_tls::process_handshake(_In_bytecount_(msg_size) const void *_ms
 }
 
 
-void eap::method_tls::process_alert(_In_bytecount_(msg_size) const void *msg, _In_ size_t msg_size)
+void eap::method_tls::process_application_data(_In_bytecount_(msg_size) const void *msg, _In_ size_t msg_size)
 {
     UNREFERENCED_PARAMETER(msg);
-
-    if (msg_size < 2)
-        throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Incomplete alert.");
-
-    //if (msg[0] == alert_level_fatal) {
-    //    // Clear session ID to avoid reconnection attempts.
-    //    m_session_id.clear();
-    //}
+    UNREFERENCED_PARAMETER(msg_size);
 }
 
 
@@ -1180,7 +1235,7 @@ void eap::method_tls::verify_server_trust()
                 if (_stricmp(a, b) == 0 || // Direct match
                     a[0] == '*' && len_b + 1 >= len_a && _stricmp(a + 1, b + len_b - (len_a - 1)) == 0) // "*..." wildchar match
                 {
-                    m_module.log_event(&EAPMETHOD_SERVER_NAME_TRUSTED, event_data(subj), event_data::blank);
+                    m_module.log_event(&EAPMETHOD_TLS_SERVER_NAME_TRUSTED, event_data(subj), event_data::blank);
                     break;
                 }
             } else
@@ -1247,7 +1302,7 @@ void eap::method_tls::verify_server_trust()
         }
     }
 
-    m_module.log_event(&EAPMETHOD_SERVER_CERT_TRUSTED, event_data::blank);
+    m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_TRUSTED, event_data::blank);
 }
 
 
