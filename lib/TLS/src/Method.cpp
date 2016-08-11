@@ -131,6 +131,14 @@ void eap::method_tls::random::clear()
 }
 
 
+void eap::method_tls::random::reset(_In_ HCRYPTPROV cp)
+{
+    _time32(&time);
+    if (!CryptGenRandom(cp, sizeof(data), data))
+        throw win_runtime_error(__FUNCTION__ " Error creating randomness.");
+}
+
+
 //////////////////////////////////////////////////////////////////////
 // eap::method_tls::master_secret
 //////////////////////////////////////////////////////////////////////
@@ -183,27 +191,27 @@ void eap::method_tls::master_secret::clear()
 //////////////////////////////////////////////////////////////////////
 
 eap::method_tls::hash_hmac::hash_hmac(
-    _In_                               HCRYPTPROV hProv,
+    _In_                               HCRYPTPROV cp,
     _In_                               ALG_ID     alg,
     _In_bytecount_(size_secret ) const void       *secret,
     _In_                               size_t     size_secret)
 {
     // Prepare padding.
     sanitizing_blob padding(sizeof(padding_t));
-    inner_padding(hProv, alg, secret, size_secret, padding.data());
+    inner_padding(cp, alg, secret, size_secret, padding.data());
 
     // Continue with the other constructor.
-    this->hash_hmac::hash_hmac(hProv, alg, padding.data());
+    this->hash_hmac::hash_hmac(cp, alg, padding.data());
 }
 
 
 eap::method_tls::hash_hmac::hash_hmac(
-    _In_       HCRYPTPROV hProv,
+    _In_       HCRYPTPROV cp,
     _In_       ALG_ID     alg,
     _In_ const padding_t  padding)
 {
     // Create inner hash.
-    if (!m_hash_inner.create(hProv, alg))
+    if (!m_hash_inner.create(cp, alg))
         throw win_runtime_error(__FUNCTION__ " Error creating inner hash.");
 
     // Initialize it with the inner padding.
@@ -216,7 +224,7 @@ eap::method_tls::hash_hmac::hash_hmac(
         padding_out[i] = padding[i] ^ (0x36 ^ 0x5c);
 
     // Create outer hash.
-    if (!m_hash_outer.create(hProv, alg))
+    if (!m_hash_outer.create(cp, alg))
         throw win_runtime_error(__FUNCTION__ " Error creating outer hash.");
 
     // Initialize it with the outer padding.
@@ -226,7 +234,7 @@ eap::method_tls::hash_hmac::hash_hmac(
 
 
 void eap::method_tls::hash_hmac::inner_padding(
-    _In_                               HCRYPTPROV hProv,
+    _In_                               HCRYPTPROV cp,
     _In_                               ALG_ID     alg,
     _In_bytecount_(size_secret ) const void       *secret,
     _In_                               size_t     size_secret,
@@ -235,7 +243,7 @@ void eap::method_tls::hash_hmac::inner_padding(
     if (size_secret > sizeof(padding_t)) {
         // If the secret is longer than padding, use secret's hash instead.
         crypt_hash hash;
-        if (!hash.create(hProv, alg))
+        if (!hash.create(cp, alg))
             throw win_runtime_error(__FUNCTION__ " Error creating hash.");
         if (!CryptHashData(hash, (const BYTE*)secret, (DWORD)size_secret, 0))
             throw win_runtime_error(__FUNCTION__ " Error hashing.");
@@ -249,6 +257,63 @@ void eap::method_tls::hash_hmac::inner_padding(
         padding[i] ^= 0x36;
     memset(padding + size_secret, 0x36, sizeof(padding_t) - size_secret);
 }
+
+
+//////////////////////////////////////////////////////////////////////
+// eap::method_tls::conn_state
+//////////////////////////////////////////////////////////////////////
+
+eap::method_tls::conn_state::conn_state()
+{
+}
+
+
+eap::method_tls::conn_state::conn_state(_In_ const conn_state &other) :
+    m_master_secret(other.m_master_secret),
+    m_random_client(other.m_random_client),
+    m_random_server(other.m_random_server)
+{
+}
+
+
+eap::method_tls::conn_state::conn_state(_Inout_ conn_state &&other) :
+    m_master_secret(std::move(other.m_master_secret)),
+    m_random_client(std::move(other.m_random_client)),
+    m_random_server(std::move(other.m_random_server))
+{
+}
+
+
+eap::method_tls::conn_state& eap::method_tls::conn_state::operator=(_In_ const conn_state &other)
+{
+    if (this != std::addressof(other)) {
+        m_master_secret = other.m_master_secret;
+        m_random_client = other.m_random_client;
+        m_random_server = other.m_random_server;
+    }
+
+    return *this;
+}
+
+
+eap::method_tls::conn_state& eap::method_tls::conn_state::operator=(_Inout_ conn_state &&other)
+{
+    if (this != std::addressof(other)) {
+        m_master_secret = std::move(other.m_master_secret);
+        m_random_client = std::move(other.m_random_client);
+        m_random_server = std::move(other.m_random_server);
+    }
+
+    return *this;
+}
+
+
+const ALG_ID eap::method_tls::conn_state::m_alg_prf        = CALG_TLS1PRF;
+const ALG_ID eap::method_tls::conn_state::m_alg_encrypt    = CALG_3DES;
+const size_t eap::method_tls::conn_state::m_size_enc_key   = 192/8; // 3DES 192bits
+const size_t eap::method_tls::conn_state::m_size_enc_iv    = 64/8;  // 3DES 64bits
+const ALG_ID eap::method_tls::conn_state::m_alg_mac        = CALG_SHA1;
+const size_t eap::method_tls::conn_state::m_size_mac_key   = 160/8; // SHA-1
 
 
 //////////////////////////////////////////////////////////////////////
@@ -275,13 +340,11 @@ eap::method_tls::method_tls(_In_ const method_tls &other) :
     m_phase(other.m_phase),
     m_packet_req(other.m_packet_req),
     m_packet_res(other.m_packet_res),
-    m_random_client(other.m_random_client),
-    m_random_server(other.m_random_server),
+    m_state(other.m_state),
     m_session_id(other.m_session_id),
     m_server_cert_chain(other.m_server_cert_chain),
     m_hash_handshake_msgs_md5(other.m_hash_handshake_msgs_md5),
     m_hash_handshake_msgs_sha1(other.m_hash_handshake_msgs_sha1),
-    m_master_secret(other.m_master_secret),
     m_send_client_cert(other.m_send_client_cert),
     //m_server_hello_done(other.m_server_hello_done),
     m_server_finished(other.m_server_finished),
@@ -298,13 +361,11 @@ eap::method_tls::method_tls(_Inout_ method_tls &&other) :
     m_phase(std::move(other.m_phase)),
     m_packet_req(std::move(other.m_packet_req)),
     m_packet_res(std::move(other.m_packet_res)),
-    m_random_client(std::move(other.m_random_client)),
-    m_random_server(std::move(other.m_random_server)),
+    m_state(std::move(other.m_state)),
     m_session_id(std::move(other.m_session_id)),
     m_server_cert_chain(std::move(other.m_server_cert_chain)),
     m_hash_handshake_msgs_md5(std::move(other.m_hash_handshake_msgs_md5)),
     m_hash_handshake_msgs_sha1(std::move(other.m_hash_handshake_msgs_sha1)),
-    m_master_secret(std::move(other.m_master_secret)),
     m_send_client_cert(std::move(other.m_send_client_cert)),
     //m_server_hello_done(std::move(other.m_server_hello_done)),
     m_server_finished(std::move(other.m_server_finished)),
@@ -324,13 +385,11 @@ eap::method_tls& eap::method_tls::operator=(_In_ const method_tls &other)
         m_phase                    = other.m_phase;
         m_packet_req               = other.m_packet_req;
         m_packet_res               = other.m_packet_res;
-        m_random_client            = other.m_random_client;
-        m_random_server            = other.m_random_server;
+        m_state                    = other.m_state;
         m_session_id               = other.m_session_id;
         m_server_cert_chain        = other.m_server_cert_chain;
         m_hash_handshake_msgs_md5  = other.m_hash_handshake_msgs_md5;
         m_hash_handshake_msgs_sha1 = other.m_hash_handshake_msgs_sha1;
-        m_master_secret            = other.m_master_secret;
         m_send_client_cert         = other.m_send_client_cert;
         //m_server_hello_done        = other.m_server_hello_done;
         m_server_finished          = other.m_server_finished;
@@ -351,13 +410,11 @@ eap::method_tls& eap::method_tls::operator=(_Inout_ method_tls &&other)
         m_phase                    = std::move(other.m_phase);
         m_packet_req               = std::move(other.m_packet_req);
         m_packet_res               = std::move(other.m_packet_res);
-        m_random_client            = std::move(other.m_random_client);
-        m_random_server            = std::move(other.m_random_server);
+        m_state                    = std::move(other.m_state);
         m_session_id               = std::move(other.m_session_id);
         m_server_cert_chain        = std::move(other.m_server_cert_chain);
         m_hash_handshake_msgs_md5  = std::move(other.m_hash_handshake_msgs_md5);
         m_hash_handshake_msgs_sha1 = std::move(other.m_hash_handshake_msgs_sha1);
-        m_master_secret            = std::move(other.m_master_secret);
         m_send_client_cert         = std::move(other.m_send_client_cert);
         //m_server_hello_done        = std::move(other.m_server_hello_done);
         m_server_finished          = std::move(other.m_server_finished);
@@ -457,10 +514,7 @@ void eap::method_tls::process_request_packet(
         m_key_server.free();
 
         // Generate client randomness.
-        _time32(&m_random_client.time);
-        if (!CryptGenRandom(m_cp, sizeof(m_random_client.data), m_random_client.data))
-            throw win_runtime_error(__FUNCTION__ " Error creating client randomness.");
-        m_random_server.clear();
+        m_state.m_random_client.reset(m_cp);
         m_server_cert_chain.clear();
         m_session_id.clear();
 
@@ -472,7 +526,6 @@ void eap::method_tls::process_request_packet(
         if (!m_hash_handshake_msgs_sha1.create(m_cp, CALG_SHA1))
             throw win_runtime_error(__FUNCTION__ " Error creating SHA-1 hashing object.");
 
-        m_master_secret.clear();
         m_send_client_cert = false;
         //m_server_hello_done = false;
         m_server_finished = false;
@@ -514,18 +567,19 @@ void eap::method_tls::process_request_packet(
             CryptHashData(m_hash_handshake_msgs_md5 , hello.data(), (DWORD)hello.size(), 0);
             CryptHashData(m_hash_handshake_msgs_sha1, hello.data(), (DWORD)hello.size(), 0);
 
+            m_phase = phase_server_hello;
+
             pEapOutput->fAllowNotifications = FALSE;
             pEapOutput->action = EapPeerMethodResponseActionSend;
-            m_phase = phase_server_hello;
             break;
         }
 
         case phase_server_hello: {
             process_packet(m_packet_req.m_data.data(), m_packet_req.m_data.size());
 
+            // Do we trust this server?
             if (m_server_cert_chain.empty())
                 throw win_runtime_error(ERROR_ENCRYPTION_FAILED, __FUNCTION__ " Can not continue without server's certificate.");
-
             verify_server_trust();
 
             // Build response packet.
@@ -538,7 +592,7 @@ void eap::method_tls::process_request_packet(
                 // New session.
 
                 if (m_send_client_cert) {
-                    // Client certificate requested, and append to packet.
+                    // Client certificate requested.
                     sanitizing_blob client_cert(make_client_cert());
                     sanitizing_blob handshake(make_handshake(client_cert, m_cipher_spec));
                     m_packet_res.m_data.insert(m_packet_res.m_data.end(), handshake.begin(), handshake.end());
@@ -559,9 +613,9 @@ void eap::method_tls::process_request_packet(
                 sanitizing_blob lblseed;
                 const unsigned char s_label[] = "master secret";
                 lblseed.assign(s_label, s_label + _countof(s_label) - 1);
-                lblseed.insert(lblseed.end(), (const unsigned char*)&m_random_client, (const unsigned char*)(&m_random_client + 1));
-                lblseed.insert(lblseed.end(), (const unsigned char*)&m_random_server, (const unsigned char*)(&m_random_server + 1));
-                memcpy(&m_master_secret, prf(&pms, sizeof(pms), lblseed.data(), lblseed.size(), sizeof(m_master_secret)).data(), sizeof(m_master_secret));
+                lblseed.insert(lblseed.end(), (const unsigned char*)&m_state.m_random_client, (const unsigned char*)(&m_state.m_random_client + 1));
+                lblseed.insert(lblseed.end(), (const unsigned char*)&m_state.m_random_server, (const unsigned char*)(&m_state.m_random_server + 1));
+                memcpy(&m_state.m_master_secret, prf(&pms, sizeof(pms), lblseed.data(), lblseed.size(), sizeof(master_secret)).data(), sizeof(master_secret));
 
                 // Create client key exchange message, and append to packet.
                 sanitizing_blob client_key_exchange(make_client_key_exchange(pms_enc));
@@ -579,7 +633,9 @@ void eap::method_tls::process_request_packet(
                 // Setup encryption.
                 derive_keys();
                 m_cipher_spec = true;
-            }
+                m_phase = phase_change_chiper_spec;
+            } else
+                m_phase = phase_finished;
 
             sanitizing_blob finished(make_finished());
             sanitizing_blob handshake(make_handshake(finished, m_cipher_spec));
@@ -589,10 +645,26 @@ void eap::method_tls::process_request_packet(
 
             pEapOutput->fAllowNotifications = FALSE;
             pEapOutput->action = EapPeerMethodResponseActionSend;
-            m_phase = phase_resume_session;
-
-            //break; // Leave commented until finished.
+            break;
         }
+
+        case phase_change_chiper_spec:
+            process_packet(m_packet_req.m_data.data(), m_packet_req.m_data.size());
+
+            if (!m_cipher_spec || !m_server_finished)
+                throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Server did not finish.");
+
+            // TLS finished.
+            m_phase = phase_finished;
+
+            pEapOutput->fAllowNotifications = FALSE;
+            pEapOutput->action = EapPeerMethodResponseActionNone;
+            break;
+
+        case phase_finished:
+            pEapOutput->fAllowNotifications = FALSE;
+            pEapOutput->action = EapPeerMethodResponseActionNone;
+            break;
 
         default:
             throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Not supported.");
@@ -696,7 +768,7 @@ eap::sanitizing_blob eap::method_tls::make_client_hello() const
     msg.push_back(1); // SSL minor version
 
     // Client random
-    msg.insert(msg.end(), (unsigned char*)&m_random_client, (unsigned char*)(&m_random_client + 1));
+    msg.insert(msg.end(), (unsigned char*)&m_state.m_random_client, (unsigned char*)(&m_state.m_random_client + 1));
 
     // Session ID
     assert(m_session_id.size() <= 32);
@@ -826,7 +898,7 @@ eap::sanitizing_blob eap::method_tls::make_finished()
     if (!CryptGetHashParam(m_hash_handshake_msgs_sha1, HP_HASHVAL, hash, 0))
         throw win_runtime_error(__FUNCTION__ " Error finishing SHA-1 hash calculation.");
     lblseed.insert(lblseed.end(), hash.begin(), hash.end());
-    sanitizing_blob verify(prf(&m_master_secret, sizeof(m_master_secret), lblseed.data(), lblseed.size(), 12));
+    sanitizing_blob verify(prf(&m_state.m_master_secret, sizeof(master_secret), lblseed.data(), lblseed.size(), 12));
     msg.insert(msg.end(), verify.begin(), verify.end());
 
     return msg;
@@ -865,42 +937,42 @@ void eap::method_tls::derive_keys()
     sanitizing_blob lblseed;
     const unsigned char s_label[] = "key expansion";
     lblseed.assign(s_label, s_label + _countof(s_label) - 1);
-    lblseed.insert(lblseed.end(), (const unsigned char*)&m_random_server, (const unsigned char*)(&m_random_server + 1));
-    lblseed.insert(lblseed.end(), (const unsigned char*)&m_random_client, (const unsigned char*)(&m_random_client + 1));
+    lblseed.insert(lblseed.end(), (const unsigned char*)&m_state.m_random_server, (const unsigned char*)(&m_state.m_random_server + 1));
+    lblseed.insert(lblseed.end(), (const unsigned char*)&m_state.m_random_client, (const unsigned char*)(&m_state.m_random_client + 1));
 
-    sanitizing_blob key_block(prf(&m_master_secret, sizeof(m_master_secret), lblseed.data(), lblseed.size(),
-        2*20 +  // client_write_MAC_secret & server_write_MAC_secret (SHA1)
-        2*24 +  // client_write_key        & server_write_key        (3DES)
-        2* 8)); // client_write_IV         & server_write_IV
+    sanitizing_blob key_block(prf(&m_state.m_master_secret, sizeof(master_secret), lblseed.data(), lblseed.size(),
+        2*m_state.m_size_mac_key +  // client_write_MAC_secret & server_write_MAC_secret (SHA1)
+        2*m_state.m_size_enc_key +  // client_write_key        & server_write_key
+        2*m_state.m_size_enc_iv )); // client_write_IV         & server_write_IV
     const unsigned char *_key_block = key_block.data();
 
     // client_write_MAC_secret
     m_padding_hmac_client.resize(sizeof(hash_hmac::padding_t));
-    hash_hmac::inner_padding(m_cp, CALG_SHA1, _key_block, 20, m_padding_hmac_client.data());
-    _key_block += 20;
+    hash_hmac::inner_padding(m_cp, m_state.m_alg_mac, _key_block, m_state.m_size_mac_key, m_padding_hmac_client.data());
+    _key_block += m_state.m_size_mac_key;
 
     // server_write_MAC_secret
     //m_padding_hmac_server.resize(sizeof(hash_hmac::padding_t));
-    //hash_hmac::inner_padding(m_cp, CALG_SHA1, _key_block, 20, m_padding_hmac_server.data());
-    _key_block += 20;
+    //hash_hmac::inner_padding(m_cp, m_state.m_alg_mac, _key_block, m_state.m_size_mac_key, m_padding_hmac_server.data());
+    _key_block += m_state.m_size_mac_key;
 
     // client_write_key
-    m_key_client = create_key(CALG_3DES, _key_block, 24);
-    _key_block += 24;
+    m_key_client = create_key(m_state.m_alg_encrypt, _key_block, m_state.m_size_enc_key);
+    _key_block += m_state.m_size_enc_key;
 
     // server_write_key
-    m_key_server = create_key(CALG_3DES, _key_block, 24);
-    _key_block += 24;
+    m_key_server = create_key(m_state.m_alg_encrypt, _key_block, m_state.m_size_enc_key);
+    _key_block += m_state.m_size_enc_key;
 
     // client_write_IV
     if (!CryptSetKeyParam(m_key_client, KP_IV, _key_block, 0))
         throw win_runtime_error(__FUNCTION__ " Error setting client_write_IV.");
-    _key_block += 8;
+    _key_block += m_state.m_size_enc_iv;
 
     // server_write_IV
     if (!CryptSetKeyParam(m_key_server, KP_IV, _key_block, 0))
         throw win_runtime_error(__FUNCTION__ " Error setting server_write_IV.");
-    _key_block += 8;
+    _key_block += m_state.m_size_enc_iv;
 }
 
 
@@ -919,15 +991,6 @@ void eap::method_tls::process_packet(_In_bytecount_(size_pck) const void *_pck, 
         if (hdr->version.major == 3 && hdr->version.minor == 1) {
             // Process TLS 1.0 message.
             switch (hdr->type) {
-            case message_type_handshake:
-                if (m_cipher_spec) {
-                    sanitizing_blob msg_dec(msg, msg_end);
-                    decrypt_message(msg_dec);
-                    process_handshake(msg_dec.data(), msg_dec.size());
-                } else
-                    process_handshake(msg, msg_end - msg);
-                break;
-
             case message_type_change_cipher_spec:
                 if (msg + 1 > msg_end)
                     throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Incomplete change cipher spec message.");
@@ -948,6 +1011,15 @@ void eap::method_tls::process_packet(_In_bytecount_(size_pck) const void *_pck, 
                     process_alert(msg_dec.data(), msg_dec.size());
                 } else
                     process_alert(msg, msg_end - msg);
+                break;
+
+            case message_type_handshake:
+                if (m_cipher_spec) {
+                    sanitizing_blob msg_dec(msg, msg_end);
+                    decrypt_message(msg_dec);
+                    process_handshake(msg_dec.data(), msg_dec.size());
+                } else
+                    process_handshake(msg, msg_end - msg);
                 break;
             }
         }
@@ -981,10 +1053,10 @@ void eap::method_tls::process_handshake(_In_bytecount_(msg_size) const void *_ms
                 rec += 2;
 
                 // Server random
-                if (rec + sizeof(m_random_server) > rec_end)
+                if (rec + sizeof(m_state.m_random_server) > rec_end)
                     throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Server random missing or incomplete.");
-                memcpy(&m_random_server, rec, sizeof(m_random_server));
-                rec += sizeof(m_random_server);
+                memcpy(&m_state.m_random_server, rec, sizeof(random));
+                rec += sizeof(random);
 
                 // Session ID
                 if (rec + 1 > rec_end || rec + 1 + rec[0] > rec_end)
@@ -1057,7 +1129,7 @@ void eap::method_tls::process_handshake(_In_bytecount_(msg_size) const void *_ms
                     throw win_runtime_error(__FUNCTION__ " Error finishing SHA-1 hash calculation.");
                 lblseed.insert(lblseed.end(), hash.begin(), hash.end());
 
-                if (memcmp(prf(&m_master_secret, sizeof(m_master_secret), lblseed.data(), lblseed.size(), 12).data(), rec, 12))
+                if (memcmp(prf(&m_state.m_master_secret, sizeof(master_secret), lblseed.data(), lblseed.size(), 12).data(), rec, 12))
                     throw win_runtime_error(ERROR_ENCRYPTION_FAILED, __FUNCTION__ " Integrity check failed.");
 
                 m_server_finished = true;
@@ -1182,7 +1254,7 @@ void eap::method_tls::verify_server_trust()
 void eap::method_tls::encrypt_message(_Inout_ sanitizing_blob &msg)
 {
     // Create a HMAC hash.
-    hash_hmac hash_hmac(m_cp, CALG_SHA1, m_padding_hmac_client.data());
+    hash_hmac hash_hmac(m_cp, m_state.m_alg_mac, m_padding_hmac_client.data());
 
     // Hash sequence number and message.
     unsigned __int64 seq_num = htonll(m_seq_num);
@@ -1198,11 +1270,16 @@ void eap::method_tls::encrypt_message(_Inout_ sanitizing_blob &msg)
     msg.erase(msg.begin(), msg.begin() + 5);
 
     size_t size =
-        msg.size() + // TLS message
-        20         + // HMAC hash (SHA-1)
-        1;           // Padding length
-    unsigned char padding = (8 - size) % 8;
-    size += padding;
+        msg.size()  + // TLS message
+        hmac.size() + // HMAC hash
+        1;            // Padding length
+
+    // Calculate padding.
+    DWORD size_block;
+    if (!CryptGetKeyParam(m_key_client, KP_BLOCKLEN, size_block, 0))
+        size_block = 0;
+    unsigned char size_padding = (unsigned char)((size_block - size) % size_block);
+    size += size_padding;
     msg.reserve(size);
 
     // Append HMAC hash.
@@ -1212,7 +1289,7 @@ void eap::method_tls::encrypt_message(_Inout_ sanitizing_blob &msg)
     msg.insert(msg.end(), hmac.begin(), hmac.end());
 
     // Append padding.
-    msg.insert(msg.end(), padding + 1, padding);
+    msg.insert(msg.end(), size_padding + 1, size_padding);
 
     // Encrypt.
     assert(size < 0xffffffff);
@@ -1232,6 +1309,8 @@ void eap::method_tls::decrypt_message(_Inout_ sanitizing_blob &msg)
     if (!CryptDecrypt(m_key_server, NULL, FALSE, 0, msg.data(), &size))
         throw win_runtime_error(__FUNCTION__ " Error decrypting message.");
 
+    // TODO: Check padding!
+
     // Remove padding.
     msg.resize(size - msg.back() - 1);
 }
@@ -1244,67 +1323,99 @@ eap::sanitizing_blob eap::method_tls::prf(
     _In_                              size_t size_seed,
     _In_                              size_t size)
 {
-    // Split secret in two halves.
-    size_t
-        size_S1 = (size_secret + 1) / 2,
-        size_S2 = size_S1;
-    const void
-        *S1 = secret,
-        *S2 = (const unsigned char*)secret + (size_secret - size_S2);
+    sanitizing_blob data;
+    data.reserve(size);
 
-    // Precalculate HMAC padding for speed.
-    sanitizing_blob
-        hmac_padding1(sizeof(hash_hmac::padding_t)),
-        hmac_padding2(sizeof(hash_hmac::padding_t));
-    hash_hmac::inner_padding(m_cp, CALG_MD5 , S1, size_S1, hmac_padding1.data());
-    hash_hmac::inner_padding(m_cp, CALG_SHA1, S2, size_S2, hmac_padding2.data());
+#pragma warning(suppress: 4127) // Prepared for future expansion to TLS 1.2, where m_alg_prf will no longer be static const.
+    if (m_state.m_alg_prf == CALG_TLS1PRF) {
+        // Split secret in two halves.
+        size_t
+            size_S1 = (size_secret + 1) / 2,
+            size_S2 = size_S1;
+        const void
+            *S1 = secret,
+            *S2 = (const unsigned char*)secret + (size_secret - size_S2);
 
-    // Prepare A for p_hash.
-    sanitizing_blob
-        A1((unsigned char*)seed, (unsigned char*)seed + size_seed),
-        A2((unsigned char*)seed, (unsigned char*)seed + size_seed);
+        // Precalculate HMAC padding for speed.
+        sanitizing_blob
+            hmac_padding1(sizeof(hash_hmac::padding_t)),
+            hmac_padding2(sizeof(hash_hmac::padding_t));
+        hash_hmac::inner_padding(m_cp, CALG_MD5 , S1, size_S1, hmac_padding1.data());
+        hash_hmac::inner_padding(m_cp, CALG_SHA1, S2, size_S2, hmac_padding2.data());
 
-    sanitizing_blob
-        hmac1,
-        hmac2;
-    sanitizing_blob data(size);
-    for (size_t i = 0, off1 = 0, off2 = 0; i < size; ) {
-        if (off1 >= hmac1.size()) {
+        // Prepare A for p_hash.
+        sanitizing_blob
+            A1((unsigned char*)seed, (unsigned char*)seed + size_seed),
+            A2((unsigned char*)seed, (unsigned char*)seed + size_seed);
+
+        sanitizing_blob
+            hmac1,
+            hmac2;
+        data.resize(size);
+        for (size_t i = 0, off1 = 0, off2 = 0; i < size; ) {
+            if (off1 >= hmac1.size()) {
+                // Rehash A.
+                hash_hmac hash1(m_cp, CALG_MD5 , hmac_padding1.data());
+                if (!CryptHashData(hash1, A1.data(), (DWORD)A1.size(), 0))
+                    throw win_runtime_error(__FUNCTION__ " Error hashing A1.");
+                hash1.calculate(A1);
+
+                // Hash A and seed.
+                hash_hmac hash2(m_cp, CALG_MD5 , hmac_padding1.data());
+                if (!CryptHashData(hash2,              A1.data(), (DWORD)A1.size(), 0) ||
+                    !CryptHashData(hash2, (const BYTE*)seed     , (DWORD)size_seed, 0))
+                    throw win_runtime_error(__FUNCTION__ " Error hashing seed,label or data.");
+                hash2.calculate(hmac1);
+                off1 = 0;
+            }
+
+            if (off2 >= hmac2.size()) {
+                // Rehash A.
+                hash_hmac hash1(m_cp, CALG_SHA1 , hmac_padding2.data());
+                if (!CryptHashData(hash1, A2.data(), (DWORD)A2.size(), 0))
+                    throw win_runtime_error(__FUNCTION__ " Error hashing A2.");
+                hash1.calculate(A2);
+
+                // Hash A and seed.
+                hash_hmac hash2(m_cp, CALG_SHA1 , hmac_padding2.data());
+                if (!CryptHashData(hash2,              A2.data(), (DWORD)A2.size(), 0) ||
+                    !CryptHashData(hash2, (const BYTE*)seed     , (DWORD)size_seed, 0))
+                    throw win_runtime_error(__FUNCTION__ " Error hashing seed,label or data.");
+                hash2.calculate(hmac2);
+                off2 = 0;
+            }
+
+            // XOR combine amount of data we have (and need).
+            size_t i_end = std::min<size_t>(i + std::min<size_t>(hmac1.size() - off1, hmac2.size() - off2), size);
+            while (i < i_end)
+                data[i++] = hmac1[off1++] ^ hmac2[off2++];
+        }
+    } else {
+        // Precalculate HMAC padding for speed.
+        sanitizing_blob hmac_padding(sizeof(hash_hmac::padding_t));
+        hash_hmac::inner_padding(m_cp, m_state.m_alg_prf, secret, size_secret, hmac_padding.data());
+
+        // Prepare A for p_hash.
+        sanitizing_blob A((unsigned char*)seed, (unsigned char*)seed + size_seed);
+
+        sanitizing_blob hmac;
+        for (size_t i = 0; i < size; ) {
             // Rehash A.
-            hash_hmac hash1(m_cp, CALG_MD5 , hmac_padding1.data());
-            if (!CryptHashData(hash1, A1.data(), (DWORD)A1.size(), 0))
-                throw win_runtime_error(__FUNCTION__ " Error hashing A1.");
-            hash1.calculate(A1);
+            hash_hmac hash1(m_cp, CALG_MD5 , hmac_padding.data());
+            if (!CryptHashData(hash1, A.data(), (DWORD)A.size(), 0))
+                throw win_runtime_error(__FUNCTION__ " Error hashing A.");
+            hash1.calculate(A);
 
             // Hash A and seed.
-            hash_hmac hash2(m_cp, CALG_MD5 , hmac_padding1.data());
-            if (!CryptHashData(hash2,              A1.data(), (DWORD)A1.size(), 0) ||
-                !CryptHashData(hash2, (const BYTE*)seed     , (DWORD)size_seed, 0))
+            hash_hmac hash2(m_cp, CALG_MD5 , hmac_padding.data());
+            if (!CryptHashData(hash2,              A.data(), (DWORD)A.size() , 0) ||
+                !CryptHashData(hash2, (const BYTE*)seed    , (DWORD)size_seed, 0))
                 throw win_runtime_error(__FUNCTION__ " Error hashing seed,label or data.");
-            hash2.calculate(hmac1);
-            off1 = 0;
+            hash2.calculate(hmac);
+
+            size_t n = std::min<size_t>(hmac.size(), size - i);
+            data.insert(data.end(), hmac.begin(), hmac.begin() + n);
         }
-
-        if (off2 >= hmac2.size()) {
-            // Rehash A.
-            hash_hmac hash1(m_cp, CALG_SHA1 , hmac_padding2.data());
-            if (!CryptHashData(hash1, A2.data(), (DWORD)A2.size(), 0))
-                throw win_runtime_error(__FUNCTION__ " Error hashing A2.");
-            hash1.calculate(A2);
-
-            // Hash A and seed.
-            hash_hmac hash2(m_cp, CALG_SHA1 , hmac_padding2.data());
-            if (!CryptHashData(hash2,              A2.data(), (DWORD)A2.size(), 0) ||
-                !CryptHashData(hash2, (const BYTE*)seed     , (DWORD)size_seed, 0))
-                throw win_runtime_error(__FUNCTION__ " Error hashing seed,label or data.");
-            hash2.calculate(hmac2);
-            off2 = 0;
-        }
-
-        // XOR combine amount of data we have (and need).
-        size_t i_end = std::min<size_t>(i + std::min<size_t>(hmac1.size() - off1, hmac2.size() - off2), size);
-        while (i < i_end)
-            data[i++] = hmac1[off1++] ^ hmac2[off2++];
     }
 
     return data;

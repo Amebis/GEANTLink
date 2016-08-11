@@ -233,6 +233,13 @@ namespace eap
             /// Empty the random
             ///
             void clear();
+
+            ///
+            /// Generate random
+            ///
+            /// \param[in] cp  Handle of the cryptographics provider
+            ///
+            void reset(_In_ HCRYPTPROV cp);
         };
 #pragma pack(pop)
 
@@ -327,7 +334,7 @@ namespace eap
             /// \param[in] size_secret  \p secret size
             ///
             hash_hmac(
-                _In_                               HCRYPTPROV hProv,
+                _In_                               HCRYPTPROV cp,
                 _In_                               ALG_ID     alg,
                 _In_bytecount_(size_secret ) const void       *secret,
                 _In_                               size_t     size_secret);
@@ -340,7 +347,7 @@ namespace eap
             /// \param[in] padding      HMAC secret XOR inner padding
             ///
             hash_hmac(
-                _In_       HCRYPTPROV hProv,
+                _In_       HCRYPTPROV cp,
                 _In_       ALG_ID     alg,
                 _In_ const padding_t  padding);
 
@@ -385,7 +392,7 @@ namespace eap
             /// \param[out] padding      HMAC secret XOR inner padding
             ///
             static void inner_padding(
-                _In_                               HCRYPTPROV hProv,
+                _In_                               HCRYPTPROV cp,
                 _In_                               ALG_ID     alg,
                 _In_bytecount_(size_secret ) const void       *secret,
                 _In_                               size_t     size_secret,
@@ -396,12 +403,72 @@ namespace eap
             winstd::crypt_hash m_hash_outer; ///< Outer hashing object
         };
 
+
+        ///
+        /// TLS client connection state
+        ///
+        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter 6.1. Connection States)](https://tools.ietf.org/html/rfc5246#section-6.1)
+        ///
+        class conn_state
+        {
+        public:
+            ///
+            /// Constructs a connection state
+            ///
+            conn_state();
+
+            ///
+            /// Copies a connection state
+            ///
+            /// \param[in] other  Connection state to copy from
+            ///
+            conn_state(_In_ const conn_state &other);
+
+            ///
+            /// Moves a connection state
+            ///
+            /// \param[in] other  Connection state to move from
+            ///
+            conn_state(_Inout_ conn_state &&other);
+
+            ///
+            /// Copies a connection state
+            ///
+            /// \param[in] other  Connection state to copy from
+            ///
+            /// \returns Reference to this object
+            ///
+            conn_state& operator=(_In_ const conn_state &other);
+
+            ///
+            /// Moves a connection state
+            ///
+            /// \param[in] other  Connection state to move from
+            ///
+            /// \returns Reference to this object
+            ///
+            conn_state& operator=(_Inout_ conn_state &&other);
+
+        public:
+            static const ALG_ID m_alg_prf;          ///> Pseudo-random function algorithm
+            static const ALG_ID m_alg_encrypt;      ///> Bulk encryption algorithm
+            static const size_t m_size_enc_key;     ///> Encryption key size in bytes (has to comply with `m_alg_encrypt`)
+            static const size_t m_size_enc_iv;      ///> Encryption initialization vector size in bytes (has to comply with `m_alg_encrypt`)
+            static const ALG_ID m_alg_mac;          ///> Message authenticy check algorithm
+            static const size_t m_size_mac_key;     ///> Message authenticy check algorithm key size (has to comply with `m_alg_mac`)
+            static const size_t m_size_mac_hash;    ///> Message authenticy check algorithm result size (has to comply with `m_alg_mac`)
+            master_secret m_master_secret;          ///< TLS master secret
+            random m_random_client;                 ///< Client random
+            random m_random_server;                 ///< Server random
+        };
+
     public:
         ///
         /// Constructs an EAP method
         ///
-        /// \param[in] mod  EAP module to use for global services
-        /// \param[in] cfg  Method configuration
+        /// \param[in] mod   EAP module to use for global services
+        /// \param[in] cfg   Method configuration
+        /// \param[in] cred  User credentials
         ///
         method_tls(_In_ module &module, _In_ config_method_tls &cfg, _In_ credentials_tls &cred);
 
@@ -682,20 +749,21 @@ namespace eap
             phase_unknown      = -1,
             phase_client_hello =  0,
             phase_server_hello,
-            phase_resume_session,
+            phase_change_chiper_spec,
+            phase_finished,
         } m_phase;                                              ///< Session phase
 
         packet m_packet_req;                                    ///< Request packet
         packet m_packet_res;                                    ///< Response packet
 
         winstd::crypt_prov m_cp;                                ///< Cryptography provider
+
+        conn_state m_state;                                     ///< Connection state
+
         sanitizing_blob m_padding_hmac_client;                  ///< Padding (key) for client side HMAC calculation
         //sanitizing_blob m_padding_hmac_server;                  ///< Padding (key) for server side HMAC calculation
         winstd::crypt_key m_key_client;                         ///< Key for encrypting messages
         winstd::crypt_key m_key_server;                         ///< Key for decrypting messages
-
-        random m_random_client;                                 ///< Client random
-        random m_random_server;                                 ///< Server random
 
         sanitizing_blob m_session_id;                           ///< TLS session ID
 
@@ -703,8 +771,6 @@ namespace eap
 
         winstd::crypt_hash m_hash_handshake_msgs_md5;           ///< Running MD5 hash of handshake messages sent
         winstd::crypt_hash m_hash_handshake_msgs_sha1;          ///< Running SHA-1 hash of handshake messages sent
-
-        master_secret m_master_secret;                          ///< TLS master secret
 
         bool m_send_client_cert;                                ///< Did server request client certificate?
         //bool m_server_hello_done;                               ///< Is server hello done?
