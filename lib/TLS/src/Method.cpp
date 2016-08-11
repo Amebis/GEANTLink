@@ -189,7 +189,7 @@ eap::method_tls::hash_hmac::hash_hmac(
     _In_                               size_t     size_secret)
 {
     // Prepare padding.
-    sanitizing_blob padding(64);
+    sanitizing_blob padding(sizeof(padding_t));
     inner_padding(hProv, alg, secret, size_secret, padding.data());
 
     // Continue with the other constructor.
@@ -198,21 +198,21 @@ eap::method_tls::hash_hmac::hash_hmac(
 
 
 eap::method_tls::hash_hmac::hash_hmac(
-    _In_       HCRYPTPROV    hProv,
-    _In_       ALG_ID        alg,
-    _In_ const unsigned char padding[64])
+    _In_       HCRYPTPROV hProv,
+    _In_       ALG_ID     alg,
+    _In_ const padding_t  padding)
 {
     // Create inner hash.
     if (!m_hash_inner.create(hProv, alg))
         throw win_runtime_error(__FUNCTION__ " Error creating inner hash.");
 
     // Initialize it with the inner padding.
-    if (!CryptHashData(m_hash_inner, padding, 64, 0))
+    if (!CryptHashData(m_hash_inner, padding, sizeof(padding_t), 0))
         throw win_runtime_error(__FUNCTION__ " Error hashing secret XOR inner padding.");
 
     // Convert inner padding to outer padding for final calculation.
-    unsigned char padding_out[64];
-    for (size_t i = 0; i < 64; i++)
+    padding_t padding_out;
+    for (size_t i = 0; i < sizeof(padding_t); i++)
         padding_out[i] = padding[i] ^ (0x36 ^ 0x5c);
 
     // Create outer hash.
@@ -220,26 +220,26 @@ eap::method_tls::hash_hmac::hash_hmac(
         throw win_runtime_error(__FUNCTION__ " Error creating outer hash.");
 
     // Initialize it with the outer padding.
-    if (!CryptHashData(m_hash_outer, padding_out, 64, 0))
+    if (!CryptHashData(m_hash_outer, padding_out, sizeof(padding_t), 0))
         throw win_runtime_error(__FUNCTION__ " Error hashing secret XOR inner padding.");
 }
 
 
 void eap::method_tls::hash_hmac::inner_padding(
-    _In_                               HCRYPTPROV    hProv,
-    _In_                               ALG_ID        alg,
-    _In_bytecount_(size_secret ) const void          *secret,
-    _In_                               size_t        size_secret,
-    _Out_                              unsigned char padding[64])
+    _In_                               HCRYPTPROV hProv,
+    _In_                               ALG_ID     alg,
+    _In_bytecount_(size_secret ) const void       *secret,
+    _In_                               size_t     size_secret,
+    _Out_                              padding_t  padding)
 {
-    if (size_secret > 64) {
+    if (size_secret > sizeof(padding_t)) {
         // If the secret is longer than padding, use secret's hash instead.
         crypt_hash hash;
         if (!hash.create(hProv, alg))
             throw win_runtime_error(__FUNCTION__ " Error creating hash.");
         if (!CryptHashData(hash, (const BYTE*)secret, (DWORD)size_secret, 0))
             throw win_runtime_error(__FUNCTION__ " Error hashing.");
-        DWORD size_hash = 64;
+        DWORD size_hash = sizeof(padding_t);
         if (!CryptGetHashParam(hash, HP_HASHVAL, padding, &size_hash, 0))
             throw win_runtime_error(__FUNCTION__ " Error finishing hash.");
         size_secret = size_hash;
@@ -247,7 +247,7 @@ void eap::method_tls::hash_hmac::inner_padding(
         memcpy(padding, secret, size_secret);
     for (size_t i = 0; i < size_secret; i++)
         padding[i] ^= 0x36;
-    memset(padding + size_secret, 0x36, 64 - size_secret);
+    memset(padding + size_secret, 0x36, sizeof(padding_t) - size_secret);
 }
 
 
@@ -452,6 +452,7 @@ void eap::method_tls::process_request_packet(
         m_phase = phase_client_hello;
         m_packet_res.clear();
         m_padding_hmac_client.clear();
+        //m_padding_hmac_server.clear();
         m_key_client.free();
         m_key_server.free();
 
@@ -874,12 +875,13 @@ void eap::method_tls::derive_keys()
     const unsigned char *_key_block = key_block.data();
 
     // client_write_MAC_secret
-    m_padding_hmac_client.resize(64);
+    m_padding_hmac_client.resize(sizeof(hash_hmac::padding_t));
     hash_hmac::inner_padding(m_cp, CALG_SHA1, _key_block, 20, m_padding_hmac_client.data());
     _key_block += 20;
 
     // server_write_MAC_secret
-    // Skip!
+    //m_padding_hmac_server.resize(sizeof(hash_hmac::padding_t));
+    //hash_hmac::inner_padding(m_cp, CALG_SHA1, _key_block, 20, m_padding_hmac_server.data());
     _key_block += 20;
 
     // client_write_key
@@ -1252,8 +1254,8 @@ eap::sanitizing_blob eap::method_tls::prf(
 
     // Precalculate HMAC padding for speed.
     sanitizing_blob
-        hmac_padding1(64),
-        hmac_padding2(64);
+        hmac_padding1(sizeof(hash_hmac::padding_t)),
+        hmac_padding2(sizeof(hash_hmac::padding_t));
     hash_hmac::inner_padding(m_cp, CALG_MD5 , S1, size_S1, hmac_padding1.data());
     hash_hmac::inner_padding(m_cp, CALG_SHA1, S2, size_S2, hmac_padding2.data());
 

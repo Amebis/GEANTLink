@@ -315,6 +315,9 @@ namespace eap
         class hash_hmac
         {
         public:
+            typedef unsigned char padding_t[64];
+
+        public:
             ///
             /// Construct new HMAC hashing object
             ///
@@ -337,9 +340,9 @@ namespace eap
             /// \param[in] padding      HMAC secret XOR inner padding
             ///
             hash_hmac(
-                _In_       HCRYPTPROV    hProv,
-                _In_       ALG_ID        alg,
-                _In_ const unsigned char padding[64]);
+                _In_       HCRYPTPROV hProv,
+                _In_       ALG_ID     alg,
+                _In_ const padding_t  padding);
 
             ///
             /// Provides access to inner hash object to hash data at will.
@@ -382,11 +385,11 @@ namespace eap
             /// \param[out] padding      HMAC secret XOR inner padding
             ///
             static void inner_padding(
-                _In_                               HCRYPTPROV    hProv,
-                _In_                               ALG_ID        alg,
-                _In_bytecount_(size_secret ) const void          *secret,
-                _In_                               size_t        size_secret,
-                _Out_                              unsigned char padding[64]);
+                _In_                               HCRYPTPROV hProv,
+                _In_                               ALG_ID     alg,
+                _In_bytecount_(size_secret ) const void       *secret,
+                _In_                               size_t     size_secret,
+                _Out_                              padding_t  padding);
 
         protected:
             winstd::crypt_hash m_hash_inner; ///< Inner hashing object
@@ -671,7 +674,7 @@ namespace eap
             return key.detach();
         }
 
-    public:
+    protected:
         config_method_tls &m_cfg;                               ///< EAP-TLS method configuration
         credentials_tls &m_cred;                                ///< EAP-TLS user credentials
 
@@ -686,7 +689,8 @@ namespace eap
         packet m_packet_res;                                    ///< Response packet
 
         winstd::crypt_prov m_cp;                                ///< Cryptography provider
-        sanitizing_blob m_padding_hmac_client;                  ///< Padding (key) for HMAC calculation
+        sanitizing_blob m_padding_hmac_client;                  ///< Padding (key) for client side HMAC calculation
+        //sanitizing_blob m_padding_hmac_server;                  ///< Padding (key) for server side HMAC calculation
         winstd::crypt_key m_key_client;                         ///< Key for encrypting messages
         winstd::crypt_key m_key_server;                         ///< Key for decrypting messages
 
@@ -707,7 +711,6 @@ namespace eap
         bool m_server_finished;                                 ///< Did server send a valid finish message?
         bool m_cipher_spec;                                     ///< Did server specify cipher?
 
-    protected:
         unsigned __int64 m_seq_num;                             ///< Sequence number for encryption
     };
 }
