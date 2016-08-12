@@ -26,10 +26,12 @@ namespace eap
     class method_tls;
 }
 
+
 #pragma once
 
-#include "../include/Config.h"
-#include "../include/Credentials.h"
+#include "Config.h"
+#include "Credentials.h"
+#include "TLS.h"
 
 #include "../../EAPBase/include/Method.h"
 
@@ -63,79 +65,6 @@ namespace eap
         enum flags_res_t {
             flags_res_length_incl = 0x80,   ///< Length included
             flags_res_more_frag   = 0x40,   ///< More fragments
-        };
-
-        ///
-        /// TLS packet type
-        ///
-        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter: A.1. Record Layer](https://tools.ietf.org/html/rfc5246#appendix-A.1)
-        ///
-        enum message_type_t  {
-            message_type_change_cipher_spec = 20,
-            message_type_alert              = 21,
-            message_type_handshake          = 22,
-            message_type_application_data   = 23,
-        };
-
-        ///
-        /// TLS handshake type
-        ///
-        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter: A.4. Handshake Protocol](https://tools.ietf.org/html/rfc5246#appendix-A.4)
-        ///
-        enum handshake_type_t {
-            handshake_type_hello_request       =  0,
-            handshake_type_client_hello        =  1,
-            handshake_type_server_hello        =  2,
-            handshake_type_certificate         = 11,
-            handshake_type_server_key_exchange = 12,
-            handshake_type_certificate_request = 13,
-            handshake_type_server_hello_done   = 14,
-            handshake_type_certificate_verify  = 15,
-            handshake_type_client_key_exchange = 16,
-            handshake_type_finished            = 20
-        };
-
-        ///
-        /// TLS alert level
-        ///
-        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter: 7.2. Alert Protocol)](https://tools.ietf.org/html/rfc5246#section-7.2)
-        ///
-        enum alert_level_t {
-            alert_level_warning = 1,
-            alert_level_fatal   = 2,
-        };
-
-        ///
-        /// TLS alert description
-        ///
-        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter: 7.2. Alert Protocol)](https://tools.ietf.org/html/rfc5246#section-7.2)
-        ///
-        enum alert_desc_t {
-            alert_desc_close_notify            =   0,
-            alert_desc_unexpected_message      =  10,
-            alert_desc_bad_record_mac          =  20,
-            alert_desc_decryption_failed       =  21, // reserved
-            alert_desc_record_overflow         =  22,
-            alert_desc_decompression_failure   =  30,
-            alert_desc_handshake_failure       =  40,
-            alert_desc_no_certificate          =  41, // reserved
-            alert_desc_bad_certificate         =  42,
-            alert_desc_unsupported_certificate =  43,
-            alert_desc_certificate_revoked     =  44,
-            alert_desc_certificate_expired     =  45,
-            alert_desc_certificate_unknown     =  46,
-            alert_desc_illegal_parameter       =  47,
-            alert_desc_unknown_ca              =  48,
-            alert_desc_access_denied           =  49,
-            alert_desc_decode_error            =  50,
-            alert_desc_decrypt_error           =  51,
-            alert_desc_export_restriction      =  60, // reserved
-            alert_desc_protocol_version        =  70,
-            alert_desc_insufficient_security   =  71,
-            alert_desc_internal_error          =  80,
-            alert_desc_user_canceled           =  90,
-            alert_desc_no_renegotiation        = 100,
-            alert_desc_unsupported_extension   = 110,
         };
 
         ///
@@ -196,56 +125,6 @@ namespace eap
 #pragma pack(push)
 #pragma pack(1)
         ///
-        /// TLS client/server random
-        ///
-        struct random
-        {
-            __time32_t time;        ///< Unix time-stamp
-            unsigned char data[28]; ///< Randomness
-
-            ///
-            /// Constructs a all-zero random
-            ///
-            random();
-
-            ///
-            /// Copies a random
-            ///
-            /// \param[in] other  Random to copy from
-            ///
-            random(_In_ const random &other);
-
-            ///
-            /// Destructor
-            ///
-            ~random();
-
-            ///
-            /// Copies a random
-            ///
-            /// \param[in] other  Random to copy from
-            ///
-            /// \returns Reference to this object
-            ///
-            random& operator=(_In_ const random &other);
-
-            ///
-            /// Empty the random
-            ///
-            void clear();
-
-            ///
-            /// Generate random
-            ///
-            /// \param[in] cp  Handle of the cryptographics provider
-            ///
-            void reset(_In_ HCRYPTPROV cp);
-        };
-#pragma pack(pop)
-
-#pragma pack(push)
-#pragma pack(1)
-        ///
         /// TLS message
         ///
         struct message
@@ -259,208 +138,6 @@ namespace eap
             unsigned char data[1];      ///< Message data
         };
 #pragma pack(pop)
-
-#pragma pack(push)
-#pragma pack(1)
-        ///
-        /// Master secret
-        ///
-        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (8.1. Computing the Master Secret)](https://tools.ietf.org/html/rfc5246#section-8.1)
-        ///
-        struct master_secret
-        {
-            unsigned char data[48];
-
-            ///
-            /// Constructs a all-zero master secret
-            ///
-            master_secret();
-
-            ///
-            /// Constructs a pre-master secret
-            ///
-            /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter 7.4.7.1. RSA-Encrypted Premaster Secret Message)](https://tools.ietf.org/html/rfc5246#section-7.4.7.1)
-            ///
-            /// \param[in] cp  Handle of the cryptographics provider
-            ///
-            master_secret(_In_ HCRYPTPROV cp);
-
-            ///
-            /// Copies a master secret
-            ///
-            /// \param[in] other  Random to copy from
-            ///
-            master_secret(_In_ const master_secret &other);
-
-            ///
-            /// Destructor
-            ///
-            ~master_secret();
-
-            ///
-            /// Copies a master secret
-            ///
-            /// \param[in] other  Random to copy from
-            ///
-            /// \returns Reference to this object
-            ///
-            master_secret& operator=(_In_ const master_secret &other);
-
-            ///
-            /// Empty the master secret
-            ///
-            void clear();
-        };
-#pragma pack(pop)
-
-        ///
-        /// Our own implementation of HMAC hashing
-        /// Microsoft's implementation ([MSDN](https://msdn.microsoft.com/en-us/library/windows/desktop/aa382379.aspx)) is flaky.
-        ///
-        /// \sa [HMAC: Keyed-Hashing for Message Authentication](https://tools.ietf.org/html/rfc2104)
-        ///
-        class hash_hmac
-        {
-        public:
-            typedef unsigned char padding_t[64];
-
-        public:
-            ///
-            /// Construct new HMAC hashing object
-            ///
-            /// \param[in] cp           Handle of the cryptographics provider
-            /// \param[in] alg          Hashing algorithm
-            /// \param[in] secret       HMAC secret
-            /// \param[in] size_secret  \p secret size
-            ///
-            hash_hmac(
-                _In_                               HCRYPTPROV cp,
-                _In_                               ALG_ID     alg,
-                _In_bytecount_(size_secret ) const void       *secret,
-                _In_                               size_t     size_secret);
-
-            ///
-            /// Construct new HMAC hashing object using already prepared inner padding
-            ///
-            /// \param[in] cp           Handle of the cryptographics provider
-            /// \param[in] alg          Hashing algorithm
-            /// \param[in] padding      HMAC secret XOR inner padding
-            ///
-            hash_hmac(
-                _In_       HCRYPTPROV cp,
-                _In_       ALG_ID     alg,
-                _In_ const padding_t  padding);
-
-            ///
-            /// Provides access to inner hash object to hash data at will.
-            ///
-            /// \returns Inner hashing object handle
-            ///
-            inline operator HCRYPTHASH()
-            {
-                return m_hash_inner;
-            }
-
-            ///
-            /// Completes hashing and returns hashed data.
-            ///
-            /// \param[out] val  Calculated hash value
-            ///
-            template<class _Ty, class _Ax>
-            inline void calculate(_Out_ std::vector<_Ty, _Ax> &val)
-            {
-                // Calculate inner hash.
-                if (!CryptGetHashParam(m_hash_inner, HP_HASHVAL, val, 0))
-                    throw win_runtime_error(__FUNCTION__ " Error calculating inner hash.");
-
-                // Hash inner hash with outer hash.
-                if (!CryptHashData(m_hash_outer, (const BYTE*)val.data(), (DWORD)(val.size() * sizeof(_Ty)), 0))
-                    throw win_runtime_error(__FUNCTION__ " Error hashing inner hash.");
-
-                // Calculate outer hash.
-                if (!CryptGetHashParam(m_hash_outer, HP_HASHVAL, val, 0))
-                    throw win_runtime_error(__FUNCTION__ " Error calculating outer hash.");
-            }
-
-            ///
-            /// Helper method to pre-derive inner padding for frequent reuse
-            ///
-            /// \param[in]  cp           Handle of the cryptographics provider
-            /// \param[in]  alg          Hashing algorithm
-            /// \param[in]  secret       HMAC secret
-            /// \param[in]  size_secret  \p secret size
-            /// \param[out] padding      HMAC secret XOR inner padding
-            ///
-            static void inner_padding(
-                _In_                               HCRYPTPROV cp,
-                _In_                               ALG_ID     alg,
-                _In_bytecount_(size_secret ) const void       *secret,
-                _In_                               size_t     size_secret,
-                _Out_                              padding_t  padding);
-
-        protected:
-            winstd::crypt_hash m_hash_inner; ///< Inner hashing object
-            winstd::crypt_hash m_hash_outer; ///< Outer hashing object
-        };
-
-
-        ///
-        /// TLS client connection state
-        ///
-        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter 6.1. Connection States)](https://tools.ietf.org/html/rfc5246#section-6.1)
-        ///
-        class conn_state
-        {
-        public:
-            ///
-            /// Constructs a connection state
-            ///
-            conn_state();
-
-            ///
-            /// Copies a connection state
-            ///
-            /// \param[in] other  Connection state to copy from
-            ///
-            conn_state(_In_ const conn_state &other);
-
-            ///
-            /// Moves a connection state
-            ///
-            /// \param[in] other  Connection state to move from
-            ///
-            conn_state(_Inout_ conn_state &&other);
-
-            ///
-            /// Copies a connection state
-            ///
-            /// \param[in] other  Connection state to copy from
-            ///
-            /// \returns Reference to this object
-            ///
-            conn_state& operator=(_In_ const conn_state &other);
-
-            ///
-            /// Moves a connection state
-            ///
-            /// \param[in] other  Connection state to move from
-            ///
-            /// \returns Reference to this object
-            ///
-            conn_state& operator=(_Inout_ conn_state &&other);
-
-        public:
-            static const ALG_ID m_alg_prf;          ///> Pseudo-random function algorithm
-            static const ALG_ID m_alg_encrypt;      ///> Bulk encryption algorithm
-            static const size_t m_size_enc_key;     ///> Encryption key size in bytes (has to comply with `m_alg_encrypt`)
-            static const size_t m_size_enc_iv;      ///> Encryption initialization vector size in bytes (has to comply with `m_alg_encrypt`)
-            static const ALG_ID m_alg_mac;          ///> Message authenticy check algorithm
-            static const size_t m_size_mac_key;     ///> Message authenticy check algorithm key size (has to comply with `m_alg_mac`)
-            static const size_t m_size_mac_hash;    ///> Message authenticy check algorithm result size (has to comply with `m_alg_mac`)
-            master_secret m_master_secret;          ///< TLS master secret
-            random m_random_client;                 ///< Client random
-            random m_random_server;                 ///< Server random
-        };
 
     public:
         ///
@@ -485,6 +162,11 @@ namespace eap
         /// \param[in] other  EAP method to move from
         ///
         method_tls(_Inout_ method_tls &&other);
+
+        ///
+        /// Destructor
+        ///
+        virtual ~method_tls();
 
         ///
         /// Copies an EAP method
@@ -594,7 +276,7 @@ namespace eap
         ///
         /// \returns Change cipher spec
         ///
-        eap::sanitizing_blob make_finished();
+        eap::sanitizing_blob make_finished() const;
 
         ///
         /// Makes a TLS handshake
@@ -632,6 +314,11 @@ namespace eap
         /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter 6.3. Key Calculation)](https://tools.ietf.org/html/rfc5246#section-6.3)
         ///
         void derive_keys();
+
+        ///
+        /// Generates master session key
+        ///
+        void derive_msk();
 
         ///
         /// Processes messages in a TLS packet
@@ -684,7 +371,7 @@ namespace eap
         ///
         /// Verifies server's certificate if trusted by configuration
         ///
-        void verify_server_trust();
+        void verify_server_trust() const;
 
         ///
         /// Encrypt TLS message
@@ -698,18 +385,18 @@ namespace eap
         ///
         /// \param[inout] msg  TLS message to decrypt
         ///
-        void decrypt_message(_Inout_ sanitizing_blob &msg);
+        void decrypt_message(_Inout_ sanitizing_blob &msg) const;
 
         ///
         /// Calculates pseudo-random P_hash data defined in RFC 5246
         ///
         /// \sa [The Transport Layer Security (TLS) Protocol Version 1.1 (Chapter 5: HMAC and the Pseudorandom Function)](https://tools.ietf.org/html/rfc4346#section-5)
         ///
-        /// \param[in] secret        Hashing secret key
-        /// \param[in] size_secret   \p secret size
-        /// \param[in] lblseed       Concatenated label and seed
-        /// \param[in] size_lblseed  \p lblseed size
-        /// \param[in] size          Number of bytes of pseudo-random data required
+        /// \param[in] secret       Hashing secret key
+        /// \param[in] size_secret  \p secret size
+        /// \param[in] seed         Random seed
+        /// \param[in] size_seed    \p seed size
+        /// \param[in] size         Number of bytes of pseudo-random data required
         ///
         /// \returns Generated pseudo-random data (\p size bytes)
         ///
@@ -718,7 +405,7 @@ namespace eap
             _In_                              size_t size_secret,
             _In_bytecount_(size_seed)   const void   *seed,
             _In_                              size_t size_seed,
-            _In_                              size_t size);
+            _In_                              size_t size) const;
 
         ///
         /// Creates a key
@@ -778,12 +465,15 @@ namespace eap
 
         winstd::crypt_prov m_cp;                                ///< Cryptography provider
 
-        conn_state m_state;                                     ///< Connection state
+        tls_conn_state m_state;                                 ///< TLS connection state for fast reconnect
 
         sanitizing_blob m_padding_hmac_client;                  ///< Padding (key) for client side HMAC calculation
         //sanitizing_blob m_padding_hmac_server;                  ///< Padding (key) for server side HMAC calculation
         winstd::crypt_key m_key_client;                         ///< Key for encrypting messages
         winstd::crypt_key m_key_server;                         ///< Key for decrypting messages
+
+        tls_random m_key_mppe_send;                             ///< MS-MPPE-Send-Key
+        tls_random m_key_mppe_recv;                             ///< MS-MPPE-Recv-Key
 
         sanitizing_blob m_session_id;                           ///< TLS session ID
 
@@ -798,5 +488,10 @@ namespace eap
         bool m_cipher_spec;                                     ///< Did server specify cipher?
 
         unsigned __int64 m_seq_num;                             ///< Sequence number for encryption
+
+        // The following members are required to avoid memory leakage in get_result()
+        EAP_ATTRIBUTES m_eap_attr_desc;                         ///< EAP Radius attributes descriptor
+        std::vector<winstd::eap_attr> m_eap_attr;               ///< EAP Radius attributes
+        BYTE *m_blob_cfg;                                       ///< Configuration BLOB
     };
 }

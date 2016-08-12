@@ -18,12 +18,12 @@
     along with GÉANTLink. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <sal.h>
-
 #include <WinStd/Common.h>
 
 #include <Windows.h>
 #include <WinCrypt.h> // Must include after <Windows.h>
+
+#include <sal.h>
 
 namespace eap
 {
@@ -41,6 +41,8 @@ namespace eap
 #pragma once
 
 #include "Credentials.h"
+#include "Method.h"
+#include "TLS.h"
 
 #include "../../EAPBase/include/Config.h"
 
@@ -166,5 +168,9 @@ namespace eap
     public:
         std::list<winstd::cert_context> m_trusted_root_ca;  ///< Trusted root CAs
         std::list<std::string> m_server_names;              ///< Acceptable authenticating server names
+
+        // Following members are used for session resumptions. They are not exported/imported to XML.
+        sanitizing_blob m_session_id;                       ///< TLS session ID
+        tls_master_secret m_master_secret;                  ///< TLS master secret
     };
 }

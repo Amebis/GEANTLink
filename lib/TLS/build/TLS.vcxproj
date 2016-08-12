@@ -82,6 +82,7 @@
     <ClInclude Include="..\include\Config.h" />
     <ClInclude Include="..\include\Credentials.h" />
     <ClInclude Include="..\include\Method.h" />
+    <ClInclude Include="..\include\TLS.h" />
     <ClInclude Include="..\src\StdAfx.h" />
   </ItemGroup>
   <ItemGroup>
@@ -94,6 +95,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\src\Credentials.cpp" />
+    <ClCompile Include="..\src\TLS.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
