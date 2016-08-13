@@ -125,7 +125,7 @@ wxTTLSConfigWindow::wxTTLSConfigWindow(const eap::config_provider &prov, eap::co
     m_outer_identity = new wxTTLSConfigPanel(m_prov, m_cfg, this);
     sb_content->Add(m_outer_identity, 0, wxALL|wxEXPAND, 5);
 
-    m_tls = new wxTLSConfigPanel(m_prov, m_cfg.m_outer, pszCredTarget, this);
+    m_tls = new wxTLSConfigPanel(m_prov, m_cfg, pszCredTarget, this);
     sb_content->Add(m_tls, 0, wxALL|wxEXPAND, 5);
 
     wxSize size = sb_content->CalcMin();

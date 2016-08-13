@@ -139,15 +139,15 @@ void eap::peer_ttls_ui::invoke_identity_ui(
     const config_provider &cfg_prov(cfg.m_providers.front());
     config_method_ttls *cfg_method = dynamic_cast<config_method_ttls*>(cfg_prov.m_methods.front().get());
     assert(cfg_method);
-    config_method_pap *cfg_inner_pap = dynamic_cast<config_method_pap*>(cfg_method->m_inner.get());
+    config_method_with_cred *cfg_inner = dynamic_cast<config_method_with_cred*>(cfg_method->m_inner.get());
 
     if (dwFlags & EAP_FLAG_GUEST_ACCESS) {
         // Disable credential saving for guests.
-        cfg_method->m_outer.m_allow_save = false;
-        if (cfg_inner_pap)
-            cfg_inner_pap->m_allow_save = false;
+        cfg_method->m_allow_save = false;
+        if (cfg_inner)
+            cfg_inner->m_allow_save = false;
         else
-            assert(0); // Unsupported inner authentication method type.
+            assert(0); // Missing inner configuration.
     }
 
     // Initialize application.
