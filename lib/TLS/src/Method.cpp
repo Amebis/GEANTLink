@@ -856,19 +856,19 @@ void eap::method_tls::derive_keys()
 void eap::method_tls::derive_msk()
 {
     sanitizing_blob seed;
-    static const unsigned char s_label[] = "ttls keying material";
+    static const unsigned char s_label[] = "client EAP encryption";
     seed.assign(s_label, s_label + _countof(s_label) - 1);
     seed.insert(seed.end(), (const unsigned char*)&m_state.m_random_client, (const unsigned char*)(&m_state.m_random_client + 1));
     seed.insert(seed.end(), (const unsigned char*)&m_state.m_random_server, (const unsigned char*)(&m_state.m_random_server + 1));
     sanitizing_blob key_block(prf(&m_state.m_master_secret, sizeof(tls_master_secret), seed.data(), seed.size(), 2*sizeof(tls_random)));
     const unsigned char *_key_block = key_block.data();
 
-    // MS-MPPE-Send-Key
-    memcpy(&m_key_mppe_send, _key_block, sizeof(tls_random));
-    _key_block += sizeof(tls_random);
-
     // MS-MPPE-Recv-Key
     memcpy(&m_key_mppe_recv, _key_block, sizeof(tls_random));
+    _key_block += sizeof(tls_random);
+
+    // MS-MPPE-Send-Key
+    memcpy(&m_key_mppe_send, _key_block, sizeof(tls_random));
     _key_block += sizeof(tls_random);
 }
 

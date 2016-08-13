@@ -96,17 +96,6 @@ namespace eap
         /// \name Packet processing
         /// @{
 
-        /////
-        ///// Starts an EAP authentication session on the peer EAPHost using the EAP method.
-        /////
-        ///// \sa [EapPeerBeginSession function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363600.aspx)
-        /////
-        //virtual void begin_session(
-        //    _In_        DWORD         dwFlags,
-        //    _In_  const EapAttributes *pAttributeArray,
-        //    _In_        HANDLE        hTokenImpersonateUser,
-        //    _In_        DWORD         dwMaxSendPacketSize);
-
         ///
         /// Processes a packet received by EAPHost from a supplicant.
         ///
@@ -126,16 +115,14 @@ namespace eap
             _Inout_bytecap_(*dwSendPacketSize) EapPacket *pSendPacket,
             _Inout_                            DWORD     *pdwSendPacketSize);
 
-        /////
-        ///// Obtains the result of an authentication session from the EAP method.
-        /////
-        ///// \sa [EapPeerGetResult function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363611.aspx)
-        /////
-        //virtual void get_result(
-        //    _In_    EapPeerMethodResultReason reason,
-        //    _Inout_ EapPeerMethodResult       *ppResult);
-
         /// @}
+
+        ///
+        /// Generates master session key
+        ///
+        /// \sa [The EAP-TLS Authentication Protocol (Chapter 2.3. Key Hierarchy)](https://tools.ietf.org/html/rfc5216#section-2.3)
+        ///
+        virtual void derive_msk();
 
     public:
         enum version_t {

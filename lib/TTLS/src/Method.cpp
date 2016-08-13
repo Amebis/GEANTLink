@@ -71,14 +71,6 @@ eap::method_ttls& eap::method_ttls::operator=(_Inout_ method_ttls &&other)
 }
 
 
-//void eap::method_ttls::begin_session(
-//    _In_        DWORD         dwFlags,
-//    _In_  const EapAttributes *pAttributeArray,
-//    _In_        HANDLE        hTokenImpersonateUser,
-//    _In_        DWORD         dwMaxSendPacketSize)
-//{
-//    m_outer.begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
-//}
 
 
 void eap::method_ttls::process_request_packet(
@@ -95,7 +87,24 @@ void eap::method_ttls::process_request_packet(
         m_module.log_event(&EAPMETHOD_TTLS_HANDSHAKE_START, event_data((unsigned int)eap_type_ttls), event_data((unsigned char)m_version), event_data((unsigned char)ver_remote), event_data::blank);
     }
 
-    method_tls::process_request_packet(pReceivedPacket, dwReceivedPacketSize, pEapOutput);
+    if (m_phase != phase_finished) {
+        // Do the TLS.
+        method_tls::process_request_packet(pReceivedPacket, dwReceivedPacketSize, pEapOutput);
+
+        if (m_phase == phase_finished) {
+            // Piggyback inner authentication.
+            if (!m_cipher_spec)
+                throw runtime_error(__FUNCTION__ " Refusing to send credentials unencrypted.");
+
+            //sanitizing_blob client(make_pap_client());
+            //sanitizing_blob application(make_message(tls_message_type_application_data, client, m_cipher_spec));
+            //m_packet_res.m_data.insert(m_packet_res.m_data.end(), application.begin(), application.end());
+            //pEapOutput->action = EapPeerMethodResponseActionSend;
+        }
+    } else {
+        // Do the TLS. Again.
+        method_tls::process_request_packet(pReceivedPacket, dwReceivedPacketSize, pEapOutput);
+    }
 }
 
 
@@ -112,9 +121,20 @@ void eap::method_ttls::get_response_packet(
 }
 
 
-//void eap::method_ttls::get_result(
-//    _In_    EapPeerMethodResultReason reason,
-//    _Inout_ EapPeerMethodResult       *ppResult)
-//{
-//    m_outer.get_result(reason, ppResult);
-//}
+void eap::method_ttls::derive_msk()
+{
+    static const unsigned char s_label[] = "ttls keying material";
+    sanitizing_blob seed(s_label, s_label + _countof(s_label) - 1);
+    seed.insert(seed.end(), (const unsigned char*)&m_state.m_random_client, (const unsigned char*)(&m_state.m_random_client + 1));
+    seed.insert(seed.end(), (const unsigned char*)&m_state.m_random_server, (const unsigned char*)(&m_state.m_random_server + 1));
+    sanitizing_blob key_block(prf(&m_state.m_master_secret, sizeof(tls_master_secret), seed.data(), seed.size(), 2*sizeof(tls_random)));
+    const unsigned char *_key_block = key_block.data();
+
+    // MS-MPPE-Recv-Key
+    memcpy(&m_key_mppe_recv, _key_block, sizeof(tls_random));
+    _key_block += sizeof(tls_random);
+
+    // MS-MPPE-Send-Key
+    memcpy(&m_key_mppe_send, _key_block, sizeof(tls_random));
+    _key_block += sizeof(tls_random);
+}

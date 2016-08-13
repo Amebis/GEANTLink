@@ -320,7 +320,9 @@ namespace eap
         ///
         /// Generates master session key
         ///
-        void derive_msk();
+        /// \sa [The EAP-TLS Authentication Protocol (Chapter 2.3. Key Hierarchy)](https://tools.ietf.org/html/rfc5216#section-2.3)
+        ///
+        virtual void derive_msk();
 
         ///
         /// Processes messages in a TLS packet
@@ -335,40 +337,40 @@ namespace eap
         ///
         /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter 7.1. Change Cipher Spec Protocol)](https://tools.ietf.org/html/rfc5246#section-7.1)
         ///
-        /// \param[in] msg      TLS change_cipher_spec message data
-        /// \param[in] msg_size TLS change_cipher_spec message data size
+        /// \param[in] msg       TLS change_cipher_spec message data
+        /// \param[in] msg_size  TLS change_cipher_spec message data size
         ///
-        void process_change_cipher_spec(_In_bytecount_(msg_size) const void *msg, _In_ size_t msg_size);
+        virtual void process_change_cipher_spec(_In_bytecount_(msg_size) const void *msg, _In_ size_t msg_size);
 
         ///
         /// Processes a TLS alert message
         ///
         /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter 7.2. Alert Protocol)](https://tools.ietf.org/html/rfc5246#section-7.2)
         ///
-        /// \param[in] msg      TLS alert message data
-        /// \param[in] msg_size TLS alert message data size
+        /// \param[in] msg       TLS alert message data
+        /// \param[in] msg_size  TLS alert message data size
         ///
-        void process_alert(_In_bytecount_(msg_size) const void *msg, _In_ size_t msg_size);
+        virtual void process_alert(_In_bytecount_(msg_size) const void *msg, _In_ size_t msg_size);
 
         ///
         /// Processes a TLS handshake message
         ///
         /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter 7.4. Handshake Protocol)](https://tools.ietf.org/html/rfc5246#section-7.4)
         ///
-        /// \param[in] msg      TLS handshake message data
-        /// \param[in] msg_size TLS handshake message data size
+        /// \param[in] msg       TLS handshake message data
+        /// \param[in] msg_size  TLS handshake message data size
         ///
-        void process_handshake(_In_bytecount_(msg_size) const void *msg, _In_ size_t msg_size);
+        virtual void process_handshake(_In_bytecount_(msg_size) const void *msg, _In_ size_t msg_size);
 
         ///
         /// Processes a TLS application_data message
         ///
         /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter 10. Application Data Protocol)](https://tools.ietf.org/html/rfc5246#section-10)
         ///
-        /// \param[in] msg      TLS application_data message data
-        /// \param[in] msg_size TLS application_data message data size
+        /// \param[in] msg       TLS application_data message data
+        /// \param[in] msg_size  TLS application_data message data size
         ///
-        void process_application_data(_In_bytecount_(msg_size) const void *msg, _In_ size_t msg_size);
+        virtual void process_application_data(_In_bytecount_(msg_size) const void *msg, _In_ size_t msg_size);
 
         ///
         /// Processes a vendor-specific TLS message
@@ -379,7 +381,7 @@ namespace eap
         /// \param[in] msg       TLS message data
         /// \param[in] msg_size  TLS message data size
         ///
-        void process_vendor_data(_In_ unsigned char type, _In_bytecount_(msg_size) const void *msg, _In_ size_t msg_size);
+        virtual void process_vendor_data(_In_ unsigned char type, _In_bytecount_(msg_size) const void *msg, _In_ size_t msg_size);
 
         ///
         /// Verifies server's certificate if trusted by configuration
