@@ -63,7 +63,7 @@ void eap::tls_random::clear()
 
 void eap::tls_random::reset(_In_ HCRYPTPROV cp)
 {
-    _time32((__time32_t*)&time);
+    _time32((__time32_t*)data);
     if (!CryptGenRandom(cp, sizeof(data) - sizeof(__time32_t), data + sizeof(__time32_t)))
         throw win_runtime_error(__FUNCTION__ " Error creating randomness.");
 }
