@@ -432,7 +432,8 @@ protected:
             try {
                 m_cred.retrieve(m_target.c_str());
             } catch (winstd::win_runtime_error &err) {
-                wxLogError(winstd::tstring_printf(_("Error reading credentials from Credential Manager: %hs (error %u)"), err.what(), err.number()).c_str());
+                if (err.number() != ERROR_NOT_FOUND)
+                    wxLogError(winstd::tstring_printf(_("Error reading credentials from Credential Manager: %hs (error %u)"), err.what(), err.number()).c_str());
             } catch (...) {
                 wxLogError(_("Reading credentials failed."));
             }
