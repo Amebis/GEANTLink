@@ -110,8 +110,8 @@ void eap::peer_ttls::get_identity(
 
         if (!is_outer_set) {
             // Outer TLS: Using EAP service cached credentials.
-            cred_out.m_outer = cred_in.m_outer;
-            log_event(&EAPMETHOD_TRACE_EVT_CRED_CACHED1, event_data((unsigned int)eap_type_tls), event_data(cred_out.m_outer.get_name()), event_data::blank);
+            (credentials_tls&)cred_out = (const credentials_tls&)cred_in;
+            log_event(&EAPMETHOD_TRACE_EVT_CRED_CACHED1, event_data((unsigned int)eap_type_tls), event_data(((credentials_tls&)cred_out).get_name()), event_data::blank);
             is_outer_set = true;
         }
 
@@ -125,8 +125,8 @@ void eap::peer_ttls::get_identity(
 
     if (!is_outer_set && cfg_method->m_outer.m_use_preshared) {
         // Outer TLS: Using preshared credentials.
-        cred_out.m_outer = *(credentials_tls*)cfg_method->m_outer.m_preshared.get();
-        log_event(&EAPMETHOD_TRACE_EVT_CRED_PRESHARED1, event_data((unsigned int)eap_type_tls), event_data(cred_out.m_outer.get_name()), event_data::blank);
+        (credentials_tls&)cred_out = *(credentials_tls*)cfg_method->m_outer.m_preshared.get();
+        log_event(&EAPMETHOD_TRACE_EVT_CRED_PRESHARED1, event_data((unsigned int)eap_type_tls), event_data(((credentials_tls&)cred_out).get_name()), event_data::blank);
         is_outer_set = true;
     }
 
@@ -154,8 +154,8 @@ void eap::peer_ttls::get_identity(
                 cred_loaded.retrieve(cfg_prov.m_id.c_str());
 
                 // Outer TLS: Using stored credentials.
-                cred_out.m_outer = std::move(cred_loaded);
-                log_event(&EAPMETHOD_TRACE_EVT_CRED_STORED1, event_data((unsigned int)eap_type_tls), event_data(cred_out.m_outer.get_name()), event_data::blank);
+                (credentials_tls&)cred_out = std::move(cred_loaded);
+                log_event(&EAPMETHOD_TRACE_EVT_CRED_STORED1, event_data((unsigned int)eap_type_tls), event_data(((credentials_tls&)cred_out).get_name()), event_data::blank);
                 is_outer_set = true;
             } catch (...) {
                 // Not actually an error.

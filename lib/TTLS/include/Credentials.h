@@ -36,7 +36,7 @@ namespace eap
 
 namespace eap
 {
-    class credentials_ttls : public credentials
+    class credentials_ttls : public credentials_tls
     {
     public:
         ///
@@ -173,7 +173,6 @@ namespace eap
         /// @}
 
     public:
-        credentials_tls m_outer;                ///< Outer credentials
         std::unique_ptr<credentials> m_inner;   ///< Inner credentials
     };
 }

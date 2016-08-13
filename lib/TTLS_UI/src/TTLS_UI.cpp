@@ -240,7 +240,7 @@ wxTTLSCredentialsPanel::wxTTLSCredentialsPanel(const eap::config_provider &prov,
     m_outer_title->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_INACTIVECAPTION ) );
     sb_content->Add(m_outer_title, 0, wxALL|wxALIGN_RIGHT, 5);
 
-    m_outer_cred = new wxTLSCredentialsPanel(m_prov, (const eap::config_method_tls&)m_cfg, ((eap::credentials_ttls&)cred).m_outer, pszCredTarget, this, is_config);
+    m_outer_cred = new wxTLSCredentialsPanel(m_prov, (const eap::config_method_tls&)m_cfg, (eap::credentials_tls&)cred, pszCredTarget, this, is_config);
     sb_content->Add(m_outer_cred, 0, wxALL|wxEXPAND, 5);
 
     this->SetSizer(sb_content);
