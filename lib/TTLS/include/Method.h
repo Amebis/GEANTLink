@@ -124,9 +124,21 @@ namespace eap
         ///
         virtual void derive_msk();
 
+    protected:
+        ///
+        /// Makes a PAP client message
+        ///
+        /// \sa [Extensible Authentication Protocol Tunneled Transport Layer Security Authenticated Protocol Version 0 (EAP-TTLSv0) (Chapter 11.2.5. PAP)](https://tools.ietf.org/html/rfc5281#section-11.2.5)
+        ///
+        /// \returns PAP client message
+        ///
+        sanitizing_blob make_pap_client() const;
+
     public:
+        credentials_ttls &m_cred;           ///< TTLS credentials
+
         enum version_t {
-            version_0 = 0,  ///< EAP-TTLS v0
-        } m_version;        ///< EAP-TTLS version
+            version_0 = 0,                  ///< EAP-TTLS v0
+        } m_version;                        ///< EAP-TTLS version
     };
 }

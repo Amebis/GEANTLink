@@ -29,6 +29,7 @@ using namespace winstd;
 //////////////////////////////////////////////////////////////////////
 
 eap::method_ttls::method_ttls(_In_ module &module, _In_ config_method_ttls &cfg, _In_ credentials_ttls &cred) :
+    m_cred(cred),
     m_version(version_0),
     method_tls(module, cfg, cred)
 {
@@ -36,6 +37,7 @@ eap::method_ttls::method_ttls(_In_ module &module, _In_ config_method_ttls &cfg,
 
 
 eap::method_ttls::method_ttls(_In_ const method_ttls &other) :
+    m_cred(other.m_cred),
     m_version(other.m_version),
     method_tls(other)
 {
@@ -43,6 +45,7 @@ eap::method_ttls::method_ttls(_In_ const method_ttls &other) :
 
 
 eap::method_ttls::method_ttls(_Inout_ method_ttls &&other) :
+    m_cred(other.m_cred),
     m_version(std::move(other.m_version)),
     method_tls(std::move(other))
 {
@@ -96,10 +99,10 @@ void eap::method_ttls::process_request_packet(
             if (!m_cipher_spec)
                 throw runtime_error(__FUNCTION__ " Refusing to send credentials unencrypted.");
 
-            //sanitizing_blob client(make_pap_client());
-            //sanitizing_blob application(make_message(tls_message_type_application_data, client, m_cipher_spec));
-            //m_packet_res.m_data.insert(m_packet_res.m_data.end(), application.begin(), application.end());
-            //pEapOutput->action = EapPeerMethodResponseActionSend;
+            sanitizing_blob client(make_pap_client());
+            sanitizing_blob application(make_message(tls_message_type_application_data, client, m_cipher_spec));
+            m_packet_res.m_data.insert(m_packet_res.m_data.end(), application.begin(), application.end());
+            pEapOutput->action = EapPeerMethodResponseActionSend;
         }
     } else {
         // Do the TLS. Again.
@@ -137,4 +140,67 @@ void eap::method_ttls::derive_msk()
     // MS-MPPE-Send-Key
     memcpy(&m_key_mppe_send, _key_block, sizeof(tls_random));
     _key_block += sizeof(tls_random);
+}
+
+
+eap::sanitizing_blob eap::method_ttls::make_pap_client() const
+{
+    const credentials_pap *cred = dynamic_cast<credentials_pap*>(m_cred.m_inner.get());
+    if (!cred)
+        throw invalid_argument(__FUNCTION__ " Inner credentials missing or not PAP.");
+
+    // Convert username and password to UTF-8.
+    sanitizing_string identity_utf8, password_utf8;
+    WideCharToMultiByte(CP_UTF8, 0, cred->m_identity.c_str(), (int)cred->m_identity.length(), identity_utf8, NULL, NULL);
+    WideCharToMultiByte(CP_UTF8, 0, cred->m_password.c_str(), (int)cred->m_password.length(), password_utf8, NULL, NULL);
+
+    unsigned char rnd;
+    CryptGenRandom(m_cp, sizeof(rnd), &rnd);
+
+    size_t
+        size_identity    = identity_utf8.length(),
+        size_password    = password_utf8.length(),
+        padding_identity = (4  -  size_identity                ) %  4,
+        padding_password = (16 - (password_utf8.length() + rnd)) % 16; // According to RFC 5281 passwords must be padded to 16B boundary with random padding blocks to make password length guessing harder.
+
+    sanitizing_blob msg;
+    msg.reserve(
+        4                + // Diameter AVP Code
+        4                + // Diameter AVP Flags & Length
+        size_identity    + // Identity
+        padding_identity + // Identity padding
+        4                + // Diameter AVP Code
+        4                + // Diameter AVP Flags & Length
+        size_password    + // Password
+        padding_password); // Password padding
+
+    // Diameter AVP Code User-Name (0x00000001)
+    msg.push_back(0x00);
+    msg.push_back(0x00);
+    msg.push_back(0x00);
+    msg.push_back(0x01);
+
+    // Diameter AVP Flags & Length
+    unsigned int identity_hdr = htonl((diameter_avp_flag_mandatory << 24) | (unsigned int)size_identity);
+    msg.insert(msg.end(), (unsigned char*)&identity_hdr, (unsigned char*)(&identity_hdr + 1));
+
+    // Identity
+    msg.insert(msg.end(), identity_utf8.begin(), identity_utf8.end());
+    msg.insert(msg.end(), padding_identity, 0);
+
+    // Diameter AVP Code User-Password (0x00000002)
+    msg.push_back(0x00);
+    msg.push_back(0x00);
+    msg.push_back(0x00);
+    msg.push_back(0x02);
+
+    // Diameter AVP Flags & Length
+    unsigned int password_hdr = htonl((diameter_avp_flag_mandatory << 24) | (unsigned int)size_password);
+    msg.insert(msg.end(), (unsigned char*)&password_hdr, (unsigned char*)(&password_hdr + 1));
+
+    // Password
+    msg.insert(msg.end(), password_utf8.begin(), password_utf8.end());
+    msg.insert(msg.end(), padding_password, 0);
+
+    return msg;
 }
