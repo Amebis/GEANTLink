@@ -279,33 +279,35 @@ namespace eap
         eap::sanitizing_blob make_finished() const;
 
         ///
-        /// Makes a TLS handshake
+        /// Makes a TLS message
         ///
         /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter A.1. Record Layer)](https://tools.ietf.org/html/rfc5246#appendix-A.1)
         ///
-        /// \param[in]  msg  Handshake data contents
+        /// \param[in] type  Message type
+        /// \param[in] msg   Message data contents
         ///
-        /// \returns TLS handshake message
+        /// \returns TLS message message
         ///
-        static eap::sanitizing_blob make_handshake(_In_ const sanitizing_blob &msg);
+        static eap::sanitizing_blob make_message(_In_ tls_message_type_t type, _In_ const sanitizing_blob &msg);
 
         ///
-        /// Makes a TLS handshake
+        /// Makes a TLS message
         ///
-        /// \param[in] msg      Handshake data contents
+        /// \param[in] type     Message type
+        /// \param[in] msg      Message data contents
         /// \param[in] encrypt  Should the message be encrypted?
         ///
-        /// \returns TLS handshake message
+        /// \returns TLS message message
         ///
-        inline eap::sanitizing_blob make_handshake(_In_ const sanitizing_blob &msg, _In_ bool encrypted)
+        inline eap::sanitizing_blob make_message(_In_ tls_message_type_t type, _In_ const sanitizing_blob &msg, _In_ bool encrypted)
         {
             if (encrypted) {
                 // Make unencrypted handshake, encrypt it, then make a new handshake message.
-                sanitizing_blob msg_enc(std::move(make_handshake(msg)));
+                sanitizing_blob msg_enc(make_message(type, msg));
                 encrypt_message(msg_enc);
-                return make_handshake(msg_enc);
+                return make_message(type, msg_enc);
             } else
-                return make_handshake(msg);
+                return make_message(type, msg);
         }
 
         ///

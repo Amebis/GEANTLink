@@ -373,7 +373,7 @@ void eap::method_tls::process_request_packet(
             m_packet_res.m_id    = m_packet_req.m_id;
             m_packet_res.m_flags = 0;
             sanitizing_blob hello(make_client_hello());
-            sanitizing_blob handshake(make_handshake(hello, m_cipher_spec));
+            sanitizing_blob handshake(make_message(tls_message_type_handshake, hello, m_cipher_spec));
             m_packet_res.m_data.assign(handshake.begin(), handshake.end());
             CryptHashData(m_hash_handshake_msgs_md5 , hello.data(), (DWORD)hello.size(), 0);
             CryptHashData(m_hash_handshake_msgs_sha1, hello.data(), (DWORD)hello.size(), 0);
@@ -416,7 +416,7 @@ void eap::method_tls::process_request_packet(
                 if (m_send_client_cert) {
                     // Client certificate requested.
                     sanitizing_blob client_cert(make_client_cert());
-                    sanitizing_blob handshake(make_handshake(client_cert, m_cipher_spec));
+                    sanitizing_blob handshake(make_message(tls_message_type_handshake, client_cert, m_cipher_spec));
                     m_packet_res.m_data.insert(m_packet_res.m_data.end(), handshake.begin(), handshake.end());
                     CryptHashData(m_hash_handshake_msgs_md5 , client_cert.data(), (DWORD)client_cert.size(), 0);
                     CryptHashData(m_hash_handshake_msgs_sha1, client_cert.data(), (DWORD)client_cert.size(), 0);
@@ -434,7 +434,7 @@ void eap::method_tls::process_request_packet(
 
                 // Create client key exchange message, and append to packet.
                 sanitizing_blob client_key_exchange(make_client_key_exchange(pms));
-                sanitizing_blob handshake(make_handshake(client_key_exchange, m_cipher_spec));
+                sanitizing_blob handshake(make_message(tls_message_type_handshake, client_key_exchange, m_cipher_spec));
                 m_packet_res.m_data.insert(m_packet_res.m_data.end(), handshake.begin(), handshake.end());
                 CryptHashData(m_hash_handshake_msgs_md5 , client_key_exchange.data(), (DWORD)client_key_exchange.size(), 0);
                 CryptHashData(m_hash_handshake_msgs_sha1, client_key_exchange.data(), (DWORD)client_key_exchange.size(), 0);
@@ -458,7 +458,7 @@ void eap::method_tls::process_request_packet(
 
             // Create finished message, and append to packet.
             sanitizing_blob finished(make_finished());
-            sanitizing_blob handshake(make_handshake(finished, m_cipher_spec));
+            sanitizing_blob handshake(make_message(tls_message_type_handshake, finished, m_cipher_spec));
             m_packet_res.m_data.insert(m_packet_res.m_data.end(), handshake.begin(), handshake.end());
             CryptHashData(m_hash_handshake_msgs_md5 , finished.data(), (DWORD)finished.size(), 0);
             CryptHashData(m_hash_handshake_msgs_sha1, finished.data(), (DWORD)finished.size(), 0);
