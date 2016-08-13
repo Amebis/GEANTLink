@@ -37,7 +37,7 @@ namespace eap
 
 namespace eap
 {
-    class method_ttls : public method
+    class method_ttls : public method_tls
     {
     public:
         ///
@@ -96,16 +96,16 @@ namespace eap
         /// \name Packet processing
         /// @{
 
-        ///
-        /// Starts an EAP authentication session on the peer EAPHost using the EAP method.
-        ///
-        /// \sa [EapPeerBeginSession function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363600.aspx)
-        ///
-        virtual void begin_session(
-            _In_        DWORD         dwFlags,
-            _In_  const EapAttributes *pAttributeArray,
-            _In_        HANDLE        hTokenImpersonateUser,
-            _In_        DWORD         dwMaxSendPacketSize);
+        /////
+        ///// Starts an EAP authentication session on the peer EAPHost using the EAP method.
+        /////
+        ///// \sa [EapPeerBeginSession function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363600.aspx)
+        /////
+        //virtual void begin_session(
+        //    _In_        DWORD         dwFlags,
+        //    _In_  const EapAttributes *pAttributeArray,
+        //    _In_        HANDLE        hTokenImpersonateUser,
+        //    _In_        DWORD         dwMaxSendPacketSize);
 
         ///
         /// Processes a packet received by EAPHost from a supplicant.
@@ -126,19 +126,18 @@ namespace eap
             _Inout_bytecap_(*dwSendPacketSize) EapPacket *pSendPacket,
             _Inout_                            DWORD     *pdwSendPacketSize);
 
-        ///
-        /// Obtains the result of an authentication session from the EAP method.
-        ///
-        /// \sa [EapPeerGetResult function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363611.aspx)
-        ///
-        virtual void get_result(
-            _In_    EapPeerMethodResultReason reason,
-            _Inout_ EapPeerMethodResult       *ppResult);
+        /////
+        ///// Obtains the result of an authentication session from the EAP method.
+        /////
+        ///// \sa [EapPeerGetResult function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363611.aspx)
+        /////
+        //virtual void get_result(
+        //    _In_    EapPeerMethodResultReason reason,
+        //    _Inout_ EapPeerMethodResult       *ppResult);
 
         /// @}
 
     public:
-        method_tls m_outer; ///< EAP-TLS method
         enum version_t {
             version_0 = 0,  ///< EAP-TTLS v0
         } m_version;        ///< EAP-TTLS version

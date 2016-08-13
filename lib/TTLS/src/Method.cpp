@@ -29,22 +29,22 @@ using namespace winstd;
 //////////////////////////////////////////////////////////////////////
 
 eap::method_ttls::method_ttls(_In_ module &module, _In_ config_method_ttls &cfg, _In_ credentials_ttls &cred) :
-    m_outer(module, cfg.m_outer, cred.m_outer),
-    method(module, cfg, cred)
+    m_version(version_0),
+    method_tls(module, cfg, cred)
 {
 }
 
 
 eap::method_ttls::method_ttls(_In_ const method_ttls &other) :
-    m_outer(other.m_outer),
-    method(other)
+    m_version(other.m_version),
+    method_tls(other)
 {
 }
 
 
 eap::method_ttls::method_ttls(_Inout_ method_ttls &&other) :
-    m_outer(std::move(other.m_outer)),
-    method(std::move(other))
+    m_version(std::move(other.m_version)),
+    method_tls(std::move(other))
 {
 }
 
@@ -52,8 +52,8 @@ eap::method_ttls::method_ttls(_Inout_ method_ttls &&other) :
 eap::method_ttls& eap::method_ttls::operator=(_In_ const method_ttls &other)
 {
     if (this != std::addressof(other)) {
-        (method&)*this = other;
-        m_outer        = other.m_outer;
+        (method_tls&)*this = other;
+        m_version          = other.m_version;
     }
 
     return *this;
@@ -63,22 +63,22 @@ eap::method_ttls& eap::method_ttls::operator=(_In_ const method_ttls &other)
 eap::method_ttls& eap::method_ttls::operator=(_Inout_ method_ttls &&other)
 {
     if (this != std::addressof(other)) {
-        (method&)*this = std::move(other);
-        m_outer        = std::move(other.m_outer);
+        (method_tls&)*this = std::move(other);
+        m_version          = std::move(other.m_version);
     }
 
     return *this;
 }
 
 
-void eap::method_ttls::begin_session(
-    _In_        DWORD         dwFlags,
-    _In_  const EapAttributes *pAttributeArray,
-    _In_        HANDLE        hTokenImpersonateUser,
-    _In_        DWORD         dwMaxSendPacketSize)
-{
-    m_outer.begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
-}
+//void eap::method_ttls::begin_session(
+//    _In_        DWORD         dwFlags,
+//    _In_  const EapAttributes *pAttributeArray,
+//    _In_        HANDLE        hTokenImpersonateUser,
+//    _In_        DWORD         dwMaxSendPacketSize)
+//{
+//    m_outer.begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
+//}
 
 
 void eap::method_ttls::process_request_packet(
@@ -95,7 +95,7 @@ void eap::method_ttls::process_request_packet(
         m_module.log_event(&EAPMETHOD_TTLS_HANDSHAKE_START, event_data((unsigned int)eap_type_ttls), event_data((unsigned char)m_version), event_data((unsigned char)ver_remote), event_data::blank);
     }
 
-    m_outer.process_request_packet(pReceivedPacket, dwReceivedPacketSize, pEapOutput);
+    method_tls::process_request_packet(pReceivedPacket, dwReceivedPacketSize, pEapOutput);
 }
 
 
@@ -103,7 +103,7 @@ void eap::method_ttls::get_response_packet(
     _Inout_bytecap_(*dwSendPacketSize) EapPacket *pSendPacket,
     _Inout_                            DWORD     *pdwSendPacketSize)
 {
-    m_outer.get_response_packet(pSendPacket, pdwSendPacketSize);
+    method_tls::get_response_packet(pSendPacket, pdwSendPacketSize);
 
     // Change packet type to EAP-TTLS, and add EAP-TTLS version.
     pSendPacket->Data[0]  = (BYTE)eap_type_ttls;
@@ -112,9 +112,9 @@ void eap::method_ttls::get_response_packet(
 }
 
 
-void eap::method_ttls::get_result(
-    _In_    EapPeerMethodResultReason reason,
-    _Inout_ EapPeerMethodResult       *ppResult)
-{
-    m_outer.get_result(reason, ppResult);
-}
+//void eap::method_ttls::get_result(
+//    _In_    EapPeerMethodResultReason reason,
+//    _Inout_ EapPeerMethodResult       *ppResult)
+//{
+//    m_outer.get_result(reason, ppResult);
+//}
