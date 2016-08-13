@@ -623,7 +623,7 @@ eap::sanitizing_blob eap::method_tls::make_client_hello() const
 
     // SSL header
     assert(size_data <= 0xffffff);
-    unsigned int ssl_header = htonl(((unsigned int)tls_handshake_type_client_hello << 24) | (unsigned int)size_data);
+    unsigned int ssl_header = htonl((tls_handshake_type_client_hello << 24) | (unsigned int)size_data);
     msg.insert(msg.end(), (unsigned char*)&ssl_header, (unsigned char*)(&ssl_header + 1));
 
     // SSL version: TLS 1.0
@@ -676,7 +676,7 @@ eap::sanitizing_blob eap::method_tls::make_client_cert() const
 
     // SSL header
     assert(size_data <= 0xffffff);
-    unsigned int ssl_header = htonl(((unsigned int)tls_handshake_type_certificate << 24) | (unsigned int)size_data);
+    unsigned int ssl_header = htonl((tls_handshake_type_certificate << 24) | (unsigned int)size_data);
     msg.insert(msg.end(), (unsigned char*)&ssl_header, (unsigned char*)(&ssl_header + 1));
 
     // List size
@@ -719,7 +719,7 @@ eap::sanitizing_blob eap::method_tls::make_client_key_exchange(_In_ const tls_ma
 
     // SSL header
     assert(size_data <= 0xffffff);
-    unsigned int ssl_header = htonl(((unsigned int)tls_handshake_type_client_key_exchange << 24) | (unsigned int)size_data);
+    unsigned int ssl_header = htonl((tls_handshake_type_client_key_exchange << 24) | (unsigned int)size_data);
     msg.insert(msg.end(), (unsigned char*)&ssl_header, (unsigned char*)(&ssl_header + 1));
 
     // Encrypted pre master secret size
@@ -756,7 +756,7 @@ eap::sanitizing_blob eap::method_tls::make_finished() const
         12); // verify_data is 12B
 
     // SSL header
-    unsigned int ssl_header = htonl(((unsigned int)tls_handshake_type_finished << 24) | 12);
+    unsigned int ssl_header = htonl((tls_handshake_type_finished << 24) | 12);
     msg.insert(msg.end(), (unsigned char*)&ssl_header, (unsigned char*)(&ssl_header + 1));
 
     // Create label + hash MD5 + hash SHA-1 seed.
