@@ -728,6 +728,9 @@ eap::sanitizing_blob eap::method_tls::make_client_key_exchange(_In_ const tls_ma
     msg.push_back((unsigned char)((size_pms_enc     ) & 0xff));
 
     // Encrypted pre master secret
+#ifdef _HOST_LOW_ENDIAN
+    std::reverse(pms_enc.begin(), pms_enc.end());
+#endif
     msg.insert(msg.end(), pms_enc.begin(), pms_enc.end());
 
     return msg;
