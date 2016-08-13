@@ -67,7 +67,7 @@ namespace eap
     ///
     /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter 6.1. Connection States)](https://tools.ietf.org/html/rfc5246#section-6.1)
     ///
-    struct tls_conn_state;
+    class tls_conn_state;
 
     ///
     /// Our own implementation of HMAC hashing
@@ -311,19 +311,9 @@ namespace eap
 #pragma pack(pop)
 
 
-    struct tls_conn_state
+    class tls_conn_state
     {
-        ALG_ID m_alg_prf;                   ///> Pseudo-tls_random function algorithm
-        ALG_ID m_alg_encrypt;               ///> Bulk encryption algorithm
-        size_t m_size_enc_key;              ///> Encryption key size in bytes (has to comply with `m_alg_encrypt`)
-        size_t m_size_enc_iv;               ///> Encryption initialization vector size in bytes (has to comply with `m_alg_encrypt`)
-        ALG_ID m_alg_mac;                   ///> Message authenticy check algorithm
-        size_t m_size_mac_key;              ///> Message authenticy check algorithm key size (has to comply with `m_alg_mac`)
-        size_t m_size_mac_hash;             ///> Message authenticy check algorithm result size (has to comply with `m_alg_mac`)
-        tls_master_secret m_master_secret;  ///< TLS master secret
-        tls_random m_random_client;         ///< Client tls_random
-        tls_random m_random_server;         ///< Server tls_random
-
+    public:
         ///
         /// Constructs a connection state
         ///
@@ -360,6 +350,18 @@ namespace eap
         /// \returns Reference to this object
         ///
         tls_conn_state& operator=(_Inout_ tls_conn_state &&other);
+
+    public:
+        ALG_ID m_alg_prf;                   ///> Pseudo-tls_random function algorithm
+        ALG_ID m_alg_encrypt;               ///> Bulk encryption algorithm
+        size_t m_size_enc_key;              ///> Encryption key size in bytes (has to comply with `m_alg_encrypt`)
+        size_t m_size_enc_iv;               ///> Encryption initialization vector size in bytes (has to comply with `m_alg_encrypt`)
+        ALG_ID m_alg_mac;                   ///> Message authenticy check algorithm
+        size_t m_size_mac_key;              ///> Message authenticy check algorithm key size (has to comply with `m_alg_mac`)
+        size_t m_size_mac_hash;             ///> Message authenticy check algorithm result size (has to comply with `m_alg_mac`)
+        tls_master_secret m_master_secret;  ///< TLS master secret
+        tls_random m_random_client;         ///< Client tls_random
+        tls_random m_random_server;         ///< Server tls_random
     };
 
 
