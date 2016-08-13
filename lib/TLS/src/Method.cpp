@@ -562,11 +562,12 @@ void eap::method_tls::get_result(
         derive_msk();
 
         // Fill array with RADIUS attributes.
+        // Note: MS-MPPE-Send-Key/MS-MPPE-Recv-Key are sent in swapped to change between client and server point of view.
         eap_attr a;
         m_eap_attr.clear();
-        a.create_ms_mppe_key(16, (LPCBYTE)&m_key_mppe_send, sizeof(tls_random));
+        a.create_ms_mppe_key(16, (LPCBYTE)&m_key_mppe_recv, sizeof(tls_random));
         m_eap_attr.push_back(std::move(a));
-        a.create_ms_mppe_key(17, (LPCBYTE)&m_key_mppe_recv, sizeof(tls_random));
+        a.create_ms_mppe_key(17, (LPCBYTE)&m_key_mppe_send, sizeof(tls_random));
         m_eap_attr.push_back(std::move(a));
         m_eap_attr.push_back(eap_attr::blank);
 
