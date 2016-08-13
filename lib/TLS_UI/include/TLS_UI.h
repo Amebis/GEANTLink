@@ -331,9 +331,12 @@ public:
 protected:
     /// \cond internal
     virtual void OnInitDialog(wxInitDialogEvent& event);
+    virtual bool TransferDataFromWindow();
     /// \endcond
 
 protected:
+    const eap::config_provider &m_prov;          ///< EAP provider
+    eap::config_method_tls &m_cfg;               ///< TLS configuration
     wxTLSServerTrustPanel *m_server_trust;       ///< Server trust configuration panel
     wxTLSCredentialsConfigPanel *m_credentials;  ///< Credentials configuration panel
 };
