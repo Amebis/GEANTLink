@@ -455,11 +455,11 @@ namespace eap
         credentials_tls &m_cred;                                ///< EAP-TLS user credentials
 
         enum phase_t {
-            phase_unknown      = -1,
-            phase_client_hello =  0,
-            phase_server_hello,
-            phase_change_chiper_spec,
-            phase_finished,
+            phase_unknown = -1,                                 ///< Unknown state
+            phase_res_client_hello =  0,                        ///< Respond with client hello
+            phase_req_server_hello,                             ///< Request and parse server hello.
+            phase_req_change_chiper_spec,                       ///< Request change cipher from server
+            phase_finished,                                     ///< Final state
         } m_phase;                                              ///< Session phase
 
         packet m_packet_req;                                    ///< Request packet

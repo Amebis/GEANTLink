@@ -336,7 +336,7 @@ void eap::method_tls::process_request_packet(
         // This is the TLS start message: initialize method.
         m_module.log_event(&EAPMETHOD_TLS_HANDSHAKE_START2, event_data((unsigned int)eap_type_tls), event_data::blank);
 
-        m_phase = phase_client_hello;
+        m_phase = phase_res_client_hello;
         m_packet_res.clear();
 
         m_state.m_random_client.reset(m_cp);
@@ -367,7 +367,7 @@ void eap::method_tls::process_request_packet(
     }
 
     switch (m_phase) {
-        case phase_client_hello: {
+        case phase_res_client_hello: {
             // Build response packet.
             m_packet_res.m_code  = EapCodeResponse;
             m_packet_res.m_id    = m_packet_req.m_id;
@@ -378,14 +378,14 @@ void eap::method_tls::process_request_packet(
             CryptHashData(m_hash_handshake_msgs_md5 , hello.data(), (DWORD)hello.size(), 0);
             CryptHashData(m_hash_handshake_msgs_sha1, hello.data(), (DWORD)hello.size(), 0);
 
-            m_phase = phase_server_hello;
+            m_phase = phase_req_server_hello;
 
             pEapOutput->fAllowNotifications = FALSE;
             pEapOutput->action = EapPeerMethodResponseActionSend;
             break;
         }
 
-        case phase_server_hello: {
+        case phase_req_server_hello: {
             process_packet(m_packet_req.m_data.data(), m_packet_req.m_data.size());
 
             if (!m_server_hello_done) {
@@ -452,7 +452,7 @@ void eap::method_tls::process_request_packet(
                 // Setup encryption.
                 derive_keys();
                 m_cipher_spec = true;
-                m_phase = phase_change_chiper_spec;
+                m_phase = phase_req_change_chiper_spec;
             } else
                 m_phase = phase_finished;
 
@@ -468,18 +468,14 @@ void eap::method_tls::process_request_packet(
             break;
         }
 
-        case phase_change_chiper_spec:
+        case phase_req_change_chiper_spec:
             process_packet(m_packet_req.m_data.data(), m_packet_req.m_data.size());
 
             if (!m_cipher_spec || !m_server_finished)
                 throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Server did not finish.");
 
-            // TLS finished.
+            // TLS finished. Continue to the finished state (no-break case).
             m_phase = phase_finished;
-
-            pEapOutput->fAllowNotifications = FALSE;
-            pEapOutput->action = EapPeerMethodResponseActionNone;
-            break;
 
         case phase_finished:
             pEapOutput->fAllowNotifications = FALSE;
@@ -559,7 +555,7 @@ void eap::method_tls::get_result(
 
     switch (reason) {
     case EapPeerMethodResultSuccess: {
-        if (m_phase < phase_change_chiper_spec)
+        if (m_phase < phase_req_change_chiper_spec)
             throw invalid_argument(__FUNCTION__ " Premature success.");
 
         // Derive MSK.
@@ -782,7 +778,7 @@ eap::sanitizing_blob eap::method_tls::make_finished() const
 }
 
 
-eap::sanitizing_blob eap::method_tls::make_handshake(_In_ const sanitizing_blob &msg)
+eap::sanitizing_blob eap::method_tls::make_message(_In_ tls_message_type_t type, _In_ const sanitizing_blob &msg)
 {
     size_t size_msg = msg.size();
     eap::sanitizing_blob msg_h;
@@ -793,7 +789,7 @@ eap::sanitizing_blob eap::method_tls::make_handshake(_In_ const sanitizing_blob 
         size_msg); // Message
 
     // SSL record type
-    msg_h.push_back((unsigned char)tls_message_type_handshake);
+    msg_h.push_back((unsigned char)type);
 
     // SSL version: TLS 1.0
     msg_h.push_back(3); // SSL major version
