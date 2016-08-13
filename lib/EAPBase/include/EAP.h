@@ -56,6 +56,16 @@ namespace eap
     /// Sanitizing dynamically allocated BLOB
     ///
     typedef std::vector<unsigned char, winstd::sanitizing_allocator<unsigned char> > sanitizing_blob;
+
+    ///
+    /// Diameter AVP flags
+    ///
+    enum diameter_avp_flags_t;
+
+    ///
+    /// Diameter AVP
+    ///
+    struct diameter_avp;
 }
 
 ///
@@ -369,6 +379,35 @@ namespace eap
         ptr_type ptr;       ///< Pointer to first data unread
         ptr_type ptr_end;   ///< Pointer to the end of BLOB
     };
+
+
+    enum diameter_avp_flags_t
+    {
+        diameter_avp_flag_vendor    = 0x80, ///< Vendor-ID present
+        diameter_avp_flag_mandatory = 0x40, ///< Mandatory
+    };
+
+
+#pragma pack(push)
+#pragma pack(1)
+    struct diameter_avp
+    {
+        unsigned char code[4];              ///< AVP Code
+        unsigned char flags;                ///< AVP Flags
+        unsigned char length[3];            ///< AVP Length
+
+#pragma warning(push)
+#pragma warning(disable: 4201)
+        union {
+            struct {
+                unsigned char vendor[4];    ///< Vendor-ID
+                unsigned char v_data[1];    ///< Data (when Vendor-ID present)
+            };
+            unsigned char data[1];          ///< Data (when Vendor-ID absent)
+        };
+#pragma warning(pop)
+    };
+#pragma pack(pop)
 }
 
 
