@@ -906,7 +906,7 @@ void eap::method_tls::process_packet(_In_bytecount_(size_pck) const void *_pck, 
                     process_handshake(msg, msg_end - msg);
                 break;
 
-            case tls_message_type_application_data:
+            case tls_message_type_application_data: {
                 if (!m_cipher_spec)
                     throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Application data should be encrypted.");
 
@@ -914,6 +914,15 @@ void eap::method_tls::process_packet(_In_bytecount_(size_pck) const void *_pck, 
                 decrypt_message(msg_dec);
                 process_application_data(msg_dec.data(), msg_dec.size());
                 break;
+            }
+
+            default:
+                if (m_cipher_spec) {
+                    sanitizing_blob msg_dec(msg, msg_end);
+                    decrypt_message(msg_dec);
+                    process_vendor_data(hdr->type, msg_dec.data(), msg_dec.size());
+                } else
+                    process_vendor_data(hdr->type, msg, msg_end - msg);
             }
         }
 
@@ -1093,6 +1102,16 @@ void eap::method_tls::process_handshake(_In_bytecount_(msg_size) const void *_ms
 
 void eap::method_tls::process_application_data(_In_bytecount_(msg_size) const void *msg, _In_ size_t msg_size)
 {
+    UNREFERENCED_PARAMETER(msg);
+    UNREFERENCED_PARAMETER(msg_size);
+
+    // TODO: Parse application data (Diameter AVP)
+}
+
+
+void eap::method_tls::process_vendor_data(_In_ unsigned char type, _In_bytecount_(msg_size) const void *msg, _In_ size_t msg_size)
+{
+    UNREFERENCED_PARAMETER(type);
     UNREFERENCED_PARAMETER(msg);
     UNREFERENCED_PARAMETER(msg_size);
 }

@@ -371,6 +371,17 @@ namespace eap
         void process_application_data(_In_bytecount_(msg_size) const void *msg, _In_ size_t msg_size);
 
         ///
+        /// Processes a vendor-specific TLS message
+        ///
+        /// \note Please see `m_cipher_spec` member if the message data came encrypted.
+        ///
+        /// \param[in] type      TLS message type
+        /// \param[in] msg       TLS message data
+        /// \param[in] msg_size  TLS message data size
+        ///
+        void process_vendor_data(_In_ unsigned char type, _In_bytecount_(msg_size) const void *msg, _In_ size_t msg_size);
+
+        ///
         /// Verifies server's certificate if trusted by configuration
         ///
         void verify_server_trust() const;
@@ -378,7 +389,7 @@ namespace eap
         ///
         /// Encrypt TLS message
         ///
-        /// \param[inout] msg         TLS message to encrypt
+        /// \param[inout] msg  TLS message to encrypt
         ///
         void encrypt_message(_Inout_ sanitizing_blob &msg);
 
