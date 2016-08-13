@@ -1236,9 +1236,7 @@ void eap::method_tls::encrypt_message(_Inout_ sanitizing_blob &msg)
         1;            // Padding length
 
     // Calculate padding.
-    DWORD size_block;
-    if (!CryptGetKeyParam(m_key_client, KP_BLOCKLEN, size_block, 0))
-        size_block = 0;
+    DWORD size_block = CryptGetKeyParam(m_key_client, KP_BLOCKLEN, size_block, 0) ? size_block / 8 : 0;
     unsigned char size_padding = (unsigned char)((size_block - size) % size_block);
     size += size_padding;
     msg.reserve(size);
