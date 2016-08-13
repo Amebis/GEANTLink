@@ -422,25 +422,18 @@ void eap::method_tls::process_request_packet(
                     CryptHashData(m_hash_handshake_msgs_sha1, client_cert.data(), (DWORD)client_cert.size(), 0);
                 }
 
-                // Generate pre-master secret and encrypt it. PMS will get sanitized in its destructor when going out-of-scope.
+                // Generate pre-master secret. PMS will get sanitized in its destructor when going out-of-scope.
                 tls_master_secret pms(m_cp);
-                sanitizing_blob pms_enc((const unsigned char*)&pms, (const unsigned char*)(&pms + 1));
-                crypt_key key;
-                if (!key.import_public(m_cp, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, &(m_server_cert_chain.front()->pCertInfo->SubjectPublicKeyInfo)))
-                    throw win_runtime_error(__FUNCTION__ " Error importing server's public key.");
-                if (!CryptEncrypt(key,  NULL, TRUE, 0, pms_enc))
-                    throw win_runtime_error(__FUNCTION__ " Error encrypting PMS.");
 
                 // Derive master secret.
-                sanitizing_blob seed;
                 static const unsigned char s_label[] = "master secret";
-                seed.assign(s_label, s_label + _countof(s_label) - 1);
+                sanitizing_blob seed(s_label, s_label + _countof(s_label) - 1);
                 seed.insert(seed.end(), (const unsigned char*)&m_state.m_random_client, (const unsigned char*)(&m_state.m_random_client + 1));
                 seed.insert(seed.end(), (const unsigned char*)&m_state.m_random_server, (const unsigned char*)(&m_state.m_random_server + 1));
                 memcpy(&m_state.m_master_secret, prf(&pms, sizeof(pms), seed.data(), seed.size(), sizeof(tls_master_secret)).data(), sizeof(tls_master_secret));
 
                 // Create client key exchange message, and append to packet.
-                sanitizing_blob client_key_exchange(make_client_key_exchange(pms_enc));
+                sanitizing_blob client_key_exchange(make_client_key_exchange(pms));
                 sanitizing_blob handshake(make_handshake(client_key_exchange, m_cipher_spec));
                 m_packet_res.m_data.insert(m_packet_res.m_data.end(), handshake.begin(), handshake.end());
                 CryptHashData(m_hash_handshake_msgs_md5 , client_key_exchange.data(), (DWORD)client_key_exchange.size(), 0);
@@ -710,8 +703,16 @@ eap::sanitizing_blob eap::method_tls::make_client_cert() const
 }
 
 
-eap::sanitizing_blob eap::method_tls::make_client_key_exchange(_In_ const sanitizing_blob &pms_enc) const
+eap::sanitizing_blob eap::method_tls::make_client_key_exchange(_In_ const tls_master_secret &pms) const
 {
+    // Encrypt pre-master key first.
+    sanitizing_blob pms_enc((const unsigned char*)&pms, (const unsigned char*)(&pms + 1));
+    crypt_key key;
+    if (!key.import_public(m_cp, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, &(m_server_cert_chain.front()->pCertInfo->SubjectPublicKeyInfo)))
+        throw win_runtime_error(__FUNCTION__ " Error importing server's public key.");
+    if (!CryptEncrypt(key,  NULL, TRUE, 0, pms_enc))
+        throw win_runtime_error(__FUNCTION__ " Error encrypting PMS.");
+
     size_t size_data, size_pms_enc = pms_enc.size();
     sanitizing_blob msg;
     msg.reserve(

@@ -254,11 +254,11 @@ namespace eap
         ///
         /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter 7.4.7. Client Key Exchange Message )](https://tools.ietf.org/html/rfc5246#section-7.4.7)
         ///
-        /// \param[in] pms_enc  Encoded pre master secret
+        /// \param[in] pms  Pre-master secret
         ///
         /// \returns Client key exchange message
         ///
-        sanitizing_blob make_client_key_exchange(_In_ const sanitizing_blob &pms_enc) const;
+        sanitizing_blob make_client_key_exchange(_In_ const tls_master_secret &pms) const;
 
         ///
         /// Makes a TLS change cipher spec message
