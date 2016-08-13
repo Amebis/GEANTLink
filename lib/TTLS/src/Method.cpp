@@ -86,12 +86,6 @@ void eap::method_ttls::process_request_packet(
     _In_                                       DWORD               dwReceivedPacketSize,
     _Inout_                                    EapPeerMethodOutput *pEapOutput)
 {
-    // Is this a valid EAP-TTLS packet?
-    if (dwReceivedPacketSize < 6)
-        throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Packet is too small. EAP-%s packets should be at least 6B.");
-    else if (pReceivedPacket->Data[0] != eap_type_ttls)
-        throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, string_printf(__FUNCTION__ " Packet is not EAP-TTLS (expected: %u, received: %u).", eap_type_ttls, pReceivedPacket->Data[0]));
-
     if (pReceivedPacket->Code == EapCodeRequest && (pReceivedPacket->Data[1] & flags_start)) {
         // This is a start EAP-TTLS packet.
 
