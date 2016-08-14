@@ -443,43 +443,20 @@ namespace eap
         ///
         /// Creates a key
         ///
+        /// \sa [How to export and import plain text session keys by using CryptoAPI](https://support.microsoft.com/en-us/kb/228786)
+        ///
         /// \param[in] alg          Key algorithm
-        /// \param[in] secret       Raw key data
+        /// \param[in] key          Key that decrypts \p secret
+        /// \param[in] secret       Key data
         /// \param[in] size_secret  \p secret size
         ///
         /// \returns Key
         ///
-        inline HCRYPTKEY create_key(
-            _In_                              ALG_ID alg,
-            _In_bytecount_(size_secret) const void   *secret,
-            _In_                              size_t size_secret)
-        {
-            assert(size_secret <= 0xffffffff);
-
-            // Prepare exported key BLOB.
-            struct key_blob_prefix {
-                PUBLICKEYSTRUC header;
-                DWORD size;
-            } const prefix = {
-                {
-                    PLAINTEXTKEYBLOB,
-                    CUR_BLOB_VERSION,
-                    0,
-                    alg,
-                },
-                (DWORD)size_secret,
-            };
-            sanitizing_blob key_blob;
-            key_blob.reserve(sizeof(key_blob_prefix) + size_secret);
-            key_blob.assign((const unsigned char*)&prefix, (const unsigned char*)(&prefix + 1));
-            key_blob.insert(key_blob.end(), (const unsigned char*)secret, (const unsigned char*)secret + size_secret);
-
-            // Import the key.
-            winstd::crypt_key key;
-            if (!key.import(m_cp, key_blob.data(), (DWORD)key_blob.size(), NULL, 0))
-                throw winstd::win_runtime_error(__FUNCTION__ " Error importing key.");
-            return key.detach();
-        }
+        HCRYPTKEY create_key(
+            _In_                              ALG_ID    alg,
+            _In_                              HCRYPTKEY key,
+            _In_bytecount_(size_secret) const void      *secret,
+            _In_                              size_t    size_secret);
 
     protected:
         config_method_tls &m_cfg;                               ///< EAP-TLS method configuration

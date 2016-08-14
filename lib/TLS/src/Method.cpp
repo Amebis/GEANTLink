@@ -811,9 +811,8 @@ eap::sanitizing_blob eap::method_tls::make_message(_In_ tls_message_type_t type,
 
 void eap::method_tls::derive_keys()
 {
-    sanitizing_blob seed;
     static const unsigned char s_label[] = "key expansion";
-    seed.assign(s_label, s_label + _countof(s_label) - 1);
+    sanitizing_blob seed(s_label, s_label + _countof(s_label) - 1);
     seed.insert(seed.end(), (const unsigned char*)&m_state.m_random_server, (const unsigned char*)(&m_state.m_random_server + 1));
     seed.insert(seed.end(), (const unsigned char*)&m_state.m_random_client, (const unsigned char*)(&m_state.m_random_client + 1));
 
@@ -833,12 +832,18 @@ void eap::method_tls::derive_keys()
     //hash_hmac::inner_padding(m_cp, m_state.m_alg_mac, _key_block, m_state.m_size_mac_key, m_padding_hmac_server.data());
     _key_block += m_state.m_size_mac_key;
 
+    // Microsoft CryptoAPI does not support importing clear text session keys.
+    // Therefore, we trick it to say the session key is "encrypted" with an exponent-of-one key.
+    crypt_key key_exp1;
+    if (!key_exp1.create_exp1(m_cp, AT_KEYEXCHANGE))
+        throw win_runtime_error(__FUNCTION__ " Error creating exponent-of-one key.");
+
     // client_write_key
-    m_key_client = create_key(m_state.m_alg_encrypt, _key_block, m_state.m_size_enc_key);
+    m_key_client = create_key(m_state.m_alg_encrypt, key_exp1, _key_block, m_state.m_size_enc_key);
     _key_block += m_state.m_size_enc_key;
 
     // server_write_key
-    m_key_server = create_key(m_state.m_alg_encrypt, _key_block, m_state.m_size_enc_key);
+    m_key_server = create_key(m_state.m_alg_encrypt, key_exp1, _key_block, m_state.m_size_enc_key);
     _key_block += m_state.m_size_enc_key;
 
     // client_write_IV
@@ -855,9 +860,8 @@ void eap::method_tls::derive_keys()
 
 void eap::method_tls::derive_msk()
 {
-    sanitizing_blob seed;
     static const unsigned char s_label[] = "client EAP encryption";
-    seed.assign(s_label, s_label + _countof(s_label) - 1);
+    sanitizing_blob seed(s_label, s_label + _countof(s_label) - 1);
     seed.insert(seed.end(), (const unsigned char*)&m_state.m_random_client, (const unsigned char*)(&m_state.m_random_client + 1));
     seed.insert(seed.end(), (const unsigned char*)&m_state.m_random_server, (const unsigned char*)(&m_state.m_random_server + 1));
     sanitizing_blob key_block(prf(m_state.m_master_secret, seed, 2*sizeof(tls_random)));
@@ -1387,4 +1391,72 @@ eap::sanitizing_blob eap::method_tls::prf(
     }
 
     return data;
+}
+
+
+HCRYPTKEY eap::method_tls::create_key(
+    _In_                              ALG_ID    alg,
+    _In_                              HCRYPTKEY key,
+    _In_bytecount_(size_secret) const void      *secret,
+    _In_                              size_t    size_secret)
+{
+    if (size_secret > m_state.m_size_enc_key)
+        throw invalid_argument(__FUNCTION__ " Secret too big to fit the key.");
+
+    // Get private key's algorithm.
+    ALG_ID alg_key;
+    if (!CryptGetKeyParam(key, KP_ALGID, alg_key, 0))
+        throw win_runtime_error(__FUNCTION__ " Error getting key's algorithm.'");
+
+    // Get private key's length in bytes.
+    DWORD size_key = CryptGetKeyParam(key, KP_KEYLEN, size_key, 0) ? size_key/8 : 0;
+
+    // SIMPLEBLOB Format is documented in SDK
+    // Copy header to buffer
+#pragma pack(push)
+#pragma pack(1)
+    struct key_blob_prefix {
+        PUBLICKEYSTRUC header;
+        ALG_ID alg;
+    } const prefix = {
+        {
+            SIMPLEBLOB,
+            CUR_BLOB_VERSION,
+            0,
+            alg,
+        },
+        alg_key,
+    };
+#pragma pack(pop)
+    sanitizing_blob key_blob;
+    key_blob.reserve(sizeof(key_blob_prefix) + size_key);
+    key_blob.assign((const unsigned char*)&prefix, (const unsigned char*)(&prefix + 1));
+
+    // Key in EME-PKCS1-v1_5 (RFC 3447).
+    key_blob.push_back(0); // Initial zero
+    key_blob.push_back(2); // PKCS #1 block type = 2
+
+    // PS
+    size_t size_ps = size_key - size_secret - 3;
+    assert(size_ps >= 8);
+    key_blob.insert(key_blob.end(), size_ps, 0);
+    unsigned char *ps = &*(key_blob.end() - size_ps);
+    CryptGenRandom(m_cp, (DWORD)size_ps, ps);
+    for (size_t i = 0; i < size_ps; i++)
+        if (ps[i] == 0) ps[i] = 1;
+
+    key_blob.push_back(0); // PS and M zero delimiter
+
+    // M
+    key_blob.insert(key_blob.end(), (const unsigned char*)secret, (const unsigned char*)secret + size_secret);
+
+#ifdef _HOST_LOW_ENDIAN
+    std::reverse(key_blob.end() - size_key, key_blob.end());
+#endif
+
+    // Import the key.
+    winstd::crypt_key key_out;
+    if (!key_out.import(m_cp, key_blob.data(), (DWORD)key_blob.size(), key, CRYPT_NO_SALT))
+        throw winstd::win_runtime_error(__FUNCTION__ " Error importing key.");
+    return key_out.detach();
 }
