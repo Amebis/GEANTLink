@@ -1105,6 +1105,9 @@ void eap::method_tls::process_handshake(_In_bytecount_(msg_size) const void *_ms
 
         msg = rec_end;
     }
+
+    CryptHashData(m_hash_handshake_msgs_md5 , (const BYTE*)_msg, (DWORD)msg_size, 0);
+    CryptHashData(m_hash_handshake_msgs_sha1, (const BYTE*)_msg, (DWORD)msg_size, 0);
 }
 
 
