@@ -1226,17 +1226,17 @@ void eap::method_tls::verify_server_trust() const
 void eap::method_tls::encrypt_message(_Inout_ sanitizing_blob &msg)
 {
     // Create a HMAC hash.
-    hash_hmac hash_hmac(m_cp, m_state.m_alg_mac, m_padding_hmac_client.data());
+    hash_hmac hash(m_cp, m_state.m_alg_mac, m_padding_hmac_client.data());
 
     // Hash sequence number and message.
     unsigned __int64 seq_num = htonll(m_seq_num);
-    if (!CryptHashData(hash_hmac, (const BYTE*)&seq_num, sizeof(seq_num), 0) ||
-        !CryptHashData(hash_hmac, msg.data(), (DWORD)msg.size(), 0))
+    if (!CryptHashData(hash, (const BYTE*)&seq_num, sizeof(seq_num), 0) ||
+        !CryptHashData(hash, msg.data(), (DWORD)msg.size(), 0))
         throw win_runtime_error(__FUNCTION__ " Error hashing data.");
 
     // Calculate hash.
     sanitizing_blob hmac;
-    hash_hmac.calculate(hmac);
+    hash.calculate(hmac);
 
     // Remove SSL/TLS header (record type, version, message size).
     msg.erase(msg.begin(), msg.begin() + 5);
