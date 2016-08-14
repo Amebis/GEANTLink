@@ -407,20 +407,38 @@ namespace eap
         ///
         /// \sa [The Transport Layer Security (TLS) Protocol Version 1.1 (Chapter 5: HMAC and the Pseudorandom Function)](https://tools.ietf.org/html/rfc4346#section-5)
         ///
-        /// \param[in] secret       Hashing secret key
-        /// \param[in] size_secret  \p secret size
-        /// \param[in] seed         Random seed
-        /// \param[in] size_seed    \p seed size
-        /// \param[in] size         Number of bytes of pseudo-random data required
+        /// \param[in] secret     Hashing secret key
+        /// \param[in] seed       Random seed
+        /// \param[in] size_seed  \p seed size
+        /// \param[in] size       Number of bytes of pseudo-random data required
         ///
         /// \returns Generated pseudo-random data (\p size bytes)
         ///
         sanitizing_blob prf(
-            _In_bytecount_(size_secret) const void   *secret,
-            _In_                              size_t size_secret,
-            _In_bytecount_(size_seed)   const void   *seed,
-            _In_                              size_t size_seed,
-            _In_                              size_t size) const;
+            _In_                      const tls_master_secret &secret,
+            _In_bytecount_(size_seed) const void              *seed,
+            _In_                            size_t            size_seed,
+            _In_                            size_t            size) const;
+
+        ///
+        /// Calculates pseudo-random P_hash data defined in RFC 5246
+        ///
+        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.1 (Chapter 5: HMAC and the Pseudorandom Function)](https://tools.ietf.org/html/rfc4346#section-5)
+        ///
+        /// \param[in] secret  Hashing secret key
+        /// \param[in] seed    Random seed
+        /// \param[in] size    Number of bytes of pseudo-random data required
+        ///
+        /// \returns Generated pseudo-random data (\p size bytes)
+        ///
+        template<class _Ty, class _Ax>
+        inline sanitizing_blob prf(
+            _In_ const tls_master_secret     &secret,
+            _In_ const std::vector<_Ty, _Ax> &seed,
+            _In_ size_t                      size) const
+        {
+            return prf(secret, seed.data(), seed.size() * sizeof(_Ty), size);
+        }
 
         ///
         /// Creates a key

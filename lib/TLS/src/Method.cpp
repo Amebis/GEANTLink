@@ -430,7 +430,7 @@ void eap::method_tls::process_request_packet(
                 sanitizing_blob seed(s_label, s_label + _countof(s_label) - 1);
                 seed.insert(seed.end(), (const unsigned char*)&m_state.m_random_client, (const unsigned char*)(&m_state.m_random_client + 1));
                 seed.insert(seed.end(), (const unsigned char*)&m_state.m_random_server, (const unsigned char*)(&m_state.m_random_server + 1));
-                memcpy(&m_state.m_master_secret, prf(&pms, sizeof(pms), seed.data(), seed.size(), sizeof(tls_master_secret)).data(), sizeof(tls_master_secret));
+                memcpy(&m_state.m_master_secret, prf(pms, seed, sizeof(tls_master_secret)).data(), sizeof(tls_master_secret));
 
                 // Create client key exchange message, and append to packet.
                 sanitizing_blob client_key_exchange(make_client_key_exchange(pms));
@@ -775,7 +775,7 @@ eap::sanitizing_blob eap::method_tls::make_finished() const
     if (!CryptGetHashParam(hash, HP_HASHVAL, hash_data, 0))
         throw win_runtime_error(__FUNCTION__ " Error finishing SHA-1 hash calculation.");
     seed.insert(seed.end(), hash_data.begin(), hash_data.end());
-    sanitizing_blob verify(prf(&m_state.m_master_secret, sizeof(tls_master_secret), seed.data(), seed.size(), 12));
+    sanitizing_blob verify(prf(m_state.m_master_secret, seed, 12));
     msg.insert(msg.end(), verify.begin(), verify.end());
 
     return msg;
@@ -817,7 +817,7 @@ void eap::method_tls::derive_keys()
     seed.insert(seed.end(), (const unsigned char*)&m_state.m_random_server, (const unsigned char*)(&m_state.m_random_server + 1));
     seed.insert(seed.end(), (const unsigned char*)&m_state.m_random_client, (const unsigned char*)(&m_state.m_random_client + 1));
 
-    sanitizing_blob key_block(prf(&m_state.m_master_secret, sizeof(tls_master_secret), seed.data(), seed.size(),
+    sanitizing_blob key_block(prf(m_state.m_master_secret, seed,
         2*m_state.m_size_mac_key +  // client_write_MAC_secret & server_write_MAC_secret (SHA1)
         2*m_state.m_size_enc_key +  // client_write_key        & server_write_key
         2*m_state.m_size_enc_iv )); // client_write_IV         & server_write_IV
@@ -860,7 +860,7 @@ void eap::method_tls::derive_msk()
     seed.assign(s_label, s_label + _countof(s_label) - 1);
     seed.insert(seed.end(), (const unsigned char*)&m_state.m_random_client, (const unsigned char*)(&m_state.m_random_client + 1));
     seed.insert(seed.end(), (const unsigned char*)&m_state.m_random_server, (const unsigned char*)(&m_state.m_random_server + 1));
-    sanitizing_blob key_block(prf(&m_state.m_master_secret, sizeof(tls_master_secret), seed.data(), seed.size(), 2*sizeof(tls_random)));
+    sanitizing_blob key_block(prf(m_state.m_master_secret, seed, 2*sizeof(tls_random)));
     const unsigned char *_key_block = key_block.data();
 
     // MS-MPPE-Recv-Key
@@ -1087,7 +1087,7 @@ void eap::method_tls::process_handshake(_In_bytecount_(msg_size) const void *_ms
                     throw win_runtime_error(__FUNCTION__ " Error finishing SHA-1 hash calculation.");
                 seed.insert(seed.end(), hash_data.begin(), hash_data.end());
 
-                if (memcmp(prf(&m_state.m_master_secret, sizeof(tls_master_secret), seed.data(), seed.size(), 12).data(), rec, 12))
+                if (memcmp(prf(m_state.m_master_secret, seed, 12).data(), rec, 12))
                     throw win_runtime_error(ERROR_ENCRYPTION_FAILED, __FUNCTION__ " Integrity check failed.");
 
                 m_server_finished = true;
@@ -1287,11 +1287,10 @@ void eap::method_tls::decrypt_message(_Inout_ sanitizing_blob &msg) const
 
 
 eap::sanitizing_blob eap::method_tls::prf(
-    _In_bytecount_(size_secret) const void   *secret,
-    _In_                              size_t size_secret,
-    _In_bytecount_(size_seed)   const void   *seed,
-    _In_                              size_t size_seed,
-    _In_                              size_t size) const
+    _In_                      const tls_master_secret &secret,
+    _In_bytecount_(size_seed) const void              *seed,
+    _In_                            size_t            size_seed,
+    _In_                            size_t            size) const
 {
     sanitizing_blob data;
     data.reserve(size);
@@ -1299,11 +1298,11 @@ eap::sanitizing_blob eap::method_tls::prf(
     if (m_state.m_alg_prf == CALG_TLS1PRF) {
         // Split secret in two halves.
         size_t
-            size_S1 = (size_secret + 1) / 2,
+            size_S1 = (sizeof(tls_master_secret) + 1) / 2,
             size_S2 = size_S1;
         const void
-            *S1 = secret,
-            *S2 = (const unsigned char*)secret + (size_secret - size_S2);
+            *S1 = &secret,
+            *S2 = (const unsigned char*)&secret + (sizeof(tls_master_secret) - size_S2);
 
         // Precalculate HMAC padding for speed.
         sanitizing_blob
@@ -1362,7 +1361,7 @@ eap::sanitizing_blob eap::method_tls::prf(
     } else {
         // Precalculate HMAC padding for speed.
         sanitizing_blob hmac_padding(sizeof(hash_hmac::padding_t));
-        hash_hmac::inner_padding(m_cp, m_state.m_alg_prf, secret, size_secret, hmac_padding.data());
+        hash_hmac::inner_padding(m_cp, m_state.m_alg_prf, &secret, sizeof(tls_master_secret), hmac_padding.data());
 
         // Prepare A for p_hash.
         sanitizing_blob A((unsigned char*)seed, (unsigned char*)seed + size_seed);

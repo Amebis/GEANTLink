@@ -130,7 +130,7 @@ void eap::method_ttls::derive_msk()
     sanitizing_blob seed(s_label, s_label + _countof(s_label) - 1);
     seed.insert(seed.end(), (const unsigned char*)&m_state.m_random_client, (const unsigned char*)(&m_state.m_random_client + 1));
     seed.insert(seed.end(), (const unsigned char*)&m_state.m_random_server, (const unsigned char*)(&m_state.m_random_server + 1));
-    sanitizing_blob key_block(prf(&m_state.m_master_secret, sizeof(tls_master_secret), seed.data(), seed.size(), 2*sizeof(tls_random)));
+    sanitizing_blob key_block(prf(m_state.m_master_secret, seed, 2*sizeof(tls_random)));
     const unsigned char *_key_block = key_block.data();
 
     // MS-MPPE-Recv-Key
