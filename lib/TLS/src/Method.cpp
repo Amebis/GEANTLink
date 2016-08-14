@@ -1253,9 +1253,6 @@ void eap::method_tls::encrypt_message(_Inout_ sanitizing_blob &msg)
     msg.reserve(size);
 
     // Append HMAC hash.
-#ifdef _HOST_LOW_ENDIAN
-    std::reverse(hmac.begin(), hmac.end());
-#endif
     msg.insert(msg.end(), hmac.begin(), hmac.end());
 
     // Append padding.
