@@ -155,7 +155,8 @@ eap::sanitizing_blob eap::method_ttls::make_pap_client() const
     WideCharToMultiByte(CP_UTF8, 0, cred->m_password.c_str(), (int)cred->m_password.length(), password_utf8, NULL, NULL);
 
     unsigned char rnd;
-    CryptGenRandom(m_cp, sizeof(rnd), &rnd);
+    if (!CryptGenRandom(m_cp, sizeof(rnd), &rnd))
+        rnd = 0;
 
     size_t
         size_identity    = identity_utf8.length(),
