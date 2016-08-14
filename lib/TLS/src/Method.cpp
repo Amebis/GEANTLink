@@ -1373,13 +1373,13 @@ eap::sanitizing_blob eap::method_tls::prf(
         sanitizing_blob hmac;
         for (size_t i = 0; i < size; ) {
             // Rehash A.
-            hash_hmac hash1(m_cp, CALG_MD5 , hmac_padding.data());
+            hash_hmac hash1(m_cp, m_state.m_alg_prf, hmac_padding.data());
             if (!CryptHashData(hash1, A.data(), (DWORD)A.size(), 0))
                 throw win_runtime_error(__FUNCTION__ " Error hashing A.");
             hash1.calculate(A);
 
             // Hash A and seed.
-            hash_hmac hash2(m_cp, CALG_MD5 , hmac_padding.data());
+            hash_hmac hash2(m_cp, m_state.m_alg_prf, hmac_padding.data());
             if (!CryptHashData(hash2,              A.data(), (DWORD)A.size() , 0) ||
                 !CryptHashData(hash2, (const BYTE*)seed    , (DWORD)size_seed, 0))
                 throw win_runtime_error(__FUNCTION__ " Error hashing seed,label or data.");
@@ -1387,6 +1387,7 @@ eap::sanitizing_blob eap::method_tls::prf(
 
             size_t n = std::min<size_t>(hmac.size(), size - i);
             data.insert(data.end(), hmac.begin(), hmac.begin() + n);
+            i += n;
         }
     }
 
