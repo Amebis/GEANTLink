@@ -332,7 +332,7 @@ void eap::method_tls::process_request_packet(
             throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, string_printf(__FUNCTION__ " ACK expected, received %u-%u-%x.", m_packet_req.m_code, m_packet_req.m_id, m_packet_req.m_flags));
     }
 
-    if (pReceivedPacket->Code == EapCodeRequest && m_packet_req.m_flags & flags_req_start) {
+    if (pReceivedPacket->Code == EapCodeRequest && (m_packet_req.m_flags & flags_req_start)) {
         // This is the TLS start message: initialize method.
         m_module.log_event(&EAPMETHOD_TLS_HANDSHAKE_START2, event_data((unsigned int)eap_type_tls), event_data::blank);
 
