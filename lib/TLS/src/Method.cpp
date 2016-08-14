@@ -1074,6 +1074,9 @@ void eap::method_tls::process_handshake(_In_bytecount_(msg_size) const void *_ms
                 break;
 
             case tls_handshake_type_finished: {
+                if (!m_cipher_spec)
+                    throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Finished message should be encrypted.");
+
                 // According to https://tools.ietf.org/html/rfc5246#section-7.4.9 all verify_data is 12B.
                 if (rec_end - rec != 12)
                     throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, string_printf(__FUNCTION__ " Finished record size incorrect (expected 12B, received %uB).", rec_end - rec));
