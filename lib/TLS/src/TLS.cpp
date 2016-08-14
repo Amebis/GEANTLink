@@ -121,12 +121,14 @@ void eap::tls_master_secret::clear()
 //////////////////////////////////////////////////////////////////////
 
 eap::tls_conn_state::tls_conn_state() :
-    m_alg_prf     (0),
-    m_alg_encrypt (0),
-    m_size_enc_key(0),
-    m_size_enc_iv (0),
-    m_alg_mac     (0),
-    m_size_mac_key(0)
+    m_alg_prf       (0),
+    m_alg_encrypt   (0),
+    m_size_enc_key  (0),
+    m_size_enc_iv   (0),
+    m_size_enc_block(0),
+    m_alg_mac       (0),
+    m_size_mac_key  (0),
+    m_size_mac_hash (0)
 {
 }
 

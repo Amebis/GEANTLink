@@ -101,7 +101,8 @@ eap::method_tls::method_tls(_In_ module &module, _In_ config_method_tls &cfg, _I
     m_server_hello_done(false),
     m_server_finished(false),
     m_cipher_spec(false),
-    m_seq_num(0),
+    m_seq_num_client(0),
+    m_seq_num_server(0),
     m_blob_cfg(NULL),
     method(module, cfg, cred)
 {
@@ -116,7 +117,7 @@ eap::method_tls::method_tls(_In_ const method_tls &other) :
     m_packet_res(other.m_packet_res),
     m_state(other.m_state),
     m_padding_hmac_client(other.m_padding_hmac_client),
-    //m_padding_hmac_server(other.m_padding_hmac_server),
+    m_padding_hmac_server(other.m_padding_hmac_server),
     m_key_client(other.m_key_client),
     m_key_server(other.m_key_server),
     m_key_mppe_send(other.m_key_mppe_send),
@@ -129,7 +130,8 @@ eap::method_tls::method_tls(_In_ const method_tls &other) :
     m_server_hello_done(other.m_server_hello_done),
     m_server_finished(other.m_server_finished),
     m_cipher_spec(other.m_cipher_spec),
-    m_seq_num(other.m_seq_num),
+    m_seq_num_client(other.m_seq_num_client),
+    m_seq_num_server(other.m_seq_num_server),
     method(other)
 {
 }
@@ -143,7 +145,7 @@ eap::method_tls::method_tls(_Inout_ method_tls &&other) :
     m_packet_res(std::move(other.m_packet_res)),
     m_state(std::move(other.m_state)),
     m_padding_hmac_client(std::move(other.m_padding_hmac_client)),
-    //m_padding_hmac_server(std::move(other.m_padding_hmac_server)),
+    m_padding_hmac_server(std::move(other.m_padding_hmac_server)),
     m_key_client(std::move(other.m_key_client)),
     m_key_server(std::move(other.m_key_server)),
     m_key_mppe_send(std::move(other.m_key_mppe_send)),
@@ -156,7 +158,8 @@ eap::method_tls::method_tls(_Inout_ method_tls &&other) :
     m_server_hello_done(std::move(other.m_server_hello_done)),
     m_server_finished(std::move(other.m_server_finished)),
     m_cipher_spec(std::move(other.m_cipher_spec)),
-    m_seq_num(std::move(other.m_seq_num)),
+    m_seq_num_client(std::move(other.m_seq_num_client)),
+    m_seq_num_server(std::move(other.m_seq_num_server)),
     method(std::move(other))
 {
 }
@@ -180,7 +183,7 @@ eap::method_tls& eap::method_tls::operator=(_In_ const method_tls &other)
         m_packet_res                = other.m_packet_res;
         m_state                     = other.m_state;
         m_padding_hmac_client       = other.m_padding_hmac_client;
-        //m_padding_hmac_server       = other.m_padding_hmac_server;
+        m_padding_hmac_server       = other.m_padding_hmac_server;
         m_key_client                = other.m_key_client;
         m_key_server                = other.m_key_server;
         m_key_mppe_send             = other.m_key_mppe_send;
@@ -193,7 +196,8 @@ eap::method_tls& eap::method_tls::operator=(_In_ const method_tls &other)
         m_server_hello_done         = other.m_server_hello_done;
         m_server_finished           = other.m_server_finished;
         m_cipher_spec               = other.m_cipher_spec;
-        m_seq_num                   = other.m_seq_num;
+        m_seq_num_client            = other.m_seq_num_client;
+        m_seq_num_server            = other.m_seq_num_server;
     }
 
     return *this;
@@ -211,7 +215,7 @@ eap::method_tls& eap::method_tls::operator=(_Inout_ method_tls &&other)
         m_packet_res                = std::move(other.m_packet_res);
         m_state                     = std::move(other.m_state);
         m_padding_hmac_client       = std::move(other.m_padding_hmac_client);
-        //m_padding_hmac_server       = std::move(other.m_padding_hmac_server);
+        m_padding_hmac_server       = std::move(other.m_padding_hmac_server);
         m_key_client                = std::move(other.m_key_client);
         m_key_server                = std::move(other.m_key_server);
         m_key_mppe_send             = std::move(other.m_key_mppe_send);
@@ -224,7 +228,8 @@ eap::method_tls& eap::method_tls::operator=(_Inout_ method_tls &&other)
         m_server_hello_done         = std::move(other.m_server_hello_done);
         m_server_finished           = std::move(other.m_server_finished);
         m_cipher_spec               = std::move(other.m_cipher_spec);
-        m_seq_num                   = std::move(other.m_seq_num);
+        m_seq_num_client            = std::move(other.m_seq_num_client);
+        m_seq_num_server            = std::move(other.m_seq_num_server);
     }
 
     return *this;
@@ -237,7 +242,7 @@ void eap::method_tls::begin_session(
     _In_        HANDLE        hTokenImpersonateUser,
     _In_        DWORD         dwMaxSendPacketSize)
 {
-    eap::method::begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
+    method::begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
 
     // Create cryptographics provider.
     if (!m_cp.create(NULL, MS_ENHANCED_PROV, PROV_RSA_FULL))
@@ -343,7 +348,7 @@ void eap::method_tls::process_request_packet(
 
         // Generate client randomness.
         m_padding_hmac_client.clear();
-        //m_padding_hmac_server.clear();
+        m_padding_hmac_server.clear();
         m_key_client.free();
         m_key_server.free();
         m_key_mppe_send.clear();
@@ -359,11 +364,13 @@ void eap::method_tls::process_request_packet(
         if (!m_hash_handshake_msgs_sha1.create(m_cp, CALG_SHA1))
             throw win_runtime_error(__FUNCTION__ " Error creating SHA-1 hashing object.");
 
-        m_send_client_cert = false;
+        m_send_client_cert  = false;
         m_server_hello_done = false;
-        m_server_finished = false;
-        m_cipher_spec = false;
-        m_seq_num = 0;
+        m_server_finished   = false;
+        m_cipher_spec       = false;
+
+        m_seq_num_client = 0;
+        m_seq_num_server = 0;
     }
 
     switch (m_phase) {
@@ -373,10 +380,9 @@ void eap::method_tls::process_request_packet(
             m_packet_res.m_id    = m_packet_req.m_id;
             m_packet_res.m_flags = 0;
             sanitizing_blob hello(make_client_hello());
+            hash_handshake(hello);
             sanitizing_blob handshake(make_message(tls_message_type_handshake, hello, m_cipher_spec));
             m_packet_res.m_data.assign(handshake.begin(), handshake.end());
-            CryptHashData(m_hash_handshake_msgs_md5 , hello.data(), (DWORD)hello.size(), 0);
-            CryptHashData(m_hash_handshake_msgs_sha1, hello.data(), (DWORD)hello.size(), 0);
 
             m_phase = phase_req_server_hello;
 
@@ -416,10 +422,9 @@ void eap::method_tls::process_request_packet(
                 if (m_send_client_cert) {
                     // Client certificate requested.
                     sanitizing_blob client_cert(make_client_cert());
+                    hash_handshake(client_cert);
                     sanitizing_blob handshake(make_message(tls_message_type_handshake, client_cert, m_cipher_spec));
                     m_packet_res.m_data.insert(m_packet_res.m_data.end(), handshake.begin(), handshake.end());
-                    CryptHashData(m_hash_handshake_msgs_md5 , client_cert.data(), (DWORD)client_cert.size(), 0);
-                    CryptHashData(m_hash_handshake_msgs_sha1, client_cert.data(), (DWORD)client_cert.size(), 0);
                 }
 
                 // Generate pre-master secret. PMS will get sanitized in its destructor when going out-of-scope.
@@ -434,10 +439,9 @@ void eap::method_tls::process_request_packet(
 
                 // Create client key exchange message, and append to packet.
                 sanitizing_blob client_key_exchange(make_client_key_exchange(pms));
+                hash_handshake(client_key_exchange);
                 sanitizing_blob handshake(make_message(tls_message_type_handshake, client_key_exchange, m_cipher_spec));
                 m_packet_res.m_data.insert(m_packet_res.m_data.end(), handshake.begin(), handshake.end());
-                CryptHashData(m_hash_handshake_msgs_md5 , client_key_exchange.data(), (DWORD)client_key_exchange.size(), 0);
-                CryptHashData(m_hash_handshake_msgs_sha1, client_key_exchange.data(), (DWORD)client_key_exchange.size(), 0);
 
                 if (m_send_client_cert) {
                     // TODO: Create and append certificate_verify message!
@@ -458,10 +462,9 @@ void eap::method_tls::process_request_packet(
 
             // Create finished message, and append to packet.
             sanitizing_blob finished(make_finished());
+            hash_handshake(finished);
             sanitizing_blob handshake(make_message(tls_message_type_handshake, finished, m_cipher_spec));
             m_packet_res.m_data.insert(m_packet_res.m_data.end(), handshake.begin(), handshake.end());
-            CryptHashData(m_hash_handshake_msgs_md5 , finished.data(), (DWORD)finished.size(), 0);
-            CryptHashData(m_hash_handshake_msgs_sha1, finished.data(), (DWORD)finished.size(), 0);
 
             pEapOutput->fAllowNotifications = FALSE;
             pEapOutput->action = EapPeerMethodResponseActionSend;
@@ -748,7 +751,7 @@ eap::sanitizing_blob eap::method_tls::make_change_chiper_spec()
         1,                                                  // Message size (low-order byte)
         1,                                                  // Message: change_cipher_spec is always "1"
     };
-    return eap::sanitizing_blob(s_msg_css, s_msg_css + _countof(s_msg_css));
+    return sanitizing_blob(s_msg_css, s_msg_css + _countof(s_msg_css));
 }
 
 
@@ -782,30 +785,41 @@ eap::sanitizing_blob eap::method_tls::make_finished() const
 }
 
 
-eap::sanitizing_blob eap::method_tls::make_message(_In_ tls_message_type_t type, _In_ const sanitizing_blob &msg)
+eap::sanitizing_blob eap::method_tls::make_message(_In_ tls_message_type_t type, _Inout_ sanitizing_blob &data, _In_ bool encrypt)
 {
-    size_t size_msg = msg.size();
-    eap::sanitizing_blob msg_h;
-    msg_h.reserve(
-        1        + // SSL record type
-        2        + // SSL version
-        2        + // Message size
-        size_msg); // Message
+    size_t size_data = data.size();
+    assert(size_data <= 0xffff);
+    message_header hdr = {
+        (unsigned char)type, // SSL record type
+        {
+            3, // SSL major version
+            1, // SSL minor version
+        },
+        {
+            // Data length (unencrypted, network byte order)
+            (unsigned char)((size_data >> 8) & 0xff),
+            (unsigned char)((size_data     ) & 0xff),
+        }
+    };
 
-    // SSL record type
-    msg_h.push_back((unsigned char)type);
+    sanitizing_blob msg;
+    if (encrypt) {
+        encrypt_message(&hdr, data);
 
-    // SSL version: TLS 1.0
-    msg_h.push_back(3); // SSL major version
-    msg_h.push_back(1); // SSL minor version
+        // Update message size.
+        size_t size_data_enc = data.size();
+        *(unsigned short*)hdr.length = htons((unsigned short)size_data_enc);
+        msg.reserve(sizeof(message_header) + size_data_enc);
+    } else
+        msg.reserve(sizeof(message_header) + size_data);
 
-    // Message
-    assert(size_msg <= 0xffff);
-    unsigned short size_msg_n = htons((unsigned short)size_msg);
-    msg_h.insert(msg_h.end(), (unsigned char*)&size_msg_n, (unsigned char*)(&size_msg_n + 1));
-    msg_h.insert(msg_h.end(), msg.begin(), msg.end());
+    // TLS header
+    msg.assign((const unsigned char*)&hdr, (const unsigned char*)(&hdr + 1));
 
-    return msg_h;
+    // Data
+    msg.insert(msg.end(), data.begin(), data.end());
+
+    return msg;
 }
 
 
@@ -828,8 +842,8 @@ void eap::method_tls::derive_keys()
     _key_block += m_state.m_size_mac_key;
 
     // server_write_MAC_secret
-    //m_padding_hmac_server.resize(sizeof(hash_hmac::padding_t));
-    //hash_hmac::inner_padding(m_cp, m_state.m_alg_mac, _key_block, m_state.m_size_mac_key, m_padding_hmac_server.data());
+    m_padding_hmac_server.resize(sizeof(hash_hmac::padding_t));
+    hash_hmac::inner_padding(m_cp, m_state.m_alg_mac, _key_block, m_state.m_size_mac_key, m_padding_hmac_server.data());
     _key_block += m_state.m_size_mac_key;
 
     // Microsoft CryptoAPI does not support importing clear text session keys.
@@ -879,12 +893,14 @@ void eap::method_tls::derive_msk()
 
 void eap::method_tls::process_packet(_In_bytecount_(size_pck) const void *_pck, _In_ size_t size_pck)
 {
+    sanitizing_blob data;
+
     for (const unsigned char *pck = (const unsigned char*)_pck, *pck_end = pck + size_pck; pck < pck_end; ) {
         if (pck + 5 > pck_end)
             throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Incomplete message header.");
-        const message *hdr = (const message*)pck;
+        const message_header *hdr = (const message_header*)pck;
         const unsigned char
-            *msg     = hdr->data,
+            *msg     = (const unsigned char*)(hdr + 1),
             *msg_end = msg + ntohs(*(unsigned short*)hdr->length);
         if (msg_end > pck_end)
             throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Incomplete message data.");
@@ -899,7 +915,7 @@ void eap::method_tls::process_packet(_In_bytecount_(size_pck) const void *_pck, 
             case tls_message_type_alert:
                 if (m_cipher_spec) {
                     sanitizing_blob msg_dec(msg, msg_end);
-                    decrypt_message(msg_dec);
+                    decrypt_message(hdr, msg_dec);
                     process_alert(msg_dec.data(), msg_dec.size());
                 } else
                     process_alert(msg, msg_end - msg);
@@ -908,7 +924,7 @@ void eap::method_tls::process_packet(_In_bytecount_(size_pck) const void *_pck, 
             case tls_message_type_handshake:
                 if (m_cipher_spec) {
                     sanitizing_blob msg_dec(msg, msg_end);
-                    decrypt_message(msg_dec);
+                    decrypt_message(hdr, msg_dec);
                     process_handshake(msg_dec.data(), msg_dec.size());
                 } else
                     process_handshake(msg, msg_end - msg);
@@ -919,7 +935,7 @@ void eap::method_tls::process_packet(_In_bytecount_(size_pck) const void *_pck, 
                     throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Application data should be encrypted.");
 
                 sanitizing_blob msg_dec(msg, msg_end);
-                decrypt_message(msg_dec);
+                decrypt_message(hdr, msg_dec);
                 process_application_data(msg_dec.data(), msg_dec.size());
                 break;
             }
@@ -927,7 +943,7 @@ void eap::method_tls::process_packet(_In_bytecount_(size_pck) const void *_pck, 
             default:
                 if (m_cipher_spec) {
                     sanitizing_blob msg_dec(msg, msg_end);
-                    decrypt_message(msg_dec);
+                    decrypt_message(hdr, msg_dec);
                     process_vendor_data(hdr->type, msg_dec.data(), msg_dec.size());
                 } else
                     process_vendor_data(hdr->type, msg, msg_end - msg);
@@ -1017,11 +1033,13 @@ void eap::method_tls::process_handshake(_In_bytecount_(msg_size) const void *_ms
                     throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Cipher or incomplete.");
                 if (rec[0] == 0x00 || rec[1] == 0x0a) {
                     // TLS_RSA_WITH_3DES_EDE_CBC_SHA
-                    m_state.m_alg_encrypt  = CALG_3DES;
-                    m_state.m_size_enc_key = 192/8; // 3DES 192bits
-                    m_state.m_size_enc_iv  = 64/8;  // 3DES 64bits
-                    m_state.m_alg_mac      = CALG_SHA1;
-                    m_state.m_size_mac_key = 160/8; // SHA-1
+                    m_state.m_alg_encrypt    = CALG_3DES;
+                    m_state.m_size_enc_key   = 192/8; // 3DES 192bits
+                    m_state.m_size_enc_iv    = 64/8;  // 3DES 64bits
+                    m_state.m_size_enc_block = 64/8;  // 3DES 64bits
+                    m_state.m_alg_mac        = CALG_SHA1;
+                    m_state.m_size_mac_key   = 160/8; // SHA-1
+                    m_state.m_size_mac_hash  = 160/8; // SHA-1
                 } else
                     throw win_runtime_error(ERROR_NOT_SUPPORTED, string_printf(__FUNCTION__ " Other than requested cipher selected (received 0x%02x%02x).", rec[0], rec[1]));
 
@@ -1109,8 +1127,7 @@ void eap::method_tls::process_handshake(_In_bytecount_(msg_size) const void *_ms
         msg = rec_end;
     }
 
-    CryptHashData(m_hash_handshake_msgs_md5 , (const BYTE*)_msg, (DWORD)msg_size, 0);
-    CryptHashData(m_hash_handshake_msgs_sha1, (const BYTE*)_msg, (DWORD)msg_size, 0);
+    hash_handshake(_msg, msg_size);
 }
 
 
@@ -1226,69 +1243,83 @@ void eap::method_tls::verify_server_trust() const
 }
 
 
-void eap::method_tls::encrypt_message(_Inout_ sanitizing_blob &msg)
+void eap::method_tls::encrypt_message(_In_ const message_header *hdr, _Inout_ sanitizing_blob &data)
 {
-    // Create a HMAC hash.
+    // Hash sequence number, TLS header, and message.
+    size_t size_data = data.size();
+    assert(size_data == ntohs(*(unsigned short*)hdr->length));
     hash_hmac hash(m_cp, m_state.m_alg_mac, m_padding_hmac_client.data());
-
-    // Hash sequence number and message.
-    unsigned __int64 seq_num = htonll(m_seq_num);
-    if (!CryptHashData(hash, (const BYTE*)&seq_num, sizeof(seq_num), 0) ||
-        !CryptHashData(hash, msg.data(), (DWORD)msg.size(), 0))
+    unsigned __int64 seq_num = htonll(m_seq_num_client);
+    if (!CryptHashData(hash, (const BYTE*)&seq_num   , sizeof(seq_num       ), 0) ||
+        !CryptHashData(hash, (const BYTE*)hdr        , sizeof(message_header), 0) ||
+        !CryptHashData(hash,              data.data(), (DWORD)size_data      , 0))
         throw win_runtime_error(__FUNCTION__ " Error hashing data.");
-
-    // Calculate hash.
     sanitizing_blob hmac;
     hash.calculate(hmac);
 
-    // Remove SSL/TLS header (record type, version, message size).
-    msg.erase(msg.begin(), msg.begin() + 5);
-
-    size_t size =
-        msg.size()  + // TLS message
+    size_t size_data_enc =
+        size_data   + // TLS message
         hmac.size() + // HMAC hash
         1;            // Padding length
 
     // Calculate padding.
-    DWORD size_block = CryptGetKeyParam(m_key_client, KP_BLOCKLEN, size_block, 0) ? size_block / 8 : 0;
-    unsigned char size_padding = (unsigned char)((size_block - size) % size_block);
-    size += size_padding;
-    msg.reserve(size);
+    unsigned char size_padding = (unsigned char)((m_state.m_size_enc_block - size_data_enc) % m_state.m_size_enc_block);
+    size_data_enc += size_padding;
+    data.reserve(size_data_enc);
 
-    // Append HMAC hash.
-    msg.insert(msg.end(), hmac.begin(), hmac.end());
-
-    // Append padding.
-    msg.insert(msg.end(), size_padding + 1, size_padding);
+    // Append HMAC hash and padding.
+    data.insert(data.end(), hmac.begin(), hmac.end());
+    data.insert(data.end(), size_padding + 1, size_padding);
 
     // Encrypt.
-    assert(size < 0xffffffff);
-    DWORD size2 = (DWORD)size;
-    if (!CryptEncrypt(m_key_client, NULL, FALSE, 0, msg.data(), &size2, (DWORD)size))
+    assert(size_data_enc < 0xffffffff);
+    DWORD size_data_enc2 = (DWORD)size_data_enc;
+    if (!CryptEncrypt(m_key_client, NULL, FALSE, 0, data.data(), &size_data_enc2, (DWORD)size_data_enc))
         throw win_runtime_error(__FUNCTION__ " Error encrypting message.");
 
     // Increment sequence number.
-    m_seq_num++;
+    m_seq_num_client++;
 }
 
 
-void eap::method_tls::decrypt_message(_Inout_ sanitizing_blob &msg) const
+void eap::method_tls::decrypt_message(_In_ const message_header *hdr, _Inout_ sanitizing_blob &data)
 {
     // Decrypt.
-    if (!CryptDecrypt(m_key_server, NULL, FALSE, 0, msg))
+    if (!CryptDecrypt(m_key_server, NULL, FALSE, 0, data))
         throw win_runtime_error(__FUNCTION__ " Error decrypting message.");
 
-    size_t size = msg.size();
+    size_t size = data.size();
     if (size) {
         // Check padding.
-        unsigned char padding = msg.back();
+        unsigned char padding = data.back();
         size_t size_data = size - 1 - padding;
         for (size_t i = size_data, i_end = size - 1; i < i_end; i++)
-            if (msg[i] != padding)
+            if (data[i] != padding)
                 throw invalid_argument(__FUNCTION__ " Incorrect message padding.");
 
-        // Remove padding.
-        msg.resize(size_data);
+        size_data -= m_state.m_size_mac_hash;
+
+        // Hash sequence number, TLS header (without length), original message length, and message.
+        hash_hmac hash(m_cp, m_state.m_alg_mac, m_padding_hmac_server.data());
+        unsigned __int64 seq_num = htonll(m_seq_num_server);
+        unsigned short size_data2 = htons((unsigned short)size_data);
+        if (!CryptHashData(hash, (const BYTE*)&seq_num   ,  sizeof(seq_num), 0) ||
+            !CryptHashData(hash, (const BYTE*)hdr        ,                3, 0) ||
+            !CryptHashData(hash, (const BYTE*)&size_data2,                2, 0) ||
+            !CryptHashData(hash,              data.data(), (DWORD)size_data, 0))
+            throw win_runtime_error(__FUNCTION__ " Error hashing data.");
+        sanitizing_blob hmac;
+        hash.calculate(hmac);
+
+        // Verify hash.
+        if (memcmp(&*(data.begin() + size_data), hmac.data(), m_state.m_size_mac_hash) != 0)
+            throw win_runtime_error(ERROR_DECRYPTION_FAILED, __FUNCTION__ " Integrity check failed.");
+
+        // Strip hash and padding.
+        data.resize(size_data);
+
+        // Increment sequence number.
+        m_seq_num_server++;
     }
 }
 

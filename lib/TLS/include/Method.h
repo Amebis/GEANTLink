@@ -127,7 +127,7 @@ namespace eap
         ///
         /// TLS message
         ///
-        struct message
+        struct message_header
         {
             unsigned char type;         ///< Message type (one of `message_type_t` constants)
             struct {
@@ -135,7 +135,6 @@ namespace eap
                 unsigned char minor;    ///< Minor version
             } version;                  ///< SSL/TLS version
             unsigned char length[2];    ///< Message length (in network byte order)
-            unsigned char data[1];      ///< Message data
         };
 #pragma pack(pop)
 
@@ -283,31 +282,40 @@ namespace eap
         ///
         /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter A.1. Record Layer)](https://tools.ietf.org/html/rfc5246#appendix-A.1)
         ///
-        /// \param[in] type  Message type
-        /// \param[in] msg   Message data contents
+        /// \param[in] type     Message type
+        /// \param[in] data     Message data contents
+        /// \param[in] encrypt  Should \p data get encrypted?
         ///
         /// \returns TLS message message
         ///
-        static eap::sanitizing_blob make_message(_In_ tls_message_type_t type, _In_ const sanitizing_blob &msg);
+        eap::sanitizing_blob make_message(_In_ tls_message_type_t type, _Inout_ sanitizing_blob &data, _In_ bool encrypt);
 
         ///
-        /// Makes a TLS message
+        /// Hashes handshake message for "finished" message validation.
         ///
-        /// \param[in] type     Message type
-        /// \param[in] msg      Message data contents
-        /// \param[in] encrypt  Should the message be encrypted?
+        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter 7.4.9. Finished)](https://tools.ietf.org/html/rfc5246#section-7.4.9)
         ///
-        /// \returns TLS message message
+        /// \param[in] data  Data to hash
+        /// \param[in] size  \p data size in bytes
         ///
-        inline eap::sanitizing_blob make_message(_In_ tls_message_type_t type, _In_ const sanitizing_blob &msg, _In_ bool encrypted)
+        inline void hash_handshake(_In_count_(size) const void *data, _In_ size_t size)
         {
-            if (encrypted) {
-                // Make unencrypted handshake, encrypt it, then make a new handshake message.
-                sanitizing_blob msg_enc(make_message(type, msg));
-                encrypt_message(msg_enc);
-                return make_message(type, msg_enc);
-            } else
-                return make_message(type, msg);
+            CryptHashData(m_hash_handshake_msgs_md5 , (const BYTE*)data, (DWORD)size, 0);
+            CryptHashData(m_hash_handshake_msgs_sha1, (const BYTE*)data, (DWORD)size, 0);
+        }
+
+        ///
+        /// Hashes handshake message for "finished" message validation.
+        ///
+        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter 7.4.9. Finished)](https://tools.ietf.org/html/rfc5246#section-7.4.9)
+        ///
+        /// \param[in] data  Data to hash
+        /// \param[in] size  \p data size in bytes
+        ///
+        template<class _Ty, class _Ax>
+        inline void hash_handshake(_In_ const std::vector<_Ty, _Ax> &data)
+        {
+            hash_handshake(data.data(), data.size() * sizeof(_Ty));
         }
 
         ///
@@ -391,16 +399,18 @@ namespace eap
         ///
         /// Encrypt TLS message
         ///
-        /// \param[inout] msg  TLS message to encrypt
+        /// \param[in]    hdr   Original TLS header for HMAC verification
+        /// \param[inout] data  TLS message to encrypt
         ///
-        void encrypt_message(_Inout_ sanitizing_blob &msg);
+        void encrypt_message(_In_ const message_header *hdr, _Inout_ sanitizing_blob &data);
 
         ///
         /// Decrypt TLS message
         ///
-        /// \param[inout] msg  TLS message to decrypt
+        /// \param[in]    hdr   Original TLS header for HMAC verification
+        /// \param[inout] data  TLS message to decrypt
         ///
-        void decrypt_message(_Inout_ sanitizing_blob &msg) const;
+        void decrypt_message(_In_ const message_header *hdr, _Inout_ sanitizing_blob &data);
 
         ///
         /// Calculates pseudo-random P_hash data defined in RFC 5246
@@ -478,7 +488,7 @@ namespace eap
         tls_conn_state m_state;                                 ///< TLS connection state for fast reconnect
 
         sanitizing_blob m_padding_hmac_client;                  ///< Padding (key) for client side HMAC calculation
-        //sanitizing_blob m_padding_hmac_server;                  ///< Padding (key) for server side HMAC calculation
+        sanitizing_blob m_padding_hmac_server;                  ///< Padding (key) for server side HMAC calculation
         winstd::crypt_key m_key_client;                         ///< Key for encrypting messages
         winstd::crypt_key m_key_server;                         ///< Key for decrypting messages
 
@@ -497,7 +507,8 @@ namespace eap
         bool m_server_finished;                                 ///< Did server send a valid finish message?
         bool m_cipher_spec;                                     ///< Did server specify cipher?
 
-        unsigned __int64 m_seq_num;                             ///< Sequence number for encryption
+        unsigned __int64 m_seq_num_client;                      ///< Sequence number for encrypting
+        unsigned __int64 m_seq_num_server;                      ///< Sequence number for decrypting
 
         // The following members are required to avoid memory leakage in get_result()
         EAP_ATTRIBUTES m_eap_attr_desc;                         ///< EAP Radius attributes descriptor
