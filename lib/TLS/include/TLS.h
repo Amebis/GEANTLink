@@ -358,7 +358,6 @@ namespace eap
         size_t m_size_enc_iv;               ///> Encryption initialization vector size in bytes (has to comply with `m_alg_encrypt`)
         ALG_ID m_alg_mac;                   ///> Message authenticy check algorithm
         size_t m_size_mac_key;              ///> Message authenticy check algorithm key size (has to comply with `m_alg_mac`)
-        size_t m_size_mac_hash;             ///> Message authenticy check algorithm result size (has to comply with `m_alg_mac`)
         tls_master_secret m_master_secret;  ///< TLS master secret
         tls_random m_random_client;         ///< Client tls_random
         tls_random m_random_server;         ///< Server tls_random
