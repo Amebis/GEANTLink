@@ -1443,11 +1443,16 @@ HCRYPTKEY eap::method_tls::create_key(
     // PS
     size_t size_ps = size_key - size_secret - 3;
     assert(size_ps >= 8);
+#if 1
+    key_blob.insert(key_blob.end(), size_ps, 1);
+#else
+    // Is random PS required at all? We are importing a clear-text session key with the exponent-of-one key. How low on security can we get?
     key_blob.insert(key_blob.end(), size_ps, 0);
     unsigned char *ps = &*(key_blob.end() - size_ps);
     CryptGenRandom(m_cp, (DWORD)size_ps, ps);
     for (size_t i = 0; i < size_ps; i++)
         if (ps[i] == 0) ps[i] = 1;
+#endif
 
     key_blob.push_back(0); // PS and M zero delimiter
 
@@ -1460,7 +1465,7 @@ HCRYPTKEY eap::method_tls::create_key(
 
     // Import the key.
     winstd::crypt_key key_out;
-    if (!key_out.import(m_cp, key_blob.data(), (DWORD)key_blob.size(), key, CRYPT_NO_SALT))
+    if (!key_out.import(m_cp, key_blob.data(), (DWORD)key_blob.size(), key, 0))
         throw winstd::win_runtime_error(__FUNCTION__ " Error importing key.");
     return key_out.detach();
 }
