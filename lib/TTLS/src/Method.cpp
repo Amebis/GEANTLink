@@ -99,9 +99,14 @@ void eap::method_ttls::process_request_packet(
             if (!m_cipher_spec)
                 throw runtime_error(__FUNCTION__ " Refusing to send credentials unencrypted.");
 
+            m_packet_res.m_code  = EapCodeResponse;
+            m_packet_res.m_id    = m_packet_req.m_id;
+            m_packet_res.m_flags = 0;
             sanitizing_blob client(make_pap_client());
             sanitizing_blob application(make_message(tls_message_type_application_data, client, m_cipher_spec));
-            m_packet_res.m_data.insert(m_packet_res.m_data.end(), application.begin(), application.end());
+            m_packet_res.m_data.assign(application.begin(), application.end());
+
+            pEapOutput->fAllowNotifications = FALSE;
             pEapOutput->action = EapPeerMethodResponseActionSend;
         }
     } else {
@@ -133,12 +138,12 @@ void eap::method_ttls::derive_msk()
     sanitizing_blob key_block(prf(m_state.m_master_secret, seed, 2*sizeof(tls_random)));
     const unsigned char *_key_block = key_block.data();
 
-    // MS-MPPE-Recv-Key
-    memcpy(&m_key_mppe_recv, _key_block, sizeof(tls_random));
+    // MSK: MPPE-Recv-Key
+    memcpy(&m_key_mppe_client, _key_block, sizeof(tls_random));
     _key_block += sizeof(tls_random);
 
-    // MS-MPPE-Send-Key
-    memcpy(&m_key_mppe_send, _key_block, sizeof(tls_random));
+    // MSK: MPPE-Send-Key
+    memcpy(&m_key_mppe_server, _key_block, sizeof(tls_random));
     _key_block += sizeof(tls_random);
 }
 
@@ -154,25 +159,25 @@ eap::sanitizing_blob eap::method_ttls::make_pap_client() const
     WideCharToMultiByte(CP_UTF8, 0, cred->m_identity.c_str(), (int)cred->m_identity.length(), identity_utf8, NULL, NULL);
     WideCharToMultiByte(CP_UTF8, 0, cred->m_password.c_str(), (int)cred->m_password.length(), password_utf8, NULL, NULL);
 
-    unsigned char rnd;
-    if (!CryptGenRandom(m_cp, sizeof(rnd), &rnd))
-        rnd = 0;
-
     size_t
         size_identity    = identity_utf8.length(),
         size_password    = password_utf8.length(),
-        padding_identity = (4  -  size_identity                ) %  4,
-        padding_password = (16 - (password_utf8.length() + rnd)) % 16; // According to RFC 5281 passwords must be padded to 16B boundary with random padding blocks to make password length guessing harder.
+        padding_identity = (4 - size_identity         ) % 4,
+        padding_password = (4 - password_utf8.length()) % 4,
+        size_identity_outer,
+        size_password_outer;
 
     sanitizing_blob msg;
     msg.reserve(
+        (size_identity_outer = 
         4                + // Diameter AVP Code
         4                + // Diameter AVP Flags & Length
-        size_identity    + // Identity
+        size_identity)   + // Identity
         padding_identity + // Identity padding
+        (size_password_outer = 
         4                + // Diameter AVP Code
         4                + // Diameter AVP Flags & Length
-        size_password    + // Password
+        size_password)   + // Password
         padding_password); // Password padding
 
     // Diameter AVP Code User-Name (0x00000001)
@@ -182,7 +187,7 @@ eap::sanitizing_blob eap::method_ttls::make_pap_client() const
     msg.push_back(0x01);
 
     // Diameter AVP Flags & Length
-    unsigned int identity_hdr = htonl((diameter_avp_flag_mandatory << 24) | (unsigned int)size_identity);
+    unsigned int identity_hdr = htonl((diameter_avp_flag_mandatory << 24) | (unsigned int)size_identity_outer);
     msg.insert(msg.end(), (unsigned char*)&identity_hdr, (unsigned char*)(&identity_hdr + 1));
 
     // Identity
@@ -196,7 +201,7 @@ eap::sanitizing_blob eap::method_ttls::make_pap_client() const
     msg.push_back(0x02);
 
     // Diameter AVP Flags & Length
-    unsigned int password_hdr = htonl((diameter_avp_flag_mandatory << 24) | (unsigned int)size_password);
+    unsigned int password_hdr = htonl((diameter_avp_flag_mandatory << 24) | (unsigned int)size_password_outer);
     msg.insert(msg.end(), (unsigned char*)&password_hdr, (unsigned char*)(&password_hdr + 1));
 
     // Password

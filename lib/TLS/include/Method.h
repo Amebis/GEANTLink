@@ -492,8 +492,8 @@ namespace eap
         winstd::crypt_key m_key_client;                         ///< Key for encrypting messages
         winstd::crypt_key m_key_server;                         ///< Key for decrypting messages
 
-        tls_random m_key_mppe_send;                             ///< MS-MPPE-Send-Key
-        tls_random m_key_mppe_recv;                             ///< MS-MPPE-Recv-Key
+        tls_random m_key_mppe_client;                           ///< MS-MPPE-Recv-Key
+        tls_random m_key_mppe_server;                           ///< MS-MPPE-Send-Key
 
         sanitizing_blob m_session_id;                           ///< TLS session ID
 

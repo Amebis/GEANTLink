@@ -217,7 +217,7 @@ namespace eap
 
 #pragma pack(push)
 #pragma pack(1)
-    struct tls_random
+    struct __declspec(novtable) tls_random
     {
         unsigned char data[32]; ///< Randomness
 
@@ -264,7 +264,7 @@ namespace eap
 
 #pragma pack(push)
 #pragma pack(1)
-    struct tls_master_secret
+    struct __declspec(novtable) tls_master_secret
     {
         unsigned char data[48];
 

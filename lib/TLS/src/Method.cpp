@@ -120,8 +120,8 @@ eap::method_tls::method_tls(_In_ const method_tls &other) :
     m_padding_hmac_server(other.m_padding_hmac_server),
     m_key_client(other.m_key_client),
     m_key_server(other.m_key_server),
-    m_key_mppe_send(other.m_key_mppe_send),
-    m_key_mppe_recv(other.m_key_mppe_recv),
+    m_key_mppe_client(other.m_key_mppe_client),
+    m_key_mppe_server(other.m_key_mppe_server),
     m_session_id(other.m_session_id),
     m_server_cert_chain(other.m_server_cert_chain),
     m_hash_handshake_msgs_md5(other.m_hash_handshake_msgs_md5),
@@ -148,8 +148,8 @@ eap::method_tls::method_tls(_Inout_ method_tls &&other) :
     m_padding_hmac_server(std::move(other.m_padding_hmac_server)),
     m_key_client(std::move(other.m_key_client)),
     m_key_server(std::move(other.m_key_server)),
-    m_key_mppe_send(std::move(other.m_key_mppe_send)),
-    m_key_mppe_recv(std::move(other.m_key_mppe_recv)),
+    m_key_mppe_client(std::move(other.m_key_mppe_client)),
+    m_key_mppe_server(std::move(other.m_key_mppe_server)),
     m_session_id(std::move(other.m_session_id)),
     m_server_cert_chain(std::move(other.m_server_cert_chain)),
     m_hash_handshake_msgs_md5(std::move(other.m_hash_handshake_msgs_md5)),
@@ -186,8 +186,8 @@ eap::method_tls& eap::method_tls::operator=(_In_ const method_tls &other)
         m_padding_hmac_server       = other.m_padding_hmac_server;
         m_key_client                = other.m_key_client;
         m_key_server                = other.m_key_server;
-        m_key_mppe_send             = other.m_key_mppe_send;
-        m_key_mppe_recv             = other.m_key_mppe_recv;
+        m_key_mppe_client           = other.m_key_mppe_client;
+        m_key_mppe_server           = other.m_key_mppe_server;
         m_session_id                = other.m_session_id;
         m_server_cert_chain         = other.m_server_cert_chain;
         m_hash_handshake_msgs_md5   = other.m_hash_handshake_msgs_md5;
@@ -218,8 +218,8 @@ eap::method_tls& eap::method_tls::operator=(_Inout_ method_tls &&other)
         m_padding_hmac_server       = std::move(other.m_padding_hmac_server);
         m_key_client                = std::move(other.m_key_client);
         m_key_server                = std::move(other.m_key_server);
-        m_key_mppe_send             = std::move(other.m_key_mppe_send);
-        m_key_mppe_recv             = std::move(other.m_key_mppe_recv);
+        m_key_mppe_client           = std::move(other.m_key_mppe_client);
+        m_key_mppe_server           = std::move(other.m_key_mppe_server);
         m_session_id                = std::move(other.m_session_id);
         m_server_cert_chain         = std::move(other.m_server_cert_chain);
         m_hash_handshake_msgs_md5   = std::move(other.m_hash_handshake_msgs_md5);
@@ -351,8 +351,8 @@ void eap::method_tls::process_request_packet(
         m_padding_hmac_server.clear();
         m_key_client.free();
         m_key_server.free();
-        m_key_mppe_send.clear();
-        m_key_mppe_recv.clear();
+        m_key_mppe_client.clear();
+        m_key_mppe_server.clear();
 
         m_server_cert_chain.clear();
 
@@ -565,12 +565,12 @@ void eap::method_tls::get_result(
         derive_msk();
 
         // Fill array with RADIUS attributes.
-        // Note: MS-MPPE-Send-Key/MS-MPPE-Recv-Key are sent in swapped to change between client and server point of view.
         eap_attr a;
         m_eap_attr.clear();
-        a.create_ms_mppe_key(16, (LPCBYTE)&m_key_mppe_recv, sizeof(tls_random));
+        m_eap_attr.reserve(3);
+        a.create_ms_mppe_key(16, (LPCBYTE)&m_key_mppe_client, sizeof(tls_random));
         m_eap_attr.push_back(std::move(a));
-        a.create_ms_mppe_key(17, (LPCBYTE)&m_key_mppe_send, sizeof(tls_random));
+        a.create_ms_mppe_key(17, (LPCBYTE)&m_key_mppe_server, sizeof(tls_random));
         m_eap_attr.push_back(std::move(a));
         m_eap_attr.push_back(eap_attr::blank);
 
@@ -882,11 +882,11 @@ void eap::method_tls::derive_msk()
     const unsigned char *_key_block = key_block.data();
 
     // MS-MPPE-Recv-Key
-    memcpy(&m_key_mppe_recv, _key_block, sizeof(tls_random));
+    memcpy(&m_key_mppe_client, _key_block, sizeof(tls_random));
     _key_block += sizeof(tls_random);
 
     // MS-MPPE-Send-Key
-    memcpy(&m_key_mppe_send, _key_block, sizeof(tls_random));
+    memcpy(&m_key_mppe_server, _key_block, sizeof(tls_random));
     _key_block += sizeof(tls_random);
 }
 
