@@ -1326,7 +1326,7 @@ void eap::method_tls::decrypt_message(_In_ tls_message_type_t type, _Inout_ sani
             // Check padding. Do not throw until HMAC is calculated.
             // [Canvel, B., "Password Interception in a SSL/TLS Channel"](http://lasecwww.epfl.ch/memo_ssl.shtml)
             unsigned char padding = data.back();
-            size_data = padding + 1 <= size_data ? size_data - (padding + 1) : 0;
+            size_data = (size_t)padding + 1 <= size_data ? size_data - (padding + 1) : 0;
             for (size_t i = size_data, i_end = data.size() - 1; i < i_end; i++)
                 if (data[i] != padding)
                     padding_ok = false;

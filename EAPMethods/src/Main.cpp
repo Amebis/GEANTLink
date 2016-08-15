@@ -131,6 +131,9 @@ DWORD WINAPI EapPeerGetInfo(_In_ EAP_TYPE* pEapType, _Out_ EAP_PEER_METHOD_ROUTI
 }
 
 
+#pragma warning(push)
+#pragma warning(disable: 4702) // Compiler is smart enough to find out the initialize() method is empty => never throws an exception.
+
 ///
 /// Initializes an EAP peer method for EAPHost.
 ///
@@ -162,6 +165,11 @@ DWORD APIENTRY EapPeerInitialize(_Out_ EAP_ERROR **ppEapError)
     return dwResult;
 }
 
+#pragma warning(pop)
+
+
+#pragma warning(push)
+#pragma warning(disable: 4702) // Compiler is smart enough to find out the shutdown() method is empty => never throws an exception.
 
 ///
 /// Shuts down the EAP method and prepares to unload its corresponding DLL.
@@ -193,6 +201,8 @@ DWORD APIENTRY EapPeerShutdown(_Out_ EAP_ERROR **ppEapError)
 
     return dwResult;
 }
+
+#pragma warning(pop)
 
 
 ///
