@@ -836,15 +836,17 @@ void eap::method_tls::derive_keys()
     m_key_server = create_key(m_state.m_alg_encrypt, key_exp1, _key_block, m_state.m_size_enc_key);
     _key_block += m_state.m_size_enc_key;
 
-    // client_write_IV
-    if (!CryptSetKeyParam(m_key_client, KP_IV, _key_block, 0))
-        throw win_runtime_error(__FUNCTION__ " Error setting client_write_IV.");
-    _key_block += m_state.m_size_enc_iv;
+    if (m_state.m_size_enc_iv) {
+        // client_write_IV
+        if (!CryptSetKeyParam(m_key_client, KP_IV, _key_block, 0))
+            throw win_runtime_error(__FUNCTION__ " Error setting client_write_IV.");
+        _key_block += m_state.m_size_enc_iv;
 
-    // server_write_IV
-    if (!CryptSetKeyParam(m_key_server, KP_IV, _key_block, 0))
-        throw win_runtime_error(__FUNCTION__ " Error setting server_write_IV.");
-    _key_block += m_state.m_size_enc_iv;
+        // server_write_IV
+        if (!CryptSetKeyParam(m_key_server, KP_IV, _key_block, 0))
+            throw win_runtime_error(__FUNCTION__ " Error setting server_write_IV.");
+        _key_block += m_state.m_size_enc_iv;
+    }
 }
 
 
@@ -1238,18 +1240,28 @@ void eap::method_tls::encrypt_message(_In_ const message_header *hdr, _Inout_ sa
     hash.calculate(hmac);
 
     size_t size_data_enc =
-        size_data   + // TLS message
-        hmac.size() + // HMAC hash
-        1;            // Padding length
+        size_data  + // TLS message
+        hmac.size(); // HMAC hash
 
-    // Calculate padding.
-    unsigned char size_padding = (unsigned char)((m_state.m_size_enc_block - size_data_enc) % m_state.m_size_enc_block);
-    size_data_enc += size_padding;
+    if (m_state.m_size_enc_block) {
+        // Block cypher
 
-    // Append HMAC hash and padding.
-    data.reserve(size_data_enc);
-    data.insert(data.end(), hmac.begin(), hmac.end());
-    data.insert(data.end(), size_padding + 1, size_padding);
+        // Calculate padding.
+        size_data_enc += 1; // Padding length
+        unsigned char size_padding = (unsigned char)((m_state.m_size_enc_block - size_data_enc) % m_state.m_size_enc_block);
+        size_data_enc += size_padding;
+
+        // Append HMAC hash and padding.
+        data.reserve(size_data_enc);
+        data.insert(data.end(), hmac.begin(), hmac.end());
+        data.insert(data.end(), size_padding + 1, size_padding);
+    } else {
+        // Stream cipher
+
+        // Append HMAC hash.
+        data.reserve(size_data_enc);
+        data.insert(data.end(), hmac.begin(), hmac.end());
+    }
 
     // Encrypt.
     assert(size_data_enc < 0xffffffff);
@@ -1270,12 +1282,16 @@ void eap::method_tls::decrypt_message(_In_ const message_header *hdr, _Inout_ sa
 
     size_t size = data.size();
     if (size) {
-        // Check padding.
-        unsigned char padding = data.back();
-        size_t size_data = size - 1 - padding;
-        for (size_t i = size_data, i_end = size - 1; i < i_end; i++)
-            if (data[i] != padding)
-                throw invalid_argument(__FUNCTION__ " Incorrect message padding.");
+        size_t size_data = size;
+
+        if (m_state.m_size_enc_block) {
+            // Check padding.
+            unsigned char padding = data.back();
+            size_data -= padding + 1;
+            for (size_t i = size_data, i_end = size - 1; i < i_end; i++)
+                if (data[i] != padding)
+                    throw invalid_argument(__FUNCTION__ " Incorrect message padding.");
+        }
 
         size_data -= m_state.m_size_mac_hash;
 
