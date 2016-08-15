@@ -159,6 +159,10 @@ eap::sanitizing_blob eap::method_ttls::make_pap_client() const
     WideCharToMultiByte(CP_UTF8, 0, cred->m_identity.c_str(), (int)cred->m_identity.length(), identity_utf8, NULL, NULL);
     WideCharToMultiByte(CP_UTF8, 0, cred->m_password.c_str(), (int)cred->m_password.length(), password_utf8, NULL, NULL);
 
+    // PAP passwords must be padded to 16B boundary according to RFC 5281. Will not add random extra padding here, as length obfuscation should be done by TLS encryption layer.
+    size_t padding_password_ex = (16 - password_utf8.length()) % 16;
+    password_utf8.append(padding_password_ex, 0);
+
     size_t
         size_identity    = identity_utf8.length(),
         size_password    = password_utf8.length(),
