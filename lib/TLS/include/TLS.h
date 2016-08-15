@@ -404,9 +404,10 @@ namespace eap
         ///
         /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter 7.4.7.1. RSA-Encrypted Premaster Secret Message)](https://tools.ietf.org/html/rfc5246#section-7.4.7.1)
         ///
-        /// \param[in] cp  Handle of the cryptographics provider
+        /// \param[in] cp   Handle of the cryptographics provider
+        /// \param[in] ver  TLS version
         ///
-        tls_master_secret(_In_ HCRYPTPROV cp);
+        tls_master_secret(_In_ HCRYPTPROV cp, _In_ tls_version ver);
 
         ///
         /// Copies a master secret

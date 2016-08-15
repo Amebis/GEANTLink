@@ -107,7 +107,7 @@ eap::method_tls::method_tls(_In_ module &module, _In_ config_provider_list &cfg,
 #endif
     method(module, cfg, cred)
 {
-    m_tls_version = tls_version_1_0;
+    m_tls_version = tls_version_1_1;
 }
 
 
@@ -413,7 +413,7 @@ void eap::method_tls::process_request_packet(
                 }
 
                 // Generate pre-master secret. PMS will get sanitized in its destructor when going out-of-scope.
-                tls_master_secret pms(m_cp);
+                tls_master_secret pms(m_cp, m_tls_version);
 
                 // Derive master secret.
                 static const unsigned char s_label[] = "master secret";
@@ -828,7 +828,7 @@ void eap::method_tls::derive_keys()
     m_key_server = create_key(m_state.m_alg_encrypt, key_exp1, _key_block, m_state.m_size_enc_key);
     _key_block += m_state.m_size_enc_key;
 
-    if (m_state.m_size_enc_iv) {
+    if (m_state.m_size_enc_iv && m_tls_version < tls_version_1_1) {
         // client_write_IV
         if (!CryptSetKeyParam(m_key_client, KP_IV, _key_block, 0))
             throw win_runtime_error(__FUNCTION__ " Error setting client_write_IV.");
@@ -875,7 +875,7 @@ void eap::method_tls::process_packet(_In_bytecount_(size_pck) const void *_pck, 
         if (msg_end > pck_end)
             throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Incomplete message data.");
 
-        if (hdr->version == m_tls_version) {
+        if (hdr->version >= tls_version_1_0) {
             // Process TLS 1.0 message.
             switch (hdr->type) {
             case tls_message_type_change_cipher_spec:
@@ -980,8 +980,9 @@ void eap::method_tls::process_handshake(_In_bytecount_(msg_size) const void *_ms
                 // TLS version
                 if (rec + 2 > rec_end)
                     throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Server SSL/TLS version missing or incomplete.");
-                else if (rec[0] != m_tls_version.major || rec[1] != m_tls_version.minor)
+                else if (*(tls_version*)rec < tls_version_1_0 || m_tls_version < *(tls_version*)rec)
                     throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Unsupported SSL/TLS version.");
+                m_tls_version = *(tls_version*)rec;
                 m_state.m_alg_prf = CALG_TLS1PRF;
                 rec += 2;
 
@@ -1013,7 +1014,12 @@ void eap::method_tls::process_handshake(_In_bytecount_(msg_size) const void *_ms
                 } else
                     throw win_runtime_error(ERROR_NOT_SUPPORTED, string_printf(__FUNCTION__ " Other than requested cipher selected (received 0x%02x%02x).", rec[0], rec[1]));
 
-                m_module.log_event(&EAPMETHOD_TLS_SERVER_HELLO, event_data((unsigned int)eap_type_tls), event_data((unsigned int)m_session_id.size()), event_data(m_session_id.data(), (ULONG)m_session_id.size()), event_data::blank);
+                m_module.log_event(&EAPMETHOD_TLS_SERVER_HELLO1,
+                    event_data((unsigned int)eap_type_tls),
+                    event_data(((unsigned int)m_tls_version.major << 8) | (unsigned int)m_tls_version.minor),
+                    event_data((unsigned int)m_session_id.size()),
+                    event_data(m_session_id.data(), (ULONG)m_session_id.size()),
+                    event_data::blank);
                 break;
 
             case tls_handshake_type_certificate: {
@@ -1241,10 +1247,11 @@ void eap::method_tls::encrypt_message(_In_ tls_message_type_t type, _Inout_ sani
         // Block cypher
 
         if (m_tls_version >= tls_version_1_1) {
-            // TLS 1.1+: Prepend random IV.
-            data.insert(data.begin(), m_state.m_size_enc_block, 0);
-            CryptGenRandom(m_cp, (DWORD)m_state.m_size_enc_block, data.data());
-            size_data_enc += m_state.m_size_enc_block;
+            // TLS 1.1+: Set random IV.
+            data.insert(data.begin(), m_state.m_size_enc_iv, 0);
+            if (!CryptGenRandom(m_cp, (DWORD)m_state.m_size_enc_iv, data.data()))
+                throw win_runtime_error(__FUNCTION__ " Error generating IV.");
+            size_data_enc += m_state.m_size_enc_iv;
         }
 
         // Calculate padding.
@@ -1299,8 +1306,8 @@ void eap::method_tls::decrypt_message(_In_ tls_message_type_t type, _Inout_ sani
 
             if (m_tls_version >= tls_version_1_1) {
                 // TLS 1.1+: Remove random IV.
-                data.erase(data.begin(), data.begin() + m_state.m_size_enc_block);
-                size_data -= m_state.m_size_enc_block;
+                data.erase(data.begin(), data.begin() + m_state.m_size_enc_iv);
+                size_data -= m_state.m_size_enc_iv;
             }
         }
 

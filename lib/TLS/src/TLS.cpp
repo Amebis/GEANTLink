@@ -88,10 +88,10 @@ eap::tls_master_secret::tls_master_secret()
 }
 
 
-eap::tls_master_secret::tls_master_secret(_In_ HCRYPTPROV cp)
+eap::tls_master_secret::tls_master_secret(_In_ HCRYPTPROV cp, _In_ tls_version ver)
 {
-    data[0] = 3;
-    data[1] = 1;
+    data[0] = ver.major;
+    data[1] = ver.minor;
 
     if (!CryptGenRandom(cp, sizeof(data) - 2, data + 2))
         throw win_runtime_error(__FUNCTION__ " Error creating PMS randomness.");
