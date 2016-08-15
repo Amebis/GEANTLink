@@ -224,3 +224,17 @@ std::wstring eap::credentials_ttls::get_identity() const
 
     return L"";
 }
+
+
+bool eap::credentials_ttls::combine(
+    _In_       const credentials_ttls   *cred_cached,
+    _In_       const config_method_ttls &cfg,
+    _In_opt_z_       LPCTSTR            pszTargetName)
+{
+    bool
+        is_outer_set = credentials_tls::combine(cred_cached, cfg, pszTargetName),
+        is_inner_set =
+            dynamic_cast<const credentials_pap*>(m_inner.get()) ? ((credentials_pap*)m_inner.get())->combine(cred_cached ? (credentials_pap*)cred_cached->m_inner.get() : NULL, (const config_method_pap&)*cfg.m_inner, pszTargetName) : false;
+
+    return is_outer_set && is_inner_set;
+}

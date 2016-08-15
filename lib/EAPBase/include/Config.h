@@ -342,6 +342,7 @@ namespace eap
         bool m_allow_save;                          ///< Are credentials allowed to be saved to Windows Credential Manager?
         bool m_use_preshared;                       ///< Use pre-shared credentials
         std::unique_ptr<credentials> m_preshared;   ///< Pre-shared credentials
+        bool m_cred_failed;                         ///< Did credential fail last time?
     };
 
 

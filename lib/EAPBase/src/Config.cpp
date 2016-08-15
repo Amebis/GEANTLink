@@ -139,6 +139,7 @@ eap::config_method& eap::config_method::operator=(_Inout_ config_method &&other)
 eap::config_method_with_cred::config_method_with_cred(_In_ module &mod) :
     m_allow_save(true),
     m_use_preshared(false),
+    m_cred_failed(false),
     config_method(mod)
 {
 }
@@ -148,6 +149,7 @@ eap::config_method_with_cred::config_method_with_cred(_In_ const config_method_w
     m_allow_save(other.m_allow_save),
     m_use_preshared(other.m_use_preshared),
     m_preshared(other.m_preshared ? (credentials*)other.m_preshared->clone() : nullptr),
+    m_cred_failed(other.m_cred_failed),
     config_method(other)
 {
 }
@@ -157,6 +159,7 @@ eap::config_method_with_cred::config_method_with_cred(_Inout_ config_method_with
     m_allow_save(std::move(other.m_allow_save)),
     m_use_preshared(std::move(other.m_use_preshared)),
     m_preshared(std::move(other.m_preshared)),
+    m_cred_failed(std::move(other.m_cred_failed)),
     config_method(std::move(other))
 {
 }
@@ -169,6 +172,7 @@ eap::config_method_with_cred& eap::config_method_with_cred::operator=(_In_ const
         m_allow_save          = other.m_allow_save;
         m_use_preshared       = other.m_use_preshared;
         m_preshared.reset(other.m_preshared ? (credentials*)other.m_preshared->clone() : nullptr);
+        m_cred_failed         = other.m_cred_failed;
     }
 
     return *this;
@@ -182,6 +186,7 @@ eap::config_method_with_cred& eap::config_method_with_cred::operator=(_Inout_ co
         m_allow_save          = std::move(other.m_allow_save   );
         m_use_preshared       = std::move(other.m_use_preshared);
         m_preshared           = std::move(other.m_preshared    );
+        m_cred_failed         = std::move(other.m_cred_failed  );
     }
 
     return *this;
@@ -243,6 +248,7 @@ void eap::config_method_with_cred::operator<<(_Inout_ cursor_out &cursor) const
     cursor << m_allow_save;
     cursor << m_use_preshared;
     cursor << *m_preshared;
+    cursor << m_cred_failed;
 }
 
 
@@ -252,7 +258,8 @@ size_t eap::config_method_with_cred::get_pk_size() const
         config_method::get_pk_size() +
         pksizeof(m_allow_save   ) +
         pksizeof(m_use_preshared) +
-        pksizeof(*m_preshared   );
+        pksizeof(*m_preshared   ) +
+        pksizeof(m_cred_failed  );
 }
 
 
@@ -262,6 +269,7 @@ void eap::config_method_with_cred::operator>>(_Inout_ cursor_in &cursor)
     cursor >> m_allow_save;
     cursor >> m_use_preshared;
     cursor >> *m_preshared;
+    cursor >> m_cred_failed;
 }
 
 

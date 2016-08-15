@@ -172,6 +172,26 @@ namespace eap
 
         /// @}
 
+        ///
+        /// Combine credentials in the following order:
+        ///
+        /// 1. Cached credentials
+        /// 2. Pre-configured credentials
+        /// 3. Stored credentials
+        ///
+        /// \param[in] cred_cached    Cached credentials (optional, can be \c NULL)
+        /// \param[in] cfg            Method configuration
+        /// \param[in] pszTargetName  The name in Windows Credential Manager to retrieve credentials from (optional, can be \c NULL)
+        ///
+        /// \returns
+        /// - \c true  if credentials were set;
+        /// - \c false otherwise
+        ///
+        bool combine(
+            _In_       const credentials_ttls   *cred_cached,
+            _In_       const config_method_ttls &cfg,
+            _In_opt_z_       LPCTSTR            pszTargetName);
+
     public:
         std::unique_ptr<credentials> m_inner;   ///< Inner credentials
     };

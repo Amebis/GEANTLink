@@ -39,10 +39,22 @@ template <class _wxT> class wxEAPConfigDialog;
 ///
 class wxEAPCredentialsDialog;
 
+
 ///
-/// EAP Provider-locked congifuration note
+/// EAP general note
+///
+class wxEAPNotePanel;
+
+
+///
+/// EAP provider-locked congifuration note
 ///
 class wxEAPProviderLockedPanel;
+
+///
+/// EAP credential warning note
+///
+class wxEAPCredentialWarningPanel;
 
 ///
 /// Base template for credential configuration panel
@@ -176,13 +188,13 @@ protected:
 };
 
 
-class wxEAPProviderLockedPanel : public wxEAPGeneralNotePanel
+class wxEAPNotePanel : public wxEAPNotePanelBase
 {
 public:
     ///
-    /// Constructs a notice pannel and set the title text
+    /// Constructs an empty notice pannel
     ///
-    wxEAPProviderLockedPanel(const eap::config_provider &prov, wxWindow* parent);
+    wxEAPNotePanel(wxWindow* parent);
 
 protected:
     /// \cond internal
@@ -210,12 +222,46 @@ protected:
         return GetPhoneNumber<_Elem, std::char_traits<_Elem>, std::allocator<_Elem> >(num);
     }
 
+    void CreateContactFields(const eap::config_provider &prov);
+
     /// \endcond
 
 protected:
-    const eap::config_provider &m_prov; ///< EAP provider
-    winstd::library m_shell32;          ///< shell32.dll resource library reference
-    wxIcon m_icon;                      ///< Panel icon
+    wxStaticText *m_provider_notice;
+    wxStaticText *m_help_web_label;
+    wxHyperlinkCtrl *m_help_web_value;
+    wxStaticText *m_help_email_label;
+    wxHyperlinkCtrl *m_help_email_value;
+    wxStaticText *m_help_phone_label;
+    wxHyperlinkCtrl *m_help_phone_value;
+};
+
+
+class wxEAPProviderLockedPanel : public wxEAPNotePanel
+{
+public:
+    ///
+    /// Constructs a notice pannel and set the title text
+    ///
+    wxEAPProviderLockedPanel(const eap::config_provider &prov, wxWindow* parent);
+
+protected:
+    winstd::library m_shell32;  ///< shell32.dll resource library reference
+    wxIcon m_icon;              ///< Panel icon
+};
+
+
+class wxEAPCredentialWarningPanel : public wxEAPNotePanel
+{
+public:
+    ///
+    /// Constructs a notice pannel and set the title text
+    ///
+    wxEAPCredentialWarningPanel(const eap::config_provider &prov, wxWindow* parent);
+
+protected:
+    winstd::library m_shell32;  ///< shell32.dll resource library reference
+    wxIcon m_icon;              ///< Panel icon
 };
 
 
@@ -342,13 +388,31 @@ protected:
     {
         UNREFERENCED_PARAMETER(event);
 
-        wxEAPCredentialsDialog dlg(m_prov, this);
-
+        // Read credentials from Credential Manager
         _Tcred cred(m_cfg.m_module);
-        _wxT *panel = new _wxT(m_prov, m_cfg, cred, m_target.c_str(), &dlg, true);
+        try {
+            cred.retrieve(m_target.c_str());
+        } catch (winstd::win_runtime_error &err) {
+            if (err.number() != ERROR_NOT_FOUND)
+                wxLogError(winstd::tstring_printf(_("Error reading credentials from Credential Manager: %hs (error %u)"), err.what(), err.number()).c_str());
+        } catch (...) {
+            wxLogError(_("Reading credentials failed."));
+        }
 
+        // Display credential prompt.
+        wxEAPCredentialsDialog dlg(m_prov, this);
+        _wxT *panel = new _wxT(m_prov, m_cfg, cred, m_target.c_str(), &dlg, true);
         dlg.AddContents((wxPanel**)&panel, 1);
-        dlg.ShowModal();
+        if (dlg.ShowModal() == wxID_OK && panel->GetRememberValue()) {
+            // Write credentials to credential manager.
+            try {
+                cred.store(m_target.c_str());
+            } catch (winstd::win_runtime_error &err) {
+                wxLogError(winstd::tstring_printf(_("Error writing credentials to Credential Manager: %hs (error %u)"), err.what(), err.number()).c_str());
+            } catch (...) {
+                wxLogError(_("Writing credentials failed."));
+            }
+        }
     }
 
 
@@ -422,46 +486,13 @@ public:
         this->Disconnect(wxEVT_UPDATE_UI, wxUpdateUIEventHandler(_Tthis::OnUpdateUI));
     }
 
+    inline bool GetRememberValue() const
+    {
+        return m_remember->GetValue();
+    }
+
 protected:
     /// \cond internal
-
-    virtual bool TransferDataToWindow()
-    {
-        if (!m_target.empty() && m_is_config) {
-            // Read credentials from Credential Manager
-            try {
-                m_cred.retrieve(m_target.c_str());
-            } catch (winstd::win_runtime_error &err) {
-                if (err.number() != ERROR_NOT_FOUND)
-                    wxLogError(winstd::tstring_printf(_("Error reading credentials from Credential Manager: %hs (error %u)"), err.what(), err.number()).c_str());
-            } catch (...) {
-                wxLogError(_("Reading credentials failed."));
-            }
-        }
-
-        return _Tbase::TransferDataToWindow();
-    }
-
-
-    virtual bool TransferDataFromWindow()
-    {
-        wxCHECK(_Tbase::TransferDataFromWindow(), false);
-
-        if (!m_target.empty()) {
-            if (m_remember->GetValue()) {
-                // Write credentials to credential manager.
-                try {
-                    m_cred.store(m_target.c_str());
-                } catch (winstd::win_runtime_error &err) {
-                    wxLogError(winstd::tstring_printf(_("Error writing credentials to Credential Manager: %hs (error %u)"), err.what(), err.number()).c_str());
-                } catch (...) {
-                    wxLogError(_("Writing credentials failed."));
-                }
-            }
-        }
-
-        return true;
-    }
 
     virtual void OnUpdateUI(wxUpdateUIEvent& event)
     {

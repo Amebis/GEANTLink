@@ -135,13 +135,20 @@ void eap::method_ttls::get_result(
         // Do the TLS.
         method_tls::get_result(reason, ppResult);
     } else {
+        config_provider &cfg_prov(m_cfg.m_providers.front());
+        config_method_ttls *cfg_method = dynamic_cast<config_method_ttls*>(cfg_prov.m_methods.front().get());
+        assert(cfg_method);
+
+        // Mark credentials appropriately, so GUI can re-prompt user.
+        cfg_method->m_inner->m_cred_failed = reason == EapPeerMethodResultFailure;
+
         // The TLS was OK.
         method_tls::get_result(EapPeerMethodResultSuccess, ppResult);
 
-        if (reason == EapPeerMethodResultFailure) {
-            ppResult->fIsSuccess = FALSE;
-            ppResult->dwFailureReasonCode = EAP_E_AUTHENTICATION_FAILED;
-        }
+        //if (reason == EapPeerMethodResultFailure) {
+        //    ppResult->fIsSuccess = FALSE;
+        //    ppResult->dwFailureReasonCode = EAP_E_AUTHENTICATION_FAILED;
+        //}
     }
 }
 

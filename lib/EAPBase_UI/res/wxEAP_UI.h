@@ -102,9 +102,9 @@ class wxEAPBannerPanelBase : public wxPanel
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class wxEAPGeneralNotePanel
+/// Class wxEAPNotePanelBase
 ///////////////////////////////////////////////////////////////////////////////
-class wxEAPGeneralNotePanel : public wxPanel 
+class wxEAPNotePanelBase : public wxPanel 
 {
 	private:
 	
@@ -115,8 +115,8 @@ class wxEAPGeneralNotePanel : public wxPanel
 	
 	public:
 		
-		wxEAPGeneralNotePanel( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxSIMPLE_BORDER|wxTAB_TRAVERSAL ); 
-		~wxEAPGeneralNotePanel();
+		wxEAPNotePanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxSIMPLE_BORDER|wxTAB_TRAVERSAL ); 
+		~wxEAPNotePanelBase();
 	
 };
 

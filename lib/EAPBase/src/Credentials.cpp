@@ -83,6 +83,19 @@ tstring eap::credentials::get_name() const
 }
 
 
+bool eap::credentials::combine(
+    _In_       const credentials       *cred_cached,
+    _In_       config_method_with_cred &cfg,
+    _In_opt_z_ LPCTSTR                 pszTargetName)
+{
+    UNREFERENCED_PARAMETER(cred_cached);
+    UNREFERENCED_PARAMETER(cfg);
+    UNREFERENCED_PARAMETER(pszTargetName);
+
+    // When there's nothing to combine...
+    return true;
+}
+
 //////////////////////////////////////////////////////////////////////
 // eap::credentials_pass
 //////////////////////////////////////////////////////////////////////

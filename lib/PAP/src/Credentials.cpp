@@ -20,6 +20,9 @@
 
 #include "StdAfx.h"
 
+using namespace std;
+using namespace winstd;
+
 
 //////////////////////////////////////////////////////////////////////
 // eap::credentials_pap
@@ -69,4 +72,41 @@ eap::config* eap::credentials_pap::clone() const
 LPCTSTR eap::credentials_pap::target_suffix() const
 {
     return _T("PAP");
+}
+
+
+bool eap::credentials_pap::combine(
+    _In_       const credentials_pap   *cred_cached,
+    _In_       const config_method_pap &cfg,
+    _In_opt_z_       LPCTSTR           pszTargetName)
+{
+    if (cred_cached) {
+        // Using EAP service cached credentials.
+        *this = *cred_cached;
+        m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CACHED1, event_data((unsigned int)eap_type_pap), event_data(credentials_pap::get_name()), event_data::blank);
+        return true;
+    }
+
+    if (cfg.m_use_preshared) {
+        // Using preshared credentials.
+        *this = *(credentials_pap*)cfg.m_preshared.get();
+        m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_PRESHARED1, event_data((unsigned int)eap_type_pap), event_data(credentials_pap::get_name()), event_data::blank);
+        return true;
+    }
+
+    if (pszTargetName) {
+        try {
+            credentials_pap cred_loaded(m_module);
+            cred_loaded.retrieve(pszTargetName);
+
+            // Using stored credentials.
+            *this = std::move(cred_loaded);
+            m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_STORED1, event_data((unsigned int)eap_type_pap), event_data(credentials_pap::get_name()), event_data::blank);
+            return true;
+        } catch (...) {
+            // Not actually an error.
+        }
+    }
+
+    return false;
 }

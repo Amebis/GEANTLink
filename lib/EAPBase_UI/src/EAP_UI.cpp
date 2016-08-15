@@ -74,28 +74,36 @@ void wxEAPCredentialsDialog::OnInitDialog(wxInitDialogEvent& event)
 
 
 //////////////////////////////////////////////////////////////////////
-// wxEAPProviderLockedPanel
+// wxEAPNotePanel
 //////////////////////////////////////////////////////////////////////
 
-wxEAPProviderLockedPanel::wxEAPProviderLockedPanel(const eap::config_provider &prov, wxWindow* parent) :
-    m_prov(prov),
-    wxEAPGeneralNotePanel(parent)
+wxEAPNotePanel::wxEAPNotePanel(wxWindow* parent) :
+    m_provider_notice(NULL),
+    m_help_web_label(NULL),
+    m_help_web_value(NULL),
+    m_help_email_label(NULL),
+    m_help_email_value(NULL),
+    m_help_phone_label(NULL),
+    m_help_phone_value(NULL),
+    wxEAPNotePanelBase(parent)
 {
-    // Load and set icon.
-    if (m_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
-        wxSetIconFromResource(m_note_icon, m_icon, m_shell32, MAKEINTRESOURCE(48));
+}
 
-    m_note_label->SetLabel(wxString::Format(_("%s has pre-set parts of this configuration. Those parts are locked to prevent accidental modification."),
-        !m_prov.m_name.empty() ? m_prov.m_name.c_str() :
-        !m_prov.m_id  .empty() ? winstd::tstring_printf(_("Your %ls provider"), m_prov.m_id.c_str()).c_str() : _("Your provider")));
-    m_note_label->Wrap(452);
 
-    if (!m_prov.m_help_email.empty() || !m_prov.m_help_web.empty() || !m_prov.m_help_phone.empty()) {
-        wxStaticText *provider_notice = new wxStaticText(this, wxID_ANY, wxString::Format(_("For additional help and instructions, please contact %s at:"),
-            !m_prov.m_name.empty() ? m_prov.m_name.c_str() :
-            !m_prov.m_id  .empty() ? winstd::tstring_printf(_("your %ls provider"), m_prov.m_id.c_str()).c_str() : _("your provider")), wxDefaultPosition, wxDefaultSize, 0);
-        provider_notice->Wrap(452);
-        m_note_vert->Add(provider_notice, 0, wxUP|wxLEFT|wxRIGHT|wxEXPAND, 5);
+bool wxEAPNotePanel::AcceptsFocusFromKeyboard() const
+{
+    return m_help_web_value || m_help_email_value || m_help_phone_label;
+}
+
+
+void wxEAPNotePanel::CreateContactFields(const eap::config_provider &prov)
+{
+    if (!prov.m_help_email.empty() || !prov.m_help_web.empty() || !prov.m_help_phone.empty()) {
+        m_provider_notice = new wxStaticText(this, wxID_ANY, wxString::Format(_("For additional help and instructions, please contact %s at:"),
+            !prov.m_name.empty() ? prov.m_name.c_str() :
+            !prov.m_id  .empty() ? winstd::tstring_printf(_("your %ls provider"), prov.m_id.c_str()).c_str() : _("your provider")), wxDefaultPosition, wxDefaultSize, 0);
+        m_provider_notice->Wrap(449);
+        m_note_vert->Add(m_provider_notice, 0, wxUP|wxLEFT|wxRIGHT|wxEXPAND, 5);
 
         wxFlexGridSizer* sb_contact_tbl;
         sb_contact_tbl = new wxFlexGridSizer(0, 2, 5, 5);
@@ -105,47 +113,79 @@ wxEAPProviderLockedPanel::wxEAPProviderLockedPanel(const eap::config_provider &p
 
         wxFont font_wingdings(-1, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Wingdings"));
 
-        if (!m_prov.m_help_web.empty()) {
-            wxStaticText *label = new wxStaticText(this, wxID_ANY, wxT("\xb6"), wxDefaultPosition, wxDefaultSize, 0);
-            label->Wrap(-1);
-            label->SetFont(font_wingdings);
-            sb_contact_tbl->Add(label, 0, wxEXPAND|wxALIGN_TOP, 5);
+        if (!prov.m_help_web.empty()) {
+            m_help_web_label = new wxStaticText(this, wxID_ANY, wxT("\xb6"), wxDefaultPosition, wxDefaultSize, 0);
+            m_help_web_label->Wrap(-1);
+            m_help_web_label->SetFont(font_wingdings);
+            sb_contact_tbl->Add(m_help_web_label, 0, wxEXPAND|wxALIGN_TOP, 5);
 
-            wxHyperlinkCtrl *value = new wxHyperlinkCtrl(this, wxID_ANY, m_prov.m_help_web, m_prov.m_help_web, wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE);
-            value->SetToolTip(_("Open the default web browser"));
-            sb_contact_tbl->Add(value, 0, wxEXPAND|wxALIGN_TOP, 5);
+            m_help_web_value = new wxHyperlinkCtrl(this, wxID_ANY, prov.m_help_web, prov.m_help_web, wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE);
+            m_help_web_value->SetToolTip(_("Open the default web browser"));
+            sb_contact_tbl->Add(m_help_web_value, 0, wxEXPAND|wxALIGN_TOP, 5);
         }
 
-        if (!m_prov.m_help_email.empty()) {
-            wxStaticText *label = new wxStaticText(this, wxID_ANY, wxT("\x2a"), wxDefaultPosition, wxDefaultSize, 0);
-            label->Wrap(-1);
-            label->SetFont(font_wingdings);
-            sb_contact_tbl->Add(label, 0, wxEXPAND|wxALIGN_TOP, 5);
+        if (!prov.m_help_email.empty()) {
+            m_help_email_label = new wxStaticText(this, wxID_ANY, wxT("\x2a"), wxDefaultPosition, wxDefaultSize, 0);
+            m_help_email_label->Wrap(-1);
+            m_help_email_label->SetFont(font_wingdings);
+            sb_contact_tbl->Add(m_help_email_label, 0, wxEXPAND|wxALIGN_TOP, 5);
 
-            wxHyperlinkCtrl *value = new wxHyperlinkCtrl(this, wxID_ANY, m_prov.m_help_email, wxString(wxT("mailto:")) + m_prov.m_help_email, wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE);
-            value->SetToolTip(_("Open your e-mail program"));
-            sb_contact_tbl->Add(value, 0, wxEXPAND|wxALIGN_TOP, 5);
+            m_help_email_value = new wxHyperlinkCtrl(this, wxID_ANY, prov.m_help_email, wxString(wxT("mailto:")) + prov.m_help_email, wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE);
+            m_help_email_value->SetToolTip(_("Open your e-mail program"));
+            sb_contact_tbl->Add(m_help_email_value, 0, wxEXPAND|wxALIGN_TOP, 5);
         }
 
-        if (!m_prov.m_help_phone.empty()) {
-            wxStaticText *label = new wxStaticText(this, wxID_ANY, wxT("\x29"), wxDefaultPosition, wxDefaultSize, 0);
-            label->Wrap(-1);
-            label->SetFont(font_wingdings);
-            sb_contact_tbl->Add(label, 0, wxEXPAND|wxALIGN_TOP, 5);
+        if (!prov.m_help_phone.empty()) {
+            m_help_phone_label = new wxStaticText(this, wxID_ANY, wxT("\x29"), wxDefaultPosition, wxDefaultSize, 0);
+            m_help_phone_label->Wrap(-1);
+            m_help_phone_label->SetFont(font_wingdings);
+            sb_contact_tbl->Add(m_help_phone_label, 0, wxEXPAND|wxALIGN_TOP, 5);
 
-            wxHyperlinkCtrl *value = new wxHyperlinkCtrl(this, wxID_ANY, m_prov.m_help_phone, wxString(wxT("tel:")) + GetPhoneNumber(m_prov.m_help_phone.c_str()), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE);
-            value->SetToolTip(_("Dial the phone number"));
-            sb_contact_tbl->Add(value, 0, wxEXPAND|wxALIGN_TOP, 5);
+            m_help_phone_value = new wxHyperlinkCtrl(this, wxID_ANY, prov.m_help_phone, wxString(wxT("tel:")) + GetPhoneNumber(prov.m_help_phone.c_str()), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE);
+            m_help_phone_value->SetToolTip(_("Dial the phone number"));
+            sb_contact_tbl->Add(m_help_phone_value, 0, wxEXPAND|wxALIGN_TOP, 5);
         }
 
         m_note_vert->Add(sb_contact_tbl, 0, wxLEFT|wxRIGHT|wxDOWN|wxEXPAND, 5);
     }
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// wxEAPProviderLockedPanel
+//////////////////////////////////////////////////////////////////////
+
+wxEAPProviderLockedPanel::wxEAPProviderLockedPanel(const eap::config_provider &prov, wxWindow* parent) : wxEAPNotePanel(parent)
+{
+    // Load and set icon.
+    if (m_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
+        wxSetIconFromResource(m_note_icon, m_icon, m_shell32, MAKEINTRESOURCE(48));
+
+    m_note_label->SetLabel(wxString::Format(_("%s has pre-set parts of this configuration. Those parts are locked to prevent accidental modification."),
+        !prov.m_name.empty() ? prov.m_name.c_str() :
+        !prov.m_id  .empty() ? winstd::tstring_printf(_("Your %ls provider"), prov.m_id.c_str()).c_str() : _("Your provider")));
+    m_note_label->Wrap(449);
+
+    CreateContactFields(prov);
 
     this->Layout();
 }
 
 
-bool wxEAPProviderLockedPanel::AcceptsFocusFromKeyboard() const
+//////////////////////////////////////////////////////////////////////
+// wxEAPCredentialWarningPanel
+//////////////////////////////////////////////////////////////////////
+
+wxEAPCredentialWarningPanel::wxEAPCredentialWarningPanel(const eap::config_provider &prov, wxWindow* parent) : wxEAPNotePanel(parent)
 {
-    return !m_prov.m_help_email.empty() || !m_prov.m_help_web.empty() || !m_prov.m_help_phone.empty();
+    // Load and set icon.
+    if (m_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
+        wxSetIconFromResource(m_note_icon, m_icon, m_shell32, MAKEINTRESOURCE(161));
+
+    m_note_label->SetLabel(_("Previous attempt to connect using provided credentials failed. Please, make sure your credentials are correct, or try again later."));
+    m_note_label->Wrap(449);
+
+    CreateContactFields(prov);
+
+    this->Layout();
 }

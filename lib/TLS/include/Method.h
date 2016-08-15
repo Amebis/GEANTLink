@@ -539,5 +539,8 @@ namespace eap
         EAP_ATTRIBUTES m_eap_attr_desc;                         ///< EAP Radius attributes descriptor
         std::vector<winstd::eap_attr> m_eap_attr;               ///< EAP Radius attributes
         BYTE *m_blob_cfg;                                       ///< Configuration BLOB
+#ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
+        BYTE *m_blob_cred;                                      ///< Credentials BLOB
+#endif
     };
 }

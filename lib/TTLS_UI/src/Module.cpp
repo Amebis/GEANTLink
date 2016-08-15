@@ -127,27 +127,55 @@ void eap::peer_ttls_ui::invoke_identity_ui(
     _Inout_                                DWORD  *pdwUserDataOutSize,
     _Inout_                                LPWSTR *ppwszIdentity)
 {
+    assert(ppwszIdentity);
+
+    // Unpack configuration.
     config_provider_list cfg(*this);
     unpack(cfg, pConnectionData, dwConnectionDataSize);
     if (cfg.m_providers.empty() || cfg.m_providers.front().m_methods.empty())
         throw invalid_argument(__FUNCTION__ " Configuration has no providers and/or methods.");
 
-    credentials_ttls cred(*this);
-    if (dwUserDataSize)
-        unpack(cred, pUserData, dwUserDataSize);
-
+    // Get method configuration.
     const config_provider &cfg_prov(cfg.m_providers.front());
     config_method_ttls *cfg_method = dynamic_cast<config_method_ttls*>(cfg_prov.m_methods.front().get());
     assert(cfg_method);
-    config_method_with_cred *cfg_inner = dynamic_cast<config_method_with_cred*>(cfg_method->m_inner.get());
+
+#ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
+    // Unpack cached credentials.
+    credentials_ttls cred_in(*this);
+    if (dwUserDataSize)
+        unpack(cred_in, pUserData, dwUserDataSize);
+#else
+    UNREFERENCED_PARAMETER(pUserData);
+    UNREFERENCED_PARAMETER(dwUserDataSize);
+#endif
+
+    credentials_ttls cred_out(*this);
+
+    // Determine inner credential type.
+    eap_type_t type_inner;
+    if (dynamic_cast<const config_method_pap*>(cfg_method->m_inner.get())) {
+        cred_out.m_inner.reset(new credentials_pap(*this));
+        type_inner = eap_type_pap;
+    } else {
+        assert(0); // Unsupported inner authentication method type.
+        type_inner = eap_type_undefined;
+    }
+
+    // Combine credentials.
+    cred_out.combine(
+#ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
+        &cred_in,
+#else
+        NULL,
+#endif
+        *cfg_method,
+        (dwFlags & EAP_FLAG_GUEST_ACCESS) == 0 ? cfg_prov.m_id.c_str() : NULL);
 
     if (dwFlags & EAP_FLAG_GUEST_ACCESS) {
         // Disable credential saving for guests.
         cfg_method->m_allow_save = false;
-        if (cfg_inner)
-            cfg_inner->m_allow_save = false;
-        else
-            assert(0); // Missing inner configuration.
+        cfg_method->m_inner->m_allow_save = false;
     }
 
     // Initialize application.
@@ -164,7 +192,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
 
         // Create and launch credentials dialog.
         wxEAPCredentialsDialog dlg(cfg_prov, &parent);
-        wxTTLSCredentialsPanel *panel = new wxTTLSCredentialsPanel(cfg_prov, *cfg_method, cred, cfg_prov.m_id.c_str(), &dlg);
+        wxTTLSCredentialsPanel *panel = new wxTTLSCredentialsPanel(cfg_prov, *cfg_method, cred_out, cfg_prov.m_id.c_str(), &dlg);
         dlg.AddContents((wxPanel**)&panel, 1);
         dlg.Centre(wxBOTH);
         result = dlg.ShowModal();
@@ -179,14 +207,14 @@ void eap::peer_ttls_ui::invoke_identity_ui(
         throw win_runtime_error(ERROR_CANCELLED, __FUNCTION__ " Cancelled.");
 
     // Build our identity. ;)
-    wstring identity(move(cfg_method->get_public_identity(cred)));
+    wstring identity(move(cfg_method->get_public_identity(cred_out)));
     log_event(&EAPMETHOD_TRACE_EVT_CRED_OUTER_ID1, event_data((unsigned int)eap_type_ttls), event_data(identity), event_data::blank);
     size_t size = sizeof(WCHAR)*(identity.length() + 1);
     *ppwszIdentity = (WCHAR*)alloc_memory(size);
     memcpy(*ppwszIdentity, identity.c_str(), size);
 
     // Pack credentials.
-    pack(cred, ppUserDataOut, pdwUserDataOutSize);
+    pack(cred_out, ppUserDataOut, pdwUserDataOutSize);
 }
 
 

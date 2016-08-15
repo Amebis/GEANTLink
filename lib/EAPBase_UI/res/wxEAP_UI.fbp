@@ -637,7 +637,7 @@
             <property name="id">wxID_ANY</property>
             <property name="maximum_size"></property>
             <property name="minimum_size"></property>
-            <property name="name">wxEAPGeneralNotePanel</property>
+            <property name="name">wxEAPNotePanelBase</property>
             <property name="pos"></property>
             <property name="size">500,-1</property>
             <property name="subclass"></property>
@@ -827,7 +827,7 @@
                                 <property name="window_extra_style"></property>
                                 <property name="window_name"></property>
                                 <property name="window_style"></property>
-                                <property name="wrap">452</property>
+                                <property name="wrap">449</property>
                                 <event name="OnChar"></event>
                                 <event name="OnEnterWindow"></event>
                                 <event name="OnEraseBackground"></event>

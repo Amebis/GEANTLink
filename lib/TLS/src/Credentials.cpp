@@ -254,6 +254,43 @@ tstring eap::credentials_tls::get_name() const
 }
 
 
+bool eap::credentials_tls::combine(
+    _In_       const credentials_tls   *cred_cached,
+    _In_       const config_method_tls &cfg,
+    _In_opt_z_       LPCTSTR           pszTargetName)
+{
+    if (cred_cached) {
+        // Using EAP service cached credentials.
+        *this = *cred_cached;
+        m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CACHED1, event_data((unsigned int)eap_type_tls), event_data(credentials_tls::get_name()), event_data::blank);
+        return true;
+    }
+
+    if (cfg.m_use_preshared) {
+        // Using preshared credentials.
+        *this = *(credentials_tls*)cfg.m_preshared.get();
+        m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_PRESHARED1, event_data((unsigned int)eap_type_tls), event_data(credentials_tls::get_name()), event_data::blank);
+        return true;
+    }
+
+    if (pszTargetName) {
+        try {
+            credentials_tls cred_loaded(m_module);
+            cred_loaded.retrieve(pszTargetName);
+
+            // Using stored credentials.
+            *this = std::move(cred_loaded);
+            m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_STORED1, event_data((unsigned int)eap_type_tls), event_data(credentials_tls::get_name()), event_data::blank);
+            return true;
+        } catch (...) {
+            // Not actually an error.
+        }
+    }
+
+    return false;
+}
+
+
 const unsigned char eap::credentials_tls::s_entropy[1024] = {
     0xb9, 0xd1, 0x62, 0xd4, 0x1c, 0xe6, 0x8c, 0x25, 0x98, 0x9b, 0x1d, 0xbc, 0x40, 0x46, 0x9e, 0x6d,
     0x63, 0xba, 0xda, 0x78, 0x65, 0x56, 0x97, 0x4f, 0xa0, 0x89, 0xf4, 0xc5, 0x1b, 0xf5, 0x8d, 0x69,

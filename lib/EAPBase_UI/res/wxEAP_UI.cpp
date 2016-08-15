@@ -119,7 +119,7 @@ wxEAPBannerPanelBase::~wxEAPBannerPanelBase()
 {
 }
 
-wxEAPGeneralNotePanel::wxEAPGeneralNotePanel( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+wxEAPNotePanelBase::wxEAPNotePanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
 	this->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_INFOBK ) );
 	
@@ -132,7 +132,7 @@ wxEAPGeneralNotePanel::wxEAPGeneralNotePanel( wxWindow* parent, wxWindowID id, c
 	m_note_vert = new wxBoxSizer( wxVERTICAL );
 	
 	m_note_label = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_note_label->Wrap( 452 );
+	m_note_label->Wrap( 449 );
 	m_note_vert->Add( m_note_label, 0, wxALL|wxEXPAND, 5 );
 	
 	
@@ -143,7 +143,7 @@ wxEAPGeneralNotePanel::wxEAPGeneralNotePanel( wxWindow* parent, wxWindowID id, c
 	this->Layout();
 }
 
-wxEAPGeneralNotePanel::~wxEAPGeneralNotePanel()
+wxEAPNotePanelBase::~wxEAPNotePanelBase()
 {
 }
 

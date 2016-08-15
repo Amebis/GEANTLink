@@ -158,6 +158,26 @@ namespace eap
         /// Returns credential name (for GUI display).
         ///
         virtual winstd::tstring get_name() const;
+
+        ///
+        /// Combine credentials in the following order:
+        ///
+        /// 1. Cached credentials
+        /// 2. Pre-configured credentials
+        /// 3. Stored credentials
+        ///
+        /// \param[in] cred_cached    Cached credentials (optional, can be \c NULL)
+        /// \param[in] cfg            Method configuration
+        /// \param[in] pszTargetName  The name in Windows Credential Manager to retrieve credentials from (optional, can be \c NULL)
+        ///
+        /// \returns
+        /// - \c true  if credentials were set;
+        /// - \c false otherwise
+        ///
+        virtual bool combine(
+            _In_       const credentials       *cred_cached,
+            _In_       config_method_with_cred &cfg,
+            _In_opt_z_ LPCTSTR                 pszTargetName);
     };
 
 

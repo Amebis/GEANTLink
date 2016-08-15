@@ -102,6 +102,9 @@ eap::method_tls::method_tls(_In_ module &module, _In_ config_provider_list &cfg,
     m_seq_num_client(0),
     m_seq_num_server(0),
     m_blob_cfg(NULL),
+#ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
+    m_blob_cred(NULL),
+#endif
     method(module, cfg, cred)
 {
 }
@@ -163,6 +166,11 @@ eap::method_tls::~method_tls()
 {
     if (m_blob_cfg)
         m_module.free_memory(m_blob_cfg);
+
+#ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
+    if (m_blob_cred)
+        m_module.free_memory(m_blob_cred);
+#endif
 }
 
 
@@ -538,7 +546,11 @@ void eap::method_tls::get_result(
         m_eap_attr_desc.pAttribs = m_eap_attr.data();
         ppResult->pAttribArray = &m_eap_attr_desc;
 
+        // Clear credentials as failed.
+        cfg_method->m_cred_failed = false;
+
         ppResult->fIsSuccess = TRUE;
+        ppResult->dwFailureReasonCode = ERROR_SUCCESS;
 
         // Update configuration with session resumption data and prepare BLOB.
         cfg_method->m_session_id    = m_session_id;
@@ -551,6 +563,9 @@ void eap::method_tls::get_result(
         // Clear session resumption data.
         cfg_method->m_session_id.clear();
         cfg_method->m_master_secret.clear();
+
+        // Mark credentials as failed, so GUI can re-prompt user.
+        cfg_method->m_cred_failed = true;
 
         ppResult->fIsSuccess = FALSE;
         ppResult->dwFailureReasonCode = EAP_E_AUTHENTICATION_FAILED;
@@ -567,6 +582,14 @@ void eap::method_tls::get_result(
     if (m_blob_cfg)
         m_module.free_memory(m_blob_cfg);
     m_blob_cfg = ppResult->pConnectionData;
+
+#ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
+    ppResult->fSaveUserData = TRUE;
+    m_module.pack(m_cred, &ppResult->pUserData, &ppResult->dwSizeofUserData);
+    if (m_blob_cred)
+        m_module.free_memory(m_blob_cred);
+    m_blob_cred = ppResult->pUserData;
+#endif
 }
 
 
