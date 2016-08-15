@@ -45,7 +45,8 @@ namespace eap
         ///
         /// \sa [Extensible Authentication Protocol Tunneled Transport Layer Security Authenticated Protocol Version 0 (EAP-TTLSv0) (Chapter: 9.1 Packet Format)](https://tools.ietf.org/html/rfc5281#section-9.1)
         ///
-        enum flags_t {
+        #pragma warning(suppress: 4480)
+        enum flags_t : unsigned char {
             flags_length_incl = method_tls::flags_req_length_incl,  ///< Length included
             flags_more_frag   = method_tls::flags_req_more_frag,    ///< More fragments
             flags_start       = method_tls::flags_req_start,        ///< Start
@@ -147,7 +148,8 @@ namespace eap
     public:
         credentials_ttls &m_cred;           ///< TTLS credentials
 
-        enum version_t {
+        #pragma warning(suppress: 4480)
+        enum version_t :unsigned char {
             version_0 = 0,                  ///< EAP-TTLS v0
         } m_version;                        ///< EAP-TTLS version
     };

@@ -168,7 +168,11 @@ inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ eap::tls_conn_state
 
 namespace eap
 {
-    enum tls_message_type_t {
+#pragma warning(push)
+#pragma warning(disable: 4480)
+
+    enum tls_message_type_t : unsigned char
+    {
         tls_message_type_change_cipher_spec = 20,
         tls_message_type_alert              = 21,
         tls_message_type_handshake          = 22,
@@ -176,7 +180,8 @@ namespace eap
     };
 
 
-    enum tls_handshake_type_t {
+    enum tls_handshake_type_t : unsigned char
+    {
         tls_handshake_type_hello_request       =  0,
         tls_handshake_type_client_hello        =  1,
         tls_handshake_type_server_hello        =  2,
@@ -190,13 +195,15 @@ namespace eap
     };
 
 
-    enum tls_alert_level_t {
+    enum tls_alert_level_t : unsigned char
+    {
         tls_alert_level_warning = 1,
         tls_alert_level_fatal   = 2,
     };
 
 
-    enum tls_alert_desc_t {
+    enum tls_alert_desc_t : unsigned char
+    {
         tls_alert_desc_close_notify            =   0,
         tls_alert_desc_unexpected_message      =  10,
         tls_alert_desc_bad_record_mac          =  20,
@@ -224,111 +231,113 @@ namespace eap
         tls_alert_desc_unsupported_extension   = 110,
     };
 
+#pragma warning(pop)
+
 
 #pragma pack(push)
 #pragma pack(1)
+    ///
+    /// TLS protocol version
+    ///
+    struct __declspec(novtable) tls_version
+    {
+        unsigned char major;    ///< Major version
+        unsigned char minor;    ///< Minor version
+
         ///
-        /// TLS protocol version
+        /// Copies a TLS version
         ///
-        struct __declspec(novtable) tls_version
+        /// \param[in] other  Version to copy from
+        ///
+        /// \returns Reference to this object
+        ///
+        inline tls_version& operator=(_In_ const tls_version &other)
         {
-            unsigned char major;    ///< Major version
-            unsigned char minor;    ///< Minor version
-
-            ///
-            /// Copies a TLS version
-            ///
-            /// \param[in] other  Version to copy from
-            ///
-            /// \returns Reference to this object
-            ///
-            inline tls_version& operator=(_In_ const tls_version &other)
-            {
-                if (this != std::addressof(other)) {
-                    major = other.major;
-                    minor = other.minor;
-                }
-                return *this;
+            if (this != std::addressof(other)) {
+                major = other.major;
+                minor = other.minor;
             }
+            return *this;
+        }
 
-            ///
-            /// Is version less than?
-            ///
-            /// \param[in] other  Protocol version to compare against
-            /// \return
-            /// - Non zero when protocol version is less than h;
-            /// - Zero otherwise.
-            ///
-            inline bool operator<(_In_ const tls_version &other) const
-            {
-                return major < other.major || major == other.major && minor < other.minor;
-            }
+        ///
+        /// Is version less than?
+        ///
+        /// \param[in] other  Protocol version to compare against
+        /// \return
+        /// - Non zero when protocol version is less than h;
+        /// - Zero otherwise.
+        ///
+        inline bool operator<(_In_ const tls_version &other) const
+        {
+            return major < other.major || major == other.major && minor < other.minor;
+        }
 
-            ///
-            /// Is version less than or equal to?
-            ///
-            /// \param[in] other  Protocol version to compare against
-            /// \return
-            /// - Non zero when protocol version is less than or equal to h;
-            /// - Zero otherwise.
-            ///
-            inline bool operator<=(_In_ const tls_version &other) const
-            {
-                return !operator>(other);
-            }
+        ///
+        /// Is version less than or equal to?
+        ///
+        /// \param[in] other  Protocol version to compare against
+        /// \return
+        /// - Non zero when protocol version is less than or equal to h;
+        /// - Zero otherwise.
+        ///
+        inline bool operator<=(_In_ const tls_version &other) const
+        {
+            return !operator>(other);
+        }
 
-            ///
-            /// Is version greater than or equal to?
-            ///
-            /// \param[in] other  Protocol version to compare against
-            /// \return
-            /// - Non zero when protocol version is greater than or equal to h;
-            /// - Zero otherwise.
-            ///
-            inline bool operator>=(_In_ const tls_version &other) const
-            {
-                return !operator<(other);
-            }
+        ///
+        /// Is version greater than or equal to?
+        ///
+        /// \param[in] other  Protocol version to compare against
+        /// \return
+        /// - Non zero when protocol version is greater than or equal to h;
+        /// - Zero otherwise.
+        ///
+        inline bool operator>=(_In_ const tls_version &other) const
+        {
+            return !operator<(other);
+        }
 
-            ///
-            /// Is version greater than?
-            ///
-            /// \param[in] other  Protocol version to compare against
-            /// \return
-            /// - Non zero when protocol version is greater than h;
-            /// - Zero otherwise.
-            ///
-            inline bool operator>(_In_ const tls_version &other) const
-            {
-                return other.major < major || other.major == major && other.minor < minor;
-            }
+        ///
+        /// Is version greater than?
+        ///
+        /// \param[in] other  Protocol version to compare against
+        /// \return
+        /// - Non zero when protocol version is greater than h;
+        /// - Zero otherwise.
+        ///
+        inline bool operator>(_In_ const tls_version &other) const
+        {
+            return other.major < major || other.major == major && other.minor < minor;
+        }
 
-            ///
-            /// Is version not equal to?
-            ///
-            /// \param[in] other  Protocol version to compare against
-            /// \return
-            /// - Non zero when protocol version is not equal to h;
-            /// - Zero otherwise.
-            ///
-            inline bool operator!=(_In_ const tls_version &other) const
-            {
-                return !operator==(other);
-            }
+        ///
+        /// Is version not equal to?
+        ///
+        /// \param[in] other  Protocol version to compare against
+        /// \return
+        /// - Non zero when protocol version is not equal to h;
+        /// - Zero otherwise.
+        ///
+        inline bool operator!=(_In_ const tls_version &other) const
+        {
+            return !operator==(other);
+        }
 
-            ///
-            /// Is version equal to?
-            ///
-            /// \param[in] other  Protocol version to compare against
-            /// \return
-            /// - Non zero when protocol version is equal to h;
-            /// - Zero otherwise.
-            ///
-            inline bool operator==(_In_ const tls_version &other) const
-            {
-                return major == other.major && minor == other.minor;
-            }
-        };
+        ///
+        /// Is version equal to?
+        ///
+        /// \param[in] other  Protocol version to compare against
+        /// \return
+        /// - Non zero when protocol version is equal to h;
+        /// - Zero otherwise.
+        ///
+        inline bool operator==(_In_ const tls_version &other) const
+        {
+            return major == other.major && minor == other.minor;
+        }
+    };
 #pragma pack(pop)
 
 

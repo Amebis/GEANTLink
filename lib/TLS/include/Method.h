@@ -46,12 +46,15 @@ namespace eap
     class method_tls : public method
     {
     public:
+#pragma warning(push)
+#pragma warning(disable: 4480)
+
         ///
         /// EAP-TLS request packet flags
         ///
         /// \sa [The EAP-TLS Authentication Protocol (Chapter: 3.1 EAP-TLS Request Packet)](https://tools.ietf.org/html/rfc5216#section-3.1)
         ///
-        enum flags_req_t {
+        enum flags_req_t : unsigned char {
             flags_req_length_incl = 0x80,   ///< Length included
             flags_req_more_frag   = 0x40,   ///< More fragments
             flags_req_start       = 0x20,   ///< Start
@@ -62,10 +65,12 @@ namespace eap
         ///
         /// \sa [The EAP-TLS Authentication Protocol (Chapter: 3.2 EAP-TLS Response Packet)](https://tools.ietf.org/html/rfc5216#section-3.2)
         ///
-        enum flags_res_t {
+        enum flags_res_t : unsigned char {
             flags_res_length_incl = 0x80,   ///< Length included
             flags_res_more_frag   = 0x40,   ///< More fragments
         };
+
+#pragma warning(pop)
 
         ///
         /// EAP-TLS packet (data)
@@ -129,7 +134,7 @@ namespace eap
         ///
         struct message_header
         {
-            unsigned char type;         ///< Message type (one of `message_type_t` constants)
+            tls_message_type_t type;    ///< Message type (one of `message_type_t` constants)
             tls_version version;        ///< SSL/TLS version
             unsigned char length[2];    ///< Message length (in network byte order)
         };
@@ -406,7 +411,7 @@ namespace eap
         ///// \param[in] msg       TLS message data
         ///// \param[in] msg_size  TLS message data size
         /////
-        //virtual void process_vendor_data(_In_ unsigned char type, _In_bytecount_(msg_size) const void *msg, _In_ size_t msg_size);
+        //virtual void process_vendor_data(_In_ tls_message_type_t type, _In_bytecount_(msg_size) const void *msg, _In_ size_t msg_size);
 
         /// @}
 
@@ -421,18 +426,18 @@ namespace eap
         ///
         /// Encrypt TLS message
         ///
-        /// \param[in]    hdr   Original TLS header for HMAC verification
+        /// \param[in]    type  Message type
         /// \param[inout] data  TLS message to encrypt
         ///
-        void encrypt_message(_In_ const message_header *hdr, _Inout_ sanitizing_blob &data);
+        void encrypt_message(_In_ tls_message_type_t type, _Inout_ sanitizing_blob &data);
 
         ///
         /// Decrypt TLS message
         ///
-        /// \param[in]    hdr   Original TLS header for HMAC verification
+        /// \param[in]    type  Original message type for HMAC verification
         /// \param[inout] data  TLS message to decrypt
         ///
-        void decrypt_message(_In_ const message_header *hdr, _Inout_ sanitizing_blob &data);
+        void decrypt_message(_In_ tls_message_type_t type, _Inout_ sanitizing_blob &data);
 
         /// @}
 

@@ -720,12 +720,12 @@ eap::sanitizing_blob eap::method_tls::make_client_key_exchange(_In_ const tls_ma
 eap::sanitizing_blob eap::method_tls::make_change_chiper_spec() const
 {
     const unsigned char msg_css[] = {
-        (unsigned char)tls_message_type_change_cipher_spec, // SSL record type
-        m_tls_version.major,                                // SSL major version
-        m_tls_version.minor,                                // SSL minor version
-        0,                                                  // Message size (high-order byte)
-        1,                                                  // Message size (low-order byte)
-        1,                                                  // Message: change_cipher_spec is always "1"
+        tls_message_type_change_cipher_spec,    // SSL record type
+        m_tls_version.major,                    // SSL major version
+        m_tls_version.minor,                    // SSL minor version
+        0,                                      // Message size (high-order byte)
+        1,                                      // Message size (low-order byte)
+        1,                                      // Message: change_cipher_spec is always "1"
     };
     return sanitizing_blob(msg_css, msg_css + _countof(msg_css));
 }
@@ -739,7 +739,7 @@ eap::sanitizing_blob eap::method_tls::make_finished() const
         12); // verify_data is 12B
 
     // SSL header
-    unsigned int ssl_header = htonl((tls_handshake_type_finished << 24) | 12);
+    unsigned int ssl_header = htonl((unsigned int)(tls_handshake_type_finished << 24) | 12);
     msg.insert(msg.end(), (unsigned char*)&ssl_header, (unsigned char*)(&ssl_header + 1));
 
     // Create label + hash MD5 + hash SHA-1 seed.
@@ -763,39 +763,31 @@ eap::sanitizing_blob eap::method_tls::make_finished() const
 
 eap::sanitizing_blob eap::method_tls::make_message(_In_ tls_message_type_t type, _Inout_ sanitizing_blob &data, _In_ bool encrypt)
 {
-    size_t size_data = data.size();
-    assert(size_data <= 0xffff);
-    message_header hdr = {
-        (unsigned char)type, // SSL record type
-        {
-            m_tls_version.major, // SSL major version
-            m_tls_version.minor, // SSL minor version
-        },
-        {
-            // Data length (unencrypted, network byte order)
-            (unsigned char)((size_data >> 8) & 0xff),
-            (unsigned char)((size_data     ) & 0xff),
-        }
-    };
-
-    sanitizing_blob msg;
     if (encrypt) {
-        encrypt_message(&hdr, data);
+        encrypt_message(type, data);
+        return make_message(type, data, false);
+    } else {
+        size_t size_data = data.size();
+        assert(size_data <= 0xffff);
+        message_header hdr = {
+            type,                    // SSL record type
+            {
+                m_tls_version.major, // SSL major version
+                m_tls_version.minor, // SSL minor version
+            },
+            {
+                // Data length (unencrypted, network byte order)
+                (unsigned char)((size_data >> 8) & 0xff),
+                (unsigned char)((size_data     ) & 0xff),
+            }
+        };
 
-        // Update message size.
-        size_t size_data_enc = data.size();
-        *(unsigned short*)hdr.length = htons((unsigned short)size_data_enc);
-        msg.reserve(sizeof(message_header) + size_data_enc);
-    } else
+        sanitizing_blob msg;
         msg.reserve(sizeof(message_header) + size_data);
-
-    // TLS header
-    msg.assign((const unsigned char*)&hdr, (const unsigned char*)(&hdr + 1));
-
-    // Data
-    msg.insert(msg.end(), data.begin(), data.end());
-
-    return msg;
+        msg.assign((const unsigned char*)&hdr, (const unsigned char*)(&hdr + 1));
+        msg.insert(msg.end(), data.begin(), data.end());
+        return msg;
+    }
 }
 
 
@@ -893,7 +885,7 @@ void eap::method_tls::process_packet(_In_bytecount_(size_pck) const void *_pck, 
             case tls_message_type_alert:
                 if (m_cipher_spec) {
                     sanitizing_blob msg_dec(msg, msg_end);
-                    decrypt_message(hdr, msg_dec);
+                    decrypt_message(hdr->type, msg_dec);
                     process_alert(msg_dec.data(), msg_dec.size());
                 } else
                     process_alert(msg, msg_end - msg);
@@ -902,7 +894,7 @@ void eap::method_tls::process_packet(_In_bytecount_(size_pck) const void *_pck, 
             case tls_message_type_handshake:
                 if (m_cipher_spec) {
                     sanitizing_blob msg_dec(msg, msg_end);
-                    decrypt_message(hdr, msg_dec);
+                    decrypt_message(hdr->type, msg_dec);
                     process_handshake(msg_dec.data(), msg_dec.size());
                 } else
                     process_handshake(msg, msg_end - msg);
@@ -913,7 +905,7 @@ void eap::method_tls::process_packet(_In_bytecount_(size_pck) const void *_pck, 
                     throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Application data should be encrypted.");
 
                 sanitizing_blob msg_dec(msg, msg_end);
-                decrypt_message(hdr, msg_dec);
+                decrypt_message(hdr->type, msg_dec);
                 process_application_data(msg_dec.data(), msg_dec.size());
                 break;
             }
@@ -921,7 +913,7 @@ void eap::method_tls::process_packet(_In_bytecount_(size_pck) const void *_pck, 
             //default:
             //    if (m_cipher_spec) {
             //        sanitizing_blob msg_dec(msg, msg_end);
-            //        decrypt_message(hdr, msg_dec);
+            //        decrypt_message(hdr->type, msg_dec);
             //        process_vendor_data(hdr->type, msg_dec.data(), msg_dec.size());
             //    } else
             //        process_vendor_data(hdr->type, msg, msg_end - msg);
@@ -982,7 +974,7 @@ void eap::method_tls::process_handshake(_In_bytecount_(msg_size) const void *_ms
             throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Incomplete record data.");
 
         // Process record.
-        unsigned char type = hdr >> 24;
+        tls_handshake_type_t type = (tls_handshake_type_t)((hdr >> 24) & 0xff);
         switch (type) {
             case tls_handshake_type_server_hello:
                 // TLS version
@@ -1099,7 +1091,7 @@ void eap::method_tls::process_handshake(_In_bytecount_(msg_size) const void *_ms
             }
 
             default:
-                m_module.log_event(&EAPMETHOD_TLS_HANDSHAKE_IGNORE, event_data((unsigned int)eap_type_tls), event_data(type), event_data::blank);
+                m_module.log_event(&EAPMETHOD_TLS_HANDSHAKE_IGNORE, event_data((unsigned int)eap_type_tls), event_data((unsigned char)type), event_data::blank);
         }
 
         msg = rec_end;
@@ -1118,7 +1110,7 @@ void eap::method_tls::process_application_data(_In_bytecount_(msg_size) const vo
 }
 
 
-//void eap::method_tls::process_vendor_data(_In_ unsigned char type, _In_bytecount_(msg_size) const void *msg, _In_ size_t msg_size)
+//void eap::method_tls::process_vendor_data(_In_ tls_message_type_t type, _In_bytecount_(msg_size) const void *msg, _In_ size_t msg_size)
 //{
 //    UNREFERENCED_PARAMETER(type);
 //    UNREFERENCED_PARAMETER(msg);
@@ -1225,16 +1217,18 @@ void eap::method_tls::verify_server_trust() const
 }
 
 
-void eap::method_tls::encrypt_message(_In_ const message_header *hdr, _Inout_ sanitizing_blob &data)
+void eap::method_tls::encrypt_message(_In_ tls_message_type_t type, _Inout_ sanitizing_blob &data)
 {
     // Hash sequence number, TLS header, and message.
     size_t size_data = data.size();
-    assert(size_data == ntohs(*(unsigned short*)hdr->length));
     hash_hmac hash(m_cp, m_state.m_alg_mac, m_padding_hmac_client.data());
-    unsigned __int64 seq_num = htonll(m_seq_num_client);
-    if (!CryptHashData(hash, (const BYTE*)&seq_num   , sizeof(seq_num       ), 0) ||
-        !CryptHashData(hash, (const BYTE*)hdr        , sizeof(message_header), 0) ||
-        !CryptHashData(hash,              data.data(), (DWORD)size_data      , 0))
+    unsigned __int64 seq_num2 = htonll(m_seq_num_client);
+    unsigned short size_data2 = htons((unsigned short)size_data);
+    if (!CryptHashData(hash, (const BYTE*)&seq_num2     , sizeof(seq_num2     ), 0) ||
+        !CryptHashData(hash, (const BYTE*)&type         , sizeof(type         ), 0) ||
+        !CryptHashData(hash, (const BYTE*)&m_tls_version, sizeof(m_tls_version), 0) ||
+        !CryptHashData(hash, (const BYTE*)&size_data2   , sizeof(size_data2   ), 0) ||
+        !CryptHashData(hash,              data.data()   , (DWORD)size_data     , 0))
         throw win_runtime_error(__FUNCTION__ " Error hashing data.");
     sanitizing_blob hmac;
     hash.calculate(hmac);
@@ -1245,6 +1239,13 @@ void eap::method_tls::encrypt_message(_In_ const message_header *hdr, _Inout_ sa
 
     if (m_state.m_size_enc_block) {
         // Block cypher
+
+        if (m_tls_version >= tls_version_1_1) {
+            // TLS 1.1+: Prepend random IV.
+            data.insert(data.begin(), m_state.m_size_enc_block, 0);
+            CryptGenRandom(m_cp, (DWORD)m_state.m_size_enc_block, data.data());
+            size_data_enc += m_state.m_size_enc_block;
+        }
 
         // Calculate padding.
         size_data_enc += 1; // Padding length
@@ -1274,35 +1275,44 @@ void eap::method_tls::encrypt_message(_In_ const message_header *hdr, _Inout_ sa
 }
 
 
-void eap::method_tls::decrypt_message(_In_ const message_header *hdr, _Inout_ sanitizing_blob &data)
+void eap::method_tls::decrypt_message(_In_ tls_message_type_t type, _Inout_ sanitizing_blob &data)
 {
     // Decrypt.
     if (!CryptDecrypt(m_key_server, NULL, FALSE, 0, data))
         throw win_runtime_error(__FUNCTION__ " Error decrypting message.");
 
-    size_t size = data.size();
-    if (size) {
-        size_t size_data = size;
+    if (!data.empty()) {
+        size_t size_data = data.size();
 
         if (m_state.m_size_enc_block) {
             // Check padding.
             unsigned char padding = data.back();
             size_data -= padding + 1;
-            for (size_t i = size_data, i_end = size - 1; i < i_end; i++)
+            for (size_t i = size_data, i_end = data.size() - 1; i < i_end; i++)
                 if (data[i] != padding)
                     throw invalid_argument(__FUNCTION__ " Incorrect message padding.");
+
+            // Remove padding.
+            data.resize(size_data);
+
+            if (m_tls_version >= tls_version_1_1) {
+                // TLS 1.1+: Remove random IV.
+                data.erase(data.begin(), data.begin() + m_state.m_size_enc_block);
+                size_data -= m_state.m_size_enc_block;
+            }
         }
 
         size_data -= m_state.m_size_mac_hash;
 
         // Hash sequence number, TLS header (without length), original message length, and message.
         hash_hmac hash(m_cp, m_state.m_alg_mac, m_padding_hmac_server.data());
-        unsigned __int64 seq_num = htonll(m_seq_num_server);
+        unsigned __int64 seq_num2 = htonll(m_seq_num_server);
         unsigned short size_data2 = htons((unsigned short)size_data);
-        if (!CryptHashData(hash, (const BYTE*)&seq_num   ,  sizeof(seq_num), 0) ||
-            !CryptHashData(hash, (const BYTE*)hdr        ,                3, 0) ||
-            !CryptHashData(hash, (const BYTE*)&size_data2,                2, 0) ||
-            !CryptHashData(hash,              data.data(), (DWORD)size_data, 0))
+        if (!CryptHashData(hash, (const BYTE*)&seq_num2     , sizeof(seq_num2     ), 0) ||
+            !CryptHashData(hash, (const BYTE*)&type         , sizeof(type         ), 0) ||
+            !CryptHashData(hash, (const BYTE*)&m_tls_version, sizeof(m_tls_version), 0) ||
+            !CryptHashData(hash, (const BYTE*)&size_data2   , sizeof(size_data2   ), 0) ||
+            !CryptHashData(hash,              data.data()   , (DWORD)size_data     , 0))
             throw win_runtime_error(__FUNCTION__ " Error hashing data.");
         sanitizing_blob hmac;
         hash.calculate(hmac);

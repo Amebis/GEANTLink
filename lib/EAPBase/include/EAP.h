@@ -381,8 +381,8 @@ namespace eap
     };
 
 
-    enum diameter_avp_flags_t
-    {
+    #pragma warning(suppress: 4480)
+    enum diameter_avp_flags_t : unsigned char {
         diameter_avp_flag_vendor    = 0x80, ///< Vendor-ID present
         diameter_avp_flag_mandatory = 0x40, ///< Mandatory
     };
@@ -738,9 +738,7 @@ inline size_t pksizeof(_In_ const winstd::eap_type_t &val)
 
 inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ winstd::eap_type_t &val)
 {
-    unsigned char t;
-    cursor >> t;
-    val = (winstd::eap_type_t)t;
+    cursor >> (unsigned char&)val;
 }
 
 
