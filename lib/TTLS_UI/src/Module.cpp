@@ -196,6 +196,29 @@ void eap::peer_ttls_ui::invoke_identity_ui(
         dlg.AddContents((wxPanel**)&panel, 1);
         dlg.Centre(wxBOTH);
         result = dlg.ShowModal();
+        if (result == wxID_OK) {
+            // Write credentials to credential manager.
+            if (panel->m_outer_cred->GetRememberValue()) {
+                try {
+                    cred_out.credentials_tls::store(cfg_prov.m_id.c_str());
+                } catch (winstd::win_runtime_error &err) {
+                    wxLogError(winstd::tstring_printf(_("Error writing credentials to Credential Manager: %hs (error %u)"), err.what(), err.number()).c_str());
+                } catch (...) {
+                    wxLogError(_("Writing credentials failed."));
+                }
+            }
+
+            wxPAPCredentialsPanel *panel_inner_cred_pap = dynamic_cast<wxPAPCredentialsPanel*>(panel->m_inner_cred);
+            if (panel_inner_cred_pap && panel_inner_cred_pap->GetRememberValue()) {
+                try {
+                    cred_out.m_inner->store(cfg_prov.m_id.c_str());
+                } catch (winstd::win_runtime_error &err) {
+                    wxLogError(winstd::tstring_printf(_("Error writing credentials to Credential Manager: %hs (error %u)"), err.what(), err.number()).c_str());
+                } catch (...) {
+                    wxLogError(_("Writing credentials failed."));
+                }
+            }
+        }
 
         wxTopLevelWindows.DeleteObject(&parent);
         parent.SetHWND((WXHWND)NULL);
