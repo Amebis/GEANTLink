@@ -486,11 +486,11 @@ protected:
     /// \endcond
 
 protected:
-    const eap::config_provider &m_prov;                 ///< Provider configuration
+    const eap::config_provider &m_prov;         ///< Provider configuration
     const eap::config_method_with_cred &m_cfg;  ///< Method configuration
-    _Tcred &m_cred;                                     ///< Credentials
-    winstd::tstring m_target;                           ///< Credential Manager target
-    bool m_is_config;                                   ///< Is this a configuration dialog?
+    _Tcred &m_cred;                             ///< Credentials
+    winstd::tstring m_target;                   ///< Credential Manager target
+    bool m_is_config;                           ///< Is this a configuration dialog?
 };
 
 

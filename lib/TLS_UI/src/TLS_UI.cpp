@@ -365,13 +365,13 @@ bool wxTLSCredentialsPanel::TransferDataToWindow()
 bool wxTLSCredentialsPanel::TransferDataFromWindow()
 {
     if (m_cert_none->GetValue())
-        m_cred.clear();
+        m_cred.m_cert.free();
     else {
         const wxCertificateClientData *data = dynamic_cast<const wxCertificateClientData*>(m_cert_select_val->GetClientObject(m_cert_select_val->GetSelection()));
         if (data)
             m_cred.m_cert.attach_duplicated(data->m_cert);
         else
-            m_cred.clear();
+            m_cred.m_cert.free();
     }
 
     // Inherited TransferDataFromWindow() calls m_cred.store().
