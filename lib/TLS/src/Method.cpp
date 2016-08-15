@@ -337,12 +337,15 @@ void eap::method_tls::process_request_packet(
             throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, string_printf(__FUNCTION__ " ACK expected, received %u-%u-%x.", m_packet_req.m_code, m_packet_req.m_id, m_packet_req.m_flags));
     }
 
+    m_packet_res.m_code  = EapCodeResponse;
+    m_packet_res.m_id    = m_packet_req.m_id;
+    m_packet_res.m_flags = 0;
+
     if (pReceivedPacket->Code == EapCodeRequest && (m_packet_req.m_flags & flags_req_start)) {
-        // This is the TLS start message: initialize method.
+        // This is the TLS start message: (re)initialize method.
         m_module.log_event(&EAPMETHOD_TLS_HANDSHAKE_START2, event_data((unsigned int)eap_type_tls), event_data::blank);
 
-        m_phase = phase_res_client_hello;
-        m_packet_res.clear();
+        m_phase = phase_req_server_hello;
 
         m_state.m_random_client.reset(m_cp);
 
@@ -371,37 +374,21 @@ void eap::method_tls::process_request_packet(
 
         m_seq_num_client = 0;
         m_seq_num_server = 0;
-    }
 
-    switch (m_phase) {
-        case phase_res_client_hello: {
-            // Build response packet.
-            m_packet_res.m_code  = EapCodeResponse;
-            m_packet_res.m_id    = m_packet_req.m_id;
-            m_packet_res.m_flags = 0;
-            sanitizing_blob hello(make_client_hello());
-            hash_handshake(hello);
-            sanitizing_blob handshake(make_message(tls_message_type_handshake, hello, m_cipher_spec));
-            m_packet_res.m_data.assign(handshake.begin(), handshake.end());
+        // Build client hello packet.
+        sanitizing_blob hello(make_client_hello());
+        hash_handshake(hello);
+        sanitizing_blob handshake(make_message(tls_message_type_handshake, hello, m_cipher_spec));
+        m_packet_res.m_data.assign(handshake.begin(), handshake.end());
+    } else {
+        // Process the packet.
+        m_packet_res.m_data.clear();
+        process_packet(m_packet_req.m_data.data(), m_packet_req.m_data.size());
 
-            m_phase = phase_req_server_hello;
-
-            pEapOutput->fAllowNotifications = FALSE;
-            pEapOutput->action = EapPeerMethodResponseActionSend;
-            break;
-        }
-
+        switch (m_phase) {
         case phase_req_server_hello: {
-            process_packet(m_packet_req.m_data.data(), m_packet_req.m_data.size());
-
             if (!m_server_hello_done) {
                 // Reply with ACK packet and wait for the next packet.
-                m_packet_res.m_code  = EapCodeResponse;
-                m_packet_res.m_id    = pReceivedPacket->Id;
-                m_packet_res.m_flags = 0;
-                m_packet_res.m_data.clear();
-                pEapOutput->fAllowNotifications = FALSE;
-                pEapOutput->action = EapPeerMethodResponseActionSend;
                 break;
             }
 
@@ -409,12 +396,6 @@ void eap::method_tls::process_request_packet(
             if (m_server_cert_chain.empty())
                 throw win_runtime_error(ERROR_ENCRYPTION_FAILED, __FUNCTION__ " Can not continue without server's certificate.");
             verify_server_trust();
-
-            // Build response packet.
-            m_packet_res.m_code  = EapCodeResponse;
-            m_packet_res.m_id    = m_packet_req.m_id;
-            m_packet_res.m_flags = 0;
-            m_packet_res.m_data.clear();
 
             if (!m_server_finished || !m_cipher_spec) {
                 // New session.
@@ -456,9 +437,7 @@ void eap::method_tls::process_request_packet(
                 // Setup encryption.
                 derive_keys();
                 m_cipher_spec = true;
-                m_phase = phase_req_change_chiper_spec;
-            } else
-                m_phase = phase_finished;
+            }
 
             // Create finished message, and append to packet.
             sanitizing_blob finished(make_finished());
@@ -466,31 +445,23 @@ void eap::method_tls::process_request_packet(
             sanitizing_blob handshake(make_message(tls_message_type_handshake, finished, m_cipher_spec));
             m_packet_res.m_data.insert(m_packet_res.m_data.end(), handshake.begin(), handshake.end());
 
-            pEapOutput->fAllowNotifications = FALSE;
-            pEapOutput->action = EapPeerMethodResponseActionSend;
+            m_phase = phase_finished;
             break;
         }
 
-        case phase_req_change_chiper_spec:
-            process_packet(m_packet_req.m_data.data(), m_packet_req.m_data.size());
-
-            if (!m_cipher_spec || !m_server_finished)
-                throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Server did not finish.");
-
-            // TLS finished. Continue to the finished state (no-break case).
-            m_phase = phase_finished;
-
         case phase_finished:
-            pEapOutput->fAllowNotifications = FALSE;
-            pEapOutput->action = EapPeerMethodResponseActionNone;
             break;
 
         default:
             throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Not supported.");
+        }
     }
 
     // Request packet was processed. Clear its data since we use the absence of data to detect first of fragmented message packages.
     m_packet_req.m_data.clear();
+
+    pEapOutput->fAllowNotifications = FALSE;
+    pEapOutput->action = EapPeerMethodResponseActionSend;
 }
 
 
@@ -558,7 +529,7 @@ void eap::method_tls::get_result(
 
     switch (reason) {
     case EapPeerMethodResultSuccess: {
-        if (m_phase < phase_req_change_chiper_spec)
+        if (m_phase < phase_finished)
             throw invalid_argument(__FUNCTION__ " Premature success.");
 
         // Derive MSK.
@@ -583,9 +554,7 @@ void eap::method_tls::get_result(
         // Update configuration with session resumption data and prepare BLOB.
         m_cfg.m_session_id    = m_session_id;
         m_cfg.m_master_secret = m_state.m_master_secret;
-        ppResult->fSaveConnectionData = TRUE;
 
-        m_phase = phase_finished;
         break;
     }
 
@@ -600,12 +569,11 @@ void eap::method_tls::get_result(
         throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Not supported.");
     }
 
-    if (ppResult->fSaveConnectionData) {
-        m_module.pack(m_cfg, &ppResult->pConnectionData, &ppResult->dwSizeofConnectionData);
-        if (m_blob_cfg)
-            m_module.free_memory(m_blob_cfg);
-        m_blob_cfg = ppResult->pConnectionData;
-    }
+    ppResult->fSaveConnectionData = TRUE;
+    m_module.pack(m_cfg, &ppResult->pConnectionData, &ppResult->dwSizeofConnectionData);
+    if (m_blob_cfg)
+        m_module.free_memory(m_blob_cfg);
+    m_blob_cfg = ppResult->pConnectionData;
 }
 
 
@@ -940,13 +908,13 @@ void eap::method_tls::process_packet(_In_bytecount_(size_pck) const void *_pck, 
                 break;
             }
 
-            default:
-                if (m_cipher_spec) {
-                    sanitizing_blob msg_dec(msg, msg_end);
-                    decrypt_message(hdr, msg_dec);
-                    process_vendor_data(hdr->type, msg_dec.data(), msg_dec.size());
-                } else
-                    process_vendor_data(hdr->type, msg, msg_end - msg);
+            //default:
+            //    if (m_cipher_spec) {
+            //        sanitizing_blob msg_dec(msg, msg_end);
+            //        decrypt_message(hdr, msg_dec);
+            //        process_vendor_data(hdr->type, msg_dec.data(), msg_dec.size());
+            //    } else
+            //        process_vendor_data(hdr->type, msg, msg_end - msg);
             }
         }
 
@@ -1140,12 +1108,12 @@ void eap::method_tls::process_application_data(_In_bytecount_(msg_size) const vo
 }
 
 
-void eap::method_tls::process_vendor_data(_In_ unsigned char type, _In_bytecount_(msg_size) const void *msg, _In_ size_t msg_size)
-{
-    UNREFERENCED_PARAMETER(type);
-    UNREFERENCED_PARAMETER(msg);
-    UNREFERENCED_PARAMETER(msg_size);
-}
+//void eap::method_tls::process_vendor_data(_In_ unsigned char type, _In_bytecount_(msg_size) const void *msg, _In_ size_t msg_size)
+//{
+//    UNREFERENCED_PARAMETER(type);
+//    UNREFERENCED_PARAMETER(msg);
+//    UNREFERENCED_PARAMETER(msg_size);
+//}
 
 
 void eap::method_tls::verify_server_trust() const
@@ -1265,9 +1233,9 @@ void eap::method_tls::encrypt_message(_In_ const message_header *hdr, _Inout_ sa
     // Calculate padding.
     unsigned char size_padding = (unsigned char)((m_state.m_size_enc_block - size_data_enc) % m_state.m_size_enc_block);
     size_data_enc += size_padding;
-    data.reserve(size_data_enc);
 
     // Append HMAC hash and padding.
+    data.reserve(size_data_enc);
     data.insert(data.end(), hmac.begin(), hmac.end());
     data.insert(data.end(), size_padding + 1, size_padding);
 

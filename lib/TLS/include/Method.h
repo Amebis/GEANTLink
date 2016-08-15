@@ -230,6 +230,9 @@ namespace eap
         /// @}
 
     protected:
+        /// \name Client handshake message generation
+        /// @{
+
         ///
         /// Makes a TLS client hello message
         ///
@@ -277,18 +280,10 @@ namespace eap
         ///
         eap::sanitizing_blob make_finished() const;
 
-        ///
-        /// Makes a TLS message
-        ///
-        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter A.1. Record Layer)](https://tools.ietf.org/html/rfc5246#appendix-A.1)
-        ///
-        /// \param[in] type     Message type
-        /// \param[in] data     Message data contents
-        /// \param[in] encrypt  Should \p data get encrypted?
-        ///
-        /// \returns TLS message message
-        ///
-        eap::sanitizing_blob make_message(_In_ tls_message_type_t type, _Inout_ sanitizing_blob &data, _In_ bool encrypt);
+        /// @}
+
+        /// \name Client/Server handshake hashing
+        /// @{
 
         ///
         /// Hashes handshake message for "finished" message validation.
@@ -318,6 +313,26 @@ namespace eap
             hash_handshake(data.data(), data.size() * sizeof(_Ty));
         }
 
+        /// @}
+
+        ///
+        /// Makes a TLS message
+        ///
+        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter A.1. Record Layer)](https://tools.ietf.org/html/rfc5246#appendix-A.1)
+        ///
+        /// \param[in] type     Message type
+        /// \param[in] data     Message data contents
+        /// \param[in] encrypt  Should \p data get encrypted?
+        ///
+        /// \returns TLS message message
+        ///
+        eap::sanitizing_blob make_message(_In_ tls_message_type_t type, _Inout_ sanitizing_blob &data, _In_ bool encrypt);
+
+        /// @}
+
+        /// \name Key derivation
+        /// @{
+
         ///
         /// Generates keys required by current connection state
         ///
@@ -331,6 +346,11 @@ namespace eap
         /// \sa [The EAP-TLS Authentication Protocol (Chapter 2.3. Key Hierarchy)](https://tools.ietf.org/html/rfc5216#section-2.3)
         ///
         virtual void derive_msk();
+
+        /// @}
+
+        /// \name Server message processing
+        /// @{
 
         ///
         /// Processes messages in a TLS packet
@@ -380,21 +400,26 @@ namespace eap
         ///
         virtual void process_application_data(_In_bytecount_(msg_size) const void *msg, _In_ size_t msg_size);
 
-        ///
-        /// Processes a vendor-specific TLS message
-        ///
-        /// \note Please see `m_cipher_spec` member if the message data came encrypted.
-        ///
-        /// \param[in] type      TLS message type
-        /// \param[in] msg       TLS message data
-        /// \param[in] msg_size  TLS message data size
-        ///
-        virtual void process_vendor_data(_In_ unsigned char type, _In_bytecount_(msg_size) const void *msg, _In_ size_t msg_size);
+        /////
+        ///// Processes a vendor-specific TLS message
+        /////
+        ///// \note Please see `m_cipher_spec` member if the message data came encrypted.
+        /////
+        ///// \param[in] type      TLS message type
+        ///// \param[in] msg       TLS message data
+        ///// \param[in] msg_size  TLS message data size
+        /////
+        //virtual void process_vendor_data(_In_ unsigned char type, _In_bytecount_(msg_size) const void *msg, _In_ size_t msg_size);
+
+        /// @}
 
         ///
         /// Verifies server's certificate if trusted by configuration
         ///
         void verify_server_trust() const;
+
+        /// \name Encryption
+        /// @{
 
         ///
         /// Encrypt TLS message
@@ -411,6 +436,11 @@ namespace eap
         /// \param[inout] data  TLS message to decrypt
         ///
         void decrypt_message(_In_ const message_header *hdr, _Inout_ sanitizing_blob &data);
+
+        /// @}
+
+        /// \name Pseudo-random generation
+        /// @{
 
         ///
         /// Calculates pseudo-random P_hash data defined in RFC 5246
@@ -450,6 +480,8 @@ namespace eap
             return prf(secret, seed.data(), seed.size() * sizeof(_Ty), size);
         }
 
+        /// @}
+
         ///
         /// Creates a key
         ///
@@ -474,9 +506,7 @@ namespace eap
 
         enum phase_t {
             phase_unknown = -1,                                 ///< Unknown state
-            phase_res_client_hello =  0,                        ///< Respond with client hello
             phase_req_server_hello,                             ///< Request and parse server hello.
-            phase_req_change_chiper_spec,                       ///< Request change cipher from server
             phase_finished,                                     ///< Final state
         } m_phase;                                              ///< Session phase
 

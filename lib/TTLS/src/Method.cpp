@@ -74,8 +74,6 @@ eap::method_ttls& eap::method_ttls::operator=(_Inout_ method_ttls &&other)
 }
 
 
-
-
 void eap::method_ttls::process_request_packet(
     _In_bytecount_(dwReceivedPacketSize) const EapPacket           *pReceivedPacket,
     _In_                                       DWORD               dwReceivedPacketSize,
