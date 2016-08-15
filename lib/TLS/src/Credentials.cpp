@@ -170,7 +170,7 @@ void eap::credentials_tls::operator>>(_Inout_ cursor_in &cursor)
 }
 
 
-void eap::credentials_tls::store(_In_ LPCTSTR pszTargetName) const
+void eap::credentials_tls::store(_In_z_ LPCTSTR pszTargetName) const
 {
     assert(pszTargetName);
 
@@ -206,7 +206,7 @@ void eap::credentials_tls::store(_In_ LPCTSTR pszTargetName) const
 }
 
 
-void eap::credentials_tls::retrieve(_In_ LPCTSTR pszTargetName)
+void eap::credentials_tls::retrieve(_In_z_ LPCTSTR pszTargetName)
 {
     assert(pszTargetName);
 

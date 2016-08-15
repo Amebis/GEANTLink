@@ -224,7 +224,7 @@ void eap::credentials_pass::operator>>(_Inout_ cursor_in &cursor)
 }
 
 
-void eap::credentials_pass::store(_In_ LPCTSTR pszTargetName) const
+void eap::credentials_pass::store(_In_z_ LPCTSTR pszTargetName) const
 {
     assert(pszTargetName);
 
@@ -263,7 +263,7 @@ void eap::credentials_pass::store(_In_ LPCTSTR pszTargetName) const
 }
 
 
-void eap::credentials_pass::retrieve(_In_ LPCTSTR pszTargetName)
+void eap::credentials_pass::retrieve(_In_z_ LPCTSTR pszTargetName)
 {
     assert(pszTargetName);
 

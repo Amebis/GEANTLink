@@ -116,14 +116,14 @@ namespace eap
         ///
         /// \param[in]  pszTargetName  The name in Windows Credential Manager to store credentials as
         ///
-        virtual void store(_In_ LPCTSTR pszTargetName) const = 0;
+        virtual void store(_In_z_ LPCTSTR pszTargetName) const = 0;
 
         ///
         /// Retrieve credentials from Windows Credential Manager
         ///
         /// \param[in]  pszTargetName  The name in Windows Credential Manager to retrieve credentials from
         ///
-        virtual void retrieve(_In_ LPCTSTR pszTargetName) = 0;
+        virtual void retrieve(_In_z_ LPCTSTR pszTargetName) = 0;
 
         ///
         /// Returns target name for Windows Credential Manager credential name
@@ -132,7 +132,7 @@ namespace eap
         ///
         /// \returns Final target name to store/retrieve credentials in Windows Credential Manager
         ///
-        inline winstd::tstring target_name(_In_ LPCTSTR pszTargetName) const
+        inline winstd::tstring target_name(_In_z_ LPCTSTR pszTargetName) const
         {
             winstd::tstring target_name(_T(PRODUCT_NAME_STR) _T("/"));
             target_name += pszTargetName;
@@ -271,14 +271,14 @@ namespace eap
         ///
         /// \param[in]  pszTargetName  The name in Windows Credential Manager to store credentials as
         ///
-        virtual void store(_In_ LPCTSTR pszTargetName) const;
+        virtual void store(_In_z_ LPCTSTR pszTargetName) const;
 
         ///
         /// Retrieve credentials from Windows Credential Manager
         ///
         /// \param[in]  pszTargetName  The name in Windows Credential Manager to retrieve credentials from
         ///
-        virtual void retrieve(_In_ LPCTSTR pszTargetName);
+        virtual void retrieve(_In_z_ LPCTSTR pszTargetName);
 
         /// @}
 

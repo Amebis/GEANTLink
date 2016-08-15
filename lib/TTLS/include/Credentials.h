@@ -151,14 +151,14 @@ namespace eap
         ///
         /// \param[in]  pszTargetName  The name in Windows Credential Manager to store credentials as
         ///
-        virtual void store(_In_ LPCTSTR pszTargetName) const;
+        virtual void store(_In_z_ LPCTSTR pszTargetName) const;
 
         ///
         /// Retrieve credentials from Windows Credential Manager
         ///
         /// \param[in]  pszTargetName  The name in Windows Credential Manager to retrieve credentials from
         ///
-        virtual void retrieve(_In_ LPCTSTR pszTargetName);
+        virtual void retrieve(_In_z_ LPCTSTR pszTargetName);
 
         ///
         /// Return target suffix for Windows Credential Manager credential name

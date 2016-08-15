@@ -187,7 +187,7 @@ void eap::credentials_ttls::operator>>(_Inout_ cursor_in &cursor)
 }
 
 
-void eap::credentials_ttls::store(_In_ LPCTSTR pszTargetName) const
+void eap::credentials_ttls::store(_In_z_ LPCTSTR pszTargetName) const
 {
     credentials_tls::store(pszTargetName);
 
@@ -196,7 +196,7 @@ void eap::credentials_ttls::store(_In_ LPCTSTR pszTargetName) const
 }
 
 
-void eap::credentials_ttls::retrieve(_In_ LPCTSTR pszTargetName)
+void eap::credentials_ttls::retrieve(_In_z_ LPCTSTR pszTargetName)
 {
     credentials_tls::retrieve(pszTargetName);
 
