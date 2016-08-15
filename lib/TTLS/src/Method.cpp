@@ -88,11 +88,11 @@ void eap::method_ttls::process_request_packet(
         m_module.log_event(&EAPMETHOD_TTLS_HANDSHAKE_START, event_data((unsigned int)eap_type_ttls), event_data((unsigned char)m_version), event_data((unsigned char)ver_remote), event_data::blank);
     }
 
-    if (m_phase != phase_finished) {
+    if (!m_server_finished) {
         // Do the TLS.
         method_tls::process_request_packet(pReceivedPacket, dwReceivedPacketSize, pEapOutput);
 
-        if (m_phase == phase_finished) {
+        if (m_server_finished) {
             // Piggyback inner authentication.
             if (!m_cipher_spec)
                 throw runtime_error(__FUNCTION__ " Refusing to send credentials unencrypted.");

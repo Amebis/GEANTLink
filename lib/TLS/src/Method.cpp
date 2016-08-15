@@ -96,11 +96,10 @@ void eap::method_tls::packet::clear()
 eap::method_tls::method_tls(_In_ module &module, _In_ config_method_tls &cfg, _In_ credentials_tls &cred) :
     m_cfg(cfg),
     m_cred(cred),
-    m_phase(phase_unknown),
-    m_send_client_cert(false),
+    m_certificate_req(false),
     m_server_hello_done(false),
-    m_server_finished(false),
     m_cipher_spec(false),
+    m_server_finished(false),
     m_seq_num_client(0),
     m_seq_num_server(0),
     m_blob_cfg(NULL),
@@ -112,7 +111,6 @@ eap::method_tls::method_tls(_In_ module &module, _In_ config_method_tls &cfg, _I
 eap::method_tls::method_tls(_In_ const method_tls &other) :
     m_cfg(other.m_cfg),
     m_cred(other.m_cred),
-    m_phase(other.m_phase),
     m_packet_req(other.m_packet_req),
     m_packet_res(other.m_packet_res),
     m_state(other.m_state),
@@ -126,10 +124,10 @@ eap::method_tls::method_tls(_In_ const method_tls &other) :
     m_server_cert_chain(other.m_server_cert_chain),
     m_hash_handshake_msgs_md5(other.m_hash_handshake_msgs_md5),
     m_hash_handshake_msgs_sha1(other.m_hash_handshake_msgs_sha1),
-    m_send_client_cert(other.m_send_client_cert),
+    m_certificate_req(other.m_certificate_req),
     m_server_hello_done(other.m_server_hello_done),
-    m_server_finished(other.m_server_finished),
     m_cipher_spec(other.m_cipher_spec),
+    m_server_finished(other.m_server_finished),
     m_seq_num_client(other.m_seq_num_client),
     m_seq_num_server(other.m_seq_num_server),
     method(other)
@@ -140,7 +138,6 @@ eap::method_tls::method_tls(_In_ const method_tls &other) :
 eap::method_tls::method_tls(_Inout_ method_tls &&other) :
     m_cfg(other.m_cfg),
     m_cred(other.m_cred),
-    m_phase(std::move(other.m_phase)),
     m_packet_req(std::move(other.m_packet_req)),
     m_packet_res(std::move(other.m_packet_res)),
     m_state(std::move(other.m_state)),
@@ -154,10 +151,10 @@ eap::method_tls::method_tls(_Inout_ method_tls &&other) :
     m_server_cert_chain(std::move(other.m_server_cert_chain)),
     m_hash_handshake_msgs_md5(std::move(other.m_hash_handshake_msgs_md5)),
     m_hash_handshake_msgs_sha1(std::move(other.m_hash_handshake_msgs_sha1)),
-    m_send_client_cert(std::move(other.m_send_client_cert)),
+    m_certificate_req(std::move(other.m_certificate_req)),
     m_server_hello_done(std::move(other.m_server_hello_done)),
-    m_server_finished(std::move(other.m_server_finished)),
     m_cipher_spec(std::move(other.m_cipher_spec)),
+    m_server_finished(std::move(other.m_server_finished)),
     m_seq_num_client(std::move(other.m_seq_num_client)),
     m_seq_num_server(std::move(other.m_seq_num_server)),
     method(std::move(other))
@@ -178,7 +175,6 @@ eap::method_tls& eap::method_tls::operator=(_In_ const method_tls &other)
         assert(std::addressof(m_cfg ) == std::addressof(other.m_cfg )); // Copy method with same configuration only!
         assert(std::addressof(m_cred) == std::addressof(other.m_cred)); // Copy method with same credentials only!
         (method&)*this              = other;
-        m_phase                     = other.m_phase;
         m_packet_req                = other.m_packet_req;
         m_packet_res                = other.m_packet_res;
         m_state                     = other.m_state;
@@ -192,10 +188,10 @@ eap::method_tls& eap::method_tls::operator=(_In_ const method_tls &other)
         m_server_cert_chain         = other.m_server_cert_chain;
         m_hash_handshake_msgs_md5   = other.m_hash_handshake_msgs_md5;
         m_hash_handshake_msgs_sha1  = other.m_hash_handshake_msgs_sha1;
-        m_send_client_cert          = other.m_send_client_cert;
+        m_certificate_req           = other.m_certificate_req;
         m_server_hello_done         = other.m_server_hello_done;
-        m_server_finished           = other.m_server_finished;
         m_cipher_spec               = other.m_cipher_spec;
+        m_server_finished           = other.m_server_finished;
         m_seq_num_client            = other.m_seq_num_client;
         m_seq_num_server            = other.m_seq_num_server;
     }
@@ -210,7 +206,6 @@ eap::method_tls& eap::method_tls::operator=(_Inout_ method_tls &&other)
         assert(std::addressof(m_cfg ) == std::addressof(other.m_cfg )); // Move method with same configuration only!
         assert(std::addressof(m_cred) == std::addressof(other.m_cred)); // Move method with same credentials only!
         (method&)*this              = std::move(other);
-        m_phase                     = std::move(other.m_phase);
         m_packet_req                = std::move(other.m_packet_req);
         m_packet_res                = std::move(other.m_packet_res);
         m_state                     = std::move(other.m_state);
@@ -224,10 +219,10 @@ eap::method_tls& eap::method_tls::operator=(_Inout_ method_tls &&other)
         m_server_cert_chain         = std::move(other.m_server_cert_chain);
         m_hash_handshake_msgs_md5   = std::move(other.m_hash_handshake_msgs_md5);
         m_hash_handshake_msgs_sha1  = std::move(other.m_hash_handshake_msgs_sha1);
-        m_send_client_cert          = std::move(other.m_send_client_cert);
+        m_certificate_req           = std::move(other.m_certificate_req);
         m_server_hello_done         = std::move(other.m_server_hello_done);
-        m_server_finished           = std::move(other.m_server_finished);
         m_cipher_spec               = std::move(other.m_cipher_spec);
+        m_server_finished           = std::move(other.m_server_finished);
         m_seq_num_client            = std::move(other.m_seq_num_client);
         m_seq_num_server            = std::move(other.m_seq_num_server);
     }
@@ -345,8 +340,6 @@ void eap::method_tls::process_request_packet(
         // This is the TLS start message: (re)initialize method.
         m_module.log_event(&EAPMETHOD_TLS_HANDSHAKE_START2, event_data((unsigned int)eap_type_tls), event_data::blank);
 
-        m_phase = phase_req_server_hello;
-
         m_state.m_random_client.reset(m_cp);
 
         // Generate client randomness.
@@ -367,10 +360,10 @@ void eap::method_tls::process_request_packet(
         if (!m_hash_handshake_msgs_sha1.create(m_cp, CALG_SHA1))
             throw win_runtime_error(__FUNCTION__ " Error creating SHA-1 hashing object.");
 
-        m_send_client_cert  = false;
+        m_certificate_req   = false;
         m_server_hello_done = false;
-        m_server_finished   = false;
         m_cipher_spec       = false;
+        m_server_finished   = false;
 
         m_seq_num_client = 0;
         m_seq_num_server = 0;
@@ -385,22 +378,22 @@ void eap::method_tls::process_request_packet(
         m_packet_res.m_data.clear();
         process_packet(m_packet_req.m_data.data(), m_packet_req.m_data.size());
 
-        switch (m_phase) {
-        case phase_req_server_hello: {
-            if (!m_server_hello_done) {
-                // Reply with ACK packet and wait for the next packet.
-                break;
-            }
+        if (m_server_finished) {
+            // Server finished.
+        } else if (m_cipher_spec) {
+            // Cipher specified.
+        } else if (m_server_hello_done) {
+            // Server hello specified.
 
             // Do we trust this server?
             if (m_server_cert_chain.empty())
                 throw win_runtime_error(ERROR_ENCRYPTION_FAILED, __FUNCTION__ " Can not continue without server's certificate.");
             verify_server_trust();
 
-            if (!m_server_finished || !m_cipher_spec) {
+            if (!m_cipher_spec || !m_server_finished) {
                 // New session.
 
-                if (m_send_client_cert) {
+                if (m_certificate_req) {
                     // Client certificate requested.
                     sanitizing_blob client_cert(make_client_cert());
                     hash_handshake(client_cert);
@@ -424,7 +417,7 @@ void eap::method_tls::process_request_packet(
                 sanitizing_blob handshake(make_message(tls_message_type_handshake, client_key_exchange, m_cipher_spec));
                 m_packet_res.m_data.insert(m_packet_res.m_data.end(), handshake.begin(), handshake.end());
 
-                if (m_send_client_cert) {
+                if (m_certificate_req) {
                     // TODO: Create and append certificate_verify message!
                 }
             }
@@ -433,7 +426,7 @@ void eap::method_tls::process_request_packet(
             sanitizing_blob ccs(make_change_chiper_spec());
             m_packet_res.m_data.insert(m_packet_res.m_data.end(), ccs.begin(), ccs.end());
 
-            if (!m_server_finished || !m_cipher_spec) {
+            if (!m_cipher_spec) {
                 // Setup encryption.
                 derive_keys();
                 m_cipher_spec = true;
@@ -444,16 +437,6 @@ void eap::method_tls::process_request_packet(
             hash_handshake(finished);
             sanitizing_blob handshake(make_message(tls_message_type_handshake, finished, m_cipher_spec));
             m_packet_res.m_data.insert(m_packet_res.m_data.end(), handshake.begin(), handshake.end());
-
-            m_phase = phase_finished;
-            break;
-        }
-
-        case phase_finished:
-            break;
-
-        default:
-            throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Not supported.");
         }
     }
 
@@ -529,7 +512,7 @@ void eap::method_tls::get_result(
 
     switch (reason) {
     case EapPeerMethodResultSuccess: {
-        if (m_phase < phase_finished)
+        if (!m_server_finished)
             throw invalid_argument(__FUNCTION__ " Premature success.");
 
         // Derive MSK.
@@ -1050,7 +1033,7 @@ void eap::method_tls::process_handshake(_In_bytecount_(msg_size) const void *_ms
             }
 
             case tls_handshake_type_certificate_request:
-                m_send_client_cert = true;
+                m_certificate_req = true;
                 m_module.log_event(&EAPMETHOD_TLS_CERTIFICATE_REQUEST, event_data((unsigned int)eap_type_tls), event_data::blank);
                 break;
 

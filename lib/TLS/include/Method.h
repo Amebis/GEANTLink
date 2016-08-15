@@ -445,7 +445,8 @@ namespace eap
         ///
         /// Calculates pseudo-random P_hash data defined in RFC 5246
         ///
-        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.1 (Chapter 5: HMAC and the Pseudorandom Function)](https://tools.ietf.org/html/rfc4346#section-5)
+        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.1 (Chapter 5. HMAC and the Pseudorandom Function)](https://tools.ietf.org/html/rfc4346#section-5)
+        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter 5. HMAC and the Pseudorandom Function)](https://tools.ietf.org/html/rfc5246#section-5)
         ///
         /// \param[in] secret     Hashing secret key
         /// \param[in] seed       Random seed
@@ -463,7 +464,8 @@ namespace eap
         ///
         /// Calculates pseudo-random P_hash data defined in RFC 5246
         ///
-        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.1 (Chapter 5: HMAC and the Pseudorandom Function)](https://tools.ietf.org/html/rfc4346#section-5)
+        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.1 (Chapter 5. HMAC and the Pseudorandom Function)](https://tools.ietf.org/html/rfc4346#section-5)
+        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter 5. HMAC and the Pseudorandom Function)](https://tools.ietf.org/html/rfc5246#section-5)
         ///
         /// \param[in] secret  Hashing secret key
         /// \param[in] seed    Random seed
@@ -504,12 +506,6 @@ namespace eap
         config_method_tls &m_cfg;                               ///< EAP-TLS method configuration
         credentials_tls &m_cred;                                ///< EAP-TLS user credentials
 
-        enum phase_t {
-            phase_unknown = -1,                                 ///< Unknown state
-            phase_req_server_hello,                             ///< Request and parse server hello.
-            phase_finished,                                     ///< Final state
-        } m_phase;                                              ///< Session phase
-
         packet m_packet_req;                                    ///< Request packet
         packet m_packet_res;                                    ///< Response packet
 
@@ -532,10 +528,10 @@ namespace eap
         winstd::crypt_hash m_hash_handshake_msgs_md5;           ///< Running MD5 hash of handshake messages sent
         winstd::crypt_hash m_hash_handshake_msgs_sha1;          ///< Running SHA-1 hash of handshake messages sent
 
-        bool m_send_client_cert;                                ///< Did server request client certificate?
+        bool m_certificate_req;                                 ///< Did server request client certificate?
         bool m_server_hello_done;                               ///< Is server hello done?
-        bool m_server_finished;                                 ///< Did server send a valid finish message?
         bool m_cipher_spec;                                     ///< Did server specify cipher?
+        bool m_server_finished;                                 ///< Did server send a valid finish message?
 
         unsigned __int64 m_seq_num_client;                      ///< Sequence number for encrypting
         unsigned __int64 m_seq_num_server;                      ///< Sequence number for decrypting
