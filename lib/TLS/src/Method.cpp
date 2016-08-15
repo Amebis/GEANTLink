@@ -93,8 +93,7 @@ void eap::method_tls::packet::clear()
 // eap::method_tls
 //////////////////////////////////////////////////////////////////////
 
-eap::method_tls::method_tls(_In_ module &module, _In_ config_method_tls &cfg, _In_ credentials_tls &cred) :
-    m_cfg(cfg),
+eap::method_tls::method_tls(_In_ module &module, _In_ config_provider_list &cfg, _In_ credentials_tls &cred) :
     m_cred(cred),
     m_certificate_req(false),
     m_server_hello_done(false),
@@ -109,7 +108,6 @@ eap::method_tls::method_tls(_In_ module &module, _In_ config_method_tls &cfg, _I
 
 
 eap::method_tls::method_tls(_In_ const method_tls &other) :
-    m_cfg(other.m_cfg),
     m_cred(other.m_cred),
     m_packet_req(other.m_packet_req),
     m_packet_res(other.m_packet_res),
@@ -136,7 +134,6 @@ eap::method_tls::method_tls(_In_ const method_tls &other) :
 
 
 eap::method_tls::method_tls(_Inout_ method_tls &&other) :
-    m_cfg(other.m_cfg),
     m_cred(other.m_cred),
     m_packet_req(std::move(other.m_packet_req)),
     m_packet_res(std::move(other.m_packet_res)),
@@ -172,7 +169,6 @@ eap::method_tls::~method_tls()
 eap::method_tls& eap::method_tls::operator=(_In_ const method_tls &other)
 {
     if (this != std::addressof(other)) {
-        assert(std::addressof(m_cfg ) == std::addressof(other.m_cfg )); // Copy method with same configuration only!
         assert(std::addressof(m_cred) == std::addressof(other.m_cred)); // Copy method with same credentials only!
         (method&)*this              = other;
         m_packet_req                = other.m_packet_req;
@@ -203,7 +199,6 @@ eap::method_tls& eap::method_tls::operator=(_In_ const method_tls &other)
 eap::method_tls& eap::method_tls::operator=(_Inout_ method_tls &&other)
 {
     if (this != std::addressof(other)) {
-        assert(std::addressof(m_cfg ) == std::addressof(other.m_cfg )); // Move method with same configuration only!
         assert(std::addressof(m_cred) == std::addressof(other.m_cred)); // Move method with same credentials only!
         (method&)*this              = std::move(other);
         m_packet_req                = std::move(other.m_packet_req);
@@ -243,8 +238,15 @@ void eap::method_tls::begin_session(
     if (!m_cp.create(NULL, MS_ENHANCED_PROV, PROV_RSA_FULL))
         throw win_runtime_error(__FUNCTION__ " Error creating cryptographics provider.");
 
-    m_session_id = m_cfg.m_session_id;
-    m_state.m_master_secret = m_cfg.m_master_secret;
+    if (m_cfg.m_providers.empty() || m_cfg.m_providers.front().m_methods.empty())
+        throw invalid_argument(__FUNCTION__ " Configuration has no providers and/or methods.");
+
+    const config_provider &cfg_prov(m_cfg.m_providers.front());
+    const config_method_tls *cfg_method = dynamic_cast<const config_method_tls*>(cfg_prov.m_methods.front().get());
+    assert(cfg_method);
+
+    m_session_id = cfg_method->m_session_id;
+    m_state.m_master_secret = cfg_method->m_master_secret;
 }
 
 
@@ -510,6 +512,10 @@ void eap::method_tls::get_result(
 {
     assert(ppResult);
 
+    config_provider &cfg_prov(m_cfg.m_providers.front());
+    config_method_tls *cfg_method = dynamic_cast<config_method_tls*>(cfg_prov.m_methods.front().get());
+    assert(cfg_method);
+
     switch (reason) {
     case EapPeerMethodResultSuccess: {
         if (!m_server_finished)
@@ -535,23 +541,27 @@ void eap::method_tls::get_result(
         ppResult->fIsSuccess = TRUE;
 
         // Update configuration with session resumption data and prepare BLOB.
-        m_cfg.m_session_id    = m_session_id;
-        m_cfg.m_master_secret = m_state.m_master_secret;
+        cfg_method->m_session_id    = m_session_id;
+        cfg_method->m_master_secret = m_state.m_master_secret;
 
         break;
     }
 
     case EapPeerMethodResultFailure:
-        // :(
-        m_cfg.m_session_id.clear();
-        m_cfg.m_master_secret.clear();
-        ppResult->fSaveConnectionData = TRUE;
+        // Clear session resumption data.
+        cfg_method->m_session_id.clear();
+        cfg_method->m_master_secret.clear();
+
+        ppResult->fIsSuccess = FALSE;
+        ppResult->dwFailureReasonCode = EAP_E_AUTHENTICATION_FAILED;
+
         break;
 
     default:
         throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Not supported.");
     }
 
+    // Always ask EAP host to save the connection data.
     ppResult->fSaveConnectionData = TRUE;
     m_module.pack(m_cfg, &ppResult->pConnectionData, &ppResult->dwSizeofConnectionData);
     if (m_blob_cfg)
@@ -610,15 +620,7 @@ eap::sanitizing_blob eap::method_tls::make_client_hello() const
 eap::sanitizing_blob eap::method_tls::make_client_cert() const
 {
     // Select client certificate.
-    PCCERT_CONTEXT cert;
-    if (m_cfg.m_use_preshared) {
-        // Using pre-shared credentials.
-        const credentials_tls *preshared = dynamic_cast<credentials_tls*>(m_cfg.m_preshared.get());
-        cert = preshared && preshared->m_cert ? preshared->m_cert : NULL;
-    } else {
-        // Using own credentials.
-        cert = m_cred.m_cert ? m_cred.m_cert : NULL;
-    }
+    PCCERT_CONTEXT cert = m_cred.m_cert ? m_cred.m_cert : NULL;
 
     size_t size_data, size_list;
     sanitizing_blob msg;
@@ -1104,14 +1106,18 @@ void eap::method_tls::verify_server_trust() const
     assert(!m_server_cert_chain.empty());
     const cert_context &cert = m_server_cert_chain.front();
 
-    if (!m_cfg.m_server_names.empty()) {
+    const config_provider &cfg_prov(m_cfg.m_providers.front());
+    const config_method_tls *cfg_method = dynamic_cast<const config_method_tls*>(cfg_prov.m_methods.front().get());
+    assert(cfg_method);
+
+    if (!cfg_method->m_server_names.empty()) {
         // Check server name.
 
         string subj;
         if (!CertGetNameStringA(cert, CERT_NAME_SIMPLE_DISPLAY_TYPE, 0, NULL, subj))
             throw win_runtime_error(__FUNCTION__ " Error retrieving server's certificate subject name.");
 
-        for (list<string>::const_iterator s = m_cfg.m_server_names.cbegin(), s_end = m_cfg.m_server_names.cend();; ++s) {
+        for (list<string>::const_iterator s = cfg_method->m_server_names.cbegin(), s_end = cfg_method->m_server_names.cend();; ++s) {
             if (s != s_end) {
                 const char
                     *a = s->c_str(),
@@ -1135,7 +1141,7 @@ void eap::method_tls::verify_server_trust() const
     cert_store store;
     if (!store.create(CERT_STORE_PROV_MEMORY, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, NULL, 0, NULL))
         throw win_runtime_error(ERROR_INVALID_DOMAINNAME, __FUNCTION__ " Error creating temporary certificate store.");
-    for (list<cert_context>::const_iterator c = m_cfg.m_trusted_root_ca.cbegin(), c_end = m_cfg.m_trusted_root_ca.cend(); c != c_end; ++c)
+    for (list<cert_context>::const_iterator c = cfg_method->m_trusted_root_ca.cbegin(), c_end = cfg_method->m_trusted_root_ca.cend(); c != c_end; ++c)
         CertAddCertificateContextToStore(store, *c, CERT_STORE_ADD_REPLACE_EXISTING, NULL);
 
     // Add all certificates from the server's certificate chain, except the first one.
@@ -1164,10 +1170,10 @@ void eap::method_tls::verify_server_trust() const
 
     // Check chain validation error flags. Ignore CERT_TRUST_IS_UNTRUSTED_ROOT flag when we check root CA explicitly.
     if (context->TrustStatus.dwErrorStatus != CERT_TRUST_NO_ERROR &&
-        (m_cfg.m_trusted_root_ca.empty() || (context->TrustStatus.dwErrorStatus & ~CERT_TRUST_IS_UNTRUSTED_ROOT) != CERT_TRUST_NO_ERROR))
+        (cfg_method->m_trusted_root_ca.empty() || (context->TrustStatus.dwErrorStatus & ~CERT_TRUST_IS_UNTRUSTED_ROOT) != CERT_TRUST_NO_ERROR))
         throw win_runtime_error(context->TrustStatus.dwErrorStatus, "Error validating certificate chain.");
 
-    if (!m_cfg.m_trusted_root_ca.empty()) {
+    if (!cfg_method->m_trusted_root_ca.empty()) {
         // Verify Root CA against our trusted root CA list
         if (context->cChain != 1)
             throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Multiple chain verification not supported.");
@@ -1175,7 +1181,7 @@ void eap::method_tls::verify_server_trust() const
             throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Can not verify empty certificate chain.");
 
         PCCERT_CONTEXT cert_root = context->rgpChain[0]->rgpElement[context->rgpChain[0]->cElement-1]->pCertContext;
-        for (list<cert_context>::const_iterator c = m_cfg.m_trusted_root_ca.cbegin(), c_end = m_cfg.m_trusted_root_ca.cend();; ++c) {
+        for (list<cert_context>::const_iterator c = cfg_method->m_trusted_root_ca.cbegin(), c_end = cfg_method->m_trusted_root_ca.cend();; ++c) {
             if (c != c_end) {
                 if (cert_root->cbCertEncoded == (*c)->cbCertEncoded &&
                     memcmp(cert_root->pbCertEncoded, (*c)->pbCertEncoded, cert_root->cbCertEncoded) == 0)

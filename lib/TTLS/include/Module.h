@@ -221,7 +221,7 @@ namespace eap
             {}
 
         public:
-            config_method_ttls m_cfg;   ///< Method configuration
+            config_provider_list m_cfg; ///< Providers configuration
             credentials_ttls m_cred;    ///< User credentials
             method_ttls m_method;       ///< EAP-TTLS method
         };

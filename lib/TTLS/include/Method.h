@@ -57,9 +57,10 @@ namespace eap
         /// Constructs an EAP method
         ///
         /// \param[in] mod  EAP module to use for global services
-        /// \param[in] cfg  Method configuration
+        /// \param[in] cfg   Providers configuration
+        /// \param[in] cred  User credentials
         ///
-        method_ttls(_In_ module &module, _In_ config_method_ttls &cfg, _In_ credentials_ttls &cred);
+        method_ttls(_In_ module &module, _In_ config_provider_list &cfg, _In_ credentials_ttls &cred);
 
         ///
         /// Copies an EAP method
@@ -114,6 +115,15 @@ namespace eap
         virtual void get_response_packet(
             _Inout_bytecap_(*dwSendPacketSize) EapPacket *pSendPacket,
             _Inout_                            DWORD     *pdwSendPacketSize);
+
+        ///
+        /// Obtains the result of an authentication session from the EAP method.
+        ///
+        /// \sa [EapPeerGetResult function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363611.aspx)
+        ///
+        virtual void get_result(
+            _In_    EapPeerMethodResultReason reason,
+            _Inout_ EapPeerMethodResult       *ppResult);
 
         /// @}
 

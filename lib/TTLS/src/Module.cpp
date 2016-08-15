@@ -83,7 +83,6 @@ void eap::peer_ttls::get_identity(
     const config_provider &cfg_prov(cfg.m_providers.front());
     const config_method_ttls *cfg_method = dynamic_cast<const config_method_ttls*>(cfg_prov.m_methods.front().get());
     assert(cfg_method);
-    const config_method_pap *cfg_inner_pap = dynamic_cast<const config_method_pap*>(cfg_method->m_inner.get());
 
     // Unpack cached credentials.
     credentials_ttls cred_in(*this);
@@ -92,11 +91,11 @@ void eap::peer_ttls::get_identity(
 
     credentials_ttls cred_out(*this);
 
-    // Determine credential storage target(s). Also used as user-friendly method name for logging.
+    // Determine credential storage target(s).
     eap_type_t type_inner;
-    if (cfg_inner_pap) {
+    if (dynamic_cast<const config_method_pap*>(cfg_method->m_inner.get()))
         type_inner = eap_type_pap;
-    } else {
+    else {
         assert(0); // Unsupported inner authentication method type.
         type_inner = eap_type_undefined;
     }
@@ -116,7 +115,7 @@ void eap::peer_ttls::get_identity(
         }
 
         if (!is_inner_set && cred_in.m_inner) {
-            // Inner PAP: Using EAP service cached credentials.
+            // Inner: Using EAP service cached credentials.
             cred_out.m_inner.reset((credentials*)cred_in.m_inner->clone());
             log_event(&EAPMETHOD_TRACE_EVT_CRED_CACHED1, event_data((unsigned int)type_inner), event_data(cred_out.m_inner->get_name()), event_data::blank);
             is_inner_set = true;
@@ -131,15 +130,12 @@ void eap::peer_ttls::get_identity(
     }
 
     if (!is_inner_set) {
-        if (cfg_inner_pap) {
-            if (cfg_inner_pap->m_use_preshared) {
-                // Inner PAP: Using preshared credentials.
-                cred_out.m_inner.reset((credentials*)cfg_inner_pap->m_preshared->clone());
-                log_event(&EAPMETHOD_TRACE_EVT_CRED_PRESHARED1, event_data((unsigned int)type_inner), event_data(cred_out.m_inner->get_name()), event_data::blank);
-                is_inner_set = true;
-            }
-        } else
-            assert(0); // Unsupported inner authentication method type.
+        if (cfg_method->m_inner->m_use_preshared) {
+            // Inner: Using preshared credentials.
+            cred_out.m_inner.reset((credentials*)cfg_method->m_inner->m_preshared->clone());
+            log_event(&EAPMETHOD_TRACE_EVT_CRED_PRESHARED1, event_data((unsigned int)type_inner), event_data(cred_out.m_inner->get_name()), event_data::blank);
+            is_inner_set = true;
+        }
     }
 
     if ((dwFlags & EAP_FLAG_GUEST_ACCESS) == 0 && (!is_outer_set || !is_inner_set)) {
@@ -164,12 +160,14 @@ void eap::peer_ttls::get_identity(
 
         if (!is_inner_set) {
             unique_ptr<credentials> cred_loaded;
-            if (cfg_inner_pap) cred_loaded.reset(new credentials_pap(*this));
-            else               assert(0); // Unsupported inner authentication method type.
+            switch (type_inner) {
+            case eap_type_pap: cred_loaded.reset(new credentials_pap(*this)); break;
+            default          : assert(0); // Unsupported inner authentication method type.
+            }
             try {
                 cred_loaded->retrieve(cfg_prov.m_id.c_str());
 
-                // Inner PAP: Using stored credentials.
+                // Inner: Using stored credentials.
                 cred_out.m_inner = std::move(cred_loaded);
                 log_event(&EAPMETHOD_TRACE_EVT_CRED_STORED1, event_data((unsigned int)type_inner), event_data(cred_out.m_inner->get_name()), event_data::blank);
                 is_inner_set = true;
@@ -304,14 +302,7 @@ EAP_SESSION_HANDLE eap::peer_ttls::begin_session(
     unique_ptr<session> s(new session(*this));
 
     // Unpack configuration.
-    config_provider_list cfg(*this);
-    unpack(cfg, pConnectionData, dwConnectionDataSize);
-    if (cfg.m_providers.empty() || cfg.m_providers.front().m_methods.empty())
-        throw invalid_argument(__FUNCTION__ " Configuration has no providers and/or methods.");
-
-    // Copy method configuration.
-    const config_provider &cfg_prov(cfg.m_providers.front());
-    s->m_cfg = *dynamic_cast<const config_method_ttls*>(cfg_prov.m_methods.front().get());
+    unpack(s->m_cfg, pConnectionData, dwConnectionDataSize);
 
     // Unpack credentials.
     unpack(s->m_cred, pUserData, dwUserDataSize);

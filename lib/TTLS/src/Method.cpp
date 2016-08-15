@@ -28,7 +28,7 @@ using namespace winstd;
 // eap::method_ttls
 //////////////////////////////////////////////////////////////////////
 
-eap::method_ttls::method_ttls(_In_ module &module, _In_ config_method_ttls &cfg, _In_ credentials_ttls &cred) :
+eap::method_ttls::method_ttls(_In_ module &module, _In_ config_provider_list &cfg, _In_ credentials_ttls &cred) :
     m_cred(cred),
     m_version(version_0),
     method_tls(module, cfg, cred)
@@ -124,6 +124,25 @@ void eap::method_ttls::get_response_packet(
     pSendPacket->Data[0]  = (BYTE)eap_type_ttls;
     pSendPacket->Data[1] &= ~flags_ver_mask;
     pSendPacket->Data[1] |= m_version;
+}
+
+
+void eap::method_ttls::get_result(
+    _In_    EapPeerMethodResultReason reason,
+    _Inout_ EapPeerMethodResult       *ppResult)
+{
+    if (!m_server_finished) {
+        // Do the TLS.
+        method_tls::get_result(reason, ppResult);
+    } else {
+        // The TLS was OK.
+        method_tls::get_result(EapPeerMethodResultSuccess, ppResult);
+
+        if (reason == EapPeerMethodResultFailure) {
+            ppResult->fIsSuccess = FALSE;
+            ppResult->dwFailureReasonCode = EAP_E_AUTHENTICATION_FAILED;
+        }
+    }
 }
 
 

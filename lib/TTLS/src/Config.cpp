@@ -35,7 +35,7 @@ eap::config_method_ttls::config_method_ttls(_In_ module &mod) :
 
 
 eap::config_method_ttls::config_method_ttls(const _In_ config_method_ttls &other) :
-    m_inner(other.m_inner ? (config_method*)other.m_inner->clone() : nullptr),
+    m_inner(other.m_inner ? (config_method_with_cred*)other.m_inner->clone() : nullptr),
     m_anonymous_identity(other.m_anonymous_identity),
     config_method_tls(other)
 {
@@ -54,7 +54,7 @@ eap::config_method_ttls& eap::config_method_ttls::operator=(const _In_ config_me
 {
     if (this != &other) {
         (config_method_tls&)*this = other;
-        m_inner.reset(other.m_inner ? (config_method*)other.m_inner->clone() : nullptr);
+        m_inner.reset(other.m_inner ? (config_method_with_cred*)other.m_inner->clone() : nullptr);
         m_anonymous_identity  = other.m_anonymous_identity;
     }
 

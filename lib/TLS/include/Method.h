@@ -143,10 +143,10 @@ namespace eap
         /// Constructs an EAP method
         ///
         /// \param[in] mod   EAP module to use for global services
-        /// \param[in] cfg   Method configuration
+        /// \param[in] cfg   Providers configuration
         /// \param[in] cred  User credentials
         ///
-        method_tls(_In_ module &module, _In_ config_method_tls &cfg, _In_ credentials_tls &cred);
+        method_tls(_In_ module &module, _In_ config_provider_list &cfg, _In_ credentials_tls &cred);
 
         ///
         /// Copies an EAP method
@@ -503,7 +503,6 @@ namespace eap
             _In_                              size_t    size_secret);
 
     protected:
-        config_method_tls &m_cfg;                               ///< EAP-TLS method configuration
         credentials_tls &m_cred;                                ///< EAP-TLS user credentials
 
         packet m_packet_req;                                    ///< Request packet
