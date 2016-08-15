@@ -637,7 +637,7 @@
             <property name="id">wxID_ANY</property>
             <property name="maximum_size"></property>
             <property name="minimum_size"></property>
-            <property name="name">wxEAPProviderLockedPanelBase</property>
+            <property name="name">wxEAPGeneralNotePanel</property>
             <property name="pos"></property>
             <property name="size">500,-1</property>
             <property name="subclass"></property>
@@ -677,7 +677,7 @@
             <event name="OnUpdateUI"></event>
             <object class="wxBoxSizer" expanded="1">
                 <property name="minimum_size"></property>
-                <property name="name">sb_provider_locked_horiz</property>
+                <property name="name">sb_note_horiz</property>
                 <property name="orient">wxHORIZONTAL</property>
                 <property name="permission">none</property>
                 <object class="sizeritem" expanded="1">
@@ -720,7 +720,7 @@
                         <property name="minimize_button">0</property>
                         <property name="minimum_size"></property>
                         <property name="moveable">1</property>
-                        <property name="name">m_provider_locked_icon</property>
+                        <property name="name">m_note_icon</property>
                         <property name="pane_border">1</property>
                         <property name="pane_position"></property>
                         <property name="pane_size"></property>
@@ -767,7 +767,7 @@
                     <property name="proportion">1</property>
                     <object class="wxBoxSizer" expanded="1">
                         <property name="minimum_size"></property>
-                        <property name="name">m_provider_locked_vert</property>
+                        <property name="name">m_note_vert</property>
                         <property name="orient">wxVERTICAL</property>
                         <property name="permission">protected</property>
                         <object class="sizeritem" expanded="1">
@@ -810,7 +810,7 @@
                                 <property name="minimize_button">0</property>
                                 <property name="minimum_size"></property>
                                 <property name="moveable">1</property>
-                                <property name="name">m_provider_locked_label</property>
+                                <property name="name">m_note_label</property>
                                 <property name="pane_border">1</property>
                                 <property name="pane_position"></property>
                                 <property name="pane_size"></property>

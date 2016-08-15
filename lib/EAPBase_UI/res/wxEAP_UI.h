@@ -102,21 +102,21 @@ class wxEAPBannerPanelBase : public wxPanel
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class wxEAPProviderLockedPanelBase
+/// Class wxEAPGeneralNotePanel
 ///////////////////////////////////////////////////////////////////////////////
-class wxEAPProviderLockedPanelBase : public wxPanel 
+class wxEAPGeneralNotePanel : public wxPanel 
 {
 	private:
 	
 	protected:
-		wxStaticBitmap* m_provider_locked_icon;
-		wxBoxSizer* m_provider_locked_vert;
-		wxStaticText* m_provider_locked_label;
+		wxStaticBitmap* m_note_icon;
+		wxBoxSizer* m_note_vert;
+		wxStaticText* m_note_label;
 	
 	public:
 		
-		wxEAPProviderLockedPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxSIMPLE_BORDER|wxTAB_TRAVERSAL ); 
-		~wxEAPProviderLockedPanelBase();
+		wxEAPGeneralNotePanel( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxSIMPLE_BORDER|wxTAB_TRAVERSAL ); 
+		~wxEAPGeneralNotePanel();
 	
 };
 

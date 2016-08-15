@@ -176,7 +176,7 @@ protected:
 };
 
 
-class wxEAPProviderLockedPanel : public wxEAPProviderLockedPanelBase
+class wxEAPProviderLockedPanel : public wxEAPGeneralNotePanel
 {
 public:
     ///

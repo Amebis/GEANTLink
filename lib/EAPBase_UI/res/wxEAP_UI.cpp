@@ -119,31 +119,31 @@ wxEAPBannerPanelBase::~wxEAPBannerPanelBase()
 {
 }
 
-wxEAPProviderLockedPanelBase::wxEAPProviderLockedPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+wxEAPGeneralNotePanel::wxEAPGeneralNotePanel( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
 	this->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_INFOBK ) );
 	
-	wxBoxSizer* sb_provider_locked_horiz;
-	sb_provider_locked_horiz = new wxBoxSizer( wxHORIZONTAL );
+	wxBoxSizer* sb_note_horiz;
+	sb_note_horiz = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_provider_locked_icon = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
-	sb_provider_locked_horiz->Add( m_provider_locked_icon, 0, wxALL, 5 );
+	m_note_icon = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
+	sb_note_horiz->Add( m_note_icon, 0, wxALL, 5 );
 	
-	m_provider_locked_vert = new wxBoxSizer( wxVERTICAL );
+	m_note_vert = new wxBoxSizer( wxVERTICAL );
 	
-	m_provider_locked_label = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_provider_locked_label->Wrap( 452 );
-	m_provider_locked_vert->Add( m_provider_locked_label, 0, wxALL|wxEXPAND, 5 );
-	
-	
-	sb_provider_locked_horiz->Add( m_provider_locked_vert, 1, wxEXPAND, 5 );
+	m_note_label = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_note_label->Wrap( 452 );
+	m_note_vert->Add( m_note_label, 0, wxALL|wxEXPAND, 5 );
 	
 	
-	this->SetSizer( sb_provider_locked_horiz );
+	sb_note_horiz->Add( m_note_vert, 1, wxEXPAND, 5 );
+	
+	
+	this->SetSizer( sb_note_horiz );
 	this->Layout();
 }
 
-wxEAPProviderLockedPanelBase::~wxEAPProviderLockedPanelBase()
+wxEAPGeneralNotePanel::~wxEAPGeneralNotePanel()
 {
 }
 

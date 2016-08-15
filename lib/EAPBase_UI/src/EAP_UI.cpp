@@ -79,23 +79,23 @@ void wxEAPCredentialsDialog::OnInitDialog(wxInitDialogEvent& event)
 
 wxEAPProviderLockedPanel::wxEAPProviderLockedPanel(const eap::config_provider &prov, wxWindow* parent) :
     m_prov(prov),
-    wxEAPProviderLockedPanelBase(parent)
+    wxEAPGeneralNotePanel(parent)
 {
     // Load and set icon.
     if (m_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
-        wxSetIconFromResource(m_provider_locked_icon, m_icon, m_shell32, MAKEINTRESOURCE(48));
+        wxSetIconFromResource(m_note_icon, m_icon, m_shell32, MAKEINTRESOURCE(48));
 
-    m_provider_locked_label->SetLabel(wxString::Format(_("%s has pre-set parts of this configuration. Those parts are locked to prevent accidental modification."),
+    m_note_label->SetLabel(wxString::Format(_("%s has pre-set parts of this configuration. Those parts are locked to prevent accidental modification."),
         !m_prov.m_name.empty() ? m_prov.m_name.c_str() :
         !m_prov.m_id  .empty() ? winstd::tstring_printf(_("Your %ls provider"), m_prov.m_id.c_str()).c_str() : _("Your provider")));
-    m_provider_locked_label->Wrap(452);
+    m_note_label->Wrap(452);
 
     if (!m_prov.m_help_email.empty() || !m_prov.m_help_web.empty() || !m_prov.m_help_phone.empty()) {
         wxStaticText *provider_notice = new wxStaticText(this, wxID_ANY, wxString::Format(_("For additional help and instructions, please contact %s at:"),
             !m_prov.m_name.empty() ? m_prov.m_name.c_str() :
             !m_prov.m_id  .empty() ? winstd::tstring_printf(_("your %ls provider"), m_prov.m_id.c_str()).c_str() : _("your provider")), wxDefaultPosition, wxDefaultSize, 0);
         provider_notice->Wrap(452);
-        m_provider_locked_vert->Add(provider_notice, 0, wxUP|wxLEFT|wxRIGHT|wxEXPAND, 5);
+        m_note_vert->Add(provider_notice, 0, wxUP|wxLEFT|wxRIGHT|wxEXPAND, 5);
 
         wxFlexGridSizer* sb_contact_tbl;
         sb_contact_tbl = new wxFlexGridSizer(0, 2, 5, 5);
@@ -138,7 +138,7 @@ wxEAPProviderLockedPanel::wxEAPProviderLockedPanel(const eap::config_provider &p
             sb_contact_tbl->Add(value, 0, wxEXPAND|wxALIGN_TOP, 5);
         }
 
-        m_provider_locked_vert->Add(sb_contact_tbl, 0, wxLEFT|wxRIGHT|wxDOWN|wxEXPAND, 5);
+        m_note_vert->Add(sb_contact_tbl, 0, wxLEFT|wxRIGHT|wxDOWN|wxEXPAND, 5);
     }
 
     this->Layout();
