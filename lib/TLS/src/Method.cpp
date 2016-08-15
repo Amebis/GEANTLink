@@ -107,6 +107,7 @@ eap::method_tls::method_tls(_In_ module &module, _In_ config_provider_list &cfg,
 #endif
     method(module, cfg, cred)
 {
+    m_tls_version = tls_version_1_0;
 }
 
 
@@ -614,9 +615,8 @@ eap::sanitizing_blob eap::method_tls::make_client_hello() const
     unsigned int ssl_header = htonl((tls_handshake_type_client_hello << 24) | (unsigned int)size_data);
     msg.insert(msg.end(), (unsigned char*)&ssl_header, (unsigned char*)(&ssl_header + 1));
 
-    // SSL version: TLS 1.0
-    msg.push_back(3); // SSL major version
-    msg.push_back(1); // SSL minor version
+    // SSL version
+    msg.insert(msg.end(), (unsigned char*)&m_tls_version, (unsigned char*)(&m_tls_version + 1));
 
     // Client random
     msg.insert(msg.end(), (unsigned char*)&m_state.m_random_client, (unsigned char*)(&m_state.m_random_client + 1));
@@ -717,17 +717,17 @@ eap::sanitizing_blob eap::method_tls::make_client_key_exchange(_In_ const tls_ma
 }
 
 
-eap::sanitizing_blob eap::method_tls::make_change_chiper_spec()
+eap::sanitizing_blob eap::method_tls::make_change_chiper_spec() const
 {
-    static const unsigned char s_msg_css[] = {
+    const unsigned char msg_css[] = {
         (unsigned char)tls_message_type_change_cipher_spec, // SSL record type
-        3,                                                  // SSL major version
-        1,                                                  // SSL minor version
+        m_tls_version.major,                                // SSL major version
+        m_tls_version.minor,                                // SSL minor version
         0,                                                  // Message size (high-order byte)
         1,                                                  // Message size (low-order byte)
         1,                                                  // Message: change_cipher_spec is always "1"
     };
-    return sanitizing_blob(s_msg_css, s_msg_css + _countof(s_msg_css));
+    return sanitizing_blob(msg_css, msg_css + _countof(msg_css));
 }
 
 
@@ -768,8 +768,8 @@ eap::sanitizing_blob eap::method_tls::make_message(_In_ tls_message_type_t type,
     message_header hdr = {
         (unsigned char)type, // SSL record type
         {
-            3, // SSL major version
-            1, // SSL minor version
+            m_tls_version.major, // SSL major version
+            m_tls_version.minor, // SSL minor version
         },
         {
             // Data length (unencrypted, network byte order)
@@ -881,7 +881,7 @@ void eap::method_tls::process_packet(_In_bytecount_(size_pck) const void *_pck, 
         if (msg_end > pck_end)
             throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Incomplete message data.");
 
-        if (hdr->version.major == 3 && hdr->version.minor == 1) {
+        if (hdr->version == m_tls_version) {
             // Process TLS 1.0 message.
             switch (hdr->type) {
             case tls_message_type_change_cipher_spec:
@@ -986,7 +986,7 @@ void eap::method_tls::process_handshake(_In_bytecount_(msg_size) const void *_ms
                 // TLS version
                 if (rec + 2 > rec_end)
                     throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Server SSL/TLS version missing or incomplete.");
-                else if (rec[0] != 3 || rec[1] != 1)
+                else if (rec[0] != m_tls_version.major || rec[1] != m_tls_version.minor)
                     throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Unsupported SSL/TLS version.");
                 m_state.m_alg_prf = CALG_TLS1PRF;
                 rec += 2;

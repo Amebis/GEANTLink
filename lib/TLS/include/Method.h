@@ -130,10 +130,7 @@ namespace eap
         struct message_header
         {
             unsigned char type;         ///< Message type (one of `message_type_t` constants)
-            struct {
-                unsigned char major;    ///< Major version
-                unsigned char minor;    ///< Minor version
-            } version;                  ///< SSL/TLS version
+            tls_version version;        ///< SSL/TLS version
             unsigned char length[2];    ///< Message length (in network byte order)
         };
 #pragma pack(pop)
@@ -269,7 +266,7 @@ namespace eap
         ///
         /// \returns Change cipher spec
         ///
-        static eap::sanitizing_blob make_change_chiper_spec();
+        eap::sanitizing_blob make_change_chiper_spec() const;
 
         ///
         /// Makes a TLS finished message
@@ -509,6 +506,8 @@ namespace eap
         packet m_packet_res;                                    ///< Response packet
 
         winstd::crypt_prov m_cp;                                ///< Cryptography provider
+
+        tls_version m_tls_version;                              ///< TLS version in use
 
         tls_conn_state m_state;                                 ///< TLS connection state for fast reconnect
 
