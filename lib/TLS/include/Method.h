@@ -297,8 +297,9 @@ namespace eap
         ///
         inline void hash_handshake(_In_count_(size) const void *data, _In_ size_t size)
         {
-            CryptHashData(m_hash_handshake_msgs_md5 , (const BYTE*)data, (DWORD)size, 0);
-            CryptHashData(m_hash_handshake_msgs_sha1, (const BYTE*)data, (DWORD)size, 0);
+            CryptHashData(m_hash_handshake_msgs_md5   , (const BYTE*)data, (DWORD)size, 0);
+            CryptHashData(m_hash_handshake_msgs_sha1  , (const BYTE*)data, (DWORD)size, 0);
+            CryptHashData(m_hash_handshake_msgs_sha256, (const BYTE*)data, (DWORD)size, 0);
         }
 
         ///
@@ -450,6 +451,8 @@ namespace eap
         /// \sa [The Transport Layer Security (TLS) Protocol Version 1.1 (Chapter 5. HMAC and the Pseudorandom Function)](https://tools.ietf.org/html/rfc4346#section-5)
         /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter 5. HMAC and the Pseudorandom Function)](https://tools.ietf.org/html/rfc5246#section-5)
         ///
+        /// \param[in] cp         Handle of the cryptographics provider
+        /// \param[in] alg        Hashing Algorithm to use (CALG_TLS1PRF = combination of MD5 and SHA-1, CALG_SHA_256...)
         /// \param[in] secret     Hashing secret key
         /// \param[in] seed       Random seed
         /// \param[in] size_seed  \p seed size
@@ -457,11 +460,60 @@ namespace eap
         ///
         /// \returns Generated pseudo-random data (\p size bytes)
         ///
-        sanitizing_blob prf(
+        static sanitizing_blob prf(
+            _In_                            HCRYPTPROV        cp,
+            _In_                            ALG_ID            alg,
             _In_                      const tls_master_secret &secret,
             _In_bytecount_(size_seed) const void              *seed,
             _In_                            size_t            size_seed,
-            _In_                            size_t            size) const;
+            _In_                            size_t            size);
+
+        ///
+        /// Calculates pseudo-random P_hash data defined in RFC 5246
+        ///
+        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.1 (Chapter 5. HMAC and the Pseudorandom Function)](https://tools.ietf.org/html/rfc4346#section-5)
+        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter 5. HMAC and the Pseudorandom Function)](https://tools.ietf.org/html/rfc5246#section-5)
+        ///
+        /// \param[in] secret     Hashing secret key
+        /// \param[in] seed       Random seed
+        /// \param[in] size_seed  \p seed size
+        /// \param[in] size       Number of bytes of pseudo-random data required
+        ///
+        /// \returns Generated pseudo-random data (\p size bytes)
+        ///
+        inline sanitizing_blob prf(
+            _In_                      const tls_master_secret &secret,
+            _In_bytecount_(size_seed) const void              *seed,
+            _In_                            size_t            size_seed,
+            _In_                            size_t            size) const
+        {
+            return prf(m_cp, m_state.m_alg_prf, secret, seed, size_seed, size);
+        }
+
+        ///
+        /// Calculates pseudo-random P_hash data defined in RFC 5246
+        ///
+        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.1 (Chapter 5. HMAC and the Pseudorandom Function)](https://tools.ietf.org/html/rfc4346#section-5)
+        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter 5. HMAC and the Pseudorandom Function)](https://tools.ietf.org/html/rfc5246#section-5)
+        ///
+        /// \param[in] cp      Handle of the cryptographics provider
+        /// \param[in] alg     Hashing Algorithm to use (CALG_TLS1PRF = combination of MD5 and SHA-1, CALG_SHA_256...)
+        /// \param[in] secret  Hashing secret key
+        /// \param[in] seed    Random seed
+        /// \param[in] size    Number of bytes of pseudo-random data required
+        ///
+        /// \returns Generated pseudo-random data (\p size bytes)
+        ///
+        template<class _Ty, class _Ax>
+        inline static sanitizing_blob prf(
+            _In_       HCRYPTPROV            cp,
+            _In_       ALG_ID                alg,
+            _In_ const tls_master_secret     &secret,
+            _In_ const std::vector<_Ty, _Ax> &seed,
+            _In_       size_t                size)
+        {
+            return prf(cp, alg, secret, seed.data(), seed.size() * sizeof(_Ty), size);
+        }
 
         ///
         /// Calculates pseudo-random P_hash data defined in RFC 5246
@@ -479,9 +531,9 @@ namespace eap
         inline sanitizing_blob prf(
             _In_ const tls_master_secret     &secret,
             _In_ const std::vector<_Ty, _Ax> &seed,
-            _In_ size_t                      size) const
+            _In_       size_t                size) const
         {
-            return prf(secret, seed.data(), seed.size() * sizeof(_Ty), size);
+            return prf(m_cp, m_state.m_alg_prf, secret, seed.data(), seed.size() * sizeof(_Ty), size);
         }
 
         /// @}
@@ -530,6 +582,7 @@ namespace eap
 
         winstd::crypt_hash m_hash_handshake_msgs_md5;           ///< Running MD5 hash of handshake messages sent
         winstd::crypt_hash m_hash_handshake_msgs_sha1;          ///< Running SHA-1 hash of handshake messages sent
+        winstd::crypt_hash m_hash_handshake_msgs_sha256;        ///< Running SHA-256 hash of handshake messages sent
 
         bool m_certificate_req;                                 ///< Did server request client certificate?
         bool m_server_hello_done;                               ///< Is server hello done?

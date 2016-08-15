@@ -122,7 +122,7 @@ void eap::peer_ttls::get_identity(
     if (*pfInvokeUI) {
         if ((dwFlags & EAP_FLAG_MACHINE_AUTH) == 0) {
             // Per-user authentication
-            log_event(&EAPMETHOD_TRACE_EVT_CRED_INVOKE_UI2);
+            log_event(&EAPMETHOD_TRACE_EVT_CRED_INVOKE_UI2, event_data::blank);
             return;
         } else {
             // Per-machine authentication

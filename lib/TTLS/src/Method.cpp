@@ -155,11 +155,26 @@ void eap::method_ttls::get_result(
 
 void eap::method_ttls::derive_msk()
 {
+    //
+    //   TLS versions 1.0 [RFC2246] and 1.1 [RFC4346] define the same PRF
+    //   function, and any EAP-TTLSv0 implementation based on these versions
+    //   of TLS must use the PRF defined therein.  It is expected that future
+    //   versions of or extensions to the TLS protocol will permit alternative
+    //   PRF functions to be negotiated.  If an alternative PRF function is
+    //   specified for the underlying TLS version or has been negotiated
+    //   during the TLS handshake negotiation, then that alternative PRF
+    //   function must be used in EAP-TTLSv0 computations instead of the TLS
+    //   1.0/1.1 PRF.
+    //
+    // [Extensible Authentication Protocol Tunneled Transport Layer Security Authenticated Protocol Version 0 (EAP-TTLSv0) (Chapter 7.8. Use of TLS PRF)](https://tools.ietf.org/html/rfc5281#section-7.8)
+    //
+    // If we use PRF_SHA256() the key exchange fails. Therefore we use PRF of TLS 1.0/1.1.
+    //
     static const unsigned char s_label[] = "ttls keying material";
     sanitizing_blob seed(s_label, s_label + _countof(s_label) - 1);
     seed.insert(seed.end(), (const unsigned char*)&m_state.m_random_client, (const unsigned char*)(&m_state.m_random_client + 1));
     seed.insert(seed.end(), (const unsigned char*)&m_state.m_random_server, (const unsigned char*)(&m_state.m_random_server + 1));
-    sanitizing_blob key_block(prf(m_state.m_master_secret, seed, 2*sizeof(tls_random)));
+    sanitizing_blob key_block(prf(m_cp, CALG_TLS1PRF, m_state.m_master_secret, seed, 2*sizeof(tls_random)));
     const unsigned char *_key_block = key_block.data();
 
     // MSK: MPPE-Recv-Key
