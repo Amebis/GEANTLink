@@ -572,31 +572,26 @@ protected:
 
     virtual bool TransferDataToWindow()
     {
-        // Inherited TransferDataToWindow() calls m_cred.retrieve().
-        // Therefore, call it now, to set m_cred.
-        if (!wxEAPCredentialsPanelBase<_Tcred, wxEAPCredentialsPanelPassBase>::TransferDataToWindow())
-            return false;
-
         m_identity->SetValue(m_cred.m_identity);
         m_identity->SetSelection(0, -1);
         m_password->SetValue(m_cred.m_password.empty() ? wxEmptyString : s_dummy_password);
 
-        return true;
+        return wxEAPCredentialsPanelBase<_Tcred, wxEAPCredentialsPanelPassBase>::TransferDataToWindow();
     }
 
     virtual bool TransferDataFromWindow()
     {
-        m_cred.m_identity = m_identity->GetValue();
+        if (!wxEAPCredentialsPanelBase<_Tcred, wxEAPCredentialsPanelPassBase>::TransferDataFromWindow())
+            return false;
 
+        m_cred.m_identity = m_identity->GetValue();
         wxString pass = m_password->GetValue();
         if (pass.compare(s_dummy_password) != 0) {
             m_cred.m_password = pass;
             pass.assign(pass.length(), wxT('*'));
         }
 
-        // Inherited TransferDataFromWindow() calls m_cred.store().
-        // Therefore, call it only now, that m_cred is set.
-        return wxEAPCredentialsPanelBase<_Tcred, wxEAPCredentialsPanelPassBase>::TransferDataFromWindow();
+        return true;
     }
 
     virtual void OnUpdateUI(wxUpdateUIEvent& event)
