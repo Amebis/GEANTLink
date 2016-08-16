@@ -59,7 +59,7 @@ namespace eap
     extern const tls_version tls_version_1_2;
 
     ///
-    /// TLS client/server tls_random
+    /// TLS client/server random
     ///
     struct tls_random;
 
@@ -71,11 +71,11 @@ namespace eap
     struct tls_master_secret;
 
     ///
-    /// TLS client connection state
+    /// HMAC padding
     ///
-    /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter 6.1. Connection States)](https://tools.ietf.org/html/rfc5246#section-6.1)
+    /// \sa [HMAC: Keyed-Hashing for Message Authentication](https://tools.ietf.org/html/rfc2104)
     ///
-    class tls_conn_state;
+    struct hmac_padding;
 
     ///
     /// Our own implementation of HMAC hashing
@@ -83,83 +83,40 @@ namespace eap
     ///
     /// \sa [HMAC: Keyed-Hashing for Message Authentication](https://tools.ietf.org/html/rfc2104)
     ///
-    class hash_hmac;
+    class hmac_hash;
+
+    ///
+    /// TLS client connection state
+    ///
+    /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter 6.1. Connection States)](https://tools.ietf.org/html/rfc5246#section-6.1)
+    ///
+    class tls_conn_state;
 }
 
-///
-/// Packs a TLS tls_random
-///
-/// \param[inout] cursor  Memory cursor
-/// \param[in]    val     Variable with data to pack
-///
-inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const eap::tls_random &val);
-
-///
-/// Returns packed size of TLS tls_random
-///
-/// \param[in] val  Data to pack
-///
-/// \returns Size of data when packed (in bytes)
-///
-inline size_t pksizeof(_In_ const eap::tls_random &val);
-
-///
-/// Unpacks a TLS tls_random
-///
-/// \param[inout] cursor  Memory cursor
-/// \param[out]   val     Variable to receive unpacked value
-///
-inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ eap::tls_random &val);
-
-///
-/// Packs a TLS master secret
-///
-/// \param[inout] cursor  Memory cursor
-/// \param[in]    val     Variable with data to pack
-///
-inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const eap::tls_master_secret &val);
-
-///
-/// Returns packed size of TLS master secret
-///
-/// \param[in] val  Data to pack
-///
-/// \returns Size of data when packed (in bytes)
-///
-inline size_t pksizeof(_In_ const eap::tls_master_secret &val);
-
-///
-/// Unpacks a TLS master secret
-///
-/// \param[inout] cursor  Memory cursor
-/// \param[out]   val     Variable to receive unpacked value
-///
-inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ eap::tls_master_secret &val);
-
-///
-/// Packs a TLS connection state
-///
-/// \param[inout] cursor  Memory cursor
-/// \param[in]    val     Variable with data to pack
-///
-inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const eap::tls_conn_state &val);
-
-///
-/// Returns packed size of TLS connection state
-///
-/// \param[in] val  Data to pack
-///
-/// \returns Size of data when packed (in bytes)
-///
-inline size_t pksizeof(_In_ const eap::tls_conn_state &val);
-
-///
-/// Unpacks a TLS connection state
-///
-/// \param[inout] cursor  Memory cursor
-/// \param[out]   val     Variable to receive unpacked value
-///
-inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ eap::tls_conn_state &val);
+/////
+///// Packs a TLS connection state
+/////
+///// \param[inout] cursor  Memory cursor
+///// \param[in]    val     Variable with data to pack
+/////
+//inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const eap::tls_conn_state &val);
+//
+/////
+///// Returns packed size of TLS connection state
+/////
+///// \param[in] val  Data to pack
+/////
+///// \returns Size of data when packed (in bytes)
+/////
+//inline size_t pksizeof(_In_ const eap::tls_conn_state &val);
+//
+/////
+///// Unpacks a TLS connection state
+/////
+///// \param[inout] cursor  Memory cursor
+///// \param[out]   val     Variable to receive unpacked value
+/////
+//inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ eap::tls_conn_state &val);
 
 #pragma once
 
@@ -343,59 +300,24 @@ namespace eap
 
 #pragma pack(push)
 #pragma pack(1)
-    struct __declspec(novtable) tls_random
+    struct __declspec(novtable) tls_random : public sanitizing_blob_xf<32>
     {
-        unsigned char data[32]; ///< Randomness
-
         ///
-        /// Constructs a all-zero tls_random
-        ///
-        tls_random();
-
-        ///
-        /// Copies a tls_random
-        ///
-        /// \param[in] other  Random to copy from
-        ///
-        tls_random(_In_ const tls_random &other);
-
-        ///
-        /// Destructor
-        ///
-        ~tls_random();
-
-        ///
-        /// Copies a tls_random
-        ///
-        /// \param[in] other  Random to copy from
-        ///
-        /// \returns Reference to this object
-        ///
-        tls_random& operator=(_In_ const tls_random &other);
-
-        ///
-        /// Empty the tls_random
-        ///
-        void clear();
-
-        ///
-        /// Generate tls_random
+        /// Generate TLS random
         ///
         /// \param[in] cp  Handle of the cryptographics provider
         ///
-        void reset(_In_ HCRYPTPROV cp);
+        void randomize(_In_ HCRYPTPROV cp);
     };
 #pragma pack(pop)
 
 
 #pragma pack(push)
 #pragma pack(1)
-    struct __declspec(novtable) tls_master_secret
+    struct __declspec(novtable) tls_master_secret : public sanitizing_blob_xf<48>
     {
-        unsigned char data[48];
-
         ///
-        /// Constructs a all-zero master secret
+        /// Constructor
         ///
         tls_master_secret();
 
@@ -412,92 +334,68 @@ namespace eap
         ///
         /// Copies a master secret
         ///
-        /// \param[in] other  Random to copy from
+        /// \param[in] other  Master secret to copy from
         ///
-        tls_master_secret(_In_ const tls_master_secret &other);
+        tls_master_secret(_In_ const sanitizing_blob_f<48> &other);
 
+#ifdef _DEBUG
         ///
-        /// Destructor
+        /// Moves the master secret
         ///
-        ~tls_master_secret();
-
+        /// \param[inout] other  Master secret to move from
         ///
-        /// Copies a master secret
-        ///
-        /// \param[in] other  Random to copy from
-        ///
-        /// \returns Reference to this object
-        ///
-        tls_master_secret& operator=(_In_ const tls_master_secret &other);
-
-        ///
-        /// Empty the master secret
-        ///
-        void clear();
+        tls_master_secret(_Inout_ sanitizing_blob_zf<48> &&other);
+#endif
     };
 #pragma pack(pop)
 
 
-    class tls_conn_state
+#pragma pack(push)
+#pragma pack(1)
+    struct __declspec(novtable) hmac_padding : public sanitizing_blob_xf<64>
     {
-    public:
         ///
-        /// Constructs a connection state
+        /// Constructor
         ///
-        tls_conn_state();
+        hmac_padding();
 
         ///
-        /// Copies a connection state
+        /// Derive padding from secret
         ///
-        /// \param[in] other  Connection state to copy from
+        /// \param[in] cp           Handle of the cryptographics provider
+        /// \param[in] alg          Hashing algorithm
+        /// \param[in] secret       HMAC secret
+        /// \param[in] size_secret  \p secret size
+        /// \param[in] pad          Padding value to XOR with (0x36=inner, 0x5c=outer...)
         ///
-        tls_conn_state(_In_ const tls_conn_state &other);
+        hmac_padding(
+            _In_                               HCRYPTPROV    cp,
+            _In_                               ALG_ID        alg,
+            _In_bytecount_(size_secret ) const void          *secret,
+            _In_                               size_t        size_secret,
+            _In_opt_                           unsigned char pad = 0x36);
 
         ///
-        /// Moves a connection state
+        /// Copies a padding
         ///
-        /// \param[in] other  Connection state to move from
+        /// \param[in] other  Master secret to copy from
         ///
-        tls_conn_state(_Inout_ tls_conn_state &&other);
+        hmac_padding(_In_ const sanitizing_blob_f<64> &other);
 
+#ifdef _DEBUG
         ///
-        /// Copies a connection state
+        /// Moves the padding
         ///
-        /// \param[in] other  Connection state to copy from
+        /// \param[inout] other  Padding to move from
         ///
-        /// \returns Reference to this object
-        ///
-        tls_conn_state& operator=(_In_ const tls_conn_state &other);
-
-        ///
-        /// Moves a connection state
-        ///
-        /// \param[in] other  Connection state to move from
-        ///
-        /// \returns Reference to this object
-        ///
-        tls_conn_state& operator=(_Inout_ tls_conn_state &&other);
-
-    public:
-        ALG_ID m_alg_prf;                   ///> Pseudo-tls_random function algorithm
-        ALG_ID m_alg_encrypt;               ///> Bulk encryption algorithm
-        size_t m_size_enc_key;              ///> Encryption key size in bytes (has to comply with `m_alg_encrypt`)
-        size_t m_size_enc_iv;               ///> Encryption initialization vector size in bytes (has to comply with `m_alg_encrypt`)
-        size_t m_size_enc_block;            ///> Encryption block size in bytes (has to comply with `m_alg_encrypt`)
-        ALG_ID m_alg_mac;                   ///> Message authenticy check algorithm
-        size_t m_size_mac_key;              ///> Message authenticy check algorithm key size (has to comply with `m_alg_mac`)
-        size_t m_size_mac_hash;             ///> Message authenticy check algorithm result size (has to comply with `m_alg_mac`)
-        tls_master_secret m_master_secret;  ///< TLS master secret
-        tls_random m_random_client;         ///< Client tls_random
-        tls_random m_random_server;         ///< Server tls_random
+        hmac_padding(_Inout_ sanitizing_blob_zf<64> &&other);
+#endif
     };
+#pragma pack(pop)
 
 
-    class hash_hmac
+    class hmac_hash
     {
-    public:
-        typedef unsigned char padding_t[64];
-
     public:
         ///
         /// Construct new HMAC hashing object
@@ -507,7 +405,7 @@ namespace eap
         /// \param[in] secret       HMAC secret
         /// \param[in] size_secret  \p secret size
         ///
-        hash_hmac(
+        hmac_hash(
             _In_                               HCRYPTPROV cp,
             _In_                               ALG_ID     alg,
             _In_bytecount_(size_secret ) const void       *secret,
@@ -520,10 +418,10 @@ namespace eap
         /// \param[in] alg          Hashing algorithm
         /// \param[in] padding      HMAC secret XOR inner padding
         ///
-        hash_hmac(
-            _In_       HCRYPTPROV cp,
-            _In_       ALG_ID     alg,
-            _In_ const padding_t  padding);
+        hmac_hash(
+            _In_       HCRYPTPROV   cp,
+            _In_       ALG_ID       alg,
+            _In_ const hmac_padding &padding);
 
         ///
         /// Provides access to inner hash object to hash data at will.
@@ -556,99 +454,86 @@ namespace eap
                 throw win_runtime_error(__FUNCTION__ " Error calculating outer hash.");
         }
 
-        ///
-        /// Helper method to pre-derive inner padding for frequent reuse
-        ///
-        /// \param[in]  cp           Handle of the cryptographics provider
-        /// \param[in]  alg          Hashing algorithm
-        /// \param[in]  secret       HMAC secret
-        /// \param[in]  size_secret  \p secret size
-        /// \param[out] padding      HMAC secret XOR inner padding
-        ///
-        static void inner_padding(
-            _In_                               HCRYPTPROV cp,
-            _In_                               ALG_ID     alg,
-            _In_bytecount_(size_secret ) const void       *secret,
-            _In_                               size_t     size_secret,
-            _Out_                              padding_t  padding);
-
     protected:
         winstd::crypt_hash m_hash_inner; ///< Inner hashing object
         winstd::crypt_hash m_hash_outer; ///< Outer hashing object
     };
+
+
+    class tls_conn_state
+    {
+    public:
+        ///
+        /// Constructs a connection state
+        ///
+        tls_conn_state();
+
+        ///
+        /// Copy a connection state
+        ///
+        /// \param[in] other  Connection state to copy from
+        ///
+        tls_conn_state(_In_ const tls_conn_state &other);
+
+        ///
+        /// Moves a connection state
+        ///
+        /// \param[inout] other  Connection state to move from
+        ///
+        tls_conn_state(_Inout_ tls_conn_state &&other);
+
+        ///
+        /// Copy a connection state
+        ///
+        /// \param[inout] other  Connection state to copy from
+        ///
+        /// \returns Reference to this object
+        ///
+        tls_conn_state& operator=(_In_ const tls_conn_state &other);
+
+        ///
+        /// Moves a connection state
+        ///
+        /// \param[in] other  Connection state to move from
+        ///
+        /// \returns Reference to this object
+        ///
+        tls_conn_state& operator=(_Inout_ tls_conn_state &&other);
+
+    public:
+        ALG_ID m_alg_encrypt;           ///< Bulk encryption algorithm
+        size_t m_size_enc_key;          ///< Encryption key size in bytes (has to comply with `m_alg_encrypt`)
+        size_t m_size_enc_iv;           ///< Encryption initialization vector size in bytes (has to comply with `m_alg_encrypt`)
+        size_t m_size_enc_block;        ///< Encryption block size in bytes (has to comply with `m_alg_encrypt`)
+        winstd::crypt_key m_key;        ///< Key for encrypting messages
+        ALG_ID m_alg_mac;               ///< Message authenticy check algorithm
+        size_t m_size_mac_key;          ///< Message authenticy check algorithm key size (has to comply with `m_alg_mac`)
+        size_t m_size_mac_hash;         ///< Message authenticy check algorithm result size (has to comply with `m_alg_mac`)
+        hmac_padding m_padding_hmac;    ///< Padding (key) for HMAC calculation
+    };
 }
 
 
-inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const eap::tls_random &val)
-{
-    eap::cursor_out::ptr_type ptr_end = cursor.ptr + sizeof(eap::tls_random);
-    assert(ptr_end <= cursor.ptr_end);
-    memcpy(cursor.ptr, val.data, sizeof(eap::tls_random));
-    cursor.ptr = ptr_end;
-}
-
-
-inline size_t pksizeof(_In_ const eap::tls_random &val)
-{
-    UNREFERENCED_PARAMETER(val);
-    return sizeof(eap::tls_random);
-}
-
-
-inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ eap::tls_random &val)
-{
-    eap::cursor_in::ptr_type ptr_end = cursor.ptr + sizeof(eap::tls_random);
-    assert(ptr_end <= cursor.ptr_end);
-    memcpy(val.data, cursor.ptr, sizeof(eap::tls_random));
-    cursor.ptr = ptr_end;
-}
-
-
-inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const eap::tls_master_secret &val)
-{
-    eap::cursor_out::ptr_type ptr_end = cursor.ptr + sizeof(eap::tls_master_secret);
-    assert(ptr_end <= cursor.ptr_end);
-    memcpy(cursor.ptr, val.data, sizeof(eap::tls_master_secret));
-    cursor.ptr = ptr_end;
-}
-
-
-inline size_t pksizeof(_In_ const eap::tls_master_secret &val)
-{
-    UNREFERENCED_PARAMETER(val);
-    return sizeof(eap::tls_master_secret);
-}
-
-
-inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ eap::tls_master_secret &val)
-{
-    eap::cursor_in::ptr_type ptr_end = cursor.ptr + sizeof(eap::tls_master_secret);
-    assert(ptr_end <= cursor.ptr_end);
-    memcpy(val.data, cursor.ptr, sizeof(eap::tls_master_secret));
-    cursor.ptr = ptr_end;
-}
-
-
-inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const eap::tls_conn_state &val)
-{
-    cursor << val.m_master_secret;
-    cursor << val.m_random_client;
-    cursor << val.m_random_server;
-}
-
-
-inline size_t pksizeof(_In_ const eap::tls_conn_state &val)
-{
-    return
-        pksizeof(val.m_master_secret) +
-        pksizeof(val.m_random_client) +
-        pksizeof(val.m_random_server);
-}
-
-
-inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ eap::tls_conn_state &val)
-{
-    cursor >> val.m_master_secret;
-    cursor >> val.m_random_client;
-    cursor >> val.m_random_server;
-}
+//inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const eap::tls_conn_state &val)
+//{
+//    cursor << val.m_master_secret;
+//    cursor << val.m_random_client;
+//    cursor << val.m_random_server;
+//}
+//
+//
+//inline size_t pksizeof(_In_ const eap::tls_conn_state &val)
+//{
+//    return
+//        pksizeof(val.m_master_secret) +
+//        pksizeof(val.m_random_client) +
+//        pksizeof(val.m_random_server);
+//}
+//
+//
+//inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ eap::tls_conn_state &val)
+//{
+//    cursor >> val.m_master_secret;
+//    cursor >> val.m_random_client;
+//    cursor >> val.m_random_server;
+//}

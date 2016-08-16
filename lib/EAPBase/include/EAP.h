@@ -58,6 +58,25 @@ namespace eap
     typedef std::vector<unsigned char, winstd::sanitizing_allocator<unsigned char> > sanitizing_blob;
 
     ///
+    /// Sanitizing BLOB of fixed size
+    ///
+    template<size_t N> struct sanitizing_blob_f;
+
+    ///
+    /// Sanitizing BLOB of fixed size (zero initialized)
+    ///
+    template<size_t N> struct sanitizing_blob_zf;
+
+    ///
+    /// Sanitizing BLOB of fixed size (zero initialized in _DEBUG version)
+    ///
+#ifdef _DEBUG
+    #define sanitizing_blob_xf sanitizing_blob_zf
+#else
+    #define sanitizing_blob_xf sanitizing_blob_f
+#endif
+
+    ///
     /// Diameter AVP flags
     ///
     enum diameter_avp_flags_t;
@@ -347,6 +366,31 @@ inline size_t pksizeof(const winstd::eap_type_t &val);
 ///
 inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ winstd::eap_type_t &val);
 
+///
+/// Packs a BLOB
+///
+/// \param[inout] cursor  Memory cursor
+/// \param[in]    val     Variable with data to pack
+///
+template<size_t N> inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const eap::sanitizing_blob_f<N> &val);
+
+///
+/// Returns packed size of a BLOB
+///
+/// \param[in] val  Data to pack
+///
+/// \returns Size of data when packed (in bytes)
+///
+template<size_t N> inline size_t pksizeof(_In_ const eap::sanitizing_blob_f<N> &val);
+
+///
+/// Unpacks a BLOB
+///
+/// \param[inout] cursor  Memory cursor
+/// \param[out]   val     Variable to receive unpacked value
+///
+template<size_t N> inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ eap::sanitizing_blob_f<N> &val);
+
 #ifndef htonll
 ///
 /// Convert host converts an unsigned __int64 from host to TCP/IP network byte order.
@@ -379,6 +423,167 @@ namespace eap
         ptr_type ptr;       ///< Pointer to first data unread
         ptr_type ptr_end;   ///< Pointer to the end of BLOB
     };
+
+
+#pragma pack(push)
+#pragma pack(1)
+
+    template<size_t N>
+    struct __declspec(novtable) sanitizing_blob_f<N>
+    {
+        unsigned char data[N]; ///< BLOB data
+
+        ///
+        /// Constructor
+        ///
+        inline sanitizing_blob_f()
+        {
+        }
+
+        ///
+        /// Copies a BLOB
+        ///
+        /// \param[in] other  BLOB to copy from
+        ///
+        inline sanitizing_blob_f(_In_ const sanitizing_blob_f<N> &other)
+        {
+            memcpy(data, other.data, N);
+        }
+
+        ///
+        /// Moves the BLOB
+        ///
+        /// \param[inout] other  Zero-initialized BLOB to move from
+        ///
+        inline sanitizing_blob_f(_Inout_ sanitizing_blob_zf<N> &&other)
+        {
+            memcpy(data, other.data, N);
+            memset(other.data, 0, N);
+        }
+
+        ///
+        /// Destructor
+        ///
+        inline ~sanitizing_blob_f()
+        {
+            SecureZeroMemory(data, N);
+        }
+
+        ///
+        /// Copies a BLOB
+        ///
+        /// \param[in] other  BLOB to copy from
+        ///
+        /// \returns Reference to this object
+        ///
+        inline sanitizing_blob_f& operator=(_In_ const sanitizing_blob_f<N> &other)
+        {
+            if (this != std::addressof(other))
+                memcpy(data, other.data, N);
+            return *this;
+        }
+
+        ///
+        /// Moves the BLOB
+        ///
+        /// \param[inout] other  Zero-initialized BLOB to copy from
+        ///
+        /// \returns Reference to this object
+        ///
+        inline sanitizing_blob_f& operator=(_Inout_ sanitizing_blob_zf<N> &&other)
+        {
+            if (this != std::addressof(other)) {
+                memcpy(data, other.data, N);
+                memset(other.data, 0, N);
+            }
+            return *this;
+        }
+
+        ///
+        /// Is BLOB not equal to?
+        ///
+        /// \param[in] other  BLOB to compare against
+        ///
+        /// \returns
+        /// - \c true when BLOBs are not equal;
+        /// - \c false otherwise
+        ///
+        inline bool operator!=(_In_ const sanitizing_blob_f<N> &other) const
+        {
+            return !operator==(other);
+        }
+
+        ///
+        /// Is BLOB equal to?
+        ///
+        /// \param[in] other  BLOB to compare against
+        ///
+        /// \returns
+        /// - \c true when BLOBs are equal;
+        /// - \c false otherwise
+        ///
+        inline bool operator==(_In_ const sanitizing_blob_f<N> &other) const
+        {
+            for (size_t i = 0; i < N; i++)
+                if (data[i] != other.data[i]) return false;
+            return true;
+        }
+
+        ///
+        /// Is BLOB empty?
+        ///
+        /// \returns
+        /// - \c true when BLOB is all-zero;
+        /// - \c false otherwise
+        ///
+        inline bool empty() const
+        {
+            for (size_t i = 0; i < N; i++)
+                if (data[i]) return false;
+            return true;
+        }
+
+        ///
+        /// Zero the BLOB
+        ///
+        inline void clear()
+        {
+            memset(data, 0, N);
+        }
+    };
+
+    template<size_t N>
+    struct __declspec(novtable) sanitizing_blob_zf<N> : sanitizing_blob_f<N>
+    {
+        ///
+        /// Constructor
+        ///
+        inline sanitizing_blob_zf() : sanitizing_blob_f<N>()
+        {
+            memset(data, 0, N);
+        }
+
+        ///
+        /// Copies a BLOB
+        ///
+        /// \param[in] other  BLOB to copy from
+        ///
+        inline sanitizing_blob_zf(_In_ const sanitizing_blob_f<N> &other) :
+            sanitizing_blob_f<N>(other)
+        {
+        }
+
+        ///
+        /// Moves the BLOB
+        ///
+        /// \param[inout] other  Zero-initialized BLOB to move from
+        ///
+        inline sanitizing_blob_zf(_Inout_ sanitizing_blob_zf<N> &&other) :
+            sanitizing_blob_f<N>(std::move(other))
+        {
+        }
+    };
+#pragma pack(pop)
 
 
     #pragma warning(suppress: 4480)
@@ -739,6 +944,34 @@ inline size_t pksizeof(_In_ const winstd::eap_type_t &val)
 inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ winstd::eap_type_t &val)
 {
     cursor >> (unsigned char&)val;
+}
+
+
+template<size_t N>
+inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const eap::sanitizing_blob_f<N> &val)
+{
+    eap::cursor_out::ptr_type ptr_end = cursor.ptr + sizeof(eap::sanitizing_blob_f<N>);
+    assert(ptr_end <= cursor.ptr_end);
+    memcpy(cursor.ptr, val.data, sizeof(eap::sanitizing_blob_f<N>));
+    cursor.ptr = ptr_end;
+}
+
+
+template<size_t N>
+inline size_t pksizeof(_In_ const eap::sanitizing_blob_f<N> &val)
+{
+    UNREFERENCED_PARAMETER(val);
+    return sizeof(eap::sanitizing_blob_f<N>);
+}
+
+
+template<size_t N>
+inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ eap::sanitizing_blob_f<N> &val)
+{
+    eap::cursor_in::ptr_type ptr_end = cursor.ptr + sizeof(eap::sanitizing_blob_f<N>);
+    assert(ptr_end <= cursor.ptr_end);
+    memcpy(val.data, cursor.ptr, sizeof(eap::sanitizing_blob_f<N>));
+    cursor.ptr = ptr_end;
 }
 
 

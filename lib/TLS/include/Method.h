@@ -151,13 +151,6 @@ namespace eap
         method_tls(_In_ module &module, _In_ config_provider_list &cfg, _In_ credentials_tls &cred);
 
         ///
-        /// Copies an EAP method
-        ///
-        /// \param[in] other  EAP method to copy from
-        ///
-        method_tls(_In_ const method_tls &other);
-
-        ///
         /// Moves an EAP method
         ///
         /// \param[in] other  EAP method to move from
@@ -168,15 +161,6 @@ namespace eap
         /// Destructor
         ///
         virtual ~method_tls();
-
-        ///
-        /// Copies an EAP method
-        ///
-        /// \param[in] other  EAP method to copy from
-        ///
-        /// \returns Reference to this object
-        ///
-        method_tls& operator=(_In_ const method_tls &other);
 
         ///
         /// Moves an EAP method
@@ -242,7 +226,7 @@ namespace eap
         ///
         /// \returns Client hello message
         ///
-        sanitizing_blob make_client_hello() const;
+        sanitizing_blob make_client_hello();
 
         ///
         /// Makes a TLS client certificate message
@@ -323,25 +307,17 @@ namespace eap
         ///
         /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter A.1. Record Layer)](https://tools.ietf.org/html/rfc5246#appendix-A.1)
         ///
-        /// \param[in] type     Message type
-        /// \param[in] data     Message data contents
-        /// \param[in] encrypt  Should \p data get encrypted?
+        /// \param[in]    type  Message type
+        /// \param[inout] data  Message data contents
         ///
         /// \returns TLS message message
         ///
-        eap::sanitizing_blob make_message(_In_ tls_message_type_t type, _Inout_ sanitizing_blob &data, _In_ bool encrypt);
+        eap::sanitizing_blob make_message(_In_ tls_message_type_t type, _Inout_ sanitizing_blob &&data);
 
         /// @}
 
         /// \name Key derivation
         /// @{
-
-        ///
-        /// Generates keys required by current connection state
-        ///
-        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter 6.3. Key Calculation)](https://tools.ietf.org/html/rfc5246#section-6.3)
-        ///
-        void derive_keys();
 
         ///
         /// Generates master session key
@@ -474,28 +450,6 @@ namespace eap
         /// \sa [The Transport Layer Security (TLS) Protocol Version 1.1 (Chapter 5. HMAC and the Pseudorandom Function)](https://tools.ietf.org/html/rfc4346#section-5)
         /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter 5. HMAC and the Pseudorandom Function)](https://tools.ietf.org/html/rfc5246#section-5)
         ///
-        /// \param[in] secret     Hashing secret key
-        /// \param[in] seed       Random seed
-        /// \param[in] size_seed  \p seed size
-        /// \param[in] size       Number of bytes of pseudo-random data required
-        ///
-        /// \returns Generated pseudo-random data (\p size bytes)
-        ///
-        inline sanitizing_blob prf(
-            _In_                      const tls_master_secret &secret,
-            _In_bytecount_(size_seed) const void              *seed,
-            _In_                            size_t            size_seed,
-            _In_                            size_t            size) const
-        {
-            return prf(m_cp, m_state.m_alg_prf, secret, seed, size_seed, size);
-        }
-
-        ///
-        /// Calculates pseudo-random P_hash data defined in RFC 5246
-        ///
-        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.1 (Chapter 5. HMAC and the Pseudorandom Function)](https://tools.ietf.org/html/rfc4346#section-5)
-        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter 5. HMAC and the Pseudorandom Function)](https://tools.ietf.org/html/rfc5246#section-5)
-        ///
         /// \param[in] cp      Handle of the cryptographics provider
         /// \param[in] alg     Hashing Algorithm to use (CALG_TLS1PRF = combination of MD5 and SHA-1, CALG_SHA_256...)
         /// \param[in] secret  Hashing secret key
@@ -513,27 +467,6 @@ namespace eap
             _In_       size_t                size)
         {
             return prf(cp, alg, secret, seed.data(), seed.size() * sizeof(_Ty), size);
-        }
-
-        ///
-        /// Calculates pseudo-random P_hash data defined in RFC 5246
-        ///
-        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.1 (Chapter 5. HMAC and the Pseudorandom Function)](https://tools.ietf.org/html/rfc4346#section-5)
-        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter 5. HMAC and the Pseudorandom Function)](https://tools.ietf.org/html/rfc5246#section-5)
-        ///
-        /// \param[in] secret  Hashing secret key
-        /// \param[in] seed    Random seed
-        /// \param[in] size    Number of bytes of pseudo-random data required
-        ///
-        /// \returns Generated pseudo-random data (\p size bytes)
-        ///
-        template<class _Ty, class _Ax>
-        inline sanitizing_blob prf(
-            _In_ const tls_master_secret     &secret,
-            _In_ const std::vector<_Ty, _Ax> &seed,
-            _In_       size_t                size) const
-        {
-            return prf(m_cp, m_state.m_alg_prf, secret, seed.data(), seed.size() * sizeof(_Ty), size);
         }
 
         /// @}
@@ -562,16 +495,21 @@ namespace eap
         packet m_packet_req;                                    ///< Request packet
         packet m_packet_res;                                    ///< Response packet
 
-        winstd::crypt_prov m_cp;                                ///< Cryptography provider
+        winstd::crypt_prov m_cp;                                ///< Cryptography provider for general services
+        winstd::crypt_prov m_cp_enc;                            ///< Cryptography provider for encryption
+        winstd::crypt_key m_key_exp1;                           ///< Key for importing derived keys
 
         tls_version m_tls_version;                              ///< TLS version in use
+        ALG_ID m_alg_prf;                                       ///< Pseudo-random function algorithm in use
 
-        tls_conn_state m_state;                                 ///< TLS connection state for fast reconnect
+        tls_conn_state m_state_client;                          ///< Client TLS connection state
+        tls_conn_state m_state_client_pending;                  ///< Client TLS connection state (pending)
+        tls_conn_state m_state_server;                          ///< Server TLS connection state
+        tls_conn_state m_state_server_pending;                  ///< Server TLS connection state (pending)
 
-        sanitizing_blob m_padding_hmac_client;                  ///< Padding (key) for client side HMAC calculation
-        sanitizing_blob m_padding_hmac_server;                  ///< Padding (key) for server side HMAC calculation
-        winstd::crypt_key m_key_client;                         ///< Key for encrypting messages
-        winstd::crypt_key m_key_server;                         ///< Key for decrypting messages
+        tls_master_secret m_master_secret;                      ///< TLS master secret
+        tls_random m_random_client;                             ///< Client random
+        tls_random m_random_server;                             ///< Server random
 
         tls_random m_key_mppe_client;                           ///< MS-MPPE-Recv-Key
         tls_random m_key_mppe_server;                           ///< MS-MPPE-Send-Key
@@ -586,7 +524,6 @@ namespace eap
 
         bool m_certificate_req;                                 ///< Did server request client certificate?
         bool m_server_hello_done;                               ///< Is server hello done?
-        bool m_cipher_spec;                                     ///< Did server specify cipher?
         bool m_server_finished;                                 ///< Did server send a valid finish message?
 
         unsigned __int64 m_seq_num_client;                      ///< Sequence number for encrypting

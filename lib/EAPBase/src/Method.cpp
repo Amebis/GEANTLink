@@ -36,31 +36,11 @@ eap::method::method(_In_ module &module, _In_ config_provider_list &cfg, _In_ cr
 }
 
 
-eap::method::method(_In_ const method &other) :
-    m_module(other.m_module),
-    m_cfg(other.m_cfg),
-    m_cred(other.m_cred)
-{
-}
-
-
 eap::method::method(_Inout_ method &&other) :
     m_module(other.m_module),
     m_cfg(other.m_cfg),
     m_cred(other.m_cred)
 {
-}
-
-
-eap::method& eap::method::operator=(_In_ const method &other)
-{
-    if (this != std::addressof(other)) {
-        assert(std::addressof(m_module) == std::addressof(other.m_module)); // Copy method within same module only!
-        assert(std::addressof(m_cfg   ) == std::addressof(other.m_cfg   )); // Copy method with same configuration only!
-        assert(std::addressof(m_cred  ) == std::addressof(other.m_cred  )); // Copy method with same credentials only!
-    }
-
-    return *this;
 }
 
 

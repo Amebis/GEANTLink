@@ -64,27 +64,11 @@ namespace eap
         method_ttls(_In_ module &module, _In_ config_provider_list &cfg, _In_ credentials_ttls &cred);
 
         ///
-        /// Copies an EAP method
-        ///
-        /// \param[in] other  EAP method to copy from
-        ///
-        method_ttls(_In_ const method_ttls &other);
-
-        ///
         /// Moves an EAP method
         ///
         /// \param[in] other  EAP method to move from
         ///
         method_ttls(_Inout_ method_ttls &&other);
-
-        ///
-        /// Copies an EAP method
-        ///
-        /// \param[in] other  EAP method to copy from
-        ///
-        /// \returns Reference to this object
-        ///
-        method_ttls& operator=(_In_ const method_ttls &other);
 
         ///
         /// Moves an EAP method

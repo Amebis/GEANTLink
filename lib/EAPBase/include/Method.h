@@ -56,12 +56,6 @@ namespace eap
         ///
         method(_In_ module &module, _In_ config_provider_list &cfg, _In_ credentials &cred);
 
-        ///
-        /// Copies an EAP method
-        ///
-        /// \param[in] other  EAP method to copy from
-        ///
-        method(_In_ const method &other);
 
         ///
         /// Moves an EAP method
@@ -69,15 +63,6 @@ namespace eap
         /// \param[in] other  EAP method to move from
         ///
         method(_Inout_ method &&other);
-
-        ///
-        /// Copies an EAP method
-        ///
-        /// \param[in] other  EAP method to copy from
-        ///
-        /// \returns Reference to this object
-        ///
-        method& operator=(_In_ const method &other);
 
         ///
         /// Moves an EAP method
@@ -138,6 +123,11 @@ namespace eap
             _Inout_ EapPeerMethodResult       *ppResult) = 0;
 
         /// @}
+
+    private:
+        // This class is noncopyable.
+        method(_In_ const method &other);
+        method& operator=(_In_ const method &other);
 
     public:
         module &m_module;               ///< EAP module

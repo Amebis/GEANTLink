@@ -36,30 +36,11 @@ eap::method_ttls::method_ttls(_In_ module &module, _In_ config_provider_list &cf
 }
 
 
-eap::method_ttls::method_ttls(_In_ const method_ttls &other) :
-    m_cred(other.m_cred),
-    m_version(other.m_version),
-    method_tls(other)
-{
-}
-
-
 eap::method_ttls::method_ttls(_Inout_ method_ttls &&other) :
     m_cred(other.m_cred),
     m_version(std::move(other.m_version)),
     method_tls(std::move(other))
 {
-}
-
-
-eap::method_ttls& eap::method_ttls::operator=(_In_ const method_ttls &other)
-{
-    if (this != std::addressof(other)) {
-        (method_tls&)*this = other;
-        m_version          = other.m_version;
-    }
-
-    return *this;
 }
 
 
@@ -94,15 +75,14 @@ void eap::method_ttls::process_request_packet(
 
         if (m_server_finished) {
             // Piggyback inner authentication.
-            if (!m_cipher_spec)
+            if (!m_state_client.m_alg_encrypt)
                 throw runtime_error(__FUNCTION__ " Refusing to send credentials unencrypted.");
 
             m_packet_res.m_code  = EapCodeResponse;
             m_packet_res.m_id    = m_packet_req.m_id;
             m_packet_res.m_flags = 0;
-            sanitizing_blob client(make_pap_client());
-            sanitizing_blob application(make_message(tls_message_type_application_data, client, m_cipher_spec));
-            m_packet_res.m_data.assign(application.begin(), application.end());
+            sanitizing_blob msg_application(make_message(tls_message_type_application_data, make_pap_client()));
+            m_packet_res.m_data.assign(msg_application.begin(), msg_application.end());
 
             pEapOutput->fAllowNotifications = FALSE;
             pEapOutput->action = EapPeerMethodResponseActionSend;
@@ -172,9 +152,9 @@ void eap::method_ttls::derive_msk()
     //
     static const unsigned char s_label[] = "ttls keying material";
     sanitizing_blob seed(s_label, s_label + _countof(s_label) - 1);
-    seed.insert(seed.end(), (const unsigned char*)&m_state.m_random_client, (const unsigned char*)(&m_state.m_random_client + 1));
-    seed.insert(seed.end(), (const unsigned char*)&m_state.m_random_server, (const unsigned char*)(&m_state.m_random_server + 1));
-    sanitizing_blob key_block(prf(m_cp, CALG_TLS1PRF, m_state.m_master_secret, seed, 2*sizeof(tls_random)));
+    seed.insert(seed.end(), (const unsigned char*)&m_random_client, (const unsigned char*)(&m_random_client + 1));
+    seed.insert(seed.end(), (const unsigned char*)&m_random_server, (const unsigned char*)(&m_random_server + 1));
+    sanitizing_blob key_block(prf(m_cp, CALG_TLS1PRF, m_master_secret, seed, 2*sizeof(tls_random)));
     const unsigned char *_key_block = key_block.data();
 
     // MSK: MPPE-Recv-Key

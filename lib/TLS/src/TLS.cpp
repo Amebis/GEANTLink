@@ -37,40 +37,7 @@ const eap::tls_version eap::tls_version_1_2 = { 3, 3 };
 // eap::tls_random
 //////////////////////////////////////////////////////////////////////
 
-eap::tls_random::tls_random()
-{
-    memset(data, 0, sizeof(data));
-}
-
-
-eap::tls_random::tls_random(_In_ const tls_random &other)
-{
-    memcpy(data, other.data, sizeof(data));
-}
-
-
-eap::tls_random::~tls_random()
-{
-    SecureZeroMemory(data, sizeof(data));
-}
-
-
-eap::tls_random& eap::tls_random::operator=(_In_ const tls_random &other)
-{
-    if (this != std::addressof(other))
-        memcpy(data, other.data, sizeof(data));
-
-    return *this;
-}
-
-
-void eap::tls_random::clear()
-{
-    memset(data, 0, sizeof(data));
-}
-
-
-void eap::tls_random::reset(_In_ HCRYPTPROV cp)
+void eap::tls_random::randomize(_In_ HCRYPTPROV cp)
 {
     _time32((__time32_t*)data);
     if (!CryptGenRandom(cp, sizeof(data) - sizeof(__time32_t), data + sizeof(__time32_t)))
@@ -84,7 +51,6 @@ void eap::tls_random::reset(_In_ HCRYPTPROV cp)
 
 eap::tls_master_secret::tls_master_secret()
 {
-    memset(data, 0, sizeof(data));
 }
 
 
@@ -98,30 +64,113 @@ eap::tls_master_secret::tls_master_secret(_In_ HCRYPTPROV cp, _In_ tls_version v
 }
 
 
-eap::tls_master_secret::tls_master_secret(_In_ const tls_master_secret &other)
+eap::tls_master_secret::tls_master_secret(_In_ const sanitizing_blob_f<48> &other) :
+    sanitizing_blob_xf<48>(other)
 {
-    memcpy(data, other.data, sizeof(data));
 }
 
 
-eap::tls_master_secret::~tls_master_secret()
+#ifdef _DEBUG
+
+eap::tls_master_secret::tls_master_secret(_Inout_ sanitizing_blob_zf<48> &&other) :
+    sanitizing_blob_xf<48>(std::move(other))
 {
-    SecureZeroMemory(data, sizeof(data));
+}
+
+#endif
+
+
+//////////////////////////////////////////////////////////////////////
+// eap::hmac_padding
+//////////////////////////////////////////////////////////////////////
+
+eap::hmac_padding::hmac_padding()
+{
 }
 
 
-eap::tls_master_secret& eap::tls_master_secret::operator=(_In_ const tls_master_secret &other)
+eap::hmac_padding::hmac_padding(
+            _In_                               HCRYPTPROV    cp,
+            _In_                               ALG_ID        alg,
+            _In_bytecount_(size_secret ) const void          *secret,
+            _In_                               size_t        size_secret,
+            _In_opt_                           unsigned char pad)
 {
-    if (this != std::addressof(other))
-        memcpy(data, other.data, sizeof(data));
-
-    return *this;
+    if (size_secret > sizeof(hmac_padding)) {
+        // If the secret is longer than padding, use secret's hash instead.
+        crypt_hash hash;
+        if (!hash.create(cp, alg))
+            throw win_runtime_error(__FUNCTION__ " Error creating hash.");
+        if (!CryptHashData(hash, (const BYTE*)secret, (DWORD)size_secret, 0))
+            throw win_runtime_error(__FUNCTION__ " Error hashing.");
+        DWORD size_hash = sizeof(hmac_padding);
+        if (!CryptGetHashParam(hash, HP_HASHVAL, data, &size_hash, 0))
+            throw win_runtime_error(__FUNCTION__ " Error finishing hash.");
+        size_secret = size_hash;
+    } else
+        memcpy(data, secret, size_secret);
+    for (size_t i = 0; i < size_secret; i++)
+        data[i] ^= pad;
+    memset(data + size_secret, pad, sizeof(hmac_padding) - size_secret);
 }
 
 
-void eap::tls_master_secret::clear()
+eap::hmac_padding::hmac_padding(_In_ const sanitizing_blob_f<64> &other) :
+    sanitizing_blob_xf<64>(other)
 {
-    memset(data, 0, sizeof(data));
+}
+
+
+#ifdef _DEBUG
+
+eap::hmac_padding::hmac_padding(_Inout_ sanitizing_blob_zf<64> &&other) :
+    sanitizing_blob_xf<64>(std::move(other))
+{
+}
+
+#endif
+
+
+//////////////////////////////////////////////////////////////////////
+// eap::hmac_hash
+//////////////////////////////////////////////////////////////////////
+
+eap::hmac_hash::hmac_hash(
+    _In_                               HCRYPTPROV cp,
+    _In_                               ALG_ID     alg,
+    _In_bytecount_(size_secret ) const void       *secret,
+    _In_                               size_t     size_secret)
+{
+    // Prepare inner padding and forward to the other constructor.
+    this->hmac_hash::hmac_hash(cp, alg, hmac_padding(cp, alg, secret, size_secret));
+}
+
+
+eap::hmac_hash::hmac_hash(
+    _In_       HCRYPTPROV   cp,
+    _In_       ALG_ID       alg,
+    _In_ const hmac_padding &padding)
+{
+    // Create inner hash.
+    if (!m_hash_inner.create(cp, alg))
+        throw win_runtime_error(__FUNCTION__ " Error creating inner hash.");
+
+    // Initialize it with the inner padding.
+    if (!CryptHashData(m_hash_inner, padding.data, sizeof(hmac_padding), 0))
+        throw win_runtime_error(__FUNCTION__ " Error hashing secret XOR inner padding.");
+
+    // Convert inner padding to outer padding for final calculation.
+    hmac_padding padding_out;
+    for (size_t i = 0; i < sizeof(hmac_padding); i++)
+        padding_out.data[i] = padding.data[i] ^ (0x36 ^ 0x5c);
+
+    // Create outer hash.
+    if (!m_hash_outer.create(cp, alg))
+        throw win_runtime_error(__FUNCTION__ " Error creating outer hash.");
+
+    // Initialize it with the outer padding.
+    if (!CryptHashData(m_hash_outer, padding_out.data, sizeof(hmac_padding), 0))
+        throw win_runtime_error(__FUNCTION__ " Error hashing secret XOR inner padding.");
 }
 
 
@@ -129,8 +178,10 @@ void eap::tls_master_secret::clear()
 // eap::tls_conn_state
 //////////////////////////////////////////////////////////////////////
 
-eap::tls_conn_state::tls_conn_state() :
-    m_alg_prf       (0),
+eap::tls_conn_state::tls_conn_state()
+#ifdef _DEBUG
+    // Initialize state primitive members for diagnostic purposes.
+    :
     m_alg_encrypt   (0),
     m_size_enc_key  (0),
     m_size_enc_iv   (0),
@@ -138,32 +189,61 @@ eap::tls_conn_state::tls_conn_state() :
     m_alg_mac       (0),
     m_size_mac_key  (0),
     m_size_mac_hash (0)
+#endif
 {
 }
 
 
 eap::tls_conn_state::tls_conn_state(_In_ const tls_conn_state &other) :
-    m_master_secret(other.m_master_secret),
-    m_random_client(other.m_random_client),
-    m_random_server(other.m_random_server)
+    m_alg_encrypt   (other.m_alg_encrypt   ),
+    m_size_enc_key  (other.m_size_enc_key  ),
+    m_size_enc_iv   (other.m_size_enc_iv   ),
+    m_size_enc_block(other.m_size_enc_block),
+    m_key           (other.m_key           ),
+    m_alg_mac       (other.m_alg_mac       ),
+    m_size_mac_key  (other.m_size_mac_key  ),
+    m_size_mac_hash (other.m_size_mac_hash ),
+    m_padding_hmac  (other.m_padding_hmac  )
 {
 }
 
 
 eap::tls_conn_state::tls_conn_state(_Inout_ tls_conn_state &&other) :
-    m_master_secret(std::move(other.m_master_secret)),
-    m_random_client(std::move(other.m_random_client)),
-    m_random_server(std::move(other.m_random_server))
+    m_alg_encrypt   (std::move(other.m_alg_encrypt   )),
+    m_size_enc_key  (std::move(other.m_size_enc_key  )),
+    m_size_enc_iv   (std::move(other.m_size_enc_iv   )),
+    m_size_enc_block(std::move(other.m_size_enc_block)),
+    m_key           (std::move(other.m_key           )),
+    m_alg_mac       (std::move(other.m_alg_mac       )),
+    m_size_mac_key  (std::move(other.m_size_mac_key  )),
+    m_size_mac_hash (std::move(other.m_size_mac_hash )),
+    m_padding_hmac  (std::move(other.m_padding_hmac  ))
 {
+#ifdef _DEBUG
+    // Reinitialize other state primitive members for diagnostic purposes.
+    other.m_alg_encrypt    = 0;
+    other.m_size_enc_key   = 0;
+    other.m_size_enc_iv    = 0;
+    other.m_size_enc_block = 0;
+    other.m_alg_mac        = 0;
+    other.m_size_mac_key   = 0;
+    other.m_size_mac_hash  = 0;
+#endif
 }
 
 
 eap::tls_conn_state& eap::tls_conn_state::operator=(_In_ const tls_conn_state &other)
 {
     if (this != std::addressof(other)) {
-        m_master_secret = other.m_master_secret;
-        m_random_client = other.m_random_client;
-        m_random_server = other.m_random_server;
+        m_alg_encrypt    = other.m_alg_encrypt   ;
+        m_size_enc_key   = other.m_size_enc_key  ;
+        m_size_enc_iv    = other.m_size_enc_iv   ;
+        m_size_enc_block = other.m_size_enc_block;
+        m_key            = other.m_key           ;
+        m_alg_mac        = other.m_alg_mac       ;
+        m_size_mac_key   = other.m_size_mac_key  ;
+        m_size_mac_hash  = other.m_size_mac_hash ;
+        m_padding_hmac   = other.m_padding_hmac  ;
     }
 
     return *this;
@@ -173,83 +253,27 @@ eap::tls_conn_state& eap::tls_conn_state::operator=(_In_ const tls_conn_state &o
 eap::tls_conn_state& eap::tls_conn_state::operator=(_Inout_ tls_conn_state &&other)
 {
     if (this != std::addressof(other)) {
-        m_master_secret = std::move(other.m_master_secret);
-        m_random_client = std::move(other.m_random_client);
-        m_random_server = std::move(other.m_random_server);
+        m_alg_encrypt    = std::move(other.m_alg_encrypt   );
+        m_size_enc_key   = std::move(other.m_size_enc_key  );
+        m_size_enc_iv    = std::move(other.m_size_enc_iv   );
+        m_size_enc_block = std::move(other.m_size_enc_block);
+        m_key            = std::move(other.m_key           );
+        m_alg_mac        = std::move(other.m_alg_mac       );
+        m_size_mac_key   = std::move(other.m_size_mac_key  );
+        m_size_mac_hash  = std::move(other.m_size_mac_hash );
+        m_padding_hmac   = std::move(other.m_padding_hmac  );
+
+#ifdef _DEBUG
+        // Reinitialize other state primitive members for diagnostic purposes.
+        other.m_alg_encrypt    = 0;
+        other.m_size_enc_key   = 0;
+        other.m_size_enc_iv    = 0;
+        other.m_size_enc_block = 0;
+        other.m_alg_mac        = 0;
+        other.m_size_mac_key   = 0;
+        other.m_size_mac_hash  = 0;
+#endif
     }
 
     return *this;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// eap::hash_hmac
-//////////////////////////////////////////////////////////////////////
-
-eap::hash_hmac::hash_hmac(
-    _In_                               HCRYPTPROV cp,
-    _In_                               ALG_ID     alg,
-    _In_bytecount_(size_secret ) const void       *secret,
-    _In_                               size_t     size_secret)
-{
-    // Prepare padding.
-    sanitizing_blob padding(sizeof(padding_t));
-    inner_padding(cp, alg, secret, size_secret, padding.data());
-
-    // Continue with the other constructor.
-    this->hash_hmac::hash_hmac(cp, alg, padding.data());
-}
-
-
-eap::hash_hmac::hash_hmac(
-    _In_       HCRYPTPROV cp,
-    _In_       ALG_ID     alg,
-    _In_ const padding_t  padding)
-{
-    // Create inner hash.
-    if (!m_hash_inner.create(cp, alg))
-        throw win_runtime_error(__FUNCTION__ " Error creating inner hash.");
-
-    // Initialize it with the inner padding.
-    if (!CryptHashData(m_hash_inner, padding, sizeof(padding_t), 0))
-        throw win_runtime_error(__FUNCTION__ " Error hashing secret XOR inner padding.");
-
-    // Convert inner padding to outer padding for final calculation.
-    padding_t padding_out;
-    for (size_t i = 0; i < sizeof(padding_t); i++)
-        padding_out[i] = padding[i] ^ (0x36 ^ 0x5c);
-
-    // Create outer hash.
-    if (!m_hash_outer.create(cp, alg))
-        throw win_runtime_error(__FUNCTION__ " Error creating outer hash.");
-
-    // Initialize it with the outer padding.
-    if (!CryptHashData(m_hash_outer, padding_out, sizeof(padding_t), 0))
-        throw win_runtime_error(__FUNCTION__ " Error hashing secret XOR inner padding.");
-}
-
-
-void eap::hash_hmac::inner_padding(
-    _In_                               HCRYPTPROV cp,
-    _In_                               ALG_ID     alg,
-    _In_bytecount_(size_secret ) const void       *secret,
-    _In_                               size_t     size_secret,
-    _Out_                              padding_t  padding)
-{
-    if (size_secret > sizeof(padding_t)) {
-        // If the secret is longer than padding, use secret's hash instead.
-        crypt_hash hash;
-        if (!hash.create(cp, alg))
-            throw win_runtime_error(__FUNCTION__ " Error creating hash.");
-        if (!CryptHashData(hash, (const BYTE*)secret, (DWORD)size_secret, 0))
-            throw win_runtime_error(__FUNCTION__ " Error hashing.");
-        DWORD size_hash = sizeof(padding_t);
-        if (!CryptGetHashParam(hash, HP_HASHVAL, padding, &size_hash, 0))
-            throw win_runtime_error(__FUNCTION__ " Error finishing hash.");
-        size_secret = size_hash;
-    } else
-        memcpy(padding, secret, size_secret);
-    for (size_t i = 0; i < size_secret; i++)
-        padding[i] ^= 0x36;
-    memset(padding + size_secret, 0x36, sizeof(padding_t) - size_secret);
 }
