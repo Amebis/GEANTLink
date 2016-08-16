@@ -580,9 +580,9 @@ namespace eap
 
         std::list<winstd::cert_context> m_server_cert_chain;    ///< Server certificate chain
 
-        winstd::crypt_hash m_hash_handshake_msgs_md5;           ///< Running MD5 hash of handshake messages sent
-        winstd::crypt_hash m_hash_handshake_msgs_sha1;          ///< Running SHA-1 hash of handshake messages sent
-        winstd::crypt_hash m_hash_handshake_msgs_sha256;        ///< Running SHA-256 hash of handshake messages sent
+        winstd::crypt_hash m_hash_handshake_msgs_md5;           ///< Running MD5 hash of handshake messages
+        winstd::crypt_hash m_hash_handshake_msgs_sha1;          ///< Running SHA-1 hash of handshake messages
+        winstd::crypt_hash m_hash_handshake_msgs_sha256;        ///< Running SHA-256 hash of handshake messages
 
         bool m_certificate_req;                                 ///< Did server request client certificate?
         bool m_server_hello_done;                               ///< Is server hello done?
