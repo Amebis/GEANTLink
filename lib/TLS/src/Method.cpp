@@ -216,6 +216,7 @@ void eap::method_tls::begin_session(
     const config_method_tls *cfg_method = dynamic_cast<const config_method_tls*>(cfg_prov.m_methods.front().get());
     assert(cfg_method);
 
+    // Restore previous session ID and master secret. We might get lucky.
     m_session_id = cfg_method->m_session_id;
     m_master_secret = cfg_method->m_master_secret;
 }
@@ -248,7 +249,7 @@ void eap::method_tls::process_request_packet(
         packet_data_size = dwReceivedPacketSize - 6;
     }
 
-    // Do the TLS defragmentation.
+    // Do the EAP-TLS defragmentation.
     if (pReceivedPacket->Data[1] & flags_req_more_frag) {
         if (m_packet_req.m_data.empty()) {
             // Start a new packet.
@@ -310,7 +311,7 @@ void eap::method_tls::process_request_packet(
     m_packet_res.m_flags = 0;
 
     if (pReceivedPacket->Code == EapCodeRequest && (m_packet_req.m_flags & flags_req_start)) {
-        // This is the TLS start message: (re)initialize method.
+        // This is the EAP-TLS start message: (re)initialize method.
         m_module.log_event(&EAPMETHOD_TLS_HANDSHAKE_START2, event_data((unsigned int)eap_type_tls), event_data::blank);
 
         m_key_mppe_client.clear();
@@ -433,7 +434,7 @@ void eap::method_tls::process_request_packet(
         }
     }
 
-    // Request packet was processed. Clear its data since we use the absence of data to detect first of fragmented message packages.
+    // EAP-Request packet was processed. Clear its data since we use the absence of data to detect first of fragmented message packages.
     m_packet_req.m_data.clear();
 
     pEapOutput->fAllowNotifications = FALSE;
@@ -512,7 +513,7 @@ void eap::method_tls::get_result(
         if (!m_server_finished)
             throw invalid_argument(__FUNCTION__ " Premature success.");
 
-        // Derive MSK.
+        // Derive MSK/EMSK for line encryption.
         derive_msk();
 
         // Fill array with RADIUS attributes.
@@ -582,19 +583,23 @@ eap::sanitizing_blob eap::method_tls::make_client_hello()
         0x00, 0x2f, // TLS_RSA_WITH_AES_128_CBC_SHA (required by TLS 1.2)
         0x00, 0x0a, // TLS_RSA_WITH_3DES_EDE_CBC_SHA (required by EAP-TLS)
     };
+    static const unsigned char s_compression_suite[] = {
+        0x00, // No compression
+    };
+
     size_t size_data;
     sanitizing_blob msg;
     msg.reserve(
-        4                      + // SSL header
+        4                            + // SSL header
         (size_data =
-        2                      + // SSL version
-        sizeof(tls_random)     + // Client random
-        1                      + // Session ID size
-        m_session_id.size()    + // Session ID
-        2                      + // Length of cypher suite list
-        sizeof(s_cipher_suite) + // Cipher suite list
-        1                      + // Length of compression suite
-        1));                     // Compression suite
+        2                            + // SSL version
+        sizeof(tls_random)           + // Client random
+        1                            + // Session ID size
+        m_session_id.size()          + // Session ID
+        2                            + // Length of cypher suite list
+        sizeof(s_cipher_suite)       + // Cipher suite list
+        1                            + // Length of compression suite
+        sizeof(s_compression_suite))); // Compression suite
 
     // SSL header
     assert(size_data <= 0xffffff);
@@ -619,8 +624,8 @@ eap::sanitizing_blob eap::method_tls::make_client_hello()
     msg.insert(msg.end(), s_cipher_suite, s_cipher_suite + _countof(s_cipher_suite));
 
     // Compression
-    msg.push_back(0x01); // Length of compression section
-    msg.push_back(0x00); // No compression (0)
+    msg.push_back((unsigned char)sizeof(s_compression_suite));
+    msg.insert(msg.end(), s_compression_suite, s_compression_suite + _countof(s_compression_suite));
 
     return msg;
 }
@@ -667,7 +672,7 @@ eap::sanitizing_blob eap::method_tls::make_client_cert() const
 
 eap::sanitizing_blob eap::method_tls::make_client_key_exchange(_In_ const tls_master_secret &pms) const
 {
-    // Encrypt pre-master key first.
+    // Encrypt pre-master key with server public key first.
     sanitizing_blob pms_enc((const unsigned char*)&pms, (const unsigned char*)(&pms + 1));
     crypt_key key;
     if (!key.import_public(m_cp_enc, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, &(m_server_cert_chain.front()->pCertInfo->SubjectPublicKeyInfo)))
@@ -819,7 +824,7 @@ void eap::method_tls::process_packet(_In_bytecount_(size_pck) const void *_pck, 
             throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Incomplete message data.");
 
         if (hdr->version >= tls_version_1_0) {
-            // Process TLS 1.0 message.
+            // Process TLS message.
             switch (hdr->type) {
             case tls_message_type_change_cipher_spec:
                 process_change_cipher_spec(msg, msg_end - msg);

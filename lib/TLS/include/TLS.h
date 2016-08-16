@@ -512,28 +512,3 @@ namespace eap
         hmac_padding m_padding_hmac;    ///< Padding (key) for HMAC calculation
     };
 }
-
-
-//inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const eap::tls_conn_state &val)
-//{
-//    cursor << val.m_master_secret;
-//    cursor << val.m_random_client;
-//    cursor << val.m_random_server;
-//}
-//
-//
-//inline size_t pksizeof(_In_ const eap::tls_conn_state &val)
-//{
-//    return
-//        pksizeof(val.m_master_secret) +
-//        pksizeof(val.m_random_client) +
-//        pksizeof(val.m_random_server);
-//}
-//
-//
-//inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ eap::tls_conn_state &val)
-//{
-//    cursor >> val.m_master_secret;
-//    cursor >> val.m_random_client;
-//    cursor >> val.m_random_server;
-//}
