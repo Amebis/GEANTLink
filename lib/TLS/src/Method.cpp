@@ -1443,7 +1443,7 @@ HCRYPTKEY eap::method_tls::create_key(
     _In_bytecount_(size_secret) const void      *secret,
     _In_                              size_t    size_secret)
 {
-#if 0
+#if 1
     UNREFERENCED_PARAMETER(key);
     assert(size_secret <= 0xffffffff);
 
