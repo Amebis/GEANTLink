@@ -217,9 +217,9 @@ void eap::method_tls::begin_session(
     const config_method_tls *cfg_method = dynamic_cast<const config_method_tls*>(cfg_prov.m_methods.front().get());
     assert(cfg_method);
 
-    // Restore previous session ID and master secret. We might get lucky.
-    m_session_id = cfg_method->m_session_id;
-    m_master_secret = cfg_method->m_master_secret;
+    //// Restore previous session ID and master secret. We might get lucky.
+    //m_session_id = cfg_method->m_session_id;
+    //m_master_secret = cfg_method->m_master_secret;
 }
 
 
@@ -874,6 +874,9 @@ void eap::method_tls::process_change_cipher_spec(_In_bytecount_(msg_size) const 
 
     m_module.log_event(&EAPMETHOD_TLS_CHANGE_CIPHER_SPEC, event_data((unsigned int)eap_type_tls), event_data::blank);
 
+    if (!m_state_server_pending.m_alg_encrypt)
+        throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Change cipher spec received without cipher being negotiated first.");
+
     static const unsigned char s_label[] = "key expansion";
     sanitizing_blob seed(s_label, s_label + _countof(s_label) - 1);
     seed.insert(seed.end(), (const unsigned char*)&m_random_server, (const unsigned char*)(&m_random_server + 1));
@@ -910,6 +913,7 @@ void eap::method_tls::process_change_cipher_spec(_In_bytecount_(msg_size) const 
 
     // Accept server pending state as current server state.
     m_state_server = std::move(m_state_server_pending);
+    m_state_server_pending.m_alg_encrypt = 0; // Explicitly invalidate server pending state. (To mark that server must re-negotiate cipher.)
 }
 
 
