@@ -812,7 +812,12 @@ void eap::method_tls::process_packet(_In_bytecount_(size_pck) const void *_pck, 
             // Process TLS message.
             switch (hdr->type) {
             case tls_message_type_change_cipher_spec:
-                process_change_cipher_spec(msg, msg_end - msg);
+                if (m_state_server.m_alg_encrypt) {
+                    sanitizing_blob msg_dec(msg, msg_end);
+                    decrypt_message(hdr->type, msg_dec);
+                    process_change_cipher_spec(msg_dec.data(), msg_dec.size());
+                } else
+                    process_change_cipher_spec(msg, msg_end - msg);
                 break;
 
             case tls_message_type_alert:
