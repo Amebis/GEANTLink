@@ -113,7 +113,7 @@ namespace eap
         /// - \c true  if credentials were set;
         /// - \c false otherwise
         ///
-        bool combine(
+        source_t combine(
             _In_       const credentials_pap   *cred_cached,
             _In_       const config_method_pap &cfg,
             _In_opt_z_       LPCTSTR           pszTargetName);

@@ -95,6 +95,7 @@ void eap::method_tls::packet::clear()
 
 eap::method_tls::method_tls(_In_ module &module, _In_ config_provider_list &cfg, _In_ credentials_tls &cred) :
     m_cred(cred),
+    m_phase(phase_unknown),
     m_seq_num_client(0),
     m_seq_num_server(0),
     m_blob_cfg(NULL),
@@ -113,7 +114,8 @@ eap::method_tls::method_tls(_Inout_ method_tls &&other) :
     m_packet_req                (std::move(other.m_packet_req                )),
     m_packet_res                (std::move(other.m_packet_res                )),
     m_cp                        (std::move(other.m_cp                        )),
-    m_cp_enc                    (std::move(other.m_cp_enc                    )),
+    m_cp_enc_client             (std::move(other.m_cp_enc_client             )),
+    m_cp_enc_server             (std::move(other.m_cp_enc_server             )),
     m_key_exp1                  (std::move(other.m_key_exp1                  )),
     m_tls_version               (std::move(other.m_tls_version               )),
     m_alg_prf                   (std::move(other.m_alg_prf                   )),
@@ -131,6 +133,7 @@ eap::method_tls::method_tls(_Inout_ method_tls &&other) :
     m_hash_handshake_msgs_md5   (std::move(other.m_hash_handshake_msgs_md5   )),
     m_hash_handshake_msgs_sha1  (std::move(other.m_hash_handshake_msgs_sha1  )),
     m_hash_handshake_msgs_sha256(std::move(other.m_hash_handshake_msgs_sha256)),
+    m_phase                     (std::move(other.m_phase                     )),
     m_seq_num_client            (std::move(other.m_seq_num_client            )),
     m_seq_num_server            (std::move(other.m_seq_num_server            )),
     method                      (std::move(other                             ))
@@ -162,7 +165,8 @@ eap::method_tls& eap::method_tls::operator=(_Inout_ method_tls &&other)
         m_packet_req                 = std::move(other.m_packet_req                );
         m_packet_res                 = std::move(other.m_packet_res                );
         m_cp                         = std::move(other.m_cp                        );
-        m_cp_enc                     = std::move(other.m_cp_enc                    );
+        m_cp_enc_client              = std::move(other.m_cp_enc_client             );
+        m_cp_enc_server              = std::move(other.m_cp_enc_server             );
         m_key_exp1                   = std::move(other.m_key_exp1                  );
         m_tls_version                = std::move(other.m_tls_version               );
         m_alg_prf                    = std::move(other.m_alg_prf                   );
@@ -180,6 +184,7 @@ eap::method_tls& eap::method_tls::operator=(_Inout_ method_tls &&other)
         m_hash_handshake_msgs_md5    = std::move(other.m_hash_handshake_msgs_md5   );
         m_hash_handshake_msgs_sha1   = std::move(other.m_hash_handshake_msgs_sha1  );
         m_hash_handshake_msgs_sha256 = std::move(other.m_hash_handshake_msgs_sha256);
+        m_phase                      = std::move(other.m_phase                     );
         m_seq_num_client             = std::move(other.m_seq_num_client            );
         m_seq_num_server             = std::move(other.m_seq_num_server            );
 
@@ -201,7 +206,7 @@ void eap::method_tls::begin_session(
 {
     method::begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
 
-    // Create cryptographics provider.
+    // Create cryptographics provider for support needs (handshake hashing, client random, temporary keys...).
     if (!m_cp.create(NULL, NULL, PROV_RSA_AES))
         throw win_runtime_error(__FUNCTION__ " Error creating cryptographics provider.");
 
@@ -217,9 +222,9 @@ void eap::method_tls::begin_session(
     const config_method_tls *cfg_method = dynamic_cast<const config_method_tls*>(cfg_prov.m_methods.front().get());
     assert(cfg_method);
 
-    //// Restore previous session ID and master secret. We might get lucky.
-    //m_session_id = cfg_method->m_session_id;
-    //m_master_secret = cfg_method->m_master_secret;
+    // Restore previous session ID and master secret. We might get lucky.
+    m_session_id = cfg_method->m_session_id;
+    m_master_secret = cfg_method->m_master_secret;
 }
 
 
@@ -314,6 +319,17 @@ void eap::method_tls::process_request_packet(
     if (pReceivedPacket->Code == EapCodeRequest && (m_packet_req.m_flags & flags_req_start)) {
         // This is the EAP-TLS start message: (re)initialize method.
         m_module.log_event(&EAPMETHOD_TLS_HANDSHAKE_START2, event_data((unsigned int)eap_type_tls), event_data::blank);
+        m_phase = phase_client_hello;
+    } else {
+        // Process the packet.
+        memset(m_handshake, 0, sizeof(m_handshake));
+        m_packet_res.m_data.clear();
+        process_packet(m_packet_req.m_data.data(), m_packet_req.m_data.size());
+    }
+
+    switch (m_phase) {
+    case phase_client_hello: {
+        m_tls_version = tls_version_1_2;
 
         m_key_mppe_client.clear();
         m_key_mppe_server.clear();
@@ -328,109 +344,122 @@ void eap::method_tls::process_request_packet(
         if (!m_hash_handshake_msgs_sha256.create(m_cp, CALG_SHA_256))
             throw win_runtime_error(__FUNCTION__ " Error creating SHA-256 hashing object.");
 
-        memset(m_handshake, 0, sizeof(m_handshake));
-
         m_seq_num_client = 0;
         m_seq_num_server = 0;
 
         // Build client hello packet.
         sanitizing_blob msg_client_hello(make_message(tls_message_type_handshake, make_client_hello()));
-        m_packet_res.m_data.assign(msg_client_hello.begin(), msg_client_hello.end());
-    } else {
-        // Process the packet.
-        m_packet_res.m_data.clear();
-        process_packet(m_packet_req.m_data.data(), m_packet_req.m_data.size());
+        m_packet_res.m_data.insert(m_packet_res.m_data.end(), msg_client_hello.begin(), msg_client_hello.end());
 
-        if (m_handshake[tls_handshake_type_finished]) {
-            // Server finished.
-        } else if (m_state_server.m_alg_encrypt) {
-            // Cipher specified (server).
-        } else if (m_handshake[tls_handshake_type_server_hello_done]) {
-            // Server hello specified.
+        m_phase = phase_server_hello;
+        break;
+    }
 
-            // Create cryptographics provider (based on server selected cipher?).
-            if (!m_cp_enc.create(NULL, NULL, PROV_RSA_AES))
-                throw win_runtime_error(__FUNCTION__ " Error creating cryptographics provider.");
+    case phase_server_hello: {
+        if (!m_handshake[tls_handshake_type_server_hello])
+            throw win_runtime_error(__FUNCTION__ " Server did not hello back. No server random! What cipher to use?");
 
+        // Create cryptographics provider (based on server selected cipher?).
+        if (!m_cp_enc_client.create(NULL, NULL, PROV_RSA_AES))
+            throw win_runtime_error(__FUNCTION__ " Error creating cryptographics provider.");
+
+        if (m_handshake[tls_handshake_type_certificate]) {
             // Do we trust this server?
             if (m_server_cert_chain.empty())
-                throw win_runtime_error(ERROR_ENCRYPTION_FAILED, __FUNCTION__ " Can not continue without server's certificate.");
+                throw win_runtime_error(ERROR_ENCRYPTION_FAILED, __FUNCTION__ " Server sent an empty certificate (chain).");
             verify_server_trust();
-
-            if (m_handshake[tls_handshake_type_certificate_request]) {
-                // Client certificate requested.
-                sanitizing_blob msg_client_cert(make_message(tls_message_type_handshake, make_client_cert()));
-                m_packet_res.m_data.insert(m_packet_res.m_data.end(), msg_client_cert.begin(), msg_client_cert.end());
-            }
-
-            {
-                // Generate pre-master secret. PMS will get sanitized in its destructor when going out-of-scope.
-                tls_master_secret pms(m_cp_enc, m_tls_version);
-
-                // Derive master secret.
-                static const unsigned char s_label[] = "master secret";
-                sanitizing_blob seed(s_label, s_label + _countof(s_label) - 1);
-                seed.insert(seed.end(), (const unsigned char*)&m_random_client, (const unsigned char*)(&m_random_client + 1));
-                seed.insert(seed.end(), (const unsigned char*)&m_random_server, (const unsigned char*)(&m_random_server + 1));
-                memcpy(&m_master_secret, prf(m_cp_enc, m_alg_prf, pms, seed, sizeof(tls_master_secret)).data(), sizeof(tls_master_secret));
-
-                // Create client key exchange message, and append to packet.
-                sanitizing_blob msg_client_key_exchange(make_message(tls_message_type_handshake, make_client_key_exchange(pms)));
-                m_packet_res.m_data.insert(m_packet_res.m_data.end(), msg_client_key_exchange.begin(), msg_client_key_exchange.end());
-            }
-
-            if (m_handshake[tls_handshake_type_certificate_request]) {
-                // TODO: Create and append certificate_verify message!
-            }
-
-            // Append change cipher spec to packet.
-            sanitizing_blob ccs(make_message(tls_message_type_change_cipher_spec, sanitizing_blob(1, 1)));
-            m_packet_res.m_data.insert(m_packet_res.m_data.end(), ccs.begin(), ccs.end());
-
-            {
-                // Adopt server provided pending state as client pending.
-                m_state_client_pending = m_state_server_pending;
-
-                // Derive client side keys
-                static const unsigned char s_label[] = "key expansion";
-                sanitizing_blob seed(s_label, s_label + _countof(s_label) - 1);
-                seed.insert(seed.end(), (const unsigned char*)&m_random_server, (const unsigned char*)(&m_random_server + 1));
-                seed.insert(seed.end(), (const unsigned char*)&m_random_client, (const unsigned char*)(&m_random_client + 1));
-                sanitizing_blob key_block(prf(m_cp_enc, m_alg_prf, m_master_secret, seed,
-                    2*m_state_client_pending.m_size_mac_key +  // client_write_MAC_secret & server_write_MAC_secret (SHA1)
-                    2*m_state_client_pending.m_size_enc_key +  // client_write_key        & server_write_key
-                    2*m_state_client_pending.m_size_enc_iv )); // client_write_IV         & server_write_IV
-                const unsigned char *_key_block = key_block.data();
-
-                // client_write_MAC_secret
-                m_state_client_pending.m_padding_hmac = hmac_padding(m_cp_enc, m_state_client_pending.m_alg_mac, _key_block, m_state_client_pending.m_size_mac_key);
-                _key_block += m_state_client_pending.m_size_mac_key;
-
-                // server_write_MAC_secret
-                _key_block += m_state_client_pending.m_size_mac_key;
-
-                // client_write_key
-                m_state_client_pending.m_key = create_key(m_state_client_pending.m_alg_encrypt, m_key_exp1, _key_block, m_state_client_pending.m_size_enc_key);
-                _key_block += m_state_client_pending.m_size_enc_key;
-
-                // server_write_key
-                _key_block += m_state_client_pending.m_size_enc_key;
-
-                if (m_state_client_pending.m_size_enc_iv && m_tls_version < tls_version_1_1) {
-                    // client_write_IV
-                    if (!CryptSetKeyParam(m_state_client_pending.m_key, KP_IV, _key_block, 0))
-                        throw win_runtime_error(__FUNCTION__ " Error setting client_write_IV.");
-                    _key_block += m_state_client_pending.m_size_enc_iv;
-                }
-
-                // Accept client pending state as current client state.
-                m_state_client = std::move(m_state_client_pending);
-            }
-
-            // Create finished message, and append to packet.
-            sanitizing_blob msg_finished(make_message(tls_message_type_handshake, make_finished()));
-            m_packet_res.m_data.insert(m_packet_res.m_data.end(), msg_finished.begin(), msg_finished.end());
         }
+
+        if (m_handshake[tls_handshake_type_certificate_request]) {
+            // Client certificate requested.
+            sanitizing_blob msg_client_cert(make_message(tls_message_type_handshake, make_client_cert()));
+            m_packet_res.m_data.insert(m_packet_res.m_data.end(), msg_client_cert.begin(), msg_client_cert.end());
+        }
+
+        if (m_handshake[tls_handshake_type_server_hello_done]) {
+            if (m_server_cert_chain.empty())
+                throw win_runtime_error(ERROR_ENCRYPTION_FAILED, __FUNCTION__ " Can not do a client key exchange without a server public key (missing server certificate).");
+
+            // Generate pre-master secret. PMS will get sanitized in its destructor when going out-of-scope.
+            // Always use latest supported version by client (not negotiated one, to detect version rollback attacks).
+            tls_master_secret pms(m_cp_enc_client, tls_version_1_2);
+
+            // Derive master secret.
+            static const unsigned char s_label[] = "master secret";
+            sanitizing_blob seed(s_label, s_label + _countof(s_label) - 1);
+            seed.insert(seed.end(), (const unsigned char*)&m_random_client, (const unsigned char*)(&m_random_client + 1));
+            seed.insert(seed.end(), (const unsigned char*)&m_random_server, (const unsigned char*)(&m_random_server + 1));
+            memcpy(&m_master_secret, prf(m_cp_enc_client, m_alg_prf, pms, seed, sizeof(tls_master_secret)).data(), sizeof(tls_master_secret));
+
+            // Create client key exchange message, and append to packet.
+            sanitizing_blob msg_client_key_exchange(make_message(tls_message_type_handshake, make_client_key_exchange(pms)));
+            m_packet_res.m_data.insert(m_packet_res.m_data.end(), msg_client_key_exchange.begin(), msg_client_key_exchange.end());
+        }
+
+        if (m_handshake[tls_handshake_type_certificate_request]) {
+            // TODO: Create and append client certificate verify message!
+        }
+
+        // Append change cipher spec to packet.
+        sanitizing_blob ccs(make_message(tls_message_type_change_cipher_spec, sanitizing_blob(1, 1)));
+        m_packet_res.m_data.insert(m_packet_res.m_data.end(), ccs.begin(), ccs.end());
+
+        // Adopt server state as client pending.
+        // If server already send the change cipher spec, use active server state. Otherwise pending.
+        m_state_client_pending = m_state_server.m_alg_encrypt ? m_state_server : m_state_server_pending;
+
+        // Derive client side keys.
+        static const unsigned char s_label[] = "key expansion";
+        sanitizing_blob seed(s_label, s_label + _countof(s_label) - 1);
+        seed.insert(seed.end(), (const unsigned char*)&m_random_server, (const unsigned char*)(&m_random_server + 1));
+        seed.insert(seed.end(), (const unsigned char*)&m_random_client, (const unsigned char*)(&m_random_client + 1));
+        sanitizing_blob key_block(prf(m_cp_enc_client, m_alg_prf, m_master_secret, seed,
+            2*m_state_client_pending.m_size_mac_key +  // client_write_MAC_secret & server_write_MAC_secret (SHA1)
+            2*m_state_client_pending.m_size_enc_key +  // client_write_key        & server_write_key
+            2*m_state_client_pending.m_size_enc_iv )); // client_write_IV         & server_write_IV
+        const unsigned char *_key_block = key_block.data();
+
+        // client_write_MAC_secret
+        m_state_client_pending.m_padding_hmac = hmac_padding(m_cp_enc_client, m_state_client_pending.m_alg_mac, _key_block, m_state_client_pending.m_size_mac_key);
+        _key_block += m_state_client_pending.m_size_mac_key;
+
+        // server_write_MAC_secret
+        _key_block += m_state_client_pending.m_size_mac_key;
+
+        // client_write_key
+        m_state_client_pending.m_key = create_key(m_cp_enc_client, m_state_client_pending.m_alg_encrypt, m_key_exp1, _key_block, m_state_client_pending.m_size_enc_key);
+        _key_block += m_state_client_pending.m_size_enc_key;
+
+        // server_write_key
+        _key_block += m_state_client_pending.m_size_enc_key;
+
+        if (m_state_client_pending.m_size_enc_iv && m_tls_version < tls_version_1_1) {
+            // client_write_IV
+            if (!CryptSetKeyParam(m_state_client_pending.m_key, KP_IV, _key_block, 0))
+                throw win_runtime_error(__FUNCTION__ " Error setting client_write_IV.");
+            _key_block += m_state_client_pending.m_size_enc_iv;
+        }
+
+        // Accept client pending state as current client state.
+        m_state_client = std::move(m_state_client_pending);
+
+        // Create finished message, and append to packet.
+        sanitizing_blob msg_finished(make_message(tls_message_type_handshake, make_finished()));
+        m_packet_res.m_data.insert(m_packet_res.m_data.end(), msg_finished.begin(), msg_finished.end());
+
+        m_phase = m_handshake[tls_handshake_type_finished] ? phase_application_data : phase_change_cipher_spec;
+        break;
+    }
+
+    case phase_change_cipher_spec:
+        // Wait in this phase until server sends change cipher spec and finish.
+        if (m_state_server.m_alg_encrypt && m_handshake[tls_handshake_type_finished])
+            m_phase = phase_application_data;
+        break;
+
+    case phase_application_data:
+        if (m_handshake[tls_handshake_type_hello_request])
+            m_phase = phase_client_hello;
     }
 
     // EAP-Request packet was processed. Clear its data since we use the absence of data to detect first of fragmented message packages.
@@ -512,6 +541,8 @@ void eap::method_tls::get_result(
         if (!m_handshake[tls_handshake_type_finished])
             throw invalid_argument(__FUNCTION__ " Premature success.");
 
+        m_module.log_event(&EAPMETHOD_TLS_SUCCESS, event_data((unsigned int)eap_type_tls), event_data::blank);
+
         // Derive MSK/EMSK for line encryption.
         derive_msk();
 
@@ -530,7 +561,7 @@ void eap::method_tls::get_result(
         ppResult->pAttribArray = &m_eap_attr_desc;
 
         // Clear credentials as failed.
-        cfg_method->m_cred_failed = false;
+        cfg_method->m_auth_failed = false;
 
         ppResult->fIsSuccess = TRUE;
         ppResult->dwFailureReasonCode = ERROR_SUCCESS;
@@ -543,15 +574,19 @@ void eap::method_tls::get_result(
     }
 
     case EapPeerMethodResultFailure:
+        m_module.log_event(&EAPMETHOD_TLS_FAILURE, event_data((unsigned int)eap_type_tls), event_data::blank);
+
         // Clear session resumption data.
         cfg_method->m_session_id.clear();
         cfg_method->m_master_secret.clear();
 
         // Mark credentials as failed, so GUI can re-prompt user.
-        cfg_method->m_cred_failed = true;
+        cfg_method->m_auth_failed = true;
 
-        ppResult->fIsSuccess = FALSE;
-        ppResult->dwFailureReasonCode = EAP_E_AUTHENTICATION_FAILED;
+        // Do not report failure to EAPHost, as it will not save updated configuration then. But we need it to save it, to alert user on next connection attempt.
+        // EAPHost is well aware of the failed condition.
+        //ppResult->fIsSuccess = FALSE;
+        //ppResult->dwFailureReasonCode = EAP_E_AUTHENTICATION_FAILED;
 
         break;
 
@@ -674,7 +709,7 @@ eap::sanitizing_blob eap::method_tls::make_client_key_exchange(_In_ const tls_ma
     // Encrypt pre-master key with server public key first.
     sanitizing_blob pms_enc((const unsigned char*)&pms, (const unsigned char*)(&pms + 1));
     crypt_key key;
-    if (!key.import_public(m_cp_enc, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, &(m_server_cert_chain.front()->pCertInfo->SubjectPublicKeyInfo)))
+    if (!key.import_public(m_cp_enc_client, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, &(m_server_cert_chain.front()->pCertInfo->SubjectPublicKeyInfo)))
         throw win_runtime_error(__FUNCTION__ " Error importing server's public key.");
     if (!CryptEncrypt(key,  NULL, TRUE, 0, pms_enc))
         throw win_runtime_error(__FUNCTION__ " Error encrypting PMS.");
@@ -737,7 +772,7 @@ eap::sanitizing_blob eap::method_tls::make_finished() const
             throw win_runtime_error(__FUNCTION__ " Error finishing SHA-256 hash calculation.");
         seed.insert(seed.end(), hash_data.begin(), hash_data.end());
     }
-    sanitizing_blob verify(prf(m_cp_enc, m_alg_prf, m_master_secret, seed, 12));
+    sanitizing_blob verify(prf(m_cp_enc_client, m_alg_prf, m_master_secret, seed, 12));
     msg.insert(msg.end(), verify.begin(), verify.end());
 
     return msg;
@@ -781,7 +816,7 @@ void eap::method_tls::derive_msk()
     sanitizing_blob seed(s_label, s_label + _countof(s_label) - 1);
     seed.insert(seed.end(), (const unsigned char*)&m_random_client, (const unsigned char*)(&m_random_client + 1));
     seed.insert(seed.end(), (const unsigned char*)&m_random_server, (const unsigned char*)(&m_random_server + 1));
-    sanitizing_blob key_block(prf(m_cp_enc, m_alg_prf, m_master_secret, seed, 2*sizeof(tls_random)));
+    sanitizing_blob key_block(prf(m_cp_enc_client, m_alg_prf, m_master_secret, seed, 2*sizeof(tls_random)));
     const unsigned char *_key_block = key_block.data();
 
     // MS-MPPE-Recv-Key
@@ -877,11 +912,15 @@ void eap::method_tls::process_change_cipher_spec(_In_bytecount_(msg_size) const 
     if (!m_state_server_pending.m_alg_encrypt)
         throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Change cipher spec received without cipher being negotiated first.");
 
+    // Create cryptographics provider (based on server selected cipher?).
+    if (!m_cp_enc_server.create(NULL, NULL, PROV_RSA_AES))
+        throw win_runtime_error(__FUNCTION__ " Error creating cryptographics provider.");
+
     static const unsigned char s_label[] = "key expansion";
     sanitizing_blob seed(s_label, s_label + _countof(s_label) - 1);
     seed.insert(seed.end(), (const unsigned char*)&m_random_server, (const unsigned char*)(&m_random_server + 1));
     seed.insert(seed.end(), (const unsigned char*)&m_random_client, (const unsigned char*)(&m_random_client + 1));
-    sanitizing_blob key_block(prf(m_cp_enc, m_alg_prf, m_master_secret, seed,
+    sanitizing_blob key_block(prf(m_cp_enc_server, m_alg_prf, m_master_secret, seed,
         2*m_state_server_pending.m_size_mac_key +  // client_write_MAC_secret & server_write_MAC_secret (SHA1)
         2*m_state_server_pending.m_size_enc_key +  // client_write_key        & server_write_key
         2*m_state_server_pending.m_size_enc_iv )); // client_write_IV         & server_write_IV
@@ -891,14 +930,14 @@ void eap::method_tls::process_change_cipher_spec(_In_bytecount_(msg_size) const 
     _key_block += m_state_server_pending.m_size_mac_key;
 
     // server_write_MAC_secret
-    m_state_server_pending.m_padding_hmac = hmac_padding(m_cp_enc, m_state_server_pending.m_alg_mac, _key_block, m_state_server_pending.m_size_mac_key);
+    m_state_server_pending.m_padding_hmac = hmac_padding(m_cp_enc_server, m_state_server_pending.m_alg_mac, _key_block, m_state_server_pending.m_size_mac_key);
     _key_block += m_state_server_pending.m_size_mac_key;
 
     // client_write_key
     _key_block += m_state_server_pending.m_size_enc_key;
 
     // server_write_key
-    m_state_server_pending.m_key = create_key(m_state_server_pending.m_alg_encrypt, m_key_exp1, _key_block, m_state_server_pending.m_size_enc_key);
+    m_state_server_pending.m_key = create_key(m_cp_enc_server, m_state_server_pending.m_alg_encrypt, m_key_exp1, _key_block, m_state_server_pending.m_size_enc_key);
     _key_block += m_state_server_pending.m_size_enc_key;
 
     if (m_state_server_pending.m_size_enc_iv && m_tls_version < tls_version_1_1) {
@@ -969,7 +1008,11 @@ void eap::method_tls::process_handshake(_In_bytecount_(msg_size) const void *_ms
                 if (rec + 1 > rec_end || rec + 1 + rec[0] > rec_end)
                     throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Session ID missing or incomplete.");
                 assert(rec[0] <= 32); // According to RFC 5246 session IDs should not be longer than 32B.
-                m_session_id.assign(rec + 1, rec + 1 + rec[0]);
+                if (m_session_id.size() != rec[0] || memcmp(m_session_id.data(), rec + 1, rec[0]) != 0) {
+                    m_module.log_event(&EAPMETHOD_TLS_SESSION_NEW, event_data((unsigned int)eap_type_tls), event_data::blank);
+                    m_session_id.assign(rec + 1, rec + 1 + rec[0]);
+                } else
+                    m_module.log_event(&EAPMETHOD_TLS_SESSION_RESUME, event_data((unsigned int)eap_type_tls), event_data::blank);
                 rec += rec[0] + 1;
 
                 // Cipher
@@ -1075,7 +1118,7 @@ void eap::method_tls::process_handshake(_In_bytecount_(msg_size) const void *_ms
                     seed.insert(seed.end(), hash_data.begin(), hash_data.end());
                 }
 
-                if (memcmp(prf(m_cp_enc, m_alg_prf, m_master_secret, seed, 12).data(), rec, 12))
+                if (memcmp(prf(m_cp_enc_server, m_alg_prf, m_master_secret, seed, 12).data(), rec, 12))
                     throw win_runtime_error(ERROR_ENCRYPTION_FAILED, __FUNCTION__ " Integrity check failed.");
 
                 m_module.log_event(&EAPMETHOD_TLS_FINISHED, event_data((unsigned int)eap_type_tls), event_data::blank);
@@ -1233,7 +1276,7 @@ void eap::method_tls::encrypt_message(_In_ tls_message_type_t type, _Inout_ sani
 {
     // Hash sequence number, TLS header, and message.
     size_t size_data = data.size();
-    hmac_hash hash(m_cp_enc, m_state_client.m_alg_mac, m_state_client.m_padding_hmac);
+    hmac_hash hash(m_cp_enc_client, m_state_client.m_alg_mac, m_state_client.m_padding_hmac);
     unsigned __int64 seq_num2 = htonll(m_seq_num_client);
     unsigned short size_data2 = htons((unsigned short)size_data);
     if (!CryptHashData(hash, (const BYTE*)&seq_num2     , sizeof(seq_num2     ), 0) ||
@@ -1255,7 +1298,7 @@ void eap::method_tls::encrypt_message(_In_ tls_message_type_t type, _Inout_ sani
         if (m_tls_version >= tls_version_1_1) {
             // TLS 1.1+: Set random IV.
             data.insert(data.begin(), m_state_client.m_size_enc_iv, 0);
-            if (!CryptGenRandom(m_cp_enc, (DWORD)m_state_client.m_size_enc_iv, data.data()))
+            if (!CryptGenRandom(m_cp_enc_client, (DWORD)m_state_client.m_size_enc_iv, data.data()))
                 throw win_runtime_error(__FUNCTION__ " Error generating IV.");
             size_data_enc += m_state_client.m_size_enc_iv;
         }
@@ -1320,7 +1363,7 @@ void eap::method_tls::decrypt_message(_In_ tls_message_type_t type, _Inout_ sani
         size_data -= m_state_server.m_size_mac_hash;
 
         // Hash sequence number, TLS header (without length), original message length, and message.
-        hmac_hash hash(m_cp_enc, m_state_server.m_alg_mac, m_state_server.m_padding_hmac);
+        hmac_hash hash(m_cp_enc_server, m_state_server.m_alg_mac, m_state_server.m_padding_hmac);
         unsigned __int64 seq_num2 = htonll(m_seq_num_server);
         unsigned short size_data2 = htons((unsigned short)size_data);
         if (!CryptHashData(hash, (const BYTE*)&seq_num2     , sizeof(seq_num2     ), 0) ||
@@ -1454,10 +1497,11 @@ eap::sanitizing_blob eap::method_tls::prf(
 
 
 HCRYPTKEY eap::method_tls::create_key(
-    _In_                              ALG_ID    alg,
-    _In_                              HCRYPTKEY key,
-    _In_bytecount_(size_secret) const void      *secret,
-    _In_                              size_t    size_secret)
+    _In_                              HCRYPTPROV cp,
+    _In_                              ALG_ID     alg,
+    _In_                              HCRYPTKEY  key,
+    _In_bytecount_(size_secret) const void       *secret,
+    _In_                              size_t     size_secret)
 {
 #if 1
     UNREFERENCED_PARAMETER(key);
@@ -1483,7 +1527,7 @@ HCRYPTKEY eap::method_tls::create_key(
 
     // Import the key.
     winstd::crypt_key key_out;
-    if (!key_out.import(m_cp_enc, key_blob.data(), (DWORD)key_blob.size(), NULL, 0))
+    if (!key_out.import(cp, key_blob.data(), (DWORD)key_blob.size(), NULL, 0))
         throw winstd::win_runtime_error(__FUNCTION__ " Error importing key.");
     return key_out.detach();
 #else
@@ -1529,7 +1573,7 @@ HCRYPTKEY eap::method_tls::create_key(
     // Is random PS required at all? We are importing a clear-text session key with the exponent-of-one key. How low on security can we get?
     key_blob.insert(key_blob.end(), size_ps, 0);
     unsigned char *ps = &*(key_blob.end() - size_ps);
-    CryptGenRandom(m_cp_enc, (DWORD)size_ps, ps);
+    CryptGenRandom(cp, (DWORD)size_ps, ps);
     for (size_t i = 0; i < size_ps; i++)
         if (ps[i] == 0) ps[i] = 1;
 #endif
@@ -1545,7 +1589,7 @@ HCRYPTKEY eap::method_tls::create_key(
 
     // Import the key.
     winstd::crypt_key key_out;
-    if (!key_out.import(m_cp_enc, key_blob.data(), (DWORD)key_blob.size(), key, 0))
+    if (!key_out.import(cp, key_blob.data(), (DWORD)key_blob.size(), key, 0))
         throw winstd::win_runtime_error(__FUNCTION__ " Error importing key.");
     return key_out.detach();
 #endif

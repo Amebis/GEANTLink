@@ -69,27 +69,24 @@ void eap::method_ttls::process_request_packet(
         m_module.log_event(&EAPMETHOD_TTLS_HANDSHAKE_START, event_data((unsigned int)eap_type_ttls), event_data((unsigned char)m_version), event_data((unsigned char)ver_remote), event_data::blank);
     }
 
-    if (!m_handshake[tls_handshake_type_finished]) {
-        // Do the TLS.
-        method_tls::process_request_packet(pReceivedPacket, dwReceivedPacketSize, pEapOutput);
+    // Do the TLS.
+    method_tls::process_request_packet(pReceivedPacket, dwReceivedPacketSize, pEapOutput);
 
-        if (m_handshake[tls_handshake_type_finished]) {
-            // Piggyback inner authentication.
-            if (!m_state_client.m_alg_encrypt)
-                throw runtime_error(__FUNCTION__ " Refusing to send credentials unencrypted.");
+    if (m_phase == phase_application_data) {
+        // Send inner authentication.
+        if (!m_state_client.m_alg_encrypt)
+            throw runtime_error(__FUNCTION__ " Refusing to send credentials unencrypted.");
 
-            m_packet_res.m_code  = EapCodeResponse;
-            m_packet_res.m_id    = m_packet_req.m_id;
-            m_packet_res.m_flags = 0;
-            sanitizing_blob msg_application(make_message(tls_message_type_application_data, make_pap_client()));
-            m_packet_res.m_data.assign(msg_application.begin(), msg_application.end());
+        m_module.log_event(&EAPMETHOD_TTLS_INNER_CRED, event_data((unsigned int)eap_type_ttls), event_data(m_cred.m_inner->get_name()), event_data::blank);
 
-            pEapOutput->fAllowNotifications = FALSE;
-            pEapOutput->action = EapPeerMethodResponseActionSend;
-        }
-    } else {
-        // Do the TLS. Again.
-        method_tls::process_request_packet(pReceivedPacket, dwReceivedPacketSize, pEapOutput);
+        m_packet_res.m_code  = EapCodeResponse;
+        m_packet_res.m_id    = m_packet_req.m_id;
+        m_packet_res.m_flags = 0;
+        sanitizing_blob msg_application(make_message(tls_message_type_application_data, make_pap_client()));
+        m_packet_res.m_data.insert(m_packet_res.m_data.end(), msg_application.begin(), msg_application.end());
+
+        pEapOutput->fAllowNotifications = FALSE;
+        pEapOutput->action = EapPeerMethodResponseActionSend;
     }
 }
 
@@ -111,7 +108,7 @@ void eap::method_ttls::get_result(
     _In_    EapPeerMethodResultReason reason,
     _Inout_ EapPeerMethodResult       *ppResult)
 {
-    if (!m_handshake[tls_handshake_type_finished]) {
+    if (m_phase != phase_application_data) {
         // Do the TLS.
         method_tls::get_result(reason, ppResult);
     } else {
@@ -120,12 +117,27 @@ void eap::method_ttls::get_result(
         config_method_ttls *cfg_method = dynamic_cast<config_method_ttls*>(cfg_prov.m_methods.front().get());
         assert(cfg_method);
 
-        // Mark credentials appropriately, so GUI can re-prompt user.
-        cfg_method->m_inner->m_cred_failed = reason == EapPeerMethodResultFailure;
+        switch (reason) {
+        case EapPeerMethodResultSuccess: {
+            m_module.log_event(&EAPMETHOD_TTLS_INNER_SUCCESS, event_data((unsigned int)eap_type_ttls), event_data::blank);
+            cfg_method->m_inner->m_auth_failed = false;
+            break;
+        }
+
+        case EapPeerMethodResultFailure:
+            m_module.log_event(&EAPMETHOD_TTLS_INNER_FAILURE, event_data((unsigned int)eap_type_ttls), event_data::blank);
+            cfg_method->m_inner->m_auth_failed = true;
+            break;
+
+        default:
+            throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Not supported.");
+        }
 
         // The TLS was OK.
         method_tls::get_result(EapPeerMethodResultSuccess, ppResult);
 
+        // Do not report failure to EAPHost, as it will not save updated configuration then. But we need it to save it, to alert user on next connection attempt.
+        // EAPHost is well aware of the failed condition.
         //if (reason == EapPeerMethodResultFailure) {
         //    ppResult->fIsSuccess = FALSE;
         //    ppResult->dwFailureReasonCode = EAP_E_AUTHENTICATION_FAILED;

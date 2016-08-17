@@ -486,6 +486,11 @@ public:
         this->Disconnect(wxEVT_UPDATE_UI, wxUpdateUIEventHandler(_Tthis::OnUpdateUI));
     }
 
+    inline void SetRememberValue(bool val)
+    {
+        return m_remember->SetValue(val);
+    }
+
     inline bool GetRememberValue() const
     {
         return m_remember->GetValue();

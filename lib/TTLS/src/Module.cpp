@@ -109,14 +109,17 @@ void eap::peer_ttls::get_identity(
     {
         // Combine credentials.
         user_impersonator impersonating(hTokenImpersonateUser);
-        *pfInvokeUI = cred_out.combine(
+        pair<eap::credentials::source_t, eap::credentials::source_t> cred_source(cred_out.combine(
 #ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
             &cred_in,
 #else
             NULL,
 #endif
             *cfg_method,
-            (dwFlags & EAP_FLAG_GUEST_ACCESS) == 0 ? cfg_prov.m_id.c_str() : NULL) ? FALSE : TRUE;
+            (dwFlags & EAP_FLAG_GUEST_ACCESS) == 0 ? cfg_prov.m_id.c_str() : NULL));
+
+        // If either of credentials is unknown, request UI.
+        *pfInvokeUI = cred_source.first == eap::credentials::source_unknown || cred_source.second == eap::credentials::source_unknown ? TRUE : FALSE;
     }
 
     if (*pfInvokeUI) {
@@ -132,14 +135,14 @@ void eap::peer_ttls::get_identity(
 
     // If we got here, we have all credentials we need. But, wait!
 
-    if (cfg_method->m_cred_failed) {
+    if (cfg_method->m_auth_failed) {
         // Outer TLS: Credentials failed on last connection attempt.
         log_event(&EAPMETHOD_TRACE_EVT_CRED_PROBLEM, event_data((unsigned int)eap_type_tls), event_data::blank);
         *pfInvokeUI = TRUE;
         return;
     }
 
-    if (cfg_method->m_inner->m_cred_failed) {
+    if (cfg_method->m_inner->m_auth_failed) {
         // Inner: Credentials failed on last connection attempt.
         log_event(&EAPMETHOD_TRACE_EVT_CRED_PROBLEM, event_data((unsigned int)type_inner), event_data::blank);
         *pfInvokeUI = TRUE;

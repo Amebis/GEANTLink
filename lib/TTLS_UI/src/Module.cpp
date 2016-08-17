@@ -163,14 +163,14 @@ void eap::peer_ttls_ui::invoke_identity_ui(
     }
 
     // Combine credentials.
-    cred_out.combine(
+    pair<eap::credentials::source_t, eap::credentials::source_t> cred_source(cred_out.combine(
 #ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
         &cred_in,
 #else
         NULL,
 #endif
         *cfg_method,
-        (dwFlags & EAP_FLAG_GUEST_ACCESS) == 0 ? cfg_prov.m_id.c_str() : NULL);
+        (dwFlags & EAP_FLAG_GUEST_ACCESS) == 0 ? cfg_prov.m_id.c_str() : NULL));
 
     if (dwFlags & EAP_FLAG_GUEST_ACCESS) {
         // Disable credential saving for guests.
@@ -190,10 +190,18 @@ void eap::peer_ttls_ui::invoke_identity_ui(
         parent.AdoptAttributesFromHWND();
         wxTopLevelWindows.Append(&parent);
 
-        // Create and launch credentials dialog.
+        // Create credentials dialog.
         wxEAPCredentialsDialog dlg(cfg_prov, &parent);
         wxTTLSCredentialsPanel *panel = new wxTTLSCredentialsPanel(cfg_prov, *cfg_method, cred_out, cfg_prov.m_id.c_str(), &dlg);
         dlg.AddContents((wxPanel**)&panel, 1);
+
+        // Set "Remember" checkboxes according to credential source,
+        panel->m_outer_cred->SetRememberValue(cred_source.first == eap::credentials::source_storage);
+        wxPAPCredentialsPanel *panel_inner_cred_pap = dynamic_cast<wxPAPCredentialsPanel*>(panel->m_inner_cred);
+        if (panel_inner_cred_pap)
+            panel_inner_cred_pap->SetRememberValue(cred_source.second == eap::credentials::source_storage);
+
+        // Centre and display dialog.
         dlg.Centre(wxBOTH);
         result = dlg.ShowModal();
         if (result == wxID_OK) {
@@ -208,7 +216,6 @@ void eap::peer_ttls_ui::invoke_identity_ui(
                 }
             }
 
-            wxPAPCredentialsPanel *panel_inner_cred_pap = dynamic_cast<wxPAPCredentialsPanel*>(panel->m_inner_cred);
             if (panel_inner_cred_pap && panel_inner_cred_pap->GetRememberValue()) {
                 try {
                     cred_out.m_inner->store(cfg_prov.m_id.c_str());

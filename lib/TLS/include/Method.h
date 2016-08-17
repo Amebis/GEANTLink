@@ -467,6 +467,7 @@ namespace eap
         ///
         /// \sa [How to export and import plain text session keys by using CryptoAPI](https://support.microsoft.com/en-us/kb/228786)
         ///
+        /// \param[in] cp           Handle of the cryptographics provider
         /// \param[in] alg          Key algorithm
         /// \param[in] key          Key that decrypts \p secret
         /// \param[in] secret       Key data
@@ -475,10 +476,11 @@ namespace eap
         /// \returns Key
         ///
         HCRYPTKEY create_key(
-            _In_                              ALG_ID    alg,
-            _In_                              HCRYPTKEY key,
-            _In_bytecount_(size_secret) const void      *secret,
-            _In_                              size_t    size_secret);
+            _In_                              HCRYPTPROV cp,
+            _In_                              ALG_ID     alg,
+            _In_                              HCRYPTKEY  key,
+            _In_bytecount_(size_secret) const void       *secret,
+            _In_                              size_t     size_secret);
 
     protected:
         credentials_tls &m_cred;                                ///< EAP-TLS user credentials
@@ -487,7 +489,8 @@ namespace eap
         packet m_packet_res;                                    ///< Response packet
 
         winstd::crypt_prov m_cp;                                ///< Cryptography provider for general services
-        winstd::crypt_prov m_cp_enc;                            ///< Cryptography provider for encryption
+        winstd::crypt_prov m_cp_enc_client;                     ///< Cryptography provider for encryption
+        winstd::crypt_prov m_cp_enc_server;                     ///< Cryptography provider for encryption
         winstd::crypt_key m_key_exp1;                           ///< Key for importing derived keys
 
         tls_version m_tls_version;                              ///< TLS version in use
@@ -514,6 +517,14 @@ namespace eap
         winstd::crypt_hash m_hash_handshake_msgs_sha256;        ///< Running SHA-256 hash of handshake messages
 
         bool m_handshake[tls_handshake_type_max];               ///< Handshake flags (map od handshake messages received)
+
+        enum {
+            phase_unknown = -1,                                 ///< Unknown phase
+            phase_client_hello = 0,                             ///< Send client hello
+            phase_server_hello,                                 ///< Wait for server hello
+            phase_change_cipher_spec,                           ///< Wait for change cipher spec
+            phase_application_data                              ///< Exchange application data
+        } m_phase;                                              ///< What phase is our communication at?
 
         unsigned __int64 m_seq_num_client;                      ///< Sequence number for encrypting
         unsigned __int64 m_seq_num_server;                      ///< Sequence number for decrypting

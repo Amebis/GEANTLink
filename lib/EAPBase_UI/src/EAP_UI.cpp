@@ -182,7 +182,7 @@ wxEAPCredentialWarningPanel::wxEAPCredentialWarningPanel(const eap::config_provi
     if (m_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
         wxSetIconFromResource(m_note_icon, m_icon, m_shell32, MAKEINTRESOURCE(161));
 
-    m_note_label->SetLabel(_("Previous attempt to connect using provided credentials failed. Please, make sure your credentials are correct, or try again later."));
+    m_note_label->SetLabel(_("Previous attempt to connect failed. Please, make sure your credentials are correct, or try again later."));
     m_note_label->Wrap(449);
 
     CreateContactFields(prov);

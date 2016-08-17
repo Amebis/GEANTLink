@@ -32,6 +32,7 @@ namespace eap
 #include "../../PAP/include/Credentials.h"
 
 #include <memory>
+#include <utility>
 
 
 namespace eap
@@ -187,7 +188,7 @@ namespace eap
         /// - \c true  if credentials were set;
         /// - \c false otherwise
         ///
-        bool combine(
+        std::pair<source_t, source_t> combine(
             _In_       const credentials_ttls   *cred_cached,
             _In_       const config_method_ttls &cfg,
             _In_opt_z_       LPCTSTR            pszTargetName);
