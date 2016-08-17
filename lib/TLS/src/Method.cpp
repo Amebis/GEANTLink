@@ -1111,17 +1111,16 @@ void eap::method_tls::verify_server_trust() const
     assert(!m_server_cert_chain.empty());
     const cert_context &cert = m_server_cert_chain.front();
 
+    string subj;
+    if (!CertGetNameStringA(cert, CERT_NAME_SIMPLE_DISPLAY_TYPE, 0, NULL, subj))
+        throw win_runtime_error(__FUNCTION__ " Error retrieving server's certificate subject name.");
+
     const config_provider &cfg_prov(m_cfg.m_providers.front());
     const config_method_tls *cfg_method = dynamic_cast<const config_method_tls*>(cfg_prov.m_methods.front().get());
     assert(cfg_method);
 
     if (!cfg_method->m_server_names.empty()) {
         // Check server name.
-
-        string subj;
-        if (!CertGetNameStringA(cert, CERT_NAME_SIMPLE_DISPLAY_TYPE, 0, NULL, subj))
-            throw win_runtime_error(__FUNCTION__ " Error retrieving server's certificate subject name.");
-
         for (list<string>::const_iterator s = cfg_method->m_server_names.cbegin(), s_end = cfg_method->m_server_names.cend();; ++s) {
             if (s != s_end) {
                 const char
@@ -1142,6 +1141,10 @@ void eap::method_tls::verify_server_trust() const
         }
     }
 
+    if (cert->pCertInfo->Issuer.cbData == cert->pCertInfo->Subject.cbData &&
+        memcmp(cert->pCertInfo->Issuer.pbData, cert->pCertInfo->Subject.pbData, cert->pCertInfo->Issuer.cbData) == 0)
+        throw com_runtime_error(CRYPT_E_SELF_SIGNED, string_printf(__FUNCTION__ " Server is using a self-signed certificate %s. Cannot trust it.", subj.c_str()).c_str());
+
     // Create temporary certificate store of our trusted root CAs.
     cert_store store;
     if (!store.create(CERT_STORE_PROV_MEMORY, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, NULL, 0, NULL))
@@ -1150,8 +1153,17 @@ void eap::method_tls::verify_server_trust() const
         CertAddCertificateContextToStore(store, *c, CERT_STORE_ADD_REPLACE_EXISTING, NULL);
 
     // Add all certificates from the server's certificate chain, except the first one.
-    for (list<cert_context>::const_iterator c = m_server_cert_chain.cbegin(), c_end = m_server_cert_chain.cend(); ++c != c_end;)
+    for (list<cert_context>::const_iterator c = m_server_cert_chain.cbegin(), c_end = m_server_cert_chain.cend(); ++c != c_end;) {
+        const cert_context &_c = *c;
+        if (_c->pCertInfo->Issuer.cbData == _c->pCertInfo->Subject.cbData &&
+            memcmp(_c->pCertInfo->Issuer.pbData, _c->pCertInfo->Subject.pbData, _c->pCertInfo->Issuer.cbData) == 0)
+        {
+            // Skip the root CA certificates (self-signed). We define in whom we trust!
+            continue;
+        }
+
         CertAddCertificateContextToStore(store, *c, CERT_STORE_ADD_REPLACE_EXISTING, NULL);
+    }
 
     // Prepare the certificate chain validation, and check.
     CERT_CHAIN_PARA chain_params = {
@@ -1171,7 +1183,7 @@ void eap::method_tls::verify_server_trust() const
     };
     cert_chain_context context;
     if (!context.create(NULL, cert, NULL, store, &chain_params, 0))
-        throw win_runtime_error(ERROR_INVALID_DOMAINNAME, __FUNCTION__ " Error creating certificate chain context.");
+        throw win_runtime_error(__FUNCTION__ " Error creating certificate chain context.");
 
     // Check chain validation error flags. Ignore CERT_TRUST_IS_UNTRUSTED_ROOT flag when we check root CA explicitly.
     if (context->TrustStatus.dwErrorStatus != CERT_TRUST_NO_ERROR &&
