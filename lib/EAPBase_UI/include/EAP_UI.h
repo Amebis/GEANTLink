@@ -128,10 +128,10 @@ public:
         // Set extra style here, as wxFormBuilder overrides all default flags.
         this->SetExtraStyle(this->GetExtraStyle() | wxWS_EX_VALIDATE_RECURSIVELY);
 
-        for (std::list<eap::config_provider>::iterator provider = m_cfg.m_providers.begin(), provider_end = m_cfg.m_providers.end(); provider != provider_end; ++provider) {
+        for (std::vector<eap::config_provider>::iterator provider = m_cfg.m_providers.begin(), provider_end = m_cfg.m_providers.end(); provider != provider_end; ++provider) {
             bool is_single = provider->m_methods.size() == 1;
-            std::list<std::unique_ptr<eap::config_method> >::size_type count = 0;
-            std::list<std::unique_ptr<eap::config_method> >::iterator method = provider->m_methods.begin(), method_end = provider->m_methods.end();
+            std::vector<std::unique_ptr<eap::config_method> >::size_type count = 0;
+            std::vector<std::unique_ptr<eap::config_method> >::iterator method = provider->m_methods.begin(), method_end = provider->m_methods.end();
             for (; method != method_end; ++method, count++)
                 m_providers->AddPage(
                     new _wxT(

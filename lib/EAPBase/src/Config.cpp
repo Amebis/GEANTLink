@@ -296,7 +296,8 @@ eap::config_provider::config_provider(_In_ const config_provider &other) :
     m_lbl_alt_password(other.m_lbl_alt_password),
     config(other)
 {
-    for (list<unique_ptr<config_method> >::const_iterator method = other.m_methods.cbegin(), method_end = other.m_methods.cend(); method != method_end; ++method)
+    m_methods.reserve(other.m_methods.size());
+    for (vector<unique_ptr<config_method> >::const_iterator method = other.m_methods.cbegin(), method_end = other.m_methods.cend(); method != method_end; ++method)
         m_methods.push_back(std::move(unique_ptr<config_method>(*method ? (config_method*)method->get()->clone() : nullptr)));
 }
 
@@ -332,7 +333,8 @@ eap::config_provider& eap::config_provider::operator=(_In_ const config_provider
         m_lbl_alt_password   = other.m_lbl_alt_password;
 
         m_methods.clear();
-        for (list<unique_ptr<config_method> >::const_iterator method = other.m_methods.cbegin(), method_end = other.m_methods.cend(); method != method_end; ++method)
+        m_methods.reserve(other.m_methods.size());
+        for (vector<unique_ptr<config_method> >::const_iterator method = other.m_methods.cbegin(), method_end = other.m_methods.cend(); method != method_end; ++method)
             m_methods.push_back(std::move(unique_ptr<config_method>(*method ? (config_method*)method->get()->clone() : nullptr)));
     }
 
@@ -432,7 +434,7 @@ void eap::config_provider::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pC
     if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:AuthenticationMethods"), bstr(L"AuthenticationMethods"), bstrNamespace, &pXmlElAuthenticationMethods)))
         throw com_runtime_error(hr, __FUNCTION__ " Error creating <AuthenticationMethods> element.");
 
-    for (list<unique_ptr<config_method> >::const_iterator method = m_methods.cbegin(), method_end = m_methods.cend(); method != method_end; ++method) {
+    for (vector<unique_ptr<config_method> >::const_iterator method = m_methods.cbegin(), method_end = m_methods.cend(); method != method_end; ++method) {
         // <AuthenticationMethod>
         com_obj<IXMLDOMElement> pXmlElAuthenticationMethod;
         if (FAILED(hr = eapxml::create_element(pDoc, bstr(L"AuthenticationMethod"), bstrNamespace, &pXmlElAuthenticationMethod)))
@@ -669,7 +671,7 @@ void eap::config_provider_list::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNod
     if (FAILED(hr = eapxml::select_node(pConfigRoot, bstr(L"eap-metadata:EAPIdentityProviderList"), &pXmlElIdentityProviderList)))
         throw com_runtime_error(hr, __FUNCTION__ " Error selecting <EAPIdentityProviderList> element.");
 
-    for (list<config_provider>::const_iterator provider = m_providers.cbegin(), provider_end = m_providers.cend(); provider != provider_end; ++provider) {
+    for (vector<config_provider>::const_iterator provider = m_providers.cbegin(), provider_end = m_providers.cend(); provider != provider_end; ++provider) {
         // <EAPIdentityProvider>
         com_obj<IXMLDOMElement> pXmlElIdentityProvider;
         if (FAILED(hr = eapxml::create_element(pDoc, bstr(L"EAPIdentityProvider"), bstrNamespace, &pXmlElIdentityProvider)))

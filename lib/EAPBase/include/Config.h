@@ -89,7 +89,6 @@ inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ eap::config &val);
 #include <eaptypes.h> // Must include after <Windows.h>
 #include <tchar.h>
 
-#include <list>
 #include <string>
 #include <memory>
 
@@ -451,7 +450,7 @@ namespace eap
         winstd::tstring m_lbl_alt_credential;                   ///< Alternative label for credential prompt
         winstd::tstring m_lbl_alt_identity;                     ///< Alternative label for identity prompt
         winstd::tstring m_lbl_alt_password;                     ///< Alternative label for password prompt
-        std::list<std::unique_ptr<config_method> > m_methods;   ///< List of method configurations
+        std::vector<std::unique_ptr<config_method> > m_methods; ///< Array of method configurations
     };
 
 
@@ -551,7 +550,7 @@ namespace eap
         /// @}
 
     public:
-        std::list<eap::config_provider> m_providers;    ///< List of provider configurations
+        std::vector<eap::config_provider> m_providers;  ///< Array of provider configurations
     };
 }
 
