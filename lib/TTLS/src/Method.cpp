@@ -69,11 +69,11 @@ void eap::method_ttls::process_request_packet(
         m_module.log_event(&EAPMETHOD_TTLS_HANDSHAKE_START, event_data((unsigned int)eap_type_ttls), event_data((unsigned char)m_version), event_data((unsigned char)ver_remote), event_data::blank);
     }
 
-    if (!m_server_finished) {
+    if (!m_handshake[tls_handshake_type_finished]) {
         // Do the TLS.
         method_tls::process_request_packet(pReceivedPacket, dwReceivedPacketSize, pEapOutput);
 
-        if (m_server_finished) {
+        if (m_handshake[tls_handshake_type_finished]) {
             // Piggyback inner authentication.
             if (!m_state_client.m_alg_encrypt)
                 throw runtime_error(__FUNCTION__ " Refusing to send credentials unencrypted.");
@@ -111,10 +111,11 @@ void eap::method_ttls::get_result(
     _In_    EapPeerMethodResultReason reason,
     _Inout_ EapPeerMethodResult       *ppResult)
 {
-    if (!m_server_finished) {
+    if (!m_handshake[tls_handshake_type_finished]) {
         // Do the TLS.
         method_tls::get_result(reason, ppResult);
     } else {
+        // The TLS finished, this is inner authentication's bussines.
         config_provider &cfg_prov(m_cfg.m_providers.front());
         config_method_ttls *cfg_method = dynamic_cast<config_method_ttls*>(cfg_prov.m_methods.front().get());
         assert(cfg_method);

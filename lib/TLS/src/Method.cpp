@@ -95,9 +95,6 @@ void eap::method_tls::packet::clear()
 
 eap::method_tls::method_tls(_In_ module &module, _In_ config_provider_list &cfg, _In_ credentials_tls &cred) :
     m_cred(cred),
-    m_certificate_req(false),
-    m_server_hello_done(false),
-    m_server_finished(false),
     m_seq_num_client(0),
     m_seq_num_server(0),
     m_blob_cfg(NULL),
@@ -107,6 +104,7 @@ eap::method_tls::method_tls(_In_ module &module, _In_ config_provider_list &cfg,
     method(module, cfg, cred)
 {
     m_tls_version = tls_version_1_2;
+    memset(m_handshake, 0, sizeof(m_handshake));
 }
 
 
@@ -133,13 +131,14 @@ eap::method_tls::method_tls(_Inout_ method_tls &&other) :
     m_hash_handshake_msgs_md5   (std::move(other.m_hash_handshake_msgs_md5   )),
     m_hash_handshake_msgs_sha1  (std::move(other.m_hash_handshake_msgs_sha1  )),
     m_hash_handshake_msgs_sha256(std::move(other.m_hash_handshake_msgs_sha256)),
-    m_certificate_req           (std::move(other.m_certificate_req           )),
-    m_server_hello_done         (std::move(other.m_server_hello_done         )),
-    m_server_finished           (std::move(other.m_server_finished           )),
     m_seq_num_client            (std::move(other.m_seq_num_client            )),
     m_seq_num_server            (std::move(other.m_seq_num_server            )),
     method                      (std::move(other                             ))
 {
+    memcpy(m_handshake, other.m_handshake, sizeof(m_handshake));
+#ifdef _DEBUG
+    memset(other.m_handshake, 0, sizeof(m_handshake));
+#endif
 }
 
 
@@ -181,11 +180,13 @@ eap::method_tls& eap::method_tls::operator=(_Inout_ method_tls &&other)
         m_hash_handshake_msgs_md5    = std::move(other.m_hash_handshake_msgs_md5   );
         m_hash_handshake_msgs_sha1   = std::move(other.m_hash_handshake_msgs_sha1  );
         m_hash_handshake_msgs_sha256 = std::move(other.m_hash_handshake_msgs_sha256);
-        m_certificate_req            = std::move(other.m_certificate_req           );
-        m_server_hello_done          = std::move(other.m_server_hello_done         );
-        m_server_finished            = std::move(other.m_server_finished           );
         m_seq_num_client             = std::move(other.m_seq_num_client            );
         m_seq_num_server             = std::move(other.m_seq_num_server            );
+
+        memcpy(m_handshake, other.m_handshake, sizeof(m_handshake));
+#ifdef _DEBUG
+        memset(other.m_handshake, 0, sizeof(m_handshake));
+#endif
     }
 
     return *this;
@@ -327,9 +328,7 @@ void eap::method_tls::process_request_packet(
         if (!m_hash_handshake_msgs_sha256.create(m_cp, CALG_SHA_256))
             throw win_runtime_error(__FUNCTION__ " Error creating SHA-256 hashing object.");
 
-        m_certificate_req   = false;
-        m_server_hello_done = false;
-        m_server_finished   = false;
+        memset(m_handshake, 0, sizeof(m_handshake));
 
         m_seq_num_client = 0;
         m_seq_num_server = 0;
@@ -342,11 +341,11 @@ void eap::method_tls::process_request_packet(
         m_packet_res.m_data.clear();
         process_packet(m_packet_req.m_data.data(), m_packet_req.m_data.size());
 
-        if (m_server_finished) {
+        if (m_handshake[tls_handshake_type_finished]) {
             // Server finished.
         } else if (m_state_server.m_alg_encrypt) {
             // Cipher specified (server).
-        } else if (m_server_hello_done) {
+        } else if (m_handshake[tls_handshake_type_server_hello_done]) {
             // Server hello specified.
 
             // Create cryptographics provider (based on server selected cipher?).
@@ -358,7 +357,7 @@ void eap::method_tls::process_request_packet(
                 throw win_runtime_error(ERROR_ENCRYPTION_FAILED, __FUNCTION__ " Can not continue without server's certificate.");
             verify_server_trust();
 
-            if (m_certificate_req) {
+            if (m_handshake[tls_handshake_type_certificate_request]) {
                 // Client certificate requested.
                 sanitizing_blob msg_client_cert(make_message(tls_message_type_handshake, make_client_cert()));
                 m_packet_res.m_data.insert(m_packet_res.m_data.end(), msg_client_cert.begin(), msg_client_cert.end());
@@ -380,7 +379,7 @@ void eap::method_tls::process_request_packet(
                 m_packet_res.m_data.insert(m_packet_res.m_data.end(), msg_client_key_exchange.begin(), msg_client_key_exchange.end());
             }
 
-            if (m_certificate_req) {
+            if (m_handshake[tls_handshake_type_certificate_request]) {
                 // TODO: Create and append certificate_verify message!
             }
 
@@ -510,7 +509,7 @@ void eap::method_tls::get_result(
 
     switch (reason) {
     case EapPeerMethodResultSuccess: {
-        if (!m_server_finished)
+        if (!m_handshake[tls_handshake_type_finished])
             throw invalid_argument(__FUNCTION__ " Premature success.");
 
         // Derive MSK/EMSK for line encryption.
@@ -1046,12 +1045,10 @@ void eap::method_tls::process_handshake(_In_bytecount_(msg_size) const void *_ms
             }
 
             case tls_handshake_type_certificate_request:
-                m_certificate_req = true;
                 m_module.log_event(&EAPMETHOD_TLS_CERTIFICATE_REQUEST, event_data((unsigned int)eap_type_tls), event_data::blank);
                 break;
 
             case tls_handshake_type_server_hello_done:
-                m_server_hello_done = true;
                 m_module.log_event(&EAPMETHOD_TLS_SERVER_HELLO_DONE, event_data((unsigned int)eap_type_tls), event_data::blank);
                 break;
 
@@ -1086,13 +1083,17 @@ void eap::method_tls::process_handshake(_In_bytecount_(msg_size) const void *_ms
                 if (memcmp(prf(m_cp_enc, m_alg_prf, m_master_secret, seed, 12).data(), rec, 12))
                     throw win_runtime_error(ERROR_ENCRYPTION_FAILED, __FUNCTION__ " Integrity check failed.");
 
-                m_server_finished = true;
                 m_module.log_event(&EAPMETHOD_TLS_FINISHED, event_data((unsigned int)eap_type_tls), event_data::blank);
                 break;
             }
 
             default:
                 m_module.log_event(&EAPMETHOD_TLS_HANDSHAKE_IGNORE, event_data((unsigned int)eap_type_tls), event_data((unsigned char)type), event_data::blank);
+        }
+
+        if (type < tls_handshake_type_max) {
+            // Set the flag this handshake message was received.
+            m_handshake[type] = true;
         }
 
         msg = rec_end;
