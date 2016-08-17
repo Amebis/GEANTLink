@@ -1087,10 +1087,13 @@ void eap::method_tls::process_handshake(_In_bytecount_(msg_size) const void *_ms
             m_handshake[type] = true;
         }
 
+        if (type != tls_handshake_type_hello_request) {
+            // Hash all but hello requests (https://tools.ietf.org/html/rfc5246#section-7.4.1.1).
+            hash_handshake(msg, rec_end - msg);
+        }
+
         msg = rec_end;
     }
-
-    hash_handshake(_msg, msg_size);
 }
 
 
