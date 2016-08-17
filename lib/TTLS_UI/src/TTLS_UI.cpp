@@ -112,7 +112,8 @@ wxTTLSConfigWindow::wxTTLSConfigWindow(const eap::config_provider &prov, eap::co
 
     m_inner_type = new wxChoicebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxCHB_DEFAULT);
     m_inner_type->SetToolTip( _("Select inner authentication method from the list") );
-    m_inner_type->AddPage(new wxPAPConfigPanel(m_prov, m_cfg_pap, pszCredTarget, m_inner_type), _("PAP"));
+    wxPAPConfigPanel *panel_pap = new wxPAPConfigPanel(m_prov, m_cfg_pap, pszCredTarget, m_inner_type);
+    m_inner_type->AddPage(panel_pap, _("PAP"));
     sb_content->Add(m_inner_type, 0, wxALL|wxEXPAND, 5);
 
     sb_content->Add(20, 20, 1, wxALL|wxEXPAND, 5);
@@ -139,7 +140,8 @@ wxTTLSConfigWindow::wxTTLSConfigWindow(const eap::config_provider &prov, eap::co
     this->SetSizer(sb_content);
     this->Layout();
 
-    m_inner_type->SetFocusFromKbd();
+    // m_inner_type->SetFocusFromKbd(); // This control steals mouse-wheel scrolling for itself
+    panel_pap->SetFocusFromKbd();
 }
 
 

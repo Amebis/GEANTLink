@@ -437,6 +437,14 @@ public:
             wxSetIconFromResource(m_credentials_icon, m_icon, m_shell32, MAKEINTRESOURCE(/*16770*/269));
     }
 
+    ///
+    /// Sets keyboard focus to the first control that do not capture mouse wheel
+    ///
+    inline void SetFocusFromKbd()
+    {
+        m_own->SetFocusFromKbd();
+    }
+
 protected:
     /// \cond internal
 
