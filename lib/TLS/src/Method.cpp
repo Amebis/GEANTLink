@@ -384,7 +384,7 @@ void eap::method_tls::process_request_packet(
             }
 
             // Append change cipher spec to packet.
-            sanitizing_blob ccs(make_change_chiper_spec());
+            sanitizing_blob ccs(make_message(tls_message_type_change_cipher_spec, sanitizing_blob(1, 1)));
             m_packet_res.m_data.insert(m_packet_res.m_data.end(), ccs.begin(), ccs.end());
 
             {
@@ -704,20 +704,6 @@ eap::sanitizing_blob eap::method_tls::make_client_key_exchange(_In_ const tls_ma
     msg.insert(msg.end(), pms_enc.begin(), pms_enc.end());
 
     return msg;
-}
-
-
-eap::sanitizing_blob eap::method_tls::make_change_chiper_spec() const
-{
-    const unsigned char msg_css[] = {
-        tls_message_type_change_cipher_spec,    // SSL record type
-        m_tls_version.major,                    // SSL major version
-        m_tls_version.minor,                    // SSL minor version
-        0,                                      // Message size (high-order byte)
-        1,                                      // Message size (low-order byte)
-        1,                                      // Message: change_cipher_spec is always "1"
-    };
-    return sanitizing_blob(msg_css, msg_css + _countof(msg_css));
 }
 
 

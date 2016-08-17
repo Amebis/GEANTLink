@@ -249,15 +249,6 @@ namespace eap
         sanitizing_blob make_client_key_exchange(_In_ const tls_master_secret &pms) const;
 
         ///
-        /// Makes a TLS change cipher spec message
-        ///
-        /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter A.1. Record Layer)](https://tools.ietf.org/html/rfc5246#appendix-A.1)
-        ///
-        /// \returns Change cipher spec
-        ///
-        eap::sanitizing_blob make_change_chiper_spec() const;
-
-        ///
         /// Makes a TLS finished message
         ///
         /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter A.1. Record Layer)](https://tools.ietf.org/html/rfc5246#appendix-A.1)
