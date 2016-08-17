@@ -91,6 +91,7 @@ protected:
     virtual bool TransferDataToWindow();
     virtual bool TransferDataFromWindow();
     virtual void OnInitDialog(wxInitDialogEvent& event);
+    virtual void OnUpdateUI(wxUpdateUIEvent& event);
     /// \endcond
 
 protected:

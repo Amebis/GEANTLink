@@ -210,4 +210,28 @@ class wxEAPProviderIdentityPanelBase : public wxPanel
 	
 };
 
+///////////////////////////////////////////////////////////////////////////////
+/// Class wxEAPProviderLockPanelBase
+///////////////////////////////////////////////////////////////////////////////
+class wxEAPProviderLockPanelBase : public wxPanel 
+{
+	private:
+	
+	protected:
+		wxStaticBitmap* m_provider_lock_icon;
+		wxStaticText* m_provider_lock_label;
+		wxCheckBox* m_provider_lock;
+		wxStaticText* m_provider_lock_note;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnUpdateUI( wxUpdateUIEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		wxEAPProviderLockPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL ); 
+		~wxEAPProviderLockPanelBase();
+	
+};
+
 #endif //__WXEAP_UI_H__

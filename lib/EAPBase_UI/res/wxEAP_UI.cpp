@@ -464,3 +464,55 @@ wxEAPProviderIdentityPanelBase::~wxEAPProviderIdentityPanelBase()
 	this->Disconnect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( wxEAPProviderIdentityPanelBase::OnUpdateUI ) );
 	
 }
+
+wxEAPProviderLockPanelBase::wxEAPProviderLockPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+{
+	wxStaticBoxSizer* sb_provider_lock;
+	sb_provider_lock = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Configuration Lock") ), wxVERTICAL );
+	
+	wxBoxSizer* sb_provider_lock_horiz;
+	sb_provider_lock_horiz = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_provider_lock_icon = new wxStaticBitmap( sb_provider_lock->GetStaticBox(), wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
+	sb_provider_lock_horiz->Add( m_provider_lock_icon, 0, wxALL, 5 );
+	
+	wxBoxSizer* sb_provider_lock_vert;
+	sb_provider_lock_vert = new wxBoxSizer( wxVERTICAL );
+	
+	m_provider_lock_label = new wxStaticText( sb_provider_lock->GetStaticBox(), wxID_ANY, _("Your configuration can be locked to prevent accidental modification by end-users. Users will only be allowed to enter credentials."), wxDefaultPosition, wxDefaultSize, 0 );
+	m_provider_lock_label->Wrap( 446 );
+	sb_provider_lock_vert->Add( m_provider_lock_label, 0, wxALL|wxEXPAND, 5 );
+	
+	wxBoxSizer* sb_provider_name;
+	sb_provider_name = new wxBoxSizer( wxVERTICAL );
+	
+	m_provider_lock = new wxCheckBox( sb_provider_lock->GetStaticBox(), wxID_ANY, _("&Lock this configuration and prevent any further modification via user interface."), wxDefaultPosition, wxDefaultSize, 0 );
+	sb_provider_name->Add( m_provider_lock, 0, wxEXPAND|wxBOTTOM, 5 );
+	
+	m_provider_lock_note = new wxStaticText( sb_provider_lock->GetStaticBox(), wxID_ANY, _("(Warning: Once locked, you can not revert using this dialog!)"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_provider_lock_note->Wrap( -1 );
+	sb_provider_name->Add( m_provider_lock_note, 0, wxALIGN_RIGHT, 5 );
+	
+	
+	sb_provider_lock_vert->Add( sb_provider_name, 0, wxEXPAND|wxALL, 5 );
+	
+	
+	sb_provider_lock_horiz->Add( sb_provider_lock_vert, 1, wxEXPAND, 5 );
+	
+	
+	sb_provider_lock->Add( sb_provider_lock_horiz, 1, wxEXPAND, 5 );
+	
+	
+	this->SetSizer( sb_provider_lock );
+	this->Layout();
+	
+	// Connect Events
+	this->Connect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( wxEAPProviderLockPanelBase::OnUpdateUI ) );
+}
+
+wxEAPProviderLockPanelBase::~wxEAPProviderLockPanelBase()
+{
+	// Disconnect Events
+	this->Disconnect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( wxEAPProviderLockPanelBase::OnUpdateUI ) );
+	
+}

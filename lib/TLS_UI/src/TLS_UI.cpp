@@ -423,14 +423,6 @@ wxTLSServerTrustPanel::wxTLSServerTrustPanel(const eap::config_provider &prov, e
 
 bool wxTLSServerTrustPanel::TransferDataToWindow()
 {
-    if (m_prov.m_read_only) {
-        // This is provider-locked configuration. Disable controls.
-        m_root_ca_add_store->Enable(false);
-        m_root_ca_add_file ->Enable(false);
-        m_root_ca_remove   ->Enable(false);
-        m_server_names     ->Enable(false);
-    }
-
     // Populate trusted CA list.
     for (std::list<winstd::cert_context>::const_iterator cert = m_cfg.m_trusted_root_ca.cbegin(), cert_end = m_cfg.m_trusted_root_ca.cend(); cert != cert_end; ++cert)
         m_root_ca->Append(wxString(eap::get_cert_title(*cert)), new wxCertificateClientData(cert->duplicate()));
@@ -469,10 +461,19 @@ void wxTLSServerTrustPanel::OnUpdateUI(wxUpdateUIEvent& event)
 {
     UNREFERENCED_PARAMETER(event);
 
-    if (!m_prov.m_read_only) {
+    if (m_prov.m_read_only) {
+        // This is provider-locked configuration. Disable controls.
+        m_root_ca_add_store->Enable(false);
+        m_root_ca_add_file ->Enable(false);
+        m_root_ca_remove   ->Enable(false);
+        m_server_names     ->Enable(false);
+    } else {
         // This is not a provider-locked configuration. Selectively enable/disable controls.
+        m_root_ca_add_store->Enable(true);
+        m_root_ca_add_file ->Enable(true);
         wxArrayInt selections;
         m_root_ca_remove->Enable(m_root_ca->GetSelections(selections) ? true : false);
+        m_server_names     ->Enable(true);
     }
 }
 

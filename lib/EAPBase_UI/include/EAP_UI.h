@@ -356,6 +356,32 @@ public:
     ///
     wxEAPProviderIdentityPanel(eap::config_provider &prov, wxWindow* parent);
 
+    friend class wxEAPConfigProvider; // Allows direct setting of keyboard focus
+
+protected:
+    /// \cond internal
+    virtual bool TransferDataToWindow();
+    virtual bool TransferDataFromWindow();
+    /// \endcond
+
+protected:
+    eap::config_provider &m_prov;   ///< EAP method configuration
+    winstd::library m_shell32;      ///< shell32.dll resource library reference
+    wxIcon m_icon;                  ///< Panel icon
+};
+
+
+class wxEAPProviderLockPanel : public wxEAPProviderLockPanelBase
+{
+public:
+    ///
+    /// Constructs a provider lock pannel
+    ///
+    /// \param[inout] prov    Provider configuration data
+    /// \param[in]    parent  Parent window
+    ///
+    wxEAPProviderLockPanel(eap::config_provider &prov, wxWindow* parent);
+
 protected:
     /// \cond internal
     virtual bool TransferDataToWindow();
@@ -383,6 +409,7 @@ public:
 protected:
     eap::config_provider &m_prov;           ///< EAP method configuration
     wxEAPProviderIdentityPanel *m_identity; ///< Provider identity panel
+    wxEAPProviderLockPanel *m_lock;         ///< Provider lock panel
 };
 
 

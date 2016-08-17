@@ -293,6 +293,38 @@ bool wxEAPProviderIdentityPanel::TransferDataFromWindow()
 
 
 //////////////////////////////////////////////////////////////////////
+// wxEAPProviderLockPanel
+//////////////////////////////////////////////////////////////////////
+
+wxEAPProviderLockPanel::wxEAPProviderLockPanel(eap::config_provider &prov, wxWindow* parent) :
+    m_prov(prov),
+    wxEAPProviderLockPanelBase(parent)
+{
+    // Load and set icon.
+    if (m_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
+        wxSetIconFromResource(m_provider_lock_icon, m_icon, m_shell32, MAKEINTRESOURCE(1003));
+}
+
+
+bool wxEAPProviderLockPanel::TransferDataToWindow()
+{
+    m_provider_lock->SetValue(m_prov.m_read_only);
+
+    return wxEAPProviderLockPanelBase::TransferDataToWindow();
+}
+
+
+bool wxEAPProviderLockPanel::TransferDataFromWindow()
+{
+    wxCHECK(wxEAPProviderLockPanelBase::TransferDataFromWindow(), false);
+
+    m_prov.m_read_only = m_provider_lock->GetValue();
+
+    return true;
+}
+
+
+//////////////////////////////////////////////////////////////////////
 // wxEAPConfigProvider
 //////////////////////////////////////////////////////////////////////
 
@@ -305,4 +337,9 @@ wxEAPConfigProvider::wxEAPConfigProvider(eap::config_provider &prov, wxWindow* p
 
     m_identity = new wxEAPProviderIdentityPanel(prov, this);
     AddContent(m_identity);
+
+    m_lock = new wxEAPProviderLockPanel(prov, this);
+    AddContent(m_lock);
+
+    m_identity->m_provider_name->SetFocusFromKbd();
 }

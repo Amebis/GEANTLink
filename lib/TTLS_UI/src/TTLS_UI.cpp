@@ -38,14 +38,6 @@ wxTTLSConfigPanel::wxTTLSConfigPanel(const eap::config_provider &prov, eap::conf
 
 bool wxTTLSConfigPanel::TransferDataToWindow()
 {
-    if (m_prov.m_read_only) {
-        // This is provider-locked configuration. Disable controls.
-        m_outer_identity_same      ->Enable(false);
-        m_outer_identity_empty     ->Enable(false);
-        m_outer_identity_custom    ->Enable(false);
-        m_outer_identity_custom_val->Enable(false);
-    }
-
     // Populate identity controls.
     if (m_cfg.m_anonymous_identity.empty()) {
         m_outer_identity_same->SetValue(true);
@@ -82,8 +74,17 @@ void wxTTLSConfigPanel::OnUpdateUI(wxUpdateUIEvent& event)
 {
     UNREFERENCED_PARAMETER(event);
 
-    if (!m_prov.m_read_only) {
+    if (m_prov.m_read_only) {
+        // This is provider-locked configuration. Disable controls.
+        m_outer_identity_same      ->Enable(false);
+        m_outer_identity_empty     ->Enable(false);
+        m_outer_identity_custom    ->Enable(false);
+        m_outer_identity_custom_val->Enable(false);
+    } else {
         // This is not a provider-locked configuration. Selectively enable/disable controls.
+        m_outer_identity_same      ->Enable(true);
+        m_outer_identity_empty     ->Enable(true);
+        m_outer_identity_custom    ->Enable(true);
         m_outer_identity_custom_val->Enable(m_outer_identity_custom->GetValue());
     }
 }
@@ -144,11 +145,6 @@ wxTTLSConfigWindow::wxTTLSConfigWindow(const eap::config_provider &prov, eap::co
 
 bool wxTTLSConfigWindow::TransferDataToWindow()
 {
-    if (m_prov.m_read_only) {
-        // This is provider-locked configuration. Disable controls.
-        m_inner_type->GetChoiceCtrl()->Enable(false);
-    }
-
     eap::config_method_pap *cfg_pap = dynamic_cast<eap::config_method_pap*>(m_cfg.m_inner.get());
     if (cfg_pap) {
         m_cfg_pap = *cfg_pap;
@@ -191,6 +187,14 @@ void wxTTLSConfigWindow::OnInitDialog(wxInitDialogEvent& event)
     m_tls->GetEventHandler()->ProcessEvent(event);
     for (wxWindowList::compatibility_iterator inner = m_inner_type->GetChildren().GetFirst(); inner; inner = inner->GetNext())
         inner->GetData()->GetEventHandler()->ProcessEvent(event);
+}
+
+
+void wxTTLSConfigWindow::OnUpdateUI(wxUpdateUIEvent& event)
+{
+    wxEAPConfigWindow::OnUpdateUI(event);
+
+    m_inner_type->GetChoiceCtrl()->Enable(!m_prov.m_read_only);
 }
 
 
