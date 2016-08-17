@@ -148,7 +148,10 @@ namespace eap
         tls_handshake_type_server_hello_done   = 14,
         tls_handshake_type_certificate_verify  = 15,
         tls_handshake_type_client_key_exchange = 16,
-        tls_handshake_type_finished            = 20
+        tls_handshake_type_finished            = 20,
+
+        tls_handshake_type_min                 =  0,    ///< First existing handshake message
+        tls_handshake_type_max                 = 21     ///< First non-existing (officially) handshake message
     };
 
 
