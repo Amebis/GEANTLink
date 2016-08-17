@@ -94,10 +94,9 @@ void wxTTLSConfigPanel::OnUpdateUI(wxUpdateUIEvent& event)
 //////////////////////////////////////////////////////////////////////
 
 wxTTLSConfigWindow::wxTTLSConfigWindow(const eap::config_provider &prov, eap::config_method &cfg, LPCTSTR pszCredTarget, wxWindow* parent) :
-    m_prov(prov),
     m_cfg((eap::config_method_ttls&)cfg),
     m_cfg_pap(cfg.m_module),
-    wxScrolledWindow(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxVSCROLL)
+    wxEAPConfigWindow(prov, cfg, parent)
 {
     wxBoxSizer* sb_content;
     sb_content = new wxBoxSizer( wxVERTICAL );
@@ -135,22 +134,11 @@ wxTTLSConfigWindow::wxTTLSConfigWindow(const eap::config_provider &prov, eap::co
         size.y  = 500;
     }
     this->SetMinSize(size);
-    this->SetScrollRate(5, 5);
 
     this->SetSizer(sb_content);
     this->Layout();
 
     m_inner_type->SetFocusFromKbd();
-
-    // Connect Events
-    this->Connect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(wxTTLSConfigWindow::OnInitDialog));
-}
-
-
-wxTTLSConfigWindow::~wxTTLSConfigWindow()
-{
-    // Disconnect Events
-    this->Disconnect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(wxTTLSConfigWindow::OnInitDialog));
 }
 
 
@@ -196,8 +184,7 @@ bool wxTTLSConfigWindow::TransferDataFromWindow()
 
 void wxTTLSConfigWindow::OnInitDialog(wxInitDialogEvent& event)
 {
-    // Call TransferDataToWindow() manually, as wxScrolledWindow somehow skips that.
-    TransferDataToWindow();
+    wxEAPConfigWindow::OnInitDialog(event);
 
     // Forward the event to child panels.
     m_outer_identity->GetEventHandler()->ProcessEvent(event);

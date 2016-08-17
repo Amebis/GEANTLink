@@ -193,7 +193,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
         // Create credentials dialog.
         wxEAPCredentialsDialog dlg(cfg_prov, &parent);
         wxTTLSCredentialsPanel *panel = new wxTTLSCredentialsPanel(cfg_prov, *cfg_method, cred_out, cfg_prov.m_id.c_str(), &dlg);
-        dlg.AddContents((wxPanel**)&panel, 1);
+        dlg.AddContent(panel);
 
         // Set "Remember" checkboxes according to credential source,
         panel->m_outer_cred->SetRememberValue(cred_source.first == eap::credentials::source_storage);

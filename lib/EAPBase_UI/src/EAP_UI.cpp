@@ -38,22 +38,19 @@ bool wxEAPBannerPanel::AcceptsFocusFromKeyboard() const
 
 
 //////////////////////////////////////////////////////////////////////
-// wxEAPCredentialsDialog
+// wxEAPGeneralDialog
 //////////////////////////////////////////////////////////////////////
 
-wxEAPCredentialsDialog::wxEAPCredentialsDialog(const eap::config_provider &prov, wxWindow* parent) : wxEAPCredentialsDialogBase(parent)
+wxEAPGeneralDialog::wxEAPGeneralDialog(wxWindow* parent, const wxString& title) : wxEAPGeneralDialogBase(parent, wxID_ANY, title)
 {
     // Set extra style here, as wxFormBuilder overrides all default flags.
     this->SetExtraStyle(this->GetExtraStyle() | wxWS_EX_VALIDATE_RECURSIVELY);
-
-    // Set banner title.
-    m_banner->m_title->SetLabel(wxString::Format(_("%s Credentials"), prov.m_id.c_str()));
 
     m_buttonsOK->SetDefault();
 }
 
 
-void wxEAPCredentialsDialog::AddContents(wxPanel **contents, size_t content_count)
+void wxEAPGeneralDialog::AddContent(wxPanel **contents, size_t content_count)
 {
     if (content_count) {
         for (size_t i = 0; i < content_count; i++)
@@ -66,10 +63,27 @@ void wxEAPCredentialsDialog::AddContents(wxPanel **contents, size_t content_coun
 }
 
 
-void wxEAPCredentialsDialog::OnInitDialog(wxInitDialogEvent& event)
+void wxEAPGeneralDialog::AddContent(wxPanel *content)
+{
+    AddContent(&content, 1);
+}
+
+
+void wxEAPGeneralDialog::OnInitDialog(wxInitDialogEvent& event)
 {
     for (wxSizerItemList::compatibility_iterator panel = m_panels->GetChildren().GetFirst(); panel; panel = panel->GetNext())
         panel->GetData()->GetWindow()->GetEventHandler()->ProcessEvent(event);
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// wxEAPCredentialsDialog
+//////////////////////////////////////////////////////////////////////
+
+wxEAPCredentialsDialog::wxEAPCredentialsDialog(const eap::config_provider &prov, wxWindow* parent) : wxEAPGeneralDialog(parent, _("EAP Credentials"))
+{
+    // Set banner title.
+    m_banner->m_title->SetLabel(wxString::Format(_("%s Credentials"), prov.m_id.c_str()));
 }
 
 
@@ -188,4 +202,107 @@ wxEAPCredentialWarningPanel::wxEAPCredentialWarningPanel(const eap::config_provi
     CreateContactFields(prov);
 
     this->Layout();
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// wxEAPConfigWindow
+//////////////////////////////////////////////////////////////////////
+
+wxEAPConfigWindow::wxEAPConfigWindow(const eap::config_provider &prov, eap::config_method &cfg, wxWindow* parent) :
+    m_prov(prov),
+    m_cfg(cfg),
+    wxScrolledWindow(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxVSCROLL)
+{
+    this->SetScrollRate(5, 5);
+
+    // Connect Events
+    this->Connect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(wxEAPConfigWindow::OnInitDialog));
+    this->Connect(wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEAPConfigWindow::OnUpdateUI));
+}
+
+
+wxEAPConfigWindow::~wxEAPConfigWindow()
+{
+    // Disconnect Events
+    this->Disconnect(wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEAPConfigWindow::OnUpdateUI));
+    this->Disconnect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(wxEAPConfigWindow::OnInitDialog));
+}
+
+
+void wxEAPConfigWindow::OnInitDialog(wxInitDialogEvent& event)
+{
+    UNREFERENCED_PARAMETER(event);
+
+    // Call TransferDataToWindow() manually, as wxScrolledWindow somehow skips that.
+    TransferDataToWindow();
+}
+
+
+void wxEAPConfigWindow::OnUpdateUI(wxUpdateUIEvent& event)
+{
+    UNREFERENCED_PARAMETER(event);
+
+    if (m_parent && m_parent->IsKindOf(wxCLASSINFO(wxNotebook))) {
+        // We're a notebook page. Set the ID of our provider as our page label.
+        wxNotebook *notebook = (wxNotebook*)m_parent;
+        int idx = notebook->FindPage(this);
+        if (idx != wxNOT_FOUND)
+            notebook->SetPageText(idx, m_prov.m_id);
+    } else
+        this->SetLabel(m_prov.m_id);
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// wxEAPProviderIdentityPanel
+//////////////////////////////////////////////////////////////////////
+
+wxEAPProviderIdentityPanel::wxEAPProviderIdentityPanel(eap::config_provider &prov, wxWindow* parent) :
+    m_prov(prov),
+    wxEAPProviderIdentityPanelBase(parent)
+{
+    // Load and set icon.
+    if (m_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
+        wxSetIconFromResource(m_provider_id_icon, m_icon, m_shell32, MAKEINTRESOURCE(259));
+}
+
+
+bool wxEAPProviderIdentityPanel::TransferDataToWindow()
+{
+    m_provider_name ->SetValue(m_prov.m_id        );
+    m_provider_web  ->SetValue(m_prov.m_help_web  );
+    m_provider_email->SetValue(m_prov.m_help_email);
+    m_provider_phone->SetValue(m_prov.m_help_phone);
+
+    return wxEAPProviderIdentityPanelBase::TransferDataToWindow();
+}
+
+
+bool wxEAPProviderIdentityPanel::TransferDataFromWindow()
+{
+    wxCHECK(wxEAPProviderIdentityPanelBase::TransferDataFromWindow(), false);
+
+    m_prov.m_id         = m_provider_name ->GetValue();
+    m_prov.m_help_web   = m_provider_web  ->GetValue();
+    m_prov.m_help_email = m_provider_email->GetValue();
+    m_prov.m_help_phone = m_provider_phone->GetValue();
+
+    return true;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// wxEAPConfigProvider
+//////////////////////////////////////////////////////////////////////
+
+wxEAPConfigProvider::wxEAPConfigProvider(eap::config_provider &prov, wxWindow* parent) :
+    m_prov(prov),
+    wxEAPGeneralDialog(parent, _("Provider Settings"))
+{
+    // Set banner title.
+    m_banner->m_title->SetLabel(_("Provider Settings"));
+
+    m_identity = new wxEAPProviderIdentityPanel(prov, this);
+    AddContent(m_identity);
 }

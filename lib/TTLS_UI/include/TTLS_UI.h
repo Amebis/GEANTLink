@@ -45,7 +45,6 @@ class wxTTLSCredentialsPanel;
 
 #include <wx/choicebk.h>
 #include <wx/icon.h>
-#include <wx/scrolwin.h>
 #include <wx/stattext.h>
 
 #include <Windows.h>
@@ -74,22 +73,18 @@ protected:
 };
 
 
-class wxTTLSConfigWindow : public wxScrolledWindow
+class wxTTLSConfigWindow : public wxEAPConfigWindow
 {
 public:
     ///
     /// Constructs a configuration panel
     ///
+    /// \param[in]    prov           Provider configuration data
     /// \param[inout] cfg            Configuration data
     /// \param[in]    pszCredTarget  Target name of credentials in Windows Credential Manager. Can be further decorated to create final target name.
     /// \param[in]    parent         Parent window
     ///
     wxTTLSConfigWindow(const eap::config_provider &prov, eap::config_method &cfg, LPCTSTR pszCredTarget, wxWindow* parent);
-
-    ///
-    /// Destructs the configuration panel
-    ///
-    virtual ~wxTTLSConfigWindow();
 
 protected:
     /// \cond internal
@@ -99,7 +94,6 @@ protected:
     /// \endcond
 
 protected:
-    const eap::config_provider &m_prov;     ///< EAP provider
     eap::config_method_ttls &m_cfg;         ///< TTLS configuration
     wxStaticText *m_outer_title;            ///< Outer authentication title
     wxTTLSConfigPanel *m_outer_identity;    ///< Outer identity configuration panel
@@ -108,7 +102,7 @@ protected:
     wxChoicebook *m_inner_type;             ///< Inner authentication type
 
     // Temporary inner method configurations to hold data until applied
-    eap::config_method_pap m_cfg_pap;            ///< PAP configuration
+    eap::config_method_pap m_cfg_pap;       ///< PAP configuration
 };
 
 

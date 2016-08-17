@@ -18,8 +18,8 @@ class wxEAPBannerPanel;
 #include <wx/settings.h>
 #include <wx/string.h>
 #include <wx/notebook.h>
-#include <wx/sizer.h>
 #include <wx/button.h>
+#include <wx/sizer.h>
 #include <wx/dialog.h>
 #include <wx/stattext.h>
 #include <wx/panel.h>
@@ -44,12 +44,15 @@ class wxEAPConfigDialogBase : public wxDialog
 	protected:
 		wxEAPBannerPanel *m_banner;
 		wxNotebook* m_providers;
+		wxButton* m_advanced;
 		wxStdDialogButtonSizer* m_buttons;
 		wxButton* m_buttonsOK;
 		wxButton* m_buttonsCancel;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnInitDialog( wxInitDialogEvent& event ) { event.Skip(); }
+		virtual void OnUpdateUI( wxUpdateUIEvent& event ) { event.Skip(); }
+		virtual void OnAdvanced( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
@@ -60,9 +63,9 @@ class wxEAPConfigDialogBase : public wxDialog
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class wxEAPCredentialsDialogBase
+/// Class wxEAPGeneralDialogBase
 ///////////////////////////////////////////////////////////////////////////////
-class wxEAPCredentialsDialogBase : public wxDialog 
+class wxEAPGeneralDialogBase : public wxDialog 
 {
 	private:
 	
@@ -79,8 +82,8 @@ class wxEAPCredentialsDialogBase : public wxDialog
 	
 	public:
 		
-		wxEAPCredentialsDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("EAP Credentials"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
-		~wxEAPCredentialsDialogBase();
+		wxEAPGeneralDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
+		~wxEAPGeneralDialogBase();
 	
 };
 
@@ -172,6 +175,38 @@ class wxEAPCredentialsPassPanelBase : public wxPanel
 		
 		wxEAPCredentialsPassPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL ); 
 		~wxEAPCredentialsPassPanelBase();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class wxEAPProviderIdentityPanelBase
+///////////////////////////////////////////////////////////////////////////////
+class wxEAPProviderIdentityPanelBase : public wxPanel 
+{
+	private:
+	
+	protected:
+		wxStaticBitmap* m_provider_id_icon;
+		wxStaticText* m_provider_id_label;
+		wxStaticText* m_provider_name_label;
+		wxTextCtrl* m_provider_name;
+		wxStaticText* m_provider_name_note;
+		wxStaticText* m_provider_helpdesk_label;
+		wxStaticText* m_provider_web_icon;
+		wxTextCtrl* m_provider_web;
+		wxStaticText* m_provider_email_icon;
+		wxTextCtrl* m_provider_email;
+		wxStaticText* m_provider_phone_icon;
+		wxTextCtrl* m_provider_phone;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnUpdateUI( wxUpdateUIEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		wxEAPProviderIdentityPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL ); 
+		~wxEAPProviderIdentityPanelBase();
 	
 };
 

@@ -28,6 +28,20 @@ wxEAPConfigDialogBase::wxEAPConfigDialogBase( wxWindow* parent, wxWindowID id, c
 	
 	sb_content->Add( m_providers, 1, wxEXPAND|wxALL, 10 );
 	
+	wxBoxSizer* sb_bottom_horiz;
+	sb_bottom_horiz = new wxBoxSizer( wxHORIZONTAL );
+	
+	wxBoxSizer* sb_bottom_horiz_inner;
+	sb_bottom_horiz_inner = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_advanced = new wxButton( this, wxID_ANY, _("Advanced..."), wxDefaultPosition, wxDefaultSize, 0 );
+	m_advanced->SetToolTip( _("Opens dialog with provider settings") );
+	
+	sb_bottom_horiz_inner->Add( m_advanced, 0, wxALL, 5 );
+	
+	
+	sb_bottom_horiz->Add( sb_bottom_horiz_inner, 1, wxEXPAND, 5 );
+	
 	m_buttons = new wxStdDialogButtonSizer();
 	m_buttonsOK = new wxButton( this, wxID_OK );
 	m_buttons->AddButton( m_buttonsOK );
@@ -35,7 +49,10 @@ wxEAPConfigDialogBase::wxEAPConfigDialogBase( wxWindow* parent, wxWindowID id, c
 	m_buttons->AddButton( m_buttonsCancel );
 	m_buttons->Realize();
 	
-	sb_content->Add( m_buttons, 0, wxEXPAND|wxALL, 5 );
+	sb_bottom_horiz->Add( m_buttons, 0, wxEXPAND|wxALL, 5 );
+	
+	
+	sb_content->Add( sb_bottom_horiz, 0, wxEXPAND, 5 );
 	
 	
 	this->SetSizer( sb_content );
@@ -44,16 +61,20 @@ wxEAPConfigDialogBase::wxEAPConfigDialogBase( wxWindow* parent, wxWindowID id, c
 	
 	// Connect Events
 	this->Connect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( wxEAPConfigDialogBase::OnInitDialog ) );
+	this->Connect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( wxEAPConfigDialogBase::OnUpdateUI ) );
+	m_advanced->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPConfigDialogBase::OnAdvanced ), NULL, this );
 }
 
 wxEAPConfigDialogBase::~wxEAPConfigDialogBase()
 {
 	// Disconnect Events
 	this->Disconnect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( wxEAPConfigDialogBase::OnInitDialog ) );
+	this->Disconnect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( wxEAPConfigDialogBase::OnUpdateUI ) );
+	m_advanced->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPConfigDialogBase::OnAdvanced ), NULL, this );
 	
 }
 
-wxEAPCredentialsDialogBase::wxEAPCredentialsDialogBase( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+wxEAPGeneralDialogBase::wxEAPGeneralDialogBase( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
 {
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
 	
@@ -84,13 +105,13 @@ wxEAPCredentialsDialogBase::wxEAPCredentialsDialogBase( wxWindow* parent, wxWind
 	sb_content->Fit( this );
 	
 	// Connect Events
-	this->Connect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( wxEAPCredentialsDialogBase::OnInitDialog ) );
+	this->Connect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( wxEAPGeneralDialogBase::OnInitDialog ) );
 }
 
-wxEAPCredentialsDialogBase::~wxEAPCredentialsDialogBase()
+wxEAPGeneralDialogBase::~wxEAPGeneralDialogBase()
 {
 	// Disconnect Events
-	this->Disconnect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( wxEAPCredentialsDialogBase::OnInitDialog ) );
+	this->Disconnect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( wxEAPGeneralDialogBase::OnInitDialog ) );
 	
 }
 
@@ -99,20 +120,20 @@ wxEAPBannerPanelBase::wxEAPBannerPanelBase( wxWindow* parent, wxWindowID id, con
 	this->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_HIGHLIGHT ) );
 	this->SetMinSize( wxSize( -1,48 ) );
 	
-	wxBoxSizer* sc_content;
-	sc_content = new wxBoxSizer( wxVERTICAL );
+	wxBoxSizer* sb_content;
+	sb_content = new wxBoxSizer( wxVERTICAL );
 	
 	m_title = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
 	m_title->Wrap( -1 );
 	m_title->SetFont( wxFont( 18, 70, 90, 90, false, wxEmptyString ) );
 	m_title->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_HIGHLIGHTTEXT ) );
 	
-	sc_content->Add( m_title, 0, wxALL|wxEXPAND, 5 );
+	sb_content->Add( m_title, 0, wxALL|wxEXPAND, 5 );
 	
 	
-	this->SetSizer( sc_content );
+	this->SetSizer( sb_content );
 	this->Layout();
-	sc_content->Fit( this );
+	sb_content->Fit( this );
 }
 
 wxEAPBannerPanelBase::~wxEAPBannerPanelBase()
@@ -332,4 +353,114 @@ wxEAPCredentialsPassPanelBase::wxEAPCredentialsPassPanelBase( wxWindow* parent, 
 
 wxEAPCredentialsPassPanelBase::~wxEAPCredentialsPassPanelBase()
 {
+}
+
+wxEAPProviderIdentityPanelBase::wxEAPProviderIdentityPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+{
+	wxStaticBoxSizer* sb_provider_id;
+	sb_provider_id = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Your Organization") ), wxVERTICAL );
+	
+	wxBoxSizer* sb_provider_id_horiz;
+	sb_provider_id_horiz = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_provider_id_icon = new wxStaticBitmap( sb_provider_id->GetStaticBox(), wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
+	sb_provider_id_horiz->Add( m_provider_id_icon, 0, wxALL, 5 );
+	
+	wxBoxSizer* sb_provider_id_vert;
+	sb_provider_id_vert = new wxBoxSizer( wxVERTICAL );
+	
+	m_provider_id_label = new wxStaticText( sb_provider_id->GetStaticBox(), wxID_ANY, _("Describe your organization to customize user prompts.  When organization is introduced, end-users find program messages easier to understand and act."), wxDefaultPosition, wxDefaultSize, 0 );
+	m_provider_id_label->Wrap( 446 );
+	sb_provider_id_vert->Add( m_provider_id_label, 0, wxALL|wxEXPAND, 5 );
+	
+	wxBoxSizer* sb_provider_name;
+	sb_provider_name = new wxBoxSizer( wxVERTICAL );
+	
+	m_provider_name_label = new wxStaticText( sb_provider_id->GetStaticBox(), wxID_ANY, _("Your organization &name:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_provider_name_label->Wrap( -1 );
+	sb_provider_name->Add( m_provider_name_label, 0, wxBOTTOM, 5 );
+	
+	m_provider_name = new wxTextCtrl( sb_provider_id->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_provider_name->SetToolTip( _("Your organization name as it will appear on helpdesk contact notifications") );
+	
+	sb_provider_name->Add( m_provider_name, 0, wxEXPAND|wxBOTTOM, 5 );
+	
+	m_provider_name_note = new wxStaticText( sb_provider_id->GetStaticBox(), wxID_ANY, _("(Keep it short, please)"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_provider_name_note->Wrap( -1 );
+	sb_provider_name->Add( m_provider_name_note, 0, wxALIGN_RIGHT, 5 );
+	
+	
+	sb_provider_id_vert->Add( sb_provider_name, 0, wxEXPAND|wxALL, 5 );
+	
+	wxBoxSizer* sb_provider_helpdesk;
+	sb_provider_helpdesk = new wxBoxSizer( wxVERTICAL );
+	
+	m_provider_helpdesk_label = new wxStaticText( sb_provider_id->GetStaticBox(), wxID_ANY, _("Helpdesk contact &information:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_provider_helpdesk_label->Wrap( -1 );
+	sb_provider_helpdesk->Add( m_provider_helpdesk_label, 0, wxBOTTOM, 5 );
+	
+	wxFlexGridSizer* sb_provider_helpdesk_inner;
+	sb_provider_helpdesk_inner = new wxFlexGridSizer( 0, 2, 0, 0 );
+	sb_provider_helpdesk_inner->AddGrowableCol( 1 );
+	sb_provider_helpdesk_inner->SetFlexibleDirection( wxBOTH );
+	sb_provider_helpdesk_inner->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_provider_web_icon = new wxStaticText( sb_provider_id->GetStaticBox(), wxID_ANY, _("¶"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_provider_web_icon->Wrap( -1 );
+	m_provider_web_icon->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 90, false, wxT("Wingdings") ) );
+	
+	sb_provider_helpdesk_inner->Add( m_provider_web_icon, 0, wxALIGN_CENTER_VERTICAL|wxBOTTOM|wxRIGHT, 5 );
+	
+	m_provider_web = new wxTextCtrl( sb_provider_id->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_provider_web->SetToolTip( _("Your helpdesk website") );
+	
+	sb_provider_helpdesk_inner->Add( m_provider_web, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL|wxBOTTOM, 5 );
+	
+	m_provider_email_icon = new wxStaticText( sb_provider_id->GetStaticBox(), wxID_ANY, _("*"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_provider_email_icon->Wrap( -1 );
+	m_provider_email_icon->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 90, false, wxT("Wingdings") ) );
+	
+	sb_provider_helpdesk_inner->Add( m_provider_email_icon, 0, wxALIGN_CENTER_VERTICAL|wxBOTTOM|wxRIGHT, 5 );
+	
+	m_provider_email = new wxTextCtrl( sb_provider_id->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_provider_email->SetToolTip( _("Your helpdesk e-mail address") );
+	
+	sb_provider_helpdesk_inner->Add( m_provider_email, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL|wxBOTTOM, 5 );
+	
+	m_provider_phone_icon = new wxStaticText( sb_provider_id->GetStaticBox(), wxID_ANY, _(")"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_provider_phone_icon->Wrap( -1 );
+	m_provider_phone_icon->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 90, false, wxT("Wingdings") ) );
+	
+	sb_provider_helpdesk_inner->Add( m_provider_phone_icon, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
+	
+	m_provider_phone = new wxTextCtrl( sb_provider_id->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_provider_phone->SetToolTip( _("Your helpdesk phone number") );
+	
+	sb_provider_helpdesk_inner->Add( m_provider_phone, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	
+	sb_provider_helpdesk->Add( sb_provider_helpdesk_inner, 1, wxEXPAND, 5 );
+	
+	
+	sb_provider_id_vert->Add( sb_provider_helpdesk, 1, wxEXPAND, 5 );
+	
+	
+	sb_provider_id_horiz->Add( sb_provider_id_vert, 1, wxEXPAND, 5 );
+	
+	
+	sb_provider_id->Add( sb_provider_id_horiz, 1, wxEXPAND, 5 );
+	
+	
+	this->SetSizer( sb_provider_id );
+	this->Layout();
+	
+	// Connect Events
+	this->Connect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( wxEAPProviderIdentityPanelBase::OnUpdateUI ) );
+}
+
+wxEAPProviderIdentityPanelBase::~wxEAPProviderIdentityPanelBase()
+{
+	// Disconnect Events
+	this->Disconnect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( wxEAPProviderIdentityPanelBase::OnUpdateUI ) );
+	
 }

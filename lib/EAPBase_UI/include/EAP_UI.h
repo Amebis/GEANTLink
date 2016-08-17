@@ -20,6 +20,7 @@
 
 #include <wx/hyperlink.h>
 #include <wx/icon.h>
+#include <wx/scrolwin.h>
 #include <wx/statbmp.h>
 #include <Windows.h>
 
@@ -35,16 +36,19 @@ class wxEAPBannerPanel;
 template <class _wxT> class wxEAPConfigDialog;
 
 ///
+/// EAP general-use dialog
+///
+class wxEAPGeneralDialog;
+
+///
 /// EAP top-most credential dialog
 ///
 class wxEAPCredentialsDialog;
-
 
 ///
 /// EAP general note
 ///
 class wxEAPNotePanel;
-
 
 ///
 /// EAP provider-locked congifuration note
@@ -55,6 +59,21 @@ class wxEAPProviderLockedPanel;
 /// EAP credential warning note
 ///
 class wxEAPCredentialWarningPanel;
+
+///
+/// EAP Configuration window
+///
+class wxEAPConfigWindow;
+
+///
+/// EAP provider identity config panel
+///
+class wxEAPProviderIdentityPanel;
+
+///
+/// EAP provider configuration dialog
+///
+class wxEAPConfigProvider;
 
 ///
 /// Base template for credential configuration panel
@@ -151,6 +170,7 @@ public:
 
 protected:
     /// \cond internal
+
     virtual void OnInitDialog(wxInitDialogEvent& event)
     {
         // Forward the event to child panels.
@@ -160,6 +180,22 @@ protected:
                 prov->GetEventHandler()->ProcessEvent(event);
         }
     }
+
+    virtual void OnUpdateUI(wxUpdateUIEvent& event)
+    {
+        UNREFERENCED_PARAMETER(event);
+
+        m_advanced->Enable(!m_cfg.m_providers.at(m_providers->GetSelection()).m_read_only);
+    }
+
+    virtual void OnAdvanced(wxCommandEvent& event)
+    {
+        UNREFERENCED_PARAMETER(event);
+
+        wxEAPConfigProvider dlg(m_cfg.m_providers.at(m_providers->GetSelection()), this);
+        dlg.ShowModal();
+    }
+
     /// \endcond
 
 
@@ -168,23 +204,38 @@ protected:
 };
 
 
-class wxEAPCredentialsDialog : public wxEAPCredentialsDialogBase
+class wxEAPGeneralDialog : public wxEAPGeneralDialogBase
+{
+public:
+    ///
+    /// Constructs a dialog
+    ///
+    wxEAPGeneralDialog(wxWindow* parent, const wxString& title = wxEmptyString);
+
+    ///
+    /// Adds panels to the dialog
+    ///
+    void AddContent(wxPanel **contents, size_t content_count);
+
+    ///
+    /// Adds single panel to the dialog
+    ///
+    void AddContent(wxPanel *content);
+
+protected:
+    /// \cond internal
+    virtual void OnInitDialog(wxInitDialogEvent& event);
+    /// \endcond
+};
+
+
+class wxEAPCredentialsDialog : public wxEAPGeneralDialog
 {
 public:
     ///
     /// Constructs a credential dialog
     ///
     wxEAPCredentialsDialog(const eap::config_provider &prov, wxWindow* parent);
-
-    ///
-    /// Adds panels to the dialog
-    ///
-    void AddContents(wxPanel **contents, size_t content_count);
-
-protected:
-    /// \cond internal
-    virtual void OnInitDialog(wxInitDialogEvent& event);
-    /// \endcond
 };
 
 
@@ -262,6 +313,76 @@ public:
 protected:
     winstd::library m_shell32;  ///< shell32.dll resource library reference
     wxIcon m_icon;              ///< Panel icon
+};
+
+
+class wxEAPConfigWindow : public wxScrolledWindow
+{
+public:
+    ///
+    /// Constructs a configuration window
+    ///
+    /// \param[in]    prov    Provider configuration data
+    /// \param[inout] cfg     Configuration data
+    /// \param[in]    parent  Parent window
+    ///
+    wxEAPConfigWindow(const eap::config_provider &prov, eap::config_method &cfg, wxWindow* parent);
+
+    ///
+    /// Destructs the configuration window
+    ///
+    virtual ~wxEAPConfigWindow();
+
+protected:
+    /// \cond internal
+    virtual void OnInitDialog(wxInitDialogEvent& event);
+    virtual void OnUpdateUI(wxUpdateUIEvent& event);
+    /// \endcond
+
+protected:
+    const eap::config_provider &m_prov;     ///< EAP provider
+    eap::config_method &m_cfg;              ///< Method configuration
+};
+
+
+class wxEAPProviderIdentityPanel : public wxEAPProviderIdentityPanelBase
+{
+public:
+    ///
+    /// Constructs a provider identity pannel
+    ///
+    /// \param[inout] prov    Provider configuration data
+    /// \param[in]    parent  Parent window
+    ///
+    wxEAPProviderIdentityPanel(eap::config_provider &prov, wxWindow* parent);
+
+protected:
+    /// \cond internal
+    virtual bool TransferDataToWindow();
+    virtual bool TransferDataFromWindow();
+    /// \endcond
+
+protected:
+    eap::config_provider &m_prov;   ///< EAP method configuration
+    winstd::library m_shell32;      ///< shell32.dll resource library reference
+    wxIcon m_icon;                  ///< Panel icon
+};
+
+
+class wxEAPConfigProvider : public wxEAPGeneralDialog
+{
+public:
+    ///
+    /// Constructs a provider config dialog
+    ///
+    /// \param[inout] prov    Provider configuration data
+    /// \param[in]    parent  Parent window
+    ///
+    wxEAPConfigProvider(eap::config_provider &prov, wxWindow* parent);
+
+protected:
+    eap::config_provider &m_prov;           ///< EAP method configuration
+    wxEAPProviderIdentityPanel *m_identity; ///< Provider identity panel
 };
 
 
@@ -402,7 +523,7 @@ protected:
         // Display credential prompt.
         wxEAPCredentialsDialog dlg(m_prov, this);
         _wxT *panel = new _wxT(m_prov, m_cfg, cred, m_target.c_str(), &dlg, true);
-        dlg.AddContents((wxPanel**)&panel, 1);
+        dlg.AddContent(panel);
         if (dlg.ShowModal() == wxID_OK && panel->GetRememberValue()) {
             // Write credentials to credential manager.
             try {
@@ -433,21 +554,21 @@ protected:
 
         _wxT *panel = new _wxT(m_prov, m_cfg, m_cred, _T(""), &dlg, true);
 
-        dlg.AddContents((wxPanel**)&panel, 1);
+        dlg.AddContent(panel);
         dlg.ShowModal();
     }
 
     /// \endcond
 
 protected:
-    const eap::config_provider &m_prov;             ///< EAP provider
+    const eap::config_provider &m_prov;     ///< EAP provider
     eap::config_method_with_cred &m_cfg;    ///< EAP method configuration
-    winstd::library m_shell32;                      ///< shell32.dll resource library reference
-    wxIcon m_icon;                                  ///< Panel icon
-    winstd::tstring m_target;                       ///< Credential Manager target
+    winstd::library m_shell32;              ///< shell32.dll resource library reference
+    wxIcon m_icon;                          ///< Panel icon
+    winstd::tstring m_target;               ///< Credential Manager target
 
 private:
-    _Tcred m_cred;                                  ///< Temporary credential data
+    _Tcred m_cred;                          ///< Temporary credential data
 };
 
 
