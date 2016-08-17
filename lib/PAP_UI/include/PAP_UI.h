@@ -25,7 +25,7 @@
 ///
 /// PAP credential configuration panel
 ///
-typedef wxEAPCredentialsConfigPanel<eap::credentials_pap, wxPasswordCredentialsPanel<eap::credentials_pap, wxEAPCredentialsPanelPassBase> > wxPAPCredentialsConfigPanel;
+typedef wxEAPCredentialsConfigPanel<eap::credentials_pap, wxPasswordCredentialsPanel<eap::credentials_pap, wxEAPCredentialsPassPanelBase> > wxPAPCredentialsConfigPanel;
 
 ///
 /// PAP configuration panel
@@ -35,7 +35,7 @@ class wxPAPConfigPanel;
 ///
 /// PAP credential entry panel
 ///
-typedef wxPasswordCredentialsPanel<eap::credentials_pap, wxEAPCredentialsPanelPassBase> wxPAPCredentialsPanel;
+typedef wxPasswordCredentialsPanel<eap::credentials_pap, wxEAPCredentialsPassPanelBase> wxPAPCredentialsPanel;
 
 #pragma once
 

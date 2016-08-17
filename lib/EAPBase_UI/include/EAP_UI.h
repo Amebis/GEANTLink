@@ -581,12 +581,12 @@ protected:
         m_identity->SetSelection(0, -1);
         m_password->SetValue(m_cred.m_password.empty() ? wxEmptyString : s_dummy_password);
 
-        return wxEAPCredentialsPanelBase<_Tcred, wxEAPCredentialsPanelPassBase>::TransferDataToWindow();
+        return wxEAPCredentialsPanelBase<_Tcred, wxEAPCredentialsPassPanelBase>::TransferDataToWindow();
     }
 
     virtual bool TransferDataFromWindow()
     {
-        if (!wxEAPCredentialsPanelBase<_Tcred, wxEAPCredentialsPanelPassBase>::TransferDataFromWindow())
+        if (!wxEAPCredentialsPanelBase<_Tcred, wxEAPCredentialsPassPanelBase>::TransferDataFromWindow())
             return false;
 
         m_cred.m_identity = m_identity->GetValue();
@@ -609,7 +609,7 @@ protected:
             m_password      ->Enable(false);
         }
 
-        wxEAPCredentialsPanelBase<_Tcred, wxEAPCredentialsPanelPassBase>::OnUpdateUI(event);
+        wxEAPCredentialsPanelBase<_Tcred, wxEAPCredentialsPassPanelBase>::OnUpdateUI(event);
     }
 
     /// \endcond
