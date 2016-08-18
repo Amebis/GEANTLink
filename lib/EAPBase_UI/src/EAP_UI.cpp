@@ -83,7 +83,7 @@ void wxEAPGeneralDialog::OnInitDialog(wxInitDialogEvent& event)
 wxEAPCredentialsDialog::wxEAPCredentialsDialog(const eap::config_provider &prov, wxWindow* parent) : wxEAPGeneralDialog(parent, _("EAP Credentials"))
 {
     // Set banner title.
-    m_banner->m_title->SetLabel(wxString::Format(_("%s Credentials"), prov.m_id.c_str()));
+    m_banner->m_title->SetLabel(wxString::Format(_("%s Credentials"), wxEAPGetProviderName(prov.m_id).c_str()));
 }
 
 
@@ -248,9 +248,9 @@ void wxEAPConfigWindow::OnUpdateUI(wxUpdateUIEvent& event)
         wxNotebook *notebook = (wxNotebook*)m_parent;
         int idx = notebook->FindPage(this);
         if (idx != wxNOT_FOUND)
-            notebook->SetPageText(idx, m_prov.m_id);
+            notebook->SetPageText(idx, wxEAPGetProviderName(m_prov.m_id));
     } else
-        this->SetLabel(m_prov.m_id);
+        this->SetLabel(wxEAPGetProviderName(m_prov.m_id));
 }
 
 

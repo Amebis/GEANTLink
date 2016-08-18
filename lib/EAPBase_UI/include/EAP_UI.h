@@ -95,6 +95,11 @@ template <class _Tcred, class _Tbase> class wxPasswordCredentialsPanel;
 ///
 inline bool wxSetIconFromResource(wxStaticBitmap *bmp, wxIcon &icon, HINSTANCE hinst, PCWSTR pszName);
 
+///
+/// Returns GUI displayable provider name
+///
+inline wxString wxEAPGetProviderName(const std::wstring &id);
+
 #pragma once
 
 #include <wx/msw/winundef.h> // Fixes `CreateDialog` name collision
@@ -158,7 +163,9 @@ public:
                         *method->get(),
                         provider->m_id.c_str(),
                         m_providers),
-                    is_single ? provider->m_id : winstd::tstring_printf(_T("%s (%u)"), provider->m_id.c_str(), count));
+                    is_single ?
+                        wxEAPGetProviderName(provider->m_id) :
+                        winstd::tstring_printf(_T("%s (%u)"), wxEAPGetProviderName(provider->m_id), count));
         }
 
         this->Layout();
@@ -793,4 +800,11 @@ inline bool wxSetIconFromResource(wxStaticBitmap *bmp, wxIcon &icon, HINSTANCE h
         return true;
     } else
         return false;
+}
+
+
+inline wxString wxEAPGetProviderName(const std::wstring &id)
+{
+    return
+        !id.empty() ? id : _("<Your Organization>");
 }
