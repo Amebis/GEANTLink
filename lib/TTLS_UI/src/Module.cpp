@@ -83,8 +83,26 @@ void eap::peer_ttls_ui::invoke_config_ui(
 {
     // Unpack configuration.
     config_provider_list cfg(*this);
-    if (dwConnectionDataInSize)
+    if (dwConnectionDataInSize) {
+        // Load existing configuration.
         unpack(cfg, pConnectionDataIn, dwConnectionDataInSize);
+    } else {
+        // This is a blank network profile. Create default configuraton.
+
+        // Start with PAP inner configuration.
+        unique_ptr<config_method_ttls> cfg_method(new config_method_ttls(*this));
+        cfg_method->m_inner.reset(new config_method_pap(*this));
+        cfg_method->m_anonymous_identity = L"@";
+        cfg_method->m_use_preshared = true;
+        cfg_method->m_preshared.reset(new credentials_tls(*this));
+
+        // Start with one method.
+        config_provider cfg_provider(*this);
+        cfg_provider.m_methods.push_back(std::move(cfg_method));
+
+        // Start with one provider.
+        cfg.m_providers.push_back(std::move(cfg_provider));
+    }
 
     // Initialize application.
     new wxApp();
