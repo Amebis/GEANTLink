@@ -105,7 +105,7 @@ EAP_ERROR* eap::module::make_error(_In_ std::exception &err) const
     {
         sec_runtime_error &e(dynamic_cast<sec_runtime_error&>(err));
         if (&e)
-            return make_error(HRESULT_CODE(e.number()), what.c_str());
+            return make_error(SCODE_CODE(e.number()), what.c_str());
     }
 
     {

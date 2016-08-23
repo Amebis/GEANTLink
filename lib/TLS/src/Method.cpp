@@ -646,7 +646,7 @@ void eap::method_tls::verify_server_trust() const
                         CRYPT_DECODE_ALLOC_FLAG | CRYPT_DECODE_ENABLE_PUNYCODE_FLAG,
                         NULL,
                         &output, &size_output))
-                    throw win_runtime_error(__FUNCTION__ " Error decoding certificate extension.");
+                    throw win_runtime_error(__FUNCTION__ " Error decoding subjectAltName2 certificate extension.");
                 san_info.reset((CERT_ALT_NAME_INFO*)output);
             } else if (strcmp(cert->pCertInfo->rgExtension[i].pszObjId, szOID_SUBJECT_ALT_NAME) == 0) {
                 unsigned char *output = NULL;
@@ -658,7 +658,7 @@ void eap::method_tls::verify_server_trust() const
                         CRYPT_DECODE_ALLOC_FLAG | CRYPT_DECODE_ENABLE_PUNYCODE_FLAG,
                         NULL,
                         &output, &size_output))
-                    throw win_runtime_error(__FUNCTION__ " Error decoding certificate extension.");
+                    throw win_runtime_error(__FUNCTION__ " Error decoding subjectAltName certificate extension.");
                 san_info.reset((CERT_ALT_NAME_INFO*)output);
             } else {
                 // Skip this extension.
@@ -693,17 +693,17 @@ void eap::method_tls::verify_server_trust() const
         }
 
         if (!found)
-            throw win_runtime_error(ERROR_INVALID_DOMAINNAME, __FUNCTION__ " Server name is not on the list of trusted server names.");
+            throw sec_runtime_error(SEC_E_WRONG_PRINCIPAL, __FUNCTION__ " Name provided in server certificate is not on the list of trusted server names.");
     }
 
     if (cert->pCertInfo->Issuer.cbData == cert->pCertInfo->Subject.cbData &&
         memcmp(cert->pCertInfo->Issuer.pbData, cert->pCertInfo->Subject.pbData, cert->pCertInfo->Issuer.cbData) == 0)
-        throw com_runtime_error(CRYPT_E_SELF_SIGNED, __FUNCTION__ " Server is using a self-signed certificate. Cannot trust it.");
+        throw sec_runtime_error(SEC_E_CERT_UNKNOWN, __FUNCTION__ " Server is using a self-signed certificate. Cannot trust it.");
 
     // Create temporary certificate store of our trusted root CAs.
     cert_store store;
     if (!store.create(CERT_STORE_PROV_MEMORY, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, NULL, 0, NULL))
-        throw win_runtime_error(ERROR_INVALID_DOMAINNAME, __FUNCTION__ " Error creating temporary certificate store.");
+        throw win_runtime_error(__FUNCTION__ " Error creating temporary certificate store.");
     for (list<cert_context>::const_iterator c = cfg_method->m_trusted_root_ca.cbegin(), c_end = cfg_method->m_trusted_root_ca.cend(); c != c_end; ++c)
         CertAddCertificateContextToStore(store, *c, CERT_STORE_ADD_REPLACE_EXISTING, NULL);
 
@@ -746,14 +746,21 @@ void eap::method_tls::verify_server_trust() const
     // Check chain validation error flags. Ignore CERT_TRUST_IS_UNTRUSTED_ROOT flag since we check root CA explicitly.
     if (context->TrustStatus.dwErrorStatus != CERT_TRUST_NO_ERROR &&
         (cfg_method->m_trusted_root_ca.empty() || (context->TrustStatus.dwErrorStatus & ~CERT_TRUST_IS_UNTRUSTED_ROOT) != CERT_TRUST_NO_ERROR))
-        throw win_runtime_error(context->TrustStatus.dwErrorStatus, "Error validating certificate chain.");
+    {
+        if (context->TrustStatus.dwErrorStatus & CERT_TRUST_IS_NOT_TIME_VALID)
+            throw sec_runtime_error(SEC_E_CERT_EXPIRED, __FUNCTION__ " Server certificate has expired (or is not valid yet).");
+        else if (context->TrustStatus.dwErrorStatus & CERT_TRUST_IS_UNTRUSTED_ROOT)
+            throw sec_runtime_error(SEC_E_UNTRUSTED_ROOT, __FUNCTION__ " Server's certificate not issued by one of configured trusted root CAs.");
+        else
+            throw sec_runtime_error(SEC_E_CERT_UNKNOWN, __FUNCTION__ " Error validating server certificate.");
+    }
 
     if (!cfg_method->m_trusted_root_ca.empty()) {
         // Verify Root CA against our trusted root CA list
         if (context->cChain != 1)
-            throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Multiple chain verification not supported.");
+            throw sec_runtime_error(SEC_E_CERT_UNKNOWN, __FUNCTION__ " Multiple chain verification not supported.");
         if (context->rgpChain[0]->cElement == 0)
-            throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Can not verify empty certificate chain.");
+            throw sec_runtime_error(SEC_E_CERT_UNKNOWN, __FUNCTION__ " Can not verify empty certificate chain.");
 
         PCCERT_CONTEXT cert_root = context->rgpChain[0]->rgpElement[context->rgpChain[0]->cElement-1]->pCertContext;
         for (list<cert_context>::const_iterator c = cfg_method->m_trusted_root_ca.cbegin(), c_end = cfg_method->m_trusted_root_ca.cend();; ++c) {
@@ -766,7 +773,7 @@ void eap::method_tls::verify_server_trust() const
                 }
             } else {
                 // Not found.
-                throw win_runtime_error(ERROR_FILE_NOT_FOUND, __FUNCTION__ " Server's certificate not issued by one of configured trusted root CAs.");
+                throw sec_runtime_error(SEC_E_UNTRUSTED_ROOT, __FUNCTION__ " Server's certificate not issued by one of configured trusted root CAs.");
             }
         }
     }
