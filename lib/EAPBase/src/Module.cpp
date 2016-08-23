@@ -91,26 +91,26 @@ EAP_ERROR* eap::module::make_error(_In_ std::exception &err) const
     MultiByteToWideChar(CP_ACP, 0, err.what(), -1, what);
 
     {
-        win_runtime_error &e(dynamic_cast<win_runtime_error&>(err));
-        if (&e)
-            return make_error(e.number(), what.c_str());
+        win_runtime_error *e = dynamic_cast<win_runtime_error*>(&err);
+        if (e)
+            return make_error(e->number(), what.c_str());
     }
 
     {
-        com_runtime_error &e(dynamic_cast<com_runtime_error&>(err));
-        if (&e)
-            return make_error(HRESULT_CODE(e.number()), what.c_str());
+        com_runtime_error *e = dynamic_cast<com_runtime_error*>(&err);
+        if (e)
+            return make_error(HRESULT_CODE(e->number()), what.c_str());
     }
 
     {
-        sec_runtime_error &e(dynamic_cast<sec_runtime_error&>(err));
-        if (&e)
-            return make_error(SCODE_CODE(e.number()), what.c_str());
+        sec_runtime_error *e = dynamic_cast<sec_runtime_error*>(&err);
+        if (e)
+            return make_error(SCODE_CODE(e->number()), what.c_str());
     }
 
     {
-        invalid_argument &e(dynamic_cast<invalid_argument&>(err));
-        if (&e)
+        invalid_argument *e = dynamic_cast<invalid_argument*>(&err);
+        if (e)
             return make_error(ERROR_INVALID_PARAMETER, what.c_str());
     }
 
