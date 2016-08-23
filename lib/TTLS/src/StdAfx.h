@@ -30,3 +30,4 @@
 #include <WinStd/EAP.h>
 
 #include <EapHostError.h>
+#include <schannel.h>

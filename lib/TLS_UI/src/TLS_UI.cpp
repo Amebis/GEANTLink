@@ -46,7 +46,7 @@ wxCertificateClientData::~wxCertificateClientData()
 wxIMPLEMENT_DYNAMIC_CLASS(wxHostNameValidator, wxValidator);
 
 
-wxHostNameValidator::wxHostNameValidator(std::string *val) :
+wxHostNameValidator::wxHostNameValidator(std::wstring *val) :
     m_val(val),
     wxValidator()
 {
@@ -98,7 +98,7 @@ bool wxHostNameValidator::TransferFromWindow()
 }
 
 
-bool wxHostNameValidator::Parse(const wxString &val_in, size_t i_start, size_t i_end, wxTextCtrl *ctrl, wxWindow *parent, std::string *val_out)
+bool wxHostNameValidator::Parse(const wxString &val_in, size_t i_start, size_t i_end, wxTextCtrl *ctrl, wxWindow *parent, std::wstring *val_out)
 {
     const wxStringCharType *buf = val_in;
 
@@ -108,7 +108,7 @@ bool wxHostNameValidator::Parse(const wxString &val_in, size_t i_start, size_t i
             // End of host name found.
             if (val_out) val_out->assign(val_in.c_str() + i_start, i - i_start);
             return true;
-        } else if (_tcschr(wxT("abcdefghijklmnopqrstuvwxyz0123456789-*"), buf[i])) {
+        } else if (buf[i] == _T('-') || buf[i] == _T('_') || _istalnum(buf[i])) {
             // Valid character found.
             i++;
         } else {
@@ -129,7 +129,7 @@ bool wxHostNameValidator::Parse(const wxString &val_in, size_t i_start, size_t i
 wxIMPLEMENT_DYNAMIC_CLASS(wxFQDNValidator, wxValidator);
 
 
-wxFQDNValidator::wxFQDNValidator(std::string *val) :
+wxFQDNValidator::wxFQDNValidator(std::wstring *val) :
     m_val(val),
     wxValidator()
 {
@@ -181,7 +181,7 @@ bool wxFQDNValidator::TransferFromWindow()
 }
 
 
-bool wxFQDNValidator::Parse(const wxString &val_in, size_t i_start, size_t i_end, wxTextCtrl *ctrl, wxWindow *parent, std::string *val_out)
+bool wxFQDNValidator::Parse(const wxString &val_in, size_t i_start, size_t i_end, wxTextCtrl *ctrl, wxWindow *parent, std::wstring *val_out)
 {
     const wxStringCharType *buf = val_in;
 
@@ -210,7 +210,7 @@ bool wxFQDNValidator::Parse(const wxString &val_in, size_t i_start, size_t i_end
 wxIMPLEMENT_DYNAMIC_CLASS(wxFQDNListValidator, wxValidator);
 
 
-wxFQDNListValidator::wxFQDNListValidator(std::list<std::string> *val) :
+wxFQDNListValidator::wxFQDNListValidator(std::list<std::wstring> *val) :
     m_val(val),
     wxValidator()
 {
@@ -246,7 +246,7 @@ bool wxFQDNListValidator::TransferToWindow()
 
     if (m_val) {
         wxString str;
-        for (std::list<std::string>::const_iterator name = m_val->cbegin(), name_end = m_val->cend(); name != name_end; ++name) {
+        for (std::list<std::wstring>::const_iterator name = m_val->cbegin(), name_end = m_val->cend(); name != name_end; ++name) {
             if (!str.IsEmpty()) str += wxT("; ");
             str += *name;
         }
@@ -267,11 +267,11 @@ bool wxFQDNListValidator::TransferFromWindow()
 }
 
 
-bool wxFQDNListValidator::Parse(const wxString &val_in, size_t i_start, size_t i_end, wxTextCtrl *ctrl, wxWindow *parent, std::list<std::string> *val_out)
+bool wxFQDNListValidator::Parse(const wxString &val_in, size_t i_start, size_t i_end, wxTextCtrl *ctrl, wxWindow *parent, std::list<std::wstring> *val_out)
 {
     const wxStringCharType *buf = val_in;
-    std::string _fqdn, *fqdn = val_out ? &_fqdn : NULL;
-    std::list<std::string> _val_out;
+    std::wstring _fqdn, *fqdn = val_out ? &_fqdn : NULL;
+    std::list<std::wstring> _val_out;
 
     size_t i = i_start;
     for (;;) {
@@ -603,21 +603,3 @@ void wxTLSConfigPanel::OnInitDialog(wxInitDialogEvent& event)
     if (m_credentials)
         m_credentials->GetEventHandler()->ProcessEvent(event);
 }
-
-
-bool wxTLSConfigPanel::TransferDataFromWindow()
-{
-    wxCHECK(wxPanel::TransferDataFromWindow(), false);
-
-    if (!m_prov.m_read_only) {
-        // This is not a provider-locked configuration. The data will get saved.
-
-        // Reset session ID and master secret to force clean connect next time.
-        m_cfg.m_session_id.clear();
-        m_cfg.m_master_secret.clear();
-    }
-
-    return true;
-}
-
-

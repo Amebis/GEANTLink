@@ -112,14 +112,15 @@ namespace eap
 
         /// @}
 
-        ///
-        /// Generates master session key
-        ///
-        /// \sa [The EAP-TLS Authentication Protocol (Chapter 2.3. Key Hierarchy)](https://tools.ietf.org/html/rfc5216#section-2.3)
-        ///
-        virtual void derive_msk();
-
     protected:
+        ///
+        /// Processes an application message
+        ///
+        /// \param[in] msg       Application message data
+        /// \param[in] size_msg  Application message data size
+        ///
+        virtual void process_application_data(_In_bytecount_(size_msg) const void *msg, _In_ size_t size_msg);
+
         ///
         /// Makes a PAP client message
         ///

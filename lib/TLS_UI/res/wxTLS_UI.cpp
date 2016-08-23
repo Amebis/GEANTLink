@@ -74,11 +74,11 @@ wxEAPTLSServerTrustConfigPanelBase::wxEAPTLSServerTrustConfigPanelBase( wxWindow
 	sb_server_names->Add( m_server_names_label, 0, wxBOTTOM, 5 );
 	
 	m_server_names = new wxTextCtrl( sb_server_trust->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_server_names->SetToolTip( _("A semicolon delimited list of acceptable server FQDN names; blank to skip name check; \"*\" wildchar allowed") );
+	m_server_names->SetToolTip( _("A semicolon delimited list of acceptable server FQDN names; blank to skip name check; Unicode characters allowed") );
 	
 	sb_server_names->Add( m_server_names, 0, wxEXPAND|wxBOTTOM, 5 );
 	
-	m_server_names_note = new wxStaticText( sb_server_trust->GetStaticBox(), wxID_ANY, _("(Example: foo.bar.com;*.domain.org)"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_server_names_note = new wxStaticText( sb_server_trust->GetStaticBox(), wxID_ANY, _("(Example: foo.bar.com;server2.bar.com)"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_server_names_note->Wrap( -1 );
 	sb_server_names->Add( m_server_names_note, 0, wxALIGN_RIGHT, 5 );
 	

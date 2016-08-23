@@ -30,5 +30,6 @@
 
 #include <WinStd/Cred.h>
 #include <WinStd/ETW.h>
+#include <WinStd/Sec.h>
 
 #include <EventsETW.h>

@@ -103,6 +103,12 @@ EAP_ERROR* eap::module::make_error(_In_ std::exception &err) const
     }
 
     {
+        sec_runtime_error &e(dynamic_cast<sec_runtime_error&>(err));
+        if (&e)
+            return make_error(HRESULT_CODE(e.number()), what.c_str());
+    }
+
+    {
         invalid_argument &e(dynamic_cast<invalid_argument&>(err));
         if (&e)
             return make_error(ERROR_INVALID_PARAMETER, what.c_str());

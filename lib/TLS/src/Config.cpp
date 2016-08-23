@@ -75,8 +75,6 @@ eap::config_method_tls::config_method_tls(_In_ module &mod) : config_method_with
 eap::config_method_tls::config_method_tls(_In_ const config_method_tls &other) :
     m_trusted_root_ca(other.m_trusted_root_ca),
     m_server_names(other.m_server_names),
-    m_session_id(other.m_session_id),
-    m_master_secret(other.m_master_secret),
     config_method_with_cred(other)
 {
 }
@@ -85,8 +83,6 @@ eap::config_method_tls::config_method_tls(_In_ const config_method_tls &other) :
 eap::config_method_tls::config_method_tls(_Inout_ config_method_tls &&other) :
     m_trusted_root_ca(std::move(other.m_trusted_root_ca)),
     m_server_names(std::move(other.m_server_names)),
-    m_session_id(std::move(other.m_session_id)),
-    m_master_secret(std::move(other.m_master_secret)),
     config_method_with_cred(std::move(other))
 {
 }
@@ -98,8 +94,6 @@ eap::config_method_tls& eap::config_method_tls::operator=(_In_ const config_meth
         (config_method_with_cred&)*this = other;
         m_trusted_root_ca = other.m_trusted_root_ca;
         m_server_names    = other.m_server_names;
-        m_session_id      = other.m_session_id;
-        m_master_secret   = other.m_master_secret;
     }
 
     return *this;
@@ -112,8 +106,6 @@ eap::config_method_tls& eap::config_method_tls::operator=(_Inout_ config_method_
         (config_method_with_cred&&)*this = std::move(other);
         m_trusted_root_ca = std::move(other.m_trusted_root_ca);
         m_server_names    = std::move(other.m_server_names);
-        m_session_id      = std::move(other.m_session_id);
-        m_master_secret   = std::move(other.m_master_secret);
     }
 
     return *this;
@@ -161,10 +153,8 @@ void eap::config_method_tls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *
     }
 
     // <ServerName>
-    for (list<string>::const_iterator i = m_server_names.begin(), i_end = m_server_names.end(); i != i_end; ++i) {
-        wstring str;
-        MultiByteToWideChar(CP_UTF8, 0, i->c_str(), (int)i->length(), str);
-        if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElServerSideCredential, bstr(L"ServerName"), bstrNamespace, bstr(str))))
+    for (list<wstring>::const_iterator i = m_server_names.begin(), i_end = m_server_names.end(); i != i_end; ++i) {
+        if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElServerSideCredential, bstr(L"ServerName"), bstrNamespace, bstr(*i))))
             throw com_runtime_error(hr, __FUNCTION__ " Error creating <ServerName> element.");
     }
 }
@@ -231,12 +221,7 @@ void eap::config_method_tls::load(_In_ IXMLDOMNode *pConfigRoot)
                 pXmlListServerIDs->get_item(j, &pXmlElServerID);
                 bstr bstrServerID;
                 pXmlElServerID->get_text(&bstrServerID);
-
-                // Server names (FQDNs) are always ASCII. Hopefully. Convert them to UTF-8 anyway for consistent comparison. CP_ANSI varies.
-                string str;
-                WideCharToMultiByte(CP_UTF8, 0, bstrServerID, bstrServerID.length(), str, NULL, NULL);
-
-                m_server_names.push_back(str);
+                m_server_names.push_back(wstring(bstrServerID));
             }
 
             m_module.log_config((xpathServerSideCredential + L"/ServerName").c_str(), m_server_names);
@@ -250,8 +235,6 @@ void eap::config_method_tls::operator<<(_Inout_ cursor_out &cursor) const
     config_method_with_cred::operator<<(cursor);
     cursor << m_trusted_root_ca;
     cursor << m_server_names   ;
-    cursor << m_session_id     ;
-    cursor << m_master_secret  ;
 }
 
 
@@ -260,9 +243,7 @@ size_t eap::config_method_tls::get_pk_size() const
     return
         config_method_with_cred::get_pk_size() +
         pksizeof(m_trusted_root_ca) +
-        pksizeof(m_server_names   ) +
-        pksizeof(m_session_id     ) +
-        pksizeof(m_master_secret  );
+        pksizeof(m_server_names   );
 }
 
 
@@ -271,8 +252,6 @@ void eap::config_method_tls::operator>>(_Inout_ cursor_in &cursor)
     config_method_with_cred::operator>>(cursor);
     cursor >> m_trusted_root_ca;
     cursor >> m_server_names   ;
-    cursor >> m_session_id     ;
-    cursor >> m_master_secret  ;
 }
 
 
