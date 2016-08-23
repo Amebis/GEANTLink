@@ -747,9 +747,9 @@ void eap::method_tls::verify_server_trust() const
     if (context->TrustStatus.dwErrorStatus != CERT_TRUST_NO_ERROR &&
         (cfg_method->m_trusted_root_ca.empty() || (context->TrustStatus.dwErrorStatus & ~CERT_TRUST_IS_UNTRUSTED_ROOT) != CERT_TRUST_NO_ERROR))
     {
-        if (context->TrustStatus.dwErrorStatus & CERT_TRUST_IS_NOT_TIME_VALID)
+        if (context->TrustStatus.dwErrorStatus & (CERT_TRUST_IS_NOT_TIME_VALID | CERT_TRUST_IS_NOT_TIME_NESTED))
             throw sec_runtime_error(SEC_E_CERT_EXPIRED, __FUNCTION__ " Server certificate has expired (or is not valid yet).");
-        else if (context->TrustStatus.dwErrorStatus & CERT_TRUST_IS_UNTRUSTED_ROOT)
+        else if (context->TrustStatus.dwErrorStatus & (CERT_TRUST_IS_UNTRUSTED_ROOT | CERT_TRUST_IS_PARTIAL_CHAIN))
             throw sec_runtime_error(SEC_E_UNTRUSTED_ROOT, __FUNCTION__ " Server's certificate not issued by one of configured trusted root CAs.");
         else
             throw sec_runtime_error(SEC_E_CERT_UNKNOWN, __FUNCTION__ " Error validating server certificate.");
