@@ -1585,7 +1585,7 @@ void eap::method_tls::verify_server_trust() const
 
     // Check chain validation error flags. Ignore CERT_TRUST_IS_UNTRUSTED_ROOT flag since we check root CA explicitly.
     if (context->TrustStatus.dwErrorStatus != CERT_TRUST_NO_ERROR &&
-        (cfg_method->m_trusted_root_ca.empty() || (context->TrustStatus.dwErrorStatus & ~CERT_TRUST_IS_UNTRUSTED_ROOT) != CERT_TRUST_NO_ERROR))
+        (context->TrustStatus.dwErrorStatus & ~CERT_TRUST_IS_UNTRUSTED_ROOT) != CERT_TRUST_NO_ERROR)
     {
         if (context->TrustStatus.dwErrorStatus & (CERT_TRUST_IS_NOT_TIME_VALID | CERT_TRUST_IS_NOT_TIME_NESTED))
             throw sec_runtime_error(SEC_E_CERT_EXPIRED, __FUNCTION__ " Server certificate has expired (or is not valid yet).");
@@ -1595,26 +1595,24 @@ void eap::method_tls::verify_server_trust() const
             throw sec_runtime_error(SEC_E_CERT_UNKNOWN, __FUNCTION__ " Error validating server certificate.");
     }
 
-    if (!cfg_method->m_trusted_root_ca.empty()) {
-        // Verify Root CA against our trusted root CA list
-        if (context->cChain != 1)
-            throw sec_runtime_error(SEC_E_CERT_UNKNOWN, __FUNCTION__ " Multiple chain verification not supported.");
-        if (context->rgpChain[0]->cElement == 0)
-            throw sec_runtime_error(SEC_E_CERT_UNKNOWN, __FUNCTION__ " Can not verify empty certificate chain.");
+    // Verify Root CA against our trusted root CA list
+    if (context->cChain != 1)
+        throw sec_runtime_error(SEC_E_CERT_UNKNOWN, __FUNCTION__ " Multiple chain verification not supported.");
+    if (context->rgpChain[0]->cElement == 0)
+        throw sec_runtime_error(SEC_E_CERT_UNKNOWN, __FUNCTION__ " Can not verify empty certificate chain.");
 
-        PCCERT_CONTEXT cert_root = context->rgpChain[0]->rgpElement[context->rgpChain[0]->cElement-1]->pCertContext;
-        for (list<cert_context>::const_iterator c = cfg_method->m_trusted_root_ca.cbegin(), c_end = cfg_method->m_trusted_root_ca.cend();; ++c) {
-            if (c != c_end) {
-                if (cert_root->cbCertEncoded == (*c)->cbCertEncoded &&
-                    memcmp(cert_root->pbCertEncoded, (*c)->pbCertEncoded, cert_root->cbCertEncoded) == 0)
-                {
-                    // Trusted root CA found.
-                    break;
-                }
-            } else {
-                // Not found.
-                throw sec_runtime_error(SEC_E_UNTRUSTED_ROOT, __FUNCTION__ " Server's certificate not issued by one of configured trusted root CAs.");
+    PCCERT_CONTEXT cert_root = context->rgpChain[0]->rgpElement[context->rgpChain[0]->cElement-1]->pCertContext;
+    for (list<cert_context>::const_iterator c = cfg_method->m_trusted_root_ca.cbegin(), c_end = cfg_method->m_trusted_root_ca.cend();; ++c) {
+        if (c != c_end) {
+            if (cert_root->cbCertEncoded == (*c)->cbCertEncoded &&
+                memcmp(cert_root->pbCertEncoded, (*c)->pbCertEncoded, cert_root->cbCertEncoded) == 0)
+            {
+                // Trusted root CA found.
+                break;
             }
+        } else {
+            // Not found.
+            throw sec_runtime_error(SEC_E_UNTRUSTED_ROOT, __FUNCTION__ " Server's certificate not issued by one of configured trusted root CAs.");
         }
     }
 
