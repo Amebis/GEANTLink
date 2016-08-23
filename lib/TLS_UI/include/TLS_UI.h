@@ -119,7 +119,7 @@ public:
     ///
     /// Construct the validator with a value to store data
     ///
-    wxHostNameValidator(std::string *val = NULL);
+    wxHostNameValidator(std::wstring *val = NULL);
 
     ///
     /// Copy constructor
@@ -149,10 +149,10 @@ public:
     ///
     /// Parses FQDN value
     ///
-    static bool Parse(const wxString &val_in, size_t i_start, size_t i_end, wxTextCtrl *ctrl, wxWindow *parent, std::string *val_out = NULL);
+    static bool Parse(const wxString &val_in, size_t i_start, size_t i_end, wxTextCtrl *ctrl, wxWindow *parent, std::wstring *val_out = NULL);
 
 protected:
-    std::string *m_val; ///< Pointer to variable to receive control's parsed value
+    std::wstring *m_val; ///< Pointer to variable to receive control's parsed value
 };
 
 
@@ -165,7 +165,7 @@ public:
     ///
     /// Construct the validator with a value to store data
     ///
-    wxFQDNValidator(std::string *val = NULL);
+    wxFQDNValidator(std::wstring *val = NULL);
 
     ///
     /// Copy constructor
@@ -195,10 +195,10 @@ public:
     ///
     /// Parses FQDN value
     ///
-    static bool Parse(const wxString &val_in, size_t i_start, size_t i_end, wxTextCtrl *ctrl, wxWindow *parent, std::string *val_out = NULL);
+    static bool Parse(const wxString &val_in, size_t i_start, size_t i_end, wxTextCtrl *ctrl, wxWindow *parent, std::wstring *val_out = NULL);
 
 protected:
-    std::string *m_val; ///< Pointer to variable to receive control's parsed value
+    std::wstring *m_val; ///< Pointer to variable to receive control's parsed value
 };
 
 
@@ -211,7 +211,7 @@ public:
     ///
     /// Construct the validator with a value to store data
     ///
-    wxFQDNListValidator(std::list<std::string> *val = NULL);
+    wxFQDNListValidator(std::list<std::wstring> *val = NULL);
 
     ///
     /// Copy constructor
@@ -241,10 +241,10 @@ public:
     ///
     /// Parses FQDN list value
     ///
-    static bool Parse(const wxString &val_in, size_t i_start, size_t i_end, wxTextCtrl *ctrl, wxWindow *parent, std::list<std::string> *val_out = NULL);
+    static bool Parse(const wxString &val_in, size_t i_start, size_t i_end, wxTextCtrl *ctrl, wxWindow *parent, std::list<std::wstring> *val_out = NULL);
 
 protected:
-    std::list<std::string> *m_val;  ///< Pointer to variable to receive control's parsed value
+    std::list<std::wstring> *m_val;  ///< Pointer to variable to receive control's parsed value
 };
 
 
@@ -311,7 +311,7 @@ protected:
     eap::config_method_tls &m_cfg;              ///< TLS configuration
     winstd::library m_certmgr;                  ///< certmgr.dll resource library reference
     wxIcon m_icon;                              ///< Panel icon
-    std::list<std::string> m_server_names_val;  ///< Acceptable authenticating server names
+    std::list<std::wstring> m_server_names_val; ///< Acceptable authenticating server names
 };
 
 

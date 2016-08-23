@@ -870,7 +870,7 @@
                                                 <property name="style"></property>
                                                 <property name="subclass"></property>
                                                 <property name="toolbar_pane">0</property>
-                                                <property name="tooltip">A semicolon delimited list of acceptable server FQDN names; blank to skip name check; &quot;*&quot; wildchar allowed</property>
+                                                <property name="tooltip">A semicolon delimited list of acceptable server FQDN names; blank to skip name check; &quot;*&quot; wildchar allowed; Unicode characters allowed</property>
                                                 <property name="validator_data_type"></property>
                                                 <property name="validator_style">wxFILTER_NONE</property>
                                                 <property name="validator_type">wxDefaultValidator</property>

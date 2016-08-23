@@ -74,7 +74,7 @@ wxEAPTLSServerTrustConfigPanelBase::wxEAPTLSServerTrustConfigPanelBase( wxWindow
 	sb_server_names->Add( m_server_names_label, 0, wxBOTTOM, 5 );
 	
 	m_server_names = new wxTextCtrl( sb_server_trust->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_server_names->SetToolTip( _("A semicolon delimited list of acceptable server FQDN names; blank to skip name check; \"*\" wildchar allowed") );
+	m_server_names->SetToolTip( _("A semicolon delimited list of acceptable server FQDN names; blank to skip name check; \"*\" wildchar allowed; Unicode characters allowed") );
 	
 	sb_server_names->Add( m_server_names, 0, wxEXPAND|wxBOTTOM, 5 );
 	

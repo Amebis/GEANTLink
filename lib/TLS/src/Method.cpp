@@ -1166,8 +1166,8 @@ void eap::method_tls::verify_server_trust() const
     assert(!m_server_cert_chain.empty());
     const cert_context &cert = m_server_cert_chain.front();
 
-    string subj;
-    if (!CertGetNameStringA(cert, CERT_NAME_SIMPLE_DISPLAY_TYPE, 0, NULL, subj))
+    wstring subj;
+    if (!CertGetNameStringW(cert, CERT_NAME_SIMPLE_DISPLAY_TYPE, 0, NULL, subj))
         throw win_runtime_error(__FUNCTION__ " Error retrieving server's certificate subject name.");
 
     const config_provider &cfg_prov(m_cfg.m_providers.front());
@@ -1176,29 +1176,29 @@ void eap::method_tls::verify_server_trust() const
 
     if (!cfg_method->m_server_names.empty()) {
         // Check server name.
-        for (list<string>::const_iterator s = cfg_method->m_server_names.cbegin(), s_end = cfg_method->m_server_names.cend();; ++s) {
+        for (list<wstring>::const_iterator s = cfg_method->m_server_names.cbegin(), s_end = cfg_method->m_server_names.cend();; ++s) {
             if (s != s_end) {
-                const char
+                const wchar_t
                     *a = s->c_str(),
                     *b = subj.c_str();
                 size_t
                     len_a = s->length(),
                     len_b = subj.length();
 
-                if (_stricmp(a, b) == 0 || // Direct match
-                    a[0] == '*' && len_b + 1 >= len_a && _stricmp(a + 1, b + len_b - (len_a - 1)) == 0) // "*..." wildchar match
+                if (_wcsicmp(a, b) == 0 || // Direct match
+                    a[0] == '*' && len_b + 1 >= len_a && _wcsicmp(a + 1, b + len_b - (len_a - 1)) == 0) // "*..." wildchar match
                 {
-                    m_module.log_event(&EAPMETHOD_TLS_SERVER_NAME_TRUSTED, event_data(subj), event_data::blank);
+                    m_module.log_event(&EAPMETHOD_TLS_SERVER_NAME_TRUSTED1, event_data(subj), event_data::blank);
                     break;
                 }
             } else
-                throw win_runtime_error(ERROR_INVALID_DOMAINNAME, string_printf(__FUNCTION__ " Server name %s is not on the list of trusted server names.", subj.c_str()).c_str());
+                throw win_runtime_error(ERROR_INVALID_DOMAINNAME, string_printf(__FUNCTION__ " Server name %ls is not on the list of trusted server names.", subj.c_str()).c_str());
         }
     }
 
     if (cert->pCertInfo->Issuer.cbData == cert->pCertInfo->Subject.cbData &&
         memcmp(cert->pCertInfo->Issuer.pbData, cert->pCertInfo->Subject.pbData, cert->pCertInfo->Issuer.cbData) == 0)
-        throw com_runtime_error(CRYPT_E_SELF_SIGNED, string_printf(__FUNCTION__ " Server is using a self-signed certificate %s. Cannot trust it.", subj.c_str()).c_str());
+        throw com_runtime_error(CRYPT_E_SELF_SIGNED, string_printf(__FUNCTION__ " Server is using a self-signed certificate %ls. Cannot trust it.", subj.c_str()).c_str());
 
     // Create temporary certificate store of our trusted root CAs.
     cert_store store;

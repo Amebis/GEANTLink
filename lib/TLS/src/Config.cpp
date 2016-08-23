@@ -161,10 +161,8 @@ void eap::config_method_tls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *
     }
 
     // <ServerName>
-    for (list<string>::const_iterator i = m_server_names.begin(), i_end = m_server_names.end(); i != i_end; ++i) {
-        wstring str;
-        MultiByteToWideChar(CP_UTF8, 0, i->c_str(), (int)i->length(), str);
-        if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElServerSideCredential, bstr(L"ServerName"), bstrNamespace, bstr(str))))
+    for (list<wstring>::const_iterator i = m_server_names.begin(), i_end = m_server_names.end(); i != i_end; ++i) {
+        if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElServerSideCredential, bstr(L"ServerName"), bstrNamespace, bstr(*i))))
             throw com_runtime_error(hr, __FUNCTION__ " Error creating <ServerName> element.");
     }
 }
@@ -231,12 +229,7 @@ void eap::config_method_tls::load(_In_ IXMLDOMNode *pConfigRoot)
                 pXmlListServerIDs->get_item(j, &pXmlElServerID);
                 bstr bstrServerID;
                 pXmlElServerID->get_text(&bstrServerID);
-
-                // Server names (FQDNs) are always ASCII. Hopefully. Convert them to UTF-8 anyway for consistent comparison. CP_ANSI varies.
-                string str;
-                WideCharToMultiByte(CP_UTF8, 0, bstrServerID, bstrServerID.length(), str, NULL, NULL);
-
-                m_server_names.push_back(str);
+                m_server_names.push_back(wstring(bstrServerID));
             }
 
             m_module.log_config((xpathServerSideCredential + L"/ServerName").c_str(), m_server_names);
