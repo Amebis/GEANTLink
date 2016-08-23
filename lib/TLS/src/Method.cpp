@@ -653,7 +653,7 @@ eap::sanitizing_blob eap::method_tls::make_client_hello()
     msg.insert(msg.end(), m_session_id.begin(), m_session_id.end());
 
     // Cypher suite list
-    unsigned short size_cipher_suite2 = htons((unsigned short)sizeof(s_cipher_suite));
+    unsigned short size_cipher_suite2 = htons((unsigned short)sizeof(s_cipher_suite)/2);
     msg.insert(msg.end(), (unsigned char*)&size_cipher_suite2, (unsigned char*)(&size_cipher_suite2 + 1));
     msg.insert(msg.end(), s_cipher_suite, s_cipher_suite + _countof(s_cipher_suite));
 
