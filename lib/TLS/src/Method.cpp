@@ -1166,30 +1166,82 @@ void eap::method_tls::verify_server_trust() const
     assert(!m_server_cert_chain.empty());
     const cert_context &cert = m_server_cert_chain.front();
 
-    wstring subj;
-    if (!CertGetNameStringW(cert, CERT_NAME_SIMPLE_DISPLAY_TYPE, 0, NULL, subj))
-        throw win_runtime_error(__FUNCTION__ " Error retrieving server's certificate subject name.");
-
     const config_provider &cfg_prov(m_cfg.m_providers.front());
     const config_method_tls *cfg_method = dynamic_cast<const config_method_tls*>(cfg_prov.m_methods.front().get());
     assert(cfg_method);
 
+    // Check server name.
     if (!cfg_method->m_server_names.empty()) {
-        // Check server name.
-        for (list<wstring>::const_iterator s = cfg_method->m_server_names.cbegin(), s_end = cfg_method->m_server_names.cend();; ++s) {
-            if (s != s_end) {
+        bool
+            has_san = false,
+            found   = false;
+
+        // Search subjectAltName2 and subjectAltName.
+        for (DWORD i = 0; !found && i < cert->pCertInfo->cExtension; i++) {
+            unique_ptr<CERT_ALT_NAME_INFO, LocalFree_delete<CERT_ALT_NAME_INFO> > san_info;
+            if (strcmp(cert->pCertInfo->rgExtension[i].pszObjId, szOID_SUBJECT_ALT_NAME2) == 0) {
+                unsigned char *output = NULL;
+                DWORD size_output;
+                if (!CryptDecodeObjectEx(
+                        X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
+                        szOID_SUBJECT_ALT_NAME2,
+                        cert->pCertInfo->rgExtension[i].Value.pbData, cert->pCertInfo->rgExtension[i].Value.cbData,
+                        CRYPT_DECODE_ALLOC_FLAG | CRYPT_DECODE_ENABLE_PUNYCODE_FLAG,
+                        NULL,
+                        &output, &size_output))
+                    throw win_runtime_error(__FUNCTION__ " Error decoding certificate extension.");
+                san_info.reset((CERT_ALT_NAME_INFO*)output);
+            } else if (strcmp(cert->pCertInfo->rgExtension[i].pszObjId, szOID_SUBJECT_ALT_NAME) == 0) {
+                unsigned char *output = NULL;
+                DWORD size_output;
+                if (!CryptDecodeObjectEx(
+                        X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
+                        szOID_SUBJECT_ALT_NAME,
+                        cert->pCertInfo->rgExtension[i].Value.pbData, cert->pCertInfo->rgExtension[i].Value.cbData,
+                        CRYPT_DECODE_ALLOC_FLAG | CRYPT_DECODE_ENABLE_PUNYCODE_FLAG,
+                        NULL,
+                        &output, &size_output))
+                    throw win_runtime_error(__FUNCTION__ " Error decoding certificate extension.");
+                san_info.reset((CERT_ALT_NAME_INFO*)output);
+            } else {
+                // Skip this extension.
+                continue;
+            }
+            has_san = true;
+
+            for (list<wstring>::const_iterator s = cfg_method->m_server_names.cbegin(), s_end = cfg_method->m_server_names.cend(); !found && s != s_end; ++s) {
+                for (DWORD i = 0; !found && i < san_info->cAltEntry; i++) {
+                    if (san_info->rgAltEntry[i].dwAltNameChoice == CERT_ALT_NAME_DNS_NAME &&
+                        _wcsicmp(s->c_str(), san_info->rgAltEntry[i].pwszDNSName) == 0)
+                    {
+                        m_module.log_event(&EAPMETHOD_TLS_SERVER_NAME_TRUSTED1, event_data(san_info->rgAltEntry[i].pwszDNSName), event_data::blank);
+                        found = true;
+                    }
+                }
+            }
+        }
+
+        if (!has_san) {
+            // Certificate has no subjectAltName. Compare against Common Name.
+            wstring subj;
+            if (!CertGetNameStringW(cert, CERT_NAME_DNS_TYPE, CERT_NAME_STR_ENABLE_PUNYCODE_FLAG, NULL, subj))
+                throw win_runtime_error(__FUNCTION__ " Error retrieving server's certificate subject name.");
+
+            for (list<wstring>::const_iterator s = cfg_method->m_server_names.cbegin(), s_end = cfg_method->m_server_names.cend(); !found && s != s_end; ++s) {
                 if (_wcsicmp(s->c_str(), subj.c_str()) == 0) {
                     m_module.log_event(&EAPMETHOD_TLS_SERVER_NAME_TRUSTED1, event_data(subj), event_data::blank);
-                    break;
+                    found = true;
                 }
-            } else
-                throw win_runtime_error(ERROR_INVALID_DOMAINNAME, string_printf(__FUNCTION__ " Server name %ls is not on the list of trusted server names.", subj.c_str()).c_str());
+            }
         }
+
+        if (!found)
+            throw win_runtime_error(ERROR_INVALID_DOMAINNAME, __FUNCTION__ " Server name is not on the list of trusted server names.");
     }
 
     if (cert->pCertInfo->Issuer.cbData == cert->pCertInfo->Subject.cbData &&
         memcmp(cert->pCertInfo->Issuer.pbData, cert->pCertInfo->Subject.pbData, cert->pCertInfo->Issuer.cbData) == 0)
-        throw com_runtime_error(CRYPT_E_SELF_SIGNED, string_printf(__FUNCTION__ " Server is using a self-signed certificate %ls. Cannot trust it.", subj.c_str()).c_str());
+        throw com_runtime_error(CRYPT_E_SELF_SIGNED, __FUNCTION__ " Server is using a self-signed certificate. Cannot trust it.");
 
     // Create temporary certificate store of our trusted root CAs.
     cert_store store;
@@ -1198,7 +1250,7 @@ void eap::method_tls::verify_server_trust() const
     for (list<cert_context>::const_iterator c = cfg_method->m_trusted_root_ca.cbegin(), c_end = cfg_method->m_trusted_root_ca.cend(); c != c_end; ++c)
         CertAddCertificateContextToStore(store, *c, CERT_STORE_ADD_REPLACE_EXISTING, NULL);
 
-    // Add all certificates from the server's certificate chain, except the first one.
+    // Add all intermediate certificates from the server's certificate chain.
     for (list<cert_context>::const_iterator c = m_server_cert_chain.cbegin(), c_end = m_server_cert_chain.cend(); ++c != c_end;) {
         const cert_context &_c = *c;
         if (_c->pCertInfo->Issuer.cbData == _c->pCertInfo->Subject.cbData &&
@@ -1231,7 +1283,7 @@ void eap::method_tls::verify_server_trust() const
     if (!context.create(NULL, cert, NULL, store, &chain_params, 0))
         throw win_runtime_error(__FUNCTION__ " Error creating certificate chain context.");
 
-    // Check chain validation error flags. Ignore CERT_TRUST_IS_UNTRUSTED_ROOT flag when we check root CA explicitly.
+    // Check chain validation error flags. Ignore CERT_TRUST_IS_UNTRUSTED_ROOT flag since we check root CA explicitly.
     if (context->TrustStatus.dwErrorStatus != CERT_TRUST_NO_ERROR &&
         (cfg_method->m_trusted_root_ca.empty() || (context->TrustStatus.dwErrorStatus & ~CERT_TRUST_IS_UNTRUSTED_ROOT) != CERT_TRUST_NO_ERROR))
         throw win_runtime_error(context->TrustStatus.dwErrorStatus, "Error validating certificate chain.");
