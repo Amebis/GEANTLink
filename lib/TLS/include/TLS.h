@@ -503,7 +503,16 @@ namespace eap
         ///
         tls_conn_state& operator=(_Inout_ tls_conn_state &&other);
 
+        ///
+        /// Configures state according to given cipher
+        ///
+        /// \param[in] cipher  Cipher ID
+        ///
+        void set_cipher(_In_ const unsigned char cipher[2]);
+
     public:
+        LPCTSTR m_prov_name;            ///< Cryptography provider name
+        DWORD m_prov_type;              ///< Cryptography provider type
         ALG_ID m_alg_encrypt;           ///< Bulk encryption algorithm
         size_t m_size_enc_key;          ///< Encryption key size in bytes (has to comply with `m_alg_encrypt`)
         size_t m_size_enc_iv;           ///< Encryption initialization vector size in bytes (has to comply with `m_alg_encrypt`)

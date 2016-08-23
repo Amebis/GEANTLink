@@ -603,3 +603,23 @@ void wxTLSConfigPanel::OnInitDialog(wxInitDialogEvent& event)
     if (m_credentials)
         m_credentials->GetEventHandler()->ProcessEvent(event);
 }
+
+
+#if EAP_TLS < EAP_TLS_SCHANNEL
+
+bool wxTLSConfigPanel::TransferDataFromWindow()
+{
+    wxCHECK(wxPanel::TransferDataFromWindow(), false);
+
+    if (!m_prov.m_read_only) {
+        // This is not a provider-locked configuration. The data will get saved.
+
+        // Reset session ID and master secret to force clean connect next time.
+        m_cfg.m_session_id.clear();
+        m_cfg.m_master_secret.clear();
+    }
+
+    return true;
+}
+
+#endif

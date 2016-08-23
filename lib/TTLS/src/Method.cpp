@@ -71,6 +71,22 @@ void eap::method_ttls::process_request_packet(
 
     // Do the TLS.
     method_tls::process_request_packet(pReceivedPacket, dwReceivedPacketSize, pEapOutput);
+
+#if EAP_TLS < EAP_TLS_SCHANNEL
+    if (m_phase == phase_application_data) {
+        // Send inner authentication.
+        if (!m_state_client.m_alg_encrypt)
+            throw runtime_error(__FUNCTION__ " Refusing to send credentials unencrypted.");
+
+        m_module.log_event(&EAPMETHOD_TTLS_INNER_CRED, event_data((unsigned int)eap_type_ttls), event_data(m_cred.m_inner->get_name()), event_data::blank);
+
+        m_packet_res.m_code  = EapCodeResponse;
+        m_packet_res.m_id    = m_packet_req.m_id;
+        m_packet_res.m_flags = 0;
+        sanitizing_blob msg_application(make_message(tls_message_type_application_data, make_pap_client()));
+        m_packet_res.m_data.insert(m_packet_res.m_data.end(), msg_application.begin(), msg_application.end());
+    }
+#endif
 }
 
 
@@ -116,12 +132,14 @@ void eap::method_ttls::get_result(
             throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Not supported.");
         }
 
+#if EAP_TLS >= EAP_TLS_SCHANNEL
         // EAP-TTLS uses different label in PRF for MSK derivation than EAP-TLS.
         static const DWORD s_key_id = 0x01; // EAP-TTLSv0 Keying Material
         static const SecPkgContext_EapPrfInfo s_prf_info = { 0, sizeof(s_key_id), (PBYTE)&s_key_id };
         SECURITY_STATUS status = SetContextAttributes(m_sc_ctx, SECPKG_ATTR_EAP_PRF_INFO, (void*)&s_prf_info, sizeof(s_prf_info));
         if (FAILED(status))
             throw sec_runtime_error(status, __FUNCTION__ "Error setting EAP-TTLS PRF in Schannel.");
+#endif
 
         // The TLS was OK.
         method_tls::get_result(EapPeerMethodResultSuccess, ppResult);
@@ -135,6 +153,43 @@ void eap::method_ttls::get_result(
     }
 }
 
+
+#if EAP_TLS < EAP_TLS_SCHANNEL
+
+void eap::method_ttls::derive_msk()
+{
+    //
+    //   TLS versions 1.0 [RFC2246] and 1.1 [RFC4346] define the same PRF
+    //   function, and any EAP-TTLSv0 implementation based on these versions
+    //   of TLS must use the PRF defined therein.  It is expected that future
+    //   versions of or extensions to the TLS protocol will permit alternative
+    //   PRF functions to be negotiated.  If an alternative PRF function is
+    //   specified for the underlying TLS version or has been negotiated
+    //   during the TLS handshake negotiation, then that alternative PRF
+    //   function must be used in EAP-TTLSv0 computations instead of the TLS
+    //   1.0/1.1 PRF.
+    //
+    // [Extensible Authentication Protocol Tunneled Transport Layer Security Authenticated Protocol Version 0 (EAP-TTLSv0) (Chapter 7.8. Use of TLS PRF)](https://tools.ietf.org/html/rfc5281#section-7.8)
+    //
+    // If we use PRF_SHA256() the key exchange fails. Therefore we use PRF of TLS 1.0/1.1.
+    //
+    static const unsigned char s_label[] = "ttls keying material";
+    sanitizing_blob seed(s_label, s_label + _countof(s_label) - 1);
+    seed.insert(seed.end(), (const unsigned char*)&m_random_client, (const unsigned char*)(&m_random_client + 1));
+    seed.insert(seed.end(), (const unsigned char*)&m_random_server, (const unsigned char*)(&m_random_server + 1));
+    sanitizing_blob key_block(prf(m_cp, CALG_TLS1PRF, m_master_secret, seed, 2*sizeof(tls_random)));
+    const unsigned char *_key_block = key_block.data();
+
+    // MSK: MPPE-Recv-Key
+    memcpy(&m_key_mppe_client, _key_block, sizeof(tls_random));
+    _key_block += sizeof(tls_random);
+
+    // MSK: MPPE-Send-Key
+    memcpy(&m_key_mppe_server, _key_block, sizeof(tls_random));
+    _key_block += sizeof(tls_random);
+}
+
+#else
 
 void eap::method_ttls::process_application_data(_In_bytecount_(size_msg) const void *msg, _In_ size_t size_msg)
 {
@@ -182,6 +237,8 @@ void eap::method_ttls::process_application_data(_In_bytecount_(size_msg) const v
         throw sec_runtime_error(status, __FUNCTION__ " Error encrypting message.");
     m_packet_res.m_data.insert(m_packet_res.m_data.end(), (const unsigned char*)buf[0].pvBuffer, (const unsigned char*)buf[0].pvBuffer + buf[0].cbBuffer + buf[1].cbBuffer + buf[2].cbBuffer);
 }
+
+#endif
 
 
 eap::sanitizing_blob eap::method_ttls::make_pap_client() const

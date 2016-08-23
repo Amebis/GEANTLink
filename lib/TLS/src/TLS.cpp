@@ -182,6 +182,8 @@ eap::tls_conn_state::tls_conn_state()
 #ifdef _DEBUG
     // Initialize state primitive members for diagnostic purposes.
     :
+    m_prov_name     (NULL),
+    m_prov_type     (0),
     m_alg_encrypt   (0),
     m_size_enc_key  (0),
     m_size_enc_iv   (0),
@@ -195,6 +197,8 @@ eap::tls_conn_state::tls_conn_state()
 
 
 eap::tls_conn_state::tls_conn_state(_In_ const tls_conn_state &other) :
+    m_prov_name     (other.m_prov_name     ),
+    m_prov_type     (other.m_prov_type     ),
     m_alg_encrypt   (other.m_alg_encrypt   ),
     m_size_enc_key  (other.m_size_enc_key  ),
     m_size_enc_iv   (other.m_size_enc_iv   ),
@@ -209,6 +213,8 @@ eap::tls_conn_state::tls_conn_state(_In_ const tls_conn_state &other) :
 
 
 eap::tls_conn_state::tls_conn_state(_Inout_ tls_conn_state &&other) :
+    m_prov_name     (std::move(other.m_prov_name     )),
+    m_prov_type     (std::move(other.m_prov_type     )),
     m_alg_encrypt   (std::move(other.m_alg_encrypt   )),
     m_size_enc_key  (std::move(other.m_size_enc_key  )),
     m_size_enc_iv   (std::move(other.m_size_enc_iv   )),
@@ -221,6 +227,8 @@ eap::tls_conn_state::tls_conn_state(_Inout_ tls_conn_state &&other) :
 {
 #ifdef _DEBUG
     // Reinitialize other state primitive members for diagnostic purposes.
+    other.m_prov_name      = NULL;
+    other.m_prov_type      = 0;
     other.m_alg_encrypt    = 0;
     other.m_size_enc_key   = 0;
     other.m_size_enc_iv    = 0;
@@ -235,6 +243,8 @@ eap::tls_conn_state::tls_conn_state(_Inout_ tls_conn_state &&other) :
 eap::tls_conn_state& eap::tls_conn_state::operator=(_In_ const tls_conn_state &other)
 {
     if (this != std::addressof(other)) {
+        m_prov_name      = other.m_prov_name     ;
+        m_prov_type      = other.m_prov_type     ;
         m_alg_encrypt    = other.m_alg_encrypt   ;
         m_size_enc_key   = other.m_size_enc_key  ;
         m_size_enc_iv    = other.m_size_enc_iv   ;
@@ -253,6 +263,8 @@ eap::tls_conn_state& eap::tls_conn_state::operator=(_In_ const tls_conn_state &o
 eap::tls_conn_state& eap::tls_conn_state::operator=(_Inout_ tls_conn_state &&other)
 {
     if (this != std::addressof(other)) {
+        m_prov_name      = std::move(other.m_prov_name     );
+        m_prov_type      = std::move(other.m_prov_type     );
         m_alg_encrypt    = std::move(other.m_alg_encrypt   );
         m_size_enc_key   = std::move(other.m_size_enc_key  );
         m_size_enc_iv    = std::move(other.m_size_enc_iv   );
@@ -265,6 +277,8 @@ eap::tls_conn_state& eap::tls_conn_state::operator=(_Inout_ tls_conn_state &&oth
 
 #ifdef _DEBUG
         // Reinitialize other state primitive members for diagnostic purposes.
+        other.m_prov_name      = NULL;
+        other.m_prov_type      = 0;
         other.m_alg_encrypt    = 0;
         other.m_size_enc_key   = 0;
         other.m_size_enc_iv    = 0;
@@ -276,4 +290,143 @@ eap::tls_conn_state& eap::tls_conn_state::operator=(_Inout_ tls_conn_state &&oth
     }
 
     return *this;
+}
+
+
+void eap::tls_conn_state::set_cipher(_In_ const unsigned char cipher[2])
+{
+    if (cipher[0] == 0x00 && cipher[1] == 0x0a) {
+        // TLS_RSA_WITH_3DES_EDE_CBC_SHA
+        m_prov_name      = NULL;
+        m_prov_type      = PROV_RSA_AES;
+        m_alg_encrypt    = CALG_3DES;
+        m_size_enc_key   = 192/8; // 3DES 192bits
+        m_size_enc_iv    = 64/8;  // 3DES 64bits
+        m_size_enc_block = 64/8;  // 3DES 64bits
+        m_alg_mac        = CALG_SHA1;
+        m_size_mac_key   = 160/8; // SHA-1
+        m_size_mac_hash  = 160/8; // SHA-1
+    } else if (cipher[0] == 0x00 && cipher[1] == 0x2f) {
+        // TLS_RSA_WITH_AES_128_CBC_SHA
+        m_prov_name      = NULL;
+        m_prov_type      = PROV_RSA_AES;
+        m_alg_encrypt    = CALG_AES_128;
+        m_size_enc_key   = 128/8; // AES-128
+        m_size_enc_iv    = 128/8; // AES-128
+        m_size_enc_block = 128/8; // AES-128
+        m_alg_mac        = CALG_SHA1;
+        m_size_mac_key   = 160/8; // SHA-1
+        m_size_mac_hash  = 160/8; // SHA-1
+    } else if (cipher[0] == 0x00 && cipher[1] == 0x3c) {
+        // AES128-SHA256
+        m_prov_name      = NULL;
+        m_prov_type      = PROV_RSA_AES;
+        m_alg_encrypt    = CALG_AES_128;
+        m_size_enc_key   = 128/8; // AES-128
+        m_size_enc_iv    = 128/8; // AES-128
+        m_size_enc_block = 128/8; // AES-128
+        m_alg_mac        = CALG_SHA_256;
+        m_size_mac_key   = 256/8; // SHA-256
+        m_size_mac_hash  = 256/8; // SHA-256
+    } else if (cipher[0] == 0x00 && cipher[1] == 0x3d) {
+        // AES256-SHA256
+        m_prov_name      = MS_ENH_RSA_AES_PROV;
+        m_prov_type      = PROV_RSA_AES;
+        m_alg_encrypt    = CALG_AES_256;
+        m_size_enc_key   = 256/8; // AES-256
+        m_size_enc_iv    = 128/8; // AES-256
+        m_size_enc_block = 128/8; // AES-256
+        m_alg_mac        = CALG_SHA_256;
+        m_size_mac_key   = 256/8; // SHA-256
+        m_size_mac_hash  = 256/8; // SHA-256
+    } else if (cipher[0] == 0x00 && cipher[1] == 0x40) {
+        // DHE-DSS-AES128-SHA256
+        m_prov_name      = MS_ENH_DSS_DH_PROV;
+        m_prov_type      = PROV_DSS_DH;
+        m_alg_encrypt    = CALG_AES_128;
+        m_size_enc_key   = 128/8; // AES-128
+        m_size_enc_iv    = 128/8; // AES-128
+        m_size_enc_block = 128/8; // AES-128
+        m_alg_mac        = CALG_SHA_256;
+        m_size_mac_key   = 256/8; // SHA-256
+        m_size_mac_hash  = 256/8; // SHA-256
+    } else if (cipher[0] == 0x00 && cipher[1] == 0x67) {
+        // DHE-RSA-AES128-SHA256
+        m_prov_name      = MS_DEF_DH_SCHANNEL_PROV;
+        m_prov_type      = PROV_DH_SCHANNEL;
+        m_alg_encrypt    = CALG_AES_128;
+        m_size_enc_key   = 128/8; // AES-128
+        m_size_enc_iv    = 128/8; // AES-128
+        m_size_enc_block = 128/8; // AES-128
+        m_alg_mac        = CALG_SHA_256;
+        m_size_mac_key   = 256/8; // SHA-256
+        m_size_mac_hash  = 256/8; // SHA-256
+    } else if (cipher[0] == 0x00 && cipher[1] == 0x6a) {
+        // DHE-DSS-AES256-SHA256
+        m_prov_name      = MS_ENH_DSS_DH_PROV;
+        m_prov_type      = PROV_DSS_DH;
+        m_alg_encrypt    = CALG_AES_256;
+        m_size_enc_key   = 256/8; // AES-256
+        m_size_enc_iv    = 128/8; // AES-256
+        m_size_enc_block = 128/8; // AES-256
+        m_alg_mac        = CALG_SHA_256;
+        m_size_mac_key   = 256/8; // SHA-256
+        m_size_mac_hash  = 256/8; // SHA-256
+    } else if (cipher[0] == 0x00 && cipher[1] == 0x6b) {
+        // DHE-RSA-AES256-SHA256
+        m_prov_name      = MS_DEF_DH_SCHANNEL_PROV;
+        m_prov_type      = PROV_DH_SCHANNEL;
+        m_alg_encrypt    = CALG_AES_256;
+        m_size_enc_key   = 256/8; // AES-256
+        m_size_enc_iv    = 128/8; // AES-256
+        m_size_enc_block = 128/8; // AES-256
+        m_alg_mac        = CALG_SHA_256;
+        m_size_mac_key   = 256/8; // SHA-256
+        m_size_mac_hash  = 256/8; // SHA-256
+    } else if (cipher[0] == 0xc0 && cipher[1] == 0x23) {
+        // ECDHE-ECDSA-AES128-SHA256
+        m_prov_name      = MS_ENH_DSS_DH_PROV;
+        m_prov_type      = PROV_DSS_DH;
+        m_alg_encrypt    = CALG_AES_128;
+        m_size_enc_key   = 128/8; // AES-128
+        m_size_enc_iv    = 128/8; // AES-128
+        m_size_enc_block = 128/8; // AES-128
+        m_alg_mac        = CALG_SHA_256;
+        m_size_mac_key   = 256/8; // SHA-256
+        m_size_mac_hash  = 256/8; // SHA-256
+    } else if (cipher[0] == 0xc0 && cipher[1] == 0x24) {
+        // ECDHE-ECDSA-AES256-SHA384
+        m_prov_name      = MS_ENH_DSS_DH_PROV;
+        m_prov_type      = PROV_DSS_DH;
+        m_alg_encrypt    = CALG_AES_256;
+        m_size_enc_key   = 256/8; // AES-256
+        m_size_enc_iv    = 128/8; // AES-256
+        m_size_enc_block = 128/8; // AES-256
+        m_alg_mac        = CALG_SHA_384;
+        m_size_mac_key   = 384/8; // SHA-384
+        m_size_mac_hash  = 384/8; // SHA-384
+    } else if (cipher[0] == 0xc0 && cipher[1] == 0x27) {
+        // ECDHE-RSA-AES128-SHA256
+        m_prov_name      = MS_ENH_DSS_DH_PROV;
+        m_prov_type      = PROV_DSS_DH;
+        m_alg_encrypt    = CALG_AES_128;
+        m_size_enc_key   = 128/8; // AES-128
+        m_size_enc_iv    = 128/8; // AES-128
+        m_size_enc_block = 128/8; // AES-128
+        m_alg_mac        = CALG_SHA_256;
+        m_size_mac_key   = 256/8; // SHA-256
+        m_size_mac_hash  = 256/8; // SHA-256
+    } else if (cipher[0] == 0xc0 && cipher[1] == 0x28) {
+        // ECDHE-RSA-AES256-SHA384
+        m_prov_name      = MS_ENH_DSS_DH_PROV;
+        m_prov_type      = PROV_DSS_DH;
+        m_alg_encrypt    = CALG_AES_256;
+        m_size_enc_key   = 256/8; // AES-256
+        m_size_enc_iv    = 128/8; // AES-256
+        m_size_enc_block = 128/8; // AES-256
+        m_alg_mac        = CALG_SHA_384;
+        m_size_mac_key   = 384/8; // SHA-384
+        m_size_mac_hash  = 384/8; // SHA-384
+    } else
+        throw win_runtime_error(ERROR_NOT_SUPPORTED, string_printf(__FUNCTION__ " Unknown cipher (received 0x%02x%02x).", cipher[0], cipher[1]));
 }
