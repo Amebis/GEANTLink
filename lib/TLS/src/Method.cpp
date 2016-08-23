@@ -1178,16 +1178,7 @@ void eap::method_tls::verify_server_trust() const
         // Check server name.
         for (list<wstring>::const_iterator s = cfg_method->m_server_names.cbegin(), s_end = cfg_method->m_server_names.cend();; ++s) {
             if (s != s_end) {
-                const wchar_t
-                    *a = s->c_str(),
-                    *b = subj.c_str();
-                size_t
-                    len_a = s->length(),
-                    len_b = subj.length();
-
-                if (_wcsicmp(a, b) == 0 || // Direct match
-                    a[0] == '*' && len_b + 1 >= len_a && _wcsicmp(a + 1, b + len_b - (len_a - 1)) == 0) // "*..." wildchar match
-                {
+                if (_wcsicmp(s->c_str(), subj.c_str()) == 0) {
                     m_module.log_event(&EAPMETHOD_TLS_SERVER_NAME_TRUSTED1, event_data(subj), event_data::blank);
                     break;
                 }

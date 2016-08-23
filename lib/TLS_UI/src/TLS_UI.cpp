@@ -108,7 +108,7 @@ bool wxHostNameValidator::Parse(const wxString &val_in, size_t i_start, size_t i
             // End of host name found.
             if (val_out) val_out->assign(val_in.c_str() + i_start, i - i_start);
             return true;
-        } else if (buf[i] == _T('-') || buf[i] == _T('_') || buf[i] == _T('*') || _istalnum(buf[i])) {
+        } else if (buf[i] == _T('-') || buf[i] == _T('_') || _istalnum(buf[i])) {
             // Valid character found.
             i++;
         } else {
