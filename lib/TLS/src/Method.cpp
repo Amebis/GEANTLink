@@ -629,7 +629,9 @@ void eap::method_tls::verify_server_trust() const
 
     // Check server name.
     if (!cfg_method->m_server_names.empty()) {
-        bool found = false;
+        bool
+            has_san = false,
+            found   = false;
 
         // Search subjectAltName2 and subjectAltName.
         for (DWORD i = 0; !found && i < cert->pCertInfo->cExtension; i++) {
@@ -662,6 +664,7 @@ void eap::method_tls::verify_server_trust() const
                 // Skip this extension.
                 continue;
             }
+            has_san = true;
 
             for (list<wstring>::const_iterator s = cfg_method->m_server_names.cbegin(), s_end = cfg_method->m_server_names.cend(); !found && s != s_end; ++s) {
                 for (DWORD i = 0; !found && i < san_info->cAltEntry; i++) {
@@ -670,8 +673,21 @@ void eap::method_tls::verify_server_trust() const
                     {
                         m_module.log_event(&EAPMETHOD_TLS_SERVER_NAME_TRUSTED1, event_data(san_info->rgAltEntry[i].pwszDNSName), event_data::blank);
                         found = true;
-                        break;
                     }
+                }
+            }
+        }
+
+        if (!has_san) {
+            // Certificate has no subjectAltName. Compare against Common Name.
+            wstring subj;
+            if (!CertGetNameStringW(cert, CERT_NAME_DNS_TYPE, CERT_NAME_STR_ENABLE_PUNYCODE_FLAG, NULL, subj))
+                throw win_runtime_error(__FUNCTION__ " Error retrieving server's certificate subject name.");
+
+            for (list<wstring>::const_iterator s = cfg_method->m_server_names.cbegin(), s_end = cfg_method->m_server_names.cend(); !found && s != s_end; ++s) {
+                if (_wcsicmp(s->c_str(), subj.c_str()) == 0) {
+                    m_module.log_event(&EAPMETHOD_TLS_SERVER_NAME_TRUSTED1, event_data(subj), event_data::blank);
+                    found = true;
                 }
             }
         }
