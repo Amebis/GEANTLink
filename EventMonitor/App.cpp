@@ -66,12 +66,12 @@ bool wxEventMonitorApp::OnInit()
 
 #ifdef __WXMSW__
     // Find EventMonitor window if already running.
-    HWND okno = ::FindWindow(_T("wxWindowNR"), _("Event Monitor"));
-    if (okno) {
-        if (::IsIconic(okno))
-            ::SendMessage(okno, WM_SYSCOMMAND, SC_RESTORE, 0);
-        ::SetActiveWindow(okno);
-        ::SetForegroundWindow(okno);
+    HWND hWnd = ::FindWindow(_T("wxWindowNR"), _("Event Monitor"));
+    if (hWnd) {
+        if (::IsIconic(hWnd))
+            ::SendMessage(hWnd, WM_SYSCOMMAND, SC_RESTORE, 0);
+        ::SetActiveWindow(hWnd);
+        ::SetForegroundWindow(hWnd);
 
         // Not an error condition actually; Just nothing else to do...
         return false;
