@@ -100,6 +100,14 @@ inline bool wxSetIconFromResource(wxStaticBitmap *bmp, wxIcon &icon, HINSTANCE h
 ///
 inline wxString wxEAPGetProviderName(const std::wstring &id);
 
+namespace eap
+{
+    ///
+    /// Base class to prevent multiple instances of the same dialog
+    ///
+    class monitor_ui;
+}
+
 #pragma once
 
 #include <wx/msw/winundef.h> // Fixes `CreateDialog` name collision
@@ -807,4 +815,56 @@ inline wxString wxEAPGetProviderName(const std::wstring &id)
 {
     return
         !id.empty() ? id : _("<Your Organization>");
+}
+
+
+namespace eap
+{
+    class monitor_ui
+    {
+    public:
+        monitor_ui(_In_ HINSTANCE module, _In_ const GUID &guid);
+        virtual ~monitor_ui();
+
+        void set_popup(_In_ HWND hwnd);
+        void release_slaves(_In_bytecount_(size) const void *data, _In_ size_t size) const;
+
+        inline bool is_master() const
+        {
+            return m_is_master;
+        }
+
+        inline bool is_slave() const
+        {
+            return !is_master();
+        }
+
+        inline const std::vector<unsigned char>& master_data() const
+        {
+            return m_data;
+        }
+
+    protected:
+        virtual LRESULT winproc(
+            _In_ UINT   msg,
+            _In_ WPARAM wparam,
+            _In_ LPARAM lparam);
+
+        static LRESULT CALLBACK winproc(
+            _In_ HWND   hwnd,
+            _In_ UINT   msg,
+            _In_ WPARAM wparam,
+            _In_ LPARAM lparam);
+
+    protected:
+        bool m_is_master;                   ///< Is this monitor master?
+        HWND m_hwnd;                        ///< Message window handle
+        std::list<HWND> m_slaves;           ///< List of slaves to notify on finish
+        HWND m_hwnd_popup;                  ///< Pop-up window handle
+        std::vector<unsigned char> m_data;  ///< Data master sent
+
+        // Custom window messages
+        static const UINT s_msg_attach;     ///< Slave sends this message to attach to master
+        static const UINT s_msg_finish;     ///< Master sends this message to slaves to notify them it has finished (wparam has size, lparam has data)
+    };
 }
