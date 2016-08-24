@@ -609,16 +609,16 @@ void eap::config_provider::operator>>(_Inout_ cursor_in &cursor)
 
 
 //////////////////////////////////////////////////////////////////////
-// eap::config_provider_list
+// eap::config_connection
 //////////////////////////////////////////////////////////////////////
 
-eap::config_provider_list::config_provider_list(_In_ module &mod) : config(mod)
+eap::config_connection::config_connection(_In_ module &mod) : config(mod)
 {
     memset(&m_connection_id, 0, sizeof(m_connection_id));
 }
 
 
-eap::config_provider_list::config_provider_list(_In_ const config_provider_list &other) :
+eap::config_connection::config_connection(_In_ const config_connection &other) :
     m_connection_id(other.m_connection_id),
     m_providers(other.m_providers),
     config(other)
@@ -626,7 +626,7 @@ eap::config_provider_list::config_provider_list(_In_ const config_provider_list 
 }
 
 
-eap::config_provider_list::config_provider_list(_Inout_ config_provider_list &&other) :
+eap::config_connection::config_connection(_Inout_ config_connection &&other) :
     m_connection_id(std::move(other.m_connection_id)),
     m_providers(std::move(other.m_providers)),
     config(std::move(other))
@@ -634,7 +634,7 @@ eap::config_provider_list::config_provider_list(_Inout_ config_provider_list &&o
 }
 
 
-eap::config_provider_list& eap::config_provider_list::operator=(_In_ const config_provider_list &other)
+eap::config_connection& eap::config_connection::operator=(_In_ const config_connection &other)
 {
     if (this != &other) {
         (config&)*this  = other;
@@ -646,7 +646,7 @@ eap::config_provider_list& eap::config_provider_list::operator=(_In_ const confi
 }
 
 
-eap::config_provider_list& eap::config_provider_list::operator=(_Inout_ config_provider_list &&other)
+eap::config_connection& eap::config_connection::operator=(_Inout_ config_connection &&other)
 {
     if (this != &other) {
         (config&&)*this = std::move(other);
@@ -658,13 +658,13 @@ eap::config_provider_list& eap::config_provider_list::operator=(_Inout_ config_p
 }
 
 
-eap::config* eap::config_provider_list::clone() const
+eap::config* eap::config_connection::clone() const
 {
-    return new config_provider_list(*this);
+    return new config_connection(*this);
 }
 
 
-void eap::config_provider_list::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot) const
+void eap::config_connection::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot) const
 {
     config::save(pDoc, pConfigRoot);
 
@@ -691,7 +691,7 @@ void eap::config_provider_list::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNod
 }
 
 
-void eap::config_provider_list::load(_In_ IXMLDOMNode *pConfigRoot)
+void eap::config_connection::load(_In_ IXMLDOMNode *pConfigRoot)
 {
     assert(pConfigRoot);
     HRESULT hr;
@@ -722,7 +722,7 @@ void eap::config_provider_list::load(_In_ IXMLDOMNode *pConfigRoot)
 }
 
 
-void eap::config_provider_list::operator<<(_Inout_ cursor_out &cursor) const
+void eap::config_connection::operator<<(_Inout_ cursor_out &cursor) const
 {
     config::operator<<(cursor);
     cursor << m_connection_id;
@@ -730,7 +730,7 @@ void eap::config_provider_list::operator<<(_Inout_ cursor_out &cursor) const
 }
 
 
-size_t eap::config_provider_list::get_pk_size() const
+size_t eap::config_connection::get_pk_size() const
 {
     return
         config::get_pk_size() +
@@ -739,7 +739,7 @@ size_t eap::config_provider_list::get_pk_size() const
 }
 
 
-void eap::config_provider_list::operator>>(_Inout_ cursor_in &cursor)
+void eap::config_connection::operator>>(_Inout_ cursor_in &cursor)
 {
     config::operator>>(cursor);
 

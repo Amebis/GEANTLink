@@ -51,10 +51,10 @@ namespace eap
         /// Constructs an EAP method
         ///
         /// \param[in] mod   EAP module to use for global services
-        /// \param[in] cfg   Providers configuration
+        /// \param[in] cfg   Connection configuration
         /// \param[in] cred  User credentials
         ///
-        method(_In_ module &module, _In_ config_provider_list &cfg, _In_ credentials &cred);
+        method(_In_ module &module, _In_ config_connection &cfg, _In_ credentials &cred);
 
 
         ///
@@ -130,8 +130,8 @@ namespace eap
         method& operator=(_In_ const method &other);
 
     public:
-        module &m_module;               ///< EAP module
-        config_provider_list &m_cfg;    ///< Providers configuration
-        credentials &m_cred;            ///< User credentials
+        module &m_module;           ///< EAP module
+        config_connection &m_cfg;   ///< Connection configuration
+        credentials &m_cred;        ///< User credentials
     };
 }

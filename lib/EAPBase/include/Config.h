@@ -40,14 +40,14 @@ namespace eap
     class config_method_with_cred;
 
     ///
-    /// Base class for single provider configuration storage
+    /// Provider configuration storage
     ///
     class config_provider;
 
     ///
-    /// Base class for the list of providers configuration storage
+    /// Connection configuration storage
     ///
-    class config_provider_list;
+    class config_connection;
 }
 
 ///
@@ -454,7 +454,7 @@ namespace eap
     };
 
 
-    class config_provider_list : public config
+    class config_connection : public config
     {
     public:
         ///
@@ -462,21 +462,21 @@ namespace eap
         ///
         /// \param[in] mod  EAP module to use for global services
         ///
-        config_provider_list(_In_ module &mod);
+        config_connection(_In_ module &mod);
 
         ///
         /// Copies configuration
         ///
         /// \param[in] other  Configuration to copy from
         ///
-        config_provider_list(_In_ const config_provider_list &other);
+        config_connection(_In_ const config_connection &other);
 
         ///
         /// Moves configuration
         ///
         /// \param[in] other  Configuration to move from
         ///
-        config_provider_list(_Inout_ config_provider_list &&other);
+        config_connection(_Inout_ config_connection &&other);
 
         ///
         /// Copies configuration
@@ -485,7 +485,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        config_provider_list& operator=(_In_ const config_provider_list &other);
+        config_connection& operator=(_In_ const config_connection &other);
 
         ///
         /// Moves configuration
@@ -494,7 +494,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        config_provider_list& operator=(_Inout_ config_provider_list &&other);
+        config_connection& operator=(_Inout_ config_connection &&other);
 
         ///
         /// Clones configuration

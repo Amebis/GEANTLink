@@ -125,7 +125,7 @@ void eap::method_tls::packet::clear()
 // eap::method_tls
 //////////////////////////////////////////////////////////////////////
 
-eap::method_tls::method_tls(_In_ module &module, _In_ config_provider_list &cfg, _In_ credentials_tls &cred) :
+eap::method_tls::method_tls(_In_ module &module, _In_ config_connection &cfg, _In_ credentials_tls &cred) :
     m_cred(cred),
     m_user_ctx(NULL),
 #if EAP_TLS < EAP_TLS_SCHANNEL

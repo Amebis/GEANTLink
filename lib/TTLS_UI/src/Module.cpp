@@ -48,7 +48,7 @@ void eap::peer_ttls_ui::config_xml2blob(
     UNREFERENCED_PARAMETER(dwFlags);
 
     // Load configuration from XML.
-    config_provider_list cfg(*this);
+    config_connection cfg(*this);
     cfg.load(pConfigRoot);
 
     // Pack configuration.
@@ -66,7 +66,7 @@ void eap::peer_ttls_ui::config_blob2xml(
     UNREFERENCED_PARAMETER(dwFlags);
 
     // Unpack configuration.
-    config_provider_list cfg(*this);
+    config_connection cfg(*this);
     unpack(cfg, pConnectionData, dwConnectionDataSize);
 
     // Save configuration to XML.
@@ -82,7 +82,7 @@ void eap::peer_ttls_ui::invoke_config_ui(
     _Inout_                                  DWORD *pdwConnectionDataOutSize)
 {
     // Unpack configuration.
-    config_provider_list cfg(*this);
+    config_connection cfg(*this);
     if (dwConnectionDataInSize) {
         // Load existing configuration.
         unpack(cfg, pConnectionDataIn, dwConnectionDataInSize);
@@ -149,7 +149,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
     assert(ppwszIdentity);
 
     // Unpack configuration.
-    config_provider_list cfg(*this);
+    config_connection cfg(*this);
     unpack(cfg, pConnectionData, dwConnectionDataSize);
     if (cfg.m_providers.empty() || cfg.m_providers.front().m_methods.empty())
         throw invalid_argument(__FUNCTION__ " Configuration has no providers and/or methods.");

@@ -74,7 +74,7 @@ void eap::peer_ttls::get_identity(
     assert(ppwszIdentity);
 
     // Unpack configuration.
-    config_provider_list cfg(*this);
+    config_connection cfg(*this);
     unpack(cfg, pConnectionData, dwConnectionDataSize);
     if (cfg.m_providers.empty() || cfg.m_providers.front().m_methods.empty())
         throw invalid_argument(__FUNCTION__ " Configuration has no providers and/or methods.");

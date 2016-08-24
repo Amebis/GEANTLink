@@ -28,7 +28,7 @@ using namespace winstd;
 // eap::method_ttls
 //////////////////////////////////////////////////////////////////////
 
-eap::method_ttls::method_ttls(_In_ module &module, _In_ config_provider_list &cfg, _In_ credentials_ttls &cred) :
+eap::method_ttls::method_ttls(_In_ module &module, _In_ config_connection &cfg, _In_ credentials_ttls &cred) :
     m_cred(cred),
     m_version(version_0),
     method_tls(module, cfg, cred)

@@ -146,10 +146,10 @@ namespace eap
         /// Constructs an EAP method
         ///
         /// \param[in] mod   EAP module to use for global services
-        /// \param[in] cfg   Providers configuration
+        /// \param[in] cfg   Connection configuration
         /// \param[in] cred  User credentials
         ///
-        method_tls(_In_ module &module, _In_ config_provider_list &cfg, _In_ credentials_tls &cred);
+        method_tls(_In_ module &module, _In_ config_connection &cfg, _In_ credentials_tls &cred);
 
         ///
         /// Moves an EAP method

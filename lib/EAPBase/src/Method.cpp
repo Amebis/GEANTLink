@@ -28,7 +28,7 @@ using namespace winstd;
 // eap::method
 //////////////////////////////////////////////////////////////////////
 
-eap::method::method(_In_ module &module, _In_ config_provider_list &cfg, _In_ credentials &cred) :
+eap::method::method(_In_ module &module, _In_ config_connection &cfg, _In_ credentials &cred) :
     m_module(module),
     m_cfg(cfg),
     m_cred(cred)
