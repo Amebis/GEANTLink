@@ -217,7 +217,7 @@ public:
     ///
     /// Constructs a dialog
     ///
-    wxEAPGeneralDialog(wxWindow* parent, const wxString& title = wxEmptyString);
+    wxEAPGeneralDialog(wxWindow *parent, wxWindowID id = wxID_ANY, const wxString &title = wxEmptyString, const wxPoint &pos = wxDefaultPosition, const wxSize &size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE);
 
     ///
     /// Adds panels to the dialog
@@ -242,7 +242,7 @@ public:
     ///
     /// Constructs a credential dialog
     ///
-    wxEAPCredentialsDialog(const eap::config_provider &prov, wxWindow* parent);
+    wxEAPCredentialsDialog(const eap::config_provider &prov, wxWindow *parent, wxWindowID id = wxID_ANY, const wxString &title = _("EAP Credentials"), const wxPoint &pos = wxDefaultPosition, const wxSize &size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE);
 };
 
 
@@ -411,7 +411,7 @@ public:
     /// \param[inout] prov    Provider configuration data
     /// \param[in]    parent  Parent window
     ///
-    wxEAPConfigProvider(eap::config_provider &prov, wxWindow* parent);
+    wxEAPConfigProvider(eap::config_provider &prov, wxWindow *parent, wxWindowID id = wxID_ANY, const wxString &title = _("Provider Settings"), const wxPoint &pos = wxDefaultPosition, const wxSize &size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE);
 
 protected:
     eap::config_provider &m_prov;           ///< EAP method configuration

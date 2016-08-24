@@ -41,7 +41,8 @@ bool wxEAPBannerPanel::AcceptsFocusFromKeyboard() const
 // wxEAPGeneralDialog
 //////////////////////////////////////////////////////////////////////
 
-wxEAPGeneralDialog::wxEAPGeneralDialog(wxWindow* parent, const wxString& title) : wxEAPGeneralDialogBase(parent, wxID_ANY, title)
+wxEAPGeneralDialog::wxEAPGeneralDialog(wxWindow *parent, wxWindowID id, const wxString &title, const wxPoint &pos, const wxSize &size, long style) :
+    wxEAPGeneralDialogBase(parent, id, title, pos, size, style)
 {
     // Set extra style here, as wxFormBuilder overrides all default flags.
     this->SetExtraStyle(this->GetExtraStyle() | wxWS_EX_VALIDATE_RECURSIVELY);
@@ -80,7 +81,8 @@ void wxEAPGeneralDialog::OnInitDialog(wxInitDialogEvent& event)
 // wxEAPCredentialsDialog
 //////////////////////////////////////////////////////////////////////
 
-wxEAPCredentialsDialog::wxEAPCredentialsDialog(const eap::config_provider &prov, wxWindow* parent) : wxEAPGeneralDialog(parent, _("EAP Credentials"))
+wxEAPCredentialsDialog::wxEAPCredentialsDialog(const eap::config_provider &prov, wxWindow *parent, wxWindowID id, const wxString &title, const wxPoint &pos, const wxSize &size, long style) :
+    wxEAPGeneralDialog(parent, id, title, pos, size, style)
 {
     // Set banner title.
     m_banner->m_title->SetLabel(wxString::Format(_("%s Credentials"), wxEAPGetProviderName(prov.m_id).c_str()));
@@ -328,12 +330,12 @@ bool wxEAPProviderLockPanel::TransferDataFromWindow()
 // wxEAPConfigProvider
 //////////////////////////////////////////////////////////////////////
 
-wxEAPConfigProvider::wxEAPConfigProvider(eap::config_provider &prov, wxWindow* parent) :
+wxEAPConfigProvider::wxEAPConfigProvider(eap::config_provider &prov, wxWindow *parent, wxWindowID id, const wxString &title, const wxPoint &pos, const wxSize &size, long style) :
     m_prov(prov),
-    wxEAPGeneralDialog(parent, _("Provider Settings"))
+    wxEAPGeneralDialog(parent, id, title, pos, size, style)
 {
     // Set banner title.
-    m_banner->m_title->SetLabel(_("Provider Settings"));
+    m_banner->m_title->SetLabel(title);
 
     m_identity = new wxEAPProviderIdentityPanel(prov, this);
     AddContent(m_identity);
