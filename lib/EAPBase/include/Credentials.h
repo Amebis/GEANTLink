@@ -120,6 +120,52 @@ namespace eap
         ///
         virtual bool empty() const;
 
+        /// \name XML configuration management
+        /// @{
+
+        ///
+        /// Save to XML document
+        ///
+        /// \param[in]  pDoc         XML document
+        /// \param[in]  pConfigRoot  Suggested root element for saving
+        ///
+        virtual void save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot) const;
+
+        ///
+        /// Load from XML document
+        ///
+        /// \param[in]  pConfigRoot  Root element for loading
+        ///
+        virtual void load(_In_ IXMLDOMNode *pConfigRoot);
+
+        /// @}
+
+        /// \name BLOB management
+        /// @{
+
+        ///
+        /// Packs a configuration
+        ///
+        /// \param[inout] cursor  Memory cursor
+        ///
+        virtual void operator<<(_Inout_ cursor_out &cursor) const;
+
+        ///
+        /// Returns packed size of a configuration
+        ///
+        /// \returns Size of data when packed (in bytes)
+        ///
+        virtual size_t get_pk_size() const;
+
+        ///
+        /// Unpacks a configuration
+        ///
+        /// \param[inout] cursor  Memory cursor
+        ///
+        virtual void operator>>(_Inout_ cursor_in &cursor);
+
+        /// @}
+
         /// \name Storage
         /// @{
 
@@ -164,12 +210,15 @@ namespace eap
         ///
         /// Returns credential identity.
         ///
-        virtual std::wstring get_identity() const = 0;
+        virtual std::wstring get_identity() const;
 
         ///
         /// Returns credential name (for GUI display).
         ///
         virtual winstd::tstring get_name() const;
+
+    public:
+        std::wstring m_identity;    ///< Identity (username\@domain, certificate name etc.)
     };
 
 
@@ -294,13 +343,7 @@ namespace eap
 
         /// @}
 
-        ///
-        /// Returns credential identity.
-        ///
-        virtual std::wstring get_identity() const;
-
     public:
-        std::wstring               m_identity;  ///< Identity (username\@domain, certificate name etc.)
         winstd::sanitizing_wstring m_password;  ///< Password
 
     private:

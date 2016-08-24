@@ -189,6 +189,8 @@ void eap::credentials_ttls::operator>>(_Inout_ cursor_in &cursor)
 
 void eap::credentials_ttls::store(_In_z_ LPCTSTR pszTargetName) const
 {
+    assert(0); // Not that we would ever store inner&outer credentials to Windows Credential Manager joined, but for completness sake... Here we go:
+
     credentials_tls::store(pszTargetName);
 
     if (m_inner)
@@ -198,6 +200,8 @@ void eap::credentials_ttls::store(_In_z_ LPCTSTR pszTargetName) const
 
 void eap::credentials_ttls::retrieve(_In_z_ LPCTSTR pszTargetName)
 {
+    assert(0); // Not that we would ever retrieve inner&outer credentials to Windows Credential Manager joined, but for completness sake... Here we go:
+
     credentials_tls::retrieve(pszTargetName);
 
     if (m_inner)

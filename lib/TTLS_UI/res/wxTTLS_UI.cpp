@@ -32,7 +32,7 @@ wxTTLSConfigPanelBase::wxTTLSConfigPanelBase( wxWindow* parent, wxWindowID id, c
 	wxBoxSizer* sb_outer_identity_radio;
 	sb_outer_identity_radio = new wxBoxSizer( wxVERTICAL );
 	
-	m_outer_identity_same = new wxRadioButton( sb_outer_identity->GetStaticBox(), wxID_ANY, _("&Same as inner identity"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP );
+	m_outer_identity_same = new wxRadioButton( sb_outer_identity->GetStaticBox(), wxID_ANY, _("&True identity"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP );
 	m_outer_identity_same->SetToolTip( _("Use my true user name") );
 	
 	sb_outer_identity_radio->Add( m_outer_identity_same, 1, wxEXPAND, 5 );

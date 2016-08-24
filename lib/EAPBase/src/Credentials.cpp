@@ -36,12 +36,14 @@ eap::credentials::credentials(_In_ module &mod) : config(mod)
 
 
 eap::credentials::credentials(_In_ const credentials &other) :
+    m_identity(other.m_identity),
     config(other)
 {
 }
 
 
 eap::credentials::credentials(_Inout_ credentials &&other) :
+    m_identity(std::move(other.m_identity)),
     config(std::move(other))
 {
 }
@@ -49,8 +51,10 @@ eap::credentials::credentials(_Inout_ credentials &&other) :
 
 eap::credentials& eap::credentials::operator=(_In_ const credentials &other)
 {
-    if (this != &other)
+    if (this != &other) {
         (config&)*this = other;
+        m_identity     = other.m_identity;
+    }
 
     return *this;
 }
@@ -58,8 +62,10 @@ eap::credentials& eap::credentials::operator=(_In_ const credentials &other)
 
 eap::credentials& eap::credentials::operator=(_Inout_ credentials &&other)
 {
-    if (this != &other)
+    if (this != &other) {
         (config&)*this = std::move(other);
+        m_identity     = std::move(other.m_identity);
+    }
 
     return *this;
 }
@@ -67,13 +73,73 @@ eap::credentials& eap::credentials::operator=(_Inout_ credentials &&other)
 
 void eap::credentials::clear()
 {
+    m_identity.clear();
 }
 
 
 bool eap::credentials::empty() const
 {
-    // Base class always report empty credentials.
-    return true;
+    return m_identity.empty();
+}
+
+
+void eap::credentials::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot) const
+{
+    assert(pDoc);
+    assert(pConfigRoot);
+
+    config::save(pDoc, pConfigRoot);
+
+    const bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
+    HRESULT hr;
+
+    // <UserName>
+    if (FAILED(hr = eapxml::put_element_value(pDoc, pConfigRoot, bstr(L"UserName"), bstrNamespace, bstr(m_identity))))
+        throw com_runtime_error(hr, __FUNCTION__ " Error creating <UserName> element.");
+}
+
+
+void eap::credentials::load(_In_ IXMLDOMNode *pConfigRoot)
+{
+    assert(pConfigRoot);
+    HRESULT hr;
+
+    config::load(pConfigRoot);
+
+    std::wstring xpath(eapxml::get_xpath(pConfigRoot));
+
+    if (FAILED(hr = eapxml::get_element_value(pConfigRoot, bstr(L"eap-metadata:UserName"), m_identity)))
+        throw com_runtime_error(hr, __FUNCTION__ " Error reading <UserName> element.");
+
+    m_module.log_config((xpath + L"/UserName").c_str(), m_identity.c_str());
+}
+
+
+void eap::credentials::operator<<(_Inout_ cursor_out &cursor) const
+{
+    config::operator<<(cursor);
+    cursor << m_identity;
+}
+
+
+size_t eap::credentials::get_pk_size() const
+{
+    return
+        config::get_pk_size() +
+        pksizeof(m_identity);
+}
+
+
+void eap::credentials::operator>>(_Inout_ cursor_in &cursor)
+{
+    config::operator>>(cursor);
+    cursor >> m_identity;
+}
+
+
+wstring eap::credentials::get_identity() const
+{
+    return m_identity;
 }
 
 
@@ -93,7 +159,6 @@ eap::credentials_pass::credentials_pass(_In_ module &mod) : credentials(mod)
 
 
 eap::credentials_pass::credentials_pass(_In_ const credentials_pass &other) :
-    m_identity(other.m_identity),
     m_password(other.m_password),
     credentials(other)
 {
@@ -101,7 +166,6 @@ eap::credentials_pass::credentials_pass(_In_ const credentials_pass &other) :
 
 
 eap::credentials_pass::credentials_pass(_Inout_ credentials_pass &&other) :
-    m_identity(std::move(other.m_identity)),
     m_password(std::move(other.m_password)),
     credentials(std::move(other))
 {
@@ -112,7 +176,6 @@ eap::credentials_pass& eap::credentials_pass::operator=(_In_ const credentials_p
 {
     if (this != &other) {
         (credentials&)*this = other;
-        m_identity          = other.m_identity;
         m_password          = other.m_password;
     }
 
@@ -124,7 +187,6 @@ eap::credentials_pass& eap::credentials_pass::operator=(_Inout_ credentials_pass
 {
     if (this != &other) {
         (credentials&)*this = std::move(other);
-        m_identity          = std::move(other.m_identity);
         m_password          = std::move(other.m_password);
     }
 
@@ -135,14 +197,13 @@ eap::credentials_pass& eap::credentials_pass::operator=(_Inout_ credentials_pass
 void eap::credentials_pass::clear()
 {
     credentials::clear();
-    m_identity.clear();
     m_password.clear();
 }
 
 
 bool eap::credentials_pass::empty() const
 {
-    return credentials::empty() && m_identity.empty() && m_password.empty();
+    return credentials::empty() && m_password.empty();
 }
 
 
@@ -155,10 +216,6 @@ void eap::credentials_pass::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *p
 
     const bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
     HRESULT hr;
-
-    // <UserName>
-    if (FAILED(hr = eapxml::put_element_value(pDoc, pConfigRoot, bstr(L"UserName"), bstrNamespace, bstr(m_identity))))
-        throw com_runtime_error(hr, __FUNCTION__ " Error creating <UserName> element.");
 
     // <Password>
     bstr pass(m_password);
@@ -177,11 +234,6 @@ void eap::credentials_pass::load(_In_ IXMLDOMNode *pConfigRoot)
     credentials::load(pConfigRoot);
 
     std::wstring xpath(eapxml::get_xpath(pConfigRoot));
-
-    if (FAILED(hr = eapxml::get_element_value(pConfigRoot, bstr(L"eap-metadata:UserName"), m_identity)))
-        throw com_runtime_error(hr, __FUNCTION__ " Error reading <UserName> element.");
-
-    m_module.log_config((xpath + L"/UserName").c_str(), m_identity.c_str());
 
     bstr pass;
     if (FAILED(hr = eapxml::get_element_value(pConfigRoot, bstr(L"eap-metadata:Password"), &pass)))
@@ -202,7 +254,6 @@ void eap::credentials_pass::load(_In_ IXMLDOMNode *pConfigRoot)
 void eap::credentials_pass::operator<<(_Inout_ cursor_out &cursor) const
 {
     credentials::operator<<(cursor);
-    cursor << m_identity;
     cursor << m_password;
 }
 
@@ -211,7 +262,6 @@ size_t eap::credentials_pass::get_pk_size() const
 {
     return
         credentials::get_pk_size() +
-        pksizeof(m_identity) +
         pksizeof(m_password);
 }
 
@@ -219,7 +269,6 @@ size_t eap::credentials_pass::get_pk_size() const
 void eap::credentials_pass::operator>>(_Inout_ cursor_in &cursor)
 {
     credentials::operator>>(cursor);
-    cursor >> m_identity;
     cursor >> m_password;
 }
 
@@ -289,7 +338,7 @@ void eap::credentials_pass::retrieve(_In_z_ LPCTSTR pszTargetName)
         m_identity.clear();
 
     wstring xpath(pszTargetName);
-    m_module.log_config((xpath + L"/Username").c_str(), m_identity.c_str());
+    m_module.log_config((xpath + L"/Identity").c_str(), m_identity.c_str());
     m_module.log_config((xpath + L"/Password").c_str(),
 #ifdef _DEBUG
         m_password.c_str()
@@ -297,12 +346,6 @@ void eap::credentials_pass::retrieve(_In_z_ LPCTSTR pszTargetName)
         L"********"
 #endif
         );
-}
-
-
-std::wstring eap::credentials_pass::get_identity() const
-{
-    return m_identity;
 }
 
 

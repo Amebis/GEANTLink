@@ -358,6 +358,8 @@ bool wxTLSCredentialsPanel::TransferDataToWindow()
             m_cert_select_val->SetSelection(0);
     }
 
+    m_identity->SetValue(m_cred.m_identity);
+
     return wxEAPCredentialsPanelBase<eap::credentials_tls, wxTLSCredentialsPanelBase>::TransferDataToWindow();
 }
 
@@ -373,6 +375,8 @@ bool wxTLSCredentialsPanel::TransferDataFromWindow()
         else
             m_cred.m_cert.free();
     }
+
+    m_cred.m_identity = m_identity->GetValue();
 
     // Inherited TransferDataFromWindow() calls m_cred.store().
     // Therefore, call it only now, that m_cred is set.

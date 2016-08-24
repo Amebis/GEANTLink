@@ -181,11 +181,6 @@ namespace eap
         virtual std::wstring get_identity() const;
 
         ///
-        /// Returns credential name (for GUI display).
-        ///
-        virtual winstd::tstring get_name() const;
-
-        ///
         /// Combine credentials in the following order:
         ///
         /// 1. Cached credentials

@@ -80,6 +80,9 @@ class wxTLSCredentialsPanelBase : public wxPanel
 		wxRadioButton* m_cert_none;
 		wxRadioButton* m_cert_select;
 		wxChoice* m_cert_select_val;
+		wxStaticText* m_identity_label;
+		wxTextCtrl* m_identity;
+		wxStaticText* m_identity_note;
 		wxCheckBox* m_remember;
 	
 	public:

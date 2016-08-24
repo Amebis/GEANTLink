@@ -161,6 +161,25 @@ wxTLSCredentialsPanelBase::wxTLSCredentialsPanelBase( wxWindow* parent, wxWindow
 	
 	sb_credentials_vert->Add( sb_cert_radio, 0, wxEXPAND|wxALL, 5 );
 	
+	wxBoxSizer* sb_identity;
+	sb_identity = new wxBoxSizer( wxVERTICAL );
+	
+	m_identity_label = new wxStaticText( sb_credentials->GetStaticBox(), wxID_ANY, _("Custom &identity:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_identity_label->Wrap( -1 );
+	sb_identity->Add( m_identity_label, 0, wxBOTTOM, 5 );
+	
+	m_identity = new wxTextCtrl( sb_credentials->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_identity->SetToolTip( _("Your identity (username@domain) to override one from certificate; or blank to use one provided in certificate") );
+	
+	sb_identity->Add( m_identity, 0, wxEXPAND|wxBOTTOM, 5 );
+	
+	m_identity_note = new wxStaticText( sb_credentials->GetStaticBox(), wxID_ANY, _("(Example: user@contoso.com)"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_identity_note->Wrap( -1 );
+	sb_identity->Add( m_identity_note, 0, wxALIGN_RIGHT, 5 );
+	
+	
+	sb_credentials_vert->Add( sb_identity, 1, wxEXPAND|wxALL, 5 );
+	
 	m_remember = new wxCheckBox( sb_credentials->GetStaticBox(), wxID_ANY, _("&Remember"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_remember->SetHelpText( _("Check if you would like to save certificate selection") );
 	
