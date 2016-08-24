@@ -113,7 +113,7 @@ void eap::peer_ttls_ui::invoke_config_ui(
     {
         // Create wxWidget-approved parent window.
         wxWindow parent;
-        parent.SetHWND((WXHWND)hwndParent);
+        parent.SetHWND((WXHWND)(hwndParent ? hwndParent : GetForegroundWindow()));
         parent.AdoptAttributesFromHWND();
         wxTopLevelWindows.Append(&parent);
 
@@ -205,7 +205,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
     {
         // Create wxWidget-approved parent window.
         wxWindow parent;
-        parent.SetHWND((WXHWND)hwndParent);
+        parent.SetHWND((WXHWND)(hwndParent ? hwndParent : GetForegroundWindow()));
         parent.AdoptAttributesFromHWND();
         wxTopLevelWindows.Append(&parent);
 
