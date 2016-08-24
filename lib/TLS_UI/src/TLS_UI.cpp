@@ -397,9 +397,11 @@ void wxTLSCredentialsPanel::OnUpdateUI(wxUpdateUIEvent& event)
             m_cert_select->Enable(false);
         }
         m_cert_select_val->Enable(false);
+        m_identity->Enable(false);
     } else {
         // Configuration mode or using own credentials. Selectively enable/disable controls.
         m_cert_select_val->Enable(m_cert_select->GetValue());
+        m_identity->Enable(true);
     }
 
     wxEAPCredentialsPanelBase<eap::credentials_tls, wxTLSCredentialsPanelBase>::OnUpdateUI(event);
