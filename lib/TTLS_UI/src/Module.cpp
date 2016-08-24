@@ -88,7 +88,6 @@ void eap::peer_ttls_ui::invoke_config_ui(
         unpack(cfg, pConnectionDataIn, dwConnectionDataInSize);
     } else {
         // This is a blank network profile. Create default configuraton.
-        CoCreateGuid(&(cfg.m_connection_id));
 
         // Start with PAP inner configuration.
         unique_ptr<config_method_ttls> cfg_method(new config_method_ttls(*this));
