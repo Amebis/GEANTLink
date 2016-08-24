@@ -579,6 +579,7 @@ void eap::method_tls::process_request_packet(
 #else
     if (pReceivedPacket->Code == EapCodeRequest && (m_packet_req.m_flags & flags_req_start)) {
         // This is the EAP-TLS start message: (re)initialize method.
+        m_module.log_event(&EAPMETHOD_TLS_HANDSHAKE_START2, event_data((unsigned int)eap_type_tls), event_data::blank);
         m_phase = phase_handshake_init;
         m_sc_queue.assign(m_packet_req.m_data.begin(), m_packet_req.m_data.end());
     } else
@@ -1352,7 +1353,32 @@ void eap::method_tls::process_handshake()
         }
         m_sc_queue.clear();
 
-        m_phase = status == SEC_E_OK ? phase_application_data : phase_handshake_cont;
+        if (status == SEC_E_OK) {
+            SecPkgContext_Authority auth;
+            if (FAILED(status = QueryContextAttributes(m_sc_ctx, SECPKG_ATTR_AUTHORITY, &auth))) {
+                m_module.log_event(&EAPMETHOD_TLS_QUERY_FAILED, event_data((unsigned int)SECPKG_ATTR_AUTHORITY), event_data(status), event_data::blank);
+                auth.sAuthorityName = _T("");
+            }
+
+            SecPkgContext_ConnectionInfo info;
+            if (SUCCEEDED(status = QueryContextAttributes(m_sc_ctx, SECPKG_ATTR_CONNECTION_INFO, &info)))
+                m_module.log_event(&EAPMETHOD_TLS_HANDSHAKE_FINISHED,
+                    event_data((unsigned int)eap_type_tls),
+                    event_data(auth.sAuthorityName),
+                    event_data(info.dwProtocol),
+                    event_data(info.aiCipher),
+                    event_data(info.dwCipherStrength),
+                    event_data(info.aiHash),
+                    event_data(info.dwHashStrength),
+                    event_data(info.aiExch),
+                    event_data(info.dwExchStrength),
+                    event_data::blank);
+            else
+                m_module.log_event(&EAPMETHOD_TLS_QUERY_FAILED, event_data((unsigned int)SECPKG_ATTR_CONNECTION_INFO), event_data(status), event_data::blank);
+
+            m_phase = phase_application_data;
+        } else
+            m_phase = phase_handshake_cont;
     } else if (status == SEC_E_INCOMPLETE_MESSAGE) {
         // Schannel neeeds more data. Send ACK packet to server to send more.
     } else if (FAILED(status)) {
