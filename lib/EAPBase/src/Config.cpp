@@ -614,10 +614,12 @@ void eap::config_provider::operator>>(_Inout_ cursor_in &cursor)
 
 eap::config_provider_list::config_provider_list(_In_ module &mod) : config(mod)
 {
+    memset(&m_connection_id, 0, sizeof(m_connection_id));
 }
 
 
 eap::config_provider_list::config_provider_list(_In_ const config_provider_list &other) :
+    m_connection_id(other.m_connection_id),
     m_providers(other.m_providers),
     config(other)
 {
@@ -625,6 +627,7 @@ eap::config_provider_list::config_provider_list(_In_ const config_provider_list 
 
 
 eap::config_provider_list::config_provider_list(_Inout_ config_provider_list &&other) :
+    m_connection_id(std::move(other.m_connection_id)),
     m_providers(std::move(other.m_providers)),
     config(std::move(other))
 {
@@ -634,8 +637,9 @@ eap::config_provider_list::config_provider_list(_Inout_ config_provider_list &&o
 eap::config_provider_list& eap::config_provider_list::operator=(_In_ const config_provider_list &other)
 {
     if (this != &other) {
-        (config&)*this = other;
-        m_providers = other.m_providers;
+        (config&)*this  = other;
+        m_connection_id = other.m_connection_id;
+        m_providers     = other.m_providers;
     }
 
     return *this;
@@ -646,6 +650,7 @@ eap::config_provider_list& eap::config_provider_list::operator=(_Inout_ config_p
 {
     if (this != &other) {
         (config&&)*this = std::move(other);
+        m_connection_id = std::move(other.m_connection_id);
         m_providers     = std::move(other.m_providers);
     }
 
@@ -693,6 +698,9 @@ void eap::config_provider_list::load(_In_ IXMLDOMNode *pConfigRoot)
 
     config::load(pConfigRoot);
 
+    // On each configuration import reset ID.
+    CoCreateGuid(&m_connection_id);
+
     // Iterate authentication providers (<EAPIdentityProvider>).
     com_obj<IXMLDOMNodeList> pXmlListProviders;
     if (FAILED(hr = eapxml::select_nodes(pConfigRoot, bstr(L"eap-metadata:EAPIdentityProviderList/eap-metadata:EAPIdentityProvider"), &pXmlListProviders)))
@@ -717,6 +725,7 @@ void eap::config_provider_list::load(_In_ IXMLDOMNode *pConfigRoot)
 void eap::config_provider_list::operator<<(_Inout_ cursor_out &cursor) const
 {
     config::operator<<(cursor);
+    cursor << m_connection_id;
     cursor << m_providers;
 }
 
@@ -725,13 +734,16 @@ size_t eap::config_provider_list::get_pk_size() const
 {
     return
         config::get_pk_size() +
-        pksizeof(m_providers);
+        pksizeof(m_connection_id) +
+        pksizeof(m_providers    );
 }
 
 
 void eap::config_provider_list::operator>>(_Inout_ cursor_in &cursor)
 {
     config::operator>>(cursor);
+
+    cursor >> m_connection_id;
 
     list<config_provider>::size_type count;
     cursor >> count;

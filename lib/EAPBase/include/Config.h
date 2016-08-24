@@ -550,6 +550,7 @@ namespace eap
         /// @}
 
     public:
+        GUID m_connection_id;                           ///< Unique connection ID
         std::vector<eap::config_provider> m_providers;  ///< Array of provider configurations
     };
 }

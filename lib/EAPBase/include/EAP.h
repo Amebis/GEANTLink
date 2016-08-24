@@ -391,6 +391,31 @@ template<size_t N> inline size_t pksizeof(_In_ const eap::sanitizing_blob_f<N> &
 ///
 template<size_t N> inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ eap::sanitizing_blob_f<N> &val);
 
+///
+/// Packs a GUID
+///
+/// \param[inout] cursor  Memory cursor
+/// \param[in]    val     Variable with data to pack
+///
+inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const GUID &val);
+
+///
+/// Returns packed size of a GUID
+///
+/// \param[in] val  Data to pack
+///
+/// \returns Size of data when packed (in bytes)
+///
+inline size_t pksizeof(_In_ const GUID &val);
+
+///
+/// Unpacks a GUID
+///
+/// \param[inout] cursor  Memory cursor
+/// \param[out]   val     Variable to receive unpacked value
+///
+inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ GUID &val);
+
 #ifndef htonll
 ///
 /// Convert host converts an unsigned __int64 from host to TCP/IP network byte order.
@@ -971,6 +996,31 @@ inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ eap::sanitizing_blo
     eap::cursor_in::ptr_type ptr_end = cursor.ptr + sizeof(eap::sanitizing_blob_f<N>);
     assert(ptr_end <= cursor.ptr_end);
     memcpy(val.data, cursor.ptr, sizeof(eap::sanitizing_blob_f<N>));
+    cursor.ptr = ptr_end;
+}
+
+
+inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const GUID &val)
+{
+    eap::cursor_out::ptr_type ptr_end = cursor.ptr + sizeof(GUID);
+    assert(ptr_end <= cursor.ptr_end);
+    memcpy(cursor.ptr, &val, sizeof(GUID));
+    cursor.ptr = ptr_end;
+}
+
+
+inline size_t pksizeof(_In_ const GUID &val)
+{
+    UNREFERENCED_PARAMETER(val);
+    return sizeof(GUID);
+}
+
+
+inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ GUID &val)
+{
+    eap::cursor_in::ptr_type ptr_end = cursor.ptr + sizeof(GUID);
+    assert(ptr_end <= cursor.ptr_end);
+    memcpy(&val, cursor.ptr, sizeof(GUID));
     cursor.ptr = ptr_end;
 }
 
