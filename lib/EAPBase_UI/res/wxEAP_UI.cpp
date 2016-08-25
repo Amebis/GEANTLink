@@ -412,7 +412,7 @@ wxEAPProviderIdentityPanelBase::wxEAPProviderIdentityPanelBase( wxWindow* parent
 	sb_provider_helpdesk_inner->Add( m_provider_web_icon, 0, wxALIGN_CENTER_VERTICAL|wxBOTTOM|wxRIGHT, 5 );
 	
 	m_provider_web = new wxTextCtrl( sb_provider_id->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_provider_web->SetToolTip( _("Your helpdesk website") );
+	m_provider_web->SetToolTip( _("Your helpdesk website address") );
 	
 	sb_provider_helpdesk_inner->Add( m_provider_web, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL|wxBOTTOM, 5 );
 	
