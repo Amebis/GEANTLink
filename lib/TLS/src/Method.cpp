@@ -729,7 +729,10 @@ void eap::method_tls::get_result(
     }
 
     case EapPeerMethodResultFailure:
-        m_module.log_event(&EAPMETHOD_TLS_FAILURE, event_data((unsigned int)eap_type_tls), event_data::blank);
+        m_module.log_event(
+            m_phase_prev < phase_handshake_cont   ? &EAPMETHOD_TLS_FAILURE_INIT :
+            m_phase_prev < phase_application_data ? &EAPMETHOD_TLS_FAILURE_HANDSHAKE : &EAPMETHOD_TLS_FAILURE,
+            event_data((unsigned int)eap_type_tls), event_data::blank);
 
 #if EAP_TLS < EAP_TLS_SCHANNEL
         // Clear session resumption data.
