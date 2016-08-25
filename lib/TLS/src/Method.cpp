@@ -1350,10 +1350,10 @@ void eap::method_tls::process_handshake()
         assert(m_sc_ctx.m_attrib & ISC_RET_ALLOCATED_MEMORY);
         m_packet_res.m_data.assign((const unsigned char*)buf_out[0].pvBuffer, (const unsigned char*)buf_out[0].pvBuffer + buf_out[0].cbBuffer);
         if (buf_in[1].BufferType == SECBUFFER_EXTRA) {
-            // Server appended extra data. Process it.
-            process_application_data(&*(m_sc_queue.end() - buf_in[1].cbBuffer), buf_in[1].cbBuffer);
-        }
-        m_sc_queue.clear();
+            // Server appended extra data.
+            m_sc_queue.erase(m_sc_queue.begin(), m_sc_queue.end() - buf_in[1].cbBuffer);
+        } else
+            m_sc_queue.clear();
 
         if (status == SEC_E_OK) {
             SecPkgContext_Authority auth;
@@ -1379,6 +1379,7 @@ void eap::method_tls::process_handshake()
                 m_module.log_event(&EAPMETHOD_TLS_QUERY_FAILED, event_data((unsigned int)SECPKG_ATTR_CONNECTION_INFO), event_data(status), event_data::blank);
 
             m_phase = phase_application_data;
+            process_application_data(m_sc_queue.data(), m_sc_queue.size());
         } else
             m_phase = phase_handshake_cont;
     } else if (status == SEC_E_INCOMPLETE_MESSAGE) {
