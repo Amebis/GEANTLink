@@ -125,7 +125,10 @@ void eap::method_ttls::get_result(
 
         case EapPeerMethodResultFailure:
             m_module.log_event(&EAPMETHOD_TTLS_INNER_FAILURE, event_data((unsigned int)eap_type_ttls), event_data::blank);
-            cfg_method->m_inner->m_auth_failed = true;
+
+            // Mark credentials as failed, so GUI can re-prompt user.
+            // But be careful: do so only if this happened after transition from handshake to application data phase.
+            cfg_method->m_inner->m_auth_failed = m_phase_prev < phase_application_data;
             break;
 
         default:

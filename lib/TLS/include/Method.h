@@ -549,7 +549,7 @@ namespace eap
             phase_handshake_cont,                               ///< Handshake continue
             phase_application_data,                             ///< Exchange application data
             phase_shutdown,                                     ///< Connection shut down
-        } m_phase;                                              ///< What phase is our communication at?
+        } m_phase, m_phase_prev;                                ///< What phase is our communication at?
 #endif
 
         // The following members are required to avoid memory leakage in get_result()

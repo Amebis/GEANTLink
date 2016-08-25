@@ -134,6 +134,7 @@ eap::method_tls::method_tls(_In_ module &module, _In_ config_connection &cfg, _I
     m_seq_num_server(0),
 #else
     m_phase(phase_unknown),
+    m_phase_prev(phase_unknown),
 #endif
     m_blob_cfg(NULL),
 #ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
@@ -185,6 +186,7 @@ eap::method_tls::method_tls(_Inout_ method_tls &&other) :
     m_sc_queue                  (std::move(other.m_sc_queue                  )),
     m_sc_ctx                    (std::move(other.m_sc_ctx                    )),
     m_phase                     (std::move(other.m_phase                     )),
+    m_phase_prev                (std::move(other.m_phase_prev                )),
 #endif
     method                      (std::move(other                             ))
 {
@@ -252,6 +254,7 @@ eap::method_tls& eap::method_tls::operator=(_Inout_ method_tls &&other)
         m_sc_queue                   = std::move(other.m_sc_queue                  );
         m_sc_ctx                     = std::move(other.m_sc_ctx                    );
         m_phase                      = std::move(other.m_phase                     );
+        m_phase_prev                 = std::move(other.m_phase_prev                );
 #endif
     }
 
@@ -585,6 +588,7 @@ void eap::method_tls::process_request_packet(
     } else
         m_sc_queue.insert(m_sc_queue.end(), m_packet_req.m_data.begin(), m_packet_req.m_data.end());
 
+    m_phase_prev = m_phase;
     switch (m_phase) {
     case phase_handshake_init:
     case phase_handshake_cont:
@@ -741,7 +745,8 @@ void eap::method_tls::get_result(
 #endif
 
         // Mark credentials as failed, so GUI can re-prompt user.
-        cfg_method->m_auth_failed = true;
+        // But be careful: do so only if this happened after transition from handshake to application data phase.
+        cfg_method->m_auth_failed = m_phase_prev < phase_application_data && m_phase >= phase_application_data;
 
         // Do not report failure to EAPHost, as it will not save updated configuration then. But we need it to save it, to alert user on next connection attempt.
         // EAPHost is well aware of the failed condition.
