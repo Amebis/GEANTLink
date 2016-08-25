@@ -1322,7 +1322,6 @@ void eap::method_tls::process_handshake()
 
     SECURITY_STATUS status;
     if (m_phase == phase_handshake_init) {
-        m_module.log_event(&EAPMETHOD_TLS_HANDSHAKE_START2, event_data((unsigned int)eap_type_tls), event_data::blank);
         status = m_sc_ctx.initialize(
             m_sc_cred,
             !m_sc_target_name.empty() ? m_sc_target_name.c_str() : NULL,
