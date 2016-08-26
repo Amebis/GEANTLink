@@ -48,8 +48,6 @@ wxETWEvent::wxETWEvent(wxEventType type, const EVENT_RECORD &record) :
     m_record(record),
     wxEvent(0, type)
 {
-    DoSetExtendedData(record.ExtendedDataCount, record.ExtendedData);
-    DoSetUserData(record.UserDataLength, record.UserData);
 }
 
 
@@ -57,92 +55,6 @@ wxETWEvent::wxETWEvent(const wxETWEvent& event) :
     m_record(event.m_record),
     wxEvent(event)
 {
-    DoSetExtendedData(event.m_record.ExtendedDataCount, event.m_record.ExtendedData);
-    DoSetUserData(event.m_record.UserDataLength, event.m_record.UserData);
-}
-
-
-wxETWEvent::~wxETWEvent()
-{
-    if (m_record.ExtendedData)
-        delete (unsigned char*)m_record.ExtendedData;
-
-    if (m_record.UserData)
-        delete (unsigned char*)m_record.UserData;
-}
-
-
-bool wxETWEvent::SetExtendedData(size_t extended_data_count, const EVENT_HEADER_EXTENDED_DATA_ITEM *extended_data)
-{
-    if (m_record.ExtendedData)
-        delete (unsigned char*)m_record.ExtendedData;
-
-    return DoSetExtendedData(extended_data_count, extended_data);
-}
-
-
-bool wxETWEvent::SetUserData(size_t user_data_length, const void *user_data)
-{
-    if (m_record.UserData)
-        delete (unsigned char*)m_record.UserData;
-
-    return DoSetUserData(user_data_length, user_data);
-}
-
-
-bool wxETWEvent::DoSetExtendedData(size_t extended_data_count, const EVENT_HEADER_EXTENDED_DATA_ITEM *extended_data)
-{
-    if (extended_data_count) {
-        wxASSERT_MSG(extended_data, wxT("extended data is NULL"));
-
-        // Count the total required memory.
-        size_t data_size = 0;
-        for (size_t i = 0; i < extended_data_count; i++)
-            data_size += extended_data[i].DataSize;
-
-        // Allocate memory for extended data.
-        m_record.ExtendedData = (EVENT_HEADER_EXTENDED_DATA_ITEM*)(new unsigned char[sizeof(EVENT_HEADER_EXTENDED_DATA_ITEM)*extended_data_count + data_size]);
-        wxCHECK_MSG(m_record.ExtendedData, false, wxT("extended data memory allocation failed"));
-
-        // Bulk-copy extended data descriptors.
-        memcpy(m_record.ExtendedData, extended_data, sizeof(EVENT_HEADER_EXTENDED_DATA_ITEM) * extended_data_count);
-
-        // Copy the data.
-        unsigned char *ptr = (unsigned char*)(m_record.ExtendedData + extended_data_count);
-        for (size_t i = 0; i < extended_data_count; i++) {
-            if (extended_data[i].DataSize) {
-                memcpy(ptr, (void*)(extended_data[i].DataPtr), extended_data[i].DataSize);
-                m_record.ExtendedData[i].DataPtr = (ULONGLONG)ptr;
-                ptr += extended_data[i].DataSize;
-            } else
-                m_record.ExtendedData[i].DataPtr = NULL;
-        }
-    } else
-        m_record.ExtendedData = NULL;
-
-    m_record.ExtendedDataCount = extended_data_count;
-
-    return true;
-}
-
-
-bool wxETWEvent::DoSetUserData(size_t user_data_length, const void *user_data)
-{
-    if (user_data_length) {
-        wxASSERT_MSG(user_data, wxT("user data is NULL"));
-
-        // Allocate memory for user data.
-        m_record.UserData = new unsigned char[user_data_length];
-        wxCHECK_MSG(m_record.UserData, false, wxT("user data memory allocation failed"));
-
-        // Copy user data.
-        memcpy(m_record.UserData, user_data, user_data_length);
-    } else
-        m_record.UserData = NULL;
-
-    m_record.UserDataLength = user_data_length;
-
-    return true;
 }
 
 
@@ -238,12 +150,22 @@ END_EVENT_TABLE()
 
 
 // {6EB8DB94-FE96-443F-A366-5FE0CEE7FB1C}
-const GUID wxETWListCtrl::s_provider_eaphost = { 0X6EB8DB94, 0XFE96, 0X443F, { 0XA3, 0X66, 0X5F, 0XE0, 0XCE, 0XE7, 0XFB, 0X1C } };
+const GUID wxETWListCtrl::s_provider_eaphost = { 0x6EB8DB94, 0xFE96, 0x443F, { 0xA3, 0x66, 0x5F, 0xE0, 0xCE, 0xE7, 0xFB, 0x1C } };
+
+// {1F678132-5938-4686-9FDC-C8FF68F15C85}
+const GUID wxETWListCtrl::s_provider_schannel = { 0x1F678132, 0x5938, 0x4686, { 0x9F, 0xDC, 0xC8, 0xFF, 0x68, 0xF1, 0x5C, 0x85 } };
 
 
 wxETWListCtrl::wxETWListCtrl(wxWindow *parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxValidator& validator, const wxString& name) :
     m_proc(NULL),
     m_item_id(0),
+    m_scroll_auto(true),
+    m_source_eaphost(false),
+    m_source_schannel(false),
+    m_source_product(true),
+    m_level(TRACE_LEVEL_INFORMATION),
+    m_rec_db(wxETWEVENT_RECORDS_MAX),
+    m_rec_idx(wxETWEVENT_RECORDS_MAX),
     wxListCtrl(parent, id, pos, size, style, validator, name)
 {
     this->AppendColumn(_("Time"  ), wxLIST_FORMAT_LEFT, 100);
@@ -251,6 +173,32 @@ wxETWListCtrl::wxETWListCtrl(wxWindow *parent, wxWindowID id, const wxPoint& pos
     this->AppendColumn(_("TID"   ), wxLIST_FORMAT_LEFT, 50 );
     this->AppendColumn(_("Source"), wxLIST_FORMAT_LEFT, 100);
     this->AppendColumn(_("Event" ), wxLIST_FORMAT_LEFT, wxLIST_AUTOSIZE_USEHEADER);
+
+    // Maximum expected column widths for pre-formatted row display
+    m_col_format_width[0] = 26;
+    m_col_format_width[1] = 5;
+    m_col_format_width[2] = 5;
+    m_col_format_width[3] = std::max<int>(std::max<int>(_countof("EAPHost"), _countof("Schannel")), _countof(PRODUCT_NAME_STR)) - 1;
+    m_col_format_width[4] = 0;
+
+    // Prepare all possible item attributes.
+    wxColour col_bg((unsigned long)0xffffff);
+    m_item_attr[0][0].SetBackgroundColour(col_bg                 );
+    m_item_attr[0][0].SetTextColour      ((unsigned long)0x666666);
+    m_item_attr[0][1].SetBackgroundColour(col_bg                 );
+    m_item_attr[0][1].SetTextColour      ((unsigned long)0x000000);
+    m_item_attr[0][2].SetBackgroundColour(col_bg                 );
+    m_item_attr[0][2].SetTextColour      ((unsigned long)0x00aacc);
+    m_item_attr[0][3].SetBackgroundColour(col_bg                 );
+    m_item_attr[0][3].SetTextColour      ((unsigned long)0x0000ff);
+    m_item_attr[1][0].SetBackgroundColour(col_bg                 );
+    m_item_attr[1][0].SetTextColour      ((unsigned long)0xcccccc);
+    m_item_attr[1][1].SetBackgroundColour(col_bg                 );
+    m_item_attr[1][1].SetTextColour      ((unsigned long)0xaaaaaa);
+    m_item_attr[1][2].SetBackgroundColour(col_bg                 );
+    m_item_attr[1][2].SetTextColour      ((unsigned long)0xaaeeee);
+    m_item_attr[1][3].SetBackgroundColour(col_bg                 );
+    m_item_attr[1][3].SetTextColour      ((unsigned long)0xaaaaff);
 
     // Start a new session.
     ULONG ulResult;
@@ -307,6 +255,7 @@ wxETWListCtrl::wxETWListCtrl(wxWindow *parent, wxWindowID id, const wxPoint& pos
         wxLogError(_("Error enabling event provider (error %u)."), ulResult);
         return;
     }
+
     if ((ulResult = EnableTraceEx(
         &s_provider_eaphost,
         &((const EVENT_TRACE_PROPERTIES*)m_session)->Wnode.Guid,
@@ -321,10 +270,24 @@ wxETWListCtrl::wxETWListCtrl(wxWindow *parent, wxWindowID id, const wxPoint& pos
         wxLogDebug(_("Error enabling EAPHost event provider (error %u)."), ulResult);
     }
 
+    if ((ulResult = EnableTraceEx(
+        &s_provider_schannel,
+        &((const EVENT_TRACE_PROPERTIES*)m_session)->Wnode.Guid,
+        m_session,
+        EVENT_CONTROL_CODE_ENABLE_PROVIDER,
+        TRACE_LEVEL_VERBOSE,
+        0, 0,
+        0,
+        NULL)) != ERROR_SUCCESS)
+    {
+        // If the Schannel trace provider failed to enable, do not despair.
+        wxLogDebug(_("Error enabling Schannel event provider (error %u)."), ulResult);
+    }
+
     // Process events in separate thread, not to block wxWidgets' message pump.
     wxArrayString sessions;
     sessions.Add(m_session.name());
-    m_proc = new wxEventTraceProcessorThread(this->GetEventHandler(), sessions);
+    m_proc = new wxEventTraceProcessorThread(GetEventHandler(), sessions);
     wxASSERT_MSG(m_proc, wxT("error allocating thread memory"));
     if (m_proc->Run() != wxTHREAD_NO_ERROR) {
         wxFAIL_MSG("Can't create the thread!");
@@ -344,6 +307,16 @@ wxETWListCtrl::~wxETWListCtrl()
         }
 
         // Disable event providers.
+        EnableTraceEx(
+                &s_provider_schannel,
+                &((const EVENT_TRACE_PROPERTIES*)m_session)->Wnode.Guid,
+                m_session,
+                EVENT_CONTROL_CODE_DISABLE_PROVIDER,
+                TRACE_LEVEL_VERBOSE,
+                0, 0,
+                0,
+                NULL);
+
         EnableTraceEx(
                 &s_provider_eaphost,
                 &((const EVENT_TRACE_PROPERTIES*)m_session)->Wnode.Guid,
@@ -367,27 +340,240 @@ wxETWListCtrl::~wxETWListCtrl()
 }
 
 
-void wxETWListCtrl::OnETWEvent(wxETWEvent& event)
+void wxETWListCtrl::CopySelected() const
 {
-    EVENT_RECORD &rec = event.GetRecord();
+    // Prepare text in ANSI and Unicode flavours.
+    string dataA, rowA;
+    wstring dataW, rowW;
+    for (long item = -1; (item = GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED)) != -1;) {
+        FormatRow(m_rec_db.at_abs(m_rec_idx.at(item)), rowA, rowW);
+        rowA +=  "\r\n"; dataA += rowA;
+        rowW += L"\r\n"; dataW += rowW;
+    }
+
+    // Put text to clipboard.
+    CopyToClipboard(dataA, dataW);
+}
+
+
+void wxETWListCtrl::CopyAll() const
+{
+    // Prepare text in ANSI and Unicode flavours.
+    string dataA, rowA;
+    wstring dataW, rowW;
+    for (size_t i = 0, n = m_rec_db.size(); i < n; i++) {
+        FormatRow(m_rec_db[i], rowA, rowW);
+        rowA +=  "\r\n"; dataA += rowA;
+        rowW += L"\r\n"; dataW += rowW;
+    }
+
+    // Put text to clipboard.
+    CopyToClipboard(dataA, dataW);
+
+}
+
+
+void wxETWListCtrl::ClearAll()
+{
+    m_rec_idx.clear();
+    m_rec_db.clear();
+    if (GetItemCount())
+        SetItemCount(0);
+}
+
+
+void wxETWListCtrl::SelectAll()
+{
+    for (long item = 0, count = GetItemCount(); item < count; item++)
+        SetItemState(item, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+}
+
+
+void wxETWListCtrl::SelectNone()
+{
+    for (long item = -1; (item = GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED)) != -1;)
+        SetItemState(item, 0, wxLIST_STATE_SELECTED);
+}
+
+
+void wxETWListCtrl::RebuildItems()
+{
+    ChildrenRepositioningGuard child_reposition(this);
+
+    // Get current focus and selection.
+    set<size_t> focus, selection;
+    for (long item = -1; (item = GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_FOCUSED)) != -1;)
+        focus.insert(m_rec_idx[item]);
+    for (long item = -1; (item = GetNextItem(item, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED)) != -1;)
+        selection.insert(m_rec_idx[item]);
+
+    // Get current view position (scrolling).
+    long
+        item_top        = GetTopItem(),
+        item_page_count = GetCountPerPage(),
+        item_center     = std::min<long>(
+            item_top + item_page_count / 2,     // Index of item in the centre of the view
+            (item_top + m_rec_idx.size()) / 2); // Index of the item in the centre between top viewed item and the last (when list is not overflowed)
+    size_t center = item_center < m_rec_idx.size() ? m_rec_idx[item_center] : -1;
+
+    // Rebuild the index.
+    m_rec_idx.clear();
+    set<size_t>::const_iterator selection_end = selection.end(), focus_end = focus.end();
+    vector<long> selection_out, focus_out;
+    long center_out = -1;
+    for (size_t i = 0, n = m_rec_db.size(); i < n; i++) {
+        size_t i_abs = m_rec_db.abs(i);
+        if (i_abs == center)
+            center_out = m_rec_idx.size();
+        if (IsVisible(m_rec_db[i])) {
+            if (selection.find(i_abs) != selection_end)
+                selection_out.push_back(m_rec_idx.size());
+            if (focus.find(i_abs) != focus_end)
+                focus_out.push_back(m_rec_idx.size());
+            m_rec_idx.push_back(i_abs);
+        }
+    }
+
+    // Set new item count.
+    long item_count = (long)m_rec_idx.size();
+    if (GetItemCount() != item_count)
+        SetItemCount(item_count);
+
+    if (item_count) {
+        // Restore focus and selection.
+        for (size_t i = 0, n = focus_out.size(); i < n; i++)
+            SetItemState(focus_out[i], wxLIST_STATE_FOCUSED, wxLIST_STATE_FOCUSED);
+        SelectNone();
+        for (size_t i = 0, n = selection_out.size(); i < n; i++)
+            SetItemState(selection_out[i], wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+
+        // Restore scrolling.
+        if (center_out != -1) {
+            wxRect pos1, pos2;
+            GetItemRect(GetTopItem(), pos1);
+            GetItemRect(std::max<long>(std::min<long>(center_out, item_count - 1) - item_page_count / 2, 0), pos2);
+            ScrollList(pos2.x - pos1.x, pos2.y - pos1.y);
+        } else
+            EnsureVisible(item_count - 1);
+
+        // Refresh items.
+        item_top = GetTopItem();
+        RefreshItems(item_top, std::min<long>(item_top + item_page_count, item_count));
+    }
+}
+
+
+bool wxETWListCtrl::IsVisible(const EVENT_RECORD &rec) const
+{
+    return
+        (m_source_product  && IsEqualGUID(rec.EventHeader.ProviderId, EAPMETHOD_TRACE_EVENT_PROVIDER) ||
+         m_source_eaphost  && IsEqualGUID(rec.EventHeader.ProviderId, s_provider_eaphost            ) ||
+         m_source_schannel && IsEqualGUID(rec.EventHeader.ProviderId, s_provider_schannel           )) &&
+         rec.EventHeader.EventDescriptor.Level <= m_level;
+}
+
+
+void wxETWListCtrl::FormatRow(const event_rec &rec, std::string &rowA, std::wstring &rowW) const
+{
+    rowA.clear();
+    rowW.clear();
+
+    // Merge columns.
+    string colA;
+    wxString colW;
+    for (size_t i = 0; i < _countof(m_col_format_width); i++) {
+        // Get column text.
+        colW = OnGetItemText(rec, i);
+        size_t len = colW.Length();
+        if (len < m_col_format_width[i]) {
+            // Pad it to required length.
+            colW.Append(wxT(' '), m_col_format_width[i] - len);
+        } else if (m_col_format_width[i] && len > m_col_format_width[i]) {
+            // Truncate it and add horizontal ellipsis.
+            colW.Truncate(m_col_format_width[i] - 3);
+            colW.Append(wxT("..."));
+        }
+
+        // Convert to ACP.
+        WideCharToMultiByte(CP_ACP, 0, colW.c_str(), -1, colA, NULL, NULL);
+
+        // Append to output.
+        if (i) {
+            rowA +=  "  ";
+            rowW += L"  ";
+        }
+        rowA += colA;
+        rowW += colW;
+    }
+}
+
+
+bool wxETWListCtrl::CopyToClipboard(const std::string &dataA, const std::wstring &dataW) const
+{
+    if (OpenClipboard(GetHWND())) {
+        EmptyClipboard();
+
+        HGLOBAL h;
+        size_t size;
+
+        size = (dataA.length() + 1) * sizeof(CHAR);
+        h = GlobalAlloc(GMEM_MOVEABLE, size);
+        if (h) {
+            LPVOID d = GlobalLock(h);
+            if (d) {
+                memcpy(d, dataA.data(), size);
+                GlobalUnlock(h);
+                SetClipboardData(CF_TEXT, h);
+            }
+        }
+
+        size = (dataW.length() + 1) * sizeof(WCHAR);
+        h = GlobalAlloc(GMEM_MOVEABLE, size);
+        if (h) {
+            LPVOID d = GlobalLock(h);
+            if (d) {
+                memcpy(d, dataW.data(), size);
+                GlobalUnlock(h);
+                SetClipboardData(CF_UNICODETEXT, h);
+            }
+        }
+
+        CloseClipboard();
+
+        return true;
+    } else
+        return false;
+}
+
+
+wxListItemAttr *wxETWListCtrl::OnGetItemAttr(long item) const
+{
+    const event_rec &rec = m_rec_db.at_abs(m_rec_idx.at(item));
     bool is_ours = IsEqualGUID(rec.EventHeader.ProviderId, EAPMETHOD_TRACE_EVENT_PROVIDER) ? true : false;
-    int column = 0;
 
-    // Prepare item to insert into the list.
-    wxListItem item;
-    item.SetId(m_item_id++);
-    item.SetTextColour(
-        rec.EventHeader.EventDescriptor.Level >= TRACE_LEVEL_VERBOSE     ? (is_ours ? 0x666666 : 0xcccccc) :
-        rec.EventHeader.EventDescriptor.Level >= TRACE_LEVEL_INFORMATION ? (is_ours ? 0x000000 : 0xaaaaaa) :
-        rec.EventHeader.EventDescriptor.Level >= TRACE_LEVEL_WARNING     ? (is_ours ? 0x00aacc : 0xaaeeee) :
-                                                                           (is_ours ? 0x0000ff : 0xaaaaff));
-    item.SetBackgroundColour(0xffffff);
+    // Select appropriate attributes acording to race, colour, or creed...
+    return (wxListItemAttr*)(
+        ((const EVENT_RECORD&)rec).EventHeader.EventDescriptor.Level >= TRACE_LEVEL_VERBOSE     ? (is_ours ? &(m_item_attr[0][0]) : &(m_item_attr[1][0])) :
+        ((const EVENT_RECORD&)rec).EventHeader.EventDescriptor.Level >= TRACE_LEVEL_INFORMATION ? (is_ours ? &(m_item_attr[0][1]) : &(m_item_attr[1][1])) :
+        ((const EVENT_RECORD&)rec).EventHeader.EventDescriptor.Level >= TRACE_LEVEL_WARNING     ? (is_ours ? &(m_item_attr[0][2]) : &(m_item_attr[1][2])) :
+                                                                                                  (is_ours ? &(m_item_attr[0][3]) : &(m_item_attr[1][3])));
+}
 
-    {
-        // Output event time-stamp.
+
+wxString wxETWListCtrl::OnGetItemText(long item, long column) const
+{
+    return OnGetItemText(m_rec_db.at_abs(m_rec_idx.at(item)), column);
+}
+
+
+wxString wxETWListCtrl::OnGetItemText(const event_rec &rec, long column) const
+{
+    switch (column) {
+    case 0: {
+        // Get event time-stamp.
         FILETIME ft;
         ft.dwHighDateTime = rec.EventHeader.TimeStamp.HighPart;
-        ft.dwLowDateTime = rec.EventHeader.TimeStamp.LowPart;
+        ft.dwLowDateTime  = rec.EventHeader.TimeStamp.LowPart;
 
         SYSTEMTIME st, st_local;
         FileTimeToSystemTime(&ft, &st);
@@ -395,39 +581,36 @@ void wxETWListCtrl::OnETWEvent(wxETWEvent& event)
 
         ULONGLONG
             ts = rec.EventHeader.TimeStamp.QuadPart,
-            nanosec = (ts % 10000000) * 100;
+            microsec = (ts % 10000000) / 10;
 
-        item.SetColumn(column++);
-        item.SetText(tstring_printf(_T("%04d-%02d-%02d %02d:%02d:%02d.%09I64u"),
-            st_local.wYear, st_local.wMonth, st_local.wDay, st_local.wHour, st_local.wMinute, st_local.wSecond, nanosec));
-        this->InsertItem(item);
+        return tstring_printf(_T("%04d-%02d-%02d %02d:%02d:%02d.%06I64u"),
+            st_local.wYear, st_local.wMonth, st_local.wDay, st_local.wHour, st_local.wMinute, st_local.wSecond, microsec);
     }
 
-    // Output process ID.
-    item.SetColumn(column++);
-    item.SetText(wxString::Format(wxT("%u"), rec.EventHeader.ProcessId));
-    this->SetItem(item);
+    case 1:
+        // Get process ID.
+        return wxString::Format(wxT("%u"), rec.EventHeader.ProcessId);
 
-    // Output thread ID.
-    item.SetColumn(column++);
-    item.SetText(wxString::Format(wxT("%u"), rec.EventHeader.ThreadId));
-    this->SetItem(item);
+    case 2:
+        // Get thread ID.
+        return wxString::Format(wxT("%u"), rec.EventHeader.ThreadId);
 
-    // Output event source.
-    item.SetColumn(column++);
-    item.SetText(is_ours ? wxT(PRODUCT_NAME_STR) : wxT("EAPHost"));
-    this->SetItem(item);
+    case 3:
+        // Get event source.
+        return
+            IsEqualGUID(rec.EventHeader.ProviderId, EAPMETHOD_TRACE_EVENT_PROVIDER) ? wxT(PRODUCT_NAME_STR) :
+            IsEqualGUID(rec.EventHeader.ProviderId, s_provider_eaphost            ) ? wxT("EAPHost"       ) :
+            IsEqualGUID(rec.EventHeader.ProviderId, s_provider_schannel           ) ? wxT("Schannel"      ) : wxEmptyString;
 
-    item.SetColumn(column++);
-    {
+    case 4: {
         // Get event meta-info.
         unique_ptr<TRACE_EVENT_INFO> info;
         ULONG ulResult;
-        if ((ulResult = TdhGetEventInformation(&rec, 0, NULL, info)) == ERROR_SUCCESS) {
+        if ((ulResult = TdhGetEventInformation((PEVENT_RECORD)&rec, 0, NULL, info)) == ERROR_SUCCESS) {
             if (info->DecodingSource != DecodingSourceWPP) {
                 if (rec.EventHeader.Flags & EVENT_HEADER_FLAG_STRING_ONLY) {
                     // This is a string-only event. Print it.
-                    item.SetText((LPCWSTR)rec.UserData);
+                    return (LPCWSTR)rec.UserData;
                 } else {
                     // This is not a string-only event. Prepare parameters.
 
@@ -437,25 +620,130 @@ void wxETWListCtrl::OnETWEvent(wxETWEvent& event)
                     props.reserve(info->TopLevelPropertyCount);
                     props_msg.reserve(info->TopLevelPropertyCount);
                     for (ULONG i = 0; i < info->TopLevelPropertyCount; i++) {
-                        props.push_back(std::move(PropertyToString(&rec, info.get(), i, NULL, 0, nPtrSize)));
+                        props.push_back(std::move(PropertyToString((PEVENT_RECORD)&rec, info.get(), i, NULL, 0, nPtrSize)));
                         props_msg.push_back((DWORD_PTR)props[i].c_str());
                     }
 
                     if (info->EventMessageOffset) {
                         // Format the message.
-                        item.SetText(wstring_msg(0, (LPCTSTR)((LPCBYTE)info.get() + info->EventMessageOffset), props_msg.data()).c_str());
+                        return wstring_msg(0, (LPCTSTR)((LPCBYTE)info.get() + info->EventMessageOffset), props_msg.data()).c_str();
                     }
                 }
             } else if (info->EventMessageOffset) {
                 // This is a WPP event.
-                item.SetText((LPCWSTR)((LPCBYTE)info.get() + info->EventMessageOffset));
+                return (LPCWSTR)((LPCBYTE)info.get() + info->EventMessageOffset);
             }
         }
     }
-    this->SetItem(item);
+    }
 
-    // Bring the record into view.
-    this->EnsureVisible(item.GetId());
+    return wxEmptyString;
+}
+
+
+void wxETWListCtrl::OnETWEvent(wxETWEvent& event)
+{
+    // Move event, since event handlers will have no use of it and destroy it in the end.
+    // This way we save memory allocation and copying.
+    event_rec rec(std::move(event.GetRecord()));
+
+    // Is event visible according to current view settings?
+    bool is_visible = IsVisible(rec);
+
+    // Move event to the end of the queue.
+    size_t pos = m_rec_db.push_back(std::move(rec));
+
+    bool has_moved;
+    if (!m_rec_idx.empty() && m_rec_idx.front() == pos) {
+        // This event overwrote previous head element in index.
+        m_rec_idx.pop_front();
+        has_moved = true;
+    } else
+        has_moved = false;
+
+    if (is_visible) {
+        // Push event absolute subscript to the index too.
+        m_rec_idx.push_back(pos);
+    }
+
+    long item_count = (long)m_rec_idx.size();
+    if (GetItemCount() != item_count)
+        SetItemCount(item_count);
+
+    if (item_count) {
+        if (m_scroll_auto) {
+            // Bring the record into view.
+            EnsureVisible(item_count - 1);
+        }
+
+        if (has_moved) {
+            long item_top  = GetTopItem();
+            RefreshItems(item_top, std::min<long>(item_top + GetCountPerPage(), item_count));
+        }
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+// wxPersistentETWListCtrl
+//////////////////////////////////////////////////////////////////////////
+
+wxPersistentETWListCtrl::wxPersistentETWListCtrl(wxETWListCtrl *wnd) : wxPersistentWindow<wxETWListCtrl>(wnd)
+{
+}
+
+
+wxString wxPersistentETWListCtrl::GetKind() const
+{
+    return wxT(wxPERSIST_TLW_KIND);
+}
+
+
+void wxPersistentETWListCtrl::Save() const
+{
+    const wxETWListCtrl * const wnd = static_cast<const wxETWListCtrl*>(GetWindow());
+
+    // Save log's column widths.
+    wxListItem col;
+    col.SetMask(wxLIST_MASK_TEXT | wxLIST_MASK_WIDTH);
+    for (int i = 0, n = wnd->GetColumnCount(); i < n; i++) {
+        wnd->GetColumn(i, col);
+        SaveValue(wxString::Format(wxT("Column%sWidth"), col.GetText().c_str()), col.GetWidth());
+    }
+
+    SaveValue(wxT("ScrollAuto"    ),      wnd->m_scroll_auto    );
+    SaveValue(wxT("SourceEAPHost" ),      wnd->m_source_eaphost );
+    SaveValue(wxT("SourceSchannel"),      wnd->m_source_schannel);
+    SaveValue(wxT("SourceProduct" ),      wnd->m_source_product );
+    SaveValue(wxT("Level"         ), (int)wnd->m_level          );
+}
+
+
+bool wxPersistentETWListCtrl::Restore()
+{
+    wxETWListCtrl * const wnd = static_cast<wxETWListCtrl*>(GetWindow());
+
+    // Restore log's column widths.
+    wxListItem col;
+    col.SetMask(wxLIST_MASK_TEXT);
+    for (int i = 0, n = wnd->GetColumnCount(); i < n; i++) {
+        wnd->GetColumn(i, col);
+
+        int width;
+        if (RestoreValue(wxString::Format(wxT("Column%sWidth"), col.GetText().c_str()), &width))
+            wnd->SetColumnWidth(i, width);
+    }
+
+    int dummy_int;
+
+    RestoreValue(wxT("ScrollAuto"    ), &(wnd->m_scroll_auto    ));
+    RestoreValue(wxT("SourceEAPHost" ), &(wnd->m_source_eaphost ));
+    RestoreValue(wxT("SourceSchannel"), &(wnd->m_source_schannel));
+    RestoreValue(wxT("SourceProduct" ), &(wnd->m_source_product ));
+    if (RestoreValue(wxT("Level"), &dummy_int))
+        wnd->m_level = (UCHAR)std::min<int>(std::max<int>(dummy_int, TRACE_LEVEL_ERROR), TRACE_LEVEL_VERBOSE);
+
+    return true;
 }
 
 

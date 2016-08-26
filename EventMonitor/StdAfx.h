@@ -25,6 +25,8 @@
 #include "Frame.h"
 #include "LogPanel.h"
 
+#include "../lib/EAPBase_UI/include/EAP_UI.h"
+
 #include "../include/Version.h"
 
 #include <wxex/common.h>
@@ -43,6 +45,8 @@
 #include <Sddl.h>
 #include <tchar.h>
 
+#include <utility>
 #include <vector>
+#include <set>
 
 #include <EventsETW.h> // Must include after <Windows.h>

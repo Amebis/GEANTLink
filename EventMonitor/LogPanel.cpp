@@ -51,13 +51,7 @@ void wxPersistentEventMonitorLogPanel::Save() const
 {
     const wxEventMonitorLogPanel * const wnd = static_cast<const wxEventMonitorLogPanel*>(GetWindow());
 
-    // Save log's column widths.
-    wxListItem col;
-    col.SetMask(wxLIST_MASK_TEXT | wxLIST_MASK_WIDTH);
-    for (int i = 0, n = wnd->m_log->GetColumnCount(); i < n; i++) {
-        wnd->m_log->GetColumn(i, col);
-        SaveValue(wxString::Format(wxT("Column%sWidth"), col.GetText().c_str()), col.GetWidth());
-    }
+    wxPersistentETWListCtrl(wnd->m_log).Save();
 }
 
 
@@ -65,16 +59,7 @@ bool wxPersistentEventMonitorLogPanel::Restore()
 {
     wxEventMonitorLogPanel * const wnd = static_cast<wxEventMonitorLogPanel*>(GetWindow());
 
-    // Restore log's column widths.
-    wxListItem col;
-    col.SetMask(wxLIST_MASK_TEXT);
-    for (int i = 0, n = wnd->m_log->GetColumnCount(); i < n; i++) {
-        wnd->m_log->GetColumn(i, col);
-
-        int width;
-        if (RestoreValue(wxString::Format(wxT("Column%sWidth"), col.GetText().c_str()), &width))
-            wnd->m_log->SetColumnWidth(i, width);
-    }
+    wxPersistentETWListCtrl(wnd->m_log).Restore();
 
     return true;
 }
