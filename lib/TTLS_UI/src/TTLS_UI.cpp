@@ -31,8 +31,9 @@ wxTTLSConfigPanel::wxTTLSConfigPanel(const eap::config_provider &prov, eap::conf
     wxTTLSConfigPanelBase(parent)
 {
     // Load and set icon.
-    if (m_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
-        wxSetIconFromResource(m_outer_identity_icon, m_icon, m_shell32, MAKEINTRESOURCE(265));
+    winstd::library lib_shell32;
+    if (lib_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
+        m_outer_identity_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(265)));
 }
 
 

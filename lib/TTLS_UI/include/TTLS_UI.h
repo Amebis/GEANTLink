@@ -68,8 +68,6 @@ protected:
 protected:
     const eap::config_provider &m_prov; ///< EAP provider
     eap::config_method_ttls &m_cfg;     ///< TTLS configuration
-    winstd::library m_shell32;          ///< shell32.dll resource library reference
-    wxIcon m_icon;                      ///< Panel icon
 };
 
 

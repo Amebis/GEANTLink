@@ -315,8 +315,9 @@ wxTLSCredentialsPanel::wxTLSCredentialsPanel(const eap::config_provider &prov, c
     wxEAPCredentialsPanelBase<eap::credentials_tls, wxTLSCredentialsPanelBase>(prov, cfg, cred, pszCredTarget, parent, is_config)
 {
     // Load and set icon.
-    if (m_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
-        wxSetIconFromResource(m_credentials_icon, m_icon, m_shell32, MAKEINTRESOURCE(269));
+    winstd::library lib_shell32;
+    if (lib_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
+        m_credentials_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(269)));
 }
 
 
@@ -418,8 +419,9 @@ wxTLSServerTrustPanel::wxTLSServerTrustPanel(const eap::config_provider &prov, e
     wxEAPTLSServerTrustConfigPanelBase(parent)
 {
     // Load and set icon.
-    if (m_certmgr.load(_T("certmgr.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
-        wxSetIconFromResource(m_server_trust_icon, m_icon, m_certmgr, MAKEINTRESOURCE(218));
+    winstd::library lib_certmgr;
+    if (lib_certmgr.load(_T("certmgr.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
+        m_server_trust_icon->SetIcon(wxLoadIconFromResource(lib_certmgr, MAKEINTRESOURCE(218)));
 
     // Do not use cfg.m_server_names directly, so we can decide not to store the value in case of provider-locked configuration.
     // Never rely on control disabled state alone, as they can be enabled using external tool like Spy++.

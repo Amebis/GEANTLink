@@ -20,10 +20,7 @@
 
 #include <wx/hyperlink.h>
 #include <wx/icon.h>
-#include <wx/menuitem.h>
 #include <wx/scrolwin.h>
-#include <wx/statbmp.h>
-#include <wx/aui/auibar.h>
 #include <Windows.h>
 
 
@@ -95,27 +92,12 @@ template <class _Tcred, class _Tbase> class wxPasswordCredentialsPanel;
 ///
 /// Loads icon from resource
 ///
-inline wxIcon wxLoadIconFromResource(HINSTANCE hinst, PCWSTR pszName, int cx, int cy);
+inline wxIcon wxLoadIconFromResource(HINSTANCE hinst, PCWSTR pszName, int cx = GetSystemMetrics(SM_CXICON), int cy = GetSystemMetrics(SM_CYICON));
 
 ///
 /// Loads icon from resource
 ///
 inline wxIcon wxLoadIconFromResource(HINSTANCE hinst, PCWSTR pszName, const wxSize &size);
-
-///
-/// Sets icon from resource
-///
-inline bool wxSetIconFromResource(wxStaticBitmap *bmp, wxIcon &icon, HINSTANCE hinst, PCWSTR pszName);
-
-///
-/// Sets icon from resource
-///
-inline bool wxSetIconFromResource(wxAuiToolBarItem *bmp, wxIcon &icon, HINSTANCE hinst, PCWSTR pszName, const wxSize &size);
-
-///
-/// Sets icon from resource
-///
-inline bool wxSetIconFromResource(wxMenuItem *item, wxIcon &icon, HINSTANCE hinst, PCWSTR pszName);
 
 ///
 /// Returns GUI displayable provider name
@@ -342,10 +324,6 @@ public:
     /// Constructs a notice pannel and set the title text
     ///
     wxEAPProviderLockedPanel(const eap::config_provider &prov, wxWindow* parent);
-
-protected:
-    winstd::library m_shell32;  ///< shell32.dll resource library reference
-    wxIcon m_icon;              ///< Panel icon
 };
 
 
@@ -356,10 +334,6 @@ public:
     /// Constructs a notice pannel and set the title text
     ///
     wxEAPCredentialWarningPanel(const eap::config_provider &prov, wxWindow* parent);
-
-protected:
-    winstd::library m_shell32;  ///< shell32.dll resource library reference
-    wxIcon m_icon;              ///< Panel icon
 };
 
 
@@ -413,8 +387,6 @@ protected:
 
 protected:
     eap::config_provider &m_prov;   ///< EAP method configuration
-    winstd::library m_shell32;      ///< shell32.dll resource library reference
-    wxIcon m_icon;                  ///< Panel icon
 };
 
 
@@ -437,8 +409,6 @@ protected:
 
 protected:
     eap::config_provider &m_prov;   ///< EAP method configuration
-    winstd::library m_shell32;      ///< shell32.dll resource library reference
-    wxIcon m_icon;                  ///< Panel icon
 };
 
 
@@ -480,8 +450,9 @@ public:
         wxEAPCredentialsConfigPanelBase(parent)
     {
         // Load and set icon.
-        if (m_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
-            wxSetIconFromResource(m_credentials_icon, m_icon, m_shell32, MAKEINTRESOURCE(/*16770*/269));
+        winstd::library lib_shell32;
+        if (lib_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
+            m_credentials_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(/*16770*/269)));
     }
 
     ///
@@ -645,8 +616,6 @@ protected:
 protected:
     const eap::config_provider &m_prov;     ///< EAP provider
     eap::config_method_with_cred &m_cfg;    ///< EAP method configuration
-    winstd::library m_shell32;              ///< shell32.dll resource library reference
-    wxIcon m_icon;                          ///< Panel icon
     winstd::tstring m_target;               ///< Credential Manager target
 
 private:
@@ -751,8 +720,9 @@ public:
         wxEAPCredentialsPanelBase<_Tcred, _Tbase>(prov, cfg, cred, pszCredTarget, parent, is_config)
     {
         // Load and set icon.
-        if (m_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
-            wxSetIconFromResource(m_credentials_icon, m_icon, m_shell32, MAKEINTRESOURCE(269));
+        winstd::library lib_shell32;
+        if (lib_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
+            m_credentials_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(269)));
 
         bool layout = false;
         if (!m_prov.m_lbl_alt_credential.empty()) {
@@ -817,10 +787,6 @@ protected:
 
     /// \endcond
 
-protected:
-    winstd::library m_shell32;      ///< shell32.dll resource library reference
-    wxIcon m_icon;                  ///< Panel icon
-
 private:
     static const wxStringCharType *s_dummy_password;
 };
@@ -850,46 +816,6 @@ inline wxIcon wxLoadIconFromResource(HINSTANCE hinst, PCWSTR pszName, const wxSi
         return icon;
     } else
         return wxNullIcon;
-}
-
-
-inline bool wxSetIconFromResource(wxStaticBitmap *bmp, wxIcon &icon, HINSTANCE hinst, PCWSTR pszName)
-{
-    wxASSERT(bmp);
-
-    icon = wxLoadIconFromResource(hinst, pszName, GetSystemMetrics(SM_CXICON), GetSystemMetrics(SM_CYICON));
-    if (icon.IsOk()) {
-        bmp->SetIcon(icon);
-        return true;
-    } else
-        return false;
-}
-
-
-inline bool wxSetIconFromResource(wxAuiToolBarItem *item, wxIcon &icon, HINSTANCE hinst, PCWSTR pszName, const wxSize &size)
-{
-    wxASSERT(item);
-
-    icon = wxLoadIconFromResource(hinst, pszName, size.GetWidth(), size.GetHeight());
-    if (icon.IsOk()) {
-        item->SetBitmap(icon);
-        item->SetDisabledBitmap(wxBitmap(icon).ConvertToDisabled());
-        return true;
-    } else
-        return false;
-}
-
-
-inline bool wxSetIconFromResource(wxMenuItem *item, wxIcon &icon, HINSTANCE hinst, PCWSTR pszName)
-{
-    wxASSERT(item);
-
-    icon = wxLoadIconFromResource(hinst, pszName, GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON));
-    if (icon.IsOk()) {
-        item->SetBitmaps(icon);
-        return true;
-    } else
-        return false;
 }
 
 

@@ -184,8 +184,9 @@ void wxEAPNotePanel::CreateContactFields(const eap::config_provider &prov)
 wxEAPProviderLockedPanel::wxEAPProviderLockedPanel(const eap::config_provider &prov, wxWindow* parent) : wxEAPNotePanel(parent)
 {
     // Load and set icon.
-    if (m_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
-        wxSetIconFromResource(m_note_icon, m_icon, m_shell32, MAKEINTRESOURCE(48));
+    winstd::library lib_shell32;
+    if (lib_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
+        m_note_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(48)));
 
     m_note_label->SetLabel(wxString::Format(_("%s has pre-set parts of this configuration. Those parts are locked to prevent accidental modification."),
         !prov.m_name.empty() ? prov.m_name.c_str() :
@@ -205,8 +206,9 @@ wxEAPProviderLockedPanel::wxEAPProviderLockedPanel(const eap::config_provider &p
 wxEAPCredentialWarningPanel::wxEAPCredentialWarningPanel(const eap::config_provider &prov, wxWindow* parent) : wxEAPNotePanel(parent)
 {
     // Load and set icon.
-    if (m_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
-        wxSetIconFromResource(m_note_icon, m_icon, m_shell32, MAKEINTRESOURCE(161));
+    winstd::library lib_shell32;
+    if (lib_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
+        m_note_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(161)));
 
     m_note_label->SetLabel(_("Previous attempt to connect failed. Please, make sure your credentials are correct, or try again later."));
     m_note_label->Wrap(449);
@@ -275,8 +277,9 @@ wxEAPProviderIdentityPanel::wxEAPProviderIdentityPanel(eap::config_provider &pro
     wxEAPProviderIdentityPanelBase(parent)
 {
     // Load and set icon.
-    if (m_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
-        wxSetIconFromResource(m_provider_id_icon, m_icon, m_shell32, MAKEINTRESOURCE(259));
+    winstd::library lib_shell32;
+    if (lib_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
+        m_provider_id_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(259)));
 }
 
 
@@ -313,8 +316,9 @@ wxEAPProviderLockPanel::wxEAPProviderLockPanel(eap::config_provider &prov, wxWin
     wxEAPProviderLockPanelBase(parent)
 {
     // Load and set icon.
-    if (m_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
-        wxSetIconFromResource(m_provider_lock_icon, m_icon, m_shell32, MAKEINTRESOURCE(1003));
+    winstd::library lib_shell32;
+    if (lib_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
+        m_provider_lock_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(1003)));
 }
 
 

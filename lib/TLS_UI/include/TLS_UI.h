@@ -269,10 +269,6 @@ protected:
     virtual bool TransferDataFromWindow();
     virtual void OnUpdateUI(wxUpdateUIEvent& event);
     /// \endcond
-
-protected:
-    winstd::library m_shell32;      ///< shell32.dll resource library reference
-    wxIcon m_icon;                  ///< Panel icon
 };
 
 
@@ -309,8 +305,6 @@ protected:
 protected:
     const eap::config_provider &m_prov;         ///< EAP provider
     eap::config_method_tls &m_cfg;              ///< TLS configuration
-    winstd::library m_certmgr;                  ///< certmgr.dll resource library reference
-    wxIcon m_icon;                              ///< Panel icon
     std::list<std::wstring> m_server_names_val; ///< Acceptable authenticating server names
 };
 
