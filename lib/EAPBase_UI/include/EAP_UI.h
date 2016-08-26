@@ -20,8 +20,10 @@
 
 #include <wx/hyperlink.h>
 #include <wx/icon.h>
+#include <wx/menuitem.h>
 #include <wx/scrolwin.h>
 #include <wx/statbmp.h>
+#include <wx/aui/auibar.h>
 #include <Windows.h>
 
 
@@ -91,9 +93,29 @@ template <class _Tcred, class _Tbase> class wxEAPCredentialsPanelBase;
 template <class _Tcred, class _Tbase> class wxPasswordCredentialsPanel;
 
 ///
+/// Loads icon from resource
+///
+inline wxIcon wxLoadIconFromResource(HINSTANCE hinst, PCWSTR pszName, int cx, int cy);
+
+///
+/// Loads icon from resource
+///
+inline wxIcon wxLoadIconFromResource(HINSTANCE hinst, PCWSTR pszName, const wxSize &size);
+
+///
 /// Sets icon from resource
 ///
 inline bool wxSetIconFromResource(wxStaticBitmap *bmp, wxIcon &icon, HINSTANCE hinst, PCWSTR pszName);
+
+///
+/// Sets icon from resource
+///
+inline bool wxSetIconFromResource(wxAuiToolBarItem *bmp, wxIcon &icon, HINSTANCE hinst, PCWSTR pszName, const wxSize &size);
+
+///
+/// Sets icon from resource
+///
+inline bool wxSetIconFromResource(wxMenuItem *item, wxIcon &icon, HINSTANCE hinst, PCWSTR pszName);
 
 ///
 /// Returns GUI displayable provider name
@@ -797,14 +819,64 @@ template <class _Tcred, class _Tbase>
 const wxStringCharType *wxPasswordCredentialsPanel<_Tcred, _Tbase>::s_dummy_password = wxT("dummypass");
 
 
+inline wxIcon wxLoadIconFromResource(HINSTANCE hinst, PCWSTR pszName, int cx, int cy)
+{
+    HICON hIcon;
+    if (SUCCEEDED(LoadIconWithScaleDown(hinst, pszName, cx, cy, &hIcon))) {
+        wxIcon icon;
+        icon.CreateFromHICON(hIcon);
+        return icon;
+    } else
+        return wxNullIcon;
+}
+
+
+inline wxIcon wxLoadIconFromResource(HINSTANCE hinst, PCWSTR pszName, const wxSize &size)
+{
+    HICON hIcon;
+    if (SUCCEEDED(LoadIconWithScaleDown(hinst, pszName, size.GetWidth(), size.GetHeight(), &hIcon))) {
+        wxIcon icon;
+        icon.CreateFromHICON(hIcon);
+        return icon;
+    } else
+        return wxNullIcon;
+}
+
+
 inline bool wxSetIconFromResource(wxStaticBitmap *bmp, wxIcon &icon, HINSTANCE hinst, PCWSTR pszName)
 {
     wxASSERT(bmp);
 
-    HICON hIcon;
-    if (SUCCEEDED(LoadIconWithScaleDown(hinst, pszName, GetSystemMetrics(SM_CXICON), GetSystemMetrics(SM_CYICON), &hIcon))) {
-        icon.CreateFromHICON(hIcon);
+    icon = wxLoadIconFromResource(hinst, pszName, GetSystemMetrics(SM_CXICON), GetSystemMetrics(SM_CYICON));
+    if (icon.IsOk()) {
         bmp->SetIcon(icon);
+        return true;
+    } else
+        return false;
+}
+
+
+inline bool wxSetIconFromResource(wxAuiToolBarItem *item, wxIcon &icon, HINSTANCE hinst, PCWSTR pszName, const wxSize &size)
+{
+    wxASSERT(item);
+
+    icon = wxLoadIconFromResource(hinst, pszName, size.GetWidth(), size.GetHeight());
+    if (icon.IsOk()) {
+        item->SetBitmap(icon);
+        item->SetDisabledBitmap(wxBitmap(icon).ConvertToDisabled());
+        return true;
+    } else
+        return false;
+}
+
+
+inline bool wxSetIconFromResource(wxMenuItem *item, wxIcon &icon, HINSTANCE hinst, PCWSTR pszName)
+{
+    wxASSERT(item);
+
+    icon = wxLoadIconFromResource(hinst, pszName, GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON));
+    if (icon.IsOk()) {
+        item->SetBitmaps(icon);
         return true;
     } else
         return false;
