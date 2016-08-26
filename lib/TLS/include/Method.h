@@ -176,7 +176,7 @@ namespace eap
         /// @{
 
         ///
-        /// Starts an EAP authentication session on the peer EAPHost using the EAP method.
+        /// Starts an EAP authentication session on the peer EapHost using the EAP method.
         ///
         /// \sa [EapPeerBeginSession function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363600.aspx)
         ///
@@ -187,7 +187,7 @@ namespace eap
             _In_        DWORD         dwMaxSendPacketSize);
 
         ///
-        /// Processes a packet received by EAPHost from a supplicant.
+        /// Processes a packet received by EapHost from a supplicant.
         ///
         /// \sa [EapPeerProcessRequestPacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363621.aspx)
         ///

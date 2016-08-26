@@ -83,7 +83,7 @@ namespace eap
         /// @{
 
         ///
-        /// Processes a packet received by EAPHost from a supplicant.
+        /// Processes a packet received by EapHost from a supplicant.
         ///
         /// \sa [EapPeerProcessRequestPacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363621.aspx)
         ///

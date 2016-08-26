@@ -81,8 +81,8 @@ protected:
     void OnEditSelectNone(wxCommandEvent& event);
     void OnViewScrollUpdate(wxUpdateUIEvent& event);
     void OnViewScroll(wxCommandEvent& event);
-    void OnViewSourceEAPHostUpdate(wxUpdateUIEvent& event);
-    void OnViewSourceEAPHost(wxCommandEvent& event);
+    void OnViewSourceEapHostUpdate(wxUpdateUIEvent& event);
+    void OnViewSourceEapHost(wxCommandEvent& event);
     void OnViewSourceSchannelUpdate(wxUpdateUIEvent& event);
     void OnViewSourceSchannel(wxCommandEvent& event);
     void OnViewSourceProductUpdate(wxUpdateUIEvent& event);
@@ -106,7 +106,7 @@ protected:
     wxAuiToolBarItem* m_toolEditClear;
     wxAuiToolBar* m_toolbarView;
     wxAuiToolBarItem* m_toolViewScrollAuto;
-    wxAuiToolBarItem* m_toolViewSourceEAPHost;
+    wxAuiToolBarItem* m_toolViewSourceEapHost;
     wxAuiToolBarItem* m_toolViewSourceSchannel;
     wxAuiToolBarItem* m_toolViewSourceProduct;
     wxAuiToolBarItem* m_toolViewLevelVerbose;

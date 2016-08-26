@@ -84,7 +84,7 @@ VOID WINAPI EapPeerFreeErrorMemory(_In_ EAP_ERROR *ppEapError)
 
 
 ///
-/// Obtains a set of function pointers for an implementation of the EAP peer method currently loaded on the EAPHost service.
+/// Obtains a set of function pointers for an implementation of the EAP peer method currently loaded on the EapHost service.
 ///
 /// \sa [EapPeerGetInfo function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363608.aspx)
 ///
@@ -135,7 +135,7 @@ DWORD WINAPI EapPeerGetInfo(_In_ EAP_TYPE* pEapType, _Out_ EAP_PEER_METHOD_ROUTI
 #pragma warning(disable: 4702) // Compiler is smart enough to find out the initialize() method is empty => never throws an exception.
 
 ///
-/// Initializes an EAP peer method for EAPHost.
+/// Initializes an EAP peer method for EapHost.
 ///
 /// \sa [EapPeerGetInfo function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363613.aspx)
 ///
@@ -206,7 +206,7 @@ DWORD APIENTRY EapPeerShutdown(_Out_ EAP_ERROR **ppEapError)
 
 
 ///
-/// Returns the user data and user identity after being called by EAPHost.
+/// Returns the user data and user identity after being called by EapHost.
 ///
 /// \sa [EapPeerGetIdentity function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363607.aspx)
 ///
@@ -263,7 +263,7 @@ DWORD APIENTRY EapPeerGetIdentity(
 
 
 ///
-/// Starts an EAP authentication session on the peer EAPHost using the EAP method.
+/// Starts an EAP authentication session on the peer EapHost using the EAP method.
 ///
 /// \sa [EapPeerBeginSession function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363600.aspx)
 ///
@@ -351,7 +351,7 @@ DWORD APIENTRY EapPeerEndSession(
 
 
 ///
-/// Processes a packet received by EAPHost from a supplicant.
+/// Processes a packet received by EapHost from a supplicant.
 ///
 /// \sa [EapPeerProcessRequestPacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363621.aspx)
 ///
@@ -930,7 +930,7 @@ DWORD WINAPI EapPeerQueryInteractiveUIInputFields(
 
 
 ///
-/// Converts user information into a user BLOB that can be consumed by EAPHost run-time functions.
+/// Converts user information into a user BLOB that can be consumed by EapHost run-time functions.
 ///
 /// \sa [EapPeerQueryUIBlobFromInteractiveUIInputFields function](https://msdn.microsoft.com/en-us/library/windows/desktop/bb204696.aspx)
 ///

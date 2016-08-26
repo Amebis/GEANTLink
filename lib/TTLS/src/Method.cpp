@@ -147,8 +147,8 @@ void eap::method_ttls::get_result(
         // The TLS was OK.
         method_tls::get_result(EapPeerMethodResultSuccess, ppResult);
 
-        // Do not report failure to EAPHost, as it will not save updated configuration then. But we need it to save it, to alert user on next connection attempt.
-        // EAPHost is well aware of the failed condition.
+        // Do not report failure to EapHost, as it will not save updated configuration then. But we need it to save it, to alert user on next connection attempt.
+        // EapHost is well aware of the failed condition.
         //if (reason == EapPeerMethodResultFailure) {
         //    ppResult->fIsSuccess = FALSE;
         //    ppResult->dwFailureReasonCode = EAP_E_AUTHENTICATION_FAILED;

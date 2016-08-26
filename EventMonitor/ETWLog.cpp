@@ -178,7 +178,7 @@ wxETWListCtrl::wxETWListCtrl(wxWindow *parent, wxWindowID id, const wxPoint& pos
     m_col_format_width[0] = 26;
     m_col_format_width[1] = 5;
     m_col_format_width[2] = 5;
-    m_col_format_width[3] = std::max<int>(std::max<int>(_countof("EAPHost"), _countof("Schannel")), _countof(PRODUCT_NAME_STR)) - 1;
+    m_col_format_width[3] = std::max<int>(std::max<int>(_countof("EapHost"), _countof("Schannel")), _countof(PRODUCT_NAME_STR)) - 1;
     m_col_format_width[4] = 0;
 
     // Prepare all possible item attributes.
@@ -266,8 +266,8 @@ wxETWListCtrl::wxETWListCtrl(wxWindow *parent, wxWindowID id, const wxPoint& pos
         0,
         NULL)) != ERROR_SUCCESS)
     {
-        // If the EAPHost trace provider failed to enable, do not despair.
-        wxLogDebug(_("Error enabling EAPHost event provider (error %u)."), ulResult);
+        // If the EapHost trace provider failed to enable, do not despair.
+        wxLogDebug(_("Error enabling EapHost event provider (error %u)."), ulResult);
     }
 
     if ((ulResult = EnableTraceEx(
@@ -599,7 +599,7 @@ wxString wxETWListCtrl::OnGetItemText(const event_rec &rec, long column) const
         // Get event source.
         return
             IsEqualGUID(rec.EventHeader.ProviderId, EAPMETHOD_TRACE_EVENT_PROVIDER) ? wxT(PRODUCT_NAME_STR) :
-            IsEqualGUID(rec.EventHeader.ProviderId, s_provider_eaphost            ) ? wxT("EAPHost"       ) :
+            IsEqualGUID(rec.EventHeader.ProviderId, s_provider_eaphost            ) ? wxT("EapHost"       ) :
             IsEqualGUID(rec.EventHeader.ProviderId, s_provider_schannel           ) ? wxT("Schannel"      ) : wxEmptyString;
 
     case 4: {
@@ -712,7 +712,7 @@ void wxPersistentETWListCtrl::Save() const
     }
 
     SaveValue(wxT("ScrollAuto"    ),      wnd->m_scroll_auto    );
-    SaveValue(wxT("SourceEAPHost" ),      wnd->m_source_eaphost );
+    SaveValue(wxT("SourceEapHost" ),      wnd->m_source_eaphost );
     SaveValue(wxT("SourceSchannel"),      wnd->m_source_schannel);
     SaveValue(wxT("SourceProduct" ),      wnd->m_source_product );
     SaveValue(wxT("Level"         ), (int)wnd->m_level          );
@@ -737,7 +737,7 @@ bool wxPersistentETWListCtrl::Restore()
     int dummy_int;
 
     RestoreValue(wxT("ScrollAuto"    ), &(wnd->m_scroll_auto    ));
-    RestoreValue(wxT("SourceEAPHost" ), &(wnd->m_source_eaphost ));
+    RestoreValue(wxT("SourceEapHost" ), &(wnd->m_source_eaphost ));
     RestoreValue(wxT("SourceSchannel"), &(wnd->m_source_schannel));
     RestoreValue(wxT("SourceProduct" ), &(wnd->m_source_product ));
     if (RestoreValue(wxT("Level"), &dummy_int))

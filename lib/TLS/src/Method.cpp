@@ -748,8 +748,8 @@ void eap::method_tls::get_result(
         // But be careful: do so only if this happened after transition from handshake to application data phase.
         cfg_method->m_auth_failed = m_phase_prev < phase_application_data && m_phase >= phase_application_data;
 
-        // Do not report failure to EAPHost, as it will not save updated configuration then. But we need it to save it, to alert user on next connection attempt.
-        // EAPHost is well aware of the failed condition.
+        // Do not report failure to EapHost, as it will not save updated configuration then. But we need it to save it, to alert user on next connection attempt.
+        // EapHost is well aware of the failed condition.
         //ppResult->fIsSuccess = FALSE;
         //ppResult->dwFailureReasonCode = EAP_E_AUTHENTICATION_FAILED;
 

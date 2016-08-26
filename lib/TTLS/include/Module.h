@@ -49,7 +49,7 @@ namespace eap
         virtual config_method* make_config_method();
 
         ///
-        /// Initializes an EAP peer method for EAPHost.
+        /// Initializes an EAP peer method for EapHost.
         ///
         /// \sa [EapPeerGetInfo function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363613.aspx)
         ///
@@ -63,7 +63,7 @@ namespace eap
         virtual void shutdown();
 
         ///
-        /// Returns the user data and user identity after being called by EAPHost.
+        /// Returns the user data and user identity after being called by EapHost.
         ///
         /// \sa [EapPeerGetIdentity function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363607.aspx)
         ///
@@ -111,7 +111,7 @@ namespace eap
         /// @{
 
         ///
-        /// Starts an EAP authentication session on the peer EAPHost using the EAP method.
+        /// Starts an EAP authentication session on the peer EapHost using the EAP method.
         ///
         /// \sa [EapPeerBeginSession function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363600.aspx)
         ///
@@ -135,7 +135,7 @@ namespace eap
         virtual void end_session(_In_ EAP_SESSION_HANDLE hSession);
 
         ///
-        /// Processes a packet received by EAPHost from a supplicant.
+        /// Processes a packet received by EapHost from a supplicant.
         ///
         /// \sa [EapPeerProcessRequestPacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363621.aspx)
         ///

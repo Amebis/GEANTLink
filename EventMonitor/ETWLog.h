@@ -144,12 +144,12 @@ protected:
 
 public:
     bool m_scroll_auto;                                 ///< Is autoscrolling enabled?
-    bool m_source_eaphost;                              ///< Shows EAPHost messages
+    bool m_source_eaphost;                              ///< Shows EapHost messages
     bool m_source_schannel;                             ///< Shows Schannel messages
     bool m_source_product;                              ///< Shows native messages
     UCHAR m_level;                                      ///< Shows messages up to this level of verboseness
 
-    static const GUID s_provider_eaphost;               ///< EAPHost event provider ID
+    static const GUID s_provider_eaphost;               ///< EapHost event provider ID
     static const GUID s_provider_schannel;              ///< Schannel event provider ID
 
 protected:

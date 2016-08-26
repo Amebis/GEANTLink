@@ -104,10 +104,10 @@ wxEventMonitorFrame::wxEventMonitorFrame(wxWindow* parent, wxWindowID id, const 
 
     m_menuView->AppendSeparator();
 
-    wxMenuItem* m_menuViewSourceEAPHost;
-    m_menuViewSourceEAPHost = new wxMenuItem(m_menuView, wxID_VIEW_SOURCE_EAPHOST, wxString("EAPHost") , _("Toggles EAPHost rows"), wxITEM_CHECK);
-    //m_menuViewSourceEAPHost->SetBitmaps(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(273), size_menu));
-    m_menuView->Append(m_menuViewSourceEAPHost);
+    wxMenuItem* m_menuViewSourceEapHost;
+    m_menuViewSourceEapHost = new wxMenuItem(m_menuView, wxID_VIEW_SOURCE_EAPHOST, wxString("EapHost") , _("Toggles EapHost rows"), wxITEM_CHECK);
+    //m_menuViewSourceEapHost->SetBitmaps(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(273), size_menu));
+    m_menuView->Append(m_menuViewSourceEapHost);
 
     wxMenuItem* m_menuViewSourceSchannel;
     m_menuViewSourceSchannel = new wxMenuItem(m_menuView, wxID_VIEW_SOURCE_SCHANNEL, wxString("Schannel") , _("Toggles Schannel rows"), wxITEM_CHECK);
@@ -155,7 +155,7 @@ wxEventMonitorFrame::wxEventMonitorFrame(wxWindow* parent, wxWindowID id, const 
 
     m_toolbarView->AddSeparator();
 
-    m_toolViewSourceEAPHost = m_toolbarView->AddTool(wxID_VIEW_SOURCE_EAPHOST, "EAPHost", wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(273), size_tool), wxNullBitmap, wxITEM_CHECK, _("Toggles EAPHost rows"), _("Toggles EAPHost rows"), NULL);
+    m_toolViewSourceEapHost = m_toolbarView->AddTool(wxID_VIEW_SOURCE_EAPHOST, "EapHost", wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(273), size_tool), wxNullBitmap, wxITEM_CHECK, _("Toggles EapHost rows"), _("Toggles EapHost rows"), NULL);
 
     m_toolViewSourceSchannel = m_toolbarView->AddTool(wxID_VIEW_SOURCE_SCHANNEL, "Schannel", wxLoadIconFromResource(lib_ieframe, MAKEINTRESOURCE(36870), size_tool), wxNullBitmap, wxITEM_CHECK, _("Toggles Schannel rows"), _("Toggles Schannel rows"), NULL);
 
@@ -200,8 +200,8 @@ wxEventMonitorFrame::wxEventMonitorFrame(wxWindow* parent, wxWindowID id, const 
     this->Connect(wxID_SELECT_NONE         ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnEditSelectNone          ));
     this->Connect(wxID_VIEW_SCROLL_AUTO    ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnViewScrollUpdate        ));
     this->Connect(wxID_VIEW_SCROLL_AUTO    ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnViewScroll              ));
-    this->Connect(wxID_VIEW_SOURCE_EAPHOST ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnViewSourceEAPHostUpdate ));
-    this->Connect(wxID_VIEW_SOURCE_EAPHOST ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnViewSourceEAPHost       ));
+    this->Connect(wxID_VIEW_SOURCE_EAPHOST ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnViewSourceEapHostUpdate ));
+    this->Connect(wxID_VIEW_SOURCE_EAPHOST ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnViewSourceEapHost       ));
     this->Connect(wxID_VIEW_SOURCE_SCHANNEL,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnViewSourceSchannelUpdate));
     this->Connect(wxID_VIEW_SOURCE_SCHANNEL,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnViewSourceSchannel      ));
     this->Connect(wxID_VIEW_SOURCE_PRODUCT ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnViewSourceProductUpdate ));
@@ -227,8 +227,8 @@ wxEventMonitorFrame::~wxEventMonitorFrame()
     this->Disconnect(wxID_SELECT_NONE        ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnEditSelectNone         ));
     this->Disconnect(wxID_VIEW_SCROLL_AUTO   ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnViewScrollUpdate       ));
     this->Disconnect(wxID_VIEW_SCROLL_AUTO   ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnViewScroll             ));
-    this->Disconnect(wxID_VIEW_SOURCE_EAPHOST,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnViewSourceEAPHostUpdate));
-    this->Disconnect(wxID_VIEW_SOURCE_EAPHOST,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnViewSourceEAPHost      ));
+    this->Disconnect(wxID_VIEW_SOURCE_EAPHOST,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnViewSourceEapHostUpdate));
+    this->Disconnect(wxID_VIEW_SOURCE_EAPHOST,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnViewSourceEapHost      ));
     this->Disconnect(wxID_VIEW_SOURCE_SCHANNEL,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnViewSourceSchannelUpdate));
     this->Disconnect(wxID_VIEW_SOURCE_SCHANNEL,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnViewSourceSchannel      ));
     this->Disconnect(wxID_VIEW_SOURCE_PRODUCT,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnViewSourceProductUpdate));
@@ -324,13 +324,13 @@ void wxEventMonitorFrame::OnViewScroll(wxCommandEvent& event)
 }
 
 
-void wxEventMonitorFrame::OnViewSourceEAPHostUpdate(wxUpdateUIEvent& event)
+void wxEventMonitorFrame::OnViewSourceEapHostUpdate(wxUpdateUIEvent& event)
 {
     event.Check(m_panel->m_log->m_source_eaphost);
 }
 
 
-void wxEventMonitorFrame::OnViewSourceEAPHost(wxCommandEvent& event)
+void wxEventMonitorFrame::OnViewSourceEapHost(wxCommandEvent& event)
 {
     bool state_new = event.IsChecked();
     if (m_panel->m_log->m_source_eaphost != state_new) {

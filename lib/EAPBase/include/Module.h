@@ -565,7 +565,7 @@ namespace eap
         peer(_In_ winstd::eap_type_t eap_method);
 
         ///
-        /// Initializes an EAP peer method for EAPHost.
+        /// Initializes an EAP peer method for EapHost.
         ///
         /// \sa [EapPeerGetInfo function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363613.aspx)
         ///
@@ -579,7 +579,7 @@ namespace eap
         virtual void shutdown() = 0;
 
         ///
-        /// Returns the user data and user identity after being called by EAPHost.
+        /// Returns the user data and user identity after being called by EapHost.
         ///
         /// \sa [EapPeerGetIdentity function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363607.aspx)
         ///
@@ -662,7 +662,7 @@ namespace eap
             _Inout_                               EAP_INTERACTIVE_UI_DATA *pEapInteractiveUIData) const;
 
         ///
-        /// Converts user information into a user BLOB that can be consumed by EAPHost run-time functions.
+        /// Converts user information into a user BLOB that can be consumed by EapHost run-time functions.
         ///
         /// \sa [EapPeerQueryUIBlobFromInteractiveUIInputFields function](https://msdn.microsoft.com/en-us/library/windows/desktop/bb204696.aspx)
         ///
@@ -679,7 +679,7 @@ namespace eap
         /// @{
 
         ///
-        /// Starts an EAP authentication session on the peer EAPHost using the EAP method.
+        /// Starts an EAP authentication session on the peer EapHost using the EAP method.
         ///
         /// \sa [EapPeerBeginSession function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363600.aspx)
         ///
@@ -703,7 +703,7 @@ namespace eap
         virtual void end_session(_In_ EAP_SESSION_HANDLE hSession) = 0;
 
         ///
-        /// Processes a packet received by EAPHost from a supplicant.
+        /// Processes a packet received by EapHost from a supplicant.
         ///
         /// \sa [EapPeerProcessRequestPacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363621.aspx)
         ///
