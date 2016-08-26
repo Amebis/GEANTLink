@@ -47,6 +47,16 @@ wxEAPGeneralDialog::wxEAPGeneralDialog(wxWindow *parent, wxWindowID id, const wx
     // Set extra style here, as wxFormBuilder overrides all default flags.
     this->SetExtraStyle(this->GetExtraStyle() | wxWS_EX_VALIDATE_RECURSIVELY);
 
+    // Load window icons.
+#ifdef __WINDOWS__
+    wxIconBundle icons;
+    icons.AddIcon(wxIcon(wxT("product.ico"), wxBITMAP_TYPE_ICO_RESOURCE, ::GetSystemMetrics(SM_CXSMICON), ::GetSystemMetrics(SM_CYSMICON)));
+    icons.AddIcon(wxIcon(wxT("product.ico"), wxBITMAP_TYPE_ICO_RESOURCE, ::GetSystemMetrics(SM_CXICON  ), ::GetSystemMetrics(SM_CYICON  )));
+    this->SetIcons(icons);
+#else
+    this->SetIcon(wxIcon(wxICON(product.ico)));
+#endif
+
     m_buttonsOK->SetDefault();
 }
 

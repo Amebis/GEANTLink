@@ -182,6 +182,16 @@ public:
         // Set extra style here, as wxFormBuilder overrides all default flags.
         this->SetExtraStyle(this->GetExtraStyle() | wxWS_EX_VALIDATE_RECURSIVELY);
 
+        // Load window icons.
+#ifdef __WINDOWS__
+        wxIconBundle icons;
+        icons.AddIcon(wxIcon(wxT("product.ico"), wxBITMAP_TYPE_ICO_RESOURCE, ::GetSystemMetrics(SM_CXSMICON), ::GetSystemMetrics(SM_CYSMICON)));
+        icons.AddIcon(wxIcon(wxT("product.ico"), wxBITMAP_TYPE_ICO_RESOURCE, ::GetSystemMetrics(SM_CXICON  ), ::GetSystemMetrics(SM_CYICON  )));
+        this->SetIcons(icons);
+#else
+        this->SetIcon(wxIcon(wxICON(product.ico)));
+#endif
+
         for (std::vector<eap::config_provider>::iterator provider = m_cfg.m_providers.begin(), provider_end = m_cfg.m_providers.end(); provider != provider_end; ++provider) {
             bool is_single = provider->m_methods.size() == 1;
             std::vector<std::unique_ptr<eap::config_method> >::size_type count = 0;
