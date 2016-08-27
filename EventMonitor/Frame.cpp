@@ -75,7 +75,7 @@ wxEventMonitorFrame::wxEventMonitorFrame(wxWindow* parent, wxWindowID id, const 
     m_menuEdit->Append(m_menuEditCopy);
 
     wxMenuItem* m_menuEditCopyAll;
-    m_menuEditCopyAll = new wxMenuItem(m_menuEdit, wxID_COPY_ALL, _("Copy All") + wxT('\t') + wxT("Ctrl+Shift+C"), _("Copies all records to clipboard (including hidden)"), wxITEM_NORMAL);
+    m_menuEditCopyAll = new wxMenuItem(m_menuEdit, wxID_COPY_ALL, _("Copy A&ll") + wxT('\t') + wxT("Ctrl+Shift+C"), _("Copies all records to clipboard (including hidden)"), wxITEM_NORMAL);
     m_menuEditCopyAll->SetBitmaps(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(133), size_menu));
     m_menuEdit->Append(m_menuEditCopyAll);
 
@@ -98,7 +98,7 @@ wxEventMonitorFrame::wxEventMonitorFrame(wxWindow* parent, wxWindowID id, const 
 
     m_menuView = new wxMenu();
     wxMenuItem* m_menuViewScrollAuto;
-    m_menuViewScrollAuto = new wxMenuItem(m_menuView, wxID_VIEW_SCROLL_AUTO, _("Auto Scroll") + wxT('\t') + wxT("Ctrl+S"), _("Automatically scrolls to the most recent records as they come-in"), wxITEM_CHECK);
+    m_menuViewScrollAuto = new wxMenuItem(m_menuView, wxID_VIEW_SCROLL_AUTO, _("Auto &Scroll") + wxT('\t') + wxT("Ctrl+S"), _("Automatically scrolls to the most recent records as they come-in"), wxITEM_CHECK);
     //m_menuViewScrollAuto->SetBitmaps(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(231), size_menu));
     m_menuView->Append(m_menuViewScrollAuto);
 
