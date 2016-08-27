@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: EventMonitor\n"
-"POT-Creation-Date: 2016-07-15 13:05+0200\n"
+"POT-Creation-Date: 2016-08-27 07:29+0200\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
 "Last-Translator: Simon Rozman <simon.rozman@amebis.si>\n"
 "Language-Team: Amebis, d. o. o., Kamnik <info@amebis.si>\n"
@@ -17,31 +17,190 @@ msgstr ""
 "X-Poedit-KeywordsList: _\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: App.cpp:69 wxEventMonitor_UI.h:54
+#: App.cpp:69 Frame.h:65 MSIBuild/En.Win32.Release.Feature-2.idtx:4
+#: MSIBuild/En.x64.Release.Feature-2.idtx:4
 msgid "Event Monitor"
 msgstr ""
 
-#: LogPanel.cpp:30
+#: ETWLog.cpp:83
+#, c-format
+msgid "Error opening event trace (error %u)."
+msgstr ""
+
+#: ETWLog.cpp:171
 msgid "Time"
 msgstr ""
 
-#: LogPanel.cpp:31
+#: ETWLog.cpp:172
+msgid "PID"
+msgstr ""
+
+#: ETWLog.cpp:173
+msgid "TID"
+msgstr ""
+
+#: ETWLog.cpp:174
 msgid "Source"
 msgstr ""
 
-#: wxEventMonitor_UI.cpp:23
+#: ETWLog.cpp:175
+msgid "Event"
+msgstr ""
+
+#: ETWLog.cpp:232
+msgid "Access denied creating event session: you need administrative privileges (Run As Administrator) or be a member of Performance Log Users group to start event tracing session."
+msgstr ""
+
+#: ETWLog.cpp:235
+#, c-format
+msgid "The %s event session already exists."
+msgstr ""
+
+#: ETWLog.cpp:239
+#, c-format
+msgid "Error creating event session (error %u)."
+msgstr ""
+
+#: ETWLog.cpp:255 ETWLog.cpp:270 ETWLog.cpp:284
+#, c-format
+msgid "Error enabling %s event provider (error %u)."
+msgstr ""
+
+#: Frame.cpp:48 Frame.cpp:108 Frame.cpp:113 Frame.cpp:158 Frame.cpp:160
+#, c-format
+msgid "Toggles display of %s records"
+msgstr ""
+
+#: Frame.cpp:65
 msgid "E&xit"
 msgstr ""
 
-#: wxEventMonitor_UI.cpp:23
-msgid "Quit this program"
+#: Frame.cpp:65
+msgid "Quits this program"
 msgstr ""
 
-#: wxEventMonitor_UI.cpp:26
+#: Frame.cpp:69
 #, fuzzy
 msgid "&Program"
 msgstr "You don't have %s subscription yet."
 
-#: wxEventMonitor_UI.cpp:32
+#: Frame.cpp:78 Frame.cpp:146
+msgid "Copy All"
+msgstr ""
+
+#: Frame.cpp:78 Frame.cpp:146
+msgid "Copies all records to clipboard (including hidden)"
+msgstr ""
+
+#: Frame.cpp:83 Frame.cpp:148
+msgid "Clear"
+msgstr ""
+
+#: Frame.cpp:83 Frame.cpp:148
+msgid "Clears all records from the log"
+msgstr ""
+
+#: Frame.cpp:90
+msgid "Select &All"
+msgstr ""
+
+#: Frame.cpp:90
+msgid "Selects all visible records"
+msgstr ""
+
+#: Frame.cpp:94
+msgid "Select &None"
+msgstr ""
+
+#: Frame.cpp:94
+msgid "Clears record selection"
+msgstr ""
+
+#: Frame.cpp:97
+msgid "&Edit"
+msgstr ""
+
+#: Frame.cpp:101 Frame.cpp:154
+msgid "Auto Scroll"
+msgstr ""
+
+#: Frame.cpp:101 Frame.cpp:154
+msgid "Automatically scrolls to the most recent records as they come-in"
+msgstr ""
+
+#: Frame.cpp:123 Frame.cpp:166
+msgid "Verbose"
+msgstr ""
+
+#: Frame.cpp:123 Frame.cpp:166
+msgid "Displays all levels of records"
+msgstr ""
+
+#: Frame.cpp:127 Frame.cpp:168
+msgid "Informational"
+msgstr ""
+
+#: Frame.cpp:127 Frame.cpp:168
+msgid "Displays all records up to informational level"
+msgstr ""
+
+#: Frame.cpp:131 Frame.cpp:170
+msgid "Warning"
+msgstr ""
+
+#: Frame.cpp:131 Frame.cpp:170
+msgid "Displays all records up to warning level"
+msgstr ""
+
+#: Frame.cpp:135 Frame.cpp:172
+#, fuzzy
+msgid "Error"
+msgstr "Napaka pri nalaganju knjižnice MSI.DLL (%1!ld!)."
+
+#: Frame.cpp:135 Frame.cpp:172
+msgid "Displays error level records only"
+msgstr ""
+
+#: Frame.cpp:139
+msgid "&View"
+msgstr ""
+
+#: Frame.cpp:144
+msgid "Copy"
+msgstr ""
+
+#: Frame.cpp:144
+msgid "Copies selected records to clipboard"
+msgstr ""
+
+#: Frame.cpp:151
+msgid "Edit"
+msgstr ""
+
+#: Frame.cpp:175
+msgid "View"
+msgstr ""
+
+#: Frame.cpp:179
 msgid "Log Trace"
+msgstr ""
+
+#: MSIBuild/En.Win32.Release.Feature-2.idtx:3
+#: MSIBuild/En.Win32.Release.Shortcut-2.idtx:3
+#: MSIBuild/En.x64.Release.Feature-2.idtx:3
+#: MSIBuild/En.x64.Release.Shortcut-2.idtx:3
+#, fuzzy
+msgid "1252"
+msgstr "1250"
+
+#: MSIBuild/En.Win32.Release.Shortcut-2.idtx:4
+#: MSIBuild/En.x64.Release.Shortcut-2.idtx:4
+msgid "EVENTM~1|GÉANTLink Event Monitor"
+msgstr ""
+
+#: MSIBuild/En.Win32.Release.Feature-2.idtx:4
+#: MSIBuild/En.Win32.Release.Shortcut-2.idtx:4
+#: MSIBuild/En.x64.Release.Feature-2.idtx:4
+#: MSIBuild/En.x64.Release.Shortcut-2.idtx:4
+msgid "Real-time display of internal events"
 msgstr ""

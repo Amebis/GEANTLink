@@ -252,7 +252,7 @@ wxETWListCtrl::wxETWListCtrl(wxWindow *parent, wxWindowID id, const wxPoint& pos
         0,
         NULL)) != ERROR_SUCCESS)
     {
-        wxLogError(_("Error enabling event provider (error %u)."), ulResult);
+        wxLogDebug(wxString::Format(_("Error enabling %s event provider (error %u)."), wxT(PRODUCT_NAME_STR)), ulResult);
         return;
     }
 
@@ -267,7 +267,7 @@ wxETWListCtrl::wxETWListCtrl(wxWindow *parent, wxWindowID id, const wxPoint& pos
         NULL)) != ERROR_SUCCESS)
     {
         // If the EapHost trace provider failed to enable, do not despair.
-        wxLogDebug(_("Error enabling EapHost event provider (error %u)."), ulResult);
+        wxLogDebug(wxString::Format(_("Error enabling %s event provider (error %u)."), wxT("EapHost")), ulResult);
     }
 
     if ((ulResult = EnableTraceEx(
@@ -281,7 +281,7 @@ wxETWListCtrl::wxETWListCtrl(wxWindow *parent, wxWindowID id, const wxPoint& pos
         NULL)) != ERROR_SUCCESS)
     {
         // If the Schannel trace provider failed to enable, do not despair.
-        wxLogDebug(_("Error enabling Schannel event provider (error %u)."), ulResult);
+        wxLogDebug(wxString::Format(_("Error enabling %s event provider (error %u)."), wxT("Schannel")), ulResult);
     }
 
     // Process events in separate thread, not to block wxWidgets' message pump.
