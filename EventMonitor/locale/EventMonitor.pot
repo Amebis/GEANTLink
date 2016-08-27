@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: EventMonitor\n"
-"POT-Creation-Date: 2016-08-27 07:29+0200\n"
+"POT-Creation-Date: 2016-08-27 07:52+0200\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
 "Last-Translator: Simon Rozman <simon.rozman@amebis.si>\n"
 "Language-Team: Amebis, d. o. o., Kamnik <info@amebis.si>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "X-Poedit-KeywordsList: _\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: App.cpp:69 Frame.h:65 MSIBuild/En.Win32.Release.Feature-2.idtx:4
+#: App.cpp:69 Frame.h:67 MSIBuild/En.Win32.Release.Feature-2.idtx:4
 #: MSIBuild/En.x64.Release.Feature-2.idtx:4
 msgid "Event Monitor"
 msgstr ""
@@ -66,7 +66,7 @@ msgstr ""
 msgid "Error enabling %s event provider (error %u)."
 msgstr ""
 
-#: Frame.cpp:48 Frame.cpp:108 Frame.cpp:113 Frame.cpp:158 Frame.cpp:160
+#: Frame.cpp:48 Frame.cpp:108 Frame.cpp:113 Frame.cpp:168 Frame.cpp:170
 #, c-format
 msgid "Toggles display of %s records"
 msgstr ""
@@ -84,19 +84,19 @@ msgstr ""
 msgid "&Program"
 msgstr "You don't have %s subscription yet."
 
-#: Frame.cpp:78 Frame.cpp:146
-msgid "Copy All"
+#: Frame.cpp:78
+msgid "Copy A&ll"
 msgstr ""
 
-#: Frame.cpp:78 Frame.cpp:146
+#: Frame.cpp:78 Frame.cpp:156
 msgid "Copies all records to clipboard (including hidden)"
 msgstr ""
 
-#: Frame.cpp:83 Frame.cpp:148
+#: Frame.cpp:83 Frame.cpp:158
 msgid "Clear"
 msgstr ""
 
-#: Frame.cpp:83 Frame.cpp:148
+#: Frame.cpp:83 Frame.cpp:158
 msgid "Clears all records from the log"
 msgstr ""
 
@@ -120,68 +120,92 @@ msgstr ""
 msgid "&Edit"
 msgstr ""
 
-#: Frame.cpp:101 Frame.cpp:154
-msgid "Auto Scroll"
+#: Frame.cpp:101
+msgid "Auto &Scroll"
 msgstr ""
 
-#: Frame.cpp:101 Frame.cpp:154
+#: Frame.cpp:101 Frame.cpp:164
 msgid "Automatically scrolls to the most recent records as they come-in"
 msgstr ""
 
-#: Frame.cpp:123 Frame.cpp:166
+#: Frame.cpp:123 Frame.cpp:176
 msgid "Verbose"
 msgstr ""
 
-#: Frame.cpp:123 Frame.cpp:166
+#: Frame.cpp:123 Frame.cpp:176
 msgid "Displays all levels of records"
 msgstr ""
 
-#: Frame.cpp:127 Frame.cpp:168
+#: Frame.cpp:127 Frame.cpp:178
 msgid "Informational"
 msgstr ""
 
-#: Frame.cpp:127 Frame.cpp:168
+#: Frame.cpp:127 Frame.cpp:178
 msgid "Displays all records up to informational level"
 msgstr ""
 
-#: Frame.cpp:131 Frame.cpp:170
+#: Frame.cpp:131 Frame.cpp:180
 msgid "Warning"
 msgstr ""
 
-#: Frame.cpp:131 Frame.cpp:170
+#: Frame.cpp:131 Frame.cpp:180
 msgid "Displays all records up to warning level"
 msgstr ""
 
-#: Frame.cpp:135 Frame.cpp:172
+#: Frame.cpp:135 Frame.cpp:182
 #, fuzzy
 msgid "Error"
 msgstr "Napaka pri nalaganju knjižnice MSI.DLL (%1!ld!)."
 
-#: Frame.cpp:135 Frame.cpp:172
+#: Frame.cpp:135 Frame.cpp:182
 msgid "Displays error level records only"
 msgstr ""
 
-#: Frame.cpp:139
+#: Frame.cpp:142
+msgid "&Edit toolbar"
+msgstr ""
+
+#: Frame.cpp:142
+msgid "Toggles display of Edit toolbar"
+msgstr ""
+
+#: Frame.cpp:146
+msgid "&View toolbar"
+msgstr ""
+
+#: Frame.cpp:146
+msgid "Toggles display of View toolbar"
+msgstr ""
+
+#: Frame.cpp:149
 msgid "&View"
 msgstr ""
 
-#: Frame.cpp:144
+#: Frame.cpp:154
 msgid "Copy"
 msgstr ""
 
-#: Frame.cpp:144
+#: Frame.cpp:154
 msgid "Copies selected records to clipboard"
 msgstr ""
 
-#: Frame.cpp:151
+#: Frame.cpp:156
+msgid "Copy All"
+msgstr ""
+
+#: Frame.cpp:161
 msgid "Edit"
 msgstr ""
 
-#: Frame.cpp:175
+#: Frame.cpp:164
+msgid "Auto Scroll"
+msgstr ""
+
+#: Frame.cpp:185
 msgid "View"
 msgstr ""
 
-#: Frame.cpp:179
+#: Frame.cpp:189
 msgid "Log Trace"
 msgstr ""
 

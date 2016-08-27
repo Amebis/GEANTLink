@@ -58,7 +58,9 @@ protected:
         wxID_VIEW_LEVEL_VERBOSE,
         wxID_VIEW_LEVEL_INFORMATION,
         wxID_VIEW_LEVEL_WARNING,
-        wxID_VIEW_LEVEL_ERROR
+        wxID_VIEW_LEVEL_ERROR,
+        wxID_VIEW_TOOLBAR_EDIT,
+        wxID_VIEW_TOOLBAR_VIEW,
     };
 
 public:
@@ -89,6 +91,10 @@ protected:
     void OnViewSourceProduct(wxCommandEvent& event);
     void OnViewLevelUpdate(wxUpdateUIEvent& event);
     void OnViewLevel(wxCommandEvent& event);
+    void OnViewToolbarEditUpdate(wxUpdateUIEvent& event);
+    void OnViewToolbarEdit(wxCommandEvent& event);
+    void OnViewToolbarViewUpdate(wxUpdateUIEvent& event);
+    void OnViewToolbarView(wxCommandEvent& event);
 
 protected:
     wxMenuBar* m_menubar;
