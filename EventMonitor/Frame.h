@@ -83,18 +83,12 @@ protected:
     void OnEditSelectNone(wxCommandEvent& event);
     void OnViewScrollUpdate(wxUpdateUIEvent& event);
     void OnViewScroll(wxCommandEvent& event);
-    void OnViewSourceEapHostUpdate(wxUpdateUIEvent& event);
-    void OnViewSourceEapHost(wxCommandEvent& event);
-    void OnViewSourceSchannelUpdate(wxUpdateUIEvent& event);
-    void OnViewSourceSchannel(wxCommandEvent& event);
-    void OnViewSourceProductUpdate(wxUpdateUIEvent& event);
-    void OnViewSourceProduct(wxCommandEvent& event);
+    void OnViewSourceUpdate(wxUpdateUIEvent& event);
+    void OnViewSource(wxCommandEvent& event);
     void OnViewLevelUpdate(wxUpdateUIEvent& event);
     void OnViewLevel(wxCommandEvent& event);
-    void OnViewToolbarEditUpdate(wxUpdateUIEvent& event);
-    void OnViewToolbarEdit(wxCommandEvent& event);
-    void OnViewToolbarViewUpdate(wxUpdateUIEvent& event);
-    void OnViewToolbarView(wxCommandEvent& event);
+    void OnViewToolbarUpdate(wxUpdateUIEvent& event);
+    void OnViewToolbar(wxCommandEvent& event);
 
 protected:
     wxMenuBar* m_menubar;

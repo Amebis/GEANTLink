@@ -197,62 +197,62 @@ wxEventMonitorFrame::wxEventMonitorFrame(wxWindow* parent, wxWindowID id, const 
     wxPersistentAuiManager(&m_mgr).Restore();
 
     // Connect Events
-    this->Connect(wxID_EXIT                ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnExit                    ));
-    this->Connect(wxID_COPY                ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnEditCopyUpdate          ));
-    this->Connect(wxID_COPY                ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnEditCopy                ));
-    this->Connect(wxID_COPY_ALL            ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnEditCopyAllUpdate       ));
-    this->Connect(wxID_COPY_ALL            ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnEditCopyAll             ));
-    this->Connect(wxID_CLEAR               ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnEditClearUpdate         ));
-    this->Connect(wxID_CLEAR               ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnEditClear               ));
-    this->Connect(wxID_SELECT_ALL          ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnEditSelectAllUpdate     ));
-    this->Connect(wxID_SELECT_ALL          ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnEditSelectAll           ));
-    this->Connect(wxID_SELECT_NONE         ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnEditSelectNoneUpdate    ));
-    this->Connect(wxID_SELECT_NONE         ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnEditSelectNone          ));
-    this->Connect(wxID_VIEW_SCROLL_AUTO    ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnViewScrollUpdate        ));
-    this->Connect(wxID_VIEW_SCROLL_AUTO    ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnViewScroll              ));
-    this->Connect(wxID_VIEW_SOURCE_EAPHOST ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnViewSourceEapHostUpdate ));
-    this->Connect(wxID_VIEW_SOURCE_EAPHOST ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnViewSourceEapHost       ));
-    this->Connect(wxID_VIEW_SOURCE_SCHANNEL,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnViewSourceSchannelUpdate));
-    this->Connect(wxID_VIEW_SOURCE_SCHANNEL,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnViewSourceSchannel      ));
-    this->Connect(wxID_VIEW_SOURCE_PRODUCT ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnViewSourceProductUpdate ));
-    this->Connect(wxID_VIEW_SOURCE_PRODUCT ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnViewSourceProduct       ));
-    this->Connect(wxID_VIEW_LEVEL_VERBOSE  , wxID_VIEW_LEVEL_ERROR, wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnViewLevelUpdate         ));
-    this->Connect(wxID_VIEW_LEVEL_VERBOSE  , wxID_VIEW_LEVEL_ERROR, wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnViewLevel               ));
-    this->Connect(wxID_VIEW_TOOLBAR_EDIT   ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnViewToolbarEditUpdate   ));
-    this->Connect(wxID_VIEW_TOOLBAR_EDIT   ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnViewToolbarEdit         ));
-    this->Connect(wxID_VIEW_TOOLBAR_VIEW   ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnViewToolbarViewUpdate   ));
-    this->Connect(wxID_VIEW_TOOLBAR_VIEW   ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnViewToolbarView         ));
+    this->Connect(wxID_EXIT                ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnExit                ));
+    this->Connect(wxID_COPY                ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnEditCopyUpdate      ));
+    this->Connect(wxID_COPY                ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnEditCopy            ));
+    this->Connect(wxID_COPY_ALL            ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnEditCopyAllUpdate   ));
+    this->Connect(wxID_COPY_ALL            ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnEditCopyAll         ));
+    this->Connect(wxID_CLEAR               ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnEditClearUpdate     ));
+    this->Connect(wxID_CLEAR               ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnEditClear           ));
+    this->Connect(wxID_SELECT_ALL          ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnEditSelectAllUpdate ));
+    this->Connect(wxID_SELECT_ALL          ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnEditSelectAll       ));
+    this->Connect(wxID_SELECT_NONE         ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnEditSelectNoneUpdate));
+    this->Connect(wxID_SELECT_NONE         ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnEditSelectNone      ));
+    this->Connect(wxID_VIEW_SCROLL_AUTO    ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnViewScrollUpdate    ));
+    this->Connect(wxID_VIEW_SCROLL_AUTO    ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnViewScroll          ));
+    this->Connect(wxID_VIEW_SOURCE_EAPHOST ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnViewSourceUpdate    ), new wxObjectWithData<GUID>(wxETWListCtrl::s_provider_eaphost ));
+    this->Connect(wxID_VIEW_SOURCE_EAPHOST ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnViewSource          ), new wxObjectWithData<GUID>(wxETWListCtrl::s_provider_eaphost ));
+    this->Connect(wxID_VIEW_SOURCE_SCHANNEL,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnViewSourceUpdate    ), new wxObjectWithData<GUID>(wxETWListCtrl::s_provider_schannel));
+    this->Connect(wxID_VIEW_SOURCE_SCHANNEL,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnViewSource          ), new wxObjectWithData<GUID>(wxETWListCtrl::s_provider_schannel));
+    this->Connect(wxID_VIEW_SOURCE_PRODUCT ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnViewSourceUpdate    ), new wxObjectWithData<GUID>(EAPMETHOD_TRACE_EVENT_PROVIDER    ));
+    this->Connect(wxID_VIEW_SOURCE_PRODUCT ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnViewSource          ), new wxObjectWithData<GUID>(EAPMETHOD_TRACE_EVENT_PROVIDER    ));
+    this->Connect(wxID_VIEW_LEVEL_VERBOSE  , wxID_VIEW_LEVEL_ERROR, wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnViewLevelUpdate     ));
+    this->Connect(wxID_VIEW_LEVEL_VERBOSE  , wxID_VIEW_LEVEL_ERROR, wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnViewLevel           ));
+    this->Connect(wxID_VIEW_TOOLBAR_EDIT   ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnViewToolbarUpdate   ), new wxObjectWithData<wxAuiPaneInfo*>(&m_mgr.GetPane(m_toolbarEdit)));
+    this->Connect(wxID_VIEW_TOOLBAR_EDIT   ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnViewToolbar         ), new wxObjectWithData<wxAuiPaneInfo*>(&m_mgr.GetPane(m_toolbarEdit)));
+    this->Connect(wxID_VIEW_TOOLBAR_VIEW   ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnViewToolbarUpdate   ), new wxObjectWithData<wxAuiPaneInfo*>(&m_mgr.GetPane(m_toolbarView)));
+    this->Connect(wxID_VIEW_TOOLBAR_VIEW   ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnViewToolbar         ), new wxObjectWithData<wxAuiPaneInfo*>(&m_mgr.GetPane(m_toolbarView)));
 }
 
 
 wxEventMonitorFrame::~wxEventMonitorFrame()
 {
     // Disconnect Events
-    this->Disconnect(wxID_EXIT                ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnExit                    ));
-    this->Disconnect(wxID_COPY                ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnEditCopyUpdate          ));
-    this->Disconnect(wxID_COPY                ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnEditCopy                ));
-    this->Disconnect(wxID_COPY_ALL            ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnEditCopyAllUpdate       ));
-    this->Disconnect(wxID_COPY_ALL            ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnEditCopyAll             ));
-    this->Disconnect(wxID_CLEAR               ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnEditClearUpdate         ));
-    this->Disconnect(wxID_CLEAR               ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnEditClear               ));
-    this->Disconnect(wxID_SELECT_ALL          ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnEditSelectAllUpdate     ));
-    this->Disconnect(wxID_SELECT_ALL          ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnEditSelectAll           ));
-    this->Disconnect(wxID_SELECT_NONE         ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnEditSelectNoneUpdate    ));
-    this->Disconnect(wxID_SELECT_NONE         ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnEditSelectNone          ));
-    this->Disconnect(wxID_VIEW_SCROLL_AUTO    ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnViewScrollUpdate        ));
-    this->Disconnect(wxID_VIEW_SCROLL_AUTO    ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnViewScroll              ));
-    this->Disconnect(wxID_VIEW_SOURCE_EAPHOST ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnViewSourceEapHostUpdate ));
-    this->Disconnect(wxID_VIEW_SOURCE_EAPHOST ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnViewSourceEapHost       ));
-    this->Disconnect(wxID_VIEW_SOURCE_SCHANNEL,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnViewSourceSchannelUpdate));
-    this->Disconnect(wxID_VIEW_SOURCE_SCHANNEL,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnViewSourceSchannel      ));
-    this->Disconnect(wxID_VIEW_SOURCE_PRODUCT ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnViewSourceProductUpdate ));
-    this->Disconnect(wxID_VIEW_SOURCE_PRODUCT ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnViewSourceProduct       ));
-    this->Disconnect(wxID_VIEW_LEVEL_VERBOSE  , wxID_VIEW_LEVEL_ERROR, wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnViewLevelUpdate         ));
-    this->Disconnect(wxID_VIEW_LEVEL_VERBOSE  , wxID_VIEW_LEVEL_ERROR, wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnViewLevel               ));
-    this->Disconnect(wxID_VIEW_TOOLBAR_EDIT   ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnViewToolbarEditUpdate   ));
-    this->Disconnect(wxID_VIEW_TOOLBAR_EDIT   ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnViewToolbarEdit         ));
-    this->Disconnect(wxID_VIEW_TOOLBAR_VIEW   ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnViewToolbarViewUpdate   ));
-    this->Disconnect(wxID_VIEW_TOOLBAR_VIEW   ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnViewToolbarView         ));
+    this->Disconnect(wxID_EXIT                ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnExit                ));
+    this->Disconnect(wxID_COPY                ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnEditCopyUpdate      ));
+    this->Disconnect(wxID_COPY                ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnEditCopy            ));
+    this->Disconnect(wxID_COPY_ALL            ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnEditCopyAllUpdate   ));
+    this->Disconnect(wxID_COPY_ALL            ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnEditCopyAll         ));
+    this->Disconnect(wxID_CLEAR               ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnEditClearUpdate     ));
+    this->Disconnect(wxID_CLEAR               ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnEditClear           ));
+    this->Disconnect(wxID_SELECT_ALL          ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnEditSelectAllUpdate ));
+    this->Disconnect(wxID_SELECT_ALL          ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnEditSelectAll       ));
+    this->Disconnect(wxID_SELECT_NONE         ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnEditSelectNoneUpdate));
+    this->Disconnect(wxID_SELECT_NONE         ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnEditSelectNone      ));
+    this->Disconnect(wxID_VIEW_SCROLL_AUTO    ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnViewScrollUpdate    ));
+    this->Disconnect(wxID_VIEW_SCROLL_AUTO    ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnViewScroll          ));
+    this->Disconnect(wxID_VIEW_SOURCE_EAPHOST ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnViewSourceUpdate    ));
+    this->Disconnect(wxID_VIEW_SOURCE_EAPHOST ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnViewSource          ));
+    this->Disconnect(wxID_VIEW_SOURCE_SCHANNEL,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnViewSourceUpdate    ));
+    this->Disconnect(wxID_VIEW_SOURCE_SCHANNEL,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnViewSource          ));
+    this->Disconnect(wxID_VIEW_SOURCE_PRODUCT ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnViewSourceUpdate    ));
+    this->Disconnect(wxID_VIEW_SOURCE_PRODUCT ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnViewSource          ));
+    this->Disconnect(wxID_VIEW_LEVEL_VERBOSE  , wxID_VIEW_LEVEL_ERROR, wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnViewLevelUpdate     ));
+    this->Disconnect(wxID_VIEW_LEVEL_VERBOSE  , wxID_VIEW_LEVEL_ERROR, wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnViewLevel           ));
+    this->Disconnect(wxID_VIEW_TOOLBAR_EDIT   ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnViewToolbarUpdate   ));
+    this->Disconnect(wxID_VIEW_TOOLBAR_EDIT   ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnViewToolbar         ));
+    this->Disconnect(wxID_VIEW_TOOLBAR_VIEW   ,                        wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEventMonitorFrame::OnViewToolbarUpdate   ));
+    this->Disconnect(wxID_VIEW_TOOLBAR_VIEW   ,                        wxEVT_MENU     , wxCommandEventHandler (wxEventMonitorFrame::OnViewToolbar         ));
 
     // Save wxAuiManager's state.
     wxPersistentAuiManager(&m_mgr).Save();
@@ -337,6 +337,7 @@ void wxEventMonitorFrame::OnViewScroll(wxCommandEvent& event)
 {
     m_panel->m_log->m_scroll_auto = event.IsChecked();
     if (m_panel->m_log->m_scroll_auto) {
+        // Scroll to the last record.
         long count = m_panel->m_log->GetItemCount();
         if (count)
             m_panel->m_log->EnsureVisible(count - 1);
@@ -344,56 +345,31 @@ void wxEventMonitorFrame::OnViewScroll(wxCommandEvent& event)
 }
 
 
-void wxEventMonitorFrame::OnViewSourceEapHostUpdate(wxUpdateUIEvent& event)
+void wxEventMonitorFrame::OnViewSourceUpdate(wxUpdateUIEvent& event)
 {
-    event.Check(m_panel->m_log->m_source_eaphost);
+    wxObjectWithData<GUID> *source = dynamic_cast<wxObjectWithData<GUID>*>(event.m_callbackUserData);
+    if (source) {
+        // Update GUI control according to event source state.
+        event.Check(m_panel->m_log->IsSourceEnabled(source->m_data));
+        event.Enable(true);
+    } else
+        event.Enable(false);
 }
 
 
-void wxEventMonitorFrame::OnViewSourceEapHost(wxCommandEvent& event)
+void wxEventMonitorFrame::OnViewSource(wxCommandEvent& event)
 {
-    bool state_new = event.IsChecked();
-    if (m_panel->m_log->m_source_eaphost != state_new) {
-        m_panel->m_log->m_source_eaphost = state_new;
-        m_panel->m_log->RebuildItems();
-    }
-}
-
-
-void wxEventMonitorFrame::OnViewSourceSchannelUpdate(wxUpdateUIEvent& event)
-{
-    event.Check(m_panel->m_log->m_source_schannel);
-}
-
-
-void wxEventMonitorFrame::OnViewSourceSchannel(wxCommandEvent& event)
-{
-    bool state_new = event.IsChecked();
-    if (m_panel->m_log->m_source_schannel != state_new) {
-        m_panel->m_log->m_source_schannel = state_new;
-        m_panel->m_log->RebuildItems();
-    }
-}
-
-
-void wxEventMonitorFrame::OnViewSourceProductUpdate(wxUpdateUIEvent& event)
-{
-    event.Check(m_panel->m_log->m_source_product);
-}
-
-
-void wxEventMonitorFrame::OnViewSourceProduct(wxCommandEvent& event)
-{
-    bool state_new = event.IsChecked();
-    if (m_panel->m_log->m_source_product != state_new) {
-        m_panel->m_log->m_source_product = state_new;
-        m_panel->m_log->RebuildItems();
+    wxObjectWithData<GUID> *source = dynamic_cast<wxObjectWithData<GUID>*>(event.m_callbackUserData);
+    if (source) {
+        // Enable event source.
+        m_panel->m_log->EnableSource(source->m_data, event.IsChecked());
     }
 }
 
 
 void wxEventMonitorFrame::OnViewLevelUpdate(wxUpdateUIEvent& event)
 {
+    // Update GUI control according to log level.
     event.Check(TRACE_LEVEL_ERROR + wxID_VIEW_LEVEL_ERROR - event.GetId() == m_panel->m_log->m_level);
 }
 
@@ -402,37 +378,33 @@ void wxEventMonitorFrame::OnViewLevel(wxCommandEvent& event)
 {
     UCHAR state_new = TRACE_LEVEL_ERROR + wxID_VIEW_LEVEL_ERROR - event.GetId();
     if (m_panel->m_log->m_level != state_new) {
+        // Set new log level.
         m_panel->m_log->m_level = state_new;
         m_panel->m_log->RebuildItems();
     }
 }
 
 
-void wxEventMonitorFrame::OnViewToolbarEditUpdate(wxUpdateUIEvent& event)
+void wxEventMonitorFrame::OnViewToolbarUpdate(wxUpdateUIEvent& event)
 {
-    event.Check(m_mgr.GetPane(m_toolbarEdit).IsShown());
+    wxObjectWithData<wxAuiPaneInfo*> *source = dynamic_cast<wxObjectWithData<wxAuiPaneInfo*>*>(event.m_callbackUserData);
+    if (source && source->m_data) {
+        // Update GUI control according to toolbar/panel visibility.
+        event.Check(source->m_data->IsShown());
+        event.Enable(true);
+    } else
+        event.Enable(false);
 }
 
 
-void wxEventMonitorFrame::OnViewToolbarEdit(wxCommandEvent& /*event*/)
+void wxEventMonitorFrame::OnViewToolbar(wxCommandEvent& event)
 {
-    wxAuiPaneInfo &paneInfo = m_mgr.GetPane(m_toolbarEdit);
-    paneInfo.Show(!paneInfo.IsShown());
-    m_mgr.Update();
-}
-
-
-void wxEventMonitorFrame::OnViewToolbarViewUpdate(wxUpdateUIEvent& event)
-{
-    event.Check(m_mgr.GetPane(m_toolbarView).IsShown());
-}
-
-
-void wxEventMonitorFrame::OnViewToolbarView(wxCommandEvent& /*event*/)
-{
-    wxAuiPaneInfo &paneInfo = m_mgr.GetPane(m_toolbarView);
-    paneInfo.Show(!paneInfo.IsShown());
-    m_mgr.Update();
+    wxObjectWithData<wxAuiPaneInfo*> *source = dynamic_cast<wxObjectWithData<wxAuiPaneInfo*>*>(event.m_callbackUserData);
+    if (source && source->m_data) {
+        // Toggle toolbar/panel visibility.
+        source->m_data->Show(!source->m_data->IsShown());
+        m_mgr.Update();
+    }
 }
 
 

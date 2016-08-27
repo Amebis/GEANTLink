@@ -158,11 +158,7 @@ const GUID wxETWListCtrl::s_provider_schannel = { 0x1F678132, 0x5938, 0x4686, { 
 
 wxETWListCtrl::wxETWListCtrl(wxWindow *parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxValidator& validator, const wxString& name) :
     m_proc(NULL),
-    m_item_id(0),
     m_scroll_auto(true),
-    m_source_eaphost(false),
-    m_source_schannel(false),
-    m_source_product(true),
     m_level(TRACE_LEVEL_INFORMATION),
     m_rec_db(wxETWEVENT_RECORDS_MAX),
     m_rec_idx(wxETWEVENT_RECORDS_MAX),
@@ -255,6 +251,7 @@ wxETWListCtrl::wxETWListCtrl(wxWindow *parent, wxWindowID id, const wxPoint& pos
         wxLogDebug(wxString::Format(_("Error enabling %s event provider (error %u)."), wxT(PRODUCT_NAME_STR)), ulResult);
         return;
     }
+    m_sources.insert(EAPMETHOD_TRACE_EVENT_PROVIDER);
 
     if ((ulResult = EnableTraceEx(
         &s_provider_eaphost,
@@ -466,10 +463,8 @@ void wxETWListCtrl::RebuildItems()
 bool wxETWListCtrl::IsVisible(const EVENT_RECORD &rec) const
 {
     return
-        (m_source_product  && IsEqualGUID(rec.EventHeader.ProviderId, EAPMETHOD_TRACE_EVENT_PROVIDER) ||
-         m_source_eaphost  && IsEqualGUID(rec.EventHeader.ProviderId, s_provider_eaphost            ) ||
-         m_source_schannel && IsEqualGUID(rec.EventHeader.ProviderId, s_provider_schannel           )) &&
-         rec.EventHeader.EventDescriptor.Level <= m_level;
+        m_sources.find(rec.EventHeader.ProviderId) != m_sources.end() &&
+        rec.EventHeader.EventDescriptor.Level <= m_level;
 }
 
 
@@ -711,11 +706,14 @@ void wxPersistentETWListCtrl::Save() const
         SaveValue(wxString::Format(wxT("Column%sWidth"), col.GetText().c_str()), col.GetWidth());
     }
 
-    SaveValue(wxT("ScrollAuto"    ),      wnd->m_scroll_auto    );
-    SaveValue(wxT("SourceEapHost" ),      wnd->m_source_eaphost );
-    SaveValue(wxT("SourceSchannel"),      wnd->m_source_schannel);
-    SaveValue(wxT("SourceProduct" ),      wnd->m_source_product );
-    SaveValue(wxT("Level"         ), (int)wnd->m_level          );
+    SaveValue(wxT("ScrollAuto"    ), wnd->m_scroll_auto);
+
+    SaveValue(wxT("SourceCount"), (long)wnd->m_sources.size());
+    long i = 0;
+    for (wxETWListCtrl::guidset::const_iterator src = wnd->m_sources.cbegin(), src_end = wnd->m_sources.cend(); src != src_end; ++src, i++)
+        SaveValue(wxString::Format(wxT("Source%u"), i), tstring_guid(*src));
+
+    SaveValue(wxT("Level"), (int)wnd->m_level);
 }
 
 
@@ -734,12 +732,25 @@ bool wxPersistentETWListCtrl::Restore()
             wnd->SetColumnWidth(i, width);
     }
 
-    int dummy_int;
+    RestoreValue(wxT("ScrollAuto"), &(wnd->m_scroll_auto));
 
-    RestoreValue(wxT("ScrollAuto"    ), &(wnd->m_scroll_auto    ));
-    RestoreValue(wxT("SourceEapHost" ), &(wnd->m_source_eaphost ));
-    RestoreValue(wxT("SourceSchannel"), &(wnd->m_source_schannel));
-    RestoreValue(wxT("SourceProduct" ), &(wnd->m_source_product ));
+    wnd->m_sources.clear();
+    long n;
+    if (RestoreValue(wxT("SourceCount"), &n)) {
+        wxString guid_str;
+        for (long i = 0; i < n; i++) {
+            if (RestoreValue(wxString::Format(wxT("Source%u"), i), &guid_str)) {
+                GUID guid;
+                if (StringToGuid(guid_str.c_str(), &guid))
+                    wnd->m_sources.insert(guid);
+            }
+        }
+    } else {
+        // Insert our provider by default.
+        wnd->m_sources.insert(EAPMETHOD_TRACE_EVENT_PROVIDER);
+    }
+
+    int dummy_int;
     if (RestoreValue(wxT("Level"), &dummy_int))
         wnd->m_level = (UCHAR)std::min<int>(std::max<int>(dummy_int, TRACE_LEVEL_ERROR), TRACE_LEVEL_VERBOSE);
 

@@ -30,6 +30,7 @@
 #include "../include/Version.h"
 
 #include <wxex/common.h>
+#include <wxex/object.h>
 #include <wxex/persist/auimanager.h>
 
 #include <WinStd/COM.h>

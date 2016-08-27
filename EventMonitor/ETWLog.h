@@ -58,6 +58,7 @@ class wxPersistentETWListCtrl;
 
 #include <memory>
 #include <vector>
+#include <set>
 
 
 class wxETWEvent : public wxEvent
@@ -110,6 +111,30 @@ protected:
 
 class wxETWListCtrl : public wxListCtrl
 {
+protected:
+    ///
+    /// Functor for GUID comparison
+    ///
+    struct less_guid : public std::binary_function<GUID, GUID, bool>
+    {
+        bool operator()(const GUID &a, const GUID &b) const
+        {
+            if (a.Data1 < b.Data1) return true;
+            if (a.Data1 > b.Data1) return false;
+            if (a.Data2 < b.Data2) return true;
+            if (a.Data2 > b.Data2) return false;
+            if (a.Data3 < b.Data3) return true;
+            if (a.Data3 > b.Data3) return false;
+            if (memcmp(a.Data4, b.Data4, sizeof(a.Data4)) < 0) return true;
+            return false;
+        }
+    };
+
+    ///
+    /// A set of GUIDs
+    ///
+    typedef std::set<GUID, less_guid> guidset;
+
 public:
     wxETWListCtrl(
               wxWindow    *parent,
@@ -121,13 +146,34 @@ public:
         const wxString    &name      = wxListCtrlNameStr);
     virtual ~wxETWListCtrl();
 
-    bool IsEmpty() const { return m_rec_db.empty(); }
+    inline bool IsEmpty() const { return m_rec_db.empty(); }
     void CopySelected() const;
     void CopyAll() const;
     void ClearAll();
     void SelectAll();
     void SelectNone();
     void RebuildItems();
+
+    inline bool IsSourceEnabled(const GUID &guid) const
+    {
+        return m_sources.find(guid) != m_sources.end();
+    }
+
+    inline void EnableSource(const GUID &guid, bool enable = true)
+    {
+        guidset::iterator s = m_sources.find(guid);
+        if (enable) {
+            if (s == m_sources.end()) {
+                m_sources.insert(guid);
+                RebuildItems();
+            }
+        } else {
+            if (s != m_sources.end()) {
+                m_sources.erase(s);
+                RebuildItems();
+            }
+        }
+    }
 
     friend class wxPersistentETWListCtrl;   // Allow saving/restoring window state.
 
@@ -144,9 +190,6 @@ protected:
 
 public:
     bool m_scroll_auto;                                 ///< Is autoscrolling enabled?
-    bool m_source_eaphost;                              ///< Shows EapHost messages
-    bool m_source_schannel;                             ///< Shows Schannel messages
-    bool m_source_product;                              ///< Shows native messages
     UCHAR m_level;                                      ///< Shows messages up to this level of verboseness
 
     static const GUID s_provider_eaphost;               ///< EapHost event provider ID
@@ -155,7 +198,8 @@ public:
 protected:
     winstd::event_session m_session;                    ///< Event session
     wxEventTraceProcessorThread *m_proc;                ///< Processor thread
-    long m_item_id;                                     ///< Next free list item ID
+
+    guidset m_sources;                                  ///< Set of enabled sources
 
     wxListItemAttr m_item_attr[2][4];                   ///< Current item attributes
     winstd::vector_queue<winstd::event_rec> m_rec_db;   ///< Event record database
