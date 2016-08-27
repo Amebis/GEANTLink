@@ -46,7 +46,7 @@ bool wxEventMonitorApp::OnInit()
         ::MsiUseFeature(_T(PRODUCT_VERSION_GUID), _T("featEventMonitor"));
 #endif
 
-    wxConfigBase *cfgPrev = wxConfigBase::Set(new wxConfig(wxT("EventMonitor"), wxT(PRODUCT_NAME_STR)));
+    wxConfigBase *cfgPrev = wxConfigBase::Set(new wxConfig(wxT(PRODUCT_NAME_STR), wxT(VENDOR_NAME_STR)));
     if (cfgPrev) wxDELETE(cfgPrev);
 
     if (!wxApp::OnInit())

@@ -61,6 +61,11 @@
 #define PRODUCT_VERSION_GUID     "{13ADDFF3-B249-4AB5-9FAD-E4CDCED62B11}"
 
 //
+// Product vendor
+//
+#define VENDOR_NAME_STR          "GÉANT"
+
+//
 // Since the product name is not finally confirmed at the time of
 // developing it, make it easily customizable.
 //
