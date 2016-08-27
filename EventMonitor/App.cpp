@@ -46,28 +46,14 @@ bool wxEventMonitorApp::OnInit()
         ::MsiUseFeature(_T(PRODUCT_VERSION_GUID), _T("featEventMonitor"));
 #endif
 
-    wxConfigBase *cfgPrev = wxConfigBase::Set(new wxConfig(wxT(PRODUCT_NAME_STR), wxT(VENDOR_NAME_STR)));
-    if (cfgPrev) wxDELETE(cfgPrev);
+    wxInitializeConfig();
 
     if (!wxApp::OnInit())
         return false;
 
-    // Set desired locale.
-    wxLanguage lang_code;
-    wxString lang;
-    if (wxConfigBase::Get()->Read(wxT("Language"), &lang)) {
-        const wxLanguageInfo *lang_info = wxLocale::FindLanguageInfo(lang);
-        lang_code = lang_info ? (wxLanguage)lang_info->Language : wxLANGUAGE_DEFAULT;
-    } else
-        lang_code = wxLANGUAGE_DEFAULT;
-    if (wxLocale::IsAvailable(lang_code)) {
-        wxString sPath;
-        if (wxConfigBase::Get()->Read(wxT("LocalizationRepositoryPath"), &sPath))
-            m_locale.AddCatalogLookupPathPrefix(sPath);
-        if (m_locale.Init(lang_code)) {
-            //wxVERIFY(m_locale.AddCatalog(wxT("wxExtend") wxT(wxExtendVersion)));
-            wxVERIFY(m_locale.AddCatalog(wxT("EventMonitor")));
-        }
+    if (wxInitializeLocale(m_locale)) {
+        //wxVERIFY(m_locale.AddCatalog(wxT("wxExtend") wxT(wxExtendVersion)));
+        wxVERIFY(m_locale.AddCatalog(wxT("EventMonitor")));
     }
 
 #ifdef __WXMSW__

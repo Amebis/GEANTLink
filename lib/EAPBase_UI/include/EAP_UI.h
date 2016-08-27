@@ -20,6 +20,7 @@
 
 #include <wx/hyperlink.h>
 #include <wx/icon.h>
+#include <wx/intl.h>
 #include <wx/scrolwin.h>
 #include <Windows.h>
 
@@ -104,6 +105,17 @@ inline wxIcon wxLoadIconFromResource(HINSTANCE hinst, PCWSTR pszName, const wxSi
 ///
 inline wxString wxEAPGetProviderName(const std::wstring &id);
 
+///
+/// Initializes wxWidgets application configuration scheme
+///
+inline void wxInitializeConfig();
+
+///
+/// Inizializes wxWidgets localization scheme
+///
+inline bool wxInitializeLocale(wxLocale &locale);
+
+
 namespace eap
 {
     ///
@@ -124,6 +136,7 @@ namespace eap
 #include <WinStd/Cred.h>
 #include <WinStd/Win.h>
 
+#include <wx/config.h>
 #include <wx/log.h>
 
 #include <CommCtrl.h>
@@ -823,6 +836,36 @@ inline wxString wxEAPGetProviderName(const std::wstring &id)
 {
     return
         !id.empty() ? id : _("<Your Organization>");
+}
+
+
+inline void wxInitializeConfig()
+{
+    wxConfigBase *cfgPrev = wxConfigBase::Set(new wxConfig(wxT(PRODUCT_NAME_STR), wxT(VENDOR_NAME_STR)));
+    if (cfgPrev) wxDELETE(cfgPrev);
+}
+
+
+inline bool wxInitializeLocale(wxLocale &locale)
+{
+    // Read language from configuration.
+    wxLanguage lang_code;
+    wxString lang;
+    if (wxConfigBase::Get()->Read(wxT("Language"), &lang)) {
+        const wxLanguageInfo *lang_info = wxLocale::FindLanguageInfo(lang);
+        lang_code = lang_info ? (wxLanguage)lang_info->Language : wxLANGUAGE_DEFAULT;
+    } else
+        lang_code = wxLANGUAGE_DEFAULT;
+
+    if (wxLocale::IsAvailable(lang_code)) {
+        // Language is "available". Well... Known actually.
+        wxString sPath;
+        if (wxConfigBase::Get()->Read(wxT("LocalizationRepositoryPath"), &sPath))
+            locale.AddCatalogLookupPathPrefix(sPath);
+        return locale.Init(lang_code);
+    }
+
+    return false;
 }
 
 

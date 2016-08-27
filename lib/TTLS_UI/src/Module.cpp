@@ -25,6 +25,21 @@ using namespace winstd;
 
 
 //////////////////////////////////////////////////////////////////////
+// wxInitializerPeer
+//////////////////////////////////////////////////////////////////////
+
+class wxInitializerPeer
+{
+public:
+    wxInitializerPeer(_In_ HINSTANCE instance);
+    virtual ~wxInitializerPeer();
+
+protected:
+    wxLocale m_locale; ///< Locale
+};
+
+
+//////////////////////////////////////////////////////////////////////
 // eap::peer_ttls_ui
 //////////////////////////////////////////////////////////////////////
 
@@ -104,28 +119,27 @@ void eap::peer_ttls_ui::invoke_config_ui(
         cfg.m_providers.push_back(std::move(cfg_provider));
     }
 
-    // Initialize application.
-    new wxApp();
-    wxEntryStart(m_instance);
-
     int result;
     {
-        // Create wxWidget-approved parent window.
-        wxWindow parent;
-        parent.SetHWND((WXHWND)(hwndParent ? hwndParent : GetForegroundWindow()));
-        parent.AdoptAttributesFromHWND();
-        wxTopLevelWindows.Append(&parent);
+        // Initialize application.
+        wxInitializerPeer init(m_instance);
 
-        // Create and launch configuration dialog.
-        wxEAPConfigDialog<wxTTLSConfigWindow> dlg(cfg, &parent);
-        result = dlg.ShowModal();
+        {
+            // Create wxWidget-approved parent window.
+            wxWindow parent;
+            parent.SetHWND((WXHWND)(hwndParent ? hwndParent : GetForegroundWindow()));
+            parent.AdoptAttributesFromHWND();
+            wxTopLevelWindows.Append(&parent);
 
-        wxTopLevelWindows.DeleteObject(&parent);
-        parent.SetHWND((WXHWND)NULL);
+            // Create and launch configuration dialog.
+            wxEAPConfigDialog<wxTTLSConfigWindow> dlg(cfg, &parent);
+            result = dlg.ShowModal();
+
+            wxTopLevelWindows.DeleteObject(&parent);
+            parent.SetHWND((WXHWND)NULL);
+        }
     }
 
-    // Clean-up and return.
-    wxEntryCleanup();
     if (result != wxID_OK)
         throw win_runtime_error(ERROR_CANCELLED, __FUNCTION__ " Cancelled.");
 
@@ -196,61 +210,60 @@ void eap::peer_ttls_ui::invoke_identity_ui(
         cfg_method->m_inner->m_allow_save = false;
     }
 
-    // Initialize application.
-    new wxApp();
-    wxEntryStart(m_instance);
-
     int result;
     {
-        // Create wxWidget-approved parent window.
-        wxWindow parent;
-        parent.SetHWND((WXHWND)(hwndParent ? hwndParent : GetForegroundWindow()));
-        parent.AdoptAttributesFromHWND();
-        wxTopLevelWindows.Append(&parent);
+        // Initialize application.
+        wxInitializerPeer init(m_instance);
 
-        // Create credentials dialog.
-        wxEAPCredentialsDialog dlg(cfg_prov, &parent);
-        wxTTLSCredentialsPanel *panel = new wxTTLSCredentialsPanel(cfg_prov, *cfg_method, cred_out, cfg_prov.m_id.c_str(), &dlg);
-        dlg.AddContent(panel);
+        {
+            // Create wxWidget-approved parent window.
+            wxWindow parent;
+            parent.SetHWND((WXHWND)(hwndParent ? hwndParent : GetForegroundWindow()));
+            parent.AdoptAttributesFromHWND();
+            wxTopLevelWindows.Append(&parent);
 
-        // Set "Remember" checkboxes according to credential source,
-        panel->m_outer_cred->SetRememberValue(cred_source.first == eap::credentials::source_storage);
-        wxPAPCredentialsPanel *panel_inner_cred_pap = dynamic_cast<wxPAPCredentialsPanel*>(panel->m_inner_cred);
-        if (panel_inner_cred_pap)
-            panel_inner_cred_pap->SetRememberValue(cred_source.second == eap::credentials::source_storage);
+            // Create credentials dialog.
+            wxEAPCredentialsDialog dlg(cfg_prov, &parent);
+            wxTTLSCredentialsPanel *panel = new wxTTLSCredentialsPanel(cfg_prov, *cfg_method, cred_out, cfg_prov.m_id.c_str(), &dlg);
+            dlg.AddContent(panel);
 
-        // Centre and display dialog.
-        dlg.Centre(wxBOTH);
-        result = dlg.ShowModal();
-        if (result == wxID_OK) {
-            // Write credentials to credential manager.
-            if (panel->m_outer_cred->GetRememberValue()) {
-                try {
-                    cred_out.credentials_tls::store(cfg_prov.m_id.c_str());
-                } catch (winstd::win_runtime_error &err) {
-                    wxLogError(winstd::tstring_printf(_("Error writing credentials to Credential Manager: %hs (error %u)"), err.what(), err.number()).c_str());
-                } catch (...) {
-                    wxLogError(_("Writing credentials failed."));
+            // Set "Remember" checkboxes according to credential source,
+            panel->m_outer_cred->SetRememberValue(cred_source.first == eap::credentials::source_storage);
+            wxPAPCredentialsPanel *panel_inner_cred_pap = dynamic_cast<wxPAPCredentialsPanel*>(panel->m_inner_cred);
+            if (panel_inner_cred_pap)
+                panel_inner_cred_pap->SetRememberValue(cred_source.second == eap::credentials::source_storage);
+
+            // Centre and display dialog.
+            dlg.Centre(wxBOTH);
+            result = dlg.ShowModal();
+            if (result == wxID_OK) {
+                // Write credentials to credential manager.
+                if (panel->m_outer_cred->GetRememberValue()) {
+                    try {
+                        cred_out.credentials_tls::store(cfg_prov.m_id.c_str());
+                    } catch (winstd::win_runtime_error &err) {
+                        wxLogError(winstd::tstring_printf(_("Error writing credentials to Credential Manager: %hs (error %u)"), err.what(), err.number()).c_str());
+                    } catch (...) {
+                        wxLogError(_("Writing credentials failed."));
+                    }
+                }
+
+                if (panel_inner_cred_pap && panel_inner_cred_pap->GetRememberValue()) {
+                    try {
+                        cred_out.m_inner->store(cfg_prov.m_id.c_str());
+                    } catch (winstd::win_runtime_error &err) {
+                        wxLogError(winstd::tstring_printf(_("Error writing credentials to Credential Manager: %hs (error %u)"), err.what(), err.number()).c_str());
+                    } catch (...) {
+                        wxLogError(_("Writing credentials failed."));
+                    }
                 }
             }
 
-            if (panel_inner_cred_pap && panel_inner_cred_pap->GetRememberValue()) {
-                try {
-                    cred_out.m_inner->store(cfg_prov.m_id.c_str());
-                } catch (winstd::win_runtime_error &err) {
-                    wxLogError(winstd::tstring_printf(_("Error writing credentials to Credential Manager: %hs (error %u)"), err.what(), err.number()).c_str());
-                } catch (...) {
-                    wxLogError(_("Writing credentials failed."));
-                }
-            }
+            wxTopLevelWindows.DeleteObject(&parent);
+            parent.SetHWND((WXHWND)NULL);
         }
-
-        wxTopLevelWindows.DeleteObject(&parent);
-        parent.SetHWND((WXHWND)NULL);
     }
 
-    // Clean-up and return.
-    wxEntryCleanup();
     if (result != wxID_OK)
         throw win_runtime_error(ERROR_CANCELLED, __FUNCTION__ " Cancelled.");
 
@@ -280,4 +293,29 @@ void eap::peer_ttls_ui::invoke_interactive_ui(
 
     InitCommonControls();
     MessageBox(hwndParent, _T(PRODUCT_NAME_STR) _T(" interactive UI goes here!"), _T(PRODUCT_NAME_STR) _T(" Prompt"), MB_OK);
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// wxInitializerPeer
+//////////////////////////////////////////////////////////////////////
+
+wxInitializerPeer::wxInitializerPeer(_In_ HINSTANCE instance)
+{
+    // Initialize application.
+    new wxApp();
+    wxEntryStart(instance);
+
+    // Do our wxWidgets configuration and localization initialization.
+    wxInitializeConfig();
+    if (wxInitializeLocale(m_locale)) {
+        //m_locale.AddCatalog(wxT("wxExtend") wxT(wxExtendVersion));
+        m_locale.AddCatalog(wxT("EAPTTLSUI"));
+    }
+}
+
+
+wxInitializerPeer::~wxInitializerPeer()
+{
+    wxEntryCleanup();
 }
