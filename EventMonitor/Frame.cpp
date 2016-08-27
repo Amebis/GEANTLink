@@ -139,11 +139,11 @@ wxEventMonitorFrame::wxEventMonitorFrame(wxWindow* parent, wxWindowID id, const 
     m_menuView->AppendSeparator();
 
     wxMenuItem* m_menuViewToolbarEdit;
-    m_menuViewToolbarEdit = new wxMenuItem(m_menuView, wxID_VIEW_TOOLBAR_EDIT, _("&Edit toolbar"), _("Toggles display of Edit toolbar"), wxITEM_CHECK);
+    m_menuViewToolbarEdit = new wxMenuItem(m_menuView, wxID_VIEW_TOOLBAR_EDIT, wxString::Format(_("%s toolbar"), _("&Edit")), wxString::Format(_("Toggles display of %s toolbar"), _("View")), wxITEM_CHECK);
     m_menuView->Append(m_menuViewToolbarEdit);
 
     wxMenuItem* m_menuViewToolbarView;
-    m_menuViewToolbarView = new wxMenuItem(m_menuView, wxID_VIEW_TOOLBAR_VIEW, _("&View toolbar"), _("Toggles display of View toolbar"), wxITEM_CHECK);
+    m_menuViewToolbarView = new wxMenuItem(m_menuView, wxID_VIEW_TOOLBAR_VIEW, wxString::Format(_("%s toolbar"), _("&View")), wxString::Format(_("Toggles display of %s toolbar"), _("View")), wxITEM_CHECK);
     m_menuView->Append(m_menuViewToolbarView);
 
     m_menubar->Append(m_menuView, _("&View"));
@@ -186,7 +186,7 @@ wxEventMonitorFrame::wxEventMonitorFrame(wxWindow* parent, wxWindowID id, const 
 
     m_panel = new wxEventMonitorLogPanel(this);
 
-    m_mgr.AddPane(m_panel, wxAuiPaneInfo() .Name(wxT("LogPanel")).Center() .Caption(_("Log Trace")).CaptionVisible(false).CloseButton(false).PaneBorder(false).Dock().Resizable().FloatingSize(wxDefaultSize).Floatable(false));
+    m_mgr.AddPane(m_panel, wxAuiPaneInfo() .Name(wxT("LogPanel")).Center() .Caption(_("Trace Log")).CaptionVisible(false).CloseButton(false).PaneBorder(false).Dock().Resizable().FloatingSize(wxDefaultSize).Floatable(false));
 
     m_statusBar = this->CreateStatusBar(1, wxST_SIZEGRIP, wxID_ANY);
 

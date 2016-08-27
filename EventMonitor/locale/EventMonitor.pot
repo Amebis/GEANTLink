@@ -1,8 +1,7 @@
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: EventMonitor\n"
-"POT-Creation-Date: 2016-08-27 07:52+0200\n"
+"POT-Creation-Date: 2016-08-27 14:20+0200\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
 "Last-Translator: Simon Rozman <simon.rozman@amebis.si>\n"
 "Language-Team: Amebis, d. o. o., Kamnik <info@amebis.si>\n"
@@ -27,41 +26,41 @@ msgstr ""
 msgid "Error opening event trace (error %u)."
 msgstr ""
 
-#: ETWLog.cpp:171
+#: ETWLog.cpp:167
 msgid "Time"
 msgstr ""
 
-#: ETWLog.cpp:172
+#: ETWLog.cpp:168
 msgid "PID"
 msgstr ""
 
-#: ETWLog.cpp:173
+#: ETWLog.cpp:169
 msgid "TID"
 msgstr ""
 
-#: ETWLog.cpp:174
+#: ETWLog.cpp:170
 msgid "Source"
 msgstr ""
 
-#: ETWLog.cpp:175
+#: ETWLog.cpp:171
 msgid "Event"
 msgstr ""
 
-#: ETWLog.cpp:232
+#: ETWLog.cpp:228
 msgid "Access denied creating event session: you need administrative privileges (Run As Administrator) or be a member of Performance Log Users group to start event tracing session."
 msgstr ""
 
-#: ETWLog.cpp:235
+#: ETWLog.cpp:231
 #, c-format
 msgid "The %s event session already exists."
 msgstr ""
 
-#: ETWLog.cpp:239
+#: ETWLog.cpp:235
 #, c-format
 msgid "Error creating event session (error %u)."
 msgstr ""
 
-#: ETWLog.cpp:255 ETWLog.cpp:270 ETWLog.cpp:284
+#: ETWLog.cpp:251 ETWLog.cpp:267 ETWLog.cpp:281
 #, c-format
 msgid "Error enabling %s event provider (error %u)."
 msgstr ""
@@ -80,9 +79,8 @@ msgid "Quits this program"
 msgstr ""
 
 #: Frame.cpp:69
-#, fuzzy
 msgid "&Program"
-msgstr "You don't have %s subscription yet."
+msgstr ""
 
 #: Frame.cpp:78
 msgid "Copy A&ll"
@@ -116,7 +114,7 @@ msgstr ""
 msgid "Clears record selection"
 msgstr ""
 
-#: Frame.cpp:97
+#: Frame.cpp:97 Frame.cpp:142
 msgid "&Edit"
 msgstr ""
 
@@ -153,31 +151,28 @@ msgid "Displays all records up to warning level"
 msgstr ""
 
 #: Frame.cpp:135 Frame.cpp:182
-#, fuzzy
 msgid "Error"
-msgstr "Napaka pri nalaganju knjižnice MSI.DLL (%1!ld!)."
+msgstr ""
 
 #: Frame.cpp:135 Frame.cpp:182
 msgid "Displays error level records only"
 msgstr ""
 
-#: Frame.cpp:142
-msgid "&Edit toolbar"
+#: Frame.cpp:142 Frame.cpp:146
+#, c-format
+msgid "%s toolbar"
 msgstr ""
 
-#: Frame.cpp:142
-msgid "Toggles display of Edit toolbar"
+#: Frame.cpp:142 Frame.cpp:146
+#, c-format
+msgid "Toggles display of %s toolbar"
 msgstr ""
 
-#: Frame.cpp:146
-msgid "&View toolbar"
+#: Frame.cpp:142 Frame.cpp:146 Frame.cpp:185
+msgid "View"
 msgstr ""
 
-#: Frame.cpp:146
-msgid "Toggles display of View toolbar"
-msgstr ""
-
-#: Frame.cpp:149
+#: Frame.cpp:146 Frame.cpp:149
 msgid "&View"
 msgstr ""
 
@@ -201,21 +196,16 @@ msgstr ""
 msgid "Auto Scroll"
 msgstr ""
 
-#: Frame.cpp:185
-msgid "View"
-msgstr ""
-
 #: Frame.cpp:189
-msgid "Log Trace"
+msgid "Trace Log"
 msgstr ""
 
 #: MSIBuild/En.Win32.Release.Feature-2.idtx:3
 #: MSIBuild/En.Win32.Release.Shortcut-2.idtx:3
 #: MSIBuild/En.x64.Release.Feature-2.idtx:3
 #: MSIBuild/En.x64.Release.Shortcut-2.idtx:3
-#, fuzzy
 msgid "1252"
-msgstr "1250"
+msgstr ""
 
 #: MSIBuild/En.Win32.Release.Shortcut-2.idtx:4
 #: MSIBuild/En.x64.Release.Shortcut-2.idtx:4
