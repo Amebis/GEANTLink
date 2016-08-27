@@ -53,12 +53,18 @@ bool wxEventMonitorApp::OnInit()
         return false;
 
     // Set desired locale.
-    wxLanguage language = (wxLanguage)wxConfigBase::Get()->Read(wxT("Language"), wxLANGUAGE_DEFAULT);
-    if (wxLocale::IsAvailable(language)) {
+    wxLanguage lang_code;
+    wxString lang;
+    if (wxConfigBase::Get()->Read(wxT("Language"), &lang)) {
+        const wxLanguageInfo *lang_info = wxLocale::FindLanguageInfo(lang);
+        lang_code = lang_info ? (wxLanguage)lang_info->Language : wxLANGUAGE_DEFAULT;
+    } else
+        lang_code = wxLANGUAGE_DEFAULT;
+    if (wxLocale::IsAvailable(lang_code)) {
         wxString sPath;
         if (wxConfigBase::Get()->Read(wxT("LocalizationRepositoryPath"), &sPath))
             m_locale.AddCatalogLookupPathPrefix(sPath);
-        if (m_locale.Init(language)) {
+        if (m_locale.Init(lang_code)) {
             //wxVERIFY(m_locale.AddCatalog(wxT("wxExtend") wxT(wxExtendVersion)));
             wxVERIFY(m_locale.AddCatalog(wxT("EventMonitor")));
         }
