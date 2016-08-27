@@ -164,11 +164,11 @@ wxETWListCtrl::wxETWListCtrl(wxWindow *parent, wxWindowID id, const wxPoint& pos
     m_rec_idx(wxETWEVENT_RECORDS_MAX),
     wxListCtrl(parent, id, pos, size, style, validator, name)
 {
-    this->AppendColumn(_("Time"  ), wxLIST_FORMAT_LEFT, 100);
-    this->AppendColumn(_("PID"   ), wxLIST_FORMAT_LEFT, 50 );
-    this->AppendColumn(_("TID"   ), wxLIST_FORMAT_LEFT, 50 );
-    this->AppendColumn(_("Source"), wxLIST_FORMAT_LEFT, 100);
-    this->AppendColumn(_("Event" ), wxLIST_FORMAT_LEFT, wxLIST_AUTOSIZE_USEHEADER);
+    this->AppendColumn(_("Time"  ), wxLIST_FORMAT_LEFT, 160);
+    this->AppendColumn(_("PID"   ), wxLIST_FORMAT_LEFT,  50);
+    this->AppendColumn(_("TID"   ), wxLIST_FORMAT_LEFT,  50);
+    this->AppendColumn(_("Source"), wxLIST_FORMAT_LEFT,  80);
+    this->AppendColumn(_("Event" ), wxLIST_FORMAT_LEFT, 350);
 
     // Maximum expected column widths for pre-formatted row display
     m_col_format_width[0] = 26;
