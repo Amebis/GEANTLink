@@ -18,7 +18,7 @@ wxEventMonitorLogPanelBase::wxEventMonitorLogPanelBase( wxWindow* parent, wxWind
 	wxBoxSizer* bSizerMain;
 	bSizerMain = new wxBoxSizer( wxVERTICAL );
 	
-	m_log = new wxETWListCtrl( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_NO_SORT_HEADER|wxLC_REPORT|wxLC_VIRTUAL|wxNO_BORDER );
+	m_log = new wxETWListCtrl( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_NO_SORT_HEADER|wxLC_REPORT|wxLC_VIRTUAL|wxNO_BORDER, wxDefaultValidator, wxT("Log") );
 	bSizerMain->Add( m_log, 1, wxEXPAND, 5 );
 	
 	
