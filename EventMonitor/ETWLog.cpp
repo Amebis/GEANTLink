@@ -411,7 +411,7 @@ void wxETWListCtrl::RebuildItems()
         item_center     = std::min<long>(
             item_top + item_page_count / 2,     // Index of item in the centre of the view
             (item_top + m_rec_idx.size()) / 2); // Index of the item in the centre between top viewed item and the last (when list is not overflowed)
-    size_t center = item_center < m_rec_idx.size() ? m_rec_idx[item_center] : -1;
+    size_t center = (size_t)item_center < m_rec_idx.size() ? m_rec_idx[item_center] : -1;
 
     // Rebuild the index.
     m_rec_idx.clear();
