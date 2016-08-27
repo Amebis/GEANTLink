@@ -122,7 +122,11 @@
     <None Include="res\EventMonitor.ico" />
     <None Include="wxEventMonitor_UI.fbp" />
   </ItemGroup>
+  <ItemGroup>
+    <POCompile Include="locale\sl_SI.po" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\include\xgettext.targets" />
   </ImportGroup>
 </Project>

@@ -59,7 +59,7 @@ bool wxEventMonitorApp::OnInit()
         if (wxConfigBase::Get()->Read(wxT("LocalizationRepositoryPath"), &sPath))
             m_locale.AddCatalogLookupPathPrefix(sPath);
         if (m_locale.Init(language)) {
-            wxVERIFY(m_locale.AddCatalog(wxT("wxExtend") wxT(wxExtendVersion)));
+            //wxVERIFY(m_locale.AddCatalog(wxT("wxExtend") wxT(wxExtendVersion)));
             wxVERIFY(m_locale.AddCatalog(wxT("EventMonitor")));
         }
     }

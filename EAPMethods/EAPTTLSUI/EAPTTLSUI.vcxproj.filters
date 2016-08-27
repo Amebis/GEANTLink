@@ -13,6 +13,10 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Resource Files\Localization">
+      <UniqueIdentifier>{e43059ae-37ac-4b28-84fb-18d1b3972b30}</UniqueIdentifier>
+      <Extensions>po;pot</Extensions>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="StdAfx.h">
@@ -36,5 +40,13 @@
     <None Include="..\build\EAPMethodUI.def">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="..\locale\EAPMethods.pot">
+      <Filter>Resource Files\Localization</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <POCompile Include="..\locale\sl_SI.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
   </ItemGroup>
 </Project>

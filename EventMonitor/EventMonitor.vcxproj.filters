@@ -74,4 +74,9 @@
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <POCompile Include="locale\sl_SI.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+  </ItemGroup>
 </Project>
