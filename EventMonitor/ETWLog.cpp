@@ -706,12 +706,12 @@ void wxPersistentETWListCtrl::Save() const
         SaveValue(wxString::Format(wxT("Column%sWidth"), col.GetText().c_str()), col.GetWidth());
     }
 
-    SaveValue(wxT("ScrollAuto"    ), wnd->m_scroll_auto);
+    SaveValue(wxT("ScrollAuto"), wnd->m_scroll_auto);
 
-    SaveValue(wxT("SourceCount"), (long)wnd->m_sources.size());
-    long i = 0;
-    for (wxETWListCtrl::guidset::const_iterator src = wnd->m_sources.cbegin(), src_end = wnd->m_sources.cend(); src != src_end; ++src, i++)
-        SaveValue(wxString::Format(wxT("Source%u"), i), tstring_guid(*src));
+    wxString data_str;
+    for (wxETWListCtrl::guidset::const_iterator src = wnd->m_sources.cbegin(), src_end = wnd->m_sources.cend(); src != src_end; ++src)
+        data_str += tstring_guid(*src);
+    SaveValue(wxT("Sources"), data_str);
 
     SaveValue(wxT("Level"), (int)wnd->m_level);
 }
@@ -735,24 +735,24 @@ bool wxPersistentETWListCtrl::Restore()
     RestoreValue(wxT("ScrollAuto"), &(wnd->m_scroll_auto));
 
     wnd->m_sources.clear();
-    long n;
-    if (RestoreValue(wxT("SourceCount"), &n)) {
-        wxString guid_str;
-        for (long i = 0; i < n; i++) {
-            if (RestoreValue(wxString::Format(wxT("Source%u"), i), &guid_str)) {
-                GUID guid;
-                if (StringToGuid(guid_str.c_str(), &guid))
-                    wnd->m_sources.insert(guid);
-            }
+    wxString data_str;
+    if (RestoreValue(wxT("Sources"), &data_str)) {
+        for (size_t i = 0; (i = data_str.find(wxT('{'), i)) != std::string::npos;) {
+            GUID guid;
+            if (StringToGuid(data_str.data() + i, &guid)) {
+                wnd->m_sources.insert(guid);
+                i += 38;
+            } else
+                i++;
         }
     } else {
         // Insert our provider by default.
         wnd->m_sources.insert(EAPMETHOD_TRACE_EVENT_PROVIDER);
     }
 
-    int dummy_int;
-    if (RestoreValue(wxT("Level"), &dummy_int))
-        wnd->m_level = (UCHAR)std::min<int>(std::max<int>(dummy_int, TRACE_LEVEL_ERROR), TRACE_LEVEL_VERBOSE);
+    int data_int;
+    if (RestoreValue(wxT("Level"), &data_int))
+        wnd->m_level = (UCHAR)std::min<int>(std::max<int>(data_int, TRACE_LEVEL_ERROR), TRACE_LEVEL_VERBOSE);
 
     return true;
 }
