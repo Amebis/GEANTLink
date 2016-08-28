@@ -76,13 +76,13 @@ LPCTSTR eap::credentials_pap::target_suffix() const
 
 
 eap::credentials::source_t eap::credentials_pap::combine(
-    _In_       const credentials_pap   *cred_cached,
-    _In_       const config_method_pap &cfg,
-    _In_opt_z_       LPCTSTR           pszTargetName)
+    _In_       const credentials             *cred_cached,
+    _In_       const config_method_with_cred &cfg,
+    _In_opt_z_       LPCTSTR                 pszTargetName)
 {
     if (cred_cached) {
         // Using EAP service cached credentials.
-        *this = *cred_cached;
+        *this = *(credentials_pap*)cred_cached;
         m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CACHED1, event_data((unsigned int)eap_type_pap), event_data(credentials_pap::get_name()), event_data::blank);
         return source_cache;
     }

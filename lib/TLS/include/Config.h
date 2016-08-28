@@ -163,6 +163,16 @@ namespace eap
         virtual winstd::eap_type_t get_method_id() const;
 
         ///
+        /// Returns a string \c L"EAP-TLS"
+        ///
+        virtual const wchar_t* get_method_str() const;
+
+        ///
+        /// Creates a blank set of credentials suitable for this method
+        ///
+        virtual credentials* make_credentials() const;
+
+        ///
         /// Adds CA to the list of trusted root CA's
         ///
         /// \sa [CertCreateCertificateContext function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa376033.aspx)

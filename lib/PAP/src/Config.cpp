@@ -74,3 +74,15 @@ eap_type_t eap::config_method_pap::get_method_id() const
 {
     return eap_type_pap;
 }
+
+
+const wchar_t* eap::config_method_pap::get_method_str() const
+{
+    return L"PAP";
+}
+
+
+eap::credentials* eap::config_method_pap::make_credentials() const
+{
+    return new credentials_pap(m_module);
+}

@@ -292,6 +292,18 @@ eap_type_t eap::config_method_tls::get_method_id() const
 }
 
 
+const wchar_t* eap::config_method_tls::get_method_str() const
+{
+    return L"EAP-TLS";
+}
+
+
+eap::credentials* eap::config_method_tls::make_credentials() const
+{
+    return new credentials_tls(m_module);
+}
+
+
 bool eap::config_method_tls::add_trusted_ca(_In_  DWORD dwCertEncodingType, _In_  const BYTE *pbCertEncoded, _In_  DWORD cbCertEncoded)
 {
     cert_context cert;

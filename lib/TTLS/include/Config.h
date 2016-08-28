@@ -33,7 +33,6 @@ namespace eap
 #include "Credentials.h"
 
 #include "../../TLS/include/Config.h"
-#include "../../PAP/include/Config.h"
 
 #include <Windows.h>
 #include <assert.h>
@@ -141,6 +140,30 @@ namespace eap {
         /// \returns `eap::type_ttls`
         ///
         virtual winstd::eap_type_t get_method_id() const;
+
+        ///
+        /// Returns a string \c L"EAP-TTLS"
+        ///
+        virtual const wchar_t* get_method_str() const;
+
+        ///
+        /// Creates a blank set of credentials suitable for this method
+        ///
+        virtual credentials* make_credentials() const;
+
+        ///
+        /// Makes a new inner method config
+        ///
+        /// \param[in] eap_type  EAP type
+        ///
+        config_method_with_cred* make_config_method(_In_ winstd::eap_type_t eap_type) const;
+
+        ///
+        /// Makes a new inner method config
+        ///
+        /// \param[in] eap_type  EAP type
+        ///
+        config_method_with_cred* make_config_method(_In_ const wchar_t *eap_type) const;
 
         ///
         /// Generates public identity using current configuration and given credentials

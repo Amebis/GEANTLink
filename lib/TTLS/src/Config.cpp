@@ -105,15 +105,19 @@ void eap::config_method_ttls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode 
     if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:InnerAuthenticationMethod"), bstr(L"InnerAuthenticationMethod"), bstrNamespace, &pXmlElInnerAuthenticationMethod)))
         throw com_runtime_error(hr, __FUNCTION__ " Error creating <InnerAuthenticationMethod> element.");
 
-    if (dynamic_cast<const config_method_pap*>(m_inner.get())) {
+    eap_type_t eap_type = m_inner->get_method_id();
+    if (eap_type_noneap_start <= eap_type && eap_type < eap_type_noneap_end) {
         // <InnerAuthenticationMethod>/<NonEAPAuthMethod>
-        if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElInnerAuthenticationMethod, bstr(L"NonEAPAuthMethod"), bstrNamespace, bstr(L"PAP"))))
+        if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElInnerAuthenticationMethod, bstr(L"NonEAPAuthMethod"), bstrNamespace, bstr(m_inner->get_method_str()))))
             throw com_runtime_error(hr, __FUNCTION__ " Error creating <NonEAPAuthMethod> element.");
+    } else {
+        // <InnerAuthenticationMethod>/<EAPMethod>
+        if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElInnerAuthenticationMethod, bstr(L"EAPMethod"), bstrNamespace, (DWORD)m_inner->get_method_id())))
+            throw com_runtime_error(hr, __FUNCTION__ " Error creating <EAPMethod> element.");
+    }
 
-        // <InnerAuthenticationMethod>/...
-        m_inner->save(pDoc, pXmlElInnerAuthenticationMethod);
-    } else
-        throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Unsupported inner authentication method.");
+    // <InnerAuthenticationMethod>/...
+    m_inner->save(pDoc, pXmlElInnerAuthenticationMethod);
 }
 
 
@@ -144,23 +148,20 @@ void eap::config_method_ttls::load(_In_ IXMLDOMNode *pConfigRoot)
         throw com_runtime_error(hr, __FUNCTION__ " Error selecting <InnerAuthenticationMethod> element.");
 
     // Determine inner authentication type (<EAPMethod> and <NonEAPAuthMethod>).
-    //DWORD dwMethodID;
+    DWORD dwMethod;
     bstr bstrMethod;
-    /*if (SUCCEEDED(eapxml::get_element_value(pXmlElInnerAuthenticationMethod, bstr(L"eap-metadata:EAPMethod"), &dwMethodID)) &&
-        dwMethodID == EAP_TYPE_MSCHAPV2)
+    if (SUCCEEDED(eapxml::get_element_value(pXmlElInnerAuthenticationMethod, bstr(L"eap-metadata:EAPMethod"), &dwMethod)) &&
+        eap_type_start <= dwMethod && dwMethod < eap_type_end)
     {
-        // MSCHAPv2
-        // TODO: Add MSCHAPv2 support.
-        throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " MSCHAPv2 not supported yet.");
-    } else*/ if (SUCCEEDED(eapxml::get_element_value(pXmlElInnerAuthenticationMethod, bstr(L"eap-metadata:NonEAPAuthMethod"), &bstrMethod)) &&
-        CompareStringEx(LOCALE_NAME_INVARIANT, NORM_IGNORECASE, bstrMethod, bstrMethod.length(), L"PAP", -1, NULL, NULL, 0) == CSTR_EQUAL)
-    {
-        // PAP
-        m_module.log_config((xpath + L"/NonEAPAuthMethod").c_str(), L"PAP");
-        m_inner.reset(new config_method_pap(m_module));
-        m_inner->load(pXmlElInnerAuthenticationMethod);
+        m_inner.reset(make_config_method((eap_type_t)dwMethod));
+        m_module.log_config((xpath + L"/EAPMethod").c_str(), m_inner->get_method_str());
+    } else if (SUCCEEDED(eapxml::get_element_value(pXmlElInnerAuthenticationMethod, bstr(L"eap-metadata:NonEAPAuthMethod"), &bstrMethod))) {
+        m_inner.reset(make_config_method(bstrMethod));
+        m_module.log_config((xpath + L"/NonEAPAuthMethod").c_str(), m_inner->get_method_str());
     } else
         throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Unsupported inner authentication method.");
+
+    m_inner->load(pXmlElInnerAuthenticationMethod);
 }
 
 
@@ -169,13 +170,8 @@ void eap::config_method_ttls::operator<<(_Inout_ cursor_out &cursor) const
     config_method_tls::operator<<(cursor);
 
     if (m_inner) {
-        if (dynamic_cast<config_method_pap*>(m_inner.get())) {
-            cursor << eap_type_pap;
-            cursor << *m_inner;
-        } else {
-            assert(0); // Unsupported inner authentication method type.
-            cursor << eap_type_undefined;
-        }
+        cursor << m_inner->get_method_id();
+        cursor << *m_inner;
     } else
         cursor << eap_type_undefined;
 
@@ -187,14 +183,9 @@ size_t eap::config_method_ttls::get_pk_size() const
 {
     size_t size_inner;
     if (m_inner) {
-        if (dynamic_cast<config_method_pap*>(m_inner.get())) {
-            size_inner =
-                pksizeof(eap_type_pap) +
-                pksizeof(*m_inner);
-        } else {
-            assert(0); // Unsupported inner authentication method type.
-            size_inner = pksizeof(eap_type_undefined);
-        }
+        size_inner =
+            pksizeof(m_inner->get_method_id()) +
+            pksizeof(*m_inner);
     } else
         size_inner = pksizeof(eap_type_undefined);
 
@@ -211,16 +202,10 @@ void eap::config_method_ttls::operator>>(_Inout_ cursor_in &cursor)
 
     eap_type_t eap_type;
     cursor >> eap_type;
-    switch (eap_type) {
-        case eap_type_pap:
-            m_inner.reset(new config_method_pap(m_module));
-            cursor >> *m_inner;
-            break;
-        default:
-            assert(0); // Unsupported inner authentication method type.
-            m_inner.reset(nullptr);
+    if (eap_type != eap_type_undefined) {
+        m_inner.reset(make_config_method(eap_type));
+        cursor >> *m_inner;
     }
-
     cursor >> m_anonymous_identity;
 }
 
@@ -228,6 +213,42 @@ void eap::config_method_ttls::operator>>(_Inout_ cursor_in &cursor)
 eap_type_t eap::config_method_ttls::get_method_id() const
 {
     return eap_type_ttls;
+}
+
+
+const wchar_t* eap::config_method_ttls::get_method_str() const
+{
+    return L"EAP-TTLS";
+}
+
+
+eap::credentials* eap::config_method_ttls::make_credentials() const
+{
+    return new credentials_ttls(m_module);
+}
+
+
+eap::config_method_with_cred* eap::config_method_ttls::make_config_method(_In_ winstd::eap_type_t eap_type) const
+{
+    switch (eap_type) {
+    case eap_type_tls : return new config_method_tls (m_module);
+    case eap_type_ttls: return new config_method_ttls(m_module);
+    case eap_type_pap : return new config_method_pap (m_module);
+    default           : throw invalid_argument(__FUNCTION__ " Unsupported inner authentication method.");
+    }
+}
+
+
+eap::config_method_with_cred* eap::config_method_ttls::make_config_method(_In_ const wchar_t *eap_type) const
+{
+    if (_wcsicmp(eap_type, L"EAP-TLS") == 0)
+        return new config_method_tls(m_module);
+    else if (_wcsicmp(eap_type, L"EAP-TTLS") == 0)
+        return new config_method_ttls(m_module);
+    else if (_wcsicmp(eap_type, L"PAP") == 0)
+        return new config_method_pap(m_module);
+    else
+        throw invalid_argument(__FUNCTION__ " Unsupported inner authentication method.");
 }
 
 

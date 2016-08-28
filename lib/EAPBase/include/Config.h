@@ -243,6 +243,11 @@ namespace eap
         /// \returns One of `winstd::eap_type_t` constants.
         ///
         virtual winstd::eap_type_t get_method_id() const = 0;
+
+        ///
+        /// Returns a string identifier of the EAP method type of this configuration
+        ///
+        virtual const wchar_t* get_method_str() const = 0;
     };
 
 
@@ -336,6 +341,11 @@ namespace eap
         virtual void operator>>(_Inout_ cursor_in &cursor);
 
         /// @}
+
+        ///
+        /// Creates a blank set of credentials suitable for this method
+        ///
+        virtual credentials* make_credentials() const = 0;
 
     public:
         bool m_allow_save;                          ///< Are credentials allowed to be saved to Windows Credential Manager?

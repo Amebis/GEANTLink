@@ -217,6 +217,27 @@ namespace eap
         ///
         virtual winstd::tstring get_name() const;
 
+        ///
+        /// Combine credentials in the following order:
+        ///
+        /// 1. Cached credentials
+        /// 2. Pre-configured credentials
+        /// 3. Stored credentials
+        ///
+        /// \param[in] cred_cached    Cached credentials (optional, can be \c NULL, must be the same type of credentials as `this`)
+        /// \param[in] cfg            Method configuration (must be the same type of configuration as `this` credentials belong to)
+        /// \param[in] pszTargetName  The name in Windows Credential Manager to retrieve credentials from (optional, can be \c NULL)
+        ///
+        /// \returns
+        /// - \c source_cache      Credentials were obtained from EapHost cache
+        /// - \c source_preshared  Credentials were set by method configuration
+        /// - \c source_storage    Credentials were loaded from Windows Credential Manager
+        ///
+        virtual source_t combine(
+            _In_       const credentials             *cred_cached,
+            _In_       const config_method_with_cred &cfg,
+            _In_opt_z_       LPCTSTR                 pszTargetName) = 0;
+
     public:
         std::wstring m_identity;    ///< Identity (username\@domain, certificate name etc.)
     };

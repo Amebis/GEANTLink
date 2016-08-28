@@ -164,10 +164,10 @@ void eap::peer_ttls_ui::invoke_identity_ui(
     // Unpack configuration.
     config_connection cfg(*this);
     unpack(cfg, pConnectionData, dwConnectionDataSize);
-    if (cfg.m_providers.empty() || cfg.m_providers.front().m_methods.empty())
-        throw invalid_argument(__FUNCTION__ " Configuration has no providers and/or methods.");
 
     // Get method configuration.
+    if (cfg.m_providers.empty() || cfg.m_providers.front().m_methods.empty())
+        throw invalid_argument(__FUNCTION__ " Configuration has no providers and/or methods.");
     const config_provider &cfg_prov(cfg.m_providers.front());
     config_method_ttls *cfg_method = dynamic_cast<config_method_ttls*>(cfg_prov.m_methods.front().get());
     assert(cfg_method);
@@ -175,8 +175,10 @@ void eap::peer_ttls_ui::invoke_identity_ui(
 #ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
     // Unpack cached credentials.
     credentials_ttls cred_in(*this);
-    if (dwUserDataSize)
+    if (dwUserDataSize) {
+        s->m_cred.m_inner.reset(cfg_method->m_inner->make_credentials());
         unpack(cred_in, pUserData, dwUserDataSize);
+    }
 #else
     UNREFERENCED_PARAMETER(pUserData);
     UNREFERENCED_PARAMETER(dwUserDataSize);
@@ -194,15 +196,23 @@ void eap::peer_ttls_ui::invoke_identity_ui(
         type_inner = eap_type_undefined;
     }
 
-    // Combine credentials.
-    pair<eap::credentials::source_t, eap::credentials::source_t> cred_source(cred_out.combine(
+    // Combine credentials. Outer and inner separately to get the idea which one is missing.
+    eap::credentials::source_t cred_source = cred_out.credentials_tls::combine(
 #ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
         &cred_in,
 #else
         NULL,
 #endif
         *cfg_method,
-        (dwFlags & EAP_FLAG_GUEST_ACCESS) == 0 ? cfg_prov.m_id.c_str() : NULL));
+        (dwFlags & EAP_FLAG_GUEST_ACCESS) == 0 ? cfg_prov.m_id.c_str() : NULL);
+    eap::credentials::source_t cred_source_inner = cred_out.m_inner->combine(
+#ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
+        cred_in.m_inner.get(),
+#else
+        NULL,
+#endif
+        *cfg_method->m_inner,
+        (dwFlags & EAP_FLAG_GUEST_ACCESS) == 0 ? cfg_prov.m_id.c_str() : NULL);
 
     if (dwFlags & EAP_FLAG_GUEST_ACCESS) {
         // Disable credential saving for guests.
@@ -228,10 +238,10 @@ void eap::peer_ttls_ui::invoke_identity_ui(
             dlg.AddContent(panel);
 
             // Set "Remember" checkboxes according to credential source,
-            panel->m_outer_cred->SetRememberValue(cred_source.first == eap::credentials::source_storage);
+            panel->m_outer_cred->SetRememberValue(cred_source == eap::credentials::source_storage);
             wxPAPCredentialsPanel *panel_inner_cred_pap = dynamic_cast<wxPAPCredentialsPanel*>(panel->m_inner_cred);
             if (panel_inner_cred_pap)
-                panel_inner_cred_pap->SetRememberValue(cred_source.second == eap::credentials::source_storage);
+                panel_inner_cred_pap->SetRememberValue(cred_source_inner == eap::credentials::source_storage);
 
             // Centre and display dialog.
             dlg.Centre(wxBOTH);

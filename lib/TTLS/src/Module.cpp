@@ -76,10 +76,10 @@ void eap::peer_ttls::get_identity(
     // Unpack configuration.
     config_connection cfg(*this);
     unpack(cfg, pConnectionData, dwConnectionDataSize);
-    if (cfg.m_providers.empty() || cfg.m_providers.front().m_methods.empty())
-        throw invalid_argument(__FUNCTION__ " Configuration has no providers and/or methods.");
 
     // Get method configuration.
+    if (cfg.m_providers.empty() || cfg.m_providers.front().m_methods.empty())
+        throw invalid_argument(__FUNCTION__ " Configuration has no providers and/or methods.");
     const config_provider &cfg_prov(cfg.m_providers.front());
     const config_method_ttls *cfg_method = dynamic_cast<const config_method_ttls*>(cfg_prov.m_methods.front().get());
     assert(cfg_method);
@@ -87,39 +87,36 @@ void eap::peer_ttls::get_identity(
 #ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
     // Unpack cached credentials.
     credentials_ttls cred_in(*this);
-    if (dwUserDataSize)
+    if (dwUserDataSize) {
+        cred_in.m_inner.reset(cfg_method->m_inner->make_credentials());
         unpack(cred_in, pUserData, dwUserDataSize);
+    }
 #else
     UNREFERENCED_PARAMETER(pUserData);
     UNREFERENCED_PARAMETER(dwUserDataSize);
 #endif
 
     credentials_ttls cred_out(*this);
+    cred_out.m_inner.reset(cfg_method->m_inner->make_credentials());
 
-    // Determine inner credential type.
-    eap_type_t type_inner;
-    if (dynamic_cast<const config_method_pap*>(cfg_method->m_inner.get())) {
-        cred_out.m_inner.reset(new credentials_pap(*this));
-        type_inner = eap_type_pap;
-    } else {
-        assert(0); // Unsupported inner authentication method type.
-        type_inner = eap_type_undefined;
-    }
+    // Assume no UI will be necessary.
+    *pfInvokeUI = FALSE;
 
     {
         // Combine credentials.
         user_impersonator impersonating(hTokenImpersonateUser);
-        pair<eap::credentials::source_t, eap::credentials::source_t> cred_source(cred_out.combine(
+        eap::credentials::source_t cred_source = cred_out.combine(
 #ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
             &cred_in,
 #else
             NULL,
 #endif
             *cfg_method,
-            (dwFlags & EAP_FLAG_GUEST_ACCESS) == 0 ? cfg_prov.m_id.c_str() : NULL));
+            (dwFlags & EAP_FLAG_GUEST_ACCESS) == 0 ? cfg_prov.m_id.c_str() : NULL);
 
         // If either of credentials is unknown, request UI.
-        *pfInvokeUI = cred_source.first == eap::credentials::source_unknown || cred_source.second == eap::credentials::source_unknown ? TRUE : FALSE;
+        if (cred_source == eap::credentials::source_unknown)
+            *pfInvokeUI = TRUE;
     }
 
     if (*pfInvokeUI) {
@@ -144,7 +141,7 @@ void eap::peer_ttls::get_identity(
 
     if (cfg_method->m_inner->m_auth_failed) {
         // Inner: Credentials failed on last connection attempt.
-        log_event(&EAPMETHOD_TRACE_EVT_CRED_PROBLEM, event_data((unsigned int)type_inner), event_data::blank);
+        log_event(&EAPMETHOD_TRACE_EVT_CRED_PROBLEM, event_data((unsigned int)cfg_method->m_inner->get_method_id()), event_data::blank);
         *pfInvokeUI = TRUE;
         return;
     }
@@ -251,7 +248,15 @@ EAP_SESSION_HANDLE eap::peer_ttls::begin_session(
     // Unpack configuration.
     unpack(s->m_cfg, pConnectionData, dwConnectionDataSize);
 
+    // Get method configuration.
+    if (s->m_cfg.m_providers.empty() || s->m_cfg.m_providers.front().m_methods.empty())
+        throw invalid_argument(__FUNCTION__ " Configuration has no providers and/or methods.");
+    const config_provider &cfg_prov(s->m_cfg.m_providers.front());
+    const config_method_ttls *cfg_method = dynamic_cast<const config_method_ttls*>(cfg_prov.m_methods.front().get());
+    assert(cfg_method);
+
     // Unpack credentials.
+    s->m_cred.m_inner.reset(cfg_method->m_inner->make_credentials());
     unpack(s->m_cred, pUserData, dwUserDataSize);
 
     // Initialize method.

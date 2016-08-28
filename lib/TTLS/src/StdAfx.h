@@ -25,6 +25,9 @@
 #include "../include/Method.h"
 #include "../include/Module.h"
 
+#include "../../PAP/include/Config.h"
+#include "../../PAP/include/Credentials.h"
+
 #include "../../EAPBase/include/EAPXML.h"
 
 #include <WinStd/EAP.h>

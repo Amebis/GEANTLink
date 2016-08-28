@@ -121,8 +121,8 @@ void eap::credentials_ttls::load(_In_ IXMLDOMNode *pConfigRoot)
 
     credentials_tls::load(pConfigRoot);
 
-    // TODO: For the time being, there is no detection what type is inner method. Introduce one!
     if (m_inner) {
+        // Load inner credentials.
         com_obj<IXMLDOMNode> pXmlElInnerAuthenticationMethod;
         if (FAILED(hr = eapxml::select_node(pConfigRoot, bstr(L"eap-metadata:InnerAuthenticationMethod"), &pXmlElInnerAuthenticationMethod)))
             throw com_runtime_error(hr, __FUNCTION__ " Error selecting <InnerAuthenticationMethod> element.");
@@ -135,55 +135,22 @@ void eap::credentials_ttls::load(_In_ IXMLDOMNode *pConfigRoot)
 void eap::credentials_ttls::operator<<(_Inout_ cursor_out &cursor) const
 {
     credentials_tls::operator<<(cursor);
-    if (m_inner) {
-        if (dynamic_cast<credentials_pap*>(m_inner.get())) {
-            cursor << eap_type_pap;
-            cursor << *m_inner;
-        } else {
-            assert(0); // Unsupported inner authentication method type.
-            cursor << eap_type_undefined;
-        }
-    } else
-        cursor << eap_type_undefined;
+    cursor << *m_inner;
 }
 
 
 size_t eap::credentials_ttls::get_pk_size() const
 {
-    size_t size_inner;
-    if (m_inner) {
-        if (dynamic_cast<credentials_pap*>(m_inner.get())) {
-            size_inner =
-                pksizeof(eap_type_pap) +
-                pksizeof(*m_inner);
-        } else {
-            assert(0); // Unsupported inner authentication method type.
-            size_inner = pksizeof(eap_type_undefined);
-        }
-    } else
-        size_inner = pksizeof(eap_type_undefined);
-
     return
         credentials_tls::get_pk_size() +
-        size_inner;
+        pksizeof(*m_inner);
 }
 
 
 void eap::credentials_ttls::operator>>(_Inout_ cursor_in &cursor)
 {
     credentials_tls::operator>>(cursor);
-
-    eap_type_t eap_type;
-    cursor >> eap_type;
-    switch (eap_type) {
-        case eap_type_pap:
-            m_inner.reset(new credentials_pap(m_module));
-            cursor >> *m_inner;
-            break;
-        default:
-            assert(0); // Unsupported inner authentication method type.
-            m_inner.reset(nullptr);
-    }
+    cursor >> *m_inner;
 }
 
 
@@ -193,8 +160,7 @@ void eap::credentials_ttls::store(_In_z_ LPCTSTR pszTargetName) const
 
     credentials_tls::store(pszTargetName);
 
-    if (m_inner)
-        m_inner->store(pszTargetName);
+    m_inner->store(pszTargetName);
 }
 
 
@@ -204,8 +170,7 @@ void eap::credentials_ttls::retrieve(_In_z_ LPCTSTR pszTargetName)
 
     credentials_tls::retrieve(pszTargetName);
 
-    if (m_inner)
-        m_inner->retrieve(pszTargetName);
+    m_inner->retrieve(pszTargetName);
 }
 
 
@@ -224,19 +189,30 @@ wstring eap::credentials_ttls::get_identity() const
         return identity;
 
     // Inner identity.
-    if (m_inner)
-        return m_inner->get_identity();
-
-    return L"";
+    return m_inner->get_identity();
 }
 
 
-pair<eap::credentials::source_t, eap::credentials::source_t> eap::credentials_ttls::combine(
-    _In_       const credentials_ttls   *cred_cached,
-    _In_       const config_method_ttls &cfg,
-    _In_opt_z_       LPCTSTR            pszTargetName)
+eap::credentials::source_t eap::credentials_ttls::combine(
+    _In_       const credentials             *cred_cached,
+    _In_       const config_method_with_cred &cfg,
+    _In_opt_z_       LPCTSTR                 pszTargetName)
 {
-    return pair<source_t, source_t>(
-        credentials_tls::combine(cred_cached, cfg, pszTargetName),
-        dynamic_cast<const credentials_pap*>(m_inner.get()) ? ((credentials_pap*)m_inner.get())->combine(cred_cached ? (credentials_pap*)cred_cached->m_inner.get() : NULL, (const config_method_pap&)*cfg.m_inner, pszTargetName) : source_unknown);
+    source_t src;
+
+    // Combine outer credentials first.
+    src = credentials_tls::combine(
+        cred_cached,
+        cfg,
+        pszTargetName);
+    if (src == source_unknown) {
+        // Outer credentials are unknown. Enough unknowness.
+        return source_unknown;
+    }
+
+    // Combine inner credentials.
+    return m_inner->combine(
+        cred_cached ? ((const credentials_ttls*)cred_cached)->m_inner.get() : NULL,
+        *((const config_method_ttls&)cfg).m_inner,
+        pszTargetName);
 }

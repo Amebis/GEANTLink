@@ -95,5 +95,15 @@ namespace eap
         /// \returns `eap::type_pap`
         ///
         virtual winstd::eap_type_t get_method_id() const;
+
+        ///
+        /// Returns a string \c L"PAP"
+        ///
+        virtual const wchar_t* get_method_str() const;
+
+        ///
+        /// Creates a blank set of credentials suitable for this method
+        ///
+        virtual credentials* make_credentials() const;
     };
 }

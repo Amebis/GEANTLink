@@ -40,6 +40,7 @@ class wxTTLSCredentialsPanel;
 #include "../../TLS_UI/include/TLS_UI.h"
 
 #include "../../TTLS/include/Config.h"
+#include "../../PAP/include/Config.h"
 
 #include <WinStd/Win.h>
 
