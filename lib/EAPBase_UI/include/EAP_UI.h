@@ -459,7 +459,8 @@ public:
         m_prov(prov),
         m_cfg(cfg),
         m_target(pszCredTarget),
-        m_cred(cfg.m_module),
+        m_cred_own(cfg.m_module),
+        m_cred_preshared(cfg.m_module),
         wxEAPCredentialsConfigPanelBase(parent)
     {
         // Load and set icon.
@@ -479,6 +480,32 @@ public:
 protected:
     /// \cond internal
 
+    bool RetrieveCredentials()
+    {
+        try {
+            m_cred_own.retrieve(m_target.c_str());
+            if (m_cred_own.empty())
+                m_own_identity->SetValue(_T("<empty credentials>"));
+            else {
+                wxString identity(m_cred_own.get_name());
+                m_own_identity->SetValue(!identity.empty() ? identity : _("<blank identity>"));
+            }
+            return true;
+        } catch (winstd::win_runtime_error &err) {
+            if (err.number() == ERROR_NOT_FOUND) {
+                m_own_identity->Clear();
+                return false;
+            } else {
+                m_own_identity->SetValue(wxString::Format(_("<error %u>"), err.number()));
+                return true;
+            }
+        } catch (...) {
+            m_own_identity->SetValue(_("<error>"));
+            return true;
+        }
+    }
+
+
     virtual bool TransferDataToWindow()
     {
         if (!m_cfg.m_use_preshared)
@@ -486,7 +513,7 @@ protected:
         else
             m_preshared->SetValue(true);
 
-        m_cred = *(_Tcred*)m_cfg.m_preshared.get();
+        m_cred_preshared = *(_Tcred*)m_cfg.m_preshared.get();
 
         return wxEAPCredentialsConfigPanelBase::TransferDataToWindow();
     }
@@ -499,7 +526,7 @@ protected:
         if (!m_prov.m_read_only) {
             // This is not a provider-locked configuration. Save the data.
             m_cfg.m_use_preshared = !m_own->GetValue();
-            *m_cfg.m_preshared    = m_cred;
+            *m_cfg.m_preshared    = m_cred_preshared;
         }
 
         return true;
@@ -509,26 +536,12 @@ protected:
     virtual void OnUpdateUI(wxUpdateUIEvent& event)
     {
         UNREFERENCED_PARAMETER(event);
-        DWORD dwResult;
 
         if (m_cfg.m_allow_save) {
-            bool has_own;
-            std::unique_ptr<CREDENTIAL, winstd::CredFree_delete<CREDENTIAL> > cred;
-            if (CredRead(m_cred.target_name(m_target.c_str()).c_str(), CRED_TYPE_GENERIC, 0, (PCREDENTIAL*)&cred)) {
-                m_own_identity->SetValue(cred->UserName && cred->UserName[0] != 0 ? cred->UserName : _("<blank>"));
-                has_own = true;
-            } else if ((dwResult = GetLastError()) == ERROR_NOT_FOUND) {
-                m_own_identity->Clear();
-                has_own = false;
-            } else {
-                m_own_identity->SetValue(wxString::Format(_("<error %u>"), dwResult));
-                has_own = true;
-            }
-
             if (m_own->GetValue()) {
                 m_own_identity->Enable(true);
                 m_own_set     ->Enable(true);
-                m_own_clear   ->Enable(has_own);
+                m_own_clear   ->Enable(RetrieveCredentials());
             } else {
                 m_own_identity->Enable(false);
                 m_own_set     ->Enable(false);
@@ -536,13 +549,17 @@ protected:
             }
         } else {
             m_own_identity->Clear();
-
             m_own_identity->Enable(false);
             m_own_set     ->Enable(false);
             m_own_clear   ->Enable(false);
         }
 
-        m_preshared_identity->SetValue(!m_cred.empty() ? m_cred.get_name() : _("<blank>"));
+        if (m_cred_preshared.empty())
+            m_preshared_identity->SetValue(_T("<empty credentials>"));
+        else {
+            wxString identity(m_cred_preshared.get_name());
+            m_preshared_identity->SetValue(!identity.empty() ? identity : _("<blank identity>"));
+        }
 
         if (m_prov.m_read_only) {
             // This is provider-locked configuration. Disable controls.
@@ -575,25 +592,20 @@ protected:
     {
         UNREFERENCED_PARAMETER(event);
 
-        // Read credentials from Credential Manager
-        _Tcred cred(m_cfg.m_module);
-        try {
-            cred.retrieve(m_target.c_str());
-        } catch (winstd::win_runtime_error &err) {
-            if (err.number() != ERROR_NOT_FOUND)
-                wxLogError(winstd::tstring_printf(_("Error reading credentials from Credential Manager: %hs (error %u)"), err.what(), err.number()).c_str());
-        } catch (...) {
-            wxLogError(_("Reading credentials failed."));
-        }
+        // Read credentials from Credential Manager.
+        RetrieveCredentials();
 
         // Display credential prompt.
         wxEAPCredentialsDialog dlg(m_prov, this);
-        _wxT *panel = new _wxT(m_prov, m_cfg, cred, m_target.c_str(), &dlg, true);
+        _wxT *panel = new _wxT(m_prov, m_cfg, m_cred_own, m_target.c_str(), &dlg, true);
         dlg.AddContent(panel);
-        if (dlg.ShowModal() == wxID_OK && panel->GetRememberValue()) {
+        if (dlg.ShowModal() == wxID_OK && panel->GetRemember()) {
             // Write credentials to credential manager.
             try {
-                cred.store(m_target.c_str());
+                m_cred_own.store(m_target.c_str());
+
+                // Re-read credentials from Credential Manager. To test if they load!
+                RetrieveCredentials();
             } catch (winstd::win_runtime_error &err) {
                 wxLogError(winstd::tstring_printf(_("Error writing credentials to Credential Manager: %hs (error %u)"), err.what(), err.number()).c_str());
             } catch (...) {
@@ -607,7 +619,7 @@ protected:
     {
         UNREFERENCED_PARAMETER(event);
 
-        if (!CredDelete(m_cred.target_name(m_target.c_str()).c_str(), CRED_TYPE_GENERIC, 0))
+        if (!CredDelete(m_cred_own.target_name(m_target.c_str()).c_str(), CRED_TYPE_GENERIC, 0))
             wxLogError(_("Deleting credentials failed (error %u)."), GetLastError());
     }
 
@@ -618,7 +630,7 @@ protected:
 
         wxEAPCredentialsDialog dlg(m_prov, this);
 
-        _wxT *panel = new _wxT(m_prov, m_cfg, m_cred, _T(""), &dlg, true);
+        _wxT *panel = new _wxT(m_prov, m_cfg, m_cred_preshared, _T(""), &dlg, true);
 
         dlg.AddContent(panel);
         dlg.ShowModal();
@@ -632,7 +644,8 @@ protected:
     winstd::tstring m_target;               ///< Credential Manager target
 
 private:
-    _Tcred m_cred;                          ///< Temporary credential data
+    _Tcred m_cred_own;                      ///< Temporary own credential data
+    _Tcred m_cred_preshared;                ///< Temporary pre-shared credential data
 };
 
 
