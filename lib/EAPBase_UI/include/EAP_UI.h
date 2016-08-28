@@ -643,7 +643,7 @@ protected:
     inline void UpdateOwnIdentity()
     {
         if (m_cred_own.empty())
-            m_own_identity->SetValue(_T("<empty credentials>"));
+            m_own_identity->SetValue(_("<empty credentials>"));
         else {
             wxString identity(m_cred_own.get_name());
             m_own_identity->SetValue(!identity.empty() ? identity : _("<blank identity>"));
@@ -654,7 +654,7 @@ protected:
     inline void UpdatePresharedIdentity()
     {
         if (m_cred_preshared.empty())
-            m_preshared_identity->SetValue(_T("<empty credentials>"));
+            m_preshared_identity->SetValue(_("<empty credentials>"));
         else {
             wxString identity(m_cred_preshared.get_name());
             m_preshared_identity->SetValue(!identity.empty() ? identity : _("<blank identity>"));

@@ -3,7 +3,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: EAPMethods\n"
-"POT-Creation-Date: 2016-08-25 10:43+0200\n"
+"POT-Creation-Date: 2016-08-28 23:08+0200\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
 "Last-Translator: Simon Rozman <simon@rozman.si>, 2016\n"
 "Language-Team: Slovenian (Slovenia) (https://www.transifex.com/eduroam_devel/teams/11799/sl_SI/)\n"
@@ -30,7 +30,7 @@ msgstr "Napredno ..."
 msgid "Opens dialog with provider settings"
 msgstr "Odpre dialog z nastavitvami ponudnika"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:174 lib/EAPBase_UI/res/wxEAP_UI.cpp:296
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:174 lib/EAPBase_UI/res/wxEAP_UI.cpp:299
 msgid "Client Credentials"
 msgstr "Odjemalčeve poverilnice"
 
@@ -84,39 +84,39 @@ msgstr ""
 msgid "Common (pre-shared) credentials"
 msgstr "Skupne (deljene) poverilnice"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:307
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:310
 msgid "Please provide your user ID and password."
 msgstr "Vnesite svoj uporabniški ID in geslo."
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:317
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:320
 msgid "User ID:"
 msgstr "Uporabniški ID:"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:322
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:325
 msgid "Enter your user name here (user@domain.org, DOMAIN\\User, etc.)"
 msgstr "Tukaj vnesite svoje up. ime (up. ime@domena.si, DOMENA\\Uporabnik ipd.)"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:326
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:329
 msgid "Password:"
 msgstr "Geslo:"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:331
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:334
 msgid "Enter your password here"
 msgstr "Tukaj vnesite svoje geslo"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:338 lib/TLS_UI/res/wxTLS_UI.cpp:183
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:341 lib/TLS_UI/res/wxTLS_UI.cpp:183
 msgid "&Remember"
 msgstr "Za&pomni si"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:339
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:342
 msgid "Check if you would like to save username and password"
 msgstr "Odkljukajte, če želite shraniti up. ime in geslo"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:361
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:364
 msgid "Your Organization"
 msgstr "Vaša organizacija"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:372
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:375
 msgid ""
 "Describe your organization to customize user prompts.  When organization is "
 "introduced, end-users find program messages easier to understand and act."
@@ -125,54 +125,54 @@ msgstr ""
 "predstavi, uporabniki lažje razumejo sporočila programa in ustrezneje "
 "reagirajo."
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:379
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:382
 msgid "Your organization &name:"
 msgstr "Ime vaše orga&nizacije:"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:384
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:387
 msgid ""
 "Your organization name as it will appear on helpdesk contact notifications"
 msgstr ""
 "Ime vaše organizacije, kot bo nastopalo na obvestilih s stikom na center za "
 "pomoč"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:388
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:391
 msgid "(Keep it short, please)"
 msgstr "(Naj bo kratko, prosim)"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:398
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:401
 msgid "Helpdesk contact &information:"
 msgstr "Podatk&i centra za pomoč:"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:408
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:411
 msgid "¶"
 msgstr "¶"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:415
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:418
 msgid "Your helpdesk website address"
 msgstr "Naslov spletne strani vašega centra za pomoč"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:419
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:422
 msgid "*"
 msgstr "*"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:426
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:429
 msgid "Your helpdesk e-mail address"
 msgstr "E-poštni naslov vašega centra za pomoč"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:430
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:433
 msgid ")"
 msgstr ")"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:437
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:440
 msgid "Your helpdesk phone number"
 msgstr "Telefonska številka vašega centra za pomoč"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:471
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:468
 msgid "Configuration Lock"
 msgstr "Zaklep konfiguracije"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:482
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:479
 msgid ""
 "Your configuration can be locked to prevent accidental modification by end-"
 "users. Users will only be allowed to enter credentials."
@@ -180,7 +180,7 @@ msgstr ""
 "Svojo konfiguracijo lahko zaklenete in preprečite končnim uporabnikom "
 "nenamerno spreminjanje. Uporabniki bodo lahko vnašali samo poverilnice."
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:489
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:486
 msgid ""
 "&Lock this configuration and prevent any further modification via user "
 "interface."
@@ -188,42 +188,42 @@ msgstr ""
 "Zak&leni to konfiguracijo in prepreči vse nadaljnje spremembe preko up. "
 "vmesnika."
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:492
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:489
 msgid "(Warning: Once locked, you can not revert using this dialog!)"
 msgstr "(Pozor: Ko zaklenete, vrnitev ne bo več možna preko tega dialoga!)"
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:88
+#: lib/EAPBase_UI/src/EAP_UI.cpp:98
 #, c-format
 msgid "%s Credentials"
 msgstr "Poverilnice za %s"
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:118
+#: lib/EAPBase_UI/src/EAP_UI.cpp:128
 #, c-format
 msgid "For additional help and instructions, please contact %s at:"
 msgstr "Za dodtano pomoč ali navodila se obrnite na %s na:"
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:120
+#: lib/EAPBase_UI/src/EAP_UI.cpp:130
 #, c-format
 msgid "your %ls provider"
 msgstr "vaš ponudnik %ls"
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:120
+#: lib/EAPBase_UI/src/EAP_UI.cpp:130
 msgid "your provider"
 msgstr "vaš ponudnik"
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:139
+#: lib/EAPBase_UI/src/EAP_UI.cpp:149
 msgid "Open the default web browser"
 msgstr "Odpre privzeto nastavljen spletni brskalnik"
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:150
+#: lib/EAPBase_UI/src/EAP_UI.cpp:160
 msgid "Open your e-mail program"
 msgstr "Odpre vaš program za e-pošto"
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:161
+#: lib/EAPBase_UI/src/EAP_UI.cpp:171
 msgid "Dial the phone number"
 msgstr "Pokliče telefonsko številko"
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:180
+#: lib/EAPBase_UI/src/EAP_UI.cpp:191
 #, c-format
 msgid ""
 "%s has pre-set parts of this configuration. Those parts are locked to "
@@ -232,16 +232,16 @@ msgstr ""
 "%s je prednastavil dele te konfiguracije. Ti deli so zaklenjeni zaradi "
 "preprečevanja nenamernih sprememb."
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:182
+#: lib/EAPBase_UI/src/EAP_UI.cpp:193
 #, c-format
 msgid "Your %ls provider"
 msgstr "Vaš ponudnik %ls"
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:182
+#: lib/EAPBase_UI/src/EAP_UI.cpp:193
 msgid "Your provider"
 msgstr "Vaš ponudnik"
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:201
+#: lib/EAPBase_UI/src/EAP_UI.cpp:213
 msgid ""
 "Previous attempt to connect failed. Please, make sure your credentials are "
 "correct, or try again later."
@@ -371,32 +371,32 @@ msgstr "Napačen znak v imenu gostitelja: %c"
 msgid "Validation conflict"
 msgstr "Nesoglasje pri preverjanju"
 
-#: lib/TLS_UI/src/TLS_UI.cpp:514
+#: lib/TLS_UI/src/TLS_UI.cpp:511
 msgid "Add Certificate"
 msgstr "Dodaj potrdilo"
 
-#: lib/TLS_UI/src/TLS_UI.cpp:515
+#: lib/TLS_UI/src/TLS_UI.cpp:512
 msgid "Certificate Files (*.cer;*.crt;*.der;*.p7b;*.pem)"
 msgstr "Datoteke s potrdili (*.cer;*.crt;*.der;*.p7b;*.pem)"
 
-#: lib/TLS_UI/src/TLS_UI.cpp:516
+#: lib/TLS_UI/src/TLS_UI.cpp:513
 msgid "X.509 Certificate Files (*.cer;*.crt;*.der;*.pem)"
 msgstr "Datoteke s potrdili X.509 (*.cer;*.crt;*.der;*.pem)"
 
-#: lib/TLS_UI/src/TLS_UI.cpp:517
+#: lib/TLS_UI/src/TLS_UI.cpp:514
 msgid "PKCS #7 Certificate Files (*.p7b)"
 msgstr "Datoteke s potrdili PKCS #7 (*.p7b)"
 
-#: lib/TLS_UI/src/TLS_UI.cpp:518
+#: lib/TLS_UI/src/TLS_UI.cpp:515
 msgid "All Files (*.*)"
 msgstr "Vse datoteke (*.*)"
 
-#: lib/TLS_UI/src/TLS_UI.cpp:534
+#: lib/TLS_UI/src/TLS_UI.cpp:531
 #, c-format
 msgid "Invalid or unsupported certificate file %s"
 msgstr "Napačna ali nepodprta datoteka s potrdilom %s"
 
-#: lib/TLS_UI/src/TLS_UI.cpp:534
+#: lib/TLS_UI/src/TLS_UI.cpp:531
 msgid "Error"
 msgstr "Napaka"
 
@@ -438,71 +438,69 @@ msgstr "Navedite zunanjo identiteto po meri"
 msgid "Custom outer identity to use"
 msgstr "Zunanja identiteta po meri za uporabo"
 
-#: lib/TTLS_UI/src/Module.cpp:231 lib/TTLS_UI/src/Module.cpp:241
-#: lib/EAPBase_UI/include/EAP_UI.h:582
+#: lib/TTLS_UI/src/Module.cpp:249 lib/TTLS_UI/src/Module.cpp:259
+#: lib/EAPBase_UI/include/EAP_UI.h:584
 #, c-format
 msgid "Error writing credentials to Credential Manager: %hs (error %u)"
 msgstr ""
 "Napaka pri zapisovanju poverilnic v upravitelja poverilnic: %hs (napaka %u)"
 
-#: lib/TTLS_UI/src/Module.cpp:233 lib/TTLS_UI/src/Module.cpp:243
-#: lib/EAPBase_UI/include/EAP_UI.h:584
+#: lib/TTLS_UI/src/Module.cpp:251 lib/TTLS_UI/src/Module.cpp:261
+#: lib/EAPBase_UI/include/EAP_UI.h:587
 msgid "Writing credentials failed."
 msgstr "Zapisovanje poverilnic ni uspelo."
 
-#: lib/TTLS_UI/src/TTLS_UI.cpp:108 lib/TTLS_UI/src/TTLS_UI.cpp:215
+#: lib/TTLS_UI/src/TTLS_UI.cpp:107 lib/TTLS_UI/src/TTLS_UI.cpp:220
 msgid "Inner Authentication"
 msgstr "Notranje overovljanje"
 
-#: lib/TTLS_UI/src/TTLS_UI.cpp:114
+#: lib/TTLS_UI/src/TTLS_UI.cpp:113
 msgid "Select inner authentication method from the list"
 msgstr "Izberite postopek notranjega overovljanja s seznama"
 
-#: lib/TTLS_UI/src/TTLS_UI.cpp:116
+#: lib/TTLS_UI/src/TTLS_UI.cpp:115
 msgid "PAP"
 msgstr "PAP"
 
-#: lib/TTLS_UI/src/TTLS_UI.cpp:121 lib/TTLS_UI/src/TTLS_UI.cpp:236
+#: lib/TTLS_UI/src/TTLS_UI.cpp:120 lib/TTLS_UI/src/TTLS_UI.cpp:241
 msgid "Outer Authentication"
 msgstr "Zunanje overovljanje"
 
-#: lib/EAPBase_UI/include/EAP_UI.h:253
+#: lib/EAPBase_UI/include/EAP_UI.h:283
 msgid "EAP Credentials"
 msgstr "Poverilnice EAP"
 
-#: lib/EAPBase_UI/include/EAP_UI.h:422
+#: lib/EAPBase_UI/include/EAP_UI.h:443
 msgid "Provider Settings"
 msgstr "Nastavitve ponudnika"
 
-#: lib/EAPBase_UI/include/EAP_UI.h:502 lib/EAPBase_UI/include/EAP_UI.h:529
-msgid "<blank>"
-msgstr "<prazno>"
-
-#: lib/EAPBase_UI/include/EAP_UI.h:508
-#, c-format
-msgid "<error %u>"
-msgstr "<napaka %u>"
-
-#: lib/EAPBase_UI/include/EAP_UI.h:568
-#, c-format
-msgid "Error reading credentials from Credential Manager: %hs (error %u)"
-msgstr ""
-"Napaka pri branju poverilnic iz upravitelja poverilnic: %hs (napaka %u)"
-
-#: lib/EAPBase_UI/include/EAP_UI.h:570
-msgid "Reading credentials failed."
-msgstr "Branje poverilnic ni uspelo."
-
-#: lib/EAPBase_UI/include/EAP_UI.h:595
+#: lib/EAPBase_UI/include/EAP_UI.h:600
 #, c-format
 msgid "Deleting credentials failed (error %u)."
 msgstr "Izbris poverilnic ni uspel (napaka %u)."
 
-#: lib/EAPBase_UI/include/EAP_UI.h:817
+#: lib/EAPBase_UI/include/EAP_UI.h:633
+#, c-format
+msgid "<error %u>"
+msgstr "<napaka %u>"
+
+#: lib/EAPBase_UI/include/EAP_UI.h:637
+msgid "<error>"
+msgstr "<napaka>"
+
+#: lib/EAPBase_UI/include/EAP_UI.h:646 lib/EAPBase_UI/include/EAP_UI.h:657
+msgid "<empty credentials>"
+msgstr "<prazne poverilnice>"
+
+#: lib/EAPBase_UI/include/EAP_UI.h:649 lib/EAPBase_UI/include/EAP_UI.h:660
+msgid "<blank identity>"
+msgstr "<prazna identiteta>"
+
+#: lib/EAPBase_UI/include/EAP_UI.h:866
 msgid "<Your Organization>"
 msgstr "<vaša organizacija>"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.h:60
+#: lib/EAPBase_UI/res/wxEAP_UI.h:64
 msgid "EAP Method Configuration"
 msgstr "Konfiguracija postopka EAP"
 
