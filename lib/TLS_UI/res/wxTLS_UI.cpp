@@ -194,8 +194,14 @@ wxTLSCredentialsPanelBase::wxTLSCredentialsPanelBase( wxWindow* parent, wxWindow
 	
 	this->SetSizer( sb_credentials );
 	this->Layout();
+	
+	// Connect Events
+	this->Connect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( wxTLSCredentialsPanelBase::OnUpdateUI ) );
 }
 
 wxTLSCredentialsPanelBase::~wxTLSCredentialsPanelBase()
 {
+	// Disconnect Events
+	this->Disconnect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( wxTLSCredentialsPanelBase::OnUpdateUI ) );
+	
 }

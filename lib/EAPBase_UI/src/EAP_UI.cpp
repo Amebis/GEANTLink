@@ -223,7 +223,7 @@ wxEAPCredentialWarningPanel::wxEAPCredentialWarningPanel(const eap::config_provi
 // wxEAPConfigWindow
 //////////////////////////////////////////////////////////////////////
 
-wxEAPConfigWindow::wxEAPConfigWindow(const eap::config_provider &prov, eap::config_method &cfg, wxWindow* parent) :
+wxEAPConfigWindow::wxEAPConfigWindow(eap::config_provider &prov, eap::config_method &cfg, wxWindow* parent) :
     m_prov(prov),
     m_cfg(cfg),
     wxScrolledWindow(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxVSCROLL)
@@ -232,39 +232,20 @@ wxEAPConfigWindow::wxEAPConfigWindow(const eap::config_provider &prov, eap::conf
 
     // Connect Events
     this->Connect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(wxEAPConfigWindow::OnInitDialog));
-    this->Connect(wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEAPConfigWindow::OnUpdateUI));
 }
 
 
 wxEAPConfigWindow::~wxEAPConfigWindow()
 {
     // Disconnect Events
-    this->Disconnect(wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxEAPConfigWindow::OnUpdateUI));
     this->Disconnect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(wxEAPConfigWindow::OnInitDialog));
 }
 
 
-void wxEAPConfigWindow::OnInitDialog(wxInitDialogEvent& event)
+void wxEAPConfigWindow::OnInitDialog(wxInitDialogEvent& /*event*/)
 {
-    UNREFERENCED_PARAMETER(event);
-
     // Call TransferDataToWindow() manually, as wxScrolledWindow somehow skips that.
     TransferDataToWindow();
-}
-
-
-void wxEAPConfigWindow::OnUpdateUI(wxUpdateUIEvent& event)
-{
-    UNREFERENCED_PARAMETER(event);
-
-    if (m_parent && m_parent->IsKindOf(wxCLASSINFO(wxNotebook))) {
-        // We're a notebook page. Set the ID of our provider as our page label.
-        wxNotebook *notebook = (wxNotebook*)m_parent;
-        int idx = notebook->FindPage(this);
-        if (idx != wxNOT_FOUND)
-            notebook->SetPageText(idx, wxEAPGetProviderName(m_prov.m_id));
-    } else
-        this->SetLabel(wxEAPGetProviderName(m_prov.m_id));
 }
 
 

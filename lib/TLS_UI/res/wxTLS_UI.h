@@ -84,6 +84,10 @@ class wxTLSCredentialsPanelBase : public wxPanel
 		wxTextCtrl* m_identity;
 		wxStaticText* m_identity_note;
 		wxCheckBox* m_remember;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnUpdateUI( wxUpdateUIEvent& event ) { event.Skip(); }
+		
 	
 	public:
 		

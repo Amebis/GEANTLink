@@ -71,10 +71,8 @@ bool wxTTLSConfigPanel::TransferDataFromWindow()
 }
 
 
-void wxTTLSConfigPanel::OnUpdateUI(wxUpdateUIEvent& event)
+void wxTTLSConfigPanel::OnUpdateUI(wxUpdateUIEvent& /*event*/)
 {
-    UNREFERENCED_PARAMETER(event);
-
     if (m_prov.m_read_only) {
         // This is provider-locked configuration. Disable controls.
         m_outer_identity_same      ->Enable(false);
@@ -95,7 +93,7 @@ void wxTTLSConfigPanel::OnUpdateUI(wxUpdateUIEvent& event)
 // wxTTLSConfigWindow
 //////////////////////////////////////////////////////////////////////
 
-wxTTLSConfigWindow::wxTTLSConfigWindow(const eap::config_provider &prov, eap::config_method &cfg, LPCTSTR pszCredTarget, wxWindow* parent) :
+wxTTLSConfigWindow::wxTTLSConfigWindow(eap::config_provider &prov, eap::config_method &cfg, LPCTSTR pszCredTarget, wxWindow* parent) :
     m_cfg((eap::config_method_ttls&)cfg),
     m_cfg_pap(cfg.m_module),
     wxEAPConfigWindow(prov, cfg, parent)
@@ -143,6 +141,14 @@ wxTTLSConfigWindow::wxTTLSConfigWindow(const eap::config_provider &prov, eap::co
 
     // m_inner_type->SetFocusFromKbd(); // This control steals mouse-wheel scrolling for itself
     panel_pap->SetFocusFromKbd();
+
+    this->Connect(wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxTTLSConfigWindow::OnUpdateUI));
+}
+
+
+wxTTLSConfigWindow::~wxTTLSConfigWindow()
+{
+    this->Disconnect(wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxTTLSConfigWindow::OnUpdateUI));
 }
 
 
@@ -193,10 +199,8 @@ void wxTTLSConfigWindow::OnInitDialog(wxInitDialogEvent& event)
 }
 
 
-void wxTTLSConfigWindow::OnUpdateUI(wxUpdateUIEvent& event)
+void wxTTLSConfigWindow::OnUpdateUI(wxUpdateUIEvent& /*event*/)
 {
-    wxEAPConfigWindow::OnUpdateUI(event);
-
     m_inner_type->GetChoiceCtrl()->Enable(!m_prov.m_read_only);
 }
 

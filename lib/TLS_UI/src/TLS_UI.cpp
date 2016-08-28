@@ -385,7 +385,7 @@ bool wxTLSCredentialsPanel::TransferDataFromWindow()
 }
 
 
-void wxTLSCredentialsPanel::OnUpdateUI(wxUpdateUIEvent& event)
+void wxTLSCredentialsPanel::OnUpdateUI(wxUpdateUIEvent& /*event*/)
 {
     if (!m_is_config && m_cfg.m_use_preshared) {
         // Credential prompt mode & Using pre-shared credentials
@@ -404,8 +404,6 @@ void wxTLSCredentialsPanel::OnUpdateUI(wxUpdateUIEvent& event)
         m_cert_select_val->Enable(m_cert_select->GetValue());
         m_identity->Enable(true);
     }
-
-    wxEAPCredentialsPanel<eap::credentials_tls, wxTLSCredentialsPanelBase>::OnUpdateUI(event);
 }
 
 
@@ -465,10 +463,8 @@ bool wxTLSServerTrustPanel::TransferDataFromWindow()
 }
 
 
-void wxTLSServerTrustPanel::OnUpdateUI(wxUpdateUIEvent& event)
+void wxTLSServerTrustPanel::OnUpdateUI(wxUpdateUIEvent& /*event*/)
 {
-    UNREFERENCED_PARAMETER(event);
-
     if (m_prov.m_read_only) {
         // This is provider-locked configuration. Disable controls.
         m_root_ca_add_store->Enable(false);
@@ -479,9 +475,12 @@ void wxTLSServerTrustPanel::OnUpdateUI(wxUpdateUIEvent& event)
         // This is not a provider-locked configuration. Selectively enable/disable controls.
         m_root_ca_add_store->Enable(true);
         m_root_ca_add_file ->Enable(true);
-        wxArrayInt selections;
-        m_root_ca_remove->Enable(m_root_ca->GetSelections(selections) ? true : false);
+        m_root_ca_remove   ->Enable(ListBox_GetSelCount(m_root_ca->GetHWND()) ? true : false); // *
         m_server_names     ->Enable(true);
+
+        // * ListBox_GetSelCount() is not cross-platform, but this is Windows EAP Supplicant,
+        //   and this is the fastest way to find out if there is a selection in the list box,
+        //   observing wxWidgets 3.0.2 has nothing faster to offer.
     }
 }
 
@@ -494,10 +493,8 @@ void wxTLSServerTrustPanel::OnRootCADClick(wxCommandEvent& event)
 }
 
 
-void wxTLSServerTrustPanel::OnRootCAAddStore(wxCommandEvent& event)
+void wxTLSServerTrustPanel::OnRootCAAddStore(wxCommandEvent& /*event*/)
 {
-    UNREFERENCED_PARAMETER(event);
-
     winstd::cert_store store;
     if (store.create(NULL, _T("ROOT"))) {
         winstd::cert_context cert;
@@ -510,8 +507,6 @@ void wxTLSServerTrustPanel::OnRootCAAddStore(wxCommandEvent& event)
 
 void wxTLSServerTrustPanel::OnRootCAAddFile(wxCommandEvent& event)
 {
-    UNREFERENCED_PARAMETER(event);
-
     const wxString separator(wxT("|"));
     wxFileDialog open_dialog(this, _("Add Certificate"), wxEmptyString, wxEmptyString,
         _("Certificate Files (*.cer;*.crt;*.der;*.p7b;*.pem)") + separator + wxT("*.cer;*.crt;*.der;*.p7b;*.pem") + separator +
@@ -538,10 +533,8 @@ void wxTLSServerTrustPanel::OnRootCAAddFile(wxCommandEvent& event)
 }
 
 
-void wxTLSServerTrustPanel::OnRootCARemove(wxCommandEvent& event)
+void wxTLSServerTrustPanel::OnRootCARemove(wxCommandEvent& /*event*/)
 {
-    UNREFERENCED_PARAMETER(event);
-
     wxArrayInt selections;
     for (int i = m_root_ca->GetSelections(selections); i--; )
         m_root_ca->Delete(selections[i]);

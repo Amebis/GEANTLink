@@ -25,3 +25,5 @@
 #include "../../../include/Version.h"
 
 #include "../include/TLS_UI.h"
+
+#include <WindowsX.h>

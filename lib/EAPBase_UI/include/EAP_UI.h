@@ -223,19 +223,22 @@ protected:
         }
     }
 
-    virtual void OnUpdateUI(wxUpdateUIEvent& event)
+    virtual void OnUpdateUI(wxUpdateUIEvent& /*event*/)
     {
-        UNREFERENCED_PARAMETER(event);
+        int idx = m_providers->GetSelection();
+        eap::config_provider &cfg_provider = ((_wxT*)m_providers->GetPage(idx))->GetProvider();
 
-        m_advanced->Enable(!m_cfg.m_providers.at(m_providers->GetSelection()).m_read_only);
+        m_advanced->Enable(!cfg_provider.m_read_only);
     }
 
-    virtual void OnAdvanced(wxCommandEvent& event)
+    virtual void OnAdvanced(wxCommandEvent& /*event*/)
     {
-        UNREFERENCED_PARAMETER(event);
+        int idx = m_providers->GetSelection();
+        eap::config_provider &cfg_provider = ((_wxT*)m_providers->GetPage(idx))->GetProvider();
 
-        wxEAPConfigProvider dlg(m_cfg.m_providers.at(m_providers->GetSelection()), this);
-        dlg.ShowModal();
+        wxEAPConfigProvider dlg(cfg_provider, this);
+        if (dlg.ShowModal() == wxID_OK)
+            m_providers->SetPageText(idx, wxEAPGetProviderName(cfg_provider.m_id));
     }
 
     /// \endcond
@@ -360,22 +363,25 @@ public:
     /// \param[inout] cfg     Configuration data
     /// \param[in]    parent  Parent window
     ///
-    wxEAPConfigWindow(const eap::config_provider &prov, eap::config_method &cfg, wxWindow* parent);
+    wxEAPConfigWindow(eap::config_provider &prov, eap::config_method &cfg, wxWindow* parent);
 
     ///
     /// Destructs the configuration window
     ///
     virtual ~wxEAPConfigWindow();
 
+public:
+    inline eap::config_provider& GetProvider() const { return m_prov; }
+    inline eap::config_method  & GetConfig  () const { return m_cfg ; }
+
 protected:
     /// \cond internal
     virtual void OnInitDialog(wxInitDialogEvent& event);
-    virtual void OnUpdateUI(wxUpdateUIEvent& event);
     /// \endcond
 
 protected:
-    const eap::config_provider &m_prov;     ///< EAP provider
-    eap::config_method &m_cfg;              ///< Method configuration
+    eap::config_provider &m_prov;   ///< EAP provider
+    eap::config_method &m_cfg;      ///< Method configuration
 };
 
 
@@ -459,6 +465,7 @@ public:
         m_prov(prov),
         m_cfg(cfg),
         m_target(pszCredTarget),
+        m_has_own(false),
         m_cred_own(cfg.m_module),
         m_cred_preshared(cfg.m_module),
         wxEAPCredentialsConfigPanelBase(parent)
@@ -480,32 +487,6 @@ public:
 protected:
     /// \cond internal
 
-    bool RetrieveCredentials()
-    {
-        try {
-            m_cred_own.retrieve(m_target.c_str());
-            if (m_cred_own.empty())
-                m_own_identity->SetValue(_T("<empty credentials>"));
-            else {
-                wxString identity(m_cred_own.get_name());
-                m_own_identity->SetValue(!identity.empty() ? identity : _("<blank identity>"));
-            }
-            return true;
-        } catch (winstd::win_runtime_error &err) {
-            if (err.number() == ERROR_NOT_FOUND) {
-                m_own_identity->Clear();
-                return false;
-            } else {
-                m_own_identity->SetValue(wxString::Format(_("<error %u>"), err.number()));
-                return true;
-            }
-        } catch (...) {
-            m_own_identity->SetValue(_("<error>"));
-            return true;
-        }
-    }
-
-
     virtual bool TransferDataToWindow()
     {
         if (!m_cfg.m_use_preshared)
@@ -513,7 +494,13 @@ protected:
         else
             m_preshared->SetValue(true);
 
+        if (m_cfg.m_allow_save) {
+            RetrieveOwnCredentials();
+            m_timer_own.Start(3000);
+        }
+
         m_cred_preshared = *(_Tcred*)m_cfg.m_preshared.get();
+        UpdatePresharedIdentity();
 
         return wxEAPCredentialsConfigPanelBase::TransferDataToWindow();
     }
@@ -533,32 +520,22 @@ protected:
     }
 
 
-    virtual void OnUpdateUI(wxUpdateUIEvent& event)
+    virtual void OnUpdateUI(wxUpdateUIEvent& /*event*/)
     {
-        UNREFERENCED_PARAMETER(event);
-
         if (m_cfg.m_allow_save) {
             if (m_own->GetValue()) {
                 m_own_identity->Enable(true);
                 m_own_set     ->Enable(true);
-                m_own_clear   ->Enable(RetrieveCredentials());
+                m_own_clear   ->Enable(m_has_own);
             } else {
                 m_own_identity->Enable(false);
                 m_own_set     ->Enable(false);
                 m_own_clear   ->Enable(false);
             }
         } else {
-            m_own_identity->Clear();
             m_own_identity->Enable(false);
             m_own_set     ->Enable(false);
             m_own_clear   ->Enable(false);
-        }
-
-        if (m_cred_preshared.empty())
-            m_preshared_identity->SetValue(_T("<empty credentials>"));
-        else {
-            wxString identity(m_cred_preshared.get_name());
-            m_preshared_identity->SetValue(!identity.empty() ? identity : _("<blank identity>"));
         }
 
         if (m_prov.m_read_only) {
@@ -575,8 +552,8 @@ protected:
             m_preshared_set     ->Enable(false);
         } else {
             // This is not a provider-locked configuration. Selectively enable/disable controls.
-            m_own               ->Enable(true);
-            m_preshared         ->Enable(true);
+            m_own      ->Enable(true);
+            m_preshared->Enable(true);
             if (m_own->GetValue()) {
                 m_preshared_identity->Enable(false);
                 m_preshared_set     ->Enable(false);
@@ -588,12 +565,10 @@ protected:
     }
 
 
-    virtual void OnSetOwn(wxCommandEvent& event)
+    virtual void OnSetOwn(wxCommandEvent& /*event*/)
     {
-        UNREFERENCED_PARAMETER(event);
-
         // Read credentials from Credential Manager.
-        RetrieveCredentials();
+        RetrieveOwnCredentials();
 
         // Display credential prompt.
         wxEAPCredentialsDialog dlg(m_prov, this);
@@ -603,37 +578,87 @@ protected:
             // Write credentials to credential manager.
             try {
                 m_cred_own.store(m_target.c_str());
-
-                // Re-read credentials from Credential Manager. To test if they load!
-                RetrieveCredentials();
+                m_has_own = TRUE;
+                UpdateOwnIdentity();
             } catch (winstd::win_runtime_error &err) {
                 wxLogError(winstd::tstring_printf(_("Error writing credentials to Credential Manager: %hs (error %u)"), err.what(), err.number()).c_str());
+                RetrieveOwnCredentials();
             } catch (...) {
                 wxLogError(_("Writing credentials failed."));
+                RetrieveOwnCredentials();
             }
         }
     }
 
 
-    virtual void OnClearOwn(wxCommandEvent& event)
+    virtual void OnClearOwn(wxCommandEvent& /*event*/)
     {
-        UNREFERENCED_PARAMETER(event);
-
-        if (!CredDelete(m_cred_own.target_name(m_target.c_str()).c_str(), CRED_TYPE_GENERIC, 0))
+        if (CredDelete(m_cred_own.target_name(m_target.c_str()).c_str(), CRED_TYPE_GENERIC, 0)) {
+            m_own_identity->Clear();
+            m_has_own = false;
+        } else
             wxLogError(_("Deleting credentials failed (error %u)."), GetLastError());
     }
 
 
-    virtual void OnSetPreshared(wxCommandEvent& event)
+    virtual void OnSetPreshared(wxCommandEvent& /*event*/)
     {
-        UNREFERENCED_PARAMETER(event);
-
         wxEAPCredentialsDialog dlg(m_prov, this);
 
         _wxT *panel = new _wxT(m_prov, m_cfg, m_cred_preshared, _T(""), &dlg, true);
 
         dlg.AddContent(panel);
-        dlg.ShowModal();
+        if (dlg.ShowModal() == wxID_OK)
+            UpdatePresharedIdentity();
+    }
+
+
+    virtual void OnTimerOwn(wxTimerEvent& /*event*/)
+    {
+        RetrieveOwnCredentials();
+    }
+
+
+    void RetrieveOwnCredentials()
+    {
+        try {
+            m_cred_own.retrieve(m_target.c_str());
+            m_has_own = true;
+            UpdateOwnIdentity();
+        } catch (winstd::win_runtime_error &err) {
+            if (err.number() == ERROR_NOT_FOUND) {
+                m_own_identity->Clear();
+                m_has_own = false;
+            } else {
+                m_own_identity->SetValue(wxString::Format(_("<error %u>"), err.number()));
+                m_has_own = true;
+            }
+        } catch (...) {
+            m_own_identity->SetValue(_("<error>"));
+            m_has_own = true;
+        }
+    }
+
+
+    inline void UpdateOwnIdentity()
+    {
+        if (m_cred_own.empty())
+            m_own_identity->SetValue(_T("<empty credentials>"));
+        else {
+            wxString identity(m_cred_own.get_name());
+            m_own_identity->SetValue(!identity.empty() ? identity : _("<blank identity>"));
+        }
+    }
+
+
+    inline void UpdatePresharedIdentity()
+    {
+        if (m_cred_preshared.empty())
+            m_preshared_identity->SetValue(_T("<empty credentials>"));
+        else {
+            wxString identity(m_cred_preshared.get_name());
+            m_preshared_identity->SetValue(!identity.empty() ? identity : _("<blank identity>"));
+        }
     }
 
     /// \endcond
@@ -644,6 +669,7 @@ protected:
     winstd::tstring m_target;               ///< Credential Manager target
 
 private:
+    bool m_has_own;                         ///< Does the user has (some sort of) credentials stored in Credential Manager?
     _Tcred m_cred_own;                      ///< Temporary own credential data
     _Tcred m_cred_preshared;                ///< Temporary pre-shared credential data
 };
@@ -676,12 +702,6 @@ public:
         m_is_config(is_config),
         _Tbase(parent)
     {
-        this->Connect(wxEVT_UPDATE_UI, wxUpdateUIEventHandler(_Tthis::OnUpdateUI));
-    }
-
-    virtual ~wxEAPCredentialsPanel()
-    {
-        this->Disconnect(wxEVT_UPDATE_UI, wxUpdateUIEventHandler(_Tthis::OnUpdateUI));
     }
 
     virtual void SetRemember(bool val)
@@ -697,10 +717,8 @@ public:
 protected:
     /// \cond internal
 
-    virtual void OnUpdateUI(wxUpdateUIEvent& event)
+    virtual bool TransferDataToWindow()
     {
-        UNREFERENCED_PARAMETER(event);
-
         if (m_is_config) {
             // Configuration mode
             // Always store credentials (somewhere).
@@ -715,6 +733,8 @@ protected:
             m_remember->SetValue(false);
             m_remember->Enable(false);
         }
+
+        return _Tbase::TransferDataToWindow();
     }
 
     /// \endcond
@@ -780,6 +800,14 @@ protected:
         m_identity->SetSelection(0, -1);
         m_password->SetValue(m_cred.m_password.empty() ? wxEmptyString : s_dummy_password);
 
+        if (!m_is_config && m_cfg.m_use_preshared) {
+            // Credential prompt mode & Using pre-shared credentials
+            m_identity_label->Enable(false);
+            m_identity      ->Enable(false);
+            m_password_label->Enable(false);
+            m_password      ->Enable(false);
+        }
+
         return wxEAPCredentialsPanel<_Tcred, wxEAPCredentialsPassPanelBase>::TransferDataToWindow();
     }
 
@@ -796,19 +824,6 @@ protected:
         }
 
         return true;
-    }
-
-    virtual void OnUpdateUI(wxUpdateUIEvent& event)
-    {
-        if (!m_is_config && m_cfg.m_use_preshared) {
-            // Credential prompt mode & Using pre-shared credentials
-            m_identity_label->Enable(false);
-            m_identity      ->Enable(false);
-            m_password_label->Enable(false);
-            m_password      ->Enable(false);
-        }
-
-        wxEAPCredentialsPanel<_Tcred, wxEAPCredentialsPassPanelBase>::OnUpdateUI(event);
     }
 
     /// \endcond

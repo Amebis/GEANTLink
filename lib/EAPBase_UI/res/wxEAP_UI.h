@@ -33,6 +33,7 @@ class wxEAPBannerPanel;
 #include <wx/radiobut.h>
 #include <wx/textctrl.h>
 #include <wx/statbox.h>
+#include <wx/timer.h>
 #include <wx/checkbox.h>
 
 ///////////////////////////////////////////////////////////////////////////
@@ -143,12 +144,14 @@ class wxEAPCredentialsConfigPanelBase : public wxPanel
 		wxRadioButton* m_preshared;
 		wxTextCtrl* m_preshared_identity;
 		wxButton* m_preshared_set;
+		wxTimer m_timer_own;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnUpdateUI( wxUpdateUIEvent& event ) { event.Skip(); }
 		virtual void OnClearOwn( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSetOwn( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSetPreshared( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnTimerOwn( wxTimerEvent& event ) { event.Skip(); }
 		
 	
 	public:
@@ -201,10 +204,6 @@ class wxEAPProviderIdentityPanelBase : public wxPanel
 		wxTextCtrl* m_provider_email;
 		wxStaticText* m_provider_phone_icon;
 		wxTextCtrl* m_provider_phone;
-		
-		// Virtual event handlers, overide them in your derived class
-		virtual void OnUpdateUI( wxUpdateUIEvent& event ) { event.Skip(); }
-		
 	
 	public:
 		
@@ -225,10 +224,6 @@ class wxEAPProviderLockPanelBase : public wxPanel
 		wxStaticText* m_provider_lock_label;
 		wxCheckBox* m_provider_lock;
 		wxStaticText* m_provider_lock_note;
-		
-		// Virtual event handlers, overide them in your derived class
-		virtual void OnUpdateUI( wxUpdateUIEvent& event ) { event.Skip(); }
-		
 	
 	public:
 		

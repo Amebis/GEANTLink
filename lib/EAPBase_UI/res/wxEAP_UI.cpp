@@ -272,12 +272,14 @@ wxEAPCredentialsConfigPanelBase::wxEAPCredentialsConfigPanelBase( wxWindow* pare
 	
 	this->SetSizer( sb_credentials );
 	this->Layout();
+	m_timer_own.SetOwner( this, wxID_ANY );
 	
 	// Connect Events
 	this->Connect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( wxEAPCredentialsConfigPanelBase::OnUpdateUI ) );
 	m_own_clear->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPCredentialsConfigPanelBase::OnClearOwn ), NULL, this );
 	m_own_set->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPCredentialsConfigPanelBase::OnSetOwn ), NULL, this );
 	m_preshared_set->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPCredentialsConfigPanelBase::OnSetPreshared ), NULL, this );
+	this->Connect( wxID_ANY, wxEVT_TIMER, wxTimerEventHandler( wxEAPCredentialsConfigPanelBase::OnTimerOwn ) );
 }
 
 wxEAPCredentialsConfigPanelBase::~wxEAPCredentialsConfigPanelBase()
@@ -287,6 +289,7 @@ wxEAPCredentialsConfigPanelBase::~wxEAPCredentialsConfigPanelBase()
 	m_own_clear->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPCredentialsConfigPanelBase::OnClearOwn ), NULL, this );
 	m_own_set->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPCredentialsConfigPanelBase::OnSetOwn ), NULL, this );
 	m_preshared_set->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPCredentialsConfigPanelBase::OnSetPreshared ), NULL, this );
+	this->Disconnect( wxID_ANY, wxEVT_TIMER, wxTimerEventHandler( wxEAPCredentialsConfigPanelBase::OnTimerOwn ) );
 	
 }
 
@@ -453,16 +456,10 @@ wxEAPProviderIdentityPanelBase::wxEAPProviderIdentityPanelBase( wxWindow* parent
 	
 	this->SetSizer( sb_provider_id );
 	this->Layout();
-	
-	// Connect Events
-	this->Connect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( wxEAPProviderIdentityPanelBase::OnUpdateUI ) );
 }
 
 wxEAPProviderIdentityPanelBase::~wxEAPProviderIdentityPanelBase()
 {
-	// Disconnect Events
-	this->Disconnect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( wxEAPProviderIdentityPanelBase::OnUpdateUI ) );
-	
 }
 
 wxEAPProviderLockPanelBase::wxEAPProviderLockPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
@@ -505,14 +502,8 @@ wxEAPProviderLockPanelBase::wxEAPProviderLockPanelBase( wxWindow* parent, wxWind
 	
 	this->SetSizer( sb_provider_lock );
 	this->Layout();
-	
-	// Connect Events
-	this->Connect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( wxEAPProviderLockPanelBase::OnUpdateUI ) );
 }
 
 wxEAPProviderLockPanelBase::~wxEAPProviderLockPanelBase()
 {
-	// Disconnect Events
-	this->Disconnect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( wxEAPProviderLockPanelBase::OnUpdateUI ) );
-	
 }

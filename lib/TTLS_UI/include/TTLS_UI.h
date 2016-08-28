@@ -76,14 +76,19 @@ class wxTTLSConfigWindow : public wxEAPConfigWindow
 {
 public:
     ///
-    /// Constructs a configuration panel
+    /// Constructs a configuration window
     ///
     /// \param[in]    prov           Provider configuration data
     /// \param[inout] cfg            Configuration data
     /// \param[in]    pszCredTarget  Target name of credentials in Windows Credential Manager. Can be further decorated to create final target name.
     /// \param[in]    parent         Parent window
     ///
-    wxTTLSConfigWindow(const eap::config_provider &prov, eap::config_method &cfg, LPCTSTR pszCredTarget, wxWindow* parent);
+    wxTTLSConfigWindow(eap::config_provider &prov, eap::config_method &cfg, LPCTSTR pszCredTarget, wxWindow* parent);
+
+    ///
+    /// Destructs the configuration window
+    ///
+    virtual ~wxTTLSConfigWindow();
 
 protected:
     /// \cond internal
