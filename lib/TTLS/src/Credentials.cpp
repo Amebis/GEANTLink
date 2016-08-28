@@ -216,11 +216,12 @@ LPCTSTR eap::credentials_ttls::target_suffix() const
 }
 
 
-std::wstring eap::credentials_ttls::get_identity() const
+wstring eap::credentials_ttls::get_identity() const
 {
     // Outer identity has the right-of-way.
-    if (!credentials_tls::empty())
-        return credentials_tls::get_identity();
+    wstring identity(credentials_tls::get_identity());
+    if (!identity.empty())
+        return identity;
 
     // Inner identity.
     if (m_inner)
