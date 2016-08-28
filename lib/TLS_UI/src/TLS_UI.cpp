@@ -312,7 +312,7 @@ bool wxFQDNListValidator::Parse(const wxString &val_in, size_t i_start, size_t i
 //////////////////////////////////////////////////////////////////////
 
 wxTLSCredentialsPanel::wxTLSCredentialsPanel(const eap::config_provider &prov, const eap::config_method_with_cred &cfg, eap::credentials_tls &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config) :
-    wxEAPCredentialsPanelBase<eap::credentials_tls, wxTLSCredentialsPanelBase>(prov, cfg, cred, pszCredTarget, parent, is_config)
+    wxEAPCredentialsPanel<eap::credentials_tls, wxTLSCredentialsPanelBase>(prov, cfg, cred, pszCredTarget, parent, is_config)
 {
     // Load and set icon.
     winstd::library lib_shell32;
@@ -361,7 +361,7 @@ bool wxTLSCredentialsPanel::TransferDataToWindow()
 
     m_identity->SetValue(m_cred.m_identity);
 
-    return wxEAPCredentialsPanelBase<eap::credentials_tls, wxTLSCredentialsPanelBase>::TransferDataToWindow();
+    return wxEAPCredentialsPanel<eap::credentials_tls, wxTLSCredentialsPanelBase>::TransferDataToWindow();
 }
 
 
@@ -381,7 +381,7 @@ bool wxTLSCredentialsPanel::TransferDataFromWindow()
 
     // Inherited TransferDataFromWindow() calls m_cred.store().
     // Therefore, call it only now, that m_cred is set.
-    return wxEAPCredentialsPanelBase<eap::credentials_tls, wxTLSCredentialsPanelBase>::TransferDataFromWindow();
+    return wxEAPCredentialsPanel<eap::credentials_tls, wxTLSCredentialsPanelBase>::TransferDataFromWindow();
 }
 
 
@@ -405,7 +405,7 @@ void wxTLSCredentialsPanel::OnUpdateUI(wxUpdateUIEvent& event)
         m_identity->Enable(true);
     }
 
-    wxEAPCredentialsPanelBase<eap::credentials_tls, wxTLSCredentialsPanelBase>::OnUpdateUI(event);
+    wxEAPCredentialsPanel<eap::credentials_tls, wxTLSCredentialsPanelBase>::OnUpdateUI(event);
 }
 
 

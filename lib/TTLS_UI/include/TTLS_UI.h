@@ -132,12 +132,12 @@ protected:
     /// \endcond
 
 public:
-    wxTLSCredentialsPanel *m_outer_cred;    ///< Outer credentials panel
-    wxPanel *m_inner_cred;                  ///< Inner credentials panel
+    wxTLSCredentialsPanel *m_outer_cred;        ///< Outer credentials panel
+    wxEAPCredentialsPanelBase *m_inner_cred;    ///< Inner credentials panel
 
 protected:
-    const eap::config_provider &m_prov;     ///< EAP provider
-    const eap::config_method_ttls &m_cfg;   ///< TTLS configuration
-    wxStaticText *m_outer_title;            ///< Outer authentication title
-    wxStaticText *m_inner_title;            ///< Inner authentication title
+    const eap::config_provider &m_prov;         ///< EAP provider
+    const eap::config_method_ttls &m_cfg;       ///< TTLS configuration
+    wxStaticText *m_outer_title;                ///< Outer authentication title
+    wxStaticText *m_inner_title;                ///< Inner authentication title
 };

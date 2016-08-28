@@ -11,6 +11,9 @@
 #include <wx/artprov.h>
 #include <wx/xrc/xmlres.h>
 #include <wx/intl.h>
+class wxEAPCredentialsPanelBase;
+
+#include "../include/wxEAP_UIBase.h"
 class wxEAPBannerPanel;
 #include <wx/gdicmn.h>
 #include <wx/font.h>
@@ -158,7 +161,7 @@ class wxEAPCredentialsConfigPanelBase : public wxPanel
 ///////////////////////////////////////////////////////////////////////////////
 /// Class wxEAPCredentialsPassPanelBase
 ///////////////////////////////////////////////////////////////////////////////
-class wxEAPCredentialsPassPanelBase : public wxPanel 
+class wxEAPCredentialsPassPanelBase : public wxEAPCredentialsPanelBase
 {
 	private:
 	

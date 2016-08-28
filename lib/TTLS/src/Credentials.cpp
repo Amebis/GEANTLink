@@ -169,13 +169,6 @@ void eap::credentials_ttls::retrieve(_In_z_ LPCTSTR pszTargetName)
 }
 
 
-LPCTSTR eap::credentials_ttls::target_suffix() const
-{
-    assert(0); // Not that we would ever store inner&outer credentials to Windows Credential Manager joined, but for completness sake... Here we go:
-    return _T("TTLS");
-}
-
-
 wstring eap::credentials_ttls::get_identity() const
 {
     // Outer identity has the right-of-way.
@@ -193,21 +186,17 @@ eap::credentials::source_t eap::credentials_ttls::combine(
     _In_       const config_method_with_cred &cfg,
     _In_opt_z_       LPCTSTR                 pszTargetName)
 {
-    source_t src;
-
-    // Combine outer credentials first.
-    src = credentials_tls::combine(
+    // Combine outer credentials.
+    source_t src_outer = credentials_tls::combine(
         cred_cached,
         cfg,
         pszTargetName);
-    if (src == source_unknown) {
-        // Outer credentials are unknown. Enough unknowness.
-        return source_unknown;
-    }
 
     // Combine inner credentials.
-    return m_inner->combine(
+    source_t src_inner = m_inner->combine(
         cred_cached ? ((const credentials_ttls*)cred_cached)->m_inner.get() : NULL,
         *((const config_method_ttls&)cfg).m_inner,
         pszTargetName);
+
+    return std::min<source_t>(src_outer, src_inner);
 }

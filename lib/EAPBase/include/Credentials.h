@@ -58,7 +58,7 @@ namespace eap
         ///
         /// Credential source when combined
         ///
-        enum  source_t {
+        enum source_t {
             source_unknown = -1, ///< Unknown source
             source_cache = 0,    ///< Credentials were obtained from EapHost cache
             source_preshared,    ///< Credentials were set by method configuration

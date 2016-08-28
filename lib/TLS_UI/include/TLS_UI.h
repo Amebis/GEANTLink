@@ -248,7 +248,7 @@ protected:
 };
 
 
-class wxTLSCredentialsPanel : public wxEAPCredentialsPanelBase<eap::credentials_tls, wxTLSCredentialsPanelBase>
+class wxTLSCredentialsPanel : public wxEAPCredentialsPanel<eap::credentials_tls, wxTLSCredentialsPanelBase>
 {
 public:
     ///

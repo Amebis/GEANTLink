@@ -104,22 +104,23 @@ void eap::peer_ttls_ui::invoke_config_ui(
     } else {
         // This is a blank network profile. Create default configuraton.
 
-        // Start with PAP inner configuration.
+        // Inner configuration: PAP
         config_method_pap *cfg_method_inner = new config_method_pap(*this);
         cfg_method_inner->m_use_preshared = false;
         cfg_method_inner->m_preshared(new credentials_pap(*this));
 
+        // Outer configuration
         unique_ptr<config_method_ttls> cfg_method(new config_method_ttls(*this));
         cfg_method->m_anonymous_identity = L"@";
         cfg_method->m_use_preshared = true;
         cfg_method->m_preshared.reset(new credentials_tls(*this));
         cfg_method->m_inner.reset(cfg_method_inner);
 
-        // Start with one method.
+        // One method
         config_provider cfg_provider(*this);
         cfg_provider.m_methods.push_back(std::move(cfg_method));
 
-        // Start with one provider.
+        // One provider
         cfg.m_providers.push_back(std::move(cfg_provider));
     }
 
@@ -189,16 +190,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
 #endif
 
     credentials_ttls cred_out(*this);
-
-    // Determine inner credential type.
-    eap_type_t type_inner;
-    if (dynamic_cast<const config_method_pap*>(cfg_method->m_inner.get())) {
-        cred_out.m_inner.reset(new credentials_pap(*this));
-        type_inner = eap_type_pap;
-    } else {
-        assert(0); // Unsupported inner authentication method type.
-        type_inner = eap_type_undefined;
-    }
+    cred_out.m_inner.reset(cfg_method->m_inner->make_credentials());
 
     // Combine credentials. Outer and inner separately to get the idea which one is missing.
     eap::credentials::source_t cred_source = cred_out.credentials_tls::combine(
@@ -242,17 +234,15 @@ void eap::peer_ttls_ui::invoke_identity_ui(
             dlg.AddContent(panel);
 
             // Set "Remember" checkboxes according to credential source,
-            panel->m_outer_cred->SetRememberValue(cred_source == eap::credentials::source_storage);
-            wxPAPCredentialsPanel *panel_inner_cred_pap = dynamic_cast<wxPAPCredentialsPanel*>(panel->m_inner_cred);
-            if (panel_inner_cred_pap)
-                panel_inner_cred_pap->SetRememberValue(cred_source_inner == eap::credentials::source_storage);
+            panel->m_outer_cred->SetRemember(cred_source == eap::credentials::source_storage);
+            panel->m_inner_cred->SetRemember(cred_source_inner == eap::credentials::source_storage);
 
             // Centre and display dialog.
             dlg.Centre(wxBOTH);
             result = dlg.ShowModal();
             if (result == wxID_OK) {
                 // Write credentials to credential manager.
-                if (panel->m_outer_cred->GetRememberValue()) {
+                if (panel->m_outer_cred->GetRemember()) {
                     try {
                         cred_out.credentials_tls::store(cfg_prov.m_id.c_str());
                     } catch (winstd::win_runtime_error &err) {
@@ -262,7 +252,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
                     }
                 }
 
-                if (panel_inner_cred_pap && panel_inner_cred_pap->GetRememberValue()) {
+                if (panel->m_inner_cred->GetRemember()) {
                     try {
                         cred_out.m_inner->store(cfg_prov.m_id.c_str());
                     } catch (winstd::win_runtime_error &err) {

@@ -81,6 +81,7 @@
   <ItemGroup>
     <ClInclude Include="..\include\EAP_UI.h" />
     <ClInclude Include="..\include\Module.h" />
+    <ClInclude Include="..\include\wxEAP_UIBase.h" />
     <ClInclude Include="..\res\wxEAP_UI.h" />
     <ClInclude Include="..\src\StdAfx.h" />
   </ItemGroup>

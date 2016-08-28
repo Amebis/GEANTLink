@@ -160,11 +160,6 @@ namespace eap
         virtual void retrieve(_In_z_ LPCTSTR pszTargetName);
 
         ///
-        /// Return target suffix for Windows Credential Manager credential name
-        ///
-        virtual LPCTSTR target_suffix() const;
-
-        ///
         /// Returns credential identity.
         ///
         virtual std::wstring get_identity() const;

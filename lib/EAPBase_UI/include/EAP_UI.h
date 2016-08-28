@@ -81,9 +81,9 @@ class wxEAPConfigProvider;
 template <class _Tcred, class _wxT> class wxEAPCredentialsConfigPanel;
 
 ///
-/// Base template for all credential entry panels
+/// Helper template for all credential entry panels
 ///
-template <class _Tcred, class _Tbase> class wxEAPCredentialsPanelBase;
+template <class _Tcred, class _Tbase> class wxEAPCredentialsPanel;
 
 ///
 /// Generic password credential entry panel
@@ -637,11 +637,11 @@ private:
 
 
 template <class _Tcred, class _Tbase>
-class wxEAPCredentialsPanelBase : public _Tbase
+class wxEAPCredentialsPanel : public _Tbase
 {
 private:
     /// \cond internal
-    typedef wxEAPCredentialsPanelBase<_Tcred, _Tbase> _Tthis;
+    typedef wxEAPCredentialsPanel<_Tcred, _Tbase> _Tthis;
     /// \endcond
 
 public:
@@ -655,7 +655,7 @@ public:
     /// \param[in]    parent         Parent window
     /// \param[in]    is_config      Is this panel used to pre-enter credentials? When \c true, the "Remember" checkbox is always selected and disabled.
     ///
-    wxEAPCredentialsPanelBase(const eap::config_provider &prov, const eap::config_method_with_cred &cfg, _Tcred &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config = false) :
+    wxEAPCredentialsPanel(const eap::config_provider &prov, const eap::config_method_with_cred &cfg, _Tcred &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config = false) :
         m_prov(prov),
         m_cfg(cfg),
         m_cred(cred),
@@ -666,17 +666,17 @@ public:
         this->Connect(wxEVT_UPDATE_UI, wxUpdateUIEventHandler(_Tthis::OnUpdateUI));
     }
 
-    virtual ~wxEAPCredentialsPanelBase()
+    virtual ~wxEAPCredentialsPanel()
     {
         this->Disconnect(wxEVT_UPDATE_UI, wxUpdateUIEventHandler(_Tthis::OnUpdateUI));
     }
 
-    inline void SetRememberValue(bool val)
+    virtual void SetRemember(bool val)
     {
         return m_remember->SetValue(val);
     }
 
-    inline bool GetRememberValue() const
+    virtual bool GetRemember() const
     {
         return m_remember->GetValue();
     }
@@ -716,7 +716,7 @@ protected:
 
 
 template <class _Tcred, class _Tbase>
-class wxPasswordCredentialsPanel : public wxEAPCredentialsPanelBase<_Tcred, _Tbase>
+class wxPasswordCredentialsPanel : public wxEAPCredentialsPanel<_Tcred, _Tbase>
 {
 public:
     ///
@@ -730,7 +730,7 @@ public:
     /// \param[in]    is_config      Is this panel used to pre-enter credentials? When \c true, the "Remember" checkbox is always selected and disabled.
     ///
     wxPasswordCredentialsPanel(const eap::config_provider &prov, const eap::config_method_with_cred &cfg, _Tcred &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config = false) :
-        wxEAPCredentialsPanelBase<_Tcred, _Tbase>(prov, cfg, cred, pszCredTarget, parent, is_config)
+        wxEAPCredentialsPanel<_Tcred, _Tbase>(prov, cfg, cred, pszCredTarget, parent, is_config)
     {
         // Load and set icon.
         winstd::library lib_shell32;
@@ -767,12 +767,12 @@ protected:
         m_identity->SetSelection(0, -1);
         m_password->SetValue(m_cred.m_password.empty() ? wxEmptyString : s_dummy_password);
 
-        return wxEAPCredentialsPanelBase<_Tcred, wxEAPCredentialsPassPanelBase>::TransferDataToWindow();
+        return wxEAPCredentialsPanel<_Tcred, wxEAPCredentialsPassPanelBase>::TransferDataToWindow();
     }
 
     virtual bool TransferDataFromWindow()
     {
-        if (!wxEAPCredentialsPanelBase<_Tcred, wxEAPCredentialsPassPanelBase>::TransferDataFromWindow())
+        if (!wxEAPCredentialsPanel<_Tcred, wxEAPCredentialsPassPanelBase>::TransferDataFromWindow())
             return false;
 
         m_cred.m_identity = m_identity->GetValue();
@@ -795,7 +795,7 @@ protected:
             m_password      ->Enable(false);
         }
 
-        wxEAPCredentialsPanelBase<_Tcred, wxEAPCredentialsPassPanelBase>::OnUpdateUI(event);
+        wxEAPCredentialsPanel<_Tcred, wxEAPCredentialsPassPanelBase>::OnUpdateUI(event);
     }
 
     /// \endcond
