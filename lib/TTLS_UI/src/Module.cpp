@@ -105,11 +105,15 @@ void eap::peer_ttls_ui::invoke_config_ui(
         // This is a blank network profile. Create default configuraton.
 
         // Start with PAP inner configuration.
+        config_method_pap *cfg_method_inner = new config_method_pap(*this);
+        cfg_method_inner->m_use_preshared = false;
+        cfg_method_inner->m_preshared(new credentials_pap(*this));
+
         unique_ptr<config_method_ttls> cfg_method(new config_method_ttls(*this));
-        cfg_method->m_inner.reset(new config_method_pap(*this));
         cfg_method->m_anonymous_identity = L"@";
         cfg_method->m_use_preshared = true;
         cfg_method->m_preshared.reset(new credentials_tls(*this));
+        cfg_method->m_inner.reset(cfg_method_inner);
 
         // Start with one method.
         config_provider cfg_provider(*this);

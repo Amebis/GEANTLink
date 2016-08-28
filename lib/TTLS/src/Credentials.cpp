@@ -79,14 +79,13 @@ eap::config* eap::credentials_ttls::clone() const
 void eap::credentials_ttls::clear()
 {
     credentials_tls::clear();
-    if (m_inner)
-        m_inner->clear();
+    m_inner->clear();
 }
 
 
 bool eap::credentials_ttls::empty() const
 {
-    return credentials_tls::empty() && (!m_inner || m_inner->empty());
+    return credentials_tls::empty() && m_inner->empty();
 }
 
 
@@ -100,17 +99,15 @@ void eap::credentials_ttls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *p
     const bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
     HRESULT hr;
 
-    if (m_inner) {
-        // <InnerAuthenticationMethod>
-        winstd::com_obj<IXMLDOMElement> pXmlElInnerAuthenticationMethod;
-        if (FAILED(hr = eapxml::create_element(pDoc, winstd::bstr(L"InnerAuthenticationMethod"), bstrNamespace, &pXmlElInnerAuthenticationMethod)))
-            throw com_runtime_error(hr, __FUNCTION__ " Error creating <InnerAuthenticationMethod> element.");
+    // <InnerAuthenticationMethod>
+    winstd::com_obj<IXMLDOMElement> pXmlElInnerAuthenticationMethod;
+    if (FAILED(hr = eapxml::create_element(pDoc, winstd::bstr(L"InnerAuthenticationMethod"), bstrNamespace, &pXmlElInnerAuthenticationMethod)))
+        throw com_runtime_error(hr, __FUNCTION__ " Error creating <InnerAuthenticationMethod> element.");
 
-        m_inner->save(pDoc, pXmlElInnerAuthenticationMethod);
+    m_inner->save(pDoc, pXmlElInnerAuthenticationMethod);
 
-        if (FAILED(hr = pConfigRoot->appendChild(pXmlElInnerAuthenticationMethod, NULL)))
-            throw com_runtime_error(hr, __FUNCTION__ " Error appending <InnerAuthenticationMethod> element.");
-    }
+    if (FAILED(hr = pConfigRoot->appendChild(pXmlElInnerAuthenticationMethod, NULL)))
+        throw com_runtime_error(hr, __FUNCTION__ " Error appending <InnerAuthenticationMethod> element.");
 }
 
 
@@ -121,14 +118,12 @@ void eap::credentials_ttls::load(_In_ IXMLDOMNode *pConfigRoot)
 
     credentials_tls::load(pConfigRoot);
 
-    if (m_inner) {
-        // Load inner credentials.
-        com_obj<IXMLDOMNode> pXmlElInnerAuthenticationMethod;
-        if (FAILED(hr = eapxml::select_node(pConfigRoot, bstr(L"eap-metadata:InnerAuthenticationMethod"), &pXmlElInnerAuthenticationMethod)))
-            throw com_runtime_error(hr, __FUNCTION__ " Error selecting <InnerAuthenticationMethod> element.");
-
+    // Load inner credentials.
+    com_obj<IXMLDOMNode> pXmlElInnerAuthenticationMethod;
+    if (SUCCEEDED(hr = eapxml::select_node(pConfigRoot, bstr(L"eap-metadata:InnerAuthenticationMethod"), &pXmlElInnerAuthenticationMethod)))
         m_inner->load(pXmlElInnerAuthenticationMethod);
-    }
+    else
+        m_inner->clear();
 }
 
 

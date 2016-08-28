@@ -168,30 +168,18 @@ void eap::config_method_ttls::load(_In_ IXMLDOMNode *pConfigRoot)
 void eap::config_method_ttls::operator<<(_Inout_ cursor_out &cursor) const
 {
     config_method_tls::operator<<(cursor);
-
-    if (m_inner) {
-        cursor << m_inner->get_method_id();
-        cursor << *m_inner;
-    } else
-        cursor << eap_type_undefined;
-
+    cursor << m_inner->get_method_id();
+    cursor << *m_inner;
     cursor << m_anonymous_identity;
 }
 
 
 size_t eap::config_method_ttls::get_pk_size() const
 {
-    size_t size_inner;
-    if (m_inner) {
-        size_inner =
-            pksizeof(m_inner->get_method_id()) +
-            pksizeof(*m_inner);
-    } else
-        size_inner = pksizeof(eap_type_undefined);
-
     return
         config_method_tls::get_pk_size() +
-        size_inner +
+        pksizeof(m_inner->get_method_id()) +
+        pksizeof(*m_inner) +
         pksizeof(m_anonymous_identity);
 }
 
@@ -202,10 +190,8 @@ void eap::config_method_ttls::operator>>(_Inout_ cursor_in &cursor)
 
     eap_type_t eap_type;
     cursor >> eap_type;
-    if (eap_type != eap_type_undefined) {
-        m_inner.reset(make_config_method(eap_type));
-        cursor >> *m_inner;
-    }
+    m_inner.reset(make_config_method(eap_type));
+    cursor >> *m_inner;
     cursor >> m_anonymous_identity;
 }
 
