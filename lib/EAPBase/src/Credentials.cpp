@@ -109,7 +109,7 @@ void eap::credentials::load(_In_ IXMLDOMNode *pConfigRoot)
     std::wstring xpath(eapxml::get_xpath(pConfigRoot));
 
     if (FAILED(hr = eapxml::get_element_value(pConfigRoot, bstr(L"eap-metadata:UserName"), m_identity)))
-        throw com_runtime_error(hr, __FUNCTION__ " Error reading <UserName> element.");
+        m_identity.clear();
 
     m_module.log_config((xpath + L"/UserName").c_str(), m_identity.c_str());
 }
