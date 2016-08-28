@@ -84,7 +84,7 @@ void eap::credentials_tls::clear()
 
 bool eap::credentials_tls::empty() const
 {
-    return credentials::empty() && !m_cert;
+    return !m_cert;
 }
 
 
@@ -174,12 +174,14 @@ void eap::credentials_tls::store(_In_z_ LPCTSTR pszTargetName) const
 {
     assert(pszTargetName);
 
-    // Encrypt the certificate using user's key.
-    DATA_BLOB cred_blob    = { m_cert->cbCertEncoded,         m_cert->pbCertEncoded };
-    DATA_BLOB entropy_blob = { sizeof(s_entropy)    , (LPBYTE)s_entropy             };
     data_blob cred_enc;
-    if (!CryptProtectData(&cred_blob, NULL, &entropy_blob, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN, &cred_enc))
-        throw win_runtime_error(__FUNCTION__ " CryptProtectData failed.");
+    if (m_cert) {
+        // Encrypt the certificate using user's key.
+        DATA_BLOB cred_blob    = { m_cert->cbCertEncoded,         m_cert->pbCertEncoded };
+        DATA_BLOB entropy_blob = { sizeof(s_entropy)    , (LPBYTE)s_entropy             };
+        if (!CryptProtectData(&cred_blob, NULL, &entropy_blob, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN, &cred_enc))
+            throw win_runtime_error(__FUNCTION__ " CryptProtectData failed.");
+    }
 
     tstring target(target_name(pszTargetName));
 
@@ -214,17 +216,20 @@ void eap::credentials_tls::retrieve(_In_z_ LPCTSTR pszTargetName)
     if (!CredRead(target_name(pszTargetName).c_str(), CRED_TYPE_GENERIC, 0, (PCREDENTIAL*)&cred))
         throw win_runtime_error(__FUNCTION__ " CredRead failed.");
 
-    // Decrypt the certificate using user's key.
-    DATA_BLOB cred_enc     = { cred->CredentialBlobSize, cred->CredentialBlob };
-    DATA_BLOB entropy_blob = { sizeof(s_entropy)       , (LPBYTE)s_entropy    };
-    data_blob cred_int;
-    if (!CryptUnprotectData(&cred_enc, NULL, &entropy_blob, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN | CRYPTPROTECT_VERIFY_PROTECTION, &cred_int))
-        throw win_runtime_error(__FUNCTION__ " CryptUnprotectData failed.");
+    if (cred->CredentialBlobSize) {
+        // Decrypt the certificate using user's key.
+        DATA_BLOB cred_enc     = { cred->CredentialBlobSize, cred->CredentialBlob };
+        DATA_BLOB entropy_blob = { sizeof(s_entropy)       , (LPBYTE)s_entropy    };
+        data_blob cred_int;
+        if (!CryptUnprotectData(&cred_enc, NULL, &entropy_blob, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN | CRYPTPROTECT_VERIFY_PROTECTION, &cred_int))
+            throw win_runtime_error(__FUNCTION__ " CryptUnprotectData failed.");
 
-    bool bResult = m_cert.create(X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, cred_int.pbData, cred_int.cbData);
-    SecureZeroMemory(cred_int.pbData, cred_int.cbData);
-    if (!bResult)
-        throw win_runtime_error(__FUNCTION__ " Error loading certificate.");
+        bool bResult = m_cert.create(X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, cred_int.pbData, cred_int.cbData);
+        SecureZeroMemory(cred_int.pbData, cred_int.cbData);
+        if (!bResult)
+            throw win_runtime_error(__FUNCTION__ " Error loading certificate.");
+    } else
+        m_cert.free();
 
     if (cred->UserName)
         m_identity = cred->UserName;
