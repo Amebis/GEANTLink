@@ -1494,27 +1494,27 @@ void eap::method_tls::verify_server_trust() const
             found   = false;
 
         // Search subjectAltName2 and subjectAltName.
-        for (DWORD i = 0; !found && i < cert->pCertInfo->cExtension; i++) {
+        for (DWORD idx_ext = 0; !found && idx_ext < cert->pCertInfo->cExtension; idx_ext++) {
             unique_ptr<CERT_ALT_NAME_INFO, LocalFree_delete<CERT_ALT_NAME_INFO> > san_info;
-            if (strcmp(cert->pCertInfo->rgExtension[i].pszObjId, szOID_SUBJECT_ALT_NAME2) == 0) {
+            if (strcmp(cert->pCertInfo->rgExtension[idx_ext].pszObjId, szOID_SUBJECT_ALT_NAME2) == 0) {
                 unsigned char *output = NULL;
                 DWORD size_output;
                 if (!CryptDecodeObjectEx(
                         X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
                         szOID_SUBJECT_ALT_NAME2,
-                        cert->pCertInfo->rgExtension[i].Value.pbData, cert->pCertInfo->rgExtension[i].Value.cbData,
+                        cert->pCertInfo->rgExtension[idx_ext].Value.pbData, cert->pCertInfo->rgExtension[idx_ext].Value.cbData,
                         CRYPT_DECODE_ALLOC_FLAG | CRYPT_DECODE_ENABLE_PUNYCODE_FLAG,
                         NULL,
                         &output, &size_output))
                     throw win_runtime_error(__FUNCTION__ " Error decoding subjectAltName2 certificate extension.");
                 san_info.reset((CERT_ALT_NAME_INFO*)output);
-            } else if (strcmp(cert->pCertInfo->rgExtension[i].pszObjId, szOID_SUBJECT_ALT_NAME) == 0) {
+            } else if (strcmp(cert->pCertInfo->rgExtension[idx_ext].pszObjId, szOID_SUBJECT_ALT_NAME) == 0) {
                 unsigned char *output = NULL;
                 DWORD size_output;
                 if (!CryptDecodeObjectEx(
                         X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
                         szOID_SUBJECT_ALT_NAME,
-                        cert->pCertInfo->rgExtension[i].Value.pbData, cert->pCertInfo->rgExtension[i].Value.cbData,
+                        cert->pCertInfo->rgExtension[idx_ext].Value.pbData, cert->pCertInfo->rgExtension[idx_ext].Value.cbData,
                         CRYPT_DECODE_ALLOC_FLAG | CRYPT_DECODE_ENABLE_PUNYCODE_FLAG,
                         NULL,
                         &output, &size_output))
@@ -1527,11 +1527,11 @@ void eap::method_tls::verify_server_trust() const
             has_san = true;
 
             for (list<wstring>::const_iterator s = cfg_method->m_server_names.cbegin(), s_end = cfg_method->m_server_names.cend(); !found && s != s_end; ++s) {
-                for (DWORD i = 0; !found && i < san_info->cAltEntry; i++) {
-                    if (san_info->rgAltEntry[i].dwAltNameChoice == CERT_ALT_NAME_DNS_NAME &&
-                        _wcsicmp(s->c_str(), san_info->rgAltEntry[i].pwszDNSName) == 0)
+                for (DWORD idx_entry = 0; !found && idx_entry < san_info->cAltEntry; idx_entry++) {
+                    if (san_info->rgAltEntry[idx_entry].dwAltNameChoice == CERT_ALT_NAME_DNS_NAME &&
+                        _wcsicmp(s->c_str(), san_info->rgAltEntry[idx_entry].pwszDNSName) == 0)
                     {
-                        m_module.log_event(&EAPMETHOD_TLS_SERVER_NAME_TRUSTED1, event_data(san_info->rgAltEntry[i].pwszDNSName), event_data::blank);
+                        m_module.log_event(&EAPMETHOD_TLS_SERVER_NAME_TRUSTED1, event_data(san_info->rgAltEntry[idx_entry].pwszDNSName), event_data::blank);
                         found = true;
                     }
                 }
