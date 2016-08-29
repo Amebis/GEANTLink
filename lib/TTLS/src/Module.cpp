@@ -132,18 +132,20 @@ void eap::peer_ttls::get_identity(
 
     // If we got here, we have all credentials we need. But, wait!
 
-    if (cfg_method->m_auth_failed) {
-        // Outer TLS: Credentials failed on last connection attempt.
-        log_event(&EAPMETHOD_TRACE_EVT_CRED_PROBLEM, event_data((unsigned int)eap_type_tls), event_data::blank);
-        *pfInvokeUI = TRUE;
-        return;
-    }
+    if ((dwFlags & EAP_FLAG_MACHINE_AUTH) == 0) {
+        if (cfg_method->m_auth_failed) {
+            // Outer: Credentials failed on last connection attempt.
+            log_event(&EAPMETHOD_TRACE_EVT_CRED_PROBLEM, event_data((unsigned int)eap_type_tls), event_data::blank);
+            *pfInvokeUI = TRUE;
+            return;
+        }
 
-    if (cfg_method->m_inner->m_auth_failed) {
-        // Inner: Credentials failed on last connection attempt.
-        log_event(&EAPMETHOD_TRACE_EVT_CRED_PROBLEM, event_data((unsigned int)cfg_method->m_inner->get_method_id()), event_data::blank);
-        *pfInvokeUI = TRUE;
-        return;
+        if (cfg_method->m_inner->m_auth_failed) {
+            // Inner: Credentials failed on last connection attempt.
+            log_event(&EAPMETHOD_TRACE_EVT_CRED_PROBLEM, event_data((unsigned int)cfg_method->m_inner->get_method_id()), event_data::blank);
+            *pfInvokeUI = TRUE;
+            return;
+        }
     }
 
     // Build our identity. ;)
