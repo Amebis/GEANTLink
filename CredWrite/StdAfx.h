@@ -20,8 +20,8 @@
 
 #pragma once
 
-#include "../lib/PAP/include/Config.h"
 #include "../lib/PAP/include/Credentials.h"
+#include "../lib/TLS/include/Credentials.h"
 #include "../lib/EAPBase/include/Module.h"
 
 #include <WinStd/Common.h>

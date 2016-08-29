@@ -40,7 +40,7 @@ static int CredWrite()
         return -1;
     }
 
-    eap::credentials_pap cred(g_module);
+    eap::credentials_pap cred_pap(g_module);
 
     // Prepare identity (user name).
     {
@@ -50,7 +50,7 @@ static int CredWrite()
         bool is_last;
         dec.decode(identity_utf8, is_last, pwcArglist[1], (size_t)-1);
 
-        MultiByteToWideChar(CP_UTF8, 0, identity_utf8.data(), (int)identity_utf8.size(), cred.m_identity);
+        MultiByteToWideChar(CP_UTF8, 0, identity_utf8.data(), (int)identity_utf8.size(), cred_pap.m_identity);
     }
 
     // Prepare password.
@@ -61,7 +61,7 @@ static int CredWrite()
         bool is_last;
         dec.decode(password_utf8, is_last, pwcArglist[2], (size_t)-1);
 
-        MultiByteToWideChar(CP_UTF8, 0, password_utf8.data(), (int)password_utf8.size(), cred.m_password);
+        MultiByteToWideChar(CP_UTF8, 0, password_utf8.data(), (int)password_utf8.size(), cred_pap.m_password);
     }
 
     // Generate target name (aka realm).
@@ -71,7 +71,7 @@ static int CredWrite()
         target_name = pwcArglist[3];
     } else {
         // Get the realm from user name.
-        LPCWSTR _identity = cred.m_identity.c_str(), domain;
+        LPCWSTR _identity = cred_pap.m_identity.c_str(), domain;
         if ((domain = wcschr(_identity, L'@')) != NULL)
             target_name = domain + 1;
         else if ((domain = wcschr(_identity, L'\\')) != NULL)
@@ -94,13 +94,25 @@ static int CredWrite()
     }
 #endif
     try {
-        cred.store(target_name.c_str());
+        cred_pap.store(target_name.c_str());
     } catch(win_runtime_error &err) {
         OutputDebugStr(_T("%hs (error %u)\n"), err.what(), err.number());
         return 2;
     } catch(...) {
         OutputDebugStr(_T("Writing credentials failed.\n"));
         return 2;
+    }
+
+    // Store empty TLS credentials.
+    eap::credentials_tls cred_tls(g_module);
+    try {
+        cred_tls.store(target_name.c_str());
+    } catch(win_runtime_error &err) {
+        OutputDebugStr(_T("%hs (error %u)\n"), err.what(), err.number());
+        return 3;
+    } catch(...) {
+        OutputDebugStr(_T("Writing credentials failed.\n"));
+        return 3;
     }
 
     return 0;
