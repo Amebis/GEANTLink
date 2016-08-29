@@ -253,11 +253,45 @@ std::wstring eap::credentials_tls::get_identity() const
     if (!m_identity.empty()) {
         return m_identity;
     } else if (m_cert) {
-        wstring identity;
-        CertGetNameString(m_cert, CERT_NAME_EMAIL_TYPE, 0, NULL, identity);
-        return identity;
-    } else
-        return L"";
+        for (DWORD idx_ext = 0; idx_ext < m_cert->pCertInfo->cExtension; idx_ext++) {
+            unique_ptr<CERT_ALT_NAME_INFO, LocalFree_delete<CERT_ALT_NAME_INFO> > san_info;
+            if (strcmp(m_cert->pCertInfo->rgExtension[idx_ext].pszObjId, szOID_SUBJECT_ALT_NAME2) == 0) {
+                unsigned char *output = NULL;
+                DWORD size_output;
+                if (!CryptDecodeObjectEx(
+                        X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
+                        szOID_SUBJECT_ALT_NAME2,
+                        m_cert->pCertInfo->rgExtension[idx_ext].Value.pbData, m_cert->pCertInfo->rgExtension[idx_ext].Value.cbData,
+                        CRYPT_DECODE_ALLOC_FLAG | CRYPT_DECODE_ENABLE_PUNYCODE_FLAG,
+                        NULL,
+                        &output, &size_output))
+                    throw win_runtime_error(__FUNCTION__ " Error decoding subjectAltName2 certificate extension.");
+                san_info.reset((CERT_ALT_NAME_INFO*)output);
+            } else if (strcmp(m_cert->pCertInfo->rgExtension[idx_ext].pszObjId, szOID_SUBJECT_ALT_NAME) == 0) {
+                unsigned char *output = NULL;
+                DWORD size_output;
+                if (!CryptDecodeObjectEx(
+                        X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
+                        szOID_SUBJECT_ALT_NAME,
+                        m_cert->pCertInfo->rgExtension[idx_ext].Value.pbData, m_cert->pCertInfo->rgExtension[idx_ext].Value.cbData,
+                        CRYPT_DECODE_ALLOC_FLAG | CRYPT_DECODE_ENABLE_PUNYCODE_FLAG,
+                        NULL,
+                        &output, &size_output))
+                    throw win_runtime_error(__FUNCTION__ " Error decoding subjectAltName certificate extension.");
+                san_info.reset((CERT_ALT_NAME_INFO*)output);
+            } else {
+                // Skip this extension.
+                continue;
+            }
+
+            for (DWORD idx_entry = 0; idx_entry < san_info->cAltEntry; idx_entry++) {
+                if (san_info->rgAltEntry[idx_entry].dwAltNameChoice == CERT_ALT_NAME_RFC822_NAME)
+                    return san_info->rgAltEntry[idx_entry].pwszRfc822Name;
+            }
+        }
+    }
+
+    return L"";
 }
 
 
