@@ -103,22 +103,40 @@ void eap::peer_ttls::get_identity(
     *pfInvokeUI = FALSE;
 
     {
-        // Combine credentials.
+        // Combine credentials. We could use eap::credentials_ttls() to do all the work, but we would not know which credentials is missing then.
         user_impersonator impersonating(hTokenImpersonateUser);
-        eap::credentials::source_t cred_source = cred_out.combine(
+
+        // Combine outer credentials.
+        LPCTSTR target_name = (dwFlags & EAP_FLAG_GUEST_ACCESS) == 0 ? cfg_prov.m_id.c_str() : NULL;
+        eap::credentials::source_t src_outer = cred_out.credentials_tls::combine(
 #ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
             &cred_in,
 #else
             NULL,
 #endif
             *cfg_method,
-            (dwFlags & EAP_FLAG_GUEST_ACCESS) == 0 ? cfg_prov.m_id.c_str() : NULL);
-
-        // If either of credentials is unknown, request UI.
-        if (cred_source == eap::credentials::source_unknown)
+            target_name);
+        if (src_outer == eap::credentials::source_unknown) {
+            log_event(&EAPMETHOD_TRACE_EVT_CRED_INVOKE_UI1, event_data((unsigned int)eap_type_tls), event_data::blank);
             *pfInvokeUI = TRUE;
+        }
+
+        // Combine inner credentials.
+        eap::credentials::source_t src_inner = cred_out.m_inner->combine(
+#ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
+            cred_in.m_inner.get(),
+#else
+            NULL,
+#endif
+            *cfg_method->m_inner,
+            target_name);
+        if (src_inner == eap::credentials::source_unknown) {
+            log_event(&EAPMETHOD_TRACE_EVT_CRED_INVOKE_UI1, event_data((unsigned int)cfg_method->m_inner->get_method_id()), event_data::blank);
+            *pfInvokeUI = TRUE;
+        }
     }
 
+    // If either of credentials is unknown, request UI.
     if (*pfInvokeUI) {
         if ((dwFlags & EAP_FLAG_MACHINE_AUTH) == 0) {
             // Per-user authentication
