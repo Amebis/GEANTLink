@@ -106,22 +106,6 @@ void eap::method_ttls::process_request_packet(
 
     // Do the TLS.
     method_tls::process_request_packet(pReceivedPacket, dwReceivedPacketSize, pEapOutput);
-
-#if EAP_TLS < EAP_TLS_SCHANNEL
-    if (m_phase == phase_application_data) {
-        // Send inner authentication.
-        if (!m_state_client.m_alg_encrypt)
-            throw runtime_error(__FUNCTION__ " Refusing to continue with inner authentication unencrypted.");
-
-        m_module.log_event(&EAPMETHOD_TTLS_INNER_CRED, event_data((unsigned int)eap_type_ttls), event_data(m_cred.m_inner->get_name()), event_data::blank);
-
-        m_packet_res.m_code  = EapCodeResponse;
-        m_packet_res.m_id    = m_packet_req.m_id;
-        m_packet_res.m_flags = 0;
-        sanitizing_blob msg_application(make_message(tls_message_type_application_data, make_pap_client()));
-        m_packet_res.m_data.insert(m_packet_res.m_data.end(), msg_application.begin(), msg_application.end());
-    }
-#endif
 }
 
 
@@ -208,12 +192,16 @@ void eap::method_ttls::derive_msk()
     _key_block += sizeof(tls_random);
 }
 
-#else
+#endif
 
 void eap::method_ttls::process_application_data(_In_bytecount_(size_msg) const void *msg, _In_ size_t size_msg)
 {
     // Prepare inner authentication.
+#if EAP_TLS < EAP_TLS_SCHANNEL
+    if (!m_state_client.m_alg_encrypt)
+#else
     if (!(m_sc_ctx.m_attrib & ISC_RET_CONFIDENTIALITY))
+#endif
         throw runtime_error(__FUNCTION__ " Refusing to continue with inner authentication unencrypted.");
 
     EapPeerMethodOutput eap_output = {};
@@ -239,17 +227,26 @@ void eap::method_ttls::process_application_data(_In_bytecount_(size_msg) const v
     switch (eap_output.action) {
     case EapPeerMethodResponseActionSend: {
         // Retrieve inner packet and send it.
-        SECURITY_STATUS status;
 
-        // Get maximum message sizes.
+        // Get maximum message size and allocate memory for response packet.
+#if EAP_TLS < EAP_TLS_SCHANNEL
+        m_packet_res.m_code  = EapCodeResponse;
+        m_packet_res.m_id    = m_packet_req.m_id;
+        m_packet_res.m_flags = 0;
+
+        DWORD size_data = m_size_inner_packet_max;
+        sanitizing_blob data(size_data, 0);
+        unsigned char *ptr_data = data.data();
+#else
         SecPkgContext_StreamSizes sizes;
-        status = QueryContextAttributes(m_sc_ctx, SECPKG_ATTR_STREAM_SIZES, &sizes);
+        SECURITY_STATUS status = QueryContextAttributes(m_sc_ctx, SECPKG_ATTR_STREAM_SIZES, &sizes);
         if (FAILED(status))
             throw sec_runtime_error(status, __FUNCTION__ " Error getting Schannel required encryption sizes.");
 
         sanitizing_blob data(sizes.cbHeader + m_size_inner_packet_max + sizes.cbTrailer, 0);
         DWORD size_data = m_size_inner_packet_max;
         unsigned char *ptr_data = data.data() + sizes.cbHeader;
+#endif
         m_inner->get_response_packet((EapPacket*)ptr_data, &size_data);
 
         if (eap_type_noneap_start <= eap_type && eap_type < eap_type_noneap_end) {
@@ -257,6 +254,11 @@ void eap::method_ttls::process_application_data(_In_bytecount_(size_msg) const v
             memmove(ptr_data, ptr_data + 4, size_data -= 4);
         }
 
+#if EAP_TLS < EAP_TLS_SCHANNEL
+        data.resize(size_data);
+        sanitizing_blob msg_application(make_message(tls_message_type_application_data, std::move(data)));
+        m_packet_res.m_data.insert(m_packet_res.m_data.end(), msg_application.begin(), msg_application.end());
+#else
         // Prepare input/output buffer(s).
         SecBuffer buf[] = {
             {  sizes.cbHeader, SECBUFFER_STREAM_HEADER , data.data()          },
@@ -275,6 +277,7 @@ void eap::method_ttls::process_application_data(_In_bytecount_(size_msg) const v
         if (FAILED(status))
             throw sec_runtime_error(status, __FUNCTION__ " Error encrypting message.");
         m_packet_res.m_data.insert(m_packet_res.m_data.end(), (const unsigned char*)buf[0].pvBuffer, (const unsigned char*)buf[0].pvBuffer + buf[0].cbBuffer + buf[1].cbBuffer + buf[2].cbBuffer);
+#endif
 
         break;
     }
@@ -283,5 +286,3 @@ void eap::method_ttls::process_application_data(_In_bytecount_(size_msg) const v
         throw invalid_argument(string_printf(__FUNCTION__ " Inner method returned an unsupported action (action %u).", eap_output.action).c_str());
     }
 }
-
-#endif

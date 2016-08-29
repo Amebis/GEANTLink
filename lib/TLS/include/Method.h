@@ -362,12 +362,12 @@ namespace eap
         /// Process handshake
         ///
         void process_handshake();
+#endif
 
         ///
         /// Process application data
         ///
         void process_application_data();
-#endif
 
         ///
         /// Processes a TLS application_data message

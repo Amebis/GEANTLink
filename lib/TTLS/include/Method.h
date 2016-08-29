@@ -140,7 +140,7 @@ namespace eap
         ///
         virtual void derive_msk();
 
-#else
+#endif
 
         ///
         /// Processes an application message
@@ -149,8 +149,6 @@ namespace eap
         /// \param[in] size_msg  Application message data size
         ///
         virtual void process_application_data(_In_bytecount_(size_msg) const void *msg, _In_ size_t size_msg);
-
-#endif
 
     protected:
         config_method_ttls &m_cfg;          ///< EAP-TTLS method configuration

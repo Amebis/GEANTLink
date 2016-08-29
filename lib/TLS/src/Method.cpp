@@ -544,14 +544,22 @@ void eap::method_tls::process_request_packet(
         sanitizing_blob msg_finished(make_message(tls_message_type_handshake, make_finished()));
         m_packet_res.m_data.insert(m_packet_res.m_data.end(), msg_finished.begin(), msg_finished.end());
 
-        m_phase = m_handshake[tls_handshake_type_finished] ? phase_application_data : phase_change_cipher_spec;
+        if (m_handshake[tls_handshake_type_finished]) {
+            // Go to application data phase. And allow piggybacking of the first data message.
+            m_phase = phase_application_data;
+            process_application_data(NULL, 0);
+        } else {
+            m_phase = phase_change_cipher_spec;
+        }
         break;
     }
 
     case phase_change_cipher_spec:
         // Wait in this phase until server sends change cipher spec and finish.
-        if (m_state_server.m_alg_encrypt && m_handshake[tls_handshake_type_finished])
+        if (m_state_server.m_alg_encrypt && m_handshake[tls_handshake_type_finished]) {
             m_phase = phase_application_data;
+            process_application_data(NULL, 0);
+        }
         break;
 
     case phase_application_data:
@@ -702,20 +710,29 @@ void eap::method_tls::get_result(
     }
 
     case EapPeerMethodResultFailure:
+#if EAP_TLS < EAP_TLS_SCHANNEL
+        m_module.log_event(
+            m_phase < phase_change_cipher_spec ? &EAPMETHOD_METHOD_FAILURE_INIT :
+            m_phase < phase_application_data   ? &EAPMETHOD_METHOD_FAILURE_HANDSHAKE : &EAPMETHOD_METHOD_FAILURE,
+            event_data((unsigned int)eap_type_tls), event_data::blank);
+
+        // Mark credentials as failed, so GUI can re-prompt user.
+        // But be careful: do so only if this happened after transition from handshake to application data phase.
+        m_cfg.m_auth_failed = m_phase >= phase_application_data;
+
+        // Clear session resumption data.
+        m_cfg.m_session_id.clear();
+        m_cfg.m_master_secret.clear();
+#else
         m_module.log_event(
             m_phase_prev < phase_handshake_cont   ? &EAPMETHOD_METHOD_FAILURE_INIT :
             m_phase_prev < phase_application_data ? &EAPMETHOD_METHOD_FAILURE_HANDSHAKE : &EAPMETHOD_METHOD_FAILURE,
             event_data((unsigned int)eap_type_tls), event_data::blank);
 
-#if EAP_TLS < EAP_TLS_SCHANNEL
-        // Clear session resumption data.
-        m_cfg.m_session_id.clear();
-        m_cfg.m_master_secret.clear();
-#endif
-
         // Mark credentials as failed, so GUI can re-prompt user.
         // But be careful: do so only if this happened after transition from handshake to application data phase.
         m_cfg.m_auth_failed = m_phase_prev < phase_application_data && m_phase >= phase_application_data;
+#endif
 
         // Do not report failure to EapHost, as it will not save updated configuration then. But we need it to save it, to alert user on next connection attempt.
         // EapHost is well aware of the failed condition.
