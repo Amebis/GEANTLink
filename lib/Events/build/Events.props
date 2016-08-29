@@ -10,6 +10,7 @@
   <ItemDefinitionGroup>
     <ResourceCompile>
       <AdditionalIncludeDirectories>temp\Events.$(Platform).$(Configuration).$(PlatformToolset);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>AFX_TARG_NEU;AFX_TARG_ENU;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup />
