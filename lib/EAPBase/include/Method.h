@@ -51,11 +51,10 @@ namespace eap
         /// Constructs an EAP method
         ///
         /// \param[in] mod   EAP module to use for global services
-        /// \param[in] cfg   Connection configuration
+        /// \param[in] cfg   Method configuration
         /// \param[in] cred  User credentials
         ///
-        method(_In_ module &module, _In_ config_connection &cfg, _In_ credentials &cred);
-
+        method(_In_ module &module, _In_ config_method_with_cred &cfg, _In_ credentials &cred);
 
         ///
         /// Moves an EAP method
@@ -130,8 +129,9 @@ namespace eap
         method& operator=(_In_ const method &other);
 
     public:
-        module &m_module;           ///< EAP module
-        config_connection &m_cfg;   ///< Connection configuration
-        credentials &m_cred;        ///< User credentials
+        module &m_module;                           ///< EAP module
+        config_method_with_cred &m_cfg;             ///< Connection configuration
+        credentials &m_cred;                        ///< User credentials
+        std::vector<winstd::eap_attr> m_eap_attr;   ///< EAP attributes
     };
 }

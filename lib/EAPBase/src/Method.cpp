@@ -28,7 +28,7 @@ using namespace winstd;
 // eap::method
 //////////////////////////////////////////////////////////////////////
 
-eap::method::method(_In_ module &module, _In_ config_connection &cfg, _In_ credentials &cred) :
+eap::method::method(_In_ module &module, _In_ config_method_with_cred &cfg, _In_ credentials &cred) :
     m_module(module),
     m_cfg(cfg),
     m_cred(cred)
@@ -37,9 +37,10 @@ eap::method::method(_In_ module &module, _In_ config_connection &cfg, _In_ crede
 
 
 eap::method::method(_Inout_ method &&other) :
-    m_module(other.m_module),
-    m_cfg(other.m_cfg),
-    m_cred(other.m_cred)
+    m_module  (          other.m_module   ),
+    m_cfg     (          other.m_cfg      ),
+    m_cred    (          other.m_cred     ),
+    m_eap_attr(std::move(other.m_eap_attr))
 {
 }
 
@@ -50,6 +51,7 @@ eap::method& eap::method::operator=(_Inout_ method &&other)
         assert(std::addressof(m_module) == std::addressof(other.m_module)); // Move method within same module only!
         assert(std::addressof(m_cfg   ) == std::addressof(other.m_cfg   )); // Move method with same configuration only!
         assert(std::addressof(m_cred  ) == std::addressof(other.m_cred  )); // Move method with same credentials only!
+        m_eap_attr = std::move(other.m_eap_attr);
     }
 
     return *this;

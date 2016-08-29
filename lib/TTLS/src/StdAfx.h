@@ -27,6 +27,7 @@
 
 #include "../../PAP/include/Config.h"
 #include "../../PAP/include/Credentials.h"
+#include "../../PAP/include/Method.h"
 
 #include "../../EAPBase/include/EAPXML.h"
 

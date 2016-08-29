@@ -214,16 +214,21 @@ namespace eap
     protected:
         class session {
         public:
-            inline session(_In_ module &mod) :
-                m_cfg(mod),
-                m_cred(mod),
-                m_method(mod, m_cfg, m_cred)
-            {}
+            session(_In_ module &mod);
+            virtual ~session();
 
         public:
-            config_connection m_cfg;    ///< Connection configuration
-            credentials_ttls m_cred;    ///< User credentials
-            method_ttls m_method;       ///< EAP-TTLS method
+            module &m_module;                       ///< Module
+            config_connection m_cfg;                ///< Connection configuration
+            credentials_ttls m_cred;                ///< User credentials
+            std::unique_ptr<method_ttls> m_method;  ///< EAP-TTLS method
+
+            // The following members are required to avoid memory leakage in get_result()
+            EAP_ATTRIBUTES m_eap_attr_desc; ///< EAP attributes descriptor
+            BYTE *m_blob_cfg;               ///< Configuration BLOB
+#ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
+            BYTE *m_blob_cred;              ///< Credentials BLOB
+#endif
         };
     };
 }

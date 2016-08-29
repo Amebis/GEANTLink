@@ -271,16 +271,19 @@ EAP_SESSION_HANDLE eap::peer_ttls::begin_session(
     // Get method configuration.
     if (s->m_cfg.m_providers.empty() || s->m_cfg.m_providers.front().m_methods.empty())
         throw invalid_argument(__FUNCTION__ " Configuration has no providers and/or methods.");
-    const config_provider &cfg_prov(s->m_cfg.m_providers.front());
-    const config_method_ttls *cfg_method = dynamic_cast<const config_method_ttls*>(cfg_prov.m_methods.front().get());
+    config_provider &cfg_prov(s->m_cfg.m_providers.front());
+    config_method_ttls *cfg_method = dynamic_cast<config_method_ttls*>(cfg_prov.m_methods.front().get());
     assert(cfg_method);
 
     // Unpack credentials.
     s->m_cred.m_inner.reset(cfg_method->m_inner->make_credentials());
     unpack(s->m_cred, pUserData, dwUserDataSize);
 
+    // We have configuration, we have credentials, create method.
+    s->m_method.reset(new method_ttls(*this, *cfg_method, s->m_cred));
+
     // Initialize method.
-    s->m_method.begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
+    s->m_method->begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
 
     return s.release();
 }
@@ -304,7 +307,7 @@ void eap::peer_ttls::process_request_packet(
     _Inout_                                    EapPeerMethodOutput *pEapOutput)
 {
     assert(dwReceivedPacketSize == ntohs(*(WORD*)pReceivedPacket->Length));
-    static_cast<session*>(hSession)->m_method.process_request_packet(pReceivedPacket, dwReceivedPacketSize, pEapOutput);
+    static_cast<session*>(hSession)->m_method->process_request_packet(pReceivedPacket, dwReceivedPacketSize, pEapOutput);
 }
 
 
@@ -313,7 +316,7 @@ void eap::peer_ttls::get_response_packet(
     _Inout_bytecap_(*dwSendPacketSize) EapPacket          *pSendPacket,
     _Inout_                            DWORD              *pdwSendPacketSize)
 {
-    static_cast<session*>(hSession)->m_method.get_response_packet(pSendPacket, pdwSendPacketSize);
+    static_cast<session*>(hSession)->m_method->get_response_packet(pSendPacket, pdwSendPacketSize);
 }
 
 
@@ -322,7 +325,27 @@ void eap::peer_ttls::get_result(
     _In_    EapPeerMethodResultReason reason,
     _Inout_ EapPeerMethodResult       *ppResult)
 {
-    static_cast<session*>(hSession)->m_method.get_result(reason, ppResult);
+    session *s = static_cast<session*>(hSession);
+
+    s->m_method->get_result(reason, ppResult);
+    s->m_eap_attr_desc.dwNumberOfAttributes = (DWORD)s->m_method->m_eap_attr.size();
+    s->m_eap_attr_desc.pAttribs = s->m_method->m_eap_attr.data();
+    ppResult->pAttribArray = &s->m_eap_attr_desc;
+
+    if (ppResult->fSaveConnectionData) {
+        pack(s->m_cfg, &ppResult->pConnectionData, &ppResult->dwSizeofConnectionData);
+        if (s->m_blob_cfg)
+            free_memory(s->m_blob_cfg);
+        s->m_blob_cfg = ppResult->pConnectionData;
+    }
+
+#ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
+    ppResult->fSaveUserData = TRUE;
+    pack(s->m_cred, &ppResult->pUserData, &ppResult->dwSizeofUserData);
+    if (s->m_blob_cred)
+        free_memory(s->m_blob_cred);
+    s->m_blob_cred = ppResult->pUserData;
+#endif
 }
 
 
@@ -375,4 +398,31 @@ void eap::peer_ttls::set_response_attributes(
     UNREFERENCED_PARAMETER(pEapOutput);
 
     throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Not supported.");
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// eap::peer_ttls::session
+//////////////////////////////////////////////////////////////////////
+
+eap::peer_ttls::session::session(_In_ module &mod) :
+    m_module(mod),
+    m_cfg(mod),
+    m_cred(mod),
+    m_blob_cfg(NULL)
+#ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
+    , m_blob_cred(NULL)
+#endif
+{}
+
+
+eap::peer_ttls::session::~session()
+{
+    if (m_blob_cfg)
+        m_module.free_memory(m_blob_cfg);
+
+#ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
+    if (m_blob_cred)
+        m_module.free_memory(m_blob_cred);
+#endif
 }

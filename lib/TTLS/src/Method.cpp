@@ -28,18 +28,25 @@ using namespace winstd;
 // eap::method_ttls
 //////////////////////////////////////////////////////////////////////
 
-eap::method_ttls::method_ttls(_In_ module &module, _In_ config_connection &cfg, _In_ credentials_ttls &cred) :
+eap::method_ttls::method_ttls(_In_ module &module, _In_ config_method_ttls &cfg, _In_ credentials_ttls &cred) :
+    m_cfg(cfg),
     m_cred(cred),
     m_version(version_0),
+    m_inner_packet_id(0),
+    m_size_inner_packet_max(0),
     method_tls(module, cfg, cred)
 {
 }
 
 
 eap::method_ttls::method_ttls(_Inout_ method_ttls &&other) :
-    m_cred(other.m_cred),
-    m_version(std::move(other.m_version)),
-    method_tls(std::move(other))
+    m_cfg                  (          other.m_cfg                   ),
+    m_cred                 (          other.m_cred                  ),
+    m_version              (std::move(other.m_version              )),
+    m_inner                (std::move(other.m_inner                )),
+    m_inner_packet_id      (std::move(other.m_inner_packet_id      )),
+    m_size_inner_packet_max(std::move(other.m_size_inner_packet_max)),
+    method_tls             (std::move(other                        ))
 {
 }
 
@@ -47,11 +54,39 @@ eap::method_ttls::method_ttls(_Inout_ method_ttls &&other) :
 eap::method_ttls& eap::method_ttls::operator=(_Inout_ method_ttls &&other)
 {
     if (this != std::addressof(other)) {
-        (method_tls&)*this = std::move(other);
-        m_version          = std::move(other.m_version);
+        (method_tls&)*this      = std::move(other                        );
+        m_version               = std::move(other.m_version              );
+        m_inner                 = std::move(other.m_inner                );
+        m_inner_packet_id       = std::move(other.m_inner_packet_id      );
+        m_size_inner_packet_max = std::move(other.m_size_inner_packet_max);
     }
 
     return *this;
+}
+
+
+void eap::method_ttls::begin_session(
+    _In_        DWORD         dwFlags,
+    _In_  const EapAttributes *pAttributeArray,
+    _In_        HANDLE        hTokenImpersonateUser,
+    _In_        DWORD         dwMaxSendPacketSize)
+{
+    method_tls::begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
+
+    // Initialize inner method.
+    switch (m_cfg.m_inner->get_method_id()) {
+    case eap_type_pap: m_inner.reset(new method_pap(m_module, (config_method_pap&)*m_cfg.m_inner, (credentials_pap&)*m_cred.m_inner.get()));
+    default: invalid_argument(__FUNCTION__ " Unsupported inner authentication method.");
+    }
+    m_inner->begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, m_size_inner_packet_max = dwMaxSendPacketSize); // TODO: Maximum inner packet size should have subtracted TLS overhead
+    m_inner_packet_id = 0;
+}
+
+
+void eap::method_ttls::end_session()
+{
+    m_inner->end_session();
+    method_tls::end_session();
 }
 
 
@@ -76,7 +111,7 @@ void eap::method_ttls::process_request_packet(
     if (m_phase == phase_application_data) {
         // Send inner authentication.
         if (!m_state_client.m_alg_encrypt)
-            throw runtime_error(__FUNCTION__ " Refusing to send credentials unencrypted.");
+            throw runtime_error(__FUNCTION__ " Refusing to continue with inner authentication unencrypted.");
 
         m_module.log_event(&EAPMETHOD_TTLS_INNER_CRED, event_data((unsigned int)eap_type_ttls), event_data(m_cred.m_inner->get_name()), event_data::blank);
 
@@ -111,29 +146,12 @@ void eap::method_ttls::get_result(
         // Do the TLS.
         method_tls::get_result(reason, ppResult);
     } else {
-        // The TLS finished, this is inner authentication's bussines.
-        config_provider &cfg_prov(m_cfg.m_providers.front());
-        config_method_ttls *cfg_method = dynamic_cast<config_method_ttls*>(cfg_prov.m_methods.front().get());
-        assert(cfg_method);
+        // Get inner method result.
+        EapPeerMethodResult result = {};
+        m_inner->get_result(reason, &result);
 
-        switch (reason) {
-        case EapPeerMethodResultSuccess: {
-            m_module.log_event(&EAPMETHOD_TTLS_INNER_SUCCESS, event_data((unsigned int)eap_type_ttls), event_data::blank);
-            cfg_method->m_inner->m_auth_failed = false;
-            break;
-        }
-
-        case EapPeerMethodResultFailure:
-            m_module.log_event(&EAPMETHOD_TTLS_INNER_FAILURE, event_data((unsigned int)eap_type_ttls), event_data::blank);
-
-            // Mark credentials as failed, so GUI can re-prompt user.
-            // But be careful: do so only if this happened after transition from handshake to application data phase.
-            cfg_method->m_inner->m_auth_failed = m_phase_prev < phase_application_data;
-            break;
-
-        default:
-            throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Not supported.");
-        }
+        if (result.fSaveConnectionData)
+            ppResult->fSaveConnectionData = TRUE;
 
 #if EAP_TLS >= EAP_TLS_SCHANNEL
         // EAP-TTLS uses different label in PRF for MSK derivation than EAP-TLS.
@@ -143,8 +161,6 @@ void eap::method_ttls::get_result(
         if (FAILED(status))
             throw sec_runtime_error(status, __FUNCTION__ "Error setting EAP-TTLS PRF in Schannel.");
 #endif
-
-        // The TLS was OK.
         method_tls::get_result(EapPeerMethodResultSuccess, ppResult);
 
         // Do not report failure to EapHost, as it will not save updated configuration then. But we need it to save it, to alert user on next connection attempt.
@@ -196,117 +212,76 @@ void eap::method_ttls::derive_msk()
 
 void eap::method_ttls::process_application_data(_In_bytecount_(size_msg) const void *msg, _In_ size_t size_msg)
 {
-    UNREFERENCED_PARAMETER(msg);
-    UNREFERENCED_PARAMETER(size_msg);
-
     // Prepare inner authentication.
     if (!(m_sc_ctx.m_attrib & ISC_RET_CONFIDENTIALITY))
-        throw runtime_error(__FUNCTION__ " Refusing to send credentials unencrypted.");
+        throw runtime_error(__FUNCTION__ " Refusing to continue with inner authentication unencrypted.");
 
-    m_module.log_event(&EAPMETHOD_TTLS_INNER_CRED, event_data((unsigned int)eap_type_ttls), event_data(m_cred.m_inner->get_name()), event_data::blank);
+    EapPeerMethodOutput eap_output = {};
+    eap_type_t eap_type = m_cfg.m_inner->get_method_id();
+    if (eap_type_noneap_start <= eap_type && eap_type < eap_type_noneap_end) {
+        // Inner method is natively non-EAP. Server sent raw data, but all our eap::method derived classes expect EAP encapsulated.
+        // Encapsulate in an EAP packet.
+        assert(size_msg < 0xffff);
+        unsigned short size_packet = (unsigned short)size_msg + 4;
+        sanitizing_blob packet;
+        packet.reserve(size_packet);
+        packet.push_back(EapCodeRequest);
+        packet.push_back(m_inner_packet_id++);
+        unsigned short size2 = htons(size_packet);
+        packet.insert(packet.end(), (unsigned char*)&size2, (unsigned char*)(&size2 + 1));
+        packet.insert(packet.end(), (unsigned char*)msg, (unsigned char*)msg + size_msg);
+        m_inner->process_request_packet((const EapPacket*)packet.data(), size_packet, &eap_output);
+    } else {
+        // Inner packet is EAP-aware.
+        m_inner->process_request_packet((const EapPacket*)msg, (DWORD)size_msg, &eap_output);
+    }
 
-    SECURITY_STATUS status;
+    switch (eap_output.action) {
+    case EapPeerMethodResponseActionSend: {
+        // Retrieve inner packet and send it.
+        SECURITY_STATUS status;
 
-    // Get maximum message sizes.
-    SecPkgContext_StreamSizes sizes;
-    status = QueryContextAttributes(m_sc_ctx, SECPKG_ATTR_STREAM_SIZES, &sizes);
-    if (FAILED(status))
-        throw sec_runtime_error(status, __FUNCTION__ " Error getting Schannel required encryption sizes.");
+        // Get maximum message sizes.
+        SecPkgContext_StreamSizes sizes;
+        status = QueryContextAttributes(m_sc_ctx, SECPKG_ATTR_STREAM_SIZES, &sizes);
+        if (FAILED(status))
+            throw sec_runtime_error(status, __FUNCTION__ " Error getting Schannel required encryption sizes.");
 
-    // Make PAP message.
-    sanitizing_blob msg_pap(make_pap_client());
-    assert(msg_pap.size() < sizes.cbMaximumMessage);
-    unsigned long size_data = std::min<unsigned long>(sizes.cbMaximumMessage, (unsigned long)msg_pap.size()); // Truncate
+        sanitizing_blob data(sizes.cbHeader + m_size_inner_packet_max + sizes.cbTrailer, 0);
+        DWORD size_data = m_size_inner_packet_max;
+        unsigned char *ptr_data = data.data() + sizes.cbHeader;
+        m_inner->get_response_packet((EapPacket*)ptr_data, &size_data);
 
-    sanitizing_blob data(sizes.cbHeader + size_data + sizes.cbTrailer, 0);
-    memcpy(data.data() + sizes.cbHeader, msg_pap.data(), size_data);
+        if (eap_type_noneap_start <= eap_type && eap_type < eap_type_noneap_end) {
+            // Inner method is non-EAP. Strip EAP header, since server expect raw data.
+            memmove(ptr_data, ptr_data + 4, size_data -= 4);
+        }
 
-    // Prepare input/output buffer(s).
-    SecBuffer buf[] = {
-        {  sizes.cbHeader, SECBUFFER_STREAM_HEADER , data.data()                              },
-        {       size_data, SECBUFFER_DATA          , data.data() + sizes.cbHeader             },
-        { sizes.cbTrailer, SECBUFFER_STREAM_TRAILER, data.data() + sizes.cbHeader + size_data },
-        {               0, SECBUFFER_EMPTY         , NULL                                     },
-    };
-    SecBufferDesc buf_desc = {
-        SECBUFFER_VERSION,
-        _countof(buf),
-        buf
-    };
+        // Prepare input/output buffer(s).
+        SecBuffer buf[] = {
+            {  sizes.cbHeader, SECBUFFER_STREAM_HEADER , data.data()          },
+            {       size_data, SECBUFFER_DATA          , ptr_data             },
+            { sizes.cbTrailer, SECBUFFER_STREAM_TRAILER, ptr_data + size_data },
+            {               0, SECBUFFER_EMPTY         , NULL                 },
+        };
+        SecBufferDesc buf_desc = {
+            SECBUFFER_VERSION,
+            _countof(buf),
+            buf
+        };
 
-    // Encrypt the message.
-    status = EncryptMessage(m_sc_ctx, 0, &buf_desc, 0);
-    if (FAILED(status))
-        throw sec_runtime_error(status, __FUNCTION__ " Error encrypting message.");
-    m_packet_res.m_data.insert(m_packet_res.m_data.end(), (const unsigned char*)buf[0].pvBuffer, (const unsigned char*)buf[0].pvBuffer + buf[0].cbBuffer + buf[1].cbBuffer + buf[2].cbBuffer);
+        // Encrypt the message.
+        status = EncryptMessage(m_sc_ctx, 0, &buf_desc, 0);
+        if (FAILED(status))
+            throw sec_runtime_error(status, __FUNCTION__ " Error encrypting message.");
+        m_packet_res.m_data.insert(m_packet_res.m_data.end(), (const unsigned char*)buf[0].pvBuffer, (const unsigned char*)buf[0].pvBuffer + buf[0].cbBuffer + buf[1].cbBuffer + buf[2].cbBuffer);
+
+        break;
+    }
+
+    default:
+        throw invalid_argument(string_printf(__FUNCTION__ " Inner method returned an unsupported action (action %u).", eap_output.action).c_str());
+    }
 }
 
 #endif
-
-
-eap::sanitizing_blob eap::method_ttls::make_pap_client() const
-{
-    const credentials_pap *cred = dynamic_cast<credentials_pap*>(m_cred.m_inner.get());
-    if (!cred)
-        throw invalid_argument(__FUNCTION__ " Inner credentials missing or not PAP.");
-
-    // Convert username and password to UTF-8.
-    sanitizing_string identity_utf8, password_utf8;
-    WideCharToMultiByte(CP_UTF8, 0, cred->m_identity.c_str(), (int)cred->m_identity.length(), identity_utf8, NULL, NULL);
-    WideCharToMultiByte(CP_UTF8, 0, cred->m_password.c_str(), (int)cred->m_password.length(), password_utf8, NULL, NULL);
-
-    // PAP passwords must be padded to 16B boundary according to RFC 5281. Will not add random extra padding here, as length obfuscation should be done by TLS encryption layer.
-    size_t padding_password_ex = (16 - password_utf8.length()) % 16;
-    password_utf8.append(padding_password_ex, 0);
-
-    size_t
-        size_identity    = identity_utf8.length(),
-        size_password    = password_utf8.length(),
-        padding_identity = (4 - size_identity         ) % 4,
-        padding_password = (4 - password_utf8.length()) % 4,
-        size_identity_outer,
-        size_password_outer;
-
-    sanitizing_blob msg;
-    msg.reserve(
-        (size_identity_outer = 
-        4                + // Diameter AVP Code
-        4                + // Diameter AVP Flags & Length
-        size_identity)   + // Identity
-        padding_identity + // Identity padding
-        (size_password_outer = 
-        4                + // Diameter AVP Code
-        4                + // Diameter AVP Flags & Length
-        size_password)   + // Password
-        padding_password); // Password padding
-
-    // Diameter AVP Code User-Name (0x00000001)
-    msg.push_back(0x00);
-    msg.push_back(0x00);
-    msg.push_back(0x00);
-    msg.push_back(0x01);
-
-    // Diameter AVP Flags & Length
-    unsigned int identity_hdr = htonl((diameter_avp_flag_mandatory << 24) | (unsigned int)size_identity_outer);
-    msg.insert(msg.end(), (unsigned char*)&identity_hdr, (unsigned char*)(&identity_hdr + 1));
-
-    // Identity
-    msg.insert(msg.end(), identity_utf8.begin(), identity_utf8.end());
-    msg.insert(msg.end(), padding_identity, 0);
-
-    // Diameter AVP Code User-Password (0x00000002)
-    msg.push_back(0x00);
-    msg.push_back(0x00);
-    msg.push_back(0x00);
-    msg.push_back(0x02);
-
-    // Diameter AVP Flags & Length
-    unsigned int password_hdr = htonl((diameter_avp_flag_mandatory << 24) | (unsigned int)size_password_outer);
-    msg.insert(msg.end(), (unsigned char*)&password_hdr, (unsigned char*)(&password_hdr + 1));
-
-    // Password
-    msg.insert(msg.end(), password_utf8.begin(), password_utf8.end());
-    msg.insert(msg.end(), padding_password, 0);
-
-    return msg;
-}

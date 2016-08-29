@@ -22,3 +22,7 @@
 
 #include "../include/Config.h"
 #include "../include/Credentials.h"
+#include "../include/Method.h"
+
+#include <Windows.h>
+#include <EapHostError.h> // include after Windows.h

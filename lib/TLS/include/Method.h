@@ -146,10 +146,10 @@ namespace eap
         /// Constructs an EAP method
         ///
         /// \param[in] mod   EAP module to use for global services
-        /// \param[in] cfg   Connection configuration
+        /// \param[in] cfg   Method configuration
         /// \param[in] cred  User credentials
         ///
-        method_tls(_In_ module &module, _In_ config_connection &cfg, _In_ credentials_tls &cred);
+        method_tls(_In_ module &module, _In_ config_method_tls &cfg, _In_ credentials_tls &cred);
 
         ///
         /// Moves an EAP method
@@ -157,11 +157,6 @@ namespace eap
         /// \param[in] other  EAP method to move from
         ///
         method_tls(_Inout_ method_tls &&other);
-
-        ///
-        /// Destructor
-        ///
-        virtual ~method_tls();
 
         ///
         /// Moves an EAP method
@@ -490,6 +485,7 @@ namespace eap
 #endif
 
     protected:
+        config_method_tls &m_cfg;                               ///< EAP-TLS method configuration
         credentials_tls &m_cred;                                ///< EAP-TLS user credentials
         HANDLE m_user_ctx;                                      ///< Handle to user context
 
@@ -550,14 +546,6 @@ namespace eap
             phase_application_data,                             ///< Exchange application data
             phase_shutdown,                                     ///< Connection shut down
         } m_phase, m_phase_prev;                                ///< What phase is our communication at?
-#endif
-
-        // The following members are required to avoid memory leakage in get_result()
-        EAP_ATTRIBUTES m_eap_attr_desc;                         ///< EAP Radius attributes descriptor
-        std::vector<winstd::eap_attr> m_eap_attr;               ///< EAP Radius attributes
-        BYTE *m_blob_cfg;                                       ///< Configuration BLOB
-#ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
-        BYTE *m_blob_cred;                                      ///< Credentials BLOB
 #endif
     };
 }

@@ -125,7 +125,8 @@ void eap::method_tls::packet::clear()
 // eap::method_tls
 //////////////////////////////////////////////////////////////////////
 
-eap::method_tls::method_tls(_In_ module &module, _In_ config_connection &cfg, _In_ credentials_tls &cred) :
+eap::method_tls::method_tls(_In_ module &module, _In_ config_method_tls &cfg, _In_ credentials_tls &cred) :
+    m_cfg(cfg),
     m_cred(cred),
     m_user_ctx(NULL),
 #if EAP_TLS < EAP_TLS_SCHANNEL
@@ -135,10 +136,6 @@ eap::method_tls::method_tls(_In_ module &module, _In_ config_connection &cfg, _I
 #else
     m_phase(phase_unknown),
     m_phase_prev(phase_unknown),
-#endif
-    m_blob_cfg(NULL),
-#ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
-    m_blob_cred(NULL),
 #endif
     method(module, cfg, cred)
 {
@@ -153,6 +150,7 @@ eap::method_tls::method_tls(_In_ module &module, _In_ config_connection &cfg, _I
 
 eap::method_tls::method_tls(_Inout_ method_tls &&other) :
     m_cred                      (          other.m_cred                       ),
+    m_cfg                       (          other.m_cfg                        ),
     m_user_ctx                  (std::move(other.m_user_ctx                  )),
     m_packet_req                (std::move(other.m_packet_req                )),
     m_packet_res                (std::move(other.m_packet_res                )),
@@ -195,18 +193,6 @@ eap::method_tls::method_tls(_Inout_ method_tls &&other) :
 #ifdef _DEBUG
     memset(other.m_handshake, 0, sizeof(m_handshake));
 #endif
-#endif
-}
-
-
-eap::method_tls::~method_tls()
-{
-    if (m_blob_cfg)
-        m_module.free_memory(m_blob_cfg);
-
-#ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
-    if (m_blob_cred)
-        m_module.free_memory(m_blob_cred);
 #endif
 }
 
@@ -273,13 +259,6 @@ void eap::method_tls::begin_session(
     m_user_ctx = hTokenImpersonateUser;
     user_impersonator impersonating(m_user_ctx);
 
-    // Get method configuration.
-    if (m_cfg.m_providers.empty() || m_cfg.m_providers.front().m_methods.empty())
-        throw invalid_argument(__FUNCTION__ " Configuration has no providers and/or methods.");
-    const config_provider &cfg_prov(m_cfg.m_providers.front());
-    const config_method_tls *cfg_method = dynamic_cast<const config_method_tls*>(cfg_prov.m_methods.front().get());
-    assert(cfg_method);
-
 #if EAP_TLS < EAP_TLS_SCHANNEL
     // Create cryptographics provider for support needs (handshake hashing, client random, temporary keys...).
     if (!m_cp.create(NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
@@ -291,13 +270,13 @@ void eap::method_tls::begin_session(
         throw win_runtime_error(__FUNCTION__ " Error creating exponent-of-one key.");
 
     // Restore previous session ID and master secret. We might get lucky.
-    m_session_id = cfg_method->m_session_id;
-    m_master_secret = cfg_method->m_master_secret;
+    m_session_id = m_cfg.m_session_id;
+    m_master_secret = m_cfg.m_master_secret;
 #else
     // Build (expected) server name(s) for Schannel.
     m_sc_target_name.clear();
-    for (list<wstring>::const_iterator name = cfg_method->m_server_names.cbegin(), name_end = cfg_method->m_server_names.cend(); name != name_end; ++name) {
-        if (name != cfg_method->m_server_names.cbegin())
+    for (list<wstring>::const_iterator name = m_cfg.m_server_names.cbegin(), name_end = m_cfg.m_server_names.cend(); name != name_end; ++name) {
+        if (name != m_cfg.m_server_names.cbegin())
             m_sc_target_name += _T(';');
 #ifdef _UNICODE
         m_sc_target_name.insert(m_sc_target_name.end(), name->begin(), name->end());
@@ -311,30 +290,30 @@ void eap::method_tls::begin_session(
     // Prepare client credentials for Schannel.
     PCCERT_CONTEXT certs[] = { m_cred.m_cert ? m_cred.m_cert : NULL };
     SCHANNEL_CRED cred = {
-        SCHANNEL_CRED_VERSION,                                                      // dwVersion
-        m_cred.m_cert ? 1 : 0,                                                      // cCreds
-        certs,                                                                      // paCred
-        NULL,                                                                       // hRootStore: Not valid for client credentials
-        0,                                                                          // cMappers
-        NULL,                                                                       // aphMappers
-        0,                                                                          // cSupportedAlgs: Use system configured default
-        NULL,                                                                       // palgSupportedAlgs: Use system configured default
-        0,                                                                          // grbitEnabledProtocols: Use default
-        0,                                                                          // dwMinimumCipherStrength: Use system configured default
-        0,                                                                          // dwMaximumCipherStrength: Use system configured default
-        0,                                                                          // dwSessionLifespan: Use system configured default = 10hr
+        SCHANNEL_CRED_VERSION,                                                // dwVersion
+        m_cred.m_cert ? 1 : 0,                                                // cCreds
+        certs,                                                                // paCred
+        NULL,                                                                 // hRootStore: Not valid for client credentials
+        0,                                                                    // cMappers
+        NULL,                                                                 // aphMappers
+        0,                                                                    // cSupportedAlgs: Use system configured default
+        NULL,                                                                 // palgSupportedAlgs: Use system configured default
+        0,                                                                    // grbitEnabledProtocols: Use default
+        0,                                                                    // dwMinimumCipherStrength: Use system configured default
+        0,                                                                    // dwMaximumCipherStrength: Use system configured default
+        0,                                                                    // dwSessionLifespan: Use system configured default = 10hr
 #if EAP_TLS >= EAP_TLS_SCHANNEL_FULL
-        SCH_CRED_AUTO_CRED_VALIDATION                                           |   // dwFlags: Let Schannel verify server certificate
+        SCH_CRED_AUTO_CRED_VALIDATION                                     |   // dwFlags: Let Schannel verify server certificate
 #else
-        SCH_CRED_MANUAL_CRED_VALIDATION                                         |   // dwFlags: Prevent Schannel verify server certificate (we want to use custom root CA store and multiple name checking)
+        SCH_CRED_MANUAL_CRED_VALIDATION                                   |   // dwFlags: Prevent Schannel verify server certificate (we want to use custom root CA store and multiple name checking)
 #endif
-        SCH_CRED_CACHE_ONLY_URL_RETRIEVAL_ON_CREATE                             |   // dwFlags: Do not attempt online revocation check - we do not expect to have network connection yet
-        SCH_CRED_IGNORE_NO_REVOCATION_CHECK                                     |   // dwFlags: Ignore no-revocation-check errors (TODO: Test if this flag is required.)
-        SCH_CRED_IGNORE_REVOCATION_OFFLINE                                      |   // dwFlags: Ignore offline-revocation errors - we do not expect to have network connection yet
-        SCH_CRED_NO_DEFAULT_CREDS                                               |   // dwFlags: If client certificate we provided is not acceptable, do not try to select one on your own
-        (cfg_method->m_server_names.empty() ? SCH_CRED_NO_SERVERNAME_CHECK : 0) |   // dwFlags: When no expected server name is given, do not do the server name check.
-        0x00400000 /*SCH_USE_STRONG_CRYPTO*/,                                       // dwFlags: Do not use broken ciphers
-        0                                                                           // dwCredFormat
+        SCH_CRED_CACHE_ONLY_URL_RETRIEVAL_ON_CREATE                       |   // dwFlags: Do not attempt online revocation check - we do not expect to have network connection yet
+        SCH_CRED_IGNORE_NO_REVOCATION_CHECK                               |   // dwFlags: Ignore no-revocation-check errors (TODO: Test if this flag is required.)
+        SCH_CRED_IGNORE_REVOCATION_OFFLINE                                |   // dwFlags: Ignore offline-revocation errors - we do not expect to have network connection yet
+        SCH_CRED_NO_DEFAULT_CREDS                                         |   // dwFlags: If client certificate we provided is not acceptable, do not try to select one on your own
+        (m_cfg.m_server_names.empty() ? SCH_CRED_NO_SERVERNAME_CHECK : 0) |   // dwFlags: When no expected server name is given, do not do the server name check.
+        0x00400000 /*SCH_USE_STRONG_CRYPTO*/,                                 // dwFlags: Do not use broken ciphers
+        0                                                                     // dwCredFormat
     };
     SECURITY_STATUS stat = m_sc_cred.acquire(NULL, UNISP_NAME, SECPKG_CRED_OUTBOUND, NULL, &cred);
     if (FAILED(stat))
@@ -378,14 +357,14 @@ void eap::method_tls::process_request_packet(
                 // Preallocate data according to the Length field.
                 size_t size_tot  = ntohl(*(unsigned int*)(pReceivedPacket->Data + 2));
                 m_packet_req.m_data.reserve(size_tot);
-                m_module.log_event(&EAPMETHOD_TLS_PACKET_RECV_FRAG_FIRST, event_data((unsigned int)eap_type_tls), event_data((unsigned int)packet_data_size), event_data((unsigned int)size_tot), event_data::blank);
+                m_module.log_event(&EAPMETHOD_PACKET_RECV_FRAG_FIRST, event_data((unsigned int)eap_type_tls), event_data((unsigned int)packet_data_size), event_data((unsigned int)size_tot), event_data::blank);
             } else {
                 // The Length field was not included. Odd. Nevermind, no pre-allocation then.
-                m_module.log_event(&EAPMETHOD_TLS_PACKET_RECV_FRAG_FIRST1, event_data((unsigned int)eap_type_tls), event_data((unsigned int)packet_data_size), event_data::blank);
+                m_module.log_event(&EAPMETHOD_PACKET_RECV_FRAG_FIRST1, event_data((unsigned int)eap_type_tls), event_data((unsigned int)packet_data_size), event_data::blank);
             }
         } else {
             // Mid fragment received.
-            m_module.log_event(&EAPMETHOD_TLS_PACKET_RECV_FRAG_MID, event_data((unsigned int)eap_type_tls), event_data((unsigned int)packet_data_size), event_data((unsigned int)m_packet_req.m_data.size()), event_data::blank);
+            m_module.log_event(&EAPMETHOD_PACKET_RECV_FRAG_MID, event_data((unsigned int)eap_type_tls), event_data((unsigned int)packet_data_size), event_data((unsigned int)m_packet_req.m_data.size()), event_data::blank);
         }
         m_packet_req.m_data.insert(m_packet_req.m_data.end(), packet_data_ptr, packet_data_ptr + packet_data_size);
 
@@ -400,11 +379,11 @@ void eap::method_tls::process_request_packet(
     } else if (!m_packet_req.m_data.empty()) {
         // Last fragment received. Append data.
         m_packet_req.m_data.insert(m_packet_req.m_data.end(), packet_data_ptr, packet_data_ptr + packet_data_size);
-        m_module.log_event(&EAPMETHOD_TLS_PACKET_RECV_FRAG_LAST, event_data((unsigned int)eap_type_tls), event_data((unsigned int)packet_data_size), event_data((unsigned int)m_packet_req.m_data.size()), event_data::blank);
+        m_module.log_event(&EAPMETHOD_PACKET_RECV_FRAG_LAST, event_data((unsigned int)eap_type_tls), event_data((unsigned int)packet_data_size), event_data((unsigned int)m_packet_req.m_data.size()), event_data::blank);
     } else {
         // This is a complete non-fragmented packet.
         m_packet_req.m_data.assign(packet_data_ptr, packet_data_ptr + packet_data_size);
-        m_module.log_event(&EAPMETHOD_TLS_PACKET_RECV, event_data((unsigned int)eap_type_tls), event_data((unsigned int)packet_data_size), event_data::blank);
+        m_module.log_event(&EAPMETHOD_PACKET_RECV, event_data((unsigned int)eap_type_tls), event_data((unsigned int)packet_data_size), event_data::blank);
     }
 
     m_packet_req.m_code  = (EapCode)pReceivedPacket->Code;
@@ -436,7 +415,7 @@ void eap::method_tls::process_request_packet(
 #if EAP_TLS < EAP_TLS_SCHANNEL
     if (pReceivedPacket->Code == EapCodeRequest && (m_packet_req.m_flags & flags_req_start)) {
         // This is the EAP-TLS start message: (re)initialize method.
-        m_module.log_event(&EAPMETHOD_TLS_HANDSHAKE_START2, event_data((unsigned int)eap_type_tls), event_data::blank);
+        m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_tls), event_data::blank);
         m_phase = phase_client_hello;
     } else {
         // Process the packet.
@@ -582,7 +561,7 @@ void eap::method_tls::process_request_packet(
 #else
     if (pReceivedPacket->Code == EapCodeRequest && (m_packet_req.m_flags & flags_req_start)) {
         // This is the EAP-TLS start message: (re)initialize method.
-        m_module.log_event(&EAPMETHOD_TLS_HANDSHAKE_START2, event_data((unsigned int)eap_type_tls), event_data::blank);
+        m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_tls), event_data::blank);
         m_phase = phase_handshake_init;
         m_sc_queue.assign(m_packet_req.m_data.begin(), m_packet_req.m_data.end());
     } else
@@ -628,7 +607,7 @@ void eap::method_tls::get_response_packet(
             // No need to fragment the packet.
             m_packet_res.m_flags &= ~flags_res_length_incl; // No need to explicitly include the Length field either.
             data_dst = pSendPacket->Data + 2;
-            m_module.log_event(&EAPMETHOD_TLS_PACKET_SEND, event_data((unsigned int)eap_type_tls), event_data((unsigned int)size_data), event_data::blank);
+            m_module.log_event(&EAPMETHOD_PACKET_SEND, event_data((unsigned int)eap_type_tls), event_data((unsigned int)size_data), event_data::blank);
         } else {
             // But it should be fragmented.
             m_packet_res.m_flags |= flags_res_length_incl | flags_res_more_frag;
@@ -636,7 +615,7 @@ void eap::method_tls::get_response_packet(
             data_dst = pSendPacket->Data + 6;
             size_data   = size_packet_limit - 10;
             size_packet = size_packet_limit;
-            m_module.log_event(&EAPMETHOD_TLS_PACKET_SEND_FRAG_FIRST, event_data((unsigned int)eap_type_tls), event_data((unsigned int)size_data), event_data((unsigned int)(m_packet_res.m_data.size() - size_data)), event_data::blank);
+            m_module.log_event(&EAPMETHOD_PACKET_SEND_FRAG_FIRST, event_data((unsigned int)eap_type_tls), event_data((unsigned int)size_data), event_data((unsigned int)(m_packet_res.m_data.size() - size_data)), event_data::blank);
         }
     } else {
         // Continuing the fragmented packet...
@@ -645,11 +624,11 @@ void eap::method_tls::get_response_packet(
             m_packet_res.m_flags &= ~flags_res_length_incl;
             size_data   = size_packet_limit - 6;
             size_packet = size_packet_limit;
-            m_module.log_event(&EAPMETHOD_TLS_PACKET_SEND_FRAG_MID, event_data((unsigned int)eap_type_tls), event_data((unsigned int)size_data), event_data((unsigned int)(m_packet_res.m_data.size() - size_data)), event_data::blank);
+            m_module.log_event(&EAPMETHOD_PACKET_SEND_FRAG_MID, event_data((unsigned int)eap_type_tls), event_data((unsigned int)size_data), event_data((unsigned int)(m_packet_res.m_data.size() - size_data)), event_data::blank);
         } else {
             // This is the last fragment.
             m_packet_res.m_flags &= ~(flags_res_length_incl | flags_res_more_frag);
-            m_module.log_event(&EAPMETHOD_TLS_PACKET_SEND_FRAG_LAST, event_data((unsigned int)eap_type_tls), event_data((unsigned int)size_data), event_data((unsigned int)(m_packet_res.m_data.size() - size_data)), event_data::blank);
+            m_module.log_event(&EAPMETHOD_PACKET_SEND_FRAG_LAST, event_data((unsigned int)eap_type_tls), event_data((unsigned int)size_data), event_data((unsigned int)(m_packet_res.m_data.size() - size_data)), event_data::blank);
         }
         data_dst = pSendPacket->Data + 2;
     }
@@ -671,13 +650,9 @@ void eap::method_tls::get_result(
 {
     assert(ppResult);
 
-    config_provider &cfg_prov(m_cfg.m_providers.front());
-    config_method_tls *cfg_method = dynamic_cast<config_method_tls*>(cfg_prov.m_methods.front().get());
-    assert(cfg_method);
-
     switch (reason) {
     case EapPeerMethodResultSuccess: {
-        m_module.log_event(&EAPMETHOD_TLS_SUCCESS, event_data((unsigned int)eap_type_tls), event_data::blank);
+        m_module.log_event(&EAPMETHOD_METHOD_SUCCESS, event_data((unsigned int)eap_type_tls), event_data::blank);
 
 #if EAP_TLS < EAP_TLS_SCHANNEL
         // Derive MSK/EMSK for line encryption.
@@ -685,8 +660,7 @@ void eap::method_tls::get_result(
 
         // Fill array with RADIUS attributes.
         eap_attr a;
-        m_eap_attr.clear();
-        m_eap_attr.reserve(3);
+        m_eap_attr.reserve(m_eap_attr.size() + 3);
         a.create_ms_mppe_key(16, (LPCBYTE)&m_key_mppe_client, sizeof(tls_random));
         m_eap_attr.push_back(std::move(a));
         a.create_ms_mppe_key(17, (LPCBYTE)&m_key_mppe_server, sizeof(tls_random));
@@ -702,8 +676,7 @@ void eap::method_tls::get_result(
 
         // Fill array with RADIUS attributes.
         eap_attr a;
-        m_eap_attr.clear();
-        m_eap_attr.reserve(3);
+        m_eap_attr.reserve(m_eap_attr.size() + 3);
         a.create_ms_mppe_key(16, _key_block, sizeof(tls_random));
         m_eap_attr.push_back(std::move(a));
         _key_block += sizeof(tls_random);
@@ -713,20 +686,16 @@ void eap::method_tls::get_result(
         m_eap_attr.push_back(eap_attr::blank);
 #endif
 
-        m_eap_attr_desc.dwNumberOfAttributes = (DWORD)m_eap_attr.size();
-        m_eap_attr_desc.pAttribs = m_eap_attr.data();
-        ppResult->pAttribArray = &m_eap_attr_desc;
-
         // Clear credentials as failed.
-        cfg_method->m_auth_failed = false;
+        m_cfg.m_auth_failed = false;
 
         ppResult->fIsSuccess = TRUE;
         ppResult->dwFailureReasonCode = ERROR_SUCCESS;
 
 #if EAP_TLS < EAP_TLS_SCHANNEL
         // Update configuration with session resumption data and prepare BLOB.
-        cfg_method->m_session_id    = m_session_id;
-        cfg_method->m_master_secret = m_master_secret;
+        m_cfg.m_session_id    = m_session_id;
+        m_cfg.m_master_secret = m_master_secret;
 #endif
 
         break;
@@ -734,19 +703,19 @@ void eap::method_tls::get_result(
 
     case EapPeerMethodResultFailure:
         m_module.log_event(
-            m_phase_prev < phase_handshake_cont   ? &EAPMETHOD_TLS_FAILURE_INIT :
-            m_phase_prev < phase_application_data ? &EAPMETHOD_TLS_FAILURE_HANDSHAKE : &EAPMETHOD_TLS_FAILURE,
+            m_phase_prev < phase_handshake_cont   ? &EAPMETHOD_METHOD_FAILURE_INIT :
+            m_phase_prev < phase_application_data ? &EAPMETHOD_METHOD_FAILURE_HANDSHAKE : &EAPMETHOD_METHOD_FAILURE,
             event_data((unsigned int)eap_type_tls), event_data::blank);
 
 #if EAP_TLS < EAP_TLS_SCHANNEL
         // Clear session resumption data.
-        cfg_method->m_session_id.clear();
-        cfg_method->m_master_secret.clear();
+        m_cfg.m_session_id.clear();
+        m_cfg.m_master_secret.clear();
 #endif
 
         // Mark credentials as failed, so GUI can re-prompt user.
         // But be careful: do so only if this happened after transition from handshake to application data phase.
-        cfg_method->m_auth_failed = m_phase_prev < phase_application_data && m_phase >= phase_application_data;
+        m_cfg.m_auth_failed = m_phase_prev < phase_application_data && m_phase >= phase_application_data;
 
         // Do not report failure to EapHost, as it will not save updated configuration then. But we need it to save it, to alert user on next connection attempt.
         // EapHost is well aware of the failed condition.
@@ -761,18 +730,6 @@ void eap::method_tls::get_result(
 
     // Always ask EAP host to save the connection data.
     ppResult->fSaveConnectionData = TRUE;
-    m_module.pack(m_cfg, &ppResult->pConnectionData, &ppResult->dwSizeofConnectionData);
-    if (m_blob_cfg)
-        m_module.free_memory(m_blob_cfg);
-    m_blob_cfg = ppResult->pConnectionData;
-
-#ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
-    ppResult->fSaveUserData = TRUE;
-    m_module.pack(m_cred, &ppResult->pUserData, &ppResult->dwSizeofUserData);
-    if (m_blob_cred)
-        m_module.free_memory(m_blob_cred);
-    m_blob_cred = ppResult->pUserData;
-#endif
 }
 
 
@@ -1483,12 +1440,8 @@ void eap::method_tls::verify_server_trust() const
         throw sec_runtime_error(status, __FUNCTION__ " Error retrieving server certificate from Schannel.");
 #endif
 
-    const config_provider &cfg_prov(m_cfg.m_providers.front());
-    const config_method_tls *cfg_method = dynamic_cast<const config_method_tls*>(cfg_prov.m_methods.front().get());
-    assert(cfg_method);
-
     // Check server name.
-    if (!cfg_method->m_server_names.empty()) {
+    if (!m_cfg.m_server_names.empty()) {
         bool
             has_san = false,
             found   = false;
@@ -1526,7 +1479,7 @@ void eap::method_tls::verify_server_trust() const
             }
             has_san = true;
 
-            for (list<wstring>::const_iterator s = cfg_method->m_server_names.cbegin(), s_end = cfg_method->m_server_names.cend(); !found && s != s_end; ++s) {
+            for (list<wstring>::const_iterator s = m_cfg.m_server_names.cbegin(), s_end = m_cfg.m_server_names.cend(); !found && s != s_end; ++s) {
                 for (DWORD idx_entry = 0; !found && idx_entry < san_info->cAltEntry; idx_entry++) {
                     if (san_info->rgAltEntry[idx_entry].dwAltNameChoice == CERT_ALT_NAME_DNS_NAME &&
                         _wcsicmp(s->c_str(), san_info->rgAltEntry[idx_entry].pwszDNSName) == 0)
@@ -1544,7 +1497,7 @@ void eap::method_tls::verify_server_trust() const
             if (!CertGetNameStringW(cert, CERT_NAME_DNS_TYPE, CERT_NAME_STR_ENABLE_PUNYCODE_FLAG, NULL, subj))
                 throw win_runtime_error(__FUNCTION__ " Error retrieving server's certificate subject name.");
 
-            for (list<wstring>::const_iterator s = cfg_method->m_server_names.cbegin(), s_end = cfg_method->m_server_names.cend(); !found && s != s_end; ++s) {
+            for (list<wstring>::const_iterator s = m_cfg.m_server_names.cbegin(), s_end = m_cfg.m_server_names.cend(); !found && s != s_end; ++s) {
                 if (_wcsicmp(s->c_str(), subj.c_str()) == 0) {
                     m_module.log_event(&EAPMETHOD_TLS_SERVER_NAME_TRUSTED1, event_data(subj), event_data::blank);
                     found = true;
@@ -1564,7 +1517,7 @@ void eap::method_tls::verify_server_trust() const
     cert_store store;
     if (!store.create(CERT_STORE_PROV_MEMORY, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, NULL, 0, NULL))
         throw win_runtime_error(__FUNCTION__ " Error creating temporary certificate store.");
-    for (list<cert_context>::const_iterator c = cfg_method->m_trusted_root_ca.cbegin(), c_end = cfg_method->m_trusted_root_ca.cend(); c != c_end; ++c)
+    for (list<cert_context>::const_iterator c = m_cfg.m_trusted_root_ca.cbegin(), c_end = m_cfg.m_trusted_root_ca.cend(); c != c_end; ++c)
         CertAddCertificateContextToStore(store, *c, CERT_STORE_ADD_REPLACE_EXISTING, NULL);
 
     // Add all intermediate certificates from the server's certificate chain.
@@ -1636,7 +1589,7 @@ void eap::method_tls::verify_server_trust() const
         throw sec_runtime_error(SEC_E_CERT_UNKNOWN, __FUNCTION__ " Can not verify empty certificate chain.");
 
     PCCERT_CONTEXT cert_root = context->rgpChain[0]->rgpElement[context->rgpChain[0]->cElement-1]->pCertContext;
-    for (list<cert_context>::const_iterator c = cfg_method->m_trusted_root_ca.cbegin(), c_end = cfg_method->m_trusted_root_ca.cend();; ++c) {
+    for (list<cert_context>::const_iterator c = m_cfg.m_trusted_root_ca.cbegin(), c_end = m_cfg.m_trusted_root_ca.cend();; ++c) {
         if (c != c_end) {
             if (cert_root->cbCertEncoded == (*c)->cbCertEncoded &&
                 memcmp(cert_root->pbCertEncoded, (*c)->pbCertEncoded, cert_root->cbCertEncoded) == 0)

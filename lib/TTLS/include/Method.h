@@ -58,10 +58,10 @@ namespace eap
         /// Constructs an EAP method
         ///
         /// \param[in] mod   EAP module to use for global services
-        /// \param[in] cfg   Connection configuration
+        /// \param[in] cfg   Method configuration
         /// \param[in] cred  User credentials
         ///
-        method_ttls(_In_ module &module, _In_ config_connection &cfg, _In_ credentials_ttls &cred);
+        method_ttls(_In_ module &module, _In_ config_method_ttls &cfg, _In_ credentials_ttls &cred);
 
         ///
         /// Moves an EAP method
@@ -81,6 +81,24 @@ namespace eap
 
         /// \name Packet processing
         /// @{
+
+        ///
+        /// Starts an EAP authentication session on the peer EapHost using the EAP method.
+        ///
+        /// \sa [EapPeerBeginSession function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363600.aspx)
+        ///
+        virtual void begin_session(
+            _In_        DWORD         dwFlags,
+            _In_  const EapAttributes *pAttributeArray,
+            _In_        HANDLE        hTokenImpersonateUser,
+            _In_        DWORD         dwMaxSendPacketSize);
+
+        ///
+        /// Ends an EAP authentication session for the EAP method.
+        ///
+        /// \sa [EapPeerEndSession function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363604.aspx)
+        ///
+        virtual void end_session();
 
         ///
         /// Processes a packet received by EapHost from a supplicant.
@@ -134,21 +152,17 @@ namespace eap
 
 #endif
 
-        ///
-        /// Makes a PAP client message
-        ///
-        /// \sa [Extensible Authentication Protocol Tunneled Transport Layer Security Authenticated Protocol Version 0 (EAP-TTLSv0) (Chapter 11.2.5. PAP)](https://tools.ietf.org/html/rfc5281#section-11.2.5)
-        ///
-        /// \returns PAP client message
-        ///
-        sanitizing_blob make_pap_client() const;
-
-    public:
-        credentials_ttls &m_cred;           ///< TTLS credentials
+    protected:
+        config_method_ttls &m_cfg;          ///< EAP-TTLS method configuration
+        credentials_ttls &m_cred;           ///< EAP-TTLS credentials
 
         #pragma warning(suppress: 4480)
         enum version_t :unsigned char {
             version_0 = 0,                  ///< EAP-TTLS v0
         } m_version;                        ///< EAP-TTLS version
+
+        std::unique_ptr<method> m_inner;    ///< Inner authentication method
+        unsigned char m_inner_packet_id;    ///< Inner packet ID
+        DWORD m_size_inner_packet_max;      ///< Maximum size of inner response packet
     };
 }
