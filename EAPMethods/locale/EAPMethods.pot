@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: EAPMethods\n"
-"POT-Creation-Date: 2016-08-28 23:08+0200\n"
+"POT-Creation-Date: 2016-08-31 00:43+0200\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
 "Last-Translator: Simon Rozman <simon.rozman@amebis.si>\n"
 "Language-Team: Amebis, d. o. o., Kamnik <info@amebis.si>\n"
@@ -20,152 +20,168 @@ msgstr ""
 "X-Poedit-SearchPath-4: EAPMethods\n"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:37
-msgid "Advanced..."
+msgid "+"
 msgstr ""
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:38
+msgid "Adds new provider"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:42
+msgid "-"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:43
+msgid "Removes selected provider"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:47
+msgid "Advanced..."
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:48
 msgid "Opens dialog with provider settings"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:174 lib/EAPBase_UI/res/wxEAP_UI.cpp:299
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:188 lib/EAPBase_UI/res/wxEAP_UI.cpp:313
 msgid "Client Credentials"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:185
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:199
 msgid "Manage credentials used to connect."
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:198
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:212
 msgid "Use &own credentials:"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:199
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:213
 msgid "Select this option if you have your unique credentials to connect"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:204
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:218
 msgid "Your credentials loaded from Windows Credential Manager"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:214
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:228
 msgid "&Clear Credentials"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:215
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:229
 msgid ""
 "Click to clear your credentials from Credential Manager.\n"
 "Note: You will be prompted to enter credentials when connecting."
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:219 lib/EAPBase_UI/res/wxEAP_UI.cpp:252
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:233 lib/EAPBase_UI/res/wxEAP_UI.cpp:266
 msgid "&Set Credentials..."
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:220 lib/EAPBase_UI/res/wxEAP_UI.cpp:253
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:234 lib/EAPBase_UI/res/wxEAP_UI.cpp:267
 msgid "Click here to set or modify your credentials"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:236
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:250
 msgid "Use &pre-shared credentials:"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:237
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:251
 msgid "Select this options if all clients connect using the same credentials"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:242
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:256
 msgid "Common (pre-shared) credentials"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:310
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:324
 msgid "Please provide your user ID and password."
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:320
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:334
 msgid "User ID:"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:325
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:339
 msgid "Enter your user name here (user@domain.org, DOMAIN\\User, etc.)"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:329
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:343
 msgid "Password:"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:334
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:348
 msgid "Enter your password here"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:341 lib/TLS_UI/res/wxTLS_UI.cpp:183
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:355 lib/TLS_UI/res/wxTLS_UI.cpp:183
 msgid "&Remember"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:342
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:356
 msgid "Check if you would like to save username and password"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:364
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:378
 msgid "Your Organization"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:375
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:389
 msgid "Describe your organization to customize user prompts.  When organization is introduced, end-users find program messages easier to understand and act."
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:382
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:396
 msgid "Your organization &name:"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:387
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:401
 msgid "Your organization name as it will appear on helpdesk contact notifications"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:391
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:405
 msgid "(Keep it short, please)"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:401
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:415
 msgid "Helpdesk contact &information:"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:411
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:425
 msgid "¶"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:418
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:432
 msgid "Your helpdesk website address"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:422
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:436
 msgid "*"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:429
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:443
 msgid "Your helpdesk e-mail address"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:433
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:447
 msgid ")"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:440
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:454
 msgid "Your helpdesk phone number"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:468
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:482
 msgid "Configuration Lock"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:479
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:493
 msgid "Your configuration can be locked to prevent accidental modification by end-users. Users will only be allowed to enter credentials."
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:486
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:500
 msgid "&Lock this configuration and prevent any further modification via user interface."
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:489
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:503
 msgid "(Warning: Once locked, you can not revert using this dialog!)"
 msgstr ""
 
@@ -388,14 +404,14 @@ msgstr ""
 msgid "Custom outer identity to use"
 msgstr ""
 
-#: lib/TTLS_UI/src/Module.cpp:249 lib/TTLS_UI/src/Module.cpp:259
-#: lib/EAPBase_UI/include/EAP_UI.h:584
+#: lib/TTLS_UI/src/Module.cpp:230 lib/TTLS_UI/src/Module.cpp:240
+#: lib/EAPBase_UI/include/EAP_UI.h:642
 #, c-format
 msgid "Error writing credentials to Credential Manager: %hs (error %u)"
 msgstr ""
 
-#: lib/TTLS_UI/src/Module.cpp:251 lib/TTLS_UI/src/Module.cpp:261
-#: lib/EAPBase_UI/include/EAP_UI.h:587
+#: lib/TTLS_UI/src/Module.cpp:232 lib/TTLS_UI/src/Module.cpp:242
+#: lib/EAPBase_UI/include/EAP_UI.h:645
 msgid "Writing credentials failed."
 msgstr ""
 
@@ -415,41 +431,50 @@ msgstr ""
 msgid "Outer Authentication"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:283
+#: lib/EAPBase_UI/include/EAP_UI.h:278
+#, c-format
+msgid "Are you sure you want to permanently remove %ls provider from configuration?"
+msgstr ""
+
+#: lib/EAPBase_UI/include/EAP_UI.h:278
+msgid "Warning"
+msgstr ""
+
+#: lib/EAPBase_UI/include/EAP_UI.h:341
 msgid "EAP Credentials"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:443
+#: lib/EAPBase_UI/include/EAP_UI.h:501
 msgid "Provider Settings"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:600
+#: lib/EAPBase_UI/include/EAP_UI.h:658
 #, c-format
 msgid "Deleting credentials failed (error %u)."
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:633
+#: lib/EAPBase_UI/include/EAP_UI.h:691
 #, c-format
 msgid "<error %u>"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:637
+#: lib/EAPBase_UI/include/EAP_UI.h:695
 msgid "<error>"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:646 lib/EAPBase_UI/include/EAP_UI.h:657
+#: lib/EAPBase_UI/include/EAP_UI.h:704 lib/EAPBase_UI/include/EAP_UI.h:715
 msgid "<empty credentials>"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:649 lib/EAPBase_UI/include/EAP_UI.h:660
+#: lib/EAPBase_UI/include/EAP_UI.h:707 lib/EAPBase_UI/include/EAP_UI.h:718
 msgid "<blank identity>"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:866
+#: lib/EAPBase_UI/include/EAP_UI.h:924
 msgid "<Your Organization>"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.h:64
+#: lib/EAPBase_UI/res/wxEAP_UI.h:68
 msgid "EAP Method Configuration"
 msgstr ""
 
