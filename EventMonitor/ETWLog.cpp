@@ -31,7 +31,7 @@ using namespace winstd;
 // Local helper functions declarations
 //////////////////////////////////////////////////////////////////////////
 
-static tstring MapToString(_In_ const EVENT_MAP_INFO *pMapInfo, _In_ LPCBYTE pData);
+static tstring MapToString(_In_ const EVENT_MAP_INFO *pMapInfo, _In_ ULONG ulData);
 static tstring DataToString(_In_ USHORT InType, _In_ USHORT OutType, _In_count_(nDataSize) LPCBYTE pData, _In_ SIZE_T nDataSize, _In_ const EVENT_MAP_INFO *pMapInfo, _In_ BYTE nPtrSize);
 static ULONG GetArraySize(PEVENT_RECORD pEvent, PTRACE_EVENT_INFO pInfo, ULONG i, ULONG *pulArraySize);
 static tstring PropertyToString(PEVENT_RECORD pEvent, PTRACE_EVENT_INFO pInfo, ULONG ulPropIndex, LPWSTR pStructureName, ULONG ulStructIndex, BYTE nPtrSize);
@@ -762,18 +762,18 @@ bool wxPersistentETWListCtrl::Restore()
 // Local helper functions
 //////////////////////////////////////////////////////////////////////////
 
-static tstring MapToString(_In_ const EVENT_MAP_INFO *pMapInfo, _In_ LPCBYTE pData)
+static tstring MapToString(_In_ const EVENT_MAP_INFO *pMapInfo, _In_ ULONG ulData)
 {
     if ( (pMapInfo->Flag &  EVENTMAP_INFO_FLAG_MANIFEST_VALUEMAP) ||
         ((pMapInfo->Flag &  EVENTMAP_INFO_FLAG_WBEM_VALUEMAP    ) && (pMapInfo->Flag & ~EVENTMAP_INFO_FLAG_WBEM_VALUEMAP) != EVENTMAP_INFO_FLAG_WBEM_FLAG))
     {
         if ((pMapInfo->Flag & EVENTMAP_INFO_FLAG_WBEM_NO_MAP) == EVENTMAP_INFO_FLAG_WBEM_NO_MAP)
-            return tstring_printf(_T("%ls"), (PBYTE)pMapInfo + pMapInfo->MapEntryArray[*(PULONG)pData].OutputOffset);
+            return tstring_printf(_T("%ls"), (PBYTE)pMapInfo + pMapInfo->MapEntryArray[ulData].OutputOffset);
         else {
             for (ULONG i = 0; ; i++) {
                 if (i >= pMapInfo->EntryCount)
-                    return tstring_printf(_T("%lu"), *(PULONG)pData);
-                else if (pMapInfo->MapEntryArray[i].Value == *(PULONG)pData)
+                    return tstring_printf(_T("%lu"), ulData);
+                else if (pMapInfo->MapEntryArray[i].Value == ulData)
                     return tstring_printf(_T("%ls"), (PBYTE)pMapInfo + pMapInfo->MapEntryArray[i].OutputOffset);
             }
         }
@@ -786,15 +786,15 @@ static tstring MapToString(_In_ const EVENT_MAP_INFO *pMapInfo, _In_ LPCBYTE pDa
 
         if (pMapInfo->Flag & EVENTMAP_INFO_FLAG_WBEM_NO_MAP) {
             for (ULONG i = 0; i < pMapInfo->EntryCount; i++)
-                if (*(PULONG)pData & (1 << i))
+                if (ulData & (1 << i))
                     out.append(tstring_printf(out.empty() ? _T("%ls") : _T(" | %ls"), (PBYTE)pMapInfo + pMapInfo->MapEntryArray[i].OutputOffset));
         } else {
             for (ULONG i = 0; i < pMapInfo->EntryCount; i++)
-                if ((pMapInfo->MapEntryArray[i].Value & *(PULONG)pData) == pMapInfo->MapEntryArray[i].Value)
+                if ((pMapInfo->MapEntryArray[i].Value & ulData) == pMapInfo->MapEntryArray[i].Value)
                     out.append(tstring_printf(out.empty() ? _T("%ls") : _T(" | %ls"), (PBYTE)pMapInfo + pMapInfo->MapEntryArray[i].OutputOffset));
         }
 
-        return out.empty() ? tstring_printf(_T("%lu"), *(PULONG)pData) : out;
+        return out.empty() ? tstring_printf(_T("%lu"), ulData) : out;
     }
 
     return _T("<unknown map>");
@@ -875,7 +875,7 @@ static tstring DataToString(_In_ USHORT InType, _In_ USHORT OutType, _In_count_(
                 case TDH_OUTTYPE_NTSTATUS  :
                 case TDH_OUTTYPE_HEXINT32  : return tstring_printf(_T("0x%x"       ),  *(PULONG)pData);
                 case TDH_OUTTYPE_IPV4      : return tstring_printf(_T("%d.%d.%d.%d"), (*(PULONG)pData >> 0) & 0xff, (*(PULONG)pData >> 8) & 0xff, (*(PULONG)pData >> 16) & 0xff, (*(PULONG)pData >> 24) & 0xff);
-                default:                     return pMapInfo ? MapToString(pMapInfo, pData) : tstring_printf(_T("%lu"), *(PULONG)pData);
+                default:                     return pMapInfo ? MapToString(pMapInfo, *(PULONG)pData) : tstring_printf(_T("%lu"), *(PULONG)pData);
             }
 
         case TDH_INTYPE_HEXINT32:
@@ -1105,8 +1105,9 @@ static tstring PropertyToString(PEVENT_RECORD pEvent, PTRACE_EVENT_INFO pInfo, U
                     // in the EVENT_MAP_ENTRY structure. Replace the trailing space with a null-
                     // terminating character, so that the bit mapped strings are correctly formatted.
                     for (ULONG i = 0; i < map_info->EntryCount; i++) {
-                        SIZE_T len = _tcslen((LPCTSTR)((PBYTE)map_info.get() + map_info->MapEntryArray[i].OutputOffset)) - 1;
-                        ((LPWSTR)((PBYTE)map_info.get() + map_info->MapEntryArray[i].OutputOffset))[len] = 0;
+                        LPWSTR str = (LPWSTR)((PBYTE)map_info.get() + map_info->MapEntryArray[i].OutputOffset);
+                        SIZE_T len = wcslen(str);
+                        if (len) str[len - 1] = 0;
                     }
                 }
 
