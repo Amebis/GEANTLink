@@ -452,7 +452,7 @@ namespace eap
 
     public:
         bool m_read_only;                                       ///< Is profile read-only
-        std::wstring m_id;                                      ///< Profile ID
+        std::wstring m_id;                                      ///< Provider ID
         winstd::tstring m_name;                                 ///< Provider name
         winstd::tstring m_help_email;                           ///< Helpdesk e-mail
         winstd::tstring m_help_web;                             ///< Helpdesk website URL

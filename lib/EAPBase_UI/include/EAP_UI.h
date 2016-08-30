@@ -199,8 +199,8 @@ public:
                         provider->m_id.c_str(),
                         m_providers),
                     is_single ?
-                        wxEAPGetProviderName(provider->m_id) :
-                        winstd::tstring_printf(_T("%s (%u)"), wxEAPGetProviderName(provider->m_id), count));
+                        wxEAPGetProviderName(provider->m_name) :
+                        winstd::tstring_printf(_T("%s (%u)"), wxEAPGetProviderName(provider->m_name), count));
         }
 
         this->Layout();
@@ -238,7 +238,7 @@ protected:
 
         wxEAPConfigProvider dlg(cfg_provider, this);
         if (dlg.ShowModal() == wxID_OK)
-            m_providers->SetPageText(idx, wxEAPGetProviderName(cfg_provider.m_id));
+            m_providers->SetPageText(idx, wxEAPGetProviderName(cfg_provider.m_name));
     }
 
     /// \endcond

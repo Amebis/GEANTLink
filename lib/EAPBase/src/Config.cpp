@@ -285,16 +285,16 @@ eap::config_provider::config_provider(_In_ module &mod) :
 
 
 eap::config_provider::config_provider(_In_ const config_provider &other) :
-    m_read_only(other.m_read_only),
-    m_id(other.m_id),
-    m_name(other.m_name),
-    m_help_email(other.m_help_email),
-    m_help_web(other.m_help_web),
-    m_help_phone(other.m_help_phone),
+    m_read_only         (other.m_read_only         ),
+    m_id                (other.m_id                ),
+    m_name              (other.m_name              ),
+    m_help_email        (other.m_help_email        ),
+    m_help_web          (other.m_help_web          ),
+    m_help_phone        (other.m_help_phone        ),
     m_lbl_alt_credential(other.m_lbl_alt_credential),
-    m_lbl_alt_identity(other.m_lbl_alt_identity),
-    m_lbl_alt_password(other.m_lbl_alt_password),
-    config(other)
+    m_lbl_alt_identity  (other.m_lbl_alt_identity  ),
+    m_lbl_alt_password  (other.m_lbl_alt_password  ),
+    config              (other                     )
 {
     m_methods.reserve(other.m_methods.size());
     for (vector<unique_ptr<config_method> >::const_iterator method = other.m_methods.cbegin(), method_end = other.m_methods.cend(); method != method_end; ++method)
@@ -303,17 +303,17 @@ eap::config_provider::config_provider(_In_ const config_provider &other) :
 
 
 eap::config_provider::config_provider(_Inout_ config_provider &&other) :
-    m_read_only(std::move(other.m_read_only)),
-    m_id(std::move(other.m_id)),
-    m_name(std::move(other.m_name)),
-    m_help_email(std::move(other.m_help_email)),
-    m_help_web(std::move(other.m_help_web)),
-    m_help_phone(std::move(other.m_help_phone)),
+    m_read_only         (std::move(other.m_read_only         )),
+    m_id                (std::move(other.m_id                )),
+    m_name              (std::move(other.m_name              )),
+    m_help_email        (std::move(other.m_help_email        )),
+    m_help_web          (std::move(other.m_help_web          )),
+    m_help_phone        (std::move(other.m_help_phone        )),
     m_lbl_alt_credential(std::move(other.m_lbl_alt_credential)),
-    m_lbl_alt_identity(std::move(other.m_lbl_alt_identity)),
-    m_lbl_alt_password(std::move(other.m_lbl_alt_password)),
-    m_methods(std::move(other.m_methods)),
-    config(std::move(other))
+    m_lbl_alt_identity  (std::move(other.m_lbl_alt_identity  )),
+    m_lbl_alt_password  (std::move(other.m_lbl_alt_password  )),
+    m_methods           (std::move(other.m_methods           )),
+    config              (std::move(other                     ))
 {
 }
 
@@ -345,17 +345,17 @@ eap::config_provider& eap::config_provider::operator=(_In_ const config_provider
 eap::config_provider& eap::config_provider::operator=(_Inout_ config_provider &&other)
 {
     if (this != &other) {
-        (config&&)*this      = std::move(other);
-        m_read_only          = std::move(m_read_only);
-        m_id                 = std::move(other.m_id);
-        m_name               = std::move(other.m_name);
-        m_help_email         = std::move(other.m_help_email);
-        m_help_web           = std::move(other.m_help_web);
-        m_help_phone         = std::move(other.m_help_phone);
+        (config&&)*this      = std::move(other                     );
+        m_read_only          = std::move(other.m_read_only         );
+        m_id                 = std::move(other.m_id                );
+        m_name               = std::move(other.m_name              );
+        m_help_email         = std::move(other.m_help_email        );
+        m_help_web           = std::move(other.m_help_web          );
+        m_help_phone         = std::move(other.m_help_phone        );
         m_lbl_alt_credential = std::move(other.m_lbl_alt_credential);
-        m_lbl_alt_identity   = std::move(other.m_lbl_alt_identity);
-        m_lbl_alt_password   = std::move(other.m_lbl_alt_password);
-        m_methods            = std::move(other.m_methods);
+        m_lbl_alt_identity   = std::move(other.m_lbl_alt_identity  );
+        m_lbl_alt_password   = std::move(other.m_lbl_alt_password  );
+        m_methods            = std::move(other.m_methods           );
     }
 
     return *this;

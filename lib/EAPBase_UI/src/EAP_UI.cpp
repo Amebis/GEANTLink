@@ -95,7 +95,7 @@ wxEAPCredentialsDialog::wxEAPCredentialsDialog(const eap::config_provider &prov,
     wxEAPGeneralDialog(parent, id, title, pos, size, style)
 {
     // Set banner title.
-    m_banner->m_title->SetLabel(wxString::Format(_("%s Credentials"), wxEAPGetProviderName(prov.m_id).c_str()));
+    m_banner->m_title->SetLabel(wxString::Format(_("%s Credentials"), wxEAPGetProviderName(prov.m_name).c_str()));
 }
 
 
@@ -266,7 +266,7 @@ wxEAPProviderIdentityPanel::wxEAPProviderIdentityPanel(eap::config_provider &pro
 
 bool wxEAPProviderIdentityPanel::TransferDataToWindow()
 {
-    m_provider_name ->SetValue(m_prov.m_id        );
+    m_provider_name ->SetValue(m_prov.m_name      );
     m_provider_web  ->SetValue(m_prov.m_help_web  );
     m_provider_email->SetValue(m_prov.m_help_email);
     m_provider_phone->SetValue(m_prov.m_help_phone);
@@ -279,7 +279,7 @@ bool wxEAPProviderIdentityPanel::TransferDataFromWindow()
 {
     wxCHECK(wxEAPProviderIdentityPanelBase::TransferDataFromWindow(), false);
 
-    m_prov.m_id         = m_provider_name ->GetValue();
+    m_prov.m_name       = m_provider_name ->GetValue();
     m_prov.m_help_web   = m_provider_web  ->GetValue();
     m_prov.m_help_email = m_provider_email->GetValue();
     m_prov.m_help_phone = m_provider_phone->GetValue();
