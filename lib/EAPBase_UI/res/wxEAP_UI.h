@@ -48,7 +48,9 @@ class wxEAPConfigDialogBase : public wxDialog
 	protected:
 		wxEAPBannerPanel *m_banner;
 		wxNotebook* m_providers;
-		wxButton* m_advanced;
+		wxButton* m_prov_add;
+		wxButton* m_prov_remove;
+		wxButton* m_prov_advanced;
 		wxStdDialogButtonSizer* m_buttons;
 		wxButton* m_buttonsOK;
 		wxButton* m_buttonsCancel;
@@ -56,7 +58,9 @@ class wxEAPConfigDialogBase : public wxDialog
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnInitDialog( wxInitDialogEvent& event ) { event.Skip(); }
 		virtual void OnUpdateUI( wxUpdateUIEvent& event ) { event.Skip(); }
-		virtual void OnAdvanced( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnProvAdd( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnProvRemove( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnProvAdvanced( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:

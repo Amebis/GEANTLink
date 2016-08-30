@@ -29,8 +29,11 @@ using namespace winstd;
 //////////////////////////////////////////////////////////////////////
 
 eap::config_method_ttls::config_method_ttls(_In_ module &mod) :
+    m_inner(new config_method_pap(mod)),
     config_method_tls(mod)
 {
+    // TTLS is using blank pre-shared credentials per default.
+    m_use_preshared = true;
 }
 
 

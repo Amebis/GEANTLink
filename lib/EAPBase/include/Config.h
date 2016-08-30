@@ -89,6 +89,7 @@ inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ eap::config &val);
 #include <eaptypes.h> // Must include after <Windows.h>
 #include <tchar.h>
 
+#include <list>
 #include <string>
 #include <memory>
 
@@ -467,6 +468,9 @@ namespace eap
     class config_connection : public config
     {
     public:
+        typedef std::list<eap::config_provider> provider_list;
+
+    public:
         ///
         /// Constructs configuration
         ///
@@ -560,7 +564,7 @@ namespace eap
         /// @}
 
     public:
-        std::vector<eap::config_provider> m_providers;  ///< Array of provider configurations
+        std::list<eap::config_provider> m_providers;    ///< Provider configurations
     };
 }
 

@@ -26,7 +26,7 @@ wxEAPConfigDialogBase::wxEAPConfigDialogBase( wxWindow* parent, wxWindowID id, c
 	m_providers->SetExtraStyle( wxWS_EX_VALIDATE_RECURSIVELY );
 	
 	
-	sb_content->Add( m_providers, 1, wxEXPAND|wxALL, 10 );
+	sb_content->Add( m_providers, 0, wxEXPAND|wxALL, 10 );
 	
 	wxBoxSizer* sb_bottom_horiz;
 	sb_bottom_horiz = new wxBoxSizer( wxHORIZONTAL );
@@ -34,10 +34,20 @@ wxEAPConfigDialogBase::wxEAPConfigDialogBase( wxWindow* parent, wxWindowID id, c
 	wxBoxSizer* sb_bottom_horiz_inner;
 	sb_bottom_horiz_inner = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_advanced = new wxButton( this, wxID_ANY, _("Advanced..."), wxDefaultPosition, wxDefaultSize, 0 );
-	m_advanced->SetToolTip( _("Opens dialog with provider settings") );
+	m_prov_add = new wxButton( this, wxID_ANY, _("+"), wxDefaultPosition, wxSize( 30,-1 ), 0 );
+	m_prov_add->SetToolTip( _("Adds new provider") );
 	
-	sb_bottom_horiz_inner->Add( m_advanced, 0, wxALL, 5 );
+	sb_bottom_horiz_inner->Add( m_prov_add, 0, wxALL, 5 );
+	
+	m_prov_remove = new wxButton( this, wxID_ANY, _("-"), wxDefaultPosition, wxSize( 30,-1 ), 0 );
+	m_prov_remove->SetToolTip( _("Removes selected provider") );
+	
+	sb_bottom_horiz_inner->Add( m_prov_remove, 0, wxALL, 5 );
+	
+	m_prov_advanced = new wxButton( this, wxID_ANY, _("Advanced..."), wxDefaultPosition, wxDefaultSize, 0 );
+	m_prov_advanced->SetToolTip( _("Opens dialog with provider settings") );
+	
+	sb_bottom_horiz_inner->Add( m_prov_advanced, 0, wxALL, 5 );
 	
 	
 	sb_bottom_horiz->Add( sb_bottom_horiz_inner, 1, wxEXPAND, 5 );
@@ -62,7 +72,9 @@ wxEAPConfigDialogBase::wxEAPConfigDialogBase( wxWindow* parent, wxWindowID id, c
 	// Connect Events
 	this->Connect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( wxEAPConfigDialogBase::OnInitDialog ) );
 	this->Connect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( wxEAPConfigDialogBase::OnUpdateUI ) );
-	m_advanced->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPConfigDialogBase::OnAdvanced ), NULL, this );
+	m_prov_add->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPConfigDialogBase::OnProvAdd ), NULL, this );
+	m_prov_remove->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPConfigDialogBase::OnProvRemove ), NULL, this );
+	m_prov_advanced->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPConfigDialogBase::OnProvAdvanced ), NULL, this );
 }
 
 wxEAPConfigDialogBase::~wxEAPConfigDialogBase()
@@ -70,7 +82,9 @@ wxEAPConfigDialogBase::~wxEAPConfigDialogBase()
 	// Disconnect Events
 	this->Disconnect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( wxEAPConfigDialogBase::OnInitDialog ) );
 	this->Disconnect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( wxEAPConfigDialogBase::OnUpdateUI ) );
-	m_advanced->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPConfigDialogBase::OnAdvanced ), NULL, this );
+	m_prov_add->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPConfigDialogBase::OnProvAdd ), NULL, this );
+	m_prov_remove->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPConfigDialogBase::OnProvRemove ), NULL, this );
+	m_prov_advanced->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPConfigDialogBase::OnProvAdvanced ), NULL, this );
 	
 }
 

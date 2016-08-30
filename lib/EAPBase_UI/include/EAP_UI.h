@@ -21,7 +21,9 @@
 #include <wx/hyperlink.h>
 #include <wx/icon.h>
 #include <wx/intl.h>
+#include <wx/msgdlg.h>
 #include <wx/scrolwin.h>
+#include <wx/textdlg.h>
 #include <Windows.h>
 
 
@@ -187,7 +189,7 @@ public:
         this->SetIcon(wxIcon(wxICON(product.ico)));
 #endif
 
-        for (std::vector<eap::config_provider>::iterator provider = m_cfg.m_providers.begin(), provider_end = m_cfg.m_providers.end(); provider != provider_end; ++provider) {
+        for (eap::config_connection::provider_list::iterator provider = m_cfg.m_providers.begin(), provider_end = m_cfg.m_providers.end(); provider != provider_end; ++provider) {
             bool is_single = provider->m_methods.size() == 1;
             std::vector<std::unique_ptr<eap::config_method> >::size_type count = 0;
             std::vector<std::unique_ptr<eap::config_method> >::iterator method = provider->m_methods.begin(), method_end = provider->m_methods.end();
@@ -223,15 +225,72 @@ protected:
         }
     }
 
+
     virtual void OnUpdateUI(wxUpdateUIEvent& /*event*/)
+    {
+        int idx = m_providers->GetSelection();
+        if (idx != wxNOT_FOUND) {
+            eap::config_provider &cfg_provider = ((_wxT*)m_providers->GetPage(idx))->GetProvider();
+            m_prov_remove->Enable(true);
+            m_prov_advanced->Enable(!cfg_provider.m_read_only);
+        } else {
+            m_prov_remove->Enable(false);
+            m_prov_advanced->Enable(false);
+        }
+    }
+
+
+    virtual void OnProvAdd(wxCommandEvent& /*event*/)
+    {
+        // One method
+        std::unique_ptr<eap::config_method> cfg_method(m_cfg.m_module.make_config_method());
+
+        // Create provider.
+        eap::config_provider cfg_provider(m_cfg.m_module);
+        GUID guid;
+        CoCreateGuid(&guid);
+        cfg_provider.m_id = std::move(winstd::wstring_guid(guid));
+        cfg_provider.m_methods.push_back(std::move(cfg_method));
+
+        // Append provider.
+        m_cfg.m_providers.push_back(std::move(cfg_provider));
+        eap::config_provider &cfg_provider2 = m_cfg.m_providers.back();
+        eap::config_method *cfg_method2 = cfg_provider2.m_methods.front().get();
+        m_providers->InsertPage(
+            m_providers->GetSelection() + 1,
+            new _wxT(
+                cfg_provider2,
+                *cfg_method2,
+                cfg_provider2.m_id.c_str(),
+                m_providers),
+                wxEAPGetProviderName(cfg_provider2.m_name), true);
+
+        this->Layout();
+        this->Fit();
+    }
+
+
+    virtual void OnProvRemove(wxCommandEvent& /*event*/)
     {
         int idx = m_providers->GetSelection();
         eap::config_provider &cfg_provider = ((_wxT*)m_providers->GetPage(idx))->GetProvider();
 
-        m_advanced->Enable(!cfg_provider.m_read_only);
+        if (wxMessageBox(tstring_printf(_("Are you sure you want to permanently remove %ls provider from configuration?"), cfg_provider.m_name.c_str()), _("Warning"), wxYES_NO, this) == wxYES) {
+            // Delete provider.
+            eap::config_connection::provider_list::iterator it(m_cfg.m_providers.begin());
+            for (int i = 0; i < idx; i++, ++it);
+            m_cfg.m_providers.erase(it);
+            m_providers->DeletePage(idx);
+            if (idx < m_providers->GetPageCount())
+                m_providers->SetSelection(idx);
+
+            this->Layout();
+            this->Fit();
+        }
     }
 
-    virtual void OnAdvanced(wxCommandEvent& /*event*/)
+
+    virtual void OnProvAdvanced(wxCommandEvent& /*event*/)
     {
         int idx = m_providers->GetSelection();
         eap::config_provider &cfg_provider = ((_wxT*)m_providers->GetPage(idx))->GetProvider();
@@ -242,7 +301,6 @@ protected:
     }
 
     /// \endcond
-
 
 protected:
     eap::config_connection &m_cfg;  ///< Connection configuration

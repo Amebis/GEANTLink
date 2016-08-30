@@ -619,14 +619,14 @@ eap::config_connection::config_connection(_In_ module &mod) : config(mod)
 
 eap::config_connection::config_connection(_In_ const config_connection &other) :
     m_providers(other.m_providers),
-    config(other)
+    config     (other            )
 {
 }
 
 
 eap::config_connection::config_connection(_Inout_ config_connection &&other) :
     m_providers(std::move(other.m_providers)),
-    config(std::move(other))
+    config     (std::move(other            ))
 {
 }
 
@@ -645,7 +645,7 @@ eap::config_connection& eap::config_connection::operator=(_In_ const config_conn
 eap::config_connection& eap::config_connection::operator=(_Inout_ config_connection &&other)
 {
     if (this != &other) {
-        (config&&)*this = std::move(other);
+        (config&&)*this = std::move(other            );
         m_providers     = std::move(other.m_providers);
     }
 
@@ -671,7 +671,7 @@ void eap::config_connection::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *
     if (FAILED(hr = eapxml::select_node(pConfigRoot, bstr(L"eap-metadata:EAPIdentityProviderList"), &pXmlElIdentityProviderList)))
         throw com_runtime_error(hr, __FUNCTION__ " Error selecting <EAPIdentityProviderList> element.");
 
-    for (vector<config_provider>::const_iterator provider = m_providers.cbegin(), provider_end = m_providers.cend(); provider != provider_end; ++provider) {
+    for (provider_list::const_iterator provider = m_providers.cbegin(), provider_end = m_providers.cend(); provider != provider_end; ++provider) {
         // <EAPIdentityProvider>
         com_obj<IXMLDOMElement> pXmlElIdentityProvider;
         if (FAILED(hr = eapxml::create_element(pDoc, bstr(L"EAPIdentityProvider"), bstrNamespace, &pXmlElIdentityProvider)))
@@ -733,10 +733,10 @@ void eap::config_connection::operator>>(_Inout_ cursor_in &cursor)
 {
     config::operator>>(cursor);
 
-    list<config_provider>::size_type count;
+    provider_list::size_type count;
     cursor >> count;
     m_providers.clear();
-    for (list<config_provider>::size_type i = 0; i < count; i++) {
+    for (provider_list::size_type i = 0; i < count; i++) {
         config_provider el(m_module);
         cursor >> el;
         m_providers.push_back(std::move(el));
