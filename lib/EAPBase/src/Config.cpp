@@ -666,10 +666,10 @@ void eap::config_connection::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *
     const bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
     HRESULT hr;
 
-    // Select <EAPIdentityProviderList> node.
-    com_obj<IXMLDOMNode> pXmlElIdentityProviderList;
-    if (FAILED(hr = eapxml::select_node(pConfigRoot, bstr(L"eap-metadata:EAPIdentityProviderList"), &pXmlElIdentityProviderList)))
-        throw com_runtime_error(hr, __FUNCTION__ " Error selecting <EAPIdentityProviderList> element.");
+    // Create <EAPIdentityProviderList> node.
+    com_obj<IXMLDOMElement> pXmlElIdentityProviderList;
+    if (FAILED(hr = eapxml::create_element(pDoc, bstr(L"EAPIdentityProviderList"), bstrNamespace, &pXmlElIdentityProviderList)))
+        throw com_runtime_error(hr, __FUNCTION__ " Error creating <EAPIdentityProviderList> element.");
 
     for (provider_list::const_iterator provider = m_providers.cbegin(), provider_end = m_providers.cend(); provider != provider_end; ++provider) {
         // <EAPIdentityProvider>
@@ -683,6 +683,9 @@ void eap::config_connection::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *
         if (FAILED(hr = pXmlElIdentityProviderList->appendChild(pXmlElIdentityProvider, NULL)))
             throw com_runtime_error(hr, __FUNCTION__ " Error appending <EAPIdentityProvider> element.");
     }
+
+    if (FAILED(hr = pConfigRoot->appendChild(pXmlElIdentityProviderList, NULL)))
+        throw com_runtime_error(hr, __FUNCTION__ " Error appending <EAPIdentityProviderList> element.");
 }
 
 

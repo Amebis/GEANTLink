@@ -193,17 +193,17 @@ DWORD WINAPI EapPeerConfigBlob2Xml(
         HRESULT hr;
 
         // Create configuration XML document.
-        com_obj<IXMLDOMDocument2> pDoc;
-        if (FAILED(hr = pDoc.create(CLSID_DOMDocument60, NULL, CLSCTX_INPROC_SERVER))) {
+        com_obj<IXMLDOMDocument2> pConfigDoc;
+        if (FAILED(hr = pConfigDoc.create(CLSID_DOMDocument60, NULL, CLSCTX_INPROC_SERVER))) {
             g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = HRESULT_CODE(hr), _T(__FUNCTION__) _T(" Error creating XML document.")));
             return dwResult;
         }
 
-        pDoc->put_async(VARIANT_FALSE);
+        pConfigDoc->put_async(VARIANT_FALSE);
 
         // Load empty XML configuration.
         VARIANT_BOOL isSuccess = VARIANT_FALSE;
-        if (FAILED((hr = pDoc->loadXML(L"<Config xmlns=\"http://www.microsoft.com/provisioning/EapHostConfig\"><EAPIdentityProviderList xmlns=\"urn:ietf:params:xml:ns:yang:ietf-eap-metadata\"></EAPIdentityProviderList></Config>", &isSuccess)))) {
+        if (FAILED((hr = pConfigDoc->loadXML(L"<Config xmlns=\"http://www.microsoft.com/provisioning/EapHostConfig\"></Config>", &isSuccess)))) {
             g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = HRESULT_CODE(hr), _T(__FUNCTION__) _T(" Error loading XML document template.")));
             return dwResult;
         }
@@ -214,16 +214,16 @@ DWORD WINAPI EapPeerConfigBlob2Xml(
 
         // Select <Config> node.
         com_obj<IXMLDOMNode> pXmlElConfig;
-        pDoc->setProperty(bstr(L"SelectionNamespaces"), variant(L"xmlns:eaphostconfig=\"http://www.microsoft.com/provisioning/EapHostConfig\""));
-        if (FAILED(eapxml::select_node(pDoc, bstr(L"eaphostconfig:Config"), &pXmlElConfig))) {
+        pConfigDoc->setProperty(bstr(L"SelectionNamespaces"), variant(L"xmlns:eaphostconfig=\"http://www.microsoft.com/provisioning/EapHostConfig\""));
+        if (FAILED(eapxml::select_node(pConfigDoc, bstr(L"eaphostconfig:Config"), &pXmlElConfig))) {
             g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_NOT_FOUND, _T(__FUNCTION__) _T(" Error selecting <Config> element.")));
             return dwResult;
         }
 
         // Save configuration.
-        pDoc->setProperty(bstr(L"SelectionNamespaces"), variant(L"xmlns:eap-metadata=\"urn:ietf:params:xml:ns:yang:ietf-eap-metadata\""));
+        pConfigDoc->setProperty(bstr(L"SelectionNamespaces"), variant(L"xmlns:eap-metadata=\"urn:ietf:params:xml:ns:yang:ietf-eap-metadata\""));
         try {
-            g_peer.config_blob2xml(dwFlags, pConnectionData, dwConnectionDataSize, pDoc, pXmlElConfig);
+            g_peer.config_blob2xml(dwFlags, pConnectionData, dwConnectionDataSize, pConfigDoc, pXmlElConfig);
         } catch (std::exception &err) {
             g_peer.log_error(*ppEapError = g_peer.make_error(err));
             return dwResult = (*ppEapError)->dwWinError;
@@ -231,7 +231,7 @@ DWORD WINAPI EapPeerConfigBlob2Xml(
             return dwResult = ERROR_INVALID_DATA;
         }
 
-        *ppConfigDoc = pDoc.detach();
+        *ppConfigDoc = pConfigDoc.detach();
     }
 
     return dwResult;
