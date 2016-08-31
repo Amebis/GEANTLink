@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: GÉANTLink MSI\n"
-"POT-Creation-Date: 2016-07-15 10:51+0200\n"
+"POT-Creation-Date: 2016-08-31 14:33+0200\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
 "Last-Translator: Simon Rozman <simon.rozman@amebis.si>\n"
 "Language-Team: Amebis, d. o. o., Kamnik <info@amebis.si>\n"
@@ -17,25 +17,20 @@ msgstr ""
 "X-Poedit-KeywordsList: _\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: En.Win32.Release.Property-2.idtx:6 En.x64.Release.Property-2.idtx:6
-msgid "+386 1 8311 035"
+#: En.Win32.Release.LaunchCondition-2.idtx:4
+#: En.x64.Release.LaunchCondition-2.idtx:4
+msgid "[ProductName] requires Windows Vista or later version of Windows."
 msgstr ""
 
 #: En.Win32.Release.Property-2.idtx:3 En.x64.Release.Property-2.idtx:3
-#, fuzzy
 msgid "1252"
-msgstr "1250"
-
-#: En.Win32.Release.Property-2.idtx:5 En.x64.Release.Property-2.idtx:5
-msgid "Amebis, p. p. 69, SI-1241 Kamnik, Slovenia, E.U."
 msgstr ""
 
-#: En.Win32.Release.Property-2.idtx:4 En.x64.Release.Property-2.idtx:4
-msgid "Amebis, Slovenia, E.U."
+#: En.Win32.Release.Property-2.idtx:4 En.Win32.Release.Property-2.idtx:5
+#: En.x64.Release.Property-2.idtx:4 En.x64.Release.Property-2.idtx:5
+msgid "http://www.geant.org/"
 msgstr ""
 
-#: En.Win32.Release.Property-2.idtx:7 En.Win32.Release.Property-2.idtx:8
-#: En.Win32.Release.Property-2.idtx:9 En.x64.Release.Property-2.idtx:7
-#: En.x64.Release.Property-2.idtx:8 En.x64.Release.Property-2.idtx:9
-msgid "http://www.amebis.si/"
+#: En.Win32.Release.Property-2.idtx:6 En.x64.Release.Property-2.idtx:6
+msgid "https://github.com/Amebis/GEANTLink/releases"
 msgstr ""

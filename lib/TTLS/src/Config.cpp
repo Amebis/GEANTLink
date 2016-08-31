@@ -212,7 +212,9 @@ const wchar_t* eap::config_method_ttls::get_method_str() const
 
 eap::credentials* eap::config_method_ttls::make_credentials() const
 {
-    return new credentials_ttls(m_module);
+    credentials_ttls *cred = new credentials_ttls(m_module);
+    cred->m_inner.reset(m_inner->make_credentials());
+    return cred;
 }
 
 
@@ -229,14 +231,10 @@ eap::config_method_with_cred* eap::config_method_ttls::make_config_method(_In_ w
 
 eap::config_method_with_cred* eap::config_method_ttls::make_config_method(_In_ const wchar_t *eap_type) const
 {
-    if (_wcsicmp(eap_type, L"EAP-TLS") == 0)
-        return new config_method_tls(m_module);
-    else if (_wcsicmp(eap_type, L"EAP-TTLS") == 0)
-        return new config_method_ttls(m_module);
-    else if (_wcsicmp(eap_type, L"PAP") == 0)
-        return new config_method_pap(m_module);
-    else
-        throw invalid_argument(__FUNCTION__ " Unsupported inner authentication method.");
+         if (_wcsicmp(eap_type, L"EAP-TLS" ) == 0) return new config_method_tls (m_module);
+    else if (_wcsicmp(eap_type, L"EAP-TTLS") == 0) return new config_method_ttls(m_module);
+    else if (_wcsicmp(eap_type, L"PAP"     ) == 0) return new config_method_pap (m_module);
+    else                                           throw invalid_argument(__FUNCTION__ " Unsupported inner authentication method.");
 }
 
 

@@ -26,7 +26,7 @@ wxEAPConfigDialogBase::wxEAPConfigDialogBase( wxWindow* parent, wxWindowID id, c
 	m_providers->SetExtraStyle( wxWS_EX_VALIDATE_RECURSIVELY );
 	
 	
-	sb_content->Add( m_providers, 0, wxEXPAND|wxALL, 10 );
+	sb_content->Add( m_providers, 1, wxEXPAND|wxALL, 10 );
 	
 	wxBoxSizer* sb_bottom_horiz;
 	sb_bottom_horiz = new wxBoxSizer( wxHORIZONTAL );
@@ -126,6 +126,48 @@ wxEAPGeneralDialogBase::~wxEAPGeneralDialogBase()
 {
 	// Disconnect Events
 	this->Disconnect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( wxEAPGeneralDialogBase::OnInitDialog ) );
+	
+}
+
+wxEAPCredentialsConnectionDialogBase::wxEAPCredentialsConnectionDialogBase( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxBoxSizer* sb_content;
+	sb_content = new wxBoxSizer( wxVERTICAL );
+	
+	m_banner = new wxEAPBannerPanel( this );
+	
+	sb_content->Add( m_banner, 0, wxEXPAND|wxBOTTOM, 5 );
+	
+	m_providers = new wxNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
+	m_providers->SetExtraStyle( wxWS_EX_VALIDATE_RECURSIVELY );
+	
+	
+	sb_content->Add( m_providers, 1, wxEXPAND | wxALL, 5 );
+	
+	m_buttons = new wxStdDialogButtonSizer();
+	m_buttonsOK = new wxButton( this, wxID_OK );
+	m_buttons->AddButton( m_buttonsOK );
+	m_buttonsCancel = new wxButton( this, wxID_CANCEL );
+	m_buttons->AddButton( m_buttonsCancel );
+	m_buttons->Realize();
+	
+	sb_content->Add( m_buttons, 0, wxEXPAND|wxALL, 5 );
+	
+	
+	this->SetSizer( sb_content );
+	this->Layout();
+	sb_content->Fit( this );
+	
+	// Connect Events
+	this->Connect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( wxEAPCredentialsConnectionDialogBase::OnInitDialog ) );
+}
+
+wxEAPCredentialsConnectionDialogBase::~wxEAPCredentialsConnectionDialogBase()
+{
+	// Disconnect Events
+	this->Disconnect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( wxEAPCredentialsConnectionDialogBase::OnInitDialog ) );
 	
 }
 

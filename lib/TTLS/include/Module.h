@@ -212,6 +212,18 @@ namespace eap
         /// @}
 
     protected:
+        ///
+        /// Checks all configured providers and tries to combine credentials.
+        ///
+        const config_method_ttls* combine_credentials(
+            _In_                             DWORD                   dwFlags,
+            _In_                       const config_connection       &cfg,
+            _In_count_(dwUserDataSize) const BYTE                    *pUserData,
+            _In_                             DWORD                   dwUserDataSize,
+            _Out_                            credentials_connection& cred_out,
+            _In_                             HANDLE                  hTokenImpersonateUser);
+
+    protected:
         class session {
         public:
             session(_In_ module &mod);
@@ -220,7 +232,7 @@ namespace eap
         public:
             module &m_module;                       ///< Module
             config_connection m_cfg;                ///< Connection configuration
-            credentials_ttls m_cred;                ///< User credentials
+            credentials_connection m_cred;          ///< Connection credentials
             std::unique_ptr<method_ttls> m_method;  ///< EAP-TTLS method
 
             // The following members are required to avoid memory leakage in get_result()

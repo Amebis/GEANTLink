@@ -43,9 +43,14 @@ template <class _wxT> class wxEAPConfigDialog;
 class wxEAPGeneralDialog;
 
 ///
-/// EAP top-most credential dialog
+/// EAP method credential dialog
 ///
 class wxEAPCredentialsDialog;
+
+///
+/// EAP connection credential dialog
+///
+class wxEAPCredentialsConnectionDialog;
 
 ///
 /// EAP general note
@@ -339,6 +344,21 @@ public:
     /// Constructs a credential dialog
     ///
     wxEAPCredentialsDialog(const eap::config_provider &prov, wxWindow *parent, wxWindowID id = wxID_ANY, const wxString &title = _("EAP Credentials"), const wxPoint &pos = wxDefaultPosition, const wxSize &size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE);
+};
+
+
+class wxEAPCredentialsConnectionDialog : public wxEAPCredentialsConnectionDialogBase
+{
+public:
+    ///
+    /// Constructs a credential dialog
+    ///
+    wxEAPCredentialsConnectionDialog(wxWindow *parent, wxWindowID id = wxID_ANY, const wxString &title = _("EAP Credentials"), const wxPoint &pos = wxDefaultPosition, const wxSize &size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE);
+
+protected:
+    /// \cond internal
+    virtual void OnInitDialog(wxInitDialogEvent& event);
+    /// \endcond
 };
 
 
@@ -701,10 +721,10 @@ protected:
     inline void UpdateOwnIdentity()
     {
         if (m_cred_own.empty())
-            m_own_identity->SetValue(_("<empty credentials>"));
+            m_own_identity->SetValue(_("<empty>"));
         else {
             wxString identity(m_cred_own.get_name());
-            m_own_identity->SetValue(!identity.empty() ? identity : _("<blank identity>"));
+            m_own_identity->SetValue(!identity.empty() ? identity : _("<blank>"));
         }
     }
 
@@ -712,10 +732,10 @@ protected:
     inline void UpdatePresharedIdentity()
     {
         if (m_cred_preshared.empty())
-            m_preshared_identity->SetValue(_("<empty credentials>"));
+            m_preshared_identity->SetValue(_("<empty>"));
         else {
             wxString identity(m_cred_preshared.get_name());
-            m_preshared_identity->SetValue(!identity.empty() ? identity : _("<blank identity>"));
+            m_preshared_identity->SetValue(!identity.empty() ? identity : _("<blank>"));
         }
     }
 

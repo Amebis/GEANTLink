@@ -65,7 +65,7 @@ class wxEAPConfigDialogBase : public wxDialog
 	
 	public:
 		
-		wxEAPConfigDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("EAP Method Configuration"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
+		wxEAPConfigDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("EAP Connection Configuration"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
 		~wxEAPConfigDialogBase();
 	
 };
@@ -92,6 +92,31 @@ class wxEAPGeneralDialogBase : public wxDialog
 		
 		wxEAPGeneralDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
 		~wxEAPGeneralDialogBase();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class wxEAPCredentialsConnectionDialogBase
+///////////////////////////////////////////////////////////////////////////////
+class wxEAPCredentialsConnectionDialogBase : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxEAPBannerPanel *m_banner;
+		wxStdDialogButtonSizer* m_buttons;
+		wxButton* m_buttonsOK;
+		wxButton* m_buttonsCancel;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnInitDialog( wxInitDialogEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		wxNotebook* m_providers;
+		
+		wxEAPCredentialsConnectionDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("EAP Credentials"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
+		~wxEAPCredentialsConnectionDialogBase();
 	
 };
 

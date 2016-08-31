@@ -100,6 +100,44 @@ wxEAPCredentialsDialog::wxEAPCredentialsDialog(const eap::config_provider &prov,
 
 
 //////////////////////////////////////////////////////////////////////
+// wxEAPCredentialsConnectionDialog
+//////////////////////////////////////////////////////////////////////
+
+wxEAPCredentialsConnectionDialog::wxEAPCredentialsConnectionDialog(wxWindow *parent, wxWindowID id, const wxString &title, const wxPoint &pos, const wxSize &size, long style) :
+    wxEAPCredentialsConnectionDialogBase(parent, id, title, pos, size, style)
+{
+    // Set extra style here, as wxFormBuilder overrides all default flags.
+    this->SetExtraStyle(this->GetExtraStyle() | wxWS_EX_VALIDATE_RECURSIVELY);
+
+    // Load window icons.
+#ifdef __WINDOWS__
+    wxIconBundle icons;
+    icons.AddIcon(wxIcon(wxT("product.ico"), wxBITMAP_TYPE_ICO_RESOURCE, ::GetSystemMetrics(SM_CXSMICON), ::GetSystemMetrics(SM_CYSMICON)));
+    icons.AddIcon(wxIcon(wxT("product.ico"), wxBITMAP_TYPE_ICO_RESOURCE, ::GetSystemMetrics(SM_CXICON  ), ::GetSystemMetrics(SM_CYICON  )));
+    this->SetIcons(icons);
+#else
+    this->SetIcon(wxIcon(wxICON(product.ico)));
+#endif
+
+    // Set banner title.
+    m_banner->m_title->SetLabel(_("EAP Credentials"));
+
+    m_buttonsOK->SetDefault();
+}
+
+
+void wxEAPCredentialsConnectionDialog::OnInitDialog(wxInitDialogEvent& event)
+{
+    // Forward the event to child panels.
+    for (wxWindowList::compatibility_iterator provider = m_providers->GetChildren().GetFirst(); provider; provider = provider->GetNext()) {
+        wxWindow *prov = wxDynamicCast(provider->GetData(), wxWindow);
+        if (prov)
+            prov->GetEventHandler()->ProcessEvent(event);
+    }
+}
+
+
+//////////////////////////////////////////////////////////////////////
 // wxEAPNotePanel
 //////////////////////////////////////////////////////////////////////
 

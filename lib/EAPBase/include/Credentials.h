@@ -31,6 +31,11 @@ namespace eap
     /// Password based method credentials
     ///
     class credentials_pass;
+
+    ///
+    /// Connection credentials
+    ///
+    class credentials_connection;
 }
 
 #pragma once
@@ -47,6 +52,7 @@ namespace eap
 #include <tchar.h>
 #include <wincred.h>
 
+#include <memory>
 #include <string>
 
 
@@ -371,5 +377,108 @@ namespace eap
         /// \cond internal
         static const unsigned char s_entropy[1024];
         /// \endcond
+    };
+
+
+    class credentials_connection : public config
+    {
+    public:
+        ///
+        /// Constructs credentials
+        ///
+        /// \param[in] mod  EAP module to use for global services
+        /// \param[in] cfg  Connection configuration
+        ///
+        credentials_connection(_In_ module &mod, _In_ const config_connection &cfg);
+
+        ///
+        /// Copies credentials
+        ///
+        /// \param[in] other  Credentials to copy from
+        ///
+        credentials_connection(_In_ const credentials_connection &other);
+
+        ///
+        /// Moves credentials
+        ///
+        /// \param[in] other  Credentials to move from
+        ///
+        credentials_connection(_Inout_ credentials_connection &&other);
+
+        ///
+        /// Copies credentials
+        ///
+        /// \param[in] other  Credentials to copy from
+        ///
+        /// \returns Reference to this object
+        ///
+        credentials_connection& operator=(_In_ const credentials_connection &other);
+
+        ///
+        /// Moves credentials
+        ///
+        /// \param[in] other  Credentials to move from
+        ///
+        /// \returns Reference to this object
+        ///
+        credentials_connection& operator=(_Inout_ credentials_connection &&other);
+
+        ///
+        /// Clones configuration
+        ///
+        /// \returns Pointer to cloned configuration
+        ///
+        virtual config* clone() const;
+
+        /// \name XML configuration management
+        /// @{
+
+        ///
+        /// Save to XML document
+        ///
+        /// \param[in]  pDoc         XML document
+        /// \param[in]  pConfigRoot  Suggested root element for saving
+        ///
+        virtual void save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot) const;
+
+        ///
+        /// Load from XML document
+        ///
+        /// \param[in]  pConfigRoot  Root element for loading
+        ///
+        virtual void load(_In_ IXMLDOMNode *pConfigRoot);
+
+        /// @}
+
+        /// \name BLOB management
+        /// @{
+
+        ///
+        /// Packs a configuration
+        ///
+        /// \param[inout] cursor  Memory cursor
+        ///
+        virtual void operator<<(_Inout_ cursor_out &cursor) const;
+
+        ///
+        /// Returns packed size of a configuration
+        ///
+        /// \returns Size of data when packed (in bytes)
+        ///
+        virtual size_t get_pk_size() const;
+
+        ///
+        /// Unpacks a configuration
+        ///
+        /// \param[inout] cursor  Memory cursor
+        ///
+        virtual void operator>>(_Inout_ cursor_in &cursor);
+
+        /// @}
+
+    public:
+        const config_connection& m_cfg;         ///< Connection configuration
+        std::wstring m_id;                      ///< Provider ID
+        std::unique_ptr<credentials> m_cred;    ///< Credentials
     };
 }

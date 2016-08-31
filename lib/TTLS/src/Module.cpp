@@ -77,97 +77,28 @@ void eap::peer_ttls::get_identity(
     config_connection cfg(*this);
     unpack(cfg, pConnectionData, dwConnectionDataSize);
 
-    // Get method configuration.
-    if (cfg.m_providers.empty() || cfg.m_providers.front().m_methods.empty())
-        throw invalid_argument(__FUNCTION__ " Configuration has no providers and/or methods.");
-    const config_provider &cfg_prov(cfg.m_providers.front());
-    const config_method_ttls *cfg_method = dynamic_cast<const config_method_ttls*>(cfg_prov.m_methods.front().get());
-    assert(cfg_method);
+    // Combine credentials.
+    credentials_connection cred_out(*this, cfg);
+    const config_method_ttls *cfg_method = combine_credentials(dwFlags, cfg, pUserData, dwUserDataSize, cred_out, hTokenImpersonateUser);
 
-#ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
-    // Unpack cached credentials.
-    credentials_ttls cred_in(*this);
-    if (dwUserDataSize) {
-        cred_in.m_inner.reset(cfg_method->m_inner->make_credentials());
-        unpack(cred_in, pUserData, dwUserDataSize);
-    }
-#else
-    UNREFERENCED_PARAMETER(pUserData);
-    UNREFERENCED_PARAMETER(dwUserDataSize);
-#endif
-
-    credentials_ttls cred_out(*this);
-    cred_out.m_inner.reset(cfg_method->m_inner->make_credentials());
-
-    // Assume no UI will be necessary.
-    *pfInvokeUI = FALSE;
-
-    {
-        // Combine credentials. We could use eap::credentials_ttls() to do all the work, but we would not know which credentials is missing then.
-        user_impersonator impersonating(hTokenImpersonateUser);
-
-        // Combine outer credentials.
-        LPCTSTR target_name = (dwFlags & EAP_FLAG_GUEST_ACCESS) == 0 ? cfg_prov.m_id.c_str() : NULL;
-        eap::credentials::source_t src_outer = cred_out.credentials_tls::combine(
-#ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
-            &cred_in,
-#else
-            NULL,
-#endif
-            *cfg_method,
-            target_name);
-        if (src_outer == eap::credentials::source_unknown) {
-            log_event(&EAPMETHOD_TRACE_EVT_CRED_INVOKE_UI1, event_data((unsigned int)eap_type_tls), event_data::blank);
-            *pfInvokeUI = TRUE;
-        }
-
-        // Combine inner credentials.
-        eap::credentials::source_t src_inner = cred_out.m_inner->combine(
-#ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
-            cred_in.m_inner.get(),
-#else
-            NULL,
-#endif
-            *cfg_method->m_inner,
-            target_name);
-        if (src_inner == eap::credentials::source_unknown) {
-            log_event(&EAPMETHOD_TRACE_EVT_CRED_INVOKE_UI1, event_data((unsigned int)cfg_method->m_inner->get_method_id()), event_data::blank);
-            *pfInvokeUI = TRUE;
-        }
-    }
-
-    // If either of credentials is unknown, request UI.
-    if (*pfInvokeUI) {
+    if (cfg_method) {
+        // No UI will be necessary.
+        *pfInvokeUI = FALSE;
+    } else {
+        // Credentials missing or incomplete.
         if ((dwFlags & EAP_FLAG_MACHINE_AUTH) == 0) {
-            // Per-user authentication
+            // Per-user authentication, request UI.
             log_event(&EAPMETHOD_TRACE_EVT_CRED_INVOKE_UI2, event_data::blank);
+            *pfInvokeUI = TRUE;
             return;
         } else {
-            // Per-machine authentication
+            // Per-machine authentication, cannot use UI.
             throw win_runtime_error(ERROR_NO_SUCH_USER, __FUNCTION__ " Credentials for per-machine authentication not available.");
         }
     }
 
-    // If we got here, we have all credentials we need. But, wait!
-
-    if ((dwFlags & EAP_FLAG_MACHINE_AUTH) == 0) {
-        if (cfg_method->m_auth_failed) {
-            // Outer: Credentials failed on last connection attempt.
-            log_event(&EAPMETHOD_TRACE_EVT_CRED_PROBLEM, event_data((unsigned int)eap_type_tls), event_data::blank);
-            *pfInvokeUI = TRUE;
-            return;
-        }
-
-        if (cfg_method->m_inner->m_auth_failed) {
-            // Inner: Credentials failed on last connection attempt.
-            log_event(&EAPMETHOD_TRACE_EVT_CRED_PROBLEM, event_data((unsigned int)cfg_method->m_inner->get_method_id()), event_data::blank);
-            *pfInvokeUI = TRUE;
-            return;
-        }
-    }
-
     // Build our identity. ;)
-    wstring identity(std::move(cfg_method->get_public_identity(cred_out)));
+    wstring identity(std::move(cfg_method->get_public_identity((const credentials_ttls&)*cred_out.m_cred)));
     log_event(&EAPMETHOD_TRACE_EVT_CRED_OUTER_ID1, event_data((unsigned int)eap_type_ttls), event_data(identity), event_data::blank);
     size_t size = sizeof(WCHAR)*(identity.length() + 1);
     *ppwszIdentity = (WCHAR*)alloc_memory(size);
@@ -268,19 +199,26 @@ EAP_SESSION_HANDLE eap::peer_ttls::begin_session(
     // Unpack configuration.
     unpack(s->m_cfg, pConnectionData, dwConnectionDataSize);
 
-    // Get method configuration.
-    if (s->m_cfg.m_providers.empty() || s->m_cfg.m_providers.front().m_methods.empty())
-        throw invalid_argument(__FUNCTION__ " Configuration has no providers and/or methods.");
-    config_provider &cfg_prov(s->m_cfg.m_providers.front());
-    config_method_ttls *cfg_method = dynamic_cast<config_method_ttls*>(cfg_prov.m_methods.front().get());
-    assert(cfg_method);
-
     // Unpack credentials.
-    s->m_cred.m_inner.reset(cfg_method->m_inner->make_credentials());
     unpack(s->m_cred, pUserData, dwUserDataSize);
 
+    config_method_ttls *cfg_method;
+
+    for (config_connection::provider_list::iterator cfg_prov = s->m_cfg.m_providers.begin(), cfg_prov_end = s->m_cfg.m_providers.end();; ++cfg_prov) {
+        if (cfg_prov != cfg_prov_end) {
+            if (_wcsicmp(cfg_prov->m_id.c_str(), s->m_cred.m_id.c_str()) == 0) {
+                // Matching provider found.
+                if (cfg_prov->m_methods.empty())
+                    throw invalid_argument(string_printf(__FUNCTION__ " %ls provider has no methods.", cfg_prov->m_id.c_str()).c_str());
+                cfg_method = dynamic_cast<config_method_ttls*>(cfg_prov->m_methods.front().get());
+                break;
+            }
+        } else
+            throw invalid_argument(string_printf(__FUNCTION__ " Credentials do not match to any provider ID within this connection configuration (provider ID: %ls).", s->m_cred.m_id.c_str()).c_str());
+    }
+
     // We have configuration, we have credentials, create method.
-    s->m_method.reset(new method_ttls(*this, *cfg_method, s->m_cred));
+    s->m_method.reset(new method_ttls(*this, *cfg_method, *(credentials_ttls*)s->m_cred.m_cred.get()));
 
     // Initialize method.
     s->m_method->begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
@@ -401,6 +339,95 @@ void eap::peer_ttls::set_response_attributes(
 }
 
 
+const eap::config_method_ttls* eap::peer_ttls::combine_credentials(
+    _In_                             DWORD                   dwFlags,
+    _In_                       const config_connection       &cfg,
+    _In_count_(dwUserDataSize) const BYTE                    *pUserData,
+    _In_                             DWORD                   dwUserDataSize,
+    _Out_                            credentials_connection& cred_out,
+    _In_                             HANDLE                  hTokenImpersonateUser)
+{
+#ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
+    // Unpack cached credentials.
+    credentials_connection cred_in(*this, cfg);
+    if (dwUserDataSize)
+        unpack(cred_in, pUserData, dwUserDataSize);
+#else
+    UNREFERENCED_PARAMETER(pUserData);
+    UNREFERENCED_PARAMETER(dwUserDataSize);
+#endif
+
+    user_impersonator impersonating(hTokenImpersonateUser);
+
+    for (config_connection::provider_list::const_iterator cfg_prov = cfg.m_providers.cbegin(), cfg_prov_end = cfg.m_providers.cend(); cfg_prov != cfg_prov_end; ++cfg_prov) {
+        // Get method configuration.
+        if (cfg_prov->m_methods.empty()) {
+            log_event(&EAPMETHOD_TRACE_EVT_CRED_NO_METHOD, event_data(cfg_prov->m_id), event_data::blank);
+            continue;
+        }
+        const config_method_ttls *cfg_method = dynamic_cast<const config_method_ttls*>(cfg_prov->m_methods.front().get());
+        assert(cfg_method);
+
+        // Combine credentials. We could use eap::credentials_ttls() to do all the work, but we would not know which credentials is missing then.
+        credentials_ttls *cred = (credentials_ttls*)cfg_method->make_credentials();
+        cred_out.m_cred.reset(cred);
+#ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
+        bool is_own = cred_in.m_cred && _wcsicmp(cred_in.m_id.c_str(), cfg_prov->m_id.c_str()) == 0;
+#endif
+
+        // Combine outer credentials.
+        LPCTSTR target_name = (dwFlags & EAP_FLAG_GUEST_ACCESS) == 0 ? cfg_prov->m_id.c_str() : NULL;
+        eap::credentials::source_t src_outer = cred->credentials_tls::combine(
+#ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
+            is_own ? cred_in.m_cred.get() : NULL,
+#else
+            NULL,
+#endif
+            *cfg_method,
+            target_name);
+        if (src_outer == eap::credentials::source_unknown) {
+            log_event(&EAPMETHOD_TRACE_EVT_CRED_UNKNOWN3, event_data(cfg_prov->m_id), event_data((unsigned int)eap_type_tls), event_data::blank);
+            continue;
+        }
+
+        // Combine inner credentials.
+        eap::credentials::source_t src_inner = cred->m_inner->combine(
+#ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
+            is_own ? ((credentials_ttls*)cred_in.m_cred.get())->m_inner.get() : NULL,
+#else
+            NULL,
+#endif
+            *cfg_method->m_inner,
+            target_name);
+        if (src_inner == eap::credentials::source_unknown) {
+            log_event(&EAPMETHOD_TRACE_EVT_CRED_UNKNOWN3, event_data(cfg_prov->m_id), event_data((unsigned int)cfg_method->m_inner->get_method_id()), event_data::blank);
+            continue;
+        }
+
+        // If we got here, we have all credentials we need. But, wait!
+
+        if ((dwFlags & EAP_FLAG_MACHINE_AUTH) == 0) {
+            if (cfg_method->m_auth_failed) {
+                // Outer: Credentials failed on last connection attempt.
+                log_event(&EAPMETHOD_TRACE_EVT_CRED_PROBLEM1, event_data(cfg_prov->m_id), event_data((unsigned int)eap_type_tls), event_data::blank);
+                continue;
+            }
+
+            if (cfg_method->m_inner->m_auth_failed) {
+                // Inner: Credentials failed on last connection attempt.
+                log_event(&EAPMETHOD_TRACE_EVT_CRED_PROBLEM1, event_data(cfg_prov->m_id), event_data((unsigned int)cfg_method->m_inner->get_method_id()), event_data::blank);
+                continue;
+            }
+        }
+
+        cred_out.m_id = cfg_prov->m_id;
+        return cfg_method;
+    }
+
+    return NULL;
+}
+
+
 //////////////////////////////////////////////////////////////////////
 // eap::peer_ttls::session
 //////////////////////////////////////////////////////////////////////
@@ -408,7 +435,7 @@ void eap::peer_ttls::set_response_attributes(
 eap::peer_ttls::session::session(_In_ module &mod) :
     m_module(mod),
     m_cfg(mod),
-    m_cred(mod),
+    m_cred(mod, m_cfg),
     m_blob_cfg(NULL)
 #ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
     , m_blob_cred(NULL)

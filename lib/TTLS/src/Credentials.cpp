@@ -103,6 +103,7 @@ void eap::credentials_ttls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *p
     if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:InnerAuthenticationMethod"), bstr(L"InnerAuthenticationMethod"), namespace_eapmetadata, &pXmlElInnerAuthenticationMethod)))
         throw com_runtime_error(hr, __FUNCTION__ " Error creating <InnerAuthenticationMethod> element.");
 
+    // <InnerAuthenticationMethod>/...
     m_inner->save(pDoc, pXmlElInnerAuthenticationMethod);
 }
 

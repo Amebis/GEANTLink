@@ -144,9 +144,9 @@ wstring eap::credentials::get_identity() const
 
 tstring eap::credentials::get_name() const
 {
-    if (empty()) return _T("<empty credentials>");
+    if (empty()) return _T("<empty>");
     tstring identity(std::move(get_identity()));
-    return !identity.empty() ? identity : _T("<blank identity>");
+    return !identity.empty() ? identity : _T("<blank>");
 }
 
 
@@ -415,3 +415,151 @@ const unsigned char eap::credentials_pass::s_entropy[1024] = {
     0x30, 0x29, 0x39, 0x9a, 0xd6, 0xab, 0x2e, 0xc6, 0x42, 0x47, 0x5e, 0x54, 0xbb, 0x90, 0xe6, 0x98,
     0xe6, 0x52, 0x58, 0x58, 0x1e, 0xd0, 0x00, 0x9c, 0x8f, 0x4a, 0x17, 0x7e, 0x8a, 0x5a, 0xef, 0x3e,
 };
+
+
+//////////////////////////////////////////////////////////////////////
+// eap::credentials_connection
+//////////////////////////////////////////////////////////////////////
+
+eap::credentials_connection::credentials_connection(_In_ module &mod, _In_ const config_connection &cfg) :
+    m_cfg(cfg),
+    config(mod)
+{
+}
+
+
+eap::credentials_connection::credentials_connection(_In_ const credentials_connection &other) :
+    m_cfg (other.m_cfg ),
+    m_id  (other.m_id  ),
+    m_cred(other.m_cred ? (credentials*)other.m_cred->clone() : nullptr),
+    config(other       )
+{
+}
+
+
+eap::credentials_connection::credentials_connection(_Inout_ credentials_connection &&other) :
+    m_cfg (          other.m_cfg  ),
+    m_id  (std::move(other.m_id  )),
+    m_cred(std::move(other.m_cred)),
+    config(std::move(other       ))
+{
+}
+
+
+eap::credentials_connection& eap::credentials_connection::operator=(_In_ const credentials_connection &other)
+{
+    if (this != &other) {
+        (config&)*this = other;
+        m_id           = other.m_id;
+        m_cred.reset(other.m_cred ? (credentials*)other.m_cred->clone() : nullptr);
+    }
+
+    return *this;
+}
+
+
+eap::credentials_connection& eap::credentials_connection::operator=(_Inout_ credentials_connection &&other)
+{
+    if (this != &other) {
+        (config&)*this = std::move(other       );
+        m_id           = std::move(other.m_id  );
+        m_cred         = std::move(other.m_cred);
+    }
+
+    return *this;
+}
+
+
+eap::config* eap::credentials_connection::clone() const
+{
+    return new credentials_connection(*this);
+}
+
+
+void eap::credentials_connection::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot) const
+{
+    assert(pDoc);
+    assert(pConfigRoot);
+
+    config::save(pDoc, pConfigRoot);
+
+    HRESULT hr;
+
+    // <IdentityProviderID>
+    if (FAILED(hr = eapxml::put_element_value(pDoc, pConfigRoot, bstr(L"IdentityProviderID"), namespace_eapmetadata, bstr(m_id))))
+        throw com_runtime_error(hr, __FUNCTION__ " Error creating <IdentityProviderID> element.");
+
+    m_cred->save(pDoc, pConfigRoot);
+}
+
+
+void eap::credentials_connection::load(_In_ IXMLDOMNode *pConfigRoot)
+{
+    assert(pConfigRoot);
+    HRESULT hr;
+
+    config::load(pConfigRoot);
+
+    std::wstring xpath(eapxml::get_xpath(pConfigRoot));
+
+    if (FAILED(hr = eapxml::get_element_value(pConfigRoot, bstr(L"eap-metadata:IdentityProviderID"), m_id)))
+        m_id.clear();
+
+    m_module.log_config((xpath + L"/IdentityProviderID").c_str(), m_id.c_str());
+
+    // Look-up the provider.
+    for (config_connection::provider_list::const_iterator cfg_prov = m_cfg.m_providers.cbegin(), cfg_prov_end = m_cfg.m_providers.cend(); ; ++cfg_prov) {
+        if (cfg_prov != cfg_prov_end) {
+            if (_wcsicmp(cfg_prov->m_id.c_str(), m_id.c_str()) == 0) {
+                // Matching provider found. Create matching blank credential set, then load.
+                if (cfg_prov->m_methods.empty())
+                    throw invalid_argument(string_printf(__FUNCTION__ " %ls provider has no methods.", cfg_prov->m_id.c_str()).c_str());
+                const config_method_with_cred *cfg_method = dynamic_cast<const config_method_with_cred*>(cfg_prov->m_methods.front().get());
+                m_cred.reset(cfg_method->make_credentials());
+                m_cred->load(pConfigRoot);
+                break;
+            }
+        } else
+            throw invalid_argument(string_printf(__FUNCTION__ " Credentials do not match to any provider ID within this connection configuration (provider ID: %ls).", m_id.c_str()).c_str());
+    }
+}
+
+
+void eap::credentials_connection::operator<<(_Inout_ cursor_out &cursor) const
+{
+    config::operator<<(cursor);
+    cursor <<  m_id  ;
+    cursor << *m_cred;
+}
+
+
+size_t eap::credentials_connection::get_pk_size() const
+{
+    return
+        config::get_pk_size() +
+        pksizeof( m_id  ) +
+        pksizeof(*m_cred);
+}
+
+
+void eap::credentials_connection::operator>>(_Inout_ cursor_in &cursor)
+{
+    config::operator>>(cursor);
+    cursor >>  m_id;
+
+    // Look-up the provider.
+    for (config_connection::provider_list::const_iterator cfg_prov = m_cfg.m_providers.cbegin(), cfg_prov_end = m_cfg.m_providers.cend(); ; ++cfg_prov) {
+        if (cfg_prov != cfg_prov_end) {
+            if (_wcsicmp(cfg_prov->m_id.c_str(), m_id.c_str()) == 0) {
+                // Matching provider found. Create matching blank credential set, then read.
+                if (cfg_prov->m_methods.empty())
+                    throw invalid_argument(string_printf(__FUNCTION__ " %ls provider has no methods.", cfg_prov->m_id.c_str()).c_str());
+                const config_method_with_cred *cfg_method = dynamic_cast<const config_method_with_cred*>(cfg_prov->m_methods.front().get());
+                m_cred.reset(cfg_method->make_credentials());
+                cursor >> *m_cred;
+                break;
+            }
+        } else
+            throw invalid_argument(string_printf(__FUNCTION__ " Credentials do not match to any provider ID within this connection configuration (provider ID: %ls).", m_id.c_str()).c_str());
+    }
+}
