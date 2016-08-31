@@ -90,11 +90,10 @@ void eap::credentials::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfi
 
     config::save(pDoc, pConfigRoot);
 
-    const bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
     HRESULT hr;
 
     // <UserName>
-    if (FAILED(hr = eapxml::put_element_value(pDoc, pConfigRoot, bstr(L"UserName"), bstrNamespace, bstr(m_identity))))
+    if (FAILED(hr = eapxml::put_element_value(pDoc, pConfigRoot, bstr(L"UserName"), namespace_eapmetadata, bstr(m_identity))))
         throw com_runtime_error(hr, __FUNCTION__ " Error creating <UserName> element.");
 }
 
@@ -216,12 +215,11 @@ void eap::credentials_pass::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *p
 
     credentials::save(pDoc, pConfigRoot);
 
-    const bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
     HRESULT hr;
 
     // <Password>
     bstr pass(m_password);
-    hr = eapxml::put_element_value(pDoc, pConfigRoot, bstr(L"Password"), bstrNamespace, pass);
+    hr = eapxml::put_element_value(pDoc, pConfigRoot, bstr(L"Password"), namespace_eapmetadata, pass);
     SecureZeroMemory((BSTR)pass, sizeof(OLECHAR)*pass.length());
     if (FAILED(hr))
         throw com_runtime_error(hr, __FUNCTION__ " Error creating <Password> element.");

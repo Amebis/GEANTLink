@@ -95,21 +95,20 @@ void eap::credentials_tls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pC
 
     credentials::save(pDoc, pConfigRoot);
 
-    const bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
     HRESULT hr;
 
     // <ClientCertificate>
     com_obj<IXMLDOMElement> pXmlElClientCertificate;
-    if (FAILED(hr = eapxml::create_element(pDoc, bstr(L"ClientCertificate"), bstrNamespace, &pXmlElClientCertificate)))
+    if (FAILED(hr = eapxml::create_element(pDoc, bstr(L"ClientCertificate"), namespace_eapmetadata, &pXmlElClientCertificate)))
         throw com_runtime_error(hr, __FUNCTION__ " Error creating <ClientCertificate> element.");
 
     if (m_cert) {
         // <ClientCertificate>/<format>
-        if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElClientCertificate, bstr(L"format"), bstrNamespace, bstr(L"PEM"))))
+        if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElClientCertificate, bstr(L"format"), namespace_eapmetadata, bstr(L"PEM"))))
             throw com_runtime_error(hr, __FUNCTION__ " Error creating <format> element.");
 
         // <ClientCertificate>/<cert-data>
-        if (FAILED(hr = eapxml::put_element_base64(pDoc, pXmlElClientCertificate, bstr(L"cert-data"), bstrNamespace, m_cert->pbCertEncoded, m_cert->cbCertEncoded)))
+        if (FAILED(hr = eapxml::put_element_base64(pDoc, pXmlElClientCertificate, bstr(L"cert-data"), namespace_eapmetadata, m_cert->pbCertEncoded, m_cert->cbCertEncoded)))
             throw com_runtime_error(hr, __FUNCTION__ " Error creating <cert-data> element.");
     }
 

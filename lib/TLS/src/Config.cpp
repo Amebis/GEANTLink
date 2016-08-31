@@ -141,27 +141,26 @@ void eap::config_method_tls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *
 
     config_method_with_cred::save(pDoc, pConfigRoot);
 
-    const bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
     HRESULT hr;
 
     // <ServerSideCredential>
     com_obj<IXMLDOMElement> pXmlElServerSideCredential;
-    if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:ServerSideCredential"), bstr(L"ServerSideCredential"), bstrNamespace, &pXmlElServerSideCredential)))
+    if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:ServerSideCredential"), bstr(L"ServerSideCredential"), namespace_eapmetadata, &pXmlElServerSideCredential)))
         throw com_runtime_error(hr, __FUNCTION__ " Error creating <ServerSideCredential> element.");
 
     for (list<cert_context>::const_iterator i = m_trusted_root_ca.begin(), i_end = m_trusted_root_ca.end(); i != i_end; ++i) {
         // <CA>
         com_obj<IXMLDOMElement> pXmlElCA;
-        if (FAILED(hr = eapxml::create_element(pDoc, bstr(L"CA"), bstrNamespace, &pXmlElCA)))
+        if (FAILED(hr = eapxml::create_element(pDoc, bstr(L"CA"), namespace_eapmetadata, &pXmlElCA)))
             throw com_runtime_error(hr, __FUNCTION__ " Error creating <CA> element.");
 
         // <CA>/<format>
-        if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElCA, bstr(L"format"), bstrNamespace, bstr(L"PEM"))))
+        if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElCA, bstr(L"format"), namespace_eapmetadata, bstr(L"PEM"))))
             throw com_runtime_error(hr, __FUNCTION__ " Error creating <format> element.");
 
         // <CA>/<cert-data>
         const cert_context &cc = *i;
-        if (FAILED(hr = eapxml::put_element_base64(pDoc, pXmlElCA, bstr(L"cert-data"), bstrNamespace, cc->pbCertEncoded, cc->cbCertEncoded)))
+        if (FAILED(hr = eapxml::put_element_base64(pDoc, pXmlElCA, bstr(L"cert-data"), namespace_eapmetadata, cc->pbCertEncoded, cc->cbCertEncoded)))
             throw com_runtime_error(hr, __FUNCTION__ " Error creating <cert-data> element.");
 
         if (FAILED(hr = pXmlElServerSideCredential->appendChild(pXmlElCA, NULL)))
@@ -170,7 +169,7 @@ void eap::config_method_tls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *
 
     // <ServerName>
     for (list<wstring>::const_iterator i = m_server_names.begin(), i_end = m_server_names.end(); i != i_end; ++i) {
-        if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElServerSideCredential, bstr(L"ServerName"), bstrNamespace, bstr(*i))))
+        if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElServerSideCredential, bstr(L"ServerName"), namespace_eapmetadata, bstr(*i))))
             throw com_runtime_error(hr, __FUNCTION__ " Error creating <ServerName> element.");
     }
 }

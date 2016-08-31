@@ -95,6 +95,9 @@ void eap::config::operator>>(_Inout_ cursor_in &cursor)
 }
 
 
+const bstr eap::config::namespace_eapmetadata(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
+
+
 //////////////////////////////////////////////////////////////////////
 // eap::config_method
 //////////////////////////////////////////////////////////////////////
@@ -198,16 +201,15 @@ void eap::config_method_with_cred::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOM
     assert(pDoc);
     assert(pConfigRoot);
 
-    const winstd::bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
     HRESULT hr;
 
     // <ClientSideCredential>
     winstd::com_obj<IXMLDOMElement> pXmlElClientSideCredential;
-    if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, winstd::bstr(L"eap-metadata:ClientSideCredential"), winstd::bstr(L"ClientSideCredential"), bstrNamespace, &pXmlElClientSideCredential)))
+    if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, winstd::bstr(L"eap-metadata:ClientSideCredential"), winstd::bstr(L"ClientSideCredential"), namespace_eapmetadata, &pXmlElClientSideCredential)))
         throw com_runtime_error(hr, __FUNCTION__ " Error creating <ClientSideCredential> element.");
 
     // <ClientSideCredential>/<allow-save>
-    if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElClientSideCredential, winstd::bstr(L"allow-save"), bstrNamespace, m_allow_save)))
+    if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElClientSideCredential, winstd::bstr(L"allow-save"), namespace_eapmetadata, m_allow_save)))
         throw com_runtime_error(hr, __FUNCTION__ " Error creating <allow-save> element.");
 
     if (m_use_preshared)
@@ -372,72 +374,71 @@ void eap::config_provider::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pC
 {
     config::save(pDoc, pConfigRoot);
 
-    const bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
     HRESULT hr;
 
     // <read-only>
-    if (FAILED(hr = eapxml::put_element_value(pDoc, pConfigRoot, bstr(L"read-only"), bstrNamespace, m_read_only)))
+    if (FAILED(hr = eapxml::put_element_value(pDoc, pConfigRoot, bstr(L"read-only"), namespace_eapmetadata, m_read_only)))
         throw com_runtime_error(hr, __FUNCTION__ " Error creating <read-only> element.");
 
     // <ID>
     if (!m_id.empty())
-        if (FAILED(hr = eapxml::put_element_value(pDoc, pConfigRoot, bstr(L"ID"), bstrNamespace, bstr(m_id))))
+        if (FAILED(hr = eapxml::put_element_value(pDoc, pConfigRoot, bstr(L"ID"), namespace_eapmetadata, bstr(m_id))))
             throw com_runtime_error(hr, __FUNCTION__ " Error creating <ID> element.");
 
     // <ProviderInfo>
     com_obj<IXMLDOMElement> pXmlElProviderInfo;
-    if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:ProviderInfo"), bstr(L"ProviderInfo"), bstrNamespace, &pXmlElProviderInfo)))
+    if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:ProviderInfo"), bstr(L"ProviderInfo"), namespace_eapmetadata, &pXmlElProviderInfo)))
         throw com_runtime_error(hr, __FUNCTION__ " Error creating <ProviderInfo> element.");
 
     // <ProviderInfo>/<DisplayName>
     if (!m_name.empty())
-        if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElProviderInfo, bstr(L"DisplayName"), bstrNamespace, bstr(m_name))))
+        if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElProviderInfo, bstr(L"DisplayName"), namespace_eapmetadata, bstr(m_name))))
             throw com_runtime_error(hr, __FUNCTION__ " Error creating <DisplayName> element.");
 
     // <ProviderInfo>/<Helpdesk>
     com_obj<IXMLDOMElement> pXmlElHelpdesk;
-    if (FAILED(hr = eapxml::create_element(pDoc, pXmlElProviderInfo, bstr(L"eap-metadata:Helpdesk"), bstr(L"Helpdesk"), bstrNamespace, &pXmlElHelpdesk)))
+    if (FAILED(hr = eapxml::create_element(pDoc, pXmlElProviderInfo, bstr(L"eap-metadata:Helpdesk"), bstr(L"Helpdesk"), namespace_eapmetadata, &pXmlElHelpdesk)))
         throw com_runtime_error(hr, __FUNCTION__ " Error creating <Helpdesk> element.");
 
     // <ProviderInfo>/<Helpdesk>/<EmailAddress>
     if (!m_help_email.empty())
-        if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElHelpdesk, bstr(L"EmailAddress"), bstrNamespace, bstr(m_help_email))))
+        if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElHelpdesk, bstr(L"EmailAddress"), namespace_eapmetadata, bstr(m_help_email))))
             throw com_runtime_error(hr, __FUNCTION__ " Error creating <EmailAddress> element.");
 
     // <ProviderInfo>/<Helpdesk>/<WebAddress>
     if (!m_help_web.empty())
-        if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElHelpdesk, bstr(L"WebAddress"), bstrNamespace, bstr(m_help_web))))
+        if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElHelpdesk, bstr(L"WebAddress"), namespace_eapmetadata, bstr(m_help_web))))
             throw com_runtime_error(hr, __FUNCTION__ " Error creating <WebAddress> element.");
 
     // <ProviderInfo>/<Helpdesk>/<Phone>
     if (!m_help_phone.empty())
-        if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElHelpdesk, bstr(L"Phone"), bstrNamespace, bstr(m_help_phone))))
+        if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElHelpdesk, bstr(L"Phone"), namespace_eapmetadata, bstr(m_help_phone))))
             throw com_runtime_error(hr, __FUNCTION__ " Error creating <Phone> element.");
 
     // <ProviderInfo>/<CredentialPrompt>
     if (!m_lbl_alt_credential.empty())
-        if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElProviderInfo, bstr(L"CredentialPrompt"), bstrNamespace, bstr(m_lbl_alt_credential))))
+        if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElProviderInfo, bstr(L"CredentialPrompt"), namespace_eapmetadata, bstr(m_lbl_alt_credential))))
             throw com_runtime_error(hr, __FUNCTION__ " Error creating <CredentialPrompt> element.");
 
     // <ProviderInfo>/<UserNameLabel>
     if (!m_lbl_alt_identity.empty())
-        if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElProviderInfo, bstr(L"UserNameLabel"), bstrNamespace, bstr(m_lbl_alt_identity))))
+        if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElProviderInfo, bstr(L"UserNameLabel"), namespace_eapmetadata, bstr(m_lbl_alt_identity))))
             throw com_runtime_error(hr, __FUNCTION__ " Error creating <UserNameLabel> element.");
 
     // <ProviderInfo>/<PasswordLabel>
     if (!m_lbl_alt_password.empty())
-        if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElProviderInfo, bstr(L"PasswordLabel"), bstrNamespace, bstr(m_lbl_alt_password))))
+        if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElProviderInfo, bstr(L"PasswordLabel"), namespace_eapmetadata, bstr(m_lbl_alt_password))))
             throw com_runtime_error(hr, __FUNCTION__ " Error creating <PasswordLabel> element.");
 
     // <AuthenticationMethods>
     com_obj<IXMLDOMElement> pXmlElAuthenticationMethods;
-    if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:AuthenticationMethods"), bstr(L"AuthenticationMethods"), bstrNamespace, &pXmlElAuthenticationMethods)))
+    if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:AuthenticationMethods"), bstr(L"AuthenticationMethods"), namespace_eapmetadata, &pXmlElAuthenticationMethods)))
         throw com_runtime_error(hr, __FUNCTION__ " Error creating <AuthenticationMethods> element.");
 
     for (vector<unique_ptr<config_method> >::const_iterator method = m_methods.cbegin(), method_end = m_methods.cend(); method != method_end; ++method) {
         // <AuthenticationMethod>
         com_obj<IXMLDOMElement> pXmlElAuthenticationMethod;
-        if (FAILED(hr = eapxml::create_element(pDoc, bstr(L"AuthenticationMethod"), bstrNamespace, &pXmlElAuthenticationMethod)))
+        if (FAILED(hr = eapxml::create_element(pDoc, bstr(L"AuthenticationMethod"), namespace_eapmetadata, &pXmlElAuthenticationMethod)))
             throw com_runtime_error(hr, __FUNCTION__ " Error creating <AuthenticationMethod> element.");
 
         // <AuthenticationMethod>/...
@@ -663,18 +664,17 @@ void eap::config_connection::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *
 {
     config::save(pDoc, pConfigRoot);
 
-    const bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
     HRESULT hr;
 
     // Create <EAPIdentityProviderList> node.
     com_obj<IXMLDOMElement> pXmlElIdentityProviderList;
-    if (FAILED(hr = eapxml::create_element(pDoc, bstr(L"EAPIdentityProviderList"), bstrNamespace, &pXmlElIdentityProviderList)))
+    if (FAILED(hr = eapxml::create_element(pDoc, bstr(L"EAPIdentityProviderList"), namespace_eapmetadata, &pXmlElIdentityProviderList)))
         throw com_runtime_error(hr, __FUNCTION__ " Error creating <EAPIdentityProviderList> element.");
 
     for (provider_list::const_iterator provider = m_providers.cbegin(), provider_end = m_providers.cend(); provider != provider_end; ++provider) {
         // <EAPIdentityProvider>
         com_obj<IXMLDOMElement> pXmlElIdentityProvider;
-        if (FAILED(hr = eapxml::create_element(pDoc, bstr(L"EAPIdentityProvider"), bstrNamespace, &pXmlElIdentityProvider)))
+        if (FAILED(hr = eapxml::create_element(pDoc, bstr(L"EAPIdentityProvider"), namespace_eapmetadata, &pXmlElIdentityProvider)))
             throw com_runtime_error(hr, __FUNCTION__ " Error creating <EAPIdentityProvider> element.");
 
         // <EAPIdentityProvider>/...

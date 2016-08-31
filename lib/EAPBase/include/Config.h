@@ -193,6 +193,9 @@ namespace eap
 
     public:
         module &m_module;   ///< EAP module
+
+    protected:
+        static const winstd::bstr namespace_eapmetadata;
     };
 
 

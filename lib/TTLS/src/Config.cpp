@@ -90,32 +90,31 @@ void eap::config_method_ttls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode 
 
     config_method_tls::save(pDoc, pConfigRoot);
 
-    const bstr bstrNamespace(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
     HRESULT hr;
 
     // <ClientSideCredential>
     com_obj<IXMLDOMElement> pXmlElClientSideCredential;
-    if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:ClientSideCredential"), bstr(L"ClientSideCredential"), bstrNamespace, &pXmlElClientSideCredential)))
+    if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:ClientSideCredential"), bstr(L"ClientSideCredential"), namespace_eapmetadata, &pXmlElClientSideCredential)))
         throw com_runtime_error(hr, __FUNCTION__ " Error creating <ClientSideCredential> element.");
 
     // <ClientSideCredential>/<AnonymousIdentity>
     if (!m_anonymous_identity.empty())
-        if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElClientSideCredential, bstr(L"AnonymousIdentity"), bstrNamespace, bstr(m_anonymous_identity))))
+        if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElClientSideCredential, bstr(L"AnonymousIdentity"), namespace_eapmetadata, bstr(m_anonymous_identity))))
             throw com_runtime_error(hr, __FUNCTION__ " Error creating <AnonymousIdentity> element.");
 
     // <InnerAuthenticationMethod>
     com_obj<IXMLDOMElement> pXmlElInnerAuthenticationMethod;
-    if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:InnerAuthenticationMethod"), bstr(L"InnerAuthenticationMethod"), bstrNamespace, &pXmlElInnerAuthenticationMethod)))
+    if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:InnerAuthenticationMethod"), bstr(L"InnerAuthenticationMethod"), namespace_eapmetadata, &pXmlElInnerAuthenticationMethod)))
         throw com_runtime_error(hr, __FUNCTION__ " Error creating <InnerAuthenticationMethod> element.");
 
     eap_type_t eap_type = m_inner->get_method_id();
     if (eap_type_noneap_start <= eap_type && eap_type < eap_type_noneap_end) {
         // <InnerAuthenticationMethod>/<NonEAPAuthMethod>
-        if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElInnerAuthenticationMethod, bstr(L"NonEAPAuthMethod"), bstrNamespace, bstr(m_inner->get_method_str()))))
+        if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElInnerAuthenticationMethod, bstr(L"NonEAPAuthMethod"), namespace_eapmetadata, bstr(m_inner->get_method_str()))))
             throw com_runtime_error(hr, __FUNCTION__ " Error creating <NonEAPAuthMethod> element.");
     } else {
         // <InnerAuthenticationMethod>/<EAPMethod>
-        if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElInnerAuthenticationMethod, bstr(L"EAPMethod"), bstrNamespace, (DWORD)m_inner->get_method_id())))
+        if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElInnerAuthenticationMethod, bstr(L"EAPMethod"), namespace_eapmetadata, (DWORD)m_inner->get_method_id())))
             throw com_runtime_error(hr, __FUNCTION__ " Error creating <EAPMethod> element.");
     }
 
