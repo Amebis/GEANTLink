@@ -99,7 +99,7 @@ void eap::credentials_tls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pC
 
     // <ClientCertificate>
     com_obj<IXMLDOMElement> pXmlElClientCertificate;
-    if (FAILED(hr = eapxml::create_element(pDoc, bstr(L"ClientCertificate"), namespace_eapmetadata, &pXmlElClientCertificate)))
+    if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:ClientCertificate"), bstr(L"ClientCertificate"), namespace_eapmetadata, &pXmlElClientCertificate)))
         throw com_runtime_error(hr, __FUNCTION__ " Error creating <ClientCertificate> element.");
 
     if (m_cert) {
@@ -111,9 +111,6 @@ void eap::credentials_tls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pC
         if (FAILED(hr = eapxml::put_element_base64(pDoc, pXmlElClientCertificate, bstr(L"cert-data"), namespace_eapmetadata, m_cert->pbCertEncoded, m_cert->cbCertEncoded)))
             throw com_runtime_error(hr, __FUNCTION__ " Error creating <cert-data> element.");
     }
-
-    if (FAILED(hr = pConfigRoot->appendChild(pXmlElClientCertificate, NULL)))
-        throw com_runtime_error(hr, __FUNCTION__ " Error appending <ClientCertificate> element.");
 }
 
 
