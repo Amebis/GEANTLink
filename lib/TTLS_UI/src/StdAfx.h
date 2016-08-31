@@ -28,3 +28,4 @@
 #include "../../PAP_UI/include/PAP_UI.h"
 
 #include <wx/app.h>
+#include <wx/thread.h>

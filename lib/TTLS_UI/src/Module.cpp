@@ -23,6 +23,9 @@
 using namespace std;
 using namespace winstd;
 
+static wxCriticalSection s_lock;
+static unsigned long s_init_ref_count = 0;
+
 
 //////////////////////////////////////////////////////////////////////
 // wxInitializerPeer
@@ -328,6 +331,10 @@ void eap::peer_ttls_ui::invoke_interactive_ui(
 
 wxInitializerPeer::wxInitializerPeer(_In_ HINSTANCE instance)
 {
+    wxCriticalSectionLocker locker(s_lock);
+    if (s_init_ref_count++)
+        return;
+
     // Initialize application.
     new wxApp();
     wxEntryStart(instance);
@@ -343,5 +350,9 @@ wxInitializerPeer::wxInitializerPeer(_In_ HINSTANCE instance)
 
 wxInitializerPeer::~wxInitializerPeer()
 {
+    wxCriticalSectionLocker locker(s_lock);
+    if (--s_init_ref_count)
+        return;
+
     wxEntryCleanup();
 }
