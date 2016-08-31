@@ -26,7 +26,7 @@ wxEAPTLSServerTrustConfigPanelBase::wxEAPTLSServerTrustConfigPanelBase( wxWindow
 	sb_server_trust_vert = new wxBoxSizer( wxVERTICAL );
 	
 	m_server_trust_label = new wxStaticText( sb_server_trust->GetStaticBox(), wxID_ANY, _("Describe the servers you trust to prevent credential interception in case of man-in-the-middle attacks."), wxDefaultPosition, wxDefaultSize, 0 );
-	m_server_trust_label->Wrap( 446 );
+	m_server_trust_label->Wrap( 445 );
 	sb_server_trust_vert->Add( m_server_trust_label, 0, wxALL|wxEXPAND, 5 );
 	
 	wxBoxSizer* sb_root_ca;
@@ -129,7 +129,7 @@ wxTLSCredentialsPanelBase::wxTLSCredentialsPanelBase( wxWindow* parent, wxWindow
 	sb_credentials_vert = new wxBoxSizer( wxVERTICAL );
 	
 	m_credentials_label = new wxStaticText( sb_credentials->GetStaticBox(), wxID_ANY, _("Please select your client certificate to use for authentication."), wxDefaultPosition, wxDefaultSize, 0 );
-	m_credentials_label->Wrap( 446 );
+	m_credentials_label->Wrap( 445 );
 	sb_credentials_vert->Add( m_credentials_label, 0, wxALL|wxEXPAND, 5 );
 	
 	wxBoxSizer* sb_cert_radio;

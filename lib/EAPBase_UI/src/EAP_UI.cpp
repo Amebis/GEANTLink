@@ -288,39 +288,72 @@ void wxEAPConfigWindow::OnInitDialog(wxInitDialogEvent& /*event*/)
 
 
 //////////////////////////////////////////////////////////////////////
-// wxEAPProviderIdentityPanel
+// wxEAPProviderContactInfoPanel
 //////////////////////////////////////////////////////////////////////
 
-wxEAPProviderIdentityPanel::wxEAPProviderIdentityPanel(eap::config_provider &prov, wxWindow* parent) :
+wxEAPProviderContactInfoPanel::wxEAPProviderContactInfoPanel(eap::config_provider &prov, wxWindow* parent) :
     m_prov(prov),
-    wxEAPProviderIdentityPanelBase(parent)
+    wxEAPProviderContactInfoPanelBase(parent)
 {
     // Load and set icon.
     winstd::library lib_shell32;
     if (lib_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
-        m_provider_id_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(259)));
+        m_provider_contact_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(259)));
 }
 
 
-bool wxEAPProviderIdentityPanel::TransferDataToWindow()
+bool wxEAPProviderContactInfoPanel::TransferDataToWindow()
 {
     m_provider_name ->SetValue(m_prov.m_name      );
     m_provider_web  ->SetValue(m_prov.m_help_web  );
     m_provider_email->SetValue(m_prov.m_help_email);
     m_provider_phone->SetValue(m_prov.m_help_phone);
 
-    return wxEAPProviderIdentityPanelBase::TransferDataToWindow();
+    return wxEAPProviderContactInfoPanelBase::TransferDataToWindow();
 }
 
 
-bool wxEAPProviderIdentityPanel::TransferDataFromWindow()
+bool wxEAPProviderContactInfoPanel::TransferDataFromWindow()
 {
-    wxCHECK(wxEAPProviderIdentityPanelBase::TransferDataFromWindow(), false);
+    wxCHECK(wxEAPProviderContactInfoPanelBase::TransferDataFromWindow(), false);
 
     m_prov.m_name       = m_provider_name ->GetValue();
     m_prov.m_help_web   = m_provider_web  ->GetValue();
     m_prov.m_help_email = m_provider_email->GetValue();
     m_prov.m_help_phone = m_provider_phone->GetValue();
+
+    return true;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// wxEAPProviderIDPanel
+//////////////////////////////////////////////////////////////////////
+
+wxEAPProviderIDPanel::wxEAPProviderIDPanel(eap::config_provider &prov, wxWindow* parent) :
+    m_prov(prov),
+    wxEAPProviderIDPanelBase(parent)
+{
+    // Load and set icon.
+    winstd::library lib_shell32;
+    if (lib_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
+        m_provider_id_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(29)));
+}
+
+
+bool wxEAPProviderIDPanel::TransferDataToWindow()
+{
+    m_provider_id->SetValue(m_prov.m_id);
+
+    return wxEAPProviderIDPanelBase::TransferDataToWindow();
+}
+
+
+bool wxEAPProviderIDPanel::TransferDataFromWindow()
+{
+    wxCHECK(wxEAPProviderIDPanelBase::TransferDataFromWindow(), false);
+
+    m_prov.m_id = m_provider_id->GetValue();
 
     return true;
 }
@@ -370,13 +403,16 @@ wxEAPConfigProvider::wxEAPConfigProvider(eap::config_provider &prov, wxWindow *p
     // Set banner title.
     m_banner->m_title->SetLabel(title);
 
-    m_identity = new wxEAPProviderIdentityPanel(prov, this);
+    m_contact = new wxEAPProviderContactInfoPanel(prov, this);
+    AddContent(m_contact);
+
+    m_identity = new wxEAPProviderIDPanel(prov, this);
     AddContent(m_identity);
 
     m_lock = new wxEAPProviderLockPanel(prov, this);
     AddContent(m_lock);
 
-    m_identity->m_provider_name->SetFocusFromKbd();
+    m_contact->m_provider_name->SetFocusFromKbd();
 }
 
 

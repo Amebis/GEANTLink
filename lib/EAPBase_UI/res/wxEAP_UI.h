@@ -214,15 +214,15 @@ class wxEAPCredentialsPassPanelBase : public wxEAPCredentialsPanelBase
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class wxEAPProviderIdentityPanelBase
+/// Class wxEAPProviderContactInfoPanelBase
 ///////////////////////////////////////////////////////////////////////////////
-class wxEAPProviderIdentityPanelBase : public wxPanel 
+class wxEAPProviderContactInfoPanelBase : public wxPanel 
 {
 	private:
 	
 	protected:
-		wxStaticBitmap* m_provider_id_icon;
-		wxStaticText* m_provider_id_label;
+		wxStaticBitmap* m_provider_contact_icon;
+		wxStaticText* m_provider_contact_label;
 		wxStaticText* m_provider_name_label;
 		wxTextCtrl* m_provider_name;
 		wxStaticText* m_provider_name_note;
@@ -236,8 +236,29 @@ class wxEAPProviderIdentityPanelBase : public wxPanel
 	
 	public:
 		
-		wxEAPProviderIdentityPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL ); 
-		~wxEAPProviderIdentityPanelBase();
+		wxEAPProviderContactInfoPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL ); 
+		~wxEAPProviderContactInfoPanelBase();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class wxEAPProviderIDPanelBase
+///////////////////////////////////////////////////////////////////////////////
+class wxEAPProviderIDPanelBase : public wxPanel 
+{
+	private:
+	
+	protected:
+		wxStaticBitmap* m_provider_id_icon;
+		wxStaticText* m_provider_id_label_outer;
+		wxStaticText* m_provider_id_label;
+		wxTextCtrl* m_provider_id;
+		wxStaticText* m_provider_id_note;
+	
+	public:
+		
+		wxEAPProviderIDPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL ); 
+		~wxEAPProviderIDPanelBase();
 	
 };
 

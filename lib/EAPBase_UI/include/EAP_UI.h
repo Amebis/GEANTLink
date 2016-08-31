@@ -73,9 +73,14 @@ class wxEAPCredentialWarningPanel;
 class wxEAPConfigWindow;
 
 ///
+/// EAP provider contact info config panel
+///
+class wxEAPProviderContactInfoPanel;
+
+///
 /// EAP provider identity config panel
 ///
-class wxEAPProviderIdentityPanel;
+class wxEAPProviderIDPanel;
 
 ///
 /// EAP provider configuration dialog
@@ -463,16 +468,16 @@ protected:
 };
 
 
-class wxEAPProviderIdentityPanel : public wxEAPProviderIdentityPanelBase
+class wxEAPProviderContactInfoPanel : public wxEAPProviderContactInfoPanelBase
 {
 public:
     ///
-    /// Constructs a provider identity pannel
+    /// Constructs a provider contact info pannel
     ///
     /// \param[inout] prov    Provider configuration data
     /// \param[in]    parent  Parent window
     ///
-    wxEAPProviderIdentityPanel(eap::config_provider &prov, wxWindow* parent);
+    wxEAPProviderContactInfoPanel(eap::config_provider &prov, wxWindow* parent);
 
     friend class wxEAPConfigProvider; // Allows direct setting of keyboard focus
 
@@ -483,7 +488,29 @@ protected:
     /// \endcond
 
 protected:
-    eap::config_provider &m_prov;   ///< EAP method configuration
+    eap::config_provider &m_prov;   ///< Provider configuration
+};
+
+
+class wxEAPProviderIDPanel : public wxEAPProviderIDPanelBase
+{
+public:
+    ///
+    /// Constructs a provider identity pannel
+    ///
+    /// \param[inout] prov    Provider configuration data
+    /// \param[in]    parent  Parent window
+    ///
+    wxEAPProviderIDPanel(eap::config_provider &prov, wxWindow* parent);
+
+protected:
+    /// \cond internal
+    virtual bool TransferDataToWindow();
+    virtual bool TransferDataFromWindow();
+    /// \endcond
+
+protected:
+    eap::config_provider &m_prov;   ///< Provider configuration
 };
 
 
@@ -521,9 +548,10 @@ public:
     wxEAPConfigProvider(eap::config_provider &prov, wxWindow *parent, wxWindowID id = wxID_ANY, const wxString &title = _("Provider Settings"), const wxPoint &pos = wxDefaultPosition, const wxSize &size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE);
 
 protected:
-    eap::config_provider &m_prov;           ///< EAP method configuration
-    wxEAPProviderIdentityPanel *m_identity; ///< Provider identity panel
-    wxEAPProviderLockPanel *m_lock;         ///< Provider lock panel
+    eap::config_provider &m_prov;               ///< EAP method configuration
+    wxEAPProviderContactInfoPanel *m_contact;   ///< Provider contact info panel
+    wxEAPProviderIDPanel *m_identity;           ///< Provider identity panel
+    wxEAPProviderLockPanel *m_lock;             ///< Provider lock panel
 };
 
 
@@ -847,7 +875,7 @@ public:
         bool layout = false;
         if (!m_prov.m_lbl_alt_credential.empty()) {
             m_credentials_label->SetLabel(m_prov.m_lbl_alt_credential);
-            m_credentials_label->Wrap( 446 );
+            m_credentials_label->Wrap( 445 );
             layout = true;
         }
 

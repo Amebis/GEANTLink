@@ -239,7 +239,7 @@ wxEAPCredentialsConfigPanelBase::wxEAPCredentialsConfigPanelBase( wxWindow* pare
 	sb_credentials_vert = new wxBoxSizer( wxVERTICAL );
 	
 	m_credentials_label = new wxStaticText( sb_credentials->GetStaticBox(), wxID_ANY, _("Manage credentials used to connect."), wxDefaultPosition, wxDefaultSize, 0 );
-	m_credentials_label->Wrap( 446 );
+	m_credentials_label->Wrap( 445 );
 	sb_credentials_vert->Add( m_credentials_label, 0, wxALL|wxEXPAND, 5 );
 	
 	wxBoxSizer* sb_cred_radio;
@@ -364,7 +364,7 @@ wxEAPCredentialsPassPanelBase::wxEAPCredentialsPassPanelBase( wxWindow* parent, 
 	sb_credentials_vert = new wxBoxSizer( wxVERTICAL );
 	
 	m_credentials_label = new wxStaticText( sb_credentials->GetStaticBox(), wxID_ANY, _("Please provide your user ID and password."), wxDefaultPosition, wxDefaultSize, 0 );
-	m_credentials_label->Wrap( 446 );
+	m_credentials_label->Wrap( 445 );
 	sb_credentials_vert->Add( m_credentials_label, 0, wxALL|wxEXPAND, 5 );
 	
 	wxFlexGridSizer* sb_credentials_tbl;
@@ -414,10 +414,114 @@ wxEAPCredentialsPassPanelBase::~wxEAPCredentialsPassPanelBase()
 {
 }
 
-wxEAPProviderIdentityPanelBase::wxEAPProviderIdentityPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+wxEAPProviderContactInfoPanelBase::wxEAPProviderContactInfoPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+{
+	wxStaticBoxSizer* sb_provider_contact;
+	sb_provider_contact = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Your Organization") ), wxVERTICAL );
+	
+	wxBoxSizer* sb_provider_contact_horiz;
+	sb_provider_contact_horiz = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_provider_contact_icon = new wxStaticBitmap( sb_provider_contact->GetStaticBox(), wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
+	sb_provider_contact_horiz->Add( m_provider_contact_icon, 0, wxALL, 5 );
+	
+	wxBoxSizer* sb_provider_contact_vert;
+	sb_provider_contact_vert = new wxBoxSizer( wxVERTICAL );
+	
+	m_provider_contact_label = new wxStaticText( sb_provider_contact->GetStaticBox(), wxID_ANY, _("Describe your organization to customize user prompts.  When organization is introduced, end-users find program messages easier to understand and act."), wxDefaultPosition, wxDefaultSize, 0 );
+	m_provider_contact_label->Wrap( 445 );
+	sb_provider_contact_vert->Add( m_provider_contact_label, 0, wxALL|wxEXPAND, 5 );
+	
+	wxBoxSizer* sb_provider_name;
+	sb_provider_name = new wxBoxSizer( wxVERTICAL );
+	
+	m_provider_name_label = new wxStaticText( sb_provider_contact->GetStaticBox(), wxID_ANY, _("Your organization &name:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_provider_name_label->Wrap( -1 );
+	sb_provider_name->Add( m_provider_name_label, 0, wxBOTTOM, 5 );
+	
+	m_provider_name = new wxTextCtrl( sb_provider_contact->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_provider_name->SetToolTip( _("Your organization name as it will appear on helpdesk contact notifications") );
+	
+	sb_provider_name->Add( m_provider_name, 0, wxEXPAND|wxBOTTOM, 5 );
+	
+	m_provider_name_note = new wxStaticText( sb_provider_contact->GetStaticBox(), wxID_ANY, _("(Keep it short, please)"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_provider_name_note->Wrap( -1 );
+	sb_provider_name->Add( m_provider_name_note, 0, wxALIGN_RIGHT, 5 );
+	
+	
+	sb_provider_contact_vert->Add( sb_provider_name, 0, wxEXPAND|wxALL, 5 );
+	
+	wxBoxSizer* sb_provider_helpdesk;
+	sb_provider_helpdesk = new wxBoxSizer( wxVERTICAL );
+	
+	m_provider_helpdesk_label = new wxStaticText( sb_provider_contact->GetStaticBox(), wxID_ANY, _("Helpdesk contact &information:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_provider_helpdesk_label->Wrap( -1 );
+	sb_provider_helpdesk->Add( m_provider_helpdesk_label, 0, wxBOTTOM, 5 );
+	
+	wxFlexGridSizer* sb_provider_helpdesk_inner;
+	sb_provider_helpdesk_inner = new wxFlexGridSizer( 0, 2, 0, 0 );
+	sb_provider_helpdesk_inner->AddGrowableCol( 1 );
+	sb_provider_helpdesk_inner->SetFlexibleDirection( wxBOTH );
+	sb_provider_helpdesk_inner->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_provider_web_icon = new wxStaticText( sb_provider_contact->GetStaticBox(), wxID_ANY, _("¶"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_provider_web_icon->Wrap( -1 );
+	m_provider_web_icon->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 90, false, wxT("Wingdings") ) );
+	
+	sb_provider_helpdesk_inner->Add( m_provider_web_icon, 0, wxALIGN_CENTER_VERTICAL|wxBOTTOM|wxRIGHT, 5 );
+	
+	m_provider_web = new wxTextCtrl( sb_provider_contact->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_provider_web->SetToolTip( _("Your helpdesk website address") );
+	
+	sb_provider_helpdesk_inner->Add( m_provider_web, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL|wxBOTTOM, 5 );
+	
+	m_provider_email_icon = new wxStaticText( sb_provider_contact->GetStaticBox(), wxID_ANY, _("*"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_provider_email_icon->Wrap( -1 );
+	m_provider_email_icon->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 90, false, wxT("Wingdings") ) );
+	
+	sb_provider_helpdesk_inner->Add( m_provider_email_icon, 0, wxALIGN_CENTER_VERTICAL|wxBOTTOM|wxRIGHT, 5 );
+	
+	m_provider_email = new wxTextCtrl( sb_provider_contact->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_provider_email->SetToolTip( _("Your helpdesk e-mail address") );
+	
+	sb_provider_helpdesk_inner->Add( m_provider_email, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL|wxBOTTOM, 5 );
+	
+	m_provider_phone_icon = new wxStaticText( sb_provider_contact->GetStaticBox(), wxID_ANY, _(")"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_provider_phone_icon->Wrap( -1 );
+	m_provider_phone_icon->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 90, false, wxT("Wingdings") ) );
+	
+	sb_provider_helpdesk_inner->Add( m_provider_phone_icon, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
+	
+	m_provider_phone = new wxTextCtrl( sb_provider_contact->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_provider_phone->SetToolTip( _("Your helpdesk phone number") );
+	
+	sb_provider_helpdesk_inner->Add( m_provider_phone, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	
+	sb_provider_helpdesk->Add( sb_provider_helpdesk_inner, 0, wxEXPAND, 5 );
+	
+	
+	sb_provider_contact_vert->Add( sb_provider_helpdesk, 0, wxEXPAND|wxALL, 5 );
+	
+	
+	sb_provider_contact_horiz->Add( sb_provider_contact_vert, 1, wxEXPAND, 5 );
+	
+	
+	sb_provider_contact->Add( sb_provider_contact_horiz, 1, wxEXPAND, 5 );
+	
+	
+	this->SetSizer( sb_provider_contact );
+	this->Layout();
+}
+
+wxEAPProviderContactInfoPanelBase::~wxEAPProviderContactInfoPanelBase()
+{
+}
+
+wxEAPProviderIDPanelBase::wxEAPProviderIDPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
 	wxStaticBoxSizer* sb_provider_id;
-	sb_provider_id = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Your Organization") ), wxVERTICAL );
+	sb_provider_id = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Provider Unique Identifier") ), wxVERTICAL );
 	
 	wxBoxSizer* sb_provider_id_horiz;
 	sb_provider_id_horiz = new wxBoxSizer( wxHORIZONTAL );
@@ -428,80 +532,28 @@ wxEAPProviderIdentityPanelBase::wxEAPProviderIdentityPanelBase( wxWindow* parent
 	wxBoxSizer* sb_provider_id_vert;
 	sb_provider_id_vert = new wxBoxSizer( wxVERTICAL );
 	
-	m_provider_id_label = new wxStaticText( sb_provider_id->GetStaticBox(), wxID_ANY, _("Describe your organization to customize user prompts.  When organization is introduced, end-users find program messages easier to understand and act."), wxDefaultPosition, wxDefaultSize, 0 );
-	m_provider_id_label->Wrap( 446 );
-	sb_provider_id_vert->Add( m_provider_id_label, 0, wxALL|wxEXPAND, 5 );
+	m_provider_id_label_outer = new wxStaticText( sb_provider_id->GetStaticBox(), wxID_ANY, _("Assign your organization a unique ID to allow sharing the same credential set across different network profiles."), wxDefaultPosition, wxDefaultSize, 0 );
+	m_provider_id_label_outer->Wrap( 445 );
+	sb_provider_id_vert->Add( m_provider_id_label_outer, 0, wxALL|wxEXPAND, 5 );
 	
-	wxBoxSizer* sb_provider_name;
-	sb_provider_name = new wxBoxSizer( wxVERTICAL );
+	wxBoxSizer* sb_provider_id_inner;
+	sb_provider_id_inner = new wxBoxSizer( wxVERTICAL );
 	
-	m_provider_name_label = new wxStaticText( sb_provider_id->GetStaticBox(), wxID_ANY, _("Your organization &name:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_provider_name_label->Wrap( -1 );
-	sb_provider_name->Add( m_provider_name_label, 0, wxBOTTOM, 5 );
+	m_provider_id_label = new wxStaticText( sb_provider_id->GetStaticBox(), wxID_ANY, _("Provider unique &identifier:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_provider_id_label->Wrap( -1 );
+	sb_provider_id_inner->Add( m_provider_id_label, 0, wxBOTTOM, 5 );
 	
-	m_provider_name = new wxTextCtrl( sb_provider_id->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_provider_name->SetToolTip( _("Your organization name as it will appear on helpdesk contact notifications") );
+	m_provider_id = new wxTextCtrl( sb_provider_id->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_provider_id->SetToolTip( _("Your organization ID to assign same credentials from other profiles") );
 	
-	sb_provider_name->Add( m_provider_name, 0, wxEXPAND|wxBOTTOM, 5 );
+	sb_provider_id_inner->Add( m_provider_id, 0, wxEXPAND|wxBOTTOM, 5 );
 	
-	m_provider_name_note = new wxStaticText( sb_provider_id->GetStaticBox(), wxID_ANY, _("(Keep it short, please)"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_provider_name_note->Wrap( -1 );
-	sb_provider_name->Add( m_provider_name_note, 0, wxALIGN_RIGHT, 5 );
-	
-	
-	sb_provider_id_vert->Add( sb_provider_name, 0, wxEXPAND|wxALL, 5 );
-	
-	wxBoxSizer* sb_provider_helpdesk;
-	sb_provider_helpdesk = new wxBoxSizer( wxVERTICAL );
-	
-	m_provider_helpdesk_label = new wxStaticText( sb_provider_id->GetStaticBox(), wxID_ANY, _("Helpdesk contact &information:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_provider_helpdesk_label->Wrap( -1 );
-	sb_provider_helpdesk->Add( m_provider_helpdesk_label, 0, wxBOTTOM, 5 );
-	
-	wxFlexGridSizer* sb_provider_helpdesk_inner;
-	sb_provider_helpdesk_inner = new wxFlexGridSizer( 0, 2, 0, 0 );
-	sb_provider_helpdesk_inner->AddGrowableCol( 1 );
-	sb_provider_helpdesk_inner->SetFlexibleDirection( wxBOTH );
-	sb_provider_helpdesk_inner->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	m_provider_web_icon = new wxStaticText( sb_provider_id->GetStaticBox(), wxID_ANY, _("¶"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_provider_web_icon->Wrap( -1 );
-	m_provider_web_icon->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 90, false, wxT("Wingdings") ) );
-	
-	sb_provider_helpdesk_inner->Add( m_provider_web_icon, 0, wxALIGN_CENTER_VERTICAL|wxBOTTOM|wxRIGHT, 5 );
-	
-	m_provider_web = new wxTextCtrl( sb_provider_id->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_provider_web->SetToolTip( _("Your helpdesk website address") );
-	
-	sb_provider_helpdesk_inner->Add( m_provider_web, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL|wxBOTTOM, 5 );
-	
-	m_provider_email_icon = new wxStaticText( sb_provider_id->GetStaticBox(), wxID_ANY, _("*"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_provider_email_icon->Wrap( -1 );
-	m_provider_email_icon->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 90, false, wxT("Wingdings") ) );
-	
-	sb_provider_helpdesk_inner->Add( m_provider_email_icon, 0, wxALIGN_CENTER_VERTICAL|wxBOTTOM|wxRIGHT, 5 );
-	
-	m_provider_email = new wxTextCtrl( sb_provider_id->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_provider_email->SetToolTip( _("Your helpdesk e-mail address") );
-	
-	sb_provider_helpdesk_inner->Add( m_provider_email, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL|wxBOTTOM, 5 );
-	
-	m_provider_phone_icon = new wxStaticText( sb_provider_id->GetStaticBox(), wxID_ANY, _(")"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_provider_phone_icon->Wrap( -1 );
-	m_provider_phone_icon->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 90, false, wxT("Wingdings") ) );
-	
-	sb_provider_helpdesk_inner->Add( m_provider_phone_icon, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
-	
-	m_provider_phone = new wxTextCtrl( sb_provider_id->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_provider_phone->SetToolTip( _("Your helpdesk phone number") );
-	
-	sb_provider_helpdesk_inner->Add( m_provider_phone, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
+	m_provider_id_note = new wxStaticText( sb_provider_id->GetStaticBox(), wxID_ANY, _("(Examples: contoso.com, DOT-UK, etc.)"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_provider_id_note->Wrap( -1 );
+	sb_provider_id_inner->Add( m_provider_id_note, 0, wxALIGN_RIGHT, 5 );
 	
 	
-	sb_provider_helpdesk->Add( sb_provider_helpdesk_inner, 1, wxEXPAND, 5 );
-	
-	
-	sb_provider_id_vert->Add( sb_provider_helpdesk, 1, wxEXPAND, 5 );
+	sb_provider_id_vert->Add( sb_provider_id_inner, 0, wxEXPAND|wxALL, 5 );
 	
 	
 	sb_provider_id_horiz->Add( sb_provider_id_vert, 1, wxEXPAND, 5 );
@@ -514,7 +566,7 @@ wxEAPProviderIdentityPanelBase::wxEAPProviderIdentityPanelBase( wxWindow* parent
 	this->Layout();
 }
 
-wxEAPProviderIdentityPanelBase::~wxEAPProviderIdentityPanelBase()
+wxEAPProviderIDPanelBase::~wxEAPProviderIDPanelBase()
 {
 }
 
@@ -533,21 +585,21 @@ wxEAPProviderLockPanelBase::wxEAPProviderLockPanelBase( wxWindow* parent, wxWind
 	sb_provider_lock_vert = new wxBoxSizer( wxVERTICAL );
 	
 	m_provider_lock_label = new wxStaticText( sb_provider_lock->GetStaticBox(), wxID_ANY, _("Your configuration can be locked to prevent accidental modification by end-users. Users will only be allowed to enter credentials."), wxDefaultPosition, wxDefaultSize, 0 );
-	m_provider_lock_label->Wrap( 446 );
+	m_provider_lock_label->Wrap( 445 );
 	sb_provider_lock_vert->Add( m_provider_lock_label, 0, wxALL|wxEXPAND, 5 );
 	
-	wxBoxSizer* sb_provider_name;
-	sb_provider_name = new wxBoxSizer( wxVERTICAL );
+	wxBoxSizer* sb_provider_lock_inner;
+	sb_provider_lock_inner = new wxBoxSizer( wxVERTICAL );
 	
 	m_provider_lock = new wxCheckBox( sb_provider_lock->GetStaticBox(), wxID_ANY, _("&Lock this configuration and prevent any further modification via user interface."), wxDefaultPosition, wxDefaultSize, 0 );
-	sb_provider_name->Add( m_provider_lock, 0, wxEXPAND|wxBOTTOM, 5 );
+	sb_provider_lock_inner->Add( m_provider_lock, 0, wxEXPAND|wxBOTTOM, 5 );
 	
 	m_provider_lock_note = new wxStaticText( sb_provider_lock->GetStaticBox(), wxID_ANY, _("(Warning: Once locked, you can not revert using this dialog!)"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_provider_lock_note->Wrap( -1 );
-	sb_provider_name->Add( m_provider_lock_note, 0, wxALIGN_RIGHT, 5 );
+	sb_provider_lock_inner->Add( m_provider_lock_note, 0, wxALIGN_RIGHT, 5 );
 	
 	
-	sb_provider_lock_vert->Add( sb_provider_name, 0, wxEXPAND|wxALL, 5 );
+	sb_provider_lock_vert->Add( sb_provider_lock_inner, 0, wxEXPAND|wxALL, 5 );
 	
 	
 	sb_provider_lock_horiz->Add( sb_provider_lock_vert, 1, wxEXPAND, 5 );
