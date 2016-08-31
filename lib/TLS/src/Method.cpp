@@ -298,7 +298,7 @@ void eap::method_tls::begin_session(
         NULL,                                                                 // aphMappers
         0,                                                                    // cSupportedAlgs: Use system configured default
         NULL,                                                                 // palgSupportedAlgs: Use system configured default
-        SP_PROT_TLS1_X_CLIENT,                                                // grbitEnabledProtocols: TLS 1.x
+        SP_PROT_TLS1_X_CLIENT | (SP_PROT_TLS1_2_CLIENT<<2),                   // grbitEnabledProtocols: TLS 1.x
         0,                                                                    // dwMinimumCipherStrength: Use system configured default
         0,                                                                    // dwMaximumCipherStrength: Use system configured default
         0,                                                                    // dwSessionLifespan: Use system configured default = 10hr
