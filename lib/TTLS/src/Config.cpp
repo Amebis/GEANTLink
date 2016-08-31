@@ -120,6 +120,39 @@ void eap::config_method_ttls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode 
 
     // <InnerAuthenticationMethod>/...
     m_inner->save(pDoc, pXmlElInnerAuthenticationMethod);
+
+    {
+        com_obj<IXMLDOMNode> pXmlElClientSideCredential;
+        if (SUCCEEDED(hr = eapxml::select_node(pConfigRoot, bstr(L"eap-metadata:ClientSideCredential"), &pXmlElClientSideCredential))) {
+            // Fix 1: Pre-shared outer credentials in draft-winter-opsawg-eap-metadata has some bizarre presence/absence/blank logic for EAP-TTLS methods only.
+            // To keep our code clean, we do some post-processing, to make draft compliant XML on output, while keeping things simple on the inside.
+            if (m_use_preshared && m_preshared->empty()) {
+                // For empty pre-shared client certificate <ClientCertificate/> must not be present.
+                com_obj<IXMLDOMNode> pXmlElClientCertificate;
+                if (SUCCEEDED(hr = eapxml::select_node(pXmlElClientSideCredential, bstr(L"eap-metadata:ClientCertificate"), &pXmlElClientCertificate))) {
+                    com_obj<IXMLDOMNode> pXmlElClientCertificateOld;
+                    hr = pXmlElClientSideCredential->removeChild(pXmlElClientCertificate, &pXmlElClientCertificateOld);
+                }
+            } else if (!m_use_preshared) {
+                // When not using pre-shared (user must supply one), add empty <ClientCertificate/>.
+                com_obj<IXMLDOMElement> pXmlElClientCertificate;
+                hr = eapxml::create_element(pDoc, pXmlElClientSideCredential, bstr(L"eap-metadata:ClientCertificate"), bstr(L"ClientCertificate"), namespace_eapmetadata, &pXmlElClientCertificate);
+            }
+
+            // Fix 2: draft-winter-opsawg-eap-metadata is using <OuterIdentity> name for <UserName> when referring to outer identity of EAP-TTLS.
+            // GÉANTLink is using <UserName> for identities and usernames uniformly. Create <OuterIdentity> and remove <UserName>.
+            com_obj<IXMLDOMElement> pXmlElUserName;
+            if (SUCCEEDED(hr = eapxml::select_element(pXmlElClientSideCredential, bstr(L"eap-metadata:UserName"), &pXmlElUserName))) {
+                bstr identity;
+                if (SUCCEEDED(hr = pXmlElUserName->get_text(&identity))) {
+                    if (SUCCEEDED(hr = eapxml::put_element_value(pDoc, pXmlElClientSideCredential, bstr(L"OuterIdentity"), namespace_eapmetadata, identity))) {
+                        com_obj<IXMLDOMNode> pXmlElClientCertificateOld;
+                        hr = pXmlElClientSideCredential->removeChild(pXmlElUserName, &pXmlElClientCertificateOld);
+                    }
+                }
+            }
+        }
+    }
 }
 
 
@@ -127,6 +160,43 @@ void eap::config_method_ttls::load(_In_ IXMLDOMNode *pConfigRoot)
 {
     assert(pConfigRoot);
     HRESULT hr;
+
+    {
+        com_obj<IXMLDOMNode> pXmlElClientSideCredential;
+        if (SUCCEEDED(hr = eapxml::select_node(pConfigRoot, bstr(L"eap-metadata:ClientSideCredential"), &pXmlElClientSideCredential))) {
+            com_obj<IXMLDOMDocument> pDoc;
+            if (SUCCEEDED(hr = pXmlElClientSideCredential->get_ownerDocument(&pDoc))) {
+                // Fix 1: Pre-shared outer credentials in draft-winter-opsawg-eap-metadata has some bizarre presence/absence/blank logic for EAP-TTLS methods only.
+                // To keep our code clean, we do some pre-processing, to accept draft compliant XML on input, while keeping things simple on the inside.
+                com_obj<IXMLDOMNode> pXmlElClientCertificate;
+                if (SUCCEEDED(hr = eapxml::select_node(pXmlElClientSideCredential, bstr(L"eap-metadata:ClientCertificate"), &pXmlElClientCertificate))) {
+                    VARIANT_BOOL has_children;
+                    if (SUCCEEDED(hr = pXmlElClientCertificate->hasChildNodes(&has_children)) && !has_children) {
+                        // Empty <ClientCertificate/> means: do not use pre-shared credentials.
+                        com_obj<IXMLDOMNode> pXmlElClientCertificateOld;
+                        hr = pXmlElClientSideCredential->removeChild(pXmlElClientCertificate, &pXmlElClientCertificateOld);
+                    }
+                } else {
+                    // Nonexisting <ClientSideCredential> means: use blank pre-shared credentials.
+                    com_obj<IXMLDOMElement> pXmlElClientCertificate;
+                    hr = eapxml::create_element(pDoc, pXmlElClientSideCredential, bstr(L"eap-metadata:ClientCertificate"), bstr(L"ClientCertificate"), namespace_eapmetadata, &pXmlElClientCertificate);
+                }
+
+                // Fix 2: draft-winter-opsawg-eap-metadata is using <OuterIdentity> name for <UserName> when referring to outer identity of EAP-TTLS.
+                // GÉANTLink is using <UserName> for identities and usernames uniformly. Create <UserName> and remove <OuterIdentity>.
+                com_obj<IXMLDOMElement> pXmlElOuterIdentity;
+                if (SUCCEEDED(hr = eapxml::select_element(pXmlElClientSideCredential, bstr(L"eap-metadata:OuterIdentity"), &pXmlElOuterIdentity))) {
+                    bstr identity;
+                    if (SUCCEEDED(hr = pXmlElOuterIdentity->get_text(&identity))) {
+                        if (SUCCEEDED(hr = eapxml::put_element_value(pDoc, pXmlElClientSideCredential, bstr(L"UserName"), namespace_eapmetadata, identity))) {
+                            com_obj<IXMLDOMNode> pXmlElClientCertificateOld;
+                            hr = pXmlElClientSideCredential->removeChild(pXmlElOuterIdentity, &pXmlElClientCertificateOld);
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     config_method_tls::load(pConfigRoot);
 

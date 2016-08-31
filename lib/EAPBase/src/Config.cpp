@@ -159,11 +159,11 @@ eap::config_method_with_cred::config_method_with_cred(_In_ const config_method_w
 
 
 eap::config_method_with_cred::config_method_with_cred(_Inout_ config_method_with_cred &&other) :
-    m_allow_save(std::move(other.m_allow_save)),
+    m_allow_save   (std::move(other.m_allow_save   )),
     m_use_preshared(std::move(other.m_use_preshared)),
-    m_preshared(std::move(other.m_preshared)),
-    m_auth_failed(std::move(other.m_auth_failed)),
-    config_method(std::move(other))
+    m_preshared    (std::move(other.m_preshared    )),
+    m_auth_failed  (std::move(other.m_auth_failed  )),
+    config_method  (std::move(other                ))
 {
 }
 
