@@ -720,23 +720,19 @@ protected:
 
     inline void UpdateOwnIdentity()
     {
-        if (m_cred_own.empty())
-            m_own_identity->SetValue(_("<empty>"));
-        else {
-            wxString identity(m_cred_own.get_name());
-            m_own_identity->SetValue(!identity.empty() ? identity : _("<blank>"));
-        }
+        wxString identity(m_cred_own.get_identity());
+        m_own_identity->SetValue(
+            !identity.empty()  ? identity :
+            m_cred_own.empty() ? _("<empty>") : _("<blank ID>"));
     }
 
 
     inline void UpdatePresharedIdentity()
     {
-        if (m_cred_preshared.empty())
-            m_preshared_identity->SetValue(_("<empty>"));
-        else {
-            wxString identity(m_cred_preshared.get_name());
-            m_preshared_identity->SetValue(!identity.empty() ? identity : _("<blank>"));
-        }
+        wxString identity(m_cred_preshared.get_identity());
+        m_preshared_identity->SetValue(
+            !identity.empty()        ? identity :
+            m_cred_preshared.empty() ? _("<empty>") : _("<blank ID>"));
     }
 
     /// \endcond

@@ -144,9 +144,10 @@ wstring eap::credentials::get_identity() const
 
 tstring eap::credentials::get_name() const
 {
-    if (empty()) return _T("<empty>");
     tstring identity(std::move(get_identity()));
-    return !identity.empty() ? identity : _T("<blank>");
+    return
+        !identity.empty() ? identity :
+        empty()           ? _T("<empty>") : _T("<blank ID>");
 }
 
 

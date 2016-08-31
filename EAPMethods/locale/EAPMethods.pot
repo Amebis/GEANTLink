@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: EAPMethods\n"
-"POT-Creation-Date: 2016-08-31 14:32+0200\n"
+"POT-Creation-Date: 2016-08-31 16:49+0200\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
 "Last-Translator: Simon Rozman <simon.rozman@amebis.si>\n"
 "Language-Team: Amebis, d. o. o., Kamnik <info@amebis.si>\n"
@@ -463,15 +463,15 @@ msgstr ""
 msgid "<error>"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:724 lib/EAPBase_UI/include/EAP_UI.h:735
+#: lib/EAPBase_UI/include/EAP_UI.h:726 lib/EAPBase_UI/include/EAP_UI.h:735
 msgid "<empty>"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:727 lib/EAPBase_UI/include/EAP_UI.h:738
-msgid "<blank>"
+#: lib/EAPBase_UI/include/EAP_UI.h:726 lib/EAPBase_UI/include/EAP_UI.h:735
+msgid "<blank ID>"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:944
+#: lib/EAPBase_UI/include/EAP_UI.h:940
 msgid "<Your Organization>"
 msgstr ""
 
