@@ -47,87 +47,6 @@ namespace eap
     class method_tls : public method
     {
     public:
-#pragma warning(push)
-#pragma warning(disable: 4480)
-
-        ///
-        /// EAP-TLS request packet flags
-        ///
-        /// \sa [The EAP-TLS Authentication Protocol (Chapter: 3.1 EAP-TLS Request Packet)](https://tools.ietf.org/html/rfc5216#section-3.1)
-        ///
-        enum flags_req_t : unsigned char {
-            flags_req_length_incl = 0x80,   ///< Length included
-            flags_req_more_frag   = 0x40,   ///< More fragments
-            flags_req_start       = 0x20,   ///< Start
-        };
-
-        ///
-        /// EAP-TLS response packet flags
-        ///
-        /// \sa [The EAP-TLS Authentication Protocol (Chapter: 3.2 EAP-TLS Response Packet)](https://tools.ietf.org/html/rfc5216#section-3.2)
-        ///
-        enum flags_res_t : unsigned char {
-            flags_res_length_incl = 0x80,   ///< Length included
-            flags_res_more_frag   = 0x40,   ///< More fragments
-        };
-
-#pragma warning(pop)
-
-        ///
-        /// EAP-TLS packet (data)
-        ///
-        class packet
-        {
-        public:
-            ///
-            /// Constructs an empty packet
-            ///
-            packet();
-
-            ///
-            /// Copies a packet
-            ///
-            /// \param[in] other  Packet to copy from
-            ///
-            packet(_In_ const packet &other);
-
-            ///
-            /// Moves a packet
-            ///
-            /// \param[in] other  Packet to move from
-            ///
-            packet(_Inout_ packet &&other);
-
-            ///
-            /// Copies a packet
-            ///
-            /// \param[in] other  Packet to copy from
-            ///
-            /// \returns Reference to this object
-            ///
-            packet& operator=(_In_ const packet &other);
-
-            ///
-            /// Moves a packet
-            ///
-            /// \param[in] other  Packet to move from
-            ///
-            /// \returns Reference to this object
-            ///
-            packet& operator=(_Inout_ packet &&other);
-
-            ///
-            /// Empty the packet
-            ///
-            void clear();
-
-        public:
-            EapCode m_code;                             ///< Packet code
-            unsigned char m_id;                         ///< Packet ID
-            unsigned char m_flags;                      ///< Packet flags
-            std::vector<unsigned char> m_data;          ///< Packet data
-        };
-
 #pragma pack(push)
 #pragma pack(1)
         ///
@@ -489,8 +408,8 @@ namespace eap
         credentials_tls &m_cred;                                ///< EAP-TLS user credentials
         HANDLE m_user_ctx;                                      ///< Handle to user context
 
-        packet m_packet_req;                                    ///< Request packet
-        packet m_packet_res;                                    ///< Response packet
+        packet_tls m_packet_req;                                ///< Request packet
+        packet_tls m_packet_res;                                ///< Response packet
 
 #if EAP_TLS < EAP_TLS_SCHANNEL
         winstd::crypt_prov m_cp;                                ///< Cryptography provider for general services

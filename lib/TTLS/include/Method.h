@@ -30,6 +30,7 @@ namespace eap
 
 #include "Config.h"
 #include "Credentials.h"
+#include "TTLS.h"
 
 #include "../../TLS/include/Method.h"
 #include "../../EAPBase/include/Method.h"
@@ -39,20 +40,6 @@ namespace eap
 {
     class method_ttls : public method_tls
     {
-    public:
-        ///
-        /// EAP-TTLS packet flags
-        ///
-        /// \sa [Extensible Authentication Protocol Tunneled Transport Layer Security Authenticated Protocol Version 0 (EAP-TTLSv0) (Chapter: 9.1 Packet Format)](https://tools.ietf.org/html/rfc5281#section-9.1)
-        ///
-        #pragma warning(suppress: 4480)
-        enum flags_t : unsigned char {
-            flags_length_incl = method_tls::flags_req_length_incl,  ///< Length included
-            flags_more_frag   = method_tls::flags_req_more_frag,    ///< More fragments
-            flags_start       = method_tls::flags_req_start,        ///< Start
-            flags_ver_mask    = 0x07,                               ///< Version mask
-        };
-
     public:
         ///
         /// Constructs an EAP method

@@ -90,6 +90,7 @@
   <ItemGroup>
     <ClCompile Include="..\src\Config.cpp" />
     <ClCompile Include="..\src\Credentials.cpp" />
+    <ClCompile Include="..\src\EAP.cpp" />
     <ClCompile Include="..\src\Module.cpp" />
     <ClCompile Include="..\src\Method.cpp" />
     <ClCompile Include="..\src\StdAfx.cpp">

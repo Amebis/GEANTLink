@@ -25,65 +25,6 @@ using namespace winstd;
 
 
 //////////////////////////////////////////////////////////////////////
-// eap::method_pap::packet
-//////////////////////////////////////////////////////////////////////
-
-eap::method_pap::packet::packet() :
-    m_code((EapCode)0),
-    m_id(0)
-{
-}
-
-
-eap::method_pap::packet::packet(_In_ const packet &other) :
-    m_code(other.m_code),
-    m_id  (other.m_id  ),
-    m_data(other.m_data)
-{
-}
-
-
-eap::method_pap::packet::packet(_Inout_ packet &&other) :
-    m_code(std::move(other.m_code)),
-    m_id  (std::move(other.m_id  )),
-    m_data(std::move(other.m_data))
-{
-}
-
-
-eap::method_pap::packet& eap::method_pap::packet::operator=(_In_ const packet &other)
-{
-    if (this != std::addressof(other)) {
-        m_code = other.m_code;
-        m_id   = other.m_id  ;
-        m_data = other.m_data;
-    }
-
-    return *this;
-}
-
-
-eap::method_pap::packet& eap::method_pap::packet::operator=(_Inout_ packet &&other)
-{
-    if (this != std::addressof(other)) {
-        m_code = std::move(other.m_code);
-        m_id   = std::move(other.m_id  );
-        m_data = std::move(other.m_data);
-    }
-
-    return *this;
-}
-
-
-void eap::method_pap::packet::clear()
-{
-    m_code = (EapCode)0;
-    m_id   = 0;
-    m_data.clear();
-}
-
-
-//////////////////////////////////////////////////////////////////////
 // eap::method_pap
 //////////////////////////////////////////////////////////////////////
 

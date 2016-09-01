@@ -91,6 +91,11 @@ namespace eap
     /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter 6.1. Connection States)](https://tools.ietf.org/html/rfc5246#section-6.1)
     ///
     class tls_conn_state;
+
+    ///
+    /// EAP-TLS packet
+    ///
+    class packet_tls;
 }
 
 /////
@@ -522,5 +527,117 @@ namespace eap
         size_t m_size_mac_key;          ///< Message authenticy check algorithm key size (has to comply with `m_alg_mac`)
         size_t m_size_mac_hash;         ///< Message authenticy check algorithm result size (has to comply with `m_alg_mac`)
         hmac_padding m_padding_hmac;    ///< Padding (key) for HMAC calculation
+    };
+
+
+    class packet_tls : public packet
+    {
+    public:
+#pragma warning(push)
+#pragma warning(disable: 4480)
+
+        ///
+        /// EAP-TLS request packet flags
+        ///
+        /// \sa [The EAP-TLS Authentication Protocol (Chapter: 3.1 EAP-TLS Request Packet)](https://tools.ietf.org/html/rfc5216#section-3.1)
+        ///
+        enum flags_req_t : unsigned char {
+            flags_req_length_incl = 0x80,   ///< Length included
+            flags_req_more_frag   = 0x40,   ///< More fragments
+            flags_req_start       = 0x20,   ///< Start
+        };
+
+        ///
+        /// EAP-TLS response packet flags
+        ///
+        /// \sa [The EAP-TLS Authentication Protocol (Chapter: 3.2 EAP-TLS Response Packet)](https://tools.ietf.org/html/rfc5216#section-3.2)
+        ///
+        enum flags_res_t : unsigned char {
+            flags_res_length_incl = 0x80,   ///< Length included
+            flags_res_more_frag   = 0x40,   ///< More fragments
+        };
+
+#pragma warning(pop)
+
+    public:
+        ///
+        /// Constructs an empty packet
+        ///
+        packet_tls();
+
+        ///
+        /// Copies a packet
+        ///
+        /// \param[in] other  Packet to copy from
+        ///
+        packet_tls(_In_ const packet_tls &other);
+
+        ///
+        /// Moves a packet
+        ///
+        /// \param[in] other  Packet to move from
+        ///
+        packet_tls(_Inout_ packet_tls &&other);
+
+        ///
+        /// Copies a packet
+        ///
+        /// \param[in] other  Packet to copy from
+        ///
+        /// \returns Reference to this object
+        ///
+        packet_tls& operator=(_In_ const packet_tls &other);
+
+        ///
+        /// Moves a packet
+        ///
+        /// \param[in] other  Packet to move from
+        ///
+        /// \returns Reference to this object
+        ///
+        packet_tls& operator=(_Inout_ packet_tls &&other);
+
+        ///
+        /// Empty the packet
+        ///
+        virtual void clear();
+
+        ///
+        /// Appends fragment
+        ///
+        /// \param[in] pck  EAP packet fragment
+        ///
+        /// \returns
+        /// - \c true  if this was the last fragment of a packet
+        /// - \c false if more fragments are to follow
+        ///
+        bool append_frag(_In_ const EapPacket *pck);
+
+        ///
+        /// Gets next fragment of the packet
+        ///
+        /// \param[out  ] pck       Memory to write EAP packet to
+        /// \param[inout] size_max  Available size of \p pck (in bytes)
+        ///
+        /// \returns Final size of the packet (fragment)
+        ///
+        unsigned short get_frag(_Out_bytecap_(size_max) EapPacket *pck, _In_ size_t size_max);
+
+        ///
+        /// Is this packet an ACK
+        ///
+        /// \param[in] id  ID of originating EAP packet
+        ///
+        inline bool is_ack(_In_ unsigned char id) const
+        {
+            return
+                m_code == EapCodeRequest &&
+                m_id   == id             &&
+                m_data.empty()           &&
+                !(m_flags & (flags_req_length_incl | flags_req_more_frag | flags_req_start));
+        }
+
+    public:
+        unsigned char m_flags;  ///< Packet flags
     };
 }

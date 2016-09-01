@@ -41,61 +41,6 @@ namespace eap
     {
     public:
         ///
-        /// EAP-PAP packet (data)
-        ///
-        class packet
-        {
-        public:
-            ///
-            /// Constructs an empty packet
-            ///
-            packet();
-
-            ///
-            /// Copies a packet
-            ///
-            /// \param[in] other  Packet to copy from
-            ///
-            packet(_In_ const packet &other);
-
-            ///
-            /// Moves a packet
-            ///
-            /// \param[in] other  Packet to move from
-            ///
-            packet(_Inout_ packet &&other);
-
-            ///
-            /// Copies a packet
-            ///
-            /// \param[in] other  Packet to copy from
-            ///
-            /// \returns Reference to this object
-            ///
-            packet& operator=(_In_ const packet &other);
-
-            ///
-            /// Moves a packet
-            ///
-            /// \param[in] other  Packet to move from
-            ///
-            /// \returns Reference to this object
-            ///
-            packet& operator=(_Inout_ packet &&other);
-
-            ///
-            /// Empty the packet
-            ///
-            void clear();
-
-        public:
-            EapCode m_code;         ///< Packet code
-            unsigned char m_id;     ///< Packet ID
-            sanitizing_blob m_data; ///< Packet data
-        };
-
-    public:
-        ///
         /// Constructs an EAP method
         ///
         /// \param[in] mod   EAP module to use for global services
