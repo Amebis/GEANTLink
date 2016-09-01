@@ -552,6 +552,31 @@ void eap::method_tls::get_result(
         // Update configuration with session resumption data and prepare BLOB.
         m_cfg.m_session_id    = m_session_id;
         m_cfg.m_master_secret = m_master_secret;
+#else
+        // Make a graceful Schannel shutdown...
+        // ...as a desparate attempt Schannel would resume session next time then?!
+        DWORD dwType = SCHANNEL_SHUTDOWN;
+        SecBuffer token = {
+            sizeof(dwType),
+            SECBUFFER_TOKEN,
+            &dwType };
+        SecBufferDesc token_desc = { SECBUFFER_VERSION, 1, &token };
+        if (SUCCEEDED(status = ApplyControlToken(m_sc_ctx, &token_desc))) {
+            // Prepare output buffer(s).
+            SecBuffer buf_out[] = { { 0, SECBUFFER_TOKEN, NULL }, };
+            sec_buffer_desc buf_out_desc(buf_out, _countof(buf_out));
+
+            // Build an SSL close notify message.
+            status = m_sc_ctx.process(
+                m_sc_cred,
+                !m_sc_target_name.empty() ? m_sc_target_name.c_str() : NULL,
+                ISC_REQ_REPLAY_DETECT | ISC_REQ_SEQUENCE_DETECT | ISC_REQ_CONFIDENTIALITY | ISC_REQ_INTEGRITY | ISC_REQ_STREAM | /*ISC_REQ_USE_SUPPLIED_CREDS |*/ ISC_REQ_EXTENDED_ERROR | ISC_REQ_ALLOCATE_MEMORY,
+                0,
+                NULL,
+                &buf_out_desc);
+            if (SUCCEEDED(status))
+                m_packet_res.m_data.insert(m_packet_res.m_data.end(), (const unsigned char*)buf_out[0].pvBuffer, (const unsigned char*)buf_out[0].pvBuffer + buf_out[0].cbBuffer);
+        }
 #endif
 
         break;
