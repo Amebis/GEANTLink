@@ -92,11 +92,10 @@ void eap::credentials::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfi
 
     HRESULT hr;
 
-    if (!m_identity.empty()) {
-        // <UserName>
+    // <UserName>
+    if (!m_identity.empty())
         if (FAILED(hr = eapxml::put_element_value(pDoc, pConfigRoot, bstr(L"UserName"), namespace_eapmetadata, bstr(m_identity))))
             throw com_runtime_error(hr, __FUNCTION__ " Error creating <UserName> element.");
-    }
 }
 
 
