@@ -433,6 +433,7 @@ namespace eap
         tls_random m_key_mppe_server;                           ///< MS-MPPE-Send-Key
 
         sanitizing_blob m_session_id;                           ///< TLS session ID
+        bool m_session_resumed;                                 ///< Did TLS session resume?
 
         std::list<winstd::cert_context> m_server_cert_chain;    ///< Server certificate chain
 

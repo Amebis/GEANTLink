@@ -65,6 +65,7 @@ eap::method_tls::method_tls(_In_ module &module, _In_ config_method_tls &cfg, _I
     m_cred(cred),
     m_user_ctx(NULL),
 #if EAP_TLS < EAP_TLS_SCHANNEL
+    m_session_resumed(false),
     m_phase(phase_unknown),
     m_seq_num_client(0),
     m_seq_num_server(0),
@@ -106,6 +107,7 @@ eap::method_tls::method_tls(_Inout_ method_tls &&other) :
     m_key_mppe_client           (std::move(other.m_key_mppe_client           )),
     m_key_mppe_server           (std::move(other.m_key_mppe_server           )),
     m_session_id                (std::move(other.m_session_id                )),
+    m_session_resumed           (std::move(other.m_session_resumed           )),
     m_server_cert_chain         (std::move(other.m_server_cert_chain         )),
     m_hash_handshake_msgs_md5   (std::move(other.m_hash_handshake_msgs_md5   )),
     m_hash_handshake_msgs_sha1  (std::move(other.m_hash_handshake_msgs_sha1  )),
@@ -157,6 +159,7 @@ eap::method_tls& eap::method_tls::operator=(_Inout_ method_tls &&other)
         m_key_mppe_client            = std::move(other.m_key_mppe_client           );
         m_key_mppe_server            = std::move(other.m_key_mppe_server           );
         m_session_id                 = std::move(other.m_session_id                );
+        m_session_resumed            = std::move(other.m_session_resumed           );
         m_server_cert_chain          = std::move(other.m_server_cert_chain         );
         m_hash_handshake_msgs_md5    = std::move(other.m_hash_handshake_msgs_md5   );
         m_hash_handshake_msgs_sha1   = std::move(other.m_hash_handshake_msgs_sha1  );
@@ -301,7 +304,7 @@ void eap::method_tls::process_request_packet(
     user_impersonator impersonating(m_user_ctx);
 
 #if EAP_TLS < EAP_TLS_SCHANNEL
-    if (pReceivedPacket->Code == EapCodeRequest && (m_packet_req.m_flags & flags_req_start)) {
+    if (pReceivedPacket->Code == EapCodeRequest && (m_packet_req.m_flags & packet_tls::flags_req_start)) {
         // This is the EAP-TLS start message: (re)initialize method.
         m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_tls), event_data::blank);
         m_phase = phase_client_hello;
@@ -435,8 +438,10 @@ void eap::method_tls::process_request_packet(
         if (m_handshake[tls_handshake_type_finished]) {
             // Go to application data phase. And allow piggybacking of the first data message.
             m_phase = phase_application_data;
+            m_session_resumed = true;
             process_application_data(NULL, 0);
         } else {
+            m_session_resumed = false;
             m_phase = phase_change_cipher_spec;
         }
         break;

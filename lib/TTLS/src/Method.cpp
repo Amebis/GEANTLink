@@ -199,10 +199,23 @@ void eap::method_ttls::process_application_data(_In_bytecount_(size_msg) const v
     // Prepare inner authentication.
 #if EAP_TLS < EAP_TLS_SCHANNEL
     if (!m_state_client.m_alg_encrypt)
+        throw runtime_error(__FUNCTION__ " Refusing to continue with inner authentication unencrypted.");
+
+    if (m_session_resumed) {
+        // On reconnect we do not need to do inner re-authentication.
+        return;
+    }
 #else
     if (!(m_sc_ctx.m_attrib & ISC_RET_CONFIDENTIALITY))
-#endif
         throw runtime_error(__FUNCTION__ " Refusing to continue with inner authentication unencrypted.");
+
+    SecPkgContext_SessionInfo session_info;
+    if (SUCCEEDED(QueryContextAttributes(m_sc_ctx, SECPKG_ATTR_SESSION_INFO, &session_info)) && (session_info.dwFlags & SSL_SESSION_RECONNECT)) {
+        // On reconnect we do not need to do inner re-authentication.
+        // According to MSDN QueryContextAttributes(SECPKG_ATTR_SESSION_INFO) works from Windows 7 on. Therefore behaviour might vary.
+        return;
+    }
+#endif
 
     EapPeerMethodOutput eap_output = {};
     eap_type_t eap_type = m_cfg.m_inner->get_method_id();
