@@ -82,6 +82,11 @@ namespace eap
     enum diameter_avp_flags_t;
 
     ///
+    /// Diameter AVP header
+    ///
+    struct diameter_avp_header;
+
+    ///
     /// Diameter AVP
     ///
     struct diameter_avp;
@@ -423,14 +428,22 @@ inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ GUID &val);
 
 #ifndef htonll
 ///
-/// Convert host converts an unsigned __int64 from host to TCP/IP network byte order.
+/// Converts an unsigned __int64 from host to TCP/IP network byte order.
 ///
-/// \param[in] val  A 64-bit unsigned number in host byte order.
+/// \param[in] val  A 64-bit unsigned number in host byte order
 ///
-/// \returns The value in TCP/IP's network byte order.
+/// \returns The value in TCP/IP's network byte order
 ///
 inline unsigned __int64 htonll(unsigned __int64 val);
 #endif
+
+///
+/// Converts an 24-bit integer from host to TCP/IP network byte order.
+///
+/// \param[in ] val  A 24-bit unsigned number in host byte order
+/// \param[out] out  A 24-bit unsigned number in network byte order
+///
+inline void hton24(_In_ unsigned int val, _Out_ unsigned char out[3]);
 
 #pragma once
 
@@ -625,12 +638,17 @@ namespace eap
 
 #pragma pack(push)
 #pragma pack(1)
-    struct diameter_avp
+
+    struct diameter_avp_header
     {
         unsigned char code[4];              ///< AVP Code
         unsigned char flags;                ///< AVP Flags
         unsigned char length[3];            ///< AVP Length
+    };
 
+
+    struct diameter_avp : public diameter_avp_header
+    {
 #pragma warning(push)
 #pragma warning(disable: 4201)
         union {
@@ -642,6 +660,7 @@ namespace eap
         };
 #pragma warning(pop)
     };
+
 #pragma pack(pop)
 
 
@@ -1092,5 +1111,14 @@ inline unsigned __int64 htonll(unsigned __int64 val)
 }
 
 #endif
+
+
+inline void hton24(_In_ unsigned int val, _Out_ unsigned char out[3])
+{
+    assert(val <= 0xffffff);
+    out[0] = (val >> 16) & 0xff;
+    out[1] = (val >>  8) & 0xff;
+    out[2] = (val      ) & 0xff;
+}
 
 #endif

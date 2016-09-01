@@ -83,14 +83,14 @@ eap::credentials::source_t eap::credentials_pap::combine(
     if (cred_cached) {
         // Using EAP service cached credentials.
         *this = *(credentials_pap*)cred_cached;
-        m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CACHED1, event_data((unsigned int)eap_type_pap), event_data(credentials_pap::get_name()), event_data::blank);
+        m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CACHED1, event_data((unsigned int)eap_type_legacy_pap), event_data(credentials_pap::get_name()), event_data::blank);
         return source_cache;
     }
 
     if (cfg.m_use_preshared) {
         // Using preshared credentials.
         *this = *(credentials_pap*)cfg.m_preshared.get();
-        m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_PRESHARED1, event_data((unsigned int)eap_type_pap), event_data(credentials_pap::get_name()), event_data::blank);
+        m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_PRESHARED1, event_data((unsigned int)eap_type_legacy_pap), event_data(credentials_pap::get_name()), event_data::blank);
         return source_preshared;
     }
 
@@ -101,7 +101,7 @@ eap::credentials::source_t eap::credentials_pap::combine(
 
             // Using stored credentials.
             *this = std::move(cred_loaded);
-            m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_STORED1, event_data((unsigned int)eap_type_pap), event_data(credentials_pap::get_name()), event_data::blank);
+            m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_STORED1, event_data((unsigned int)eap_type_legacy_pap), event_data(credentials_pap::get_name()), event_data::blank);
             return source_storage;
         } catch (...) {
             // Not actually an error.

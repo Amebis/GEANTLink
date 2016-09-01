@@ -69,10 +69,10 @@ void eap::method_pap::process_request_packet(
     assert(pReceivedPacket && dwReceivedPacketSize >= 4);
     assert(pEapOutput);
 
-    m_module.log_event(&EAPMETHOD_PACKET_RECV, event_data((unsigned int)eap_type_pap), event_data((unsigned int)dwReceivedPacketSize - 4), event_data::blank);
+    m_module.log_event(&EAPMETHOD_PACKET_RECV, event_data((unsigned int)eap_type_legacy_pap), event_data((unsigned int)dwReceivedPacketSize - 4), event_data::blank);
 
     if (pReceivedPacket->Id == 0) {
-        m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_pap), event_data::blank);
+        m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_legacy_pap), event_data::blank);
         m_phase = phase_init;
     }
 
@@ -97,43 +97,33 @@ void eap::method_pap::process_request_packet(
             size_password_outer;
 
         m_packet_res.m_code = EapCodeResponse;
-        m_packet_res.m_id    = pReceivedPacket->Id;
+        m_packet_res.m_id   = pReceivedPacket->Id;
         m_packet_res.m_data.clear();
         m_packet_res.m_data.reserve(
             (size_identity_outer = 
-            4                + // Diameter AVP Code
-            4                + // Diameter AVP Flags & Length
-            size_identity)   + // Identity
-            padding_identity + // Identity padding
+            sizeof(diameter_avp_header) + // Diameter header
+            size_identity)              + // Identity
+            padding_identity            + // Identity padding
             (size_password_outer = 
-            4                + // Diameter AVP Code
-            4                + // Diameter AVP Flags & Length
-            size_password)   + // Password
-            padding_password); // Password padding
+            sizeof(diameter_avp_header) + // Diameter header
+            size_password)              + // Password
+            padding_password);            // Password padding
 
         // Diameter AVP Code User-Name (0x00000001)
-        m_packet_res.m_data.push_back(0x00);
-        m_packet_res.m_data.push_back(0x00);
-        m_packet_res.m_data.push_back(0x00);
-        m_packet_res.m_data.push_back(0x01);
-
-        // Diameter AVP Flags & Length
-        unsigned int identity_hdr = htonl((diameter_avp_flag_mandatory << 24) | (unsigned int)size_identity_outer);
-        m_packet_res.m_data.insert(m_packet_res.m_data.end(), (unsigned char*)&identity_hdr, (unsigned char*)(&identity_hdr + 1));
+        diameter_avp_header hdr;
+        *(unsigned int*)hdr.code = htonl(0x00000001);
+        hdr.flags = diameter_avp_flag_mandatory;
+        hton24((unsigned int)size_identity_outer, hdr.length);
+        m_packet_res.m_data.insert(m_packet_res.m_data.end(), (unsigned char*)&hdr, (unsigned char*)(&hdr + 1));
 
         // Identity
         m_packet_res.m_data.insert(m_packet_res.m_data.end(), identity_utf8.begin(), identity_utf8.end());
         m_packet_res.m_data.insert(m_packet_res.m_data.end(), padding_identity, 0);
 
         // Diameter AVP Code User-Password (0x00000002)
-        m_packet_res.m_data.push_back(0x00);
-        m_packet_res.m_data.push_back(0x00);
-        m_packet_res.m_data.push_back(0x00);
-        m_packet_res.m_data.push_back(0x02);
-
-        // Diameter AVP Flags & Length
-        unsigned int password_hdr = htonl((diameter_avp_flag_mandatory << 24) | (unsigned int)size_password_outer);
-        m_packet_res.m_data.insert(m_packet_res.m_data.end(), (unsigned char*)&password_hdr, (unsigned char*)(&password_hdr + 1));
+        *(unsigned int*)hdr.code = htonl(0x00000002);
+        hton24((unsigned int)size_password_outer, hdr.length);
+        m_packet_res.m_data.insert(m_packet_res.m_data.end(), (unsigned char*)&hdr, (unsigned char*)(&hdr + 1));
 
         // Password
         m_packet_res.m_data.insert(m_packet_res.m_data.end(), password_utf8.begin(), password_utf8.end());
@@ -167,7 +157,7 @@ void eap::method_pap::get_response_packet(
     // Not fragmented.
     if (size_packet <= size_packet_limit) {
         // No need to fragment the packet.
-        m_module.log_event(&EAPMETHOD_PACKET_SEND, event_data((unsigned int)eap_type_pap), event_data((unsigned int)size_data), event_data::blank);
+        m_module.log_event(&EAPMETHOD_PACKET_SEND, event_data((unsigned int)eap_type_legacy_pap), event_data((unsigned int)size_data), event_data::blank);
     } else {
         // But it should be fragmented.
         throw com_runtime_error(TYPE_E_SIZETOOBIG, __FUNCTION__ " PAP message exceeds 64kB.");
@@ -190,7 +180,7 @@ void eap::method_pap::get_result(
 
     switch (reason) {
     case EapPeerMethodResultSuccess: {
-        m_module.log_event(&EAPMETHOD_METHOD_SUCCESS, event_data((unsigned int)eap_type_pap), event_data::blank);
+        m_module.log_event(&EAPMETHOD_METHOD_SUCCESS, event_data((unsigned int)eap_type_legacy_pap), event_data::blank);
         m_cfg.m_auth_failed = false;
 
         ppResult->fIsSuccess = TRUE;
@@ -202,7 +192,7 @@ void eap::method_pap::get_result(
     case EapPeerMethodResultFailure:
         m_module.log_event(
             m_phase_prev < phase_finished ? &EAPMETHOD_METHOD_FAILURE_INIT : &EAPMETHOD_METHOD_FAILURE,
-            event_data((unsigned int)eap_type_pap), event_data::blank);
+            event_data((unsigned int)eap_type_legacy_pap), event_data::blank);
 
         // Mark credentials as failed, so GUI can re-prompt user.
         // But be careful: do so only after credentials were actually tried.

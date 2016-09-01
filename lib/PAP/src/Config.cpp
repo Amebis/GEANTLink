@@ -72,7 +72,7 @@ eap::config* eap::config_method_pap::clone() const
 
 eap_type_t eap::config_method_pap::get_method_id() const
 {
-    return eap_type_pap;
+    return eap_type_legacy_pap;
 }
 
 
