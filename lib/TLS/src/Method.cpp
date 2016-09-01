@@ -580,6 +580,8 @@ void eap::method_tls::get_result(
         // Mark credentials as failed, so GUI can re-prompt user.
         // But be careful: do so only if this happened after transition from handshake to application data phase.
         m_cfg.m_auth_failed = m_phase_prev < phase_application_data && m_phase >= phase_application_data;
+
+        // TODO: Research how a Schannel session context can be cleared not to resume.
 #endif
 
         // Do not report failure to EapHost, as it will not save updated configuration then. But we need it to save it, to alert user on next connection attempt.
@@ -1134,11 +1136,7 @@ void eap::method_tls::process_handshake()
         },
         { 0, SECBUFFER_EMPTY, NULL },
     };
-    SecBufferDesc buf_in_desc = {
-        SECBUFFER_VERSION,
-        _countof(buf_in),
-        buf_in
-    };
+    SecBufferDesc buf_in_desc = { SECBUFFER_VERSION, _countof(buf_in), buf_in };
 
     // Prepare output buffer(s).
     SecBuffer buf_out[] = {

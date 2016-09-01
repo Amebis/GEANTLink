@@ -147,12 +147,15 @@ void eap::method_ttls::get_result(
 #endif
         method_tls::get_result(EapPeerMethodResultSuccess, ppResult);
 
-        // Do not report failure to EapHost, as it will not save updated configuration then. But we need it to save it, to alert user on next connection attempt.
-        // EapHost is well aware of the failed condition.
-        //if (reason == EapPeerMethodResultFailure) {
-        //    ppResult->fIsSuccess = FALSE;
-        //    ppResult->dwFailureReasonCode = EAP_E_AUTHENTICATION_FAILED;
-        //}
+        if (reason == EapPeerMethodResultFailure) {
+            // Clear session resumption data.
+#if EAP_TLS < EAP_TLS_SCHANNEL
+            m_cfg.m_session_id.clear();
+            m_cfg.m_master_secret.clear();
+#else
+            // TODO: Research how a Schannel session context can be cleared not to resume.
+#endif
+        }
     }
 }
 
