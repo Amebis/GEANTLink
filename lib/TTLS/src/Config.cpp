@@ -138,19 +138,6 @@ void eap::config_method_ttls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode 
                 com_obj<IXMLDOMElement> pXmlElClientCertificate;
                 hr = eapxml::create_element(pDoc, pXmlElClientSideCredential, bstr(L"eap-metadata:ClientCertificate"), bstr(L"ClientCertificate"), namespace_eapmetadata, &pXmlElClientCertificate);
             }
-
-            // Fix 2: draft-winter-opsawg-eap-metadata is using <OuterIdentity> name for <UserName> when referring to outer identity of EAP-TTLS.
-            // GÉANTLink is using <UserName> for identities and usernames uniformly. Create <OuterIdentity> and remove <UserName>.
-            com_obj<IXMLDOMElement> pXmlElUserName;
-            if (SUCCEEDED(hr = eapxml::select_element(pXmlElClientSideCredential, bstr(L"eap-metadata:UserName"), &pXmlElUserName))) {
-                bstr identity;
-                if (SUCCEEDED(hr = pXmlElUserName->get_text(&identity))) {
-                    if (SUCCEEDED(hr = eapxml::put_element_value(pDoc, pXmlElClientSideCredential, bstr(L"OuterIdentity"), namespace_eapmetadata, identity))) {
-                        com_obj<IXMLDOMNode> pXmlElClientCertificateOld;
-                        hr = pXmlElClientSideCredential->removeChild(pXmlElUserName, &pXmlElClientCertificateOld);
-                    }
-                }
-            }
         }
     }
 }
@@ -180,19 +167,6 @@ void eap::config_method_ttls::load(_In_ IXMLDOMNode *pConfigRoot)
                     // Nonexisting <ClientSideCredential> means: use blank pre-shared credentials.
                     com_obj<IXMLDOMElement> pXmlElClientCertificate;
                     hr = eapxml::create_element(pDoc, pXmlElClientSideCredential, bstr(L"eap-metadata:ClientCertificate"), bstr(L"ClientCertificate"), namespace_eapmetadata, &pXmlElClientCertificate);
-                }
-
-                // Fix 2: draft-winter-opsawg-eap-metadata is using <OuterIdentity> name for <UserName> when referring to outer identity of EAP-TTLS.
-                // GÉANTLink is using <UserName> for identities and usernames uniformly. Create <UserName> and remove <OuterIdentity>.
-                com_obj<IXMLDOMElement> pXmlElOuterIdentity;
-                if (SUCCEEDED(hr = eapxml::select_element(pXmlElClientSideCredential, bstr(L"eap-metadata:OuterIdentity"), &pXmlElOuterIdentity))) {
-                    bstr identity;
-                    if (SUCCEEDED(hr = pXmlElOuterIdentity->get_text(&identity))) {
-                        if (SUCCEEDED(hr = eapxml::put_element_value(pDoc, pXmlElClientSideCredential, bstr(L"UserName"), namespace_eapmetadata, identity))) {
-                            com_obj<IXMLDOMNode> pXmlElClientCertificateOld;
-                            hr = pXmlElClientSideCredential->removeChild(pXmlElOuterIdentity, &pXmlElClientCertificateOld);
-                        }
-                    }
                 }
             }
         }
