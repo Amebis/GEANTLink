@@ -30,6 +30,10 @@
 #include "../../PAP/include/Credentials.h"
 #include "../../PAP/include/Method.h"
 
+#include "../../MSCHAPv2/include/Config.h"
+#include "../../MSCHAPv2/include/Credentials.h"
+#include "../../MSCHAPv2/include/Method.h"
+
 #include "../../EAPBase/include/EAPXML.h"
 
 #include <WinStd/EAP.h>

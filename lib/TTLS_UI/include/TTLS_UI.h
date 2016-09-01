@@ -41,6 +41,7 @@ class wxTTLSCredentialsPanel;
 
 #include "../../TTLS/include/Config.h"
 #include "../../PAP/include/Config.h"
+#include "../../MSCHAPv2/include/Config.h"
 
 #include <WinStd/Win.h>
 
@@ -107,7 +108,8 @@ protected:
     wxChoicebook *m_inner_type;             ///< Inner authentication type
 
     // Temporary inner method configurations to hold data until applied
-    eap::config_method_pap m_cfg_pap;       ///< PAP configuration
+    eap::config_method_pap      m_cfg_pap;       ///< PAP configuration
+    eap::config_method_mschapv2 m_cfg_mschapv2;  ///< MSCHAPv2 configuration
 };
 
 

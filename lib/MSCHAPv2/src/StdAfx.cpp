@@ -18,15 +18,4 @@
     along with GÉANTLink. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
-
-#define _CRT_SECURE_NO_WARNINGS // Prevent warnings from wxWidgets headers
-
-#include "../include/Module.h"
-#include "../include/TTLS_UI.h"
-
-#include "../../PAP_UI/include/PAP_UI.h"
-#include "../../MSCHAPv2_UI/include/MSCHAPv2_UI.h"
-
-#include <wx/app.h>
-#include <wx/thread.h>
+#include "StdAfx.h"

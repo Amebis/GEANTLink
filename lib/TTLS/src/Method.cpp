@@ -75,8 +75,9 @@ void eap::method_ttls::begin_session(
 
     // Initialize inner method.
     switch (m_cfg.m_inner->get_method_id()) {
-    case eap_type_pap: m_inner.reset(new method_pap(m_module, (config_method_pap&)*m_cfg.m_inner, (credentials_pap&)*m_cred.m_inner.get()));
-    default: invalid_argument(__FUNCTION__ " Unsupported inner authentication method.");
+    case eap_type_legacy_pap     : m_inner.reset(new method_pap     (m_module, (config_method_pap     &)*m_cfg.m_inner, (credentials_pap     &)*m_cred.m_inner.get())); break;
+    case eap_type_legacy_mschapv2: m_inner.reset(new method_mschapv2(m_module, (config_method_mschapv2&)*m_cfg.m_inner, (credentials_mschapv2&)*m_cred.m_inner.get())); break;
+    default: throw invalid_argument(__FUNCTION__ " Unsupported inner authentication method.");
     }
     m_inner->begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, m_size_inner_packet_max = dwMaxSendPacketSize); // TODO: Maximum inner packet size should have subtracted TLS overhead
     m_inner_packet_id = 0;

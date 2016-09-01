@@ -96,6 +96,7 @@ void wxTTLSConfigPanel::OnUpdateUI(wxUpdateUIEvent& /*event*/)
 wxTTLSConfigWindow::wxTTLSConfigWindow(eap::config_provider &prov, eap::config_method &cfg, LPCTSTR pszCredTarget, wxWindow* parent) :
     m_cfg((eap::config_method_ttls&)cfg),
     m_cfg_pap(cfg.m_module),
+    m_cfg_mschapv2(cfg.m_module),
     wxEAPConfigWindow(prov, cfg, parent)
 {
     wxBoxSizer* sb_content;
@@ -113,6 +114,8 @@ wxTTLSConfigWindow::wxTTLSConfigWindow(eap::config_provider &prov, eap::config_m
     m_inner_type->SetToolTip( _("Select inner authentication method from the list") );
     wxPAPConfigPanel *panel_pap = new wxPAPConfigPanel(m_prov, m_cfg_pap, pszCredTarget, m_inner_type);
     m_inner_type->AddPage(panel_pap, _("PAP"));
+    wxMSCHAPv2ConfigPanel *panel_mschapv2 = new wxMSCHAPv2ConfigPanel(m_prov, m_cfg_mschapv2, pszCredTarget, m_inner_type);
+    m_inner_type->AddPage(panel_mschapv2, _("MSCHAPv2"));
     sb_content->Add(m_inner_type, 0, wxALL|wxEXPAND, 5);
 
     sb_content->Add(20, 20, 1, wxALL|wxEXPAND, 5);
@@ -154,12 +157,20 @@ wxTTLSConfigWindow::~wxTTLSConfigWindow()
 
 bool wxTTLSConfigWindow::TransferDataToWindow()
 {
-    eap::config_method_pap *cfg_pap = dynamic_cast<eap::config_method_pap*>(m_cfg.m_inner.get());
-    if (cfg_pap) {
-        m_cfg_pap = *cfg_pap;
+    switch (m_cfg.m_inner->get_method_id()) {
+    case winstd::eap_type_legacy_pap:
+        m_cfg_pap = *(eap::config_method_pap*)m_cfg.m_inner.get();
         m_inner_type->SetSelection(0); // 0=PAP
-    } else
+        break;
+
+    case winstd::eap_type_legacy_mschapv2:
+        m_cfg_mschapv2 = *(eap::config_method_mschapv2*)m_cfg.m_inner.get();
+        m_inner_type->SetSelection(1); // 1=MSCHAPv2
+        break;
+
+    default:
         wxFAIL_MSG(wxT("Unsupported inner authentication method type."));
+    }
 
     // Do not invoke inherited TransferDataToWindow(), as it will call others TransferDataToWindow().
     // This will handle wxTTLSConfigWindow::OnInitDialog() via wxEVT_INIT_DIALOG forwarding.
@@ -176,6 +187,10 @@ bool wxTTLSConfigWindow::TransferDataFromWindow()
         switch (m_inner_type->GetSelection()) {
         case 0: // 0=PAP
             m_cfg.m_inner.reset(new eap::config_method_pap(m_cfg_pap));
+            break;
+
+        case 1: // 1=MSCHAPv2
+            m_cfg.m_inner.reset(new eap::config_method_mschapv2(m_cfg_mschapv2));
             break;
 
         default:

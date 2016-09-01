@@ -20,13 +20,9 @@
 
 #pragma once
 
-#define _CRT_SECURE_NO_WARNINGS // Prevent warnings from wxWidgets headers
+#include "../include/Config.h"
+#include "../include/Credentials.h"
+#include "../include/Method.h"
 
-#include "../include/Module.h"
-#include "../include/TTLS_UI.h"
-
-#include "../../PAP_UI/include/PAP_UI.h"
-#include "../../MSCHAPv2_UI/include/MSCHAPv2_UI.h"
-
-#include <wx/app.h>
-#include <wx/thread.h>
+#include <Windows.h>
+#include <EapHostError.h> // include after Windows.h
