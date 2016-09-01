@@ -291,7 +291,7 @@ protected:
             for (int i = 0; i < idx; i++, ++it);
             m_cfg.m_providers.erase(it);
             m_providers->DeletePage(idx);
-            if (idx < m_providers->GetPageCount())
+            if ((size_t)idx < m_providers->GetPageCount())
                 m_providers->SetSelection(idx);
 
             this->Layout();
