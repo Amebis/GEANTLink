@@ -87,9 +87,9 @@ namespace eap
     struct diameter_avp_header;
 
     ///
-    /// Diameter AVP
+    /// Diameter AVP header with Vendor-ID
     ///
-    struct diameter_avp;
+    struct diameter_avp_header_ven;
 
     ///
     /// EAP packet
@@ -641,24 +641,15 @@ namespace eap
 
     struct diameter_avp_header
     {
-        unsigned char code[4];              ///< AVP Code
-        unsigned char flags;                ///< AVP Flags
-        unsigned char length[3];            ///< AVP Length
+        unsigned char code[4];      ///< AVP Code
+        unsigned char flags;        ///< AVP Flags
+        unsigned char length[3];    ///< AVP Length
     };
 
 
-    struct diameter_avp : public diameter_avp_header
+    struct diameter_avp_header_ven : public diameter_avp_header
     {
-#pragma warning(push)
-#pragma warning(disable: 4201)
-        union {
-            struct {
-                unsigned char vendor[4];    ///< Vendor-ID
-                unsigned char v_data[1];    ///< Data (when Vendor-ID present)
-            };
-            unsigned char data[1];          ///< Data (when Vendor-ID absent)
-        };
-#pragma warning(pop)
+        unsigned char vendor[4];    ///< Vendor-ID
     };
 
 #pragma pack(pop)
