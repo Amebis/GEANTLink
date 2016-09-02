@@ -1175,6 +1175,12 @@ void eap::method_tls::process_handshake()
             0,
             &buf_in_desc,
             &buf_out_desc);
+
+        // In a desparate attempt to make Schannel remember and resume the TLS session, we send it the SCHANNEL_SESSION_TOKEN/SSL_SESSION_ENABLE_RECONNECTS
+        SCHANNEL_SESSION_TOKEN token_session = { SCHANNEL_SESSION, SSL_SESSION_ENABLE_RECONNECTS };
+        SecBuffer token[] = { { sizeof(token_session), SECBUFFER_TOKEN, &token_session } };
+        SecBufferDesc token_desc = { SECBUFFER_VERSION, _countof(token), token };
+        ApplyControlToken(m_sc_ctx, &token_desc);
     } else {
         status = m_sc_ctx.process(
             m_sc_cred,
