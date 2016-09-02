@@ -119,3 +119,29 @@ void eap::method_noneap::get_response_packet(
     *pdwSendPacketSize = (DWORD)size_packet;
     m_packet_res.clear();
 }
+
+
+void eap::method_noneap::append_avp(_In_ unsigned int code, _In_ unsigned char flags, _In_bytecount_(size) const void *data, _In_ unsigned int size)
+{
+    unsigned int
+        padding = (unsigned int)((4 - size) % 4),
+        size_outer;
+
+    m_packet_res.reserve(
+        m_packet_res.size() + 
+        (size_outer = 
+        sizeof(diameter_avp_header) + // Diameter header
+        size)                       + // Data
+        padding);                     // Data padding
+
+    // Diameter AVP header
+    diameter_avp_header hdr;
+    *(unsigned int*)hdr.code = htonl(code);
+    hdr.flags = flags;
+    hton24(size_outer, hdr.length);
+    m_packet_res.insert(m_packet_res.end(), (unsigned char*)&hdr, (unsigned char*)(&hdr + 1));
+
+    // Data
+    m_packet_res.insert(m_packet_res.end(), (unsigned char*)data, (unsigned char*)data + size);
+    m_packet_res.insert(m_packet_res.end(), padding, 0);
+}

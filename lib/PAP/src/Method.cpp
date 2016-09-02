@@ -94,44 +94,11 @@ void eap::method_pap::process_request_packet(
         size_t padding_password_ex = (16 - password_utf8.length()) % 16;
         password_utf8.append(padding_password_ex, 0);
 
-        size_t
-            size_identity    = identity_utf8.length(),
-            size_password    = password_utf8.length(),
-            padding_identity = (4 - size_identity         ) % 4,
-            padding_password = (4 - password_utf8.length()) % 4,
-            size_identity_outer,
-            size_password_outer;
-
         m_packet_res.clear();
-        m_packet_res.reserve(
-            (size_identity_outer = 
-            sizeof(diameter_avp_header) + // Diameter header
-            size_identity)              + // Identity
-            padding_identity            + // Identity padding
-            (size_password_outer = 
-            sizeof(diameter_avp_header) + // Diameter header
-            size_password)              + // Password
-            padding_password);            // Password padding
 
-        // Diameter AVP Code User-Name (0x00000001)
-        diameter_avp_header hdr;
-        *(unsigned int*)hdr.code = htonl(0x00000001);
-        hdr.flags = diameter_avp_flag_mandatory;
-        hton24((unsigned int)size_identity_outer, hdr.length);
-        m_packet_res.insert(m_packet_res.end(), (unsigned char*)&hdr, (unsigned char*)(&hdr + 1));
-
-        // Identity
-        m_packet_res.insert(m_packet_res.end(), identity_utf8.begin(), identity_utf8.end());
-        m_packet_res.insert(m_packet_res.end(), padding_identity, 0);
-
-        // Diameter AVP Code User-Password (0x00000002)
-        *(unsigned int*)hdr.code = htonl(0x00000002);
-        hton24((unsigned int)size_password_outer, hdr.length);
-        m_packet_res.insert(m_packet_res.end(), (unsigned char*)&hdr, (unsigned char*)(&hdr + 1));
-
-        // Password
-        m_packet_res.insert(m_packet_res.end(), password_utf8.begin(), password_utf8.end());
-        m_packet_res.insert(m_packet_res.end(), padding_password, 0);
+        // Diameter AVP (User-Name=0x00000001, User-Password=0x00000002)
+        append_avp(0x00000001, diameter_avp_flag_mandatory, identity_utf8.data(), (unsigned int)identity_utf8.size());
+        append_avp(0x00000002, diameter_avp_flag_mandatory, password_utf8.data(), (unsigned int)password_utf8.size());
 
         m_phase = phase_finished;
         break;
