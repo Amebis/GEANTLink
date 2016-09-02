@@ -120,26 +120,17 @@ void eap::method_ttls::get_result(
     _In_    EapPeerMethodResultReason reason,
     _Inout_ EapPeerMethodResult       *ppResult)
 {
-    if (m_phase != phase_application_data) {
-        // Do the TLS.
-        method_tls::get_result(reason, ppResult);
-    } else {
+    // Do the TLS.
+    method_tls::get_result(reason, ppResult);
+
+    if (m_phase == phase_application_data) {
+
         // Get inner method result.
         EapPeerMethodResult result = {};
         m_inner->get_result(reason, &result);
 
         if (result.fSaveConnectionData)
             ppResult->fSaveConnectionData = TRUE;
-
-#if EAP_TLS >= EAP_TLS_SCHANNEL
-        // EAP-TTLS uses different label in PRF for MSK derivation than EAP-TLS.
-        static const DWORD s_key_id = 0x01; // EAP-TTLSv0 Keying Material
-        static const SecPkgContext_EapPrfInfo s_prf_info = { 0, sizeof(s_key_id), (PBYTE)&s_key_id };
-        SECURITY_STATUS status = SetContextAttributes(m_sc_ctx, SECPKG_ATTR_EAP_PRF_INFO, (void*)&s_prf_info, sizeof(s_prf_info));
-        if (FAILED(status))
-            throw sec_runtime_error(status, __FUNCTION__ "Error setting EAP-TTLS PRF in Schannel.");
-#endif
-        method_tls::get_result(EapPeerMethodResultSuccess, ppResult);
 
         if (reason == EapPeerMethodResultFailure) {
             // Clear session resumption data.
@@ -154,10 +145,11 @@ void eap::method_ttls::get_result(
 }
 
 
-#if EAP_TLS < EAP_TLS_SCHANNEL
-
 void eap::method_ttls::derive_msk()
 {
+    const unsigned char *_key_block;
+
+#if EAP_TLS < EAP_TLS_SCHANNEL
     //
     //   TLS versions 1.0 [RFC2246] and 1.1 [RFC4346] define the same PRF
     //   function, and any EAP-TTLSv0 implementation based on these versions
@@ -178,7 +170,21 @@ void eap::method_ttls::derive_msk()
     seed.insert(seed.end(), (const unsigned char*)&m_random_client, (const unsigned char*)(&m_random_client + 1));
     seed.insert(seed.end(), (const unsigned char*)&m_random_server, (const unsigned char*)(&m_random_server + 1));
     sanitizing_blob key_block(prf(m_cp, CALG_TLS1PRF, m_master_secret, seed, 2*sizeof(tls_random)));
-    const unsigned char *_key_block = key_block.data();
+    _key_block = key_block.data();
+#else
+    // EAP-TTLS uses different label in PRF for MSK derivation than EAP-TLS.
+    static const DWORD s_key_id = 0x01; // EAP-TTLSv0 Keying Material
+    static const SecPkgContext_EapPrfInfo s_prf_info = { 0, sizeof(s_key_id), (PBYTE)&s_key_id };
+    SECURITY_STATUS status = SetContextAttributes(m_sc_ctx, SECPKG_ATTR_EAP_PRF_INFO, (void*)&s_prf_info, sizeof(s_prf_info));
+    if (FAILED(status))
+        throw sec_runtime_error(status, __FUNCTION__ " Error setting EAP-TTLS PRF in Schannel.");
+
+    SecPkgContext_EapKeyBlock key_block;
+    status = QueryContextAttributes(m_sc_ctx, SECPKG_ATTR_EAP_KEY_BLOCK, &key_block);
+    if (FAILED(status))
+        throw sec_runtime_error(status, __FUNCTION__ " Error generating MSK in Schannel.");
+    _key_block = key_block.rgbKeys;
+#endif
 
     // MSK: MPPE-Recv-Key
     memcpy(&m_key_mppe_client, _key_block, sizeof(tls_random));
@@ -189,7 +195,6 @@ void eap::method_ttls::derive_msk()
     _key_block += sizeof(tls_random);
 }
 
-#endif
 
 void eap::method_ttls::process_application_data(_In_bytecount_(size_msg) const void *msg, _In_ size_t size_msg)
 {

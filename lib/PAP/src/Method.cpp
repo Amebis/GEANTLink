@@ -176,7 +176,7 @@ void eap::method_pap::get_result(
         m_module.log_event(&EAPMETHOD_METHOD_SUCCESS, event_data((unsigned int)eap_type_legacy_pap), event_data::blank);
         m_cfg.m_auth_failed = false;
 
-        ppResult->fIsSuccess = TRUE;
+        ppResult->fIsSuccess          = TRUE;
         ppResult->dwFailureReasonCode = ERROR_SUCCESS;
 
         break;
@@ -189,11 +189,11 @@ void eap::method_pap::get_result(
 
         // Mark credentials as failed, so GUI can re-prompt user.
         // But be careful: do so only after credentials were actually tried.
-        m_cfg.m_auth_failed = m_phase == phase_finished;
+        m_cfg.m_auth_failed = m_phase_prev < phase_finished && m_phase >= phase_finished;
 
         // Do not report failure to EapHost, as it will not save updated configuration then. But we need it to save it, to alert user on next connection attempt.
         // EapHost is well aware of the failed condition.
-        //ppResult->fIsSuccess = FALSE;
+        //ppResult->fIsSuccess          = FALSE;
         //ppResult->dwFailureReasonCode = EAP_E_AUTHENTICATION_FAILED;
 
         break;

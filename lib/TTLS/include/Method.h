@@ -118,16 +118,12 @@ namespace eap
         /// @}
 
     protected:
-#if EAP_TLS < EAP_TLS_SCHANNEL
-
         ///
         /// Generates master session key
         ///
         /// \sa [The EAP-TLS Authentication Protocol (Chapter 2.3. Key Hierarchy)](https://tools.ietf.org/html/rfc5216#section-2.3)
         ///
         virtual void derive_msk();
-
-#endif
 
         ///
         /// Processes an application message

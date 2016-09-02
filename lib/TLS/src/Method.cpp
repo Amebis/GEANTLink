@@ -90,6 +90,8 @@ eap::method_tls::method_tls(_Inout_ method_tls &&other) :
     m_user_ctx                  (std::move(other.m_user_ctx                  )),
     m_packet_req                (std::move(other.m_packet_req                )),
     m_packet_res                (std::move(other.m_packet_res                )),
+    m_key_mppe_client           (std::move(other.m_key_mppe_client           )),
+    m_key_mppe_server           (std::move(other.m_key_mppe_server           )),
 #if EAP_TLS < EAP_TLS_SCHANNEL
     m_cp                        (std::move(other.m_cp                        )),
     m_cp_enc_client             (std::move(other.m_cp_enc_client             )),
@@ -104,8 +106,6 @@ eap::method_tls::method_tls(_Inout_ method_tls &&other) :
     m_master_secret             (std::move(other.m_master_secret             )),
     m_random_client             (std::move(other.m_random_client             )),
     m_random_server             (std::move(other.m_random_server             )),
-    m_key_mppe_client           (std::move(other.m_key_mppe_client           )),
-    m_key_mppe_server           (std::move(other.m_key_mppe_server           )),
     m_session_id                (std::move(other.m_session_id                )),
     m_session_resumed           (std::move(other.m_session_resumed           )),
     m_server_cert_chain         (std::move(other.m_server_cert_chain         )),
@@ -142,6 +142,8 @@ eap::method_tls& eap::method_tls::operator=(_Inout_ method_tls &&other)
         m_user_ctx                   = std::move(other.m_user_ctx                  );
         m_packet_req                 = std::move(other.m_packet_req                );
         m_packet_res                 = std::move(other.m_packet_res                );
+        m_key_mppe_client            = std::move(other.m_key_mppe_client           );
+        m_key_mppe_server            = std::move(other.m_key_mppe_server           );
 #if EAP_TLS < EAP_TLS_SCHANNEL
         m_cp                         = std::move(other.m_cp                        );
         m_cp_enc_client              = std::move(other.m_cp_enc_client             );
@@ -156,8 +158,6 @@ eap::method_tls& eap::method_tls::operator=(_Inout_ method_tls &&other)
         m_master_secret              = std::move(other.m_master_secret             );
         m_random_client              = std::move(other.m_random_client             );
         m_random_server              = std::move(other.m_random_server             );
-        m_key_mppe_client            = std::move(other.m_key_mppe_client           );
-        m_key_mppe_server            = std::move(other.m_key_mppe_server           );
         m_session_id                 = std::move(other.m_session_id                );
         m_session_resumed            = std::move(other.m_session_resumed           );
         m_server_cert_chain          = std::move(other.m_server_cert_chain         );
@@ -308,6 +308,9 @@ void eap::method_tls::process_request_packet(
         // This is the EAP-TLS start message: (re)initialize method.
         m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_tls), event_data::blank);
         m_phase = phase_client_hello;
+
+        m_key_mppe_client.clear();
+        m_key_mppe_server.clear();
     } else {
         // Process the packet.
         memset(m_handshake, 0, sizeof(m_handshake));
@@ -318,9 +321,6 @@ void eap::method_tls::process_request_packet(
     switch (m_phase) {
     case phase_client_hello: {
         m_tls_version = tls_version_1_2;
-
-        m_key_mppe_client.clear();
-        m_key_mppe_server.clear();
 
         m_server_cert_chain.clear();
 
@@ -464,6 +464,8 @@ void eap::method_tls::process_request_packet(
         // This is the EAP-TLS start message: (re)initialize method.
         m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_tls), event_data::blank);
         m_phase = phase_handshake_init;
+        m_key_mppe_client.clear();
+        m_key_mppe_server.clear();
         m_sc_queue.assign(m_packet_req.m_data.begin(), m_packet_req.m_data.end());
     } else
         m_sc_queue.insert(m_sc_queue.end(), m_packet_req.m_data.begin(), m_packet_req.m_data.end());
@@ -510,7 +512,6 @@ void eap::method_tls::get_result(
     case EapPeerMethodResultSuccess: {
         m_module.log_event(&EAPMETHOD_METHOD_SUCCESS, event_data((unsigned int)eap_type_tls), event_data::blank);
 
-#if EAP_TLS < EAP_TLS_SCHANNEL
         // Derive MSK/EMSK for line encryption.
         derive_msk();
 
@@ -522,34 +523,15 @@ void eap::method_tls::get_result(
         a.create_ms_mppe_key(17, (LPCBYTE)&m_key_mppe_server, sizeof(tls_random));
         m_eap_attr.push_back(std::move(a));
         m_eap_attr.push_back(eap_attr::blank);
-#else
-        // Derive MSK/EMSK for line encryption.
-        SecPkgContext_EapKeyBlock key_block;
-        SECURITY_STATUS status = QueryContextAttributes(m_sc_ctx, SECPKG_ATTR_EAP_KEY_BLOCK, &key_block);
-        if (FAILED(status))
-            throw sec_runtime_error(status, __FUNCTION__ "Error generating MSK in Schannel.");
-        const unsigned char *_key_block = key_block.rgbKeys;
-
-        // Fill array with RADIUS attributes.
-        eap_attr a;
-        m_eap_attr.reserve(m_eap_attr.size() + 3);
-        a.create_ms_mppe_key(16, _key_block, sizeof(tls_random));
-        m_eap_attr.push_back(std::move(a));
-        _key_block += sizeof(tls_random);
-        a.create_ms_mppe_key(17, _key_block, sizeof(tls_random));
-        m_eap_attr.push_back(std::move(a));
-        _key_block += sizeof(tls_random);
-        m_eap_attr.push_back(eap_attr::blank);
-#endif
 
         // Clear credentials as failed.
         m_cfg.m_auth_failed = false;
 
-        ppResult->fIsSuccess = TRUE;
+        ppResult->fIsSuccess          = TRUE;
         ppResult->dwFailureReasonCode = ERROR_SUCCESS;
 
 #if EAP_TLS < EAP_TLS_SCHANNEL
-        // Update configuration with session resumption data and prepare BLOB.
+        // Update configuration with session resumption data.
         m_cfg.m_session_id    = m_session_id;
         m_cfg.m_master_secret = m_master_secret;
 #else
@@ -561,6 +543,7 @@ void eap::method_tls::get_result(
             SECBUFFER_TOKEN,
             &dwType };
         SecBufferDesc token_desc = { SECBUFFER_VERSION, 1, &token };
+        SECURITY_STATUS status;
         if (SUCCEEDED(status = ApplyControlToken(m_sc_ctx, &token_desc))) {
             // Prepare output buffer(s).
             SecBuffer buf_out[] = { { 0, SECBUFFER_TOKEN, NULL }, };
@@ -591,7 +574,7 @@ void eap::method_tls::get_result(
 
         // Mark credentials as failed, so GUI can re-prompt user.
         // But be careful: do so only if this happened after transition from handshake to application data phase.
-        m_cfg.m_auth_failed = m_phase >= phase_application_data;
+        m_cfg.m_auth_failed = m_phase_prev < phase_application_data && m_phase >= phase_application_data;
 
         // Clear session resumption data.
         m_cfg.m_session_id.clear();
@@ -611,7 +594,7 @@ void eap::method_tls::get_result(
 
         // Do not report failure to EapHost, as it will not save updated configuration then. But we need it to save it, to alert user on next connection attempt.
         // EapHost is well aware of the failed condition.
-        //ppResult->fIsSuccess = FALSE;
+        //ppResult->fIsSuccess          = FALSE;
         //ppResult->dwFailureReasonCode = EAP_E_AUTHENTICATION_FAILED;
 
         break;
@@ -817,15 +800,27 @@ eap::sanitizing_blob eap::method_tls::make_message(_In_ tls_message_type_t type,
     return msg;
 }
 
+#endif
 
 void eap::method_tls::derive_msk()
 {
+    const unsigned char *_key_block;
+
+#if EAP_TLS < EAP_TLS_SCHANNEL
     static const unsigned char s_label[] = "client EAP encryption";
     sanitizing_blob seed(s_label, s_label + _countof(s_label) - 1);
     seed.insert(seed.end(), (const unsigned char*)&m_random_client, (const unsigned char*)(&m_random_client + 1));
     seed.insert(seed.end(), (const unsigned char*)&m_random_server, (const unsigned char*)(&m_random_server + 1));
     sanitizing_blob key_block(prf(m_cp, m_alg_prf, m_master_secret, seed, 2*sizeof(tls_random)));
-    const unsigned char *_key_block = key_block.data();
+    _key_block = key_block.data();
+#else
+    // Derive MSK/EMSK for line encryption.
+    SecPkgContext_EapKeyBlock key_block;
+    SECURITY_STATUS status = QueryContextAttributes(m_sc_ctx, SECPKG_ATTR_EAP_KEY_BLOCK, &key_block);
+    if (FAILED(status))
+        throw sec_runtime_error(status, __FUNCTION__ " Error generating MSK in Schannel.");
+    _key_block = key_block.rgbKeys;
+#endif
 
     // MS-MPPE-Recv-Key
     memcpy(&m_key_mppe_client, _key_block, sizeof(tls_random));
@@ -836,6 +831,7 @@ void eap::method_tls::derive_msk()
     _key_block += sizeof(tls_random);
 }
 
+#if EAP_TLS < EAP_TLS_SCHANNEL
 
 void eap::method_tls::process_packet(_In_bytecount_(size_pck) const void *_pck, _In_ size_t size_pck)
 {

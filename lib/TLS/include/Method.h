@@ -223,6 +223,8 @@ namespace eap
 
         /// @}
 
+#endif
+
         /// \name Key derivation
         /// @{
 
@@ -234,6 +236,8 @@ namespace eap
         virtual void derive_msk();
 
         /// @}
+
+#if EAP_TLS < EAP_TLS_SCHANNEL
 
         /// \name Server message processing
         /// @{
@@ -420,6 +424,9 @@ namespace eap
         packet_tls m_packet_req;                                ///< Request packet
         packet_tls m_packet_res;                                ///< Response packet
 
+        tls_random m_key_mppe_client;                           ///< MS-MPPE-Recv-Key
+        tls_random m_key_mppe_server;                           ///< MS-MPPE-Send-Key
+
 #if EAP_TLS < EAP_TLS_SCHANNEL
         winstd::crypt_prov m_cp;                                ///< Cryptography provider for general services
         winstd::crypt_prov m_cp_enc_client;                     ///< Cryptography provider for encryption
@@ -437,9 +444,6 @@ namespace eap
         tls_master_secret m_master_secret;                      ///< TLS master secret
         tls_random m_random_client;                             ///< Client random
         tls_random m_random_server;                             ///< Server random
-
-        tls_random m_key_mppe_client;                           ///< MS-MPPE-Recv-Key
-        tls_random m_key_mppe_server;                           ///< MS-MPPE-Send-Key
 
         sanitizing_blob m_session_id;                           ///< TLS session ID
         bool m_session_resumed;                                 ///< Did TLS session resume?
