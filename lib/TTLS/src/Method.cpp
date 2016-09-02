@@ -124,23 +124,11 @@ void eap::method_ttls::get_result(
     method_tls::get_result(reason, ppResult);
 
     if (m_phase == phase_application_data) {
-
         // Get inner method result.
         EapPeerMethodResult result = {};
         m_inner->get_result(reason, &result);
-
         if (result.fSaveConnectionData)
             ppResult->fSaveConnectionData = TRUE;
-
-        if (reason == EapPeerMethodResultFailure) {
-            // Clear session resumption data.
-#if EAP_TLS < EAP_TLS_SCHANNEL
-            m_cfg.m_session_id.clear();
-            m_cfg.m_master_secret.clear();
-#else
-            // TODO: Research how a Schannel session context can be cleared not to resume.
-#endif
-        }
     }
 }
 
