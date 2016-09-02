@@ -78,7 +78,7 @@ namespace eap
             _In_        DWORD         dwFlags,
             _In_  const EapAttributes *pAttributeArray,
             _In_        HANDLE        hTokenImpersonateUser,
-            _In_        DWORD         dwMaxSendPacketSize);
+            _In_opt_    DWORD         dwMaxSendPacketSize = MAXDWORD);
 
         ///
         /// Ends an EAP authentication session for the EAP method.
@@ -147,7 +147,5 @@ namespace eap
         } m_version;                        ///< EAP-TTLS version
 
         std::unique_ptr<method> m_inner;    ///< Inner authentication method
-        unsigned char m_inner_packet_id;    ///< Inner packet ID
-        DWORD m_size_inner_packet_max;      ///< Maximum size of inner response packet
     };
 }

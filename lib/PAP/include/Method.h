@@ -77,7 +77,7 @@ namespace eap
             _In_        DWORD         dwFlags,
             _In_  const EapAttributes *pAttributeArray,
             _In_        HANDLE        hTokenImpersonateUser,
-            _In_        DWORD         dwMaxSendPacketSize);
+            _In_opt_    DWORD         dwMaxSendPacketSize = MAXDWORD);
 
         ///
         /// Processes a packet received by EapHost from a supplicant.

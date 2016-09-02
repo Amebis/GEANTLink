@@ -32,21 +32,17 @@ eap::method_ttls::method_ttls(_In_ module &module, _In_ config_method_ttls &cfg,
     m_cfg(cfg),
     m_cred(cred),
     m_version(version_0),
-    m_inner_packet_id(0),
-    m_size_inner_packet_max(0),
     method_tls(module, cfg, cred)
 {
 }
 
 
 eap::method_ttls::method_ttls(_Inout_ method_ttls &&other) :
-    m_cfg                  (          other.m_cfg                   ),
-    m_cred                 (          other.m_cred                  ),
-    m_version              (std::move(other.m_version              )),
-    m_inner                (std::move(other.m_inner                )),
-    m_inner_packet_id      (std::move(other.m_inner_packet_id      )),
-    m_size_inner_packet_max(std::move(other.m_size_inner_packet_max)),
-    method_tls             (std::move(other                        ))
+    m_cfg     (          other.m_cfg     ),
+    m_cred    (          other.m_cred    ),
+    m_version (std::move(other.m_version)),
+    m_inner   (std::move(other.m_inner  )),
+    method_tls(std::move(other          ))
 {
 }
 
@@ -54,11 +50,9 @@ eap::method_ttls::method_ttls(_Inout_ method_ttls &&other) :
 eap::method_ttls& eap::method_ttls::operator=(_Inout_ method_ttls &&other)
 {
     if (this != std::addressof(other)) {
-        (method_tls&)*this      = std::move(other                        );
-        m_version               = std::move(other.m_version              );
-        m_inner                 = std::move(other.m_inner                );
-        m_inner_packet_id       = std::move(other.m_inner_packet_id      );
-        m_size_inner_packet_max = std::move(other.m_size_inner_packet_max);
+        (method_tls&)*this = std::move(other          );
+        m_version          = std::move(other.m_version);
+        m_inner            = std::move(other.m_inner  );
     }
 
     return *this;
@@ -69,7 +63,7 @@ void eap::method_ttls::begin_session(
     _In_        DWORD         dwFlags,
     _In_  const EapAttributes *pAttributeArray,
     _In_        HANDLE        hTokenImpersonateUser,
-    _In_        DWORD         dwMaxSendPacketSize)
+    _In_opt_    DWORD         dwMaxSendPacketSize)
 {
     method_tls::begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
 
@@ -79,8 +73,7 @@ void eap::method_ttls::begin_session(
     case eap_type_legacy_mschapv2: m_inner.reset(new method_mschapv2(m_module, (config_method_mschapv2&)*m_cfg.m_inner, (credentials_mschapv2&)*m_cred.m_inner.get())); break;
     default: throw invalid_argument(__FUNCTION__ " Unsupported inner authentication method.");
     }
-    m_inner->begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, m_size_inner_packet_max = dwMaxSendPacketSize); // TODO: Maximum inner packet size should have subtracted TLS overhead
-    m_inner_packet_id = 0;
+    m_inner->begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, MAXDWORD);
 }
 
 
@@ -243,8 +236,8 @@ void eap::method_ttls::process_application_data(_In_bytecount_(size_msg) const v
         if (FAILED(status))
             throw sec_runtime_error(status, __FUNCTION__ " Error getting Schannel required encryption sizes.");
 
-        sanitizing_blob data(sizes.cbHeader + m_size_inner_packet_max + sizes.cbTrailer, 0);
-        DWORD size_data = m_size_inner_packet_max;
+        sanitizing_blob data(sizes.cbHeader + sizes.cbMaximumMessage + sizes.cbTrailer, 0);
+        DWORD size_data = sizes.cbMaximumMessage;
         unsigned char *ptr_data = data.data() + sizes.cbHeader;
 #endif
         m_inner->get_response_packet(ptr_data, &size_data);
