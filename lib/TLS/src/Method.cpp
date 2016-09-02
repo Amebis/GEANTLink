@@ -1618,6 +1618,29 @@ void eap::method_tls::decrypt_message(_In_ tls_message_type_t type, _Inout_ sani
 }
 
 
+size_t eap::method_tls::get_max_message(_In_ size_t size_message) const
+{
+    if (m_state_client.m_size_enc_block) {
+        // Padding
+        size_message -= size_message % m_state_client.m_size_enc_block;
+        size_message--;
+
+        // HMAC
+        size_message -= m_state_client.m_size_mac_hash;
+
+        if (m_tls_version >= tls_version_1_1) {
+            // IV (TLS 1.1+)
+            size_message -= m_state_client.m_size_enc_iv;
+        }
+    } else {
+        // HMAC
+        size_message -= m_state_client.m_size_mac_hash;
+    }
+
+    return size_message;
+}
+
+
 eap::sanitizing_blob eap::method_tls::prf(
     _In_                            HCRYPTPROV        cp,
     _In_                            ALG_ID            alg,

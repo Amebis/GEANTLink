@@ -327,6 +327,15 @@ namespace eap
         ///
         void decrypt_message(_In_ tls_message_type_t type, _Inout_ sanitizing_blob &data);
 
+        ///
+        /// Returns maximum netto size of a message for a given TLS message size
+        ///
+        /// \param[in] size_message  Size of the final TLS message
+        ///
+        /// \returns Netto size of message data
+        ///
+        size_t get_max_message(_In_ size_t size_message) const;
+
         /// @}
 
         /// \name Pseudo-random generation

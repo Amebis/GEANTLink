@@ -227,7 +227,7 @@ void eap::method_ttls::process_application_data(_In_bytecount_(size_msg) const v
         m_packet_res.m_id    = m_packet_req.m_id;
         m_packet_res.m_flags = 0;
 
-        DWORD size_data = m_size_inner_packet_max;
+        DWORD size_data = (DWORD)get_max_message(16384 - sizeof(message_header));
         sanitizing_blob data(size_data, 0);
         unsigned char *ptr_data = data.data();
 #else
