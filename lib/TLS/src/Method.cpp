@@ -261,7 +261,7 @@ void eap::method_tls::begin_session(
 
 
 void eap::method_tls::process_request_packet(
-    _In_bytecount_(dwReceivedPacketSize) const EapPacket           *pReceivedPacket,
+    _In_bytecount_(dwReceivedPacketSize) const void                *pReceivedPacket,
     _In_                                       DWORD               dwReceivedPacketSize,
     _Inout_                                    EapPeerMethodOutput *pEapOutput)
 {
@@ -274,10 +274,10 @@ void eap::method_tls::process_request_packet(
     //else if (pReceivedPacket->Data[0] != eap_type_tls) // Skip method check, to allow TTLS extension.
     //    throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, string_printf(__FUNCTION__ " Packet is not EAP-TLS (expected: %u, received: %u).", eap_type_tls, pReceivedPacket->Data[0]));
 
-    if (!m_packet_req.append_frag(pReceivedPacket)) {
+    if (!m_packet_req.append_frag((const EapPacket*)pReceivedPacket)) {
         // This was not the only/last fragment. Reply with ACK packet.
         m_packet_res.m_code  = EapCodeResponse;
-        m_packet_res.m_id    = pReceivedPacket->Id;
+        m_packet_res.m_id    = ((const EapPacket*)pReceivedPacket)->Id;
         m_packet_res.m_flags = 0;
         m_packet_res.m_data.clear();
         pEapOutput->fAllowNotifications = FALSE;
@@ -304,7 +304,7 @@ void eap::method_tls::process_request_packet(
     user_impersonator impersonating(m_user_ctx);
 
 #if EAP_TLS < EAP_TLS_SCHANNEL
-    if (pReceivedPacket->Code == EapCodeRequest && (m_packet_req.m_flags & packet_tls::flags_req_start)) {
+    if (((const EapPacket*)pReceivedPacket)->Code == EapCodeRequest && (m_packet_req.m_flags & packet_tls::flags_req_start)) {
         // This is the EAP-TLS start message: (re)initialize method.
         m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_tls), event_data::blank);
         m_phase = phase_client_hello;
@@ -460,7 +460,7 @@ void eap::method_tls::process_request_packet(
             m_phase = phase_client_hello;
     }
 #else
-    if (pReceivedPacket->Code == EapCodeRequest && (m_packet_req.m_flags & packet_tls::flags_req_start)) {
+    if (((const EapPacket*)pReceivedPacket)->Code == EapCodeRequest && (m_packet_req.m_flags & packet_tls::flags_req_start)) {
         // This is the EAP-TLS start message: (re)initialize method.
         m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_tls), event_data::blank);
         m_phase = phase_handshake_init;
@@ -490,13 +490,13 @@ void eap::method_tls::process_request_packet(
 
 
 void eap::method_tls::get_response_packet(
-    _Inout_bytecap_(*dwSendPacketSize) EapPacket *pSendPacket,
-    _Inout_                            DWORD     *pdwSendPacketSize)
+    _Inout_bytecap_(*dwSendPacketSize) void  *pSendPacket,
+    _Inout_                            DWORD *pdwSendPacketSize)
 {
     assert(pdwSendPacketSize);
     assert(pSendPacket);
 
-    *pdwSendPacketSize = m_packet_res.get_frag(pSendPacket, *pdwSendPacketSize);
+    *pdwSendPacketSize = m_packet_res.get_frag((EapPacket*)pSendPacket, *pdwSendPacketSize);
 }
 
 

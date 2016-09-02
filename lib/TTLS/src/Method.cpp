@@ -92,15 +92,15 @@ void eap::method_ttls::end_session()
 
 
 void eap::method_ttls::process_request_packet(
-    _In_bytecount_(dwReceivedPacketSize) const EapPacket           *pReceivedPacket,
+    _In_bytecount_(dwReceivedPacketSize) const void                *pReceivedPacket,
     _In_                                       DWORD               dwReceivedPacketSize,
     _Inout_                                    EapPeerMethodOutput *pEapOutput)
 {
-    if (pReceivedPacket->Code == EapCodeRequest && (pReceivedPacket->Data[1] & packet_ttls::flags_start)) {
+    if (((const EapPacket*)pReceivedPacket)->Code == EapCodeRequest && (((const EapPacket*)pReceivedPacket)->Data[1] & packet_ttls::flags_start)) {
         // This is a start EAP-TTLS packet.
 
         // Determine minimum EAP-TTLS version supported by server and us.
-        version_t ver_remote = (version_t)(pReceivedPacket->Data[1] & packet_ttls::flags_ver_mask);
+        version_t ver_remote = (version_t)(((const EapPacket*)pReceivedPacket)->Data[1] & packet_ttls::flags_ver_mask);
         m_version = std::min<version_t>(ver_remote, version_0);
         m_module.log_event(&EAPMETHOD_TTLS_HANDSHAKE_START, event_data((unsigned int)eap_type_ttls), event_data((unsigned char)m_version), event_data((unsigned char)ver_remote), event_data::blank);
     }
@@ -111,15 +111,15 @@ void eap::method_ttls::process_request_packet(
 
 
 void eap::method_ttls::get_response_packet(
-    _Inout_bytecap_(*dwSendPacketSize) EapPacket *pSendPacket,
-    _Inout_                            DWORD     *pdwSendPacketSize)
+    _Inout_bytecap_(*dwSendPacketSize) void  *pSendPacket,
+    _Inout_                            DWORD *pdwSendPacketSize)
 {
     method_tls::get_response_packet(pSendPacket, pdwSendPacketSize);
 
     // Change packet type to EAP-TTLS, and add EAP-TTLS version.
-    pSendPacket->Data[0]  = (BYTE)eap_type_ttls;
-    pSendPacket->Data[1] &= ~packet_ttls::flags_ver_mask;
-    pSendPacket->Data[1] |= m_version;
+    ((EapPacket*)pSendPacket)->Data[0]  = (BYTE)eap_type_ttls;
+    ((EapPacket*)pSendPacket)->Data[1] &= ~packet_ttls::flags_ver_mask;
+    ((EapPacket*)pSendPacket)->Data[1] |= m_version;
 }
 
 
@@ -222,24 +222,7 @@ void eap::method_ttls::process_application_data(_In_bytecount_(size_msg) const v
 #endif
 
     EapPeerMethodOutput eap_output = {};
-    eap_type_t eap_type = m_cfg.m_inner->get_method_id();
-    if (eap_type_noneap_start <= eap_type && eap_type < eap_type_noneap_end) {
-        // Inner method is natively non-EAP. Server sent raw data, but all our eap::method derived classes expect EAP encapsulated.
-        // Encapsulate in an EAP packet.
-        assert(size_msg < 0xffff);
-        unsigned short size_packet = (unsigned short)size_msg + 4;
-        sanitizing_blob packet;
-        packet.reserve(size_packet);
-        packet.push_back(EapCodeRequest);
-        packet.push_back(m_inner_packet_id++);
-        unsigned short size2 = htons(size_packet);
-        packet.insert(packet.end(), (unsigned char*)&size2, (unsigned char*)(&size2 + 1));
-        packet.insert(packet.end(), (unsigned char*)msg, (unsigned char*)msg + size_msg);
-        m_inner->process_request_packet((const EapPacket*)packet.data(), size_packet, &eap_output);
-    } else {
-        // Inner packet is EAP-aware.
-        m_inner->process_request_packet((const EapPacket*)msg, (DWORD)size_msg, &eap_output);
-    }
+    m_inner->process_request_packet(msg, (DWORD)size_msg, &eap_output);
 
     switch (eap_output.action) {
     case EapPeerMethodResponseActionSend: {
@@ -264,12 +247,7 @@ void eap::method_ttls::process_application_data(_In_bytecount_(size_msg) const v
         DWORD size_data = m_size_inner_packet_max;
         unsigned char *ptr_data = data.data() + sizes.cbHeader;
 #endif
-        m_inner->get_response_packet((EapPacket*)ptr_data, &size_data);
-
-        if (eap_type_noneap_start <= eap_type && eap_type < eap_type_noneap_end) {
-            // Inner method is non-EAP. Strip EAP header, since server expect raw data.
-            memmove(ptr_data, ptr_data + 4, size_data -= 4);
-        }
+        m_inner->get_response_packet(ptr_data, &size_data);
 
 #if EAP_TLS < EAP_TLS_SCHANNEL
         data.resize(size_data);

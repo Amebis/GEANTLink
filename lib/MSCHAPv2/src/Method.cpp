@@ -61,20 +61,28 @@ eap::method_mschapv2& eap::method_mschapv2::operator=(_Inout_ method_mschapv2 &&
 }
 
 
+void eap::method_mschapv2::begin_session(
+    _In_        DWORD         dwFlags,
+    _In_  const EapAttributes *pAttributeArray,
+    _In_        HANDLE        hTokenImpersonateUser,
+    _In_        DWORD         dwMaxSendPacketSize)
+{
+    method::begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
+
+    m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_legacy_mschapv2), event_data::blank);
+    m_phase = phase_init;
+}
+
+
 void eap::method_mschapv2::process_request_packet(
-    _In_bytecount_(dwReceivedPacketSize) const EapPacket           *pReceivedPacket,
+    _In_bytecount_(dwReceivedPacketSize) const void                *pReceivedPacket,
     _In_                                       DWORD               dwReceivedPacketSize,
     _Inout_                                    EapPeerMethodOutput *pEapOutput)
 {
-    assert(pReceivedPacket && dwReceivedPacketSize >= 4);
+    assert(pReceivedPacket || dwReceivedPacketSize == 0);
     assert(pEapOutput);
 
-    m_module.log_event(&EAPMETHOD_PACKET_RECV, event_data((unsigned int)eap_type_legacy_mschapv2), event_data((unsigned int)dwReceivedPacketSize - 4), event_data::blank);
-
-    if (pReceivedPacket->Id == 0) {
-        m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_legacy_mschapv2), event_data::blank);
-        m_phase = phase_init;
-    }
+    m_module.log_event(&EAPMETHOD_PACKET_RECV, event_data((unsigned int)eap_type_legacy_mschapv2), event_data((unsigned int)dwReceivedPacketSize), event_data::blank);
 
     m_phase_prev = m_phase;
     switch (m_phase) {
@@ -96,10 +104,8 @@ void eap::method_mschapv2::process_request_packet(
             size_identity_outer,
             size_password_outer;
 
-        m_packet_res.m_code = EapCodeResponse;
-        m_packet_res.m_id   = pReceivedPacket->Id;
-        m_packet_res.m_data.clear();
-        m_packet_res.m_data.reserve(
+        m_packet_res.clear();
+        m_packet_res.reserve(
             (size_identity_outer = 
             sizeof(diameter_avp_header) + // Diameter header
             size_identity)              + // Identity
@@ -114,20 +120,20 @@ void eap::method_mschapv2::process_request_packet(
         *(unsigned int*)hdr.code = htonl(0x00000001);
         hdr.flags = diameter_avp_flag_mandatory;
         hton24((unsigned int)size_identity_outer, hdr.length);
-        m_packet_res.m_data.insert(m_packet_res.m_data.end(), (unsigned char*)&hdr, (unsigned char*)(&hdr + 1));
+        m_packet_res.insert(m_packet_res.end(), (unsigned char*)&hdr, (unsigned char*)(&hdr + 1));
 
         // Identity
-        m_packet_res.m_data.insert(m_packet_res.m_data.end(), identity_utf8.begin(), identity_utf8.end());
-        m_packet_res.m_data.insert(m_packet_res.m_data.end(), padding_identity, 0);
+        m_packet_res.insert(m_packet_res.end(), identity_utf8.begin(), identity_utf8.end());
+        m_packet_res.insert(m_packet_res.end(), padding_identity, 0);
 
         // Diameter AVP Code User-Password (0x00000002)
         *(unsigned int*)hdr.code = htonl(0x00000002);
         hton24((unsigned int)size_password_outer, hdr.length);
-        m_packet_res.m_data.insert(m_packet_res.m_data.end(), (unsigned char*)&hdr, (unsigned char*)(&hdr + 1));
+        m_packet_res.insert(m_packet_res.end(), (unsigned char*)&hdr, (unsigned char*)(&hdr + 1));
 
         // Password
-        m_packet_res.m_data.insert(m_packet_res.m_data.end(), password_utf8.begin(), password_utf8.end());
-        m_packet_res.m_data.insert(m_packet_res.m_data.end(), padding_password, 0);
+        m_packet_res.insert(m_packet_res.end(), password_utf8.begin(), password_utf8.end());
+        m_packet_res.insert(m_packet_res.end(), padding_password, 0);
 
         m_phase = phase_finished;
         break;
@@ -143,32 +149,19 @@ void eap::method_mschapv2::process_request_packet(
 
 
 void eap::method_mschapv2::get_response_packet(
-    _Inout_bytecap_(*dwSendPacketSize) EapPacket *pSendPacket,
-    _Inout_                            DWORD     *pdwSendPacketSize)
+    _Inout_bytecap_(*dwSendPacketSize) void  *pSendPacket,
+    _Inout_                            DWORD *pdwSendPacketSize)
 {
     assert(pdwSendPacketSize);
     assert(pSendPacket);
 
-    unsigned int
-        size_data   = (unsigned int)m_packet_res.m_data.size(),
-        size_packet = size_data + 4;
-    unsigned short size_packet_limit = (unsigned short)std::min<unsigned int>(*pdwSendPacketSize, USHRT_MAX);
+    size_t size_packet = m_packet_res.size();
+    if (size_packet > *pdwSendPacketSize)
+        throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %u, maximum: %u).", size_packet, *pdwSendPacketSize).c_str());
 
-    // Not fragmented.
-    if (size_packet <= size_packet_limit) {
-        // No need to fragment the packet.
-        m_module.log_event(&EAPMETHOD_PACKET_SEND, event_data((unsigned int)eap_type_legacy_mschapv2), event_data((unsigned int)size_data), event_data::blank);
-    } else {
-        // But it should be fragmented.
-        throw com_runtime_error(TYPE_E_SIZETOOBIG, __FUNCTION__ " PAP message exceeds 64kB.");
-    }
-
-    pSendPacket->Code = (BYTE)m_packet_res.m_code;
-    pSendPacket->Id   = m_packet_res.m_id;
-    *(unsigned short*)pSendPacket->Length = htons((unsigned short)size_packet);
-    memcpy(pSendPacket->Data, m_packet_res.m_data.data(), size_data);
-    m_packet_res.m_data.erase(m_packet_res.m_data.begin(), m_packet_res.m_data.begin() + size_data);
-    *pdwSendPacketSize = size_packet;
+    memcpy(pSendPacket, m_packet_res.data(), size_packet);
+    *pdwSendPacketSize = (DWORD)size_packet;
+    m_packet_res.clear();
 }
 
 

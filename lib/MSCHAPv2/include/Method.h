@@ -69,12 +69,23 @@ namespace eap
         /// @{
 
         ///
+        /// Starts an EAP authentication session on the peer EapHost using the EAP method.
+        ///
+        /// \sa [EapPeerBeginSession function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363600.aspx)
+        ///
+        virtual void begin_session(
+            _In_        DWORD         dwFlags,
+            _In_  const EapAttributes *pAttributeArray,
+            _In_        HANDLE        hTokenImpersonateUser,
+            _In_        DWORD         dwMaxSendPacketSize);
+
+        ///
         /// Processes a packet received by EapHost from a supplicant.
         ///
         /// \sa [EapPeerProcessRequestPacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363621.aspx)
         ///
         virtual void process_request_packet(
-            _In_bytecount_(dwReceivedPacketSize) const EapPacket           *pReceivedPacket,
+            _In_bytecount_(dwReceivedPacketSize) const void                *pReceivedPacket,
             _In_                                       DWORD               dwReceivedPacketSize,
             _Inout_                                    EapPeerMethodOutput *pEapOutput);
 
@@ -84,8 +95,8 @@ namespace eap
         /// \sa [EapPeerGetResponsePacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363610.aspx)
         ///
         virtual void get_response_packet(
-            _Inout_bytecap_(*dwSendPacketSize) EapPacket *pSendPacket,
-            _Inout_                            DWORD     *pdwSendPacketSize);
+            _Inout_bytecap_(*dwSendPacketSize) void  *pSendPacket,
+            _Inout_                            DWORD *pdwSendPacketSize);
 
         ///
         /// Obtains the result of an authentication session from the EAP method.
@@ -99,14 +110,14 @@ namespace eap
         /// @}
 
     protected:
-        credentials_mschapv2 &m_cred;    ///< EAP-TLS user credentials
+        credentials_mschapv2 &m_cred;   ///< EAP-TLS user credentials
 
-        packet m_packet_res;        ///< Response packet
+        sanitizing_blob m_packet_res;   ///< Response packet
 
         enum {
-            phase_unknown = -1,     ///< Unknown phase
-            phase_init = 0,         ///< Handshake initialize
-            phase_finished,         ///< Connection shut down
-        } m_phase, m_phase_prev;    ///< What phase is our communication at?
+            phase_unknown = -1,         ///< Unknown phase
+            phase_init = 0,             ///< Handshake initialize
+            phase_finished,             ///< Connection shut down
+        } m_phase, m_phase_prev;        ///< What phase is our communication at?
     };
 }

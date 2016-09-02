@@ -21,7 +21,7 @@
 namespace eap
 {
     ///
-    /// EAP method base class
+    /// EAP and non-EAP method base class
     ///
     class method;
 }
@@ -99,7 +99,7 @@ namespace eap
         /// \sa [EapPeerProcessRequestPacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363621.aspx)
         ///
         virtual void process_request_packet(
-            _In_bytecount_(dwReceivedPacketSize) const EapPacket           *pReceivedPacket,
+            _In_bytecount_(dwReceivedPacketSize) const void                *pReceivedPacket,
             _In_                                       DWORD               dwReceivedPacketSize,
             _Inout_                                    EapPeerMethodOutput *pEapOutput) = 0;
 
@@ -109,8 +109,8 @@ namespace eap
         /// \sa [EapPeerGetResponsePacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363610.aspx)
         ///
         virtual void get_response_packet(
-            _Inout_bytecap_(*dwSendPacketSize) EapPacket *pSendPacket,
-            _Inout_                            DWORD     *pdwSendPacketSize) = 0;
+            _Inout_bytecap_(*dwSendPacketSize) void  *pSendPacket,
+            _Inout_                            DWORD *pdwSendPacketSize) = 0;
 
         ///
         /// Obtains the result of an authentication session from the EAP method.
