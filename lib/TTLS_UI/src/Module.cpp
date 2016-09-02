@@ -23,9 +23,6 @@
 using namespace std;
 using namespace winstd;
 
-static wxCriticalSection s_lock;
-static unsigned long s_init_ref_count = 0;
-
 
 //////////////////////////////////////////////////////////////////////
 // wxInitializerPeer
@@ -38,7 +35,9 @@ public:
     virtual ~wxInitializerPeer();
 
 protected:
-    wxLocale m_locale; ///< Locale
+    static wxCriticalSection s_lock;        ///< Initialization lock
+    static unsigned long s_init_ref_count;  ///< Initialization reference counter
+    static wxLocale s_locale;               ///< Locale
 };
 
 
@@ -341,9 +340,9 @@ wxInitializerPeer::wxInitializerPeer(_In_ HINSTANCE instance)
 
     // Do our wxWidgets configuration and localization initialization.
     wxInitializeConfig();
-    if (wxInitializeLocale(m_locale)) {
-        //m_locale.AddCatalog(wxT("wxExtend") wxT(wxExtendVersion));
-        m_locale.AddCatalog(wxT("EAPTTLSUI"));
+    if (wxInitializeLocale(s_locale)) {
+        //s_locale.AddCatalog(wxT("wxExtend") wxT(wxExtendVersion));
+        s_locale.AddCatalog(wxT("EAPTTLSUI"));
     }
 }
 
@@ -356,3 +355,8 @@ wxInitializerPeer::~wxInitializerPeer()
 
     wxEntryCleanup();
 }
+
+
+wxCriticalSection wxInitializerPeer::s_lock;
+unsigned long wxInitializerPeer::s_init_ref_count = 0;
+wxLocale wxInitializerPeer::s_locale;
