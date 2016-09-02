@@ -37,7 +37,7 @@ namespace eap
 
 namespace eap
 {
-    class method_mschapv2 : public method
+    class method_mschapv2 : public method_noneap
     {
     public:
         ///
@@ -90,15 +90,6 @@ namespace eap
             _Inout_                                    EapPeerMethodOutput *pEapOutput);
 
         ///
-        /// Obtains a response packet from the EAP method.
-        ///
-        /// \sa [EapPeerGetResponsePacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363610.aspx)
-        ///
-        virtual void get_response_packet(
-            _Inout_bytecap_(*dwSendPacketSize) void  *pSendPacket,
-            _Inout_                            DWORD *pdwSendPacketSize);
-
-        ///
         /// Obtains the result of an authentication session from the EAP method.
         ///
         /// \sa [EapPeerGetResult function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363611.aspx)
@@ -111,8 +102,6 @@ namespace eap
 
     protected:
         credentials_mschapv2 &m_cred;   ///< EAP-TLS user credentials
-
-        sanitizing_blob m_packet_res;   ///< Response packet
 
         enum {
             phase_unknown = -1,         ///< Unknown phase

@@ -24,6 +24,11 @@ namespace eap
     /// EAP and non-EAP method base class
     ///
     class method;
+
+    ///
+    /// Non-EAP method base class
+    ///
+    class method_noneap;
 }
 
 #pragma once
@@ -133,5 +138,52 @@ namespace eap
         config_method_with_cred &m_cfg;             ///< Connection configuration
         credentials &m_cred;                        ///< User credentials
         std::vector<winstd::eap_attr> m_eap_attr;   ///< EAP attributes
+    };
+
+
+    class method_noneap : public method
+    {
+    public:
+        ///
+        /// Constructs an EAP method
+        ///
+        /// \param[in] mod   EAP module to use for global services
+        /// \param[in] cfg   Method configuration
+        /// \param[in] cred  User credentials
+        ///
+        method_noneap(_In_ module &module, _In_ config_method_with_cred &cfg, _In_ credentials &cred);
+
+        ///
+        /// Moves an EAP method
+        ///
+        /// \param[in] other  EAP method to move from
+        ///
+        method_noneap(_Inout_ method_noneap &&other);
+
+        ///
+        /// Moves an EAP method
+        ///
+        /// \param[in] other  EAP method to move from
+        ///
+        /// \returns Reference to this object
+        ///
+        method_noneap& operator=(_Inout_ method_noneap &&other);
+
+        /// \name Packet processing
+        /// @{
+
+        ///
+        /// Obtains a response packet from the EAP method.
+        ///
+        /// \sa [EapPeerGetResponsePacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363610.aspx)
+        ///
+        virtual void get_response_packet(
+            _Inout_bytecap_(*dwSendPacketSize) void  *pSendPacket,
+            _Inout_                            DWORD *pdwSendPacketSize);
+
+        /// @}
+
+    protected:
+        sanitizing_blob m_packet_res;   ///< Response packet
     };
 }

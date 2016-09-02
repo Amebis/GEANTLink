@@ -32,17 +32,16 @@ eap::method_pap::method_pap(_In_ module &module, _In_ config_method_pap &cfg, _I
     m_cred(cred),
     m_phase(phase_unknown),
     m_phase_prev(phase_unknown),
-    method(module, cfg, cred)
+    method_noneap(module, cfg, cred)
 {
 }
 
 
 eap::method_pap::method_pap(_Inout_ method_pap &&other) :
-    m_cred      (          other.m_cred       ),
-    m_packet_res(std::move(other.m_packet_res)),
-    m_phase     (std::move(other.m_phase     )),
-    m_phase_prev(std::move(other.m_phase_prev)),
-    method      (std::move(other             ))
+    m_cred       (          other.m_cred       ),
+    m_phase      (std::move(other.m_phase     )),
+    m_phase_prev (std::move(other.m_phase_prev)),
+    method_noneap(std::move(other             ))
 {
 }
 
@@ -51,10 +50,9 @@ eap::method_pap& eap::method_pap::operator=(_Inout_ method_pap &&other)
 {
     if (this != std::addressof(other)) {
         assert(std::addressof(m_cred) == std::addressof(other.m_cred)); // Move method with same credentials only!
-        (method&)*this = std::move(other             );
-        m_packet_res   = std::move(other.m_packet_res);
-        m_phase        = std::move(other.m_phase     );
-        m_phase_prev   = std::move(other.m_phase_prev);
+        (method_noneap&)*this = std::move(other             );
+        m_phase               = std::move(other.m_phase     );
+        m_phase_prev          = std::move(other.m_phase_prev);
     }
 
     return *this;
@@ -67,7 +65,7 @@ void eap::method_pap::begin_session(
     _In_        HANDLE        hTokenImpersonateUser,
     _In_opt_    DWORD         dwMaxSendPacketSize)
 {
-    method::begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
+    method_noneap::begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
 
     m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_legacy_pap), event_data::blank);
     m_phase = phase_init;
@@ -145,23 +143,6 @@ void eap::method_pap::process_request_packet(
 
     pEapOutput->fAllowNotifications = TRUE;
     pEapOutput->action = EapPeerMethodResponseActionSend;
-}
-
-
-void eap::method_pap::get_response_packet(
-    _Inout_bytecap_(*dwSendPacketSize) void  *pSendPacket,
-    _Inout_                            DWORD *pdwSendPacketSize)
-{
-    assert(pdwSendPacketSize);
-    assert(pSendPacket);
-
-    size_t size_packet = m_packet_res.size();
-    if (size_packet > *pdwSendPacketSize)
-        throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %u, maximum: %u).", size_packet, *pdwSendPacketSize).c_str());
-
-    memcpy(pSendPacket, m_packet_res.data(), size_packet);
-    *pdwSendPacketSize = (DWORD)size_packet;
-    m_packet_res.clear();
 }
 
 

@@ -74,3 +74,48 @@ void eap::method::begin_session(
 void eap::method::end_session()
 {
 }
+
+
+//////////////////////////////////////////////////////////////////////
+// eap::method_noneap
+//////////////////////////////////////////////////////////////////////
+
+eap::method_noneap::method_noneap(_In_ module &module, _In_ config_method_with_cred &cfg, _In_ credentials &cred) : method(module, cfg, cred)
+{
+}
+
+
+eap::method_noneap::method_noneap(_Inout_ method_noneap &&other) :
+    m_packet_res(std::move(other.m_packet_res)),
+    method      (std::move(other             ))
+{
+}
+
+
+eap::method_noneap& eap::method_noneap::operator=(_Inout_ method_noneap &&other)
+{
+    if (this != std::addressof(other)) {
+        assert(std::addressof(m_cred) == std::addressof(other.m_cred)); // Move method with same credentials only!
+        (method&)*this = std::move(other             );
+        m_packet_res   = std::move(other.m_packet_res);
+    }
+
+    return *this;
+}
+
+
+void eap::method_noneap::get_response_packet(
+    _Inout_bytecap_(*dwSendPacketSize) void  *pSendPacket,
+    _Inout_                            DWORD *pdwSendPacketSize)
+{
+    assert(pdwSendPacketSize);
+    assert(pSendPacket);
+
+    size_t size_packet = m_packet_res.size();
+    if (size_packet > *pdwSendPacketSize)
+        throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %u, maximum: %u).", size_packet, *pdwSendPacketSize).c_str());
+
+    memcpy(pSendPacket, m_packet_res.data(), size_packet);
+    *pdwSendPacketSize = (DWORD)size_packet;
+    m_packet_res.clear();
+}
