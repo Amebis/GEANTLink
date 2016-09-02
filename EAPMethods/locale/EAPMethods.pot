@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: EAPMethods\n"
-"POT-Creation-Date: 2016-08-31 17:41+0200\n"
+"POT-Creation-Date: 2016-09-02 19:08+0200\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
 "Last-Translator: Simon Rozman <simon.rozman@amebis.si>\n"
 "Language-Team: Amebis, d. o. o., Kamnik <info@amebis.si>\n"
@@ -178,30 +178,38 @@ msgid "Assign your organization a unique ID to allow sharing the same credential
 msgstr ""
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:542
+msgid "&Namespace:"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:546
+msgid "urn:RFC4282:realm"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:546
+msgid "urn:uuid"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:558
 msgid "Provider unique &identifier:"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:547
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:563
 msgid "Your organization ID to assign same credentials from other profiles"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:551
-msgid "(Examples: contoso.com, DOT-UK, etc.)"
-msgstr ""
-
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:576
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:588
 msgid "Configuration Lock"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:587
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:599
 msgid "Your configuration can be locked to prevent accidental modification by end-users. Users will only be allowed to enter credentials."
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:594
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:606
 msgid "&Lock this configuration and prevent any further modification via user interface."
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:597
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:609
 msgid "(Warning: Once locked, you can not revert using this dialog!)"
 msgstr ""
 
@@ -210,8 +218,8 @@ msgstr ""
 msgid "%s Credentials"
 msgstr ""
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:123 lib/EAPBase_UI/include/EAP_UI.h:351
-#: lib/EAPBase_UI/include/EAP_UI.h:361 lib/EAPBase_UI/res/wxEAP_UI.h:118
+#: lib/EAPBase_UI/src/EAP_UI.cpp:123 lib/EAPBase_UI/include/EAP_UI.h:352
+#: lib/EAPBase_UI/include/EAP_UI.h:362 lib/EAPBase_UI/res/wxEAP_UI.h:119
 msgid "EAP Credentials"
 msgstr ""
 
@@ -220,42 +228,32 @@ msgstr ""
 msgid "For additional help and instructions, please contact %s at:"
 msgstr ""
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:168
-#, c-format
-msgid "your %ls provider"
-msgstr ""
-
-#: lib/EAPBase_UI/src/EAP_UI.cpp:168
+#: lib/EAPBase_UI/src/EAP_UI.cpp:167
 msgid "your provider"
 msgstr ""
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:187
+#: lib/EAPBase_UI/src/EAP_UI.cpp:186
 msgid "Open the default web browser"
 msgstr ""
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:198
+#: lib/EAPBase_UI/src/EAP_UI.cpp:197
 msgid "Open your e-mail program"
 msgstr ""
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:209
+#: lib/EAPBase_UI/src/EAP_UI.cpp:208
 msgid "Dial the phone number"
 msgstr ""
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:229
+#: lib/EAPBase_UI/src/EAP_UI.cpp:228
 #, c-format
 msgid "%s has pre-set parts of this configuration. Those parts are locked to prevent accidental modification."
 msgstr ""
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:231
-#, c-format
-msgid "Your %ls provider"
-msgstr ""
-
-#: lib/EAPBase_UI/src/EAP_UI.cpp:231
+#: lib/EAPBase_UI/src/EAP_UI.cpp:229
 msgid "Your provider"
 msgstr ""
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:251
+#: lib/EAPBase_UI/src/EAP_UI.cpp:249
 msgid "Previous attempt to connect failed. Please, make sure your credentials are correct, or try again later."
 msgstr ""
 
@@ -429,73 +427,77 @@ msgstr ""
 msgid "Custom outer identity to use"
 msgstr ""
 
-#: lib/TTLS_UI/src/Module.cpp:272 lib/TTLS_UI/src/Module.cpp:282
-#: lib/EAPBase_UI/include/EAP_UI.h:690
+#: lib/TTLS_UI/src/Module.cpp:275 lib/TTLS_UI/src/Module.cpp:285
+#: lib/EAPBase_UI/include/EAP_UI.h:689
 #, c-format
 msgid "Error writing credentials to Credential Manager: %hs (error %u)"
 msgstr ""
 
-#: lib/TTLS_UI/src/Module.cpp:274 lib/TTLS_UI/src/Module.cpp:284
-#: lib/EAPBase_UI/include/EAP_UI.h:693
+#: lib/TTLS_UI/src/Module.cpp:277 lib/TTLS_UI/src/Module.cpp:287
+#: lib/EAPBase_UI/include/EAP_UI.h:692
 msgid "Writing credentials failed."
 msgstr ""
 
-#: lib/TTLS_UI/src/TTLS_UI.cpp:107 lib/TTLS_UI/src/TTLS_UI.cpp:220
+#: lib/TTLS_UI/src/TTLS_UI.cpp:108 lib/TTLS_UI/src/TTLS_UI.cpp:235
 msgid "Inner Authentication"
 msgstr ""
 
-#: lib/TTLS_UI/src/TTLS_UI.cpp:113
+#: lib/TTLS_UI/src/TTLS_UI.cpp:114
 msgid "Select inner authentication method from the list"
 msgstr ""
 
-#: lib/TTLS_UI/src/TTLS_UI.cpp:115
+#: lib/TTLS_UI/src/TTLS_UI.cpp:116
 msgid "PAP"
 msgstr ""
 
-#: lib/TTLS_UI/src/TTLS_UI.cpp:120 lib/TTLS_UI/src/TTLS_UI.cpp:241
+#: lib/TTLS_UI/src/TTLS_UI.cpp:118
+msgid "MSCHAPv2"
+msgstr ""
+
+#: lib/TTLS_UI/src/TTLS_UI.cpp:123 lib/TTLS_UI/src/TTLS_UI.cpp:256
 msgid "Outer Authentication"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:288
+#: lib/EAPBase_UI/include/EAP_UI.h:289
 #, c-format
 msgid "Are you sure you want to permanently remove %ls provider from configuration?"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:288
+#: lib/EAPBase_UI/include/EAP_UI.h:289
 msgid "Warning"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:548
+#: lib/EAPBase_UI/include/EAP_UI.h:549
 msgid "Provider Settings"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:706
+#: lib/EAPBase_UI/include/EAP_UI.h:705
 #, c-format
 msgid "Deleting credentials failed (error %u)."
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:739
+#: lib/EAPBase_UI/include/EAP_UI.h:738
 #, c-format
 msgid "<error %u>"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:743
+#: lib/EAPBase_UI/include/EAP_UI.h:742
 msgid "<error>"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:754 lib/EAPBase_UI/include/EAP_UI.h:763
+#: lib/EAPBase_UI/include/EAP_UI.h:753 lib/EAPBase_UI/include/EAP_UI.h:762
 msgid "<empty>"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:754 lib/EAPBase_UI/include/EAP_UI.h:763
+#: lib/EAPBase_UI/include/EAP_UI.h:753 lib/EAPBase_UI/include/EAP_UI.h:762
 msgid "<blank ID>"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:968
+#: lib/EAPBase_UI/include/EAP_UI.h:962
 msgid "<Your Organization>"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.h:68
+#: lib/EAPBase_UI/res/wxEAP_UI.h:69
 msgid "EAP Connection Configuration"
 msgstr ""
 

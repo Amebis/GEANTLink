@@ -199,20 +199,21 @@ public:
         this->SetIcon(wxIcon(wxICON(product.ico)));
 #endif
 
+        wstring target_name;
         for (eap::config_connection::provider_list::iterator provider = m_cfg.m_providers.begin(), provider_end = m_cfg.m_providers.end(); provider != provider_end; ++provider) {
             bool is_single = provider->m_methods.size() == 1;
             std::vector<std::unique_ptr<eap::config_method> >::size_type count = 0;
             std::vector<std::unique_ptr<eap::config_method> >::iterator method = provider->m_methods.begin(), method_end = provider->m_methods.end();
-            for (; method != method_end; ++method, count++)
+            for (; method != method_end; ++method, count++) {
                 m_providers->AddPage(
                     new _wxT(
                         *provider,
                         *method->get(),
-                        provider->m_id.c_str(),
                         m_providers),
                     is_single ?
                         wxEAPGetProviderName(provider->m_name) :
                         winstd::tstring_printf(_T("%s (%u)"), wxEAPGetProviderName(provider->m_name), count));
+            }
         }
 
         this->Layout();
@@ -259,7 +260,8 @@ protected:
         eap::config_provider cfg_provider(m_cfg.m_module);
         GUID guid;
         CoCreateGuid(&guid);
-        cfg_provider.m_id = std::move(winstd::wstring_guid(guid));
+        cfg_provider.m_namespace = L"urn:uuid";
+        cfg_provider.m_id        = winstd::wstring_guid(guid).substr(1, 36);
         cfg_provider.m_methods.push_back(std::move(cfg_method));
 
         // Append provider.
@@ -271,7 +273,6 @@ protected:
             new _wxT(
                 cfg_provider2,
                 *cfg_method2,
-                cfg_provider2.m_id.c_str(),
                 m_providers),
                 wxEAPGetProviderName(cfg_provider2.m_name), true);
 
@@ -562,15 +563,13 @@ public:
     ///
     /// Constructs a credential configuration panel
     ///
-    /// \param[in]    prov           Provider configuration data
-    /// \param[inout] cfg            Configuration data
-    /// \param[in]    pszCredTarget  Target name of credentials in Windows Credential Manager. Can be further decorated to create final target name.
-    /// \param[in]    parent         Parent window
+    /// \param[in]    prov    Provider configuration data
+    /// \param[inout] cfg     Configuration data
+    /// \param[in]    parent  Parent window
     ///
-    wxEAPCredentialsConfigPanel(const eap::config_provider &prov, eap::config_method_with_cred &cfg, LPCTSTR pszCredTarget, wxWindow *parent) :
+    wxEAPCredentialsConfigPanel(const eap::config_provider &prov, eap::config_method_with_cred &cfg, wxWindow *parent) :
         m_prov(prov),
         m_cfg(cfg),
-        m_target(pszCredTarget),
         m_has_own(false),
         m_cred_own(cfg.m_module),
         m_cred_preshared(cfg.m_module),
@@ -678,12 +677,12 @@ protected:
 
         // Display credential prompt.
         wxEAPCredentialsDialog dlg(m_prov, this);
-        _wxT *panel = new _wxT(m_prov, m_cfg, m_cred_own, m_target.c_str(), &dlg, true);
+        _wxT *panel = new _wxT(m_prov, m_cfg, m_cred_own, &dlg, true);
         dlg.AddContent(panel);
         if (dlg.ShowModal() == wxID_OK && panel->GetRemember()) {
             // Write credentials to credential manager.
             try {
-                m_cred_own.store(m_target.c_str());
+                m_cred_own.store(m_prov.get_id().c_str());
                 m_has_own = TRUE;
                 UpdateOwnIdentity();
             } catch (winstd::win_runtime_error &err) {
@@ -699,7 +698,7 @@ protected:
 
     virtual void OnClearOwn(wxCommandEvent& /*event*/)
     {
-        if (CredDelete(m_cred_own.target_name(m_target.c_str()).c_str(), CRED_TYPE_GENERIC, 0)) {
+        if (CredDelete(m_cred_own.target_name(m_prov.get_id().c_str()).c_str(), CRED_TYPE_GENERIC, 0)) {
             m_own_identity->Clear();
             m_has_own = false;
         } else
@@ -711,7 +710,7 @@ protected:
     {
         wxEAPCredentialsDialog dlg(m_prov, this);
 
-        _wxT *panel = new _wxT(m_prov, m_cfg, m_cred_preshared, _T(""), &dlg, true);
+        _wxT *panel = new _wxT(m_prov, m_cfg, m_cred_preshared, &dlg, true);
 
         dlg.AddContent(panel);
         if (dlg.ShowModal() == wxID_OK)
@@ -728,7 +727,7 @@ protected:
     void RetrieveOwnCredentials()
     {
         try {
-            m_cred_own.retrieve(m_target.c_str());
+            m_cred_own.retrieve(m_prov.get_id().c_str());
             m_has_own = true;
             UpdateOwnIdentity();
         } catch (winstd::win_runtime_error &err) {
@@ -768,7 +767,6 @@ protected:
 protected:
     const eap::config_provider &m_prov;     ///< EAP provider
     eap::config_method_with_cred &m_cfg;    ///< EAP method configuration
-    winstd::tstring m_target;               ///< Credential Manager target
 
 private:
     bool m_has_own;                         ///< Does the user has (some sort of) credentials stored in Credential Manager?
@@ -789,18 +787,16 @@ public:
     ///
     /// Constructs a credentials panel
     ///
-    /// \param[in]    prov           Provider configuration data
-    /// \param[in]    cfg            Configuration data
-    /// \param[inout] cred           Credentials data
-    /// \param[in]    pszCredTarget  Target name of credentials in Windows Credential Manager. Can be further decorated to create final target name.
-    /// \param[in]    parent         Parent window
-    /// \param[in]    is_config      Is this panel used to pre-enter credentials? When \c true, the "Remember" checkbox is always selected and disabled.
+    /// \param[in]    prov        Provider configuration data
+    /// \param[in]    cfg         Configuration data
+    /// \param[inout] cred        Credentials data
+    /// \param[in]    parent      Parent window
+    /// \param[in]    is_config   Is this panel used to pre-enter credentials? When \c true, the "Remember" checkbox is always selected and disabled.
     ///
-    wxEAPCredentialsPanel(const eap::config_provider &prov, const eap::config_method_with_cred &cfg, _Tcred &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config = false) :
+    wxEAPCredentialsPanel(const eap::config_provider &prov, const eap::config_method_with_cred &cfg, _Tcred &cred, wxWindow* parent, bool is_config = false) :
         m_prov(prov),
         m_cfg(cfg),
         m_cred(cred),
-        m_target(pszCredTarget),
         m_is_config(is_config),
         _Tbase(parent)
     {
@@ -845,7 +841,6 @@ protected:
     const eap::config_provider &m_prov;         ///< Provider configuration
     const eap::config_method_with_cred &m_cfg;  ///< Method configuration
     _Tcred &m_cred;                             ///< Credentials
-    winstd::tstring m_target;                   ///< Credential Manager target
     bool m_is_config;                           ///< Is this a configuration dialog?
 };
 
@@ -857,15 +852,14 @@ public:
     ///
     /// Constructs a password credentials panel
     ///
-    /// \param[in]    prov           Provider configuration data
-    /// \param[in]    cfg            Configuration data
-    /// \param[inout] cred           Credentials data
-    /// \param[in]    pszCredTarget  Target name of credentials in Windows Credential Manager. Can be further decorated to create final target name.
-    /// \param[in]    parent         Parent window
-    /// \param[in]    is_config      Is this panel used to pre-enter credentials? When \c true, the "Remember" checkbox is always selected and disabled.
+    /// \param[in]    prov       Provider configuration data
+    /// \param[in]    cfg        Configuration data
+    /// \param[inout] cred       Credentials data
+    /// \param[in]    parent     Parent window
+    /// \param[in]    is_config  Is this panel used to pre-enter credentials? When \c true, the "Remember" checkbox is always selected and disabled.
     ///
-    wxPasswordCredentialsPanel(const eap::config_provider &prov, const eap::config_method_with_cred &cfg, _Tcred &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config = false) :
-        wxEAPCredentialsPanel<_Tcred, _Tbase>(prov, cfg, cred, pszCredTarget, parent, is_config)
+    wxPasswordCredentialsPanel(const eap::config_provider &prov, const eap::config_method_with_cred &cfg, _Tcred &cred, wxWindow* parent, bool is_config = false) :
+        wxEAPCredentialsPanel<_Tcred, _Tbase>(prov, cfg, cred, parent, is_config)
     {
         // Load and set icon.
         winstd::library lib_shell32;
@@ -875,7 +869,7 @@ public:
         bool layout = false;
         if (!m_prov.m_lbl_alt_credential.empty()) {
             m_credentials_label->SetLabel(m_prov.m_lbl_alt_credential);
-            m_credentials_label->Wrap( 445 );
+            m_credentials_label->Wrap( 440 );
             layout = true;
         }
 

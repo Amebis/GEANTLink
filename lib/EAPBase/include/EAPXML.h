@@ -48,6 +48,17 @@ namespace eapxml
     inline HRESULT put_element_value(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _In_ bool bValue);
     inline HRESULT put_element_base64(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _In_count_(nValueLen) LPCVOID pValue, _In_ SIZE_T nValueLen);
     inline HRESULT put_element_hex(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _In_count_(nValueLen) LPCVOID pValue, _In_ SIZE_T nValueLen);
+    inline HRESULT get_attrib_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrAttributeName, _Out_ BSTR *pbstrValue);
+    template<class _Traits, class _Ax> inline HRESULT get_attrib_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrAttributeName, _Out_ std::basic_string<wchar_t, _Traits, _Ax> &sValue);
+    inline HRESULT get_attrib_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrAttributeName, _Out_ DWORD *pdwValue);
+    inline HRESULT get_attrib_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrAttributeName, _Out_ bool *pbValue);
+    template<class _Ty, class _Ax> inline HRESULT get_attrib_base64(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrAttributeName, _Out_ std::vector<_Ty, _Ax> &aValue);
+    template<class _Ty, class _Ax> inline HRESULT get_attrib_hex(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrAttributeName, _Out_ std::vector<_Ty, _Ax> &aValue);
+    inline HRESULT put_attrib_value(_In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrAttributeName, _In_opt_z_ _In_z_ const BSTR bstrValue);
+    inline HRESULT put_attrib_value(_In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrAttributeName, _In_opt_z_ _In_ DWORD dwValue);
+    inline HRESULT put_attrib_value(_In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrAttributeName, _In_opt_z_ _In_ bool bValue);
+    inline HRESULT put_attrib_base64(_In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrAttributeName, _In_opt_z_ _In_count_(nValueLen) LPCVOID pValue, _In_ SIZE_T nValueLen);
+    inline HRESULT put_attrib_hex(_In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrAttributeName, _In_count_(nValueLen) LPCVOID pValue, _In_ SIZE_T nValueLen);
     inline std::wstring get_xpath(_In_ IXMLDOMNode *pXmlNode);
 }
 
@@ -381,6 +392,144 @@ namespace eapxml
         winstd::hex_enc enc;
         enc.encode(sHex, pValue, nValueLen);
         return put_element_value(pDoc, pCurrentDOMNode, bstrElementName, bstrNamespace, winstd::bstr(sHex));
+    }
+
+
+    inline HRESULT get_attrib_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrAttributeName, _Out_ BSTR *pbstrValue)
+    {
+        assert(pbstrValue);
+
+        HRESULT hr;
+        winstd::com_obj<IXMLDOMNamedNodeMap> pXmlAttributes;
+        winstd::com_obj<IXMLDOMNode> pXmlAt;
+        VARIANT varValue;
+        V_VT(&varValue) = VT_EMPTY;
+
+        return
+            SUCCEEDED(hr = pXmlParent->get_attributes(&pXmlAttributes)) ?
+            SUCCEEDED(hr = pXmlAttributes->getNamedItem(bstrAttributeName, &pXmlAt)) ?
+            pXmlAt ?
+            SUCCEEDED(hr = pXmlAt->get_nodeValue(&varValue)) ?
+            V_VT(&varValue) == VT_BSTR ? *pbstrValue = V_BSTR(&varValue), S_OK : E_UNEXPECTED : hr : E_NOT_SET : hr : hr;
+    }
+
+
+    template<class _Traits, class _Ax>
+    inline HRESULT get_attrib_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrAttributeName, _Out_ std::basic_string<wchar_t, _Traits, _Ax> &sValue)
+    {
+        winstd::bstr bstr;
+        HRESULT hr = get_attrib_value(pXmlParent, bstrAttributeName, &bstr);
+        if (SUCCEEDED(hr))
+            sValue.assign(bstr, bstr.length());
+        return hr;
+    }
+
+
+    inline HRESULT get_attrib_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrAttributeName, _Out_ DWORD *pdwValue)
+    {
+        assert(pdwValue);
+
+        winstd::bstr bstr;
+        HRESULT hr = get_attrib_value(pXmlParent, bstrAttributeName, &bstr);
+        if (SUCCEEDED(hr))
+            *pdwValue = wcstoul(bstr, NULL, 10);
+        return hr;
+    }
+
+
+    inline HRESULT get_attrib_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrAttributeName, _Out_ bool *pbValue)
+    {
+        assert(pbValue);
+
+        winstd::bstr bstr;
+        HRESULT hr = get_attrib_value(pXmlParent, bstrAttributeName, &bstr);
+        if (SUCCEEDED(hr)) {
+            if (CompareStringEx(LOCALE_NAME_INVARIANT, NORM_IGNORECASE, bstr, bstr.length(), L"true" , -1, NULL, NULL, 0) == CSTR_EQUAL ||
+                CompareStringEx(LOCALE_NAME_INVARIANT, NORM_IGNORECASE, bstr, bstr.length(), L"1"    , -1, NULL, NULL, 0) == CSTR_EQUAL)
+                *pbValue = true;
+            else if (
+                CompareStringEx(LOCALE_NAME_INVARIANT, NORM_IGNORECASE, bstr, bstr.length(), L"false", -1, NULL, NULL, 0) == CSTR_EQUAL ||
+                CompareStringEx(LOCALE_NAME_INVARIANT, NORM_IGNORECASE, bstr, bstr.length(), L"0"    , -1, NULL, NULL, 0) == CSTR_EQUAL)
+                *pbValue = false;
+            else
+                hr = E_NOT_VALID_STATE;
+        }
+
+        return hr;
+    }
+
+
+    template<class _Ty, class _Ax>
+    inline HRESULT get_attrib_base64(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrAttributeName, _Out_ std::vector<_Ty, _Ax> &aValue)
+    {
+        winstd::bstr bstr;
+        HRESULT hr = get_attrib_value(pXmlParent, bstrAttributeName, &bstr);
+        if (SUCCEEDED(hr)) {
+            winstd::base64_dec dec;
+            bool is_last;
+            dec.decode(aValue, is_last, (BSTR)bstr, bstr.length());
+        }
+
+        return hr;
+    }
+
+
+    template<class _Ty, class _Ax>
+    inline HRESULT get_attrib_hex(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrAttributeName, _Out_ std::vector<_Ty, _Ax> &aValue)
+    {
+        winstd::bstr bstr;
+        HRESULT hr = get_attrib_value(pXmlParent, bstrAttributeName, &bstr);
+        if (SUCCEEDED(hr)) {
+            winstd::hex_dec dec;
+            bool is_last;
+            dec.decode(aValue, is_last, (BSTR)bstr, bstr.length());
+        }
+
+        return hr;
+    }
+
+
+    inline HRESULT put_attrib_value(_In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrAttributeName, _In_z_ const BSTR bstrValue)
+    {
+        HRESULT hr;
+        winstd::com_obj<IXMLDOMElement> pXmlEl;
+        VARIANT varValue;
+        V_VT(&varValue) = VT_BSTR;
+        V_BSTR(&varValue) = bstrValue;
+
+        return
+            SUCCEEDED(hr = pCurrentDOMNode->QueryInterface(__uuidof(IXMLDOMElement), (void**)&pXmlEl)) &&
+            SUCCEEDED(hr = pXmlEl->setAttribute(bstrAttributeName, varValue)) ? S_OK : hr;
+    }
+
+
+    inline HRESULT put_attrib_value(_In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrAttributeName, _In_ DWORD dwValue)
+    {
+        return put_attrib_value(pCurrentDOMNode, bstrAttributeName, winstd::bstr(winstd::wstring_printf(L"%d", dwValue)));
+    }
+
+
+    inline HRESULT put_attrib_value(_In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrAttributeName, _In_ bool bValue)
+    {
+        return put_attrib_value(pCurrentDOMNode, bstrAttributeName, winstd::bstr(bValue ? L"true": L"false"));
+    }
+
+
+    inline HRESULT put_attrib_base64(_In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrAttributeName, _In_count_(nValueLen) LPCVOID pValue, _In_ SIZE_T nValueLen)
+    {
+        std::wstring sBase64;
+        winstd::base64_enc enc;
+        enc.encode(sBase64, pValue, nValueLen);
+        return put_attrib_value(pCurrentDOMNode, bstrAttributeName, winstd::bstr(sBase64));
+    }
+
+
+    inline HRESULT put_attrib_hex(_In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrAttributeName, _In_count_(nValueLen) LPCVOID pValue, _In_ SIZE_T nValueLen)
+    {
+        std::wstring sHex;
+        winstd::hex_enc enc;
+        enc.encode(sHex, pValue, nValueLen);
+        return put_attrib_value(pCurrentDOMNode, bstrAttributeName, winstd::bstr(sHex));
     }
 
 

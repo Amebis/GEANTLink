@@ -239,7 +239,7 @@ wxEAPCredentialsConfigPanelBase::wxEAPCredentialsConfigPanelBase( wxWindow* pare
 	sb_credentials_vert = new wxBoxSizer( wxVERTICAL );
 	
 	m_credentials_label = new wxStaticText( sb_credentials->GetStaticBox(), wxID_ANY, _("Manage credentials used to connect."), wxDefaultPosition, wxDefaultSize, 0 );
-	m_credentials_label->Wrap( 445 );
+	m_credentials_label->Wrap( 440 );
 	sb_credentials_vert->Add( m_credentials_label, 0, wxALL|wxEXPAND, 5 );
 	
 	wxBoxSizer* sb_cred_radio;
@@ -364,7 +364,7 @@ wxEAPCredentialsPassPanelBase::wxEAPCredentialsPassPanelBase( wxWindow* parent, 
 	sb_credentials_vert = new wxBoxSizer( wxVERTICAL );
 	
 	m_credentials_label = new wxStaticText( sb_credentials->GetStaticBox(), wxID_ANY, _("Please provide your user ID and password."), wxDefaultPosition, wxDefaultSize, 0 );
-	m_credentials_label->Wrap( 445 );
+	m_credentials_label->Wrap( 440 );
 	sb_credentials_vert->Add( m_credentials_label, 0, wxALL|wxEXPAND, 5 );
 	
 	wxFlexGridSizer* sb_credentials_tbl;
@@ -429,7 +429,7 @@ wxEAPProviderContactInfoPanelBase::wxEAPProviderContactInfoPanelBase( wxWindow* 
 	sb_provider_contact_vert = new wxBoxSizer( wxVERTICAL );
 	
 	m_provider_contact_label = new wxStaticText( sb_provider_contact->GetStaticBox(), wxID_ANY, _("Describe your organization to customize user prompts.  When organization is introduced, end-users find program messages easier to understand and act."), wxDefaultPosition, wxDefaultSize, 0 );
-	m_provider_contact_label->Wrap( 445 );
+	m_provider_contact_label->Wrap( 440 );
 	sb_provider_contact_vert->Add( m_provider_contact_label, 0, wxALL|wxEXPAND, 5 );
 	
 	wxBoxSizer* sb_provider_name;
@@ -533,8 +533,24 @@ wxEAPProviderIDPanelBase::wxEAPProviderIDPanelBase( wxWindow* parent, wxWindowID
 	sb_provider_id_vert = new wxBoxSizer( wxVERTICAL );
 	
 	m_provider_id_label_outer = new wxStaticText( sb_provider_id->GetStaticBox(), wxID_ANY, _("Assign your organization a unique ID to allow sharing the same credential set across different network profiles."), wxDefaultPosition, wxDefaultSize, 0 );
-	m_provider_id_label_outer->Wrap( 445 );
+	m_provider_id_label_outer->Wrap( 440 );
 	sb_provider_id_vert->Add( m_provider_id_label_outer, 0, wxALL|wxEXPAND, 5 );
+	
+	wxBoxSizer* sb_provider_namespace;
+	sb_provider_namespace = new wxBoxSizer( wxVERTICAL );
+	
+	m_provider_namespace_label = new wxStaticText( sb_provider_id->GetStaticBox(), wxID_ANY, _("&Namespace:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_provider_namespace_label->Wrap( -1 );
+	sb_provider_namespace->Add( m_provider_namespace_label, 0, wxBOTTOM, 5 );
+	
+	wxString m_provider_namespaceChoices[] = { _("urn:RFC4282:realm"), _("urn:uuid") };
+	int m_provider_namespaceNChoices = sizeof( m_provider_namespaceChoices ) / sizeof( wxString );
+	m_provider_namespace = new wxChoice( sb_provider_id->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxDefaultSize, m_provider_namespaceNChoices, m_provider_namespaceChoices, 0 );
+	m_provider_namespace->SetSelection( 0 );
+	sb_provider_namespace->Add( m_provider_namespace, 0, wxEXPAND, 5 );
+	
+	
+	sb_provider_id_vert->Add( sb_provider_namespace, 0, wxEXPAND|wxALL, 5 );
 	
 	wxBoxSizer* sb_provider_id_inner;
 	sb_provider_id_inner = new wxBoxSizer( wxVERTICAL );
@@ -546,11 +562,7 @@ wxEAPProviderIDPanelBase::wxEAPProviderIDPanelBase( wxWindow* parent, wxWindowID
 	m_provider_id = new wxTextCtrl( sb_provider_id->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	m_provider_id->SetToolTip( _("Your organization ID to assign same credentials from other profiles") );
 	
-	sb_provider_id_inner->Add( m_provider_id, 0, wxEXPAND|wxBOTTOM, 5 );
-	
-	m_provider_id_note = new wxStaticText( sb_provider_id->GetStaticBox(), wxID_ANY, _("(Examples: contoso.com, DOT-UK, etc.)"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_provider_id_note->Wrap( -1 );
-	sb_provider_id_inner->Add( m_provider_id_note, 0, wxALIGN_RIGHT, 5 );
+	sb_provider_id_inner->Add( m_provider_id, 0, wxEXPAND, 5 );
 	
 	
 	sb_provider_id_vert->Add( sb_provider_id_inner, 0, wxEXPAND|wxALL, 5 );
@@ -585,7 +597,7 @@ wxEAPProviderLockPanelBase::wxEAPProviderLockPanelBase( wxWindow* parent, wxWind
 	sb_provider_lock_vert = new wxBoxSizer( wxVERTICAL );
 	
 	m_provider_lock_label = new wxStaticText( sb_provider_lock->GetStaticBox(), wxID_ANY, _("Your configuration can be locked to prevent accidental modification by end-users. Users will only be allowed to enter credentials."), wxDefaultPosition, wxDefaultSize, 0 );
-	m_provider_lock_label->Wrap( 445 );
+	m_provider_lock_label->Wrap( 440 );
 	sb_provider_lock_vert->Add( m_provider_lock_label, 0, wxALL|wxEXPAND, 5 );
 	
 	wxBoxSizer* sb_provider_lock_inner;

@@ -26,7 +26,7 @@ wxTTLSConfigPanelBase::wxTTLSConfigPanelBase( wxWindow* parent, wxWindowID id, c
 	sb_outer_identity_vert = new wxBoxSizer( wxVERTICAL );
 	
 	m_outer_identity_label = new wxStaticText( sb_outer_identity->GetStaticBox(), wxID_ANY, _("Select the user ID supplicant introduces itself as to authenticator:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_outer_identity_label->Wrap( 445 );
+	m_outer_identity_label->Wrap( 440 );
 	sb_outer_identity_vert->Add( m_outer_identity_label, 0, wxALL|wxEXPAND, 5 );
 	
 	wxBoxSizer* sb_outer_identity_radio;

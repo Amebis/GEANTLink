@@ -476,8 +476,34 @@ namespace eap
 
         /// @}
 
+        ///
+        /// Returns provider namespace and ID concatenated
+        ///
+        inline std::wstring get_id() const
+        {
+            if (m_namespace.empty())
+                return m_id;
+            else {
+                std::wstring id(m_namespace);
+                id += L':';
+                id += m_id;
+                return id;
+            }
+        }
+
+        ///
+        /// Checks if credentials match given provider.
+        ///
+        inline bool match(_In_ const config_provider &cfg_provider) const
+        {
+            return
+                _wcsicmp(m_namespace.c_str(), cfg_provider.m_namespace.c_str()) == 0 &&
+                _wcsicmp(m_id       .c_str(), cfg_provider.m_id       .c_str()) == 0;
+        }
+
     public:
         const config_connection& m_cfg;         ///< Connection configuration
+        std::wstring m_namespace;               ///< Provider namespace URI
         std::wstring m_id;                      ///< Provider ID
         std::unique_ptr<credentials> m_cred;    ///< Credentials
     };

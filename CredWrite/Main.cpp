@@ -72,11 +72,10 @@ static int CredWrite()
     } else {
         // Get the realm from user name.
         LPCWSTR _identity = cred_pap.m_identity.c_str(), domain;
-        if ((domain = wcschr(_identity, L'@')) != NULL)
-            target_name = domain + 1;
-        else if ((domain = wcschr(_identity, L'\\')) != NULL)
-            target_name.assign(_identity, domain);
-        else
+        if ((domain = wcschr(_identity, L'@')) != NULL) {
+            target_name  = L"urn:RFC4282:realm:";
+            target_name += domain + 1;
+        } else
             target_name = L"*";
     }
 

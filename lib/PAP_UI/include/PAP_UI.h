@@ -51,7 +51,7 @@ public:
     ///
     /// Constructs a configuration panel
     ///
-    wxPAPConfigPanel(const eap::config_provider &prov, eap::config_method_pap &cfg, LPCTSTR pszCredTarget, wxWindow* parent);
+    wxPAPConfigPanel(const eap::config_provider &prov, eap::config_method_pap &cfg, wxWindow* parent);
 
     ///
     /// Destructs the configuration panel

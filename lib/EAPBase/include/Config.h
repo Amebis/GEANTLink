@@ -454,9 +454,25 @@ namespace eap
 
         /// @}
 
+        ///
+        /// Returns provider namespace and ID concatenated
+        ///
+        inline std::wstring get_id() const
+        {
+            if (m_namespace.empty())
+                return m_id;
+            else {
+                std::wstring id(m_namespace);
+                id += L':';
+                id += m_id;
+                return id;
+            }
+        }
+
     public:
-        bool m_read_only;                                       ///< Is profile read-only
+        std::wstring m_namespace;                               ///< Provider namespace URI
         std::wstring m_id;                                      ///< Provider ID
+        bool m_read_only;                                       ///< Is profile read-only
         winstd::tstring m_name;                                 ///< Provider name
         winstd::tstring m_help_email;                           ///< Helpdesk e-mail
         winstd::tstring m_help_web;                             ///< Helpdesk website URL

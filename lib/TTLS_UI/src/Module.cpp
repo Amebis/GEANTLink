@@ -185,9 +185,11 @@ void eap::peer_ttls_ui::invoke_identity_ui(
             bool combined = false;
             wxEAPCredentialsConnectionDialog dlg(&parent);
             for (config_connection::provider_list::iterator cfg_prov = cfg.m_providers.begin(), cfg_prov_end = cfg.m_providers.end(); cfg_prov != cfg_prov_end; ++cfg_prov) {
+                wstring target_name(std::move(cfg_prov->get_id()));
+
                 // Get method configuration.
                 if (cfg_prov->m_methods.empty()) {
-                    log_event(&EAPMETHOD_TRACE_EVT_CRED_NO_METHOD, event_data(cfg_prov->m_id), event_data::blank);
+                    log_event(&EAPMETHOD_TRACE_EVT_CRED_NO_METHOD, event_data(target_name), event_data::blank);
                     continue;
                 }
                 config_method_ttls *cfg_method = dynamic_cast<config_method_ttls*>(cfg_prov->m_methods.front().get());
@@ -195,15 +197,16 @@ void eap::peer_ttls_ui::invoke_identity_ui(
 
                 // Prepare new set of credentials for given provider.
                 credentials_connection cred_method(*this, cfg);
-                cred_method.m_id = cfg_prov->m_id;
+                cred_method.m_namespace = cfg_prov->m_namespace;
+                cred_method.m_id        = cfg_prov->m_id;
                 credentials_ttls *_cred_method = (credentials_ttls*)cfg_method->make_credentials();
                 cred_method.m_cred.reset(_cred_method);
 #ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
-                bool is_own = cred_in.m_cred && _wcsicmp(cred_in.m_id.c_str(), cfg_prov->m_id.c_str()) == 0;
+                bool is_own = cred_in.m_cred && cred_in.match(*cfg_prov);
 #endif
 
                 // Combine outer credentials.
-                LPCTSTR target_name = (dwFlags & EAP_FLAG_GUEST_ACCESS) == 0 ? cfg_prov->m_id.c_str() : NULL;
+                LPCTSTR _target_name = (dwFlags & EAP_FLAG_GUEST_ACCESS) == 0 ? target_name.c_str() : NULL;
                 eap::credentials::source_t src_outer = _cred_method->credentials_tls::combine(
 #ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
                     is_own ? cred_in.m_cred.get() : NULL,
@@ -211,7 +214,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
                     NULL,
 #endif
                     *cfg_method,
-                    target_name);
+                    _target_name);
 
                 // Combine inner credentials.
                 eap::credentials::source_t src_inner = _cred_method->m_inner->combine(
@@ -221,7 +224,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
                     NULL,
 #endif
                     *cfg_method->m_inner,
-                    target_name);
+                    _target_name);
 
                 if (dwFlags & EAP_FLAG_GUEST_ACCESS) {
                     // Disable credential saving for guests.
@@ -230,7 +233,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
                 }
 
                 // Create method credentials panel.
-                wxTTLSCredentialsPanel *panel = new wxTTLSCredentialsPanel(*cfg_prov, *cfg_method, *_cred_method, cfg_prov->m_id.c_str(), dlg.m_providers);
+                wxTTLSCredentialsPanel *panel = new wxTTLSCredentialsPanel(*cfg_prov, *cfg_method, *_cred_method, dlg.m_providers);
 
                 // Set "Remember" checkboxes according to credential source,
                 panel->m_outer_cred->SetRemember(src_outer == eap::credentials::source_storage);
@@ -262,11 +265,12 @@ void eap::peer_ttls_ui::invoke_identity_ui(
                     cfg_method = res.first;
                     cred_out = res.second;
                     credentials_ttls *_cred_out = dynamic_cast<credentials_ttls*>(cred_out.m_cred.get());
+                    wstring target_name(std::move(cred_out.get_id()));
 
                     // Write credentials to credential manager.
                     if (panel->m_outer_cred->GetRemember()) {
                         try {
-                            _cred_out->credentials_tls::store(cred_out.m_id.c_str());
+                            _cred_out->credentials_tls::store(target_name.c_str());
                         } catch (winstd::win_runtime_error &err) {
                             wxLogError(winstd::tstring_printf(_("Error writing credentials to Credential Manager: %hs (error %u)"), err.what(), err.number()).c_str());
                         } catch (...) {
@@ -276,7 +280,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
 
                     if (panel->m_inner_cred->GetRemember()) {
                         try {
-                            _cred_out->m_inner->store(cred_out.m_id.c_str());
+                            _cred_out->m_inner->store(target_name.c_str());
                         } catch (winstd::win_runtime_error &err) {
                             wxLogError(winstd::tstring_printf(_("Error writing credentials to Credential Manager: %hs (error %u)"), err.what(), err.number()).c_str());
                         } catch (...) {

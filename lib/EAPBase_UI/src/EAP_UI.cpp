@@ -164,8 +164,7 @@ void wxEAPNotePanel::CreateContactFields(const eap::config_provider &prov)
 {
     if (!prov.m_help_email.empty() || !prov.m_help_web.empty() || !prov.m_help_phone.empty()) {
         m_provider_notice = new wxStaticText(this, wxID_ANY, wxString::Format(_("For additional help and instructions, please contact %s at:"),
-            !prov.m_name.empty() ? prov.m_name.c_str() :
-            !prov.m_id  .empty() ? winstd::tstring_printf(_("your %ls provider"), prov.m_id.c_str()).c_str() : _("your provider")), wxDefaultPosition, wxDefaultSize, 0);
+            !prov.m_name.empty() ? prov.m_name.c_str() : _("your provider")), wxDefaultPosition, wxDefaultSize, 0);
         m_provider_notice->Wrap(449);
         m_note_vert->Add(m_provider_notice, 0, wxUP|wxLEFT|wxRIGHT|wxEXPAND, 5);
 
@@ -227,8 +226,7 @@ wxEAPProviderLockedPanel::wxEAPProviderLockedPanel(const eap::config_provider &p
         m_note_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(48)));
 
     m_note_label->SetLabel(wxString::Format(_("%s has pre-set parts of this configuration. Those parts are locked to prevent accidental modification."),
-        !prov.m_name.empty() ? prov.m_name.c_str() :
-        !prov.m_id  .empty() ? winstd::tstring_printf(_("Your %ls provider"), prov.m_id.c_str()).c_str() : _("Your provider")));
+        !prov.m_name.empty() ? prov.m_name.c_str() : _("Your provider")));
     m_note_label->Wrap(449);
 
     CreateContactFields(prov);
@@ -343,7 +341,8 @@ wxEAPProviderIDPanel::wxEAPProviderIDPanel(eap::config_provider &prov, wxWindow*
 
 bool wxEAPProviderIDPanel::TransferDataToWindow()
 {
-    m_provider_id->SetValue(m_prov.m_id);
+    m_provider_namespace->SetStringSelection(m_prov.m_namespace);
+    m_provider_id       ->SetValue(m_prov.m_id);
 
     return wxEAPProviderIDPanelBase::TransferDataToWindow();
 }
@@ -353,7 +352,8 @@ bool wxEAPProviderIDPanel::TransferDataFromWindow()
 {
     wxCHECK(wxEAPProviderIDPanelBase::TransferDataFromWindow(), false);
 
-    m_prov.m_id = m_provider_id->GetValue();
+    m_prov.m_namespace = m_provider_namespace->GetStringSelection();
+    m_prov.m_id        = m_provider_id       ->GetValue();
 
     return true;
 }

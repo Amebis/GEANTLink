@@ -51,7 +51,7 @@ public:
     ///
     /// Constructs a configuration panel
     ///
-    wxMSCHAPv2ConfigPanel(const eap::config_provider &prov, eap::config_method_mschapv2 &cfg, LPCTSTR pszCredTarget, wxWindow* parent);
+    wxMSCHAPv2ConfigPanel(const eap::config_provider &prov, eap::config_method_mschapv2 &cfg, wxWindow* parent);
 
     ///
     /// Destructs the configuration panel

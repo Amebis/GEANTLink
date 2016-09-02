@@ -254,14 +254,13 @@ public:
     ///
     /// Constructs a configuration panel
     ///
-    /// \param[in]    prov           Provider configuration data
-    /// \param[in]    cfg            Configuration data
-    /// \param[inout] cred           Credentials data
-    /// \param[in]    pszCredTarget  Target name of credentials in Windows Credential Manager. Can be further decorated to create final target name.
-    /// \param[in]    parent         Parent window
-    /// \param[in]    is_config      Is this panel used to pre-enter credentials? When \c true, the "Remember" checkbox is always selected and disabled.
+    /// \param[in]    prov       Provider configuration data
+    /// \param[in]    cfg        Configuration data
+    /// \param[inout] cred       Credentials data
+    /// \param[in]    parent     Parent window
+    /// \param[in]    is_config  Is this panel used to pre-enter credentials? When \c true, the "Remember" checkbox is always selected and disabled.
     ///
-    wxTLSCredentialsPanel(const eap::config_provider &prov, const eap::config_method_with_cred &cfg, eap::credentials_tls &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config = false);
+    wxTLSCredentialsPanel(const eap::config_provider &prov, const eap::config_method_with_cred &cfg, eap::credentials_tls &cred, wxWindow* parent, bool is_config = false);
 
 protected:
     /// \cond internal
@@ -315,7 +314,7 @@ public:
     ///
     /// Constructs a configuration panel
     ///
-    wxTLSConfigPanel(const eap::config_provider &prov, eap::config_method_tls &cfg, LPCTSTR pszCredTarget, wxWindow* parent);
+    wxTLSConfigPanel(const eap::config_provider &prov, eap::config_method_tls &cfg, wxWindow* parent);
 
     ///
     /// Destructs the configuration panel

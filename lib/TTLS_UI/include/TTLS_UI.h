@@ -79,12 +79,11 @@ public:
     ///
     /// Constructs a configuration window
     ///
-    /// \param[in]    prov           Provider configuration data
-    /// \param[inout] cfg            Configuration data
-    /// \param[in]    pszCredTarget  Target name of credentials in Windows Credential Manager. Can be further decorated to create final target name.
-    /// \param[in]    parent         Parent window
+    /// \param[in]    prov    Provider configuration data
+    /// \param[inout] cfg     Configuration data
+    /// \param[in]    parent  Parent window
     ///
-    wxTTLSConfigWindow(eap::config_provider &prov, eap::config_method &cfg, LPCTSTR pszCredTarget, wxWindow* parent);
+    wxTTLSConfigWindow(eap::config_provider &prov, eap::config_method &cfg, wxWindow* parent);
 
     ///
     /// Destructs the configuration window
@@ -119,14 +118,13 @@ public:
     ///
     /// Constructs a configuration panel
     ///
-    /// \param[in]    prov           Provider configuration data
-    /// \param[in]    cfg            Configuration data
-    /// \param[inout] cred           Credentials data
-    /// \param[in]    pszCredTarget  Target name of credentials in Windows Credential Manager. Can be further decorated to create final target name.
-    /// \param[in]    parent         Parent window
-    /// \param[in]    is_config      Is this panel used to pre-enter credentials? When \c true, the "Remember" checkbox is always selected and disabled.
+    /// \param[in]    prov       Provider configuration data
+    /// \param[in]    cfg        Configuration data
+    /// \param[inout] cred       Credentials data
+    /// \param[in]    parent     Parent window
+    /// \param[in]    is_config  Is this panel used to pre-enter credentials? When \c true, the "Remember" checkbox is always selected and disabled.
     ///
-    wxTTLSCredentialsPanel(const eap::config_provider &prov, const eap::config_method &cfg, eap::credentials &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config = false);
+    wxTTLSCredentialsPanel(const eap::config_provider &prov, const eap::config_method &cfg, eap::credentials &cred, wxWindow* parent, bool is_config = false);
 
     ///
     /// Destructs the configuration panel

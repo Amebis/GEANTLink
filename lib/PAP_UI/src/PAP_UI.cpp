@@ -25,12 +25,12 @@
 // wxPAPConfigPanel
 //////////////////////////////////////////////////////////////////////
 
-wxPAPConfigPanel::wxPAPConfigPanel(const eap::config_provider &prov, eap::config_method_pap &cfg, LPCTSTR pszCredTarget, wxWindow* parent) : wxPanel(parent)
+wxPAPConfigPanel::wxPAPConfigPanel(const eap::config_provider &prov, eap::config_method_pap &cfg, wxWindow* parent) : wxPanel(parent)
 {
     wxBoxSizer* sb_content;
     sb_content = new wxBoxSizer( wxVERTICAL );
 
-    m_credentials = new wxPAPCredentialsConfigPanel(prov, cfg, pszCredTarget, this);
+    m_credentials = new wxPAPCredentialsConfigPanel(prov, cfg, this);
     sb_content->Add(m_credentials, 0, wxEXPAND, 5);
 
     this->SetSizer(sb_content);

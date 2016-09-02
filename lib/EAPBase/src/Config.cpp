@@ -287,8 +287,9 @@ eap::config_provider::config_provider(_In_ module &mod) :
 
 
 eap::config_provider::config_provider(_In_ const config_provider &other) :
-    m_read_only         (other.m_read_only         ),
+    m_namespace         (other.m_namespace         ),
     m_id                (other.m_id                ),
+    m_read_only         (other.m_read_only         ),
     m_name              (other.m_name              ),
     m_help_email        (other.m_help_email        ),
     m_help_web          (other.m_help_web          ),
@@ -305,8 +306,9 @@ eap::config_provider::config_provider(_In_ const config_provider &other) :
 
 
 eap::config_provider::config_provider(_Inout_ config_provider &&other) :
-    m_read_only         (std::move(other.m_read_only         )),
+    m_namespace         (std::move(other.m_namespace         )),
     m_id                (std::move(other.m_id                )),
+    m_read_only         (std::move(other.m_read_only         )),
     m_name              (std::move(other.m_name              )),
     m_help_email        (std::move(other.m_help_email        )),
     m_help_web          (std::move(other.m_help_web          )),
@@ -324,8 +326,9 @@ eap::config_provider& eap::config_provider::operator=(_In_ const config_provider
 {
     if (this != &other) {
         (config&)*this       = other;
-        m_read_only          = other.m_read_only;
+        m_namespace          = other.m_namespace;
         m_id                 = other.m_id;
+        m_read_only          = other.m_read_only;
         m_name               = other.m_name;
         m_help_email         = other.m_help_email;
         m_help_web           = other.m_help_web;
@@ -348,8 +351,9 @@ eap::config_provider& eap::config_provider::operator=(_Inout_ config_provider &&
 {
     if (this != &other) {
         (config&&)*this      = std::move(other                     );
-        m_read_only          = std::move(other.m_read_only         );
+        m_namespace          = std::move(other.m_namespace         );
         m_id                 = std::move(other.m_id                );
+        m_read_only          = std::move(other.m_read_only         );
         m_name               = std::move(other.m_name              );
         m_help_email         = std::move(other.m_help_email        );
         m_help_web           = std::move(other.m_help_web          );
@@ -376,14 +380,19 @@ void eap::config_provider::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pC
 
     HRESULT hr;
 
+    // namespace
+    if (!m_namespace.empty())
+        if (FAILED(hr = eapxml::put_attrib_value(pConfigRoot, bstr(L"namespace"), bstr(m_namespace))))
+            throw com_runtime_error(hr, __FUNCTION__ " Error creating namespace attribute.");
+
+    // ID
+    if (!m_id.empty())
+        if (FAILED(hr = eapxml::put_attrib_value(pConfigRoot, bstr(L"ID"), bstr(m_id))))
+            throw com_runtime_error(hr, __FUNCTION__ " Error creating ID attribute.");
+
     // <read-only>
     if (FAILED(hr = eapxml::put_element_value(pDoc, pConfigRoot, bstr(L"read-only"), namespace_eapmetadata, m_read_only)))
         throw com_runtime_error(hr, __FUNCTION__ " Error creating <read-only> element.");
-
-    // <ID>
-    if (!m_id.empty())
-        if (FAILED(hr = eapxml::put_element_value(pDoc, pConfigRoot, bstr(L"ID"), namespace_eapmetadata, bstr(m_id))))
-            throw com_runtime_error(hr, __FUNCTION__ " Error creating <ID> element.");
 
     // <ProviderInfo>
     com_obj<IXMLDOMElement> pXmlElProviderInfo;
@@ -458,15 +467,20 @@ void eap::config_provider::load(_In_ IXMLDOMNode *pConfigRoot)
 
     config::load(pConfigRoot);
 
+    // namespace
+    m_namespace.clear();
+    eapxml::get_attrib_value(pConfigRoot, bstr(L"namespace"), m_namespace);
+    m_module.log_config((xpath + L" namespace").c_str(), m_namespace.c_str());
+
+    // ID
+    m_id.clear();
+    eapxml::get_attrib_value(pConfigRoot, bstr(L"ID"), m_id);
+    m_module.log_config((xpath + L" ID").c_str(), m_id.c_str());
+
     // <read-only>
     if (FAILED(hr = eapxml::get_element_value(pConfigRoot, bstr(L"eap-metadata:read-only"), &m_read_only)))
         m_read_only = true;
     m_module.log_config((xpath + L"/read-only").c_str(), m_read_only);
-
-    // <ID>
-    m_id.clear();
-    eapxml::get_element_value(pConfigRoot, bstr(L"eap-metadata:ID"), m_id);
-    m_module.log_config((xpath + L"/ID").c_str(), m_id.c_str());
 
     // <ProviderInfo>
     m_name.clear();
@@ -550,8 +564,9 @@ void eap::config_provider::load(_In_ IXMLDOMNode *pConfigRoot)
 void eap::config_provider::operator<<(_Inout_ cursor_out &cursor) const
 {
     config::operator<<(cursor);
-    cursor << m_read_only         ;
+    cursor << m_namespace         ;
     cursor << m_id                ;
+    cursor << m_read_only         ;
     cursor << m_name              ;
     cursor << m_help_email        ;
     cursor << m_help_web          ;
@@ -567,8 +582,9 @@ size_t eap::config_provider::get_pk_size() const
 {
     return
         config::get_pk_size()          +
-        pksizeof(m_read_only         ) +
+        pksizeof(m_namespace         ) +
         pksizeof(m_id                ) +
+        pksizeof(m_read_only         ) +
         pksizeof(m_name              ) +
         pksizeof(m_help_email        ) +
         pksizeof(m_help_web          ) +
@@ -583,8 +599,9 @@ size_t eap::config_provider::get_pk_size() const
 void eap::config_provider::operator>>(_Inout_ cursor_in &cursor)
 {
     config::operator>>(cursor);
-    cursor >> m_read_only         ;
+    cursor >> m_namespace         ;
     cursor >> m_id                ;
+    cursor >> m_read_only         ;
     cursor >> m_name              ;
     cursor >> m_help_email        ;
     cursor >> m_help_web          ;

@@ -35,6 +35,7 @@ class wxEAPBannerPanel;
 #include <wx/statbox.h>
 #include <wx/timer.h>
 #include <wx/checkbox.h>
+#include <wx/choice.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -251,9 +252,10 @@ class wxEAPProviderIDPanelBase : public wxPanel
 	protected:
 		wxStaticBitmap* m_provider_id_icon;
 		wxStaticText* m_provider_id_label_outer;
+		wxStaticText* m_provider_namespace_label;
+		wxChoice* m_provider_namespace;
 		wxStaticText* m_provider_id_label;
 		wxTextCtrl* m_provider_id;
-		wxStaticText* m_provider_id_note;
 	
 	public:
 		

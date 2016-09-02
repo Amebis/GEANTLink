@@ -311,8 +311,8 @@ bool wxFQDNListValidator::Parse(const wxString &val_in, size_t i_start, size_t i
 // wxTLSCredentialsPanel
 //////////////////////////////////////////////////////////////////////
 
-wxTLSCredentialsPanel::wxTLSCredentialsPanel(const eap::config_provider &prov, const eap::config_method_with_cred &cfg, eap::credentials_tls &cred, LPCTSTR pszCredTarget, wxWindow* parent, bool is_config) :
-    wxEAPCredentialsPanel<eap::credentials_tls, wxTLSCredentialsPanelBase>(prov, cfg, cred, pszCredTarget, parent, is_config)
+wxTLSCredentialsPanel::wxTLSCredentialsPanel(const eap::config_provider &prov, const eap::config_method_with_cred &cfg, eap::credentials_tls &cred, wxWindow* parent, bool is_config) :
+    wxEAPCredentialsPanel<eap::credentials_tls, wxTLSCredentialsPanelBase>(prov, cfg, cred, parent, is_config)
 {
     // Load and set icon.
     winstd::library lib_shell32;
@@ -568,7 +568,7 @@ bool wxTLSServerTrustPanel::AddRootCA(PCCERT_CONTEXT cert)
 // wxTLSConfigPanel
 //////////////////////////////////////////////////////////////////////
 
-wxTLSConfigPanel::wxTLSConfigPanel(const eap::config_provider &prov, eap::config_method_tls &cfg, LPCTSTR pszCredTarget, wxWindow* parent) :
+wxTLSConfigPanel::wxTLSConfigPanel(const eap::config_provider &prov, eap::config_method_tls &cfg, wxWindow* parent) :
     m_prov(prov),
     m_cfg(cfg),
     wxPanel(parent)
@@ -579,7 +579,7 @@ wxTLSConfigPanel::wxTLSConfigPanel(const eap::config_provider &prov, eap::config
     m_server_trust = new wxTLSServerTrustPanel(prov, cfg, this);
     sb_content->Add(m_server_trust, 0, wxDOWN|wxEXPAND, 5);
 
-    m_credentials = new wxTLSCredentialsConfigPanel(prov, cfg, pszCredTarget, this);
+    m_credentials = new wxTLSCredentialsConfigPanel(prov, cfg, this);
     sb_content->Add(m_credentials, 0, wxUP|wxEXPAND, 5);
 
     this->SetSizer(sb_content);
