@@ -190,9 +190,20 @@ namespace eap
         /// \param[in] code     AVP code
         /// \param[in] flags    AVP flags
         /// \param[in] data     AVP data (<16777212B)
-        /// \param[in] padding  Padding to use (must be multiple of 4B)
+        /// \param[in] size     Size of \p data in bytes
         ///
         void append_avp(_In_ unsigned int code, _In_ unsigned char flags, _In_bytecount_(size) const void *data, _In_ unsigned int size);
+
+        ///
+        /// Appends Diameter AVP to response packet
+        ///
+        /// \param[in] code       AVP code
+        /// \param[in] vendor_id  Vendor-ID
+        /// \param[in] flags      AVP flags
+        /// \param[in] data       AVP data (<16777212B)
+        /// \param[in] size       Size of \p data in bytes
+        ///
+        void append_avp(_In_ unsigned int code, _In_ unsigned int vendor_id, _In_ unsigned char flags, _In_bytecount_(size) const void *data, _In_ unsigned int size);
 
     protected:
         sanitizing_blob m_packet_res;   ///< Response packet

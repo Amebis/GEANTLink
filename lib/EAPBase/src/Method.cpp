@@ -145,3 +145,29 @@ void eap::method_noneap::append_avp(_In_ unsigned int code, _In_ unsigned char f
     m_packet_res.insert(m_packet_res.end(), (unsigned char*)data, (unsigned char*)data + size);
     m_packet_res.insert(m_packet_res.end(), padding, 0);
 }
+
+
+void eap::method_noneap::append_avp(_In_ unsigned int code, _In_ unsigned int vendor_id, _In_ unsigned char flags, _In_bytecount_(size) const void *data, _In_ unsigned int size)
+{
+    unsigned int
+        padding = (unsigned int)((4 - size) % 4),
+        size_outer;
+
+    m_packet_res.reserve(
+        m_packet_res.size() + 
+        (size_outer = 
+        sizeof(diameter_avp_header_ven) + // Diameter header
+        size)                           + // Data
+        padding);                         // Data padding
+
+    // Diameter AVP header
+    diameter_avp_header_ven hdr;
+    *(unsigned int*)hdr.code = htonl(code);
+    hdr.flags = flags | diameter_avp_flag_vendor;
+    hton24(size_outer, hdr.length);
+    m_packet_res.insert(m_packet_res.end(), (unsigned char*)&hdr, (unsigned char*)(&hdr + 1));
+
+    // Data
+    m_packet_res.insert(m_packet_res.end(), (unsigned char*)data, (unsigned char*)data + size);
+    m_packet_res.insert(m_packet_res.end(), padding, 0);
+}
