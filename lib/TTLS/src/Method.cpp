@@ -188,6 +188,40 @@ void eap::method_ttls::derive_msk()
 }
 
 
+eap::sanitizing_blob eap::method_ttls::derive_challenge(_In_ size_t size)
+{
+#if EAP_TLS < EAP_TLS_SCHANNEL
+    static const unsigned char s_label[] = "ttls challenge";
+    sanitizing_blob seed(s_label, s_label + _countof(s_label) - 1);
+    seed.insert(seed.end(), (const unsigned char*)&m_random_client, (const unsigned char*)(&m_random_client + 1));
+    seed.insert(seed.end(), (const unsigned char*)&m_random_server, (const unsigned char*)(&m_random_server + 1));
+    return prf(m_cp, CALG_TLS1PRF, m_master_secret, seed, size);
+#else
+    static const DWORD s_key_id = 0x02; // EAP-TTLSv0 Challenge Data
+    static const SecPkgContext_EapPrfInfo s_prf_info = { 0, sizeof(s_key_id), (PBYTE)&s_key_id };
+    SECURITY_STATUS status = SetContextAttributes(m_sc_ctx, SECPKG_ATTR_EAP_PRF_INFO, (void*)&s_prf_info, sizeof(s_prf_info));
+    if (FAILED(status))
+        throw sec_runtime_error(status, __FUNCTION__ " Error setting EAP-TTLS PRF in Schannel.");
+
+    SecPkgContext_EapKeyBlock key_block;
+    status = QueryContextAttributes(m_sc_ctx, SECPKG_ATTR_EAP_KEY_BLOCK, &key_block);
+    if (FAILED(status))
+        throw sec_runtime_error(status, __FUNCTION__ " Error generating PRF in Schannel.");
+    sanitizing_blob key;
+    key.reserve(size);
+    if (size <= sizeof(key_block.rgbKeys))
+        key.assign(key_block.rgbKeys, key_block.rgbKeys + size);
+    else if (size <= sizeof(key_block.rgbKeys) + sizeof(key_block.rgbIVs)) {
+        key.assign(           key_block.rgbKeys, key_block.rgbKeys        + sizeof(key_block.rgbKeys));
+        key.insert(key.end(), key_block.rgbIVs , key_block.rgbIVs  + size - sizeof(key_block.rgbKeys));
+    } else
+        throw invalid_argument(string_printf(__FUNCTION__ " Schannel cannot generate PRF this big (maximum: %u, requested: %u).", sizeof(key_block.rgbKeys) + sizeof(key_block.rgbIVs), size).c_str());
+    SecureZeroMemory(&key_block, sizeof(key_block));
+    return key;
+#endif
+}
+
+
 void eap::method_ttls::process_application_data(_In_bytecount_(size_msg) const void *msg, _In_ size_t size_msg)
 {
     // Prepare inner authentication.

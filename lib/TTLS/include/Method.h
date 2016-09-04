@@ -126,6 +126,15 @@ namespace eap
         virtual void derive_msk();
 
         ///
+        /// Generates keying material for inner authentication
+        ///
+        /// \param[in] size  Number of bytes of keying material required
+        ///
+        /// \returns Keing material
+        ///
+        virtual sanitizing_blob derive_challenge(_In_ size_t size);
+
+        ///
         /// Processes an application message
         ///
         /// \param[in] msg       Application message data
