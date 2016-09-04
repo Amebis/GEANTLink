@@ -71,7 +71,7 @@ namespace eap
     struct __declspec(novtable) challenge_mschapv2 : public sanitizing_blob_xf<16>
     {
         ///
-        /// Generate challenge random
+        /// Generates random challenge
         ///
         /// \param[in] cp  Handle of the cryptographics provider
         ///

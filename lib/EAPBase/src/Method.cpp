@@ -165,6 +165,7 @@ void eap::method_noneap::append_avp(_In_ unsigned int code, _In_ unsigned int ve
     *(unsigned int*)hdr.code = htonl(code);
     hdr.flags = flags | diameter_avp_flag_vendor;
     hton24(size_outer, hdr.length);
+    *(unsigned int*)hdr.vendor = htonl(vendor_id);
     m_packet_res.insert(m_packet_res.end(), (unsigned char*)&hdr, (unsigned char*)(&hdr + 1));
 
     // Data

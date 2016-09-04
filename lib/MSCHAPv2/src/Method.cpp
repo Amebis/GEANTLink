@@ -109,20 +109,28 @@ void eap::method_mschapv2::process_request_packet(
         sanitizing_string identity_utf8;
         WideCharToMultiByte(CP_UTF8, 0, m_cred.m_identity.c_str(), (int)m_cred.m_identity.length(), identity_utf8, NULL, NULL);
 
+        // Calculate Peer-Challenge and Response
+        m_challenge_client.randomize(m_cp);
+        m_nt_resp = nt_response(m_cp, m_challenge_server, m_challenge_client, identity_utf8.c_str(), m_cred.m_password.c_str());
+
         // Prepare MS-CHAP2-Response
         sanitizing_blob response;
-        response.push_back(m_ident); // Ident
+        response.reserve(
+            1                          + // Ident
+            1                          + // Flags
+            sizeof(challenge_mschapv2) + // Peer-Challenge
+            8                          + // Reserved
+            sizeof(nt_response));        // Response
+        response.push_back(m_ident);
         response.push_back(0); // Flags
-        m_challenge_client.randomize(m_cp);
         response.insert(response.end(), (unsigned char*)&m_challenge_client, (unsigned char*)(&m_challenge_client + 1)); // Peer-Challenge
         response.insert(response.end(), 8, 0); // Reserved
-        m_nt_resp = nt_response(m_cp, m_challenge_server, m_challenge_client, identity_utf8.c_str(), m_cred.m_password.c_str());
         response.insert(response.end(), (unsigned char*)&m_nt_resp, (unsigned char*)(&m_nt_resp + 1)); // NT-Response
 
         // Diameter AVP (User-Name=1, MS-CHAP-Challenge=11/311, MS-CHAP2-Response=25/311)
-        append_avp( 1,      diameter_avp_flag_mandatory,                 identity_utf8.data(), (unsigned int)identity_utf8.size()      );
-        append_avp(11, 311, diameter_avp_flag_mandatory, (unsigned char*)&m_challenge_server , (unsigned int)sizeof(m_challenge_server));
-        append_avp(25, 311, diameter_avp_flag_mandatory,                 response.data()     , (unsigned int)response.size()           );
+        append_avp( 1,      diameter_avp_flag_mandatory,                 identity_utf8.data(), (unsigned int )identity_utf8.size()      );
+        append_avp(11, 311, diameter_avp_flag_mandatory, (unsigned char*)&m_challenge_server , (unsigned char)sizeof(m_challenge_server));
+        append_avp(25, 311, diameter_avp_flag_mandatory,                 response.data()     , (unsigned char)response.size()           );
 
         m_phase = phase_challenge_server;
         break;
