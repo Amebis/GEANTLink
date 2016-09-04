@@ -181,6 +181,10 @@ void eap::method_ttls::derive_msk()
     // MSK: MPPE-Send-Key
     memcpy(&m_key_mppe_server, _key_block, sizeof(tls_random));
     _key_block += sizeof(tls_random);
+
+#if EAP_TLS >= EAP_TLS_SCHANNEL
+    SecureZeroMemory(&key_block, sizeof(key_block));
+#endif
 }
 
 
