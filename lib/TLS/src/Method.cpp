@@ -894,9 +894,9 @@ void eap::method_tls::process_packet(_In_bytecount_(size_pck) const void *_pck, 
 }
 
 
-void eap::method_tls::process_change_cipher_spec(_In_bytecount_(msg_size) const void *_msg, _In_ size_t msg_size)
+void eap::method_tls::process_change_cipher_spec(_In_bytecount_(size_msg) const void *_msg, _In_ size_t size_msg)
 {
-    if (msg_size < 1)
+    if (size_msg < 1)
         throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Incomplete change cipher spec.");
 
     const unsigned char *msg = (const unsigned char*)_msg;
@@ -952,9 +952,9 @@ void eap::method_tls::process_change_cipher_spec(_In_bytecount_(msg_size) const 
 }
 
 
-void eap::method_tls::process_alert(_In_bytecount_(msg_size) const void *_msg, _In_ size_t msg_size)
+void eap::method_tls::process_alert(_In_bytecount_(size_msg) const void *_msg, _In_ size_t size_msg)
 {
-    if (msg_size < 2)
+    if (size_msg < 2)
         throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Incomplete alert.");
 
     const unsigned char *msg = (const unsigned char*)_msg;
@@ -968,9 +968,9 @@ void eap::method_tls::process_alert(_In_bytecount_(msg_size) const void *_msg, _
 }
 
 
-void eap::method_tls::process_handshake(_In_bytecount_(msg_size) const void *_msg, _In_ size_t msg_size)
+void eap::method_tls::process_handshake(_In_bytecount_(size_msg) const void *_msg, _In_ size_t size_msg)
 {
-    for (const unsigned char *msg = (const unsigned char*)_msg, *msg_end = msg + msg_size; msg < msg_end; ) {
+    for (const unsigned char *msg = (const unsigned char*)_msg, *msg_end = msg + size_msg; msg < msg_end; ) {
         // Parse record header.
         if (msg + sizeof(unsigned int) > msg_end)
             throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Incomplete record header.");

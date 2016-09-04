@@ -96,9 +96,9 @@ void eap::method_pap::process_request_packet(
 
         m_packet_res.clear();
 
-        // Diameter AVP (User-Name=0x00000001, User-Password=0x00000002)
-        append_avp(0x00000001, diameter_avp_flag_mandatory, identity_utf8.data(), (unsigned int)identity_utf8.size());
-        append_avp(0x00000002, diameter_avp_flag_mandatory, password_utf8.data(), (unsigned int)password_utf8.size());
+        // Diameter AVP (User-Name=1, User-Password=2)
+        append_avp(1, diameter_avp_flag_mandatory, identity_utf8.data(), (unsigned int)identity_utf8.size());
+        append_avp(2, diameter_avp_flag_mandatory, password_utf8.data(), (unsigned int)password_utf8.size());
 
         m_phase = phase_finished;
         break;

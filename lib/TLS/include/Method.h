@@ -256,9 +256,9 @@ namespace eap
         /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter 7.1. Change Cipher Spec Protocol)](https://tools.ietf.org/html/rfc5246#section-7.1)
         ///
         /// \param[in] msg       TLS change_cipher_spec message data
-        /// \param[in] msg_size  TLS change_cipher_spec message data size
+        /// \param[in] size_msg  TLS change_cipher_spec message data size
         ///
-        virtual void process_change_cipher_spec(_In_bytecount_(msg_size) const void *msg, _In_ size_t msg_size);
+        virtual void process_change_cipher_spec(_In_bytecount_(size_msg) const void *msg, _In_ size_t size_msg);
 
         ///
         /// Processes a TLS alert message
@@ -266,9 +266,9 @@ namespace eap
         /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter 7.2. Alert Protocol)](https://tools.ietf.org/html/rfc5246#section-7.2)
         ///
         /// \param[in] msg       TLS alert message data
-        /// \param[in] msg_size  TLS alert message data size
+        /// \param[in] size_msg  TLS alert message data size
         ///
-        virtual void process_alert(_In_bytecount_(msg_size) const void *msg, _In_ size_t msg_size);
+        virtual void process_alert(_In_bytecount_(size_msg) const void *msg, _In_ size_t size_msg);
 
         ///
         /// Processes a TLS handshake message
@@ -276,9 +276,9 @@ namespace eap
         /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter 7.4. Handshake Protocol)](https://tools.ietf.org/html/rfc5246#section-7.4)
         ///
         /// \param[in] msg       TLS handshake message data
-        /// \param[in] msg_size  TLS handshake message data size
+        /// \param[in] size_msg  TLS handshake message data size
         ///
-        virtual void process_handshake(_In_bytecount_(msg_size) const void *msg, _In_ size_t msg_size);
+        virtual void process_handshake(_In_bytecount_(size_msg) const void *msg, _In_ size_t size_msg);
 
 #else
         ///
@@ -298,9 +298,9 @@ namespace eap
         /// \sa [The Transport Layer Security (TLS) Protocol Version 1.2 (Chapter 10. Application Data Protocol)](https://tools.ietf.org/html/rfc5246#section-10)
         ///
         /// \param[in] msg       TLS application_data message data
-        /// \param[in] msg_size  TLS application_data message data size
+        /// \param[in] size_msg  TLS application_data message data size
         ///
-        virtual void process_application_data(_In_bytecount_(msg_size) const void *msg, _In_ size_t msg_size);
+        virtual void process_application_data(_In_bytecount_(size_msg) const void *msg, _In_ size_t size_msg);
 
         /// @}
 
