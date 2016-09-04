@@ -26,11 +26,11 @@ namespace eap
     class method_mschapv2;
 }
 
-
 #pragma once
 
 #include "Config.h"
 #include "Credentials.h"
+#include "MSCHAPv2.h"
 
 #include "../../EAPBase/include/Method.h"
 
@@ -100,13 +100,52 @@ namespace eap
 
         /// @}
 
+        friend class method_ttls;               // Setting of initial challenge derived from TLS PRF
+
     protected:
-        credentials_mschapv2 &m_cred;   ///< EAP-TLS user credentials
+        ///
+        /// Processes AVPs in a Diameter packet
+        ///
+        /// \param[in] pck       Packet data
+        /// \param[in] size_pck  \p pck size in bytes
+        ///
+        void process_packet(_In_bytecount_(size_pck) const void *pck, _In_ size_t size_pck);
+
+        ///
+        /// Processes MS-CHAP2-Success AVP
+        ///
+        /// \sa [Microsoft PPP CHAP Extensions, Version 2 (Chapter 5. Success Packet)](https://tools.ietf.org/html/rfc2759#section-5)
+        ///
+        /// \param[in] pck       Packet data
+        /// \param[in] size_pck  \p pck size in bytes
+        ///
+        void process_success(_In_ int argc, _In_count_(argc) const wchar_t *argv[]);
+
+        ///
+        /// Processes MS-CHAP-Error AVP
+        ///
+        /// \sa [Microsoft PPP CHAP Extensions, Version 2 (Chapter 6. Failure Packet)](https://tools.ietf.org/html/rfc2759#section-6)
+        ///
+        /// \param[in] pck       Packet data
+        /// \param[in] size_pck  \p pck size in bytes
+        ///
+        void process_error(_In_ int argc, _In_count_(argc) const wchar_t *argv[]);
+
+    protected:
+        credentials_mschapv2 &m_cred;           ///< EAP-TLS user credentials
+        winstd::crypt_prov m_cp;                ///< Cryptography provider for general services
+
+        challenge_mschapv2 m_challenge_server;  ///< MSCHAP server challenge
+        challenge_mschapv2 m_challenge_client;  ///< MSCHAP client challenge
+        unsigned char m_ident;                  ///< Ident
+        nt_response m_nt_resp;                  ///< NT-Response
+        bool m_success;                         ///< Did we receive MS-CHAP2-Success?
 
         enum {
-            phase_unknown = -1,         ///< Unknown phase
-            phase_init = 0,             ///< Handshake initialize
-            phase_finished,             ///< Connection shut down
-        } m_phase, m_phase_prev;        ///< What phase is our communication at?
+            phase_unknown = -1,                 ///< Unknown phase
+            phase_init = 0,                     ///< Send client challenge
+            phase_challenge_server,             ///< Verify server challenge
+            phase_finished,                     ///< Connection shut down
+        } m_phase, m_phase_prev;                ///< What phase is our communication at?
     };
 }

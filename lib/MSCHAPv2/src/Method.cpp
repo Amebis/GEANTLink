@@ -30,6 +30,8 @@ using namespace winstd;
 
 eap::method_mschapv2::method_mschapv2(_In_ module &module, _In_ config_method_mschapv2 &cfg, _In_ credentials_mschapv2 &cred) :
     m_cred(cred),
+    m_ident(0),
+    m_success(false),
     m_phase(phase_unknown),
     m_phase_prev(phase_unknown),
     method_noneap(module, cfg, cred)
@@ -38,10 +40,16 @@ eap::method_mschapv2::method_mschapv2(_In_ module &module, _In_ config_method_ms
 
 
 eap::method_mschapv2::method_mschapv2(_Inout_ method_mschapv2 &&other) :
-    m_cred       (          other.m_cred       ),
-    m_phase      (std::move(other.m_phase     )),
-    m_phase_prev (std::move(other.m_phase_prev)),
-    method_noneap(std::move(other             ))
+    m_cred            (          other.m_cred             ),
+    m_cp              (std::move(other.m_cp              )),
+    m_challenge_server(std::move(other.m_challenge_server)),
+    m_challenge_client(std::move(other.m_challenge_client)),
+    m_ident           (std::move(other.m_ident           )),
+    m_nt_resp         (std::move(other.m_nt_resp         )),
+    m_success         (std::move(other.m_success         )),
+    m_phase           (std::move(other.m_phase           )),
+    m_phase_prev      (std::move(other.m_phase_prev      )),
+    method_noneap     (std::move(other                   ))
 {
 }
 
@@ -50,9 +58,15 @@ eap::method_mschapv2& eap::method_mschapv2::operator=(_Inout_ method_mschapv2 &&
 {
     if (this != std::addressof(other)) {
         assert(std::addressof(m_cred) == std::addressof(other.m_cred)); // Move method with same credentials only!
-        (method_noneap&)*this = std::move(other             );
-        m_phase               = std::move(other.m_phase     );
-        m_phase_prev          = std::move(other.m_phase_prev);
+        (method_noneap&)*this = std::move(other                   );
+        m_cp                  = std::move(other.m_cp              );
+        m_challenge_server    = std::move(other.m_challenge_server);
+        m_challenge_client    = std::move(other.m_challenge_client);
+        m_ident               = std::move(other.m_ident           );
+        m_nt_resp             = std::move(other.m_nt_resp         );
+        m_success             = std::move(other.m_success         );
+        m_phase               = std::move(other.m_phase           );
+        m_phase_prev          = std::move(other.m_phase_prev      );
     }
 
     return *this;
@@ -66,6 +80,10 @@ void eap::method_mschapv2::begin_session(
     _In_opt_    DWORD         dwMaxSendPacketSize)
 {
     method_noneap::begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
+
+    // Create cryptographics provider for support needs (client challenge ...).
+    if (!m_cp.create(NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
+        throw win_runtime_error(__FUNCTION__ " Error creating cryptographics provider.");
 
     m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_legacy_mschapv2), event_data::blank);
     m_phase = phase_init;
@@ -82,23 +100,36 @@ void eap::method_mschapv2::process_request_packet(
 
     m_module.log_event(&EAPMETHOD_PACKET_RECV, event_data((unsigned int)eap_type_legacy_mschapv2), event_data((unsigned int)dwReceivedPacketSize), event_data::blank);
 
+    process_packet(pReceivedPacket, dwReceivedPacketSize);
+
     m_phase_prev = m_phase;
     switch (m_phase) {
     case phase_init: {
-        // Convert username and password to UTF-8.
-        sanitizing_string identity_utf8, password_utf8;
+        // Convert username to UTF-8.
+        sanitizing_string identity_utf8;
         WideCharToMultiByte(CP_UTF8, 0, m_cred.m_identity.c_str(), (int)m_cred.m_identity.length(), identity_utf8, NULL, NULL);
-        WideCharToMultiByte(CP_UTF8, 0, m_cred.m_password.c_str(), (int)m_cred.m_password.length(), password_utf8, NULL, NULL);
 
-        // PAP passwords must be padded to 16B boundary according to RFC 5281. Will not add random extra padding here, as length obfuscation should be done by outer transport layers.
-        size_t padding_password_ex = (16 - password_utf8.length()) % 16;
-        password_utf8.append(padding_password_ex, 0);
+        // Prepare MS-CHAP2-Response
+        sanitizing_blob response;
+        response.push_back(m_ident); // Ident
+        response.push_back(0); // Flags
+        m_challenge_client.randomize(m_cp);
+        response.insert(response.end(), (unsigned char*)&m_challenge_client, (unsigned char*)(&m_challenge_client + 1)); // Peer-Challenge
+        response.insert(response.end(), 8, 0); // Reserved
+        m_nt_resp = nt_response(m_cp, m_challenge_server, m_challenge_client, identity_utf8.c_str(), m_cred.m_password.c_str());
+        response.insert(response.end(), (unsigned char*)&m_nt_resp, (unsigned char*)(&m_nt_resp + 1)); // NT-Response
 
-        // Diameter AVP (User-Name=0x00000001, User-Password=0x00000002)
-        append_avp(0x00000001, diameter_avp_flag_mandatory, identity_utf8.data(), (unsigned int)identity_utf8.size());
-        append_avp(0x00000002, diameter_avp_flag_mandatory, password_utf8.data(), (unsigned int)password_utf8.size());
+        // Diameter AVP (User-Name=1, MS-CHAP-Challenge=11/311, MS-CHAP2-Response=25/311)
+        append_avp( 1,      diameter_avp_flag_mandatory,                 identity_utf8.data(), (unsigned int)identity_utf8.size()      );
+        append_avp(11, 311, diameter_avp_flag_mandatory, (unsigned char*)&m_challenge_server , (unsigned int)sizeof(m_challenge_server));
+        append_avp(25, 311, diameter_avp_flag_mandatory,                 response.data()     , (unsigned int)response.size()           );
 
-        m_phase = phase_finished;
+        m_phase = phase_challenge_server;
+        break;
+    }
+
+    case phase_challenge_server: {
+        // We do not need to do anything.
         break;
     }
 
@@ -150,4 +181,91 @@ void eap::method_mschapv2::get_result(
 
     // Always ask EAP host to save the connection data.
     ppResult->fSaveConnectionData = TRUE;
+}
+
+
+void eap::method_mschapv2::process_packet(_In_bytecount_(size_pck) const void *_pck, _In_ size_t size_pck)
+{
+    sanitizing_blob data;
+    wstring msg_w;
+
+    for (const unsigned char *pck = (const unsigned char*)_pck, *pck_end = pck + size_pck; pck < pck_end; ) {
+        if (pck + sizeof(diameter_avp_header) > pck_end)
+            throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Incomplete message header.");
+        const diameter_avp_header *hdr = (const diameter_avp_header*)pck;
+        unsigned int code = ntohl(*(unsigned int*)hdr->code);
+        unsigned int vendor;
+        const unsigned char *msg;
+        if (hdr->flags & diameter_avp_flag_vendor) {
+            if (pck + sizeof(diameter_avp_header_ven) > pck_end)
+                throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Incomplete message header.");
+            const diameter_avp_header_ven *hdr_ven = (const diameter_avp_header_ven*)pck;
+            vendor = ntohl(*(unsigned int*)hdr_ven->vendor);
+            msg = (const unsigned char*)(hdr_ven + 1);
+        } else {
+            vendor = 0;
+            msg = (const unsigned char*)(hdr + 1);
+        }
+        const unsigned char *msg_end = pck + ntohs(*(unsigned short*)hdr->length);
+        if (msg_end > pck_end)
+            throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Incomplete message data.");
+
+        if (code == 26 && vendor == 311) {
+            // MS-CHAP2-Success
+            MultiByteToWideChar(CP_UTF8, 0, (const char*)msg, (int)(msg_end - msg), msg_w);
+            int argc;
+            unique_ptr<LPWSTR[], LocalFree_delete<LPWSTR[]> > argv(CommandLineToArgvW(msg_w.c_str(), &argc));
+            if (!argv) argc = 0;
+            process_success(argc, (const wchar_t**)argv.get());
+        } else if (code == 2 && vendor == 311) {
+            // MS-CHAP2-Error
+            MultiByteToWideChar(CP_UTF8, 0, (const char*)msg, (int)(msg_end - msg), msg_w);
+            int argc;
+            unique_ptr<LPWSTR[], LocalFree_delete<LPWSTR[]> > argv(CommandLineToArgvW(msg_w.c_str(), &argc));
+            if (!argv) argc = 0;
+            process_error(argc, (const wchar_t**)argv.get());
+        } else if (hdr->flags & diameter_avp_flag_mandatory)
+            throw win_runtime_error(ERROR_NOT_SUPPORTED, string_printf(__FUNCTION__ " Server sent mandatory Diameter AVP we do not support (code: %u, vendor: %u).", code, vendor).c_str());
+
+        pck = msg_end;
+    }
+}
+
+
+void eap::method_mschapv2::process_success(_In_ int argc, _In_count_(argc) const wchar_t *argv[])
+{
+    m_success = false;
+
+    for (int i = 0; i < argc; i++) {
+        if ((argv[i][0] == L'S' || argv[i][0] == L's') && argv[i][1] == L'=') {
+            // "S="
+            hex_dec dec;
+            sanitizing_blob resp;
+            bool is_last;
+            dec.decode(resp, is_last, argv[i] + 2, (size_t)-1);
+
+            // Calculate expected authenticator response.
+            sanitizing_string identity_utf8;
+            WideCharToMultiByte(CP_UTF8, 0, m_cred.m_identity.c_str(), (int)m_cred.m_identity.length(), identity_utf8, NULL, NULL);
+            authenticator_response resp_exp(m_cp, m_challenge_server, m_challenge_client, identity_utf8.c_str(), m_cred.m_password.c_str(), m_nt_resp);
+
+            // Compare against provided authemticator response.
+            if (resp.size() != sizeof(resp_exp) || memcpy(resp.data(), &resp_exp, sizeof(resp_exp)) != 0)
+                throw invalid_argument(__FUNCTION__ " MS-CHAP2-Success authentication response string failed.");
+
+            m_success = true;
+        }
+    }
+
+    if (!m_success)
+        throw invalid_argument(__FUNCTION__ " MS-CHAP2-Success authentication response string not found.");
+
+    //m_module.log_event(&EAPMETHOD_TLS_ALERT, event_data((unsigned int)eap_type_tls), event_data((unsigned char)msg[0]), event_data((unsigned char)msg[1]), event_data::blank);
+}
+
+
+void eap::method_mschapv2::process_error(_In_ int argc, _In_count_(argc) const wchar_t *argv[])
+{
+    UNREFERENCED_PARAMETER(argc);
+    UNREFERENCED_PARAMETER(argv);
 }

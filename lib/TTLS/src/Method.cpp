@@ -245,9 +245,15 @@ void eap::method_ttls::process_application_data(_In_bytecount_(size_msg) const v
     }
 #endif
 
+    method_mschapv2 *inner_mschapv2 = dynamic_cast<method_mschapv2*>(m_inner.get());
+    if (inner_mschapv2) {
+        sanitizing_blob keying(derive_challenge(sizeof(challenge_mschapv2) + 1));
+        memcpy(&inner_mschapv2->m_challenge_server, keying.data(), sizeof(challenge_mschapv2));
+        inner_mschapv2->m_ident = keying[sizeof(challenge_mschapv2) + 0];
+    }
+
     EapPeerMethodOutput eap_output = {};
     m_inner->process_request_packet(msg, (DWORD)size_msg, &eap_output);
-
     switch (eap_output.action) {
     case EapPeerMethodResponseActionSend: {
         // Retrieve inner packet and send it.

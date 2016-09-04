@@ -23,6 +23,9 @@
 #include "../include/Config.h"
 #include "../include/Credentials.h"
 #include "../include/Method.h"
+#include "../include/MSCHAPv2.h"
+
+#include <WinStd/Hex.h>
 
 #include <Windows.h>
 #include <EapHostError.h> // include after Windows.h
