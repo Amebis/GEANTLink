@@ -633,7 +633,7 @@ namespace eap
     enum diameter_avp_flags_t : unsigned char {
         diameter_avp_flag_vendor    = 0x80, ///< Vendor-ID present
         diameter_avp_flag_mandatory = 0x40, ///< Mandatory
-        diameter_avp_flag_privacy   = 0x20, ///< Privacy Required
+        diameter_avp_flag_protected = 0x20, ///< Protected
     };
 
 
