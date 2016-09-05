@@ -547,7 +547,7 @@ msgstr "<napaka>"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:753 lib/EAPBase_UI/include/EAP_UI.h:762
 msgid "<empty>"
-msgstr "<napaka>"
+msgstr "<prazno>"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:753 lib/EAPBase_UI/include/EAP_UI.h:762
 msgid "<blank ID>"
