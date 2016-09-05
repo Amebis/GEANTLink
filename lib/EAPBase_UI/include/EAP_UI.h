@@ -268,16 +268,16 @@ protected:
         m_cfg.m_providers.push_back(std::move(cfg_provider));
         eap::config_provider &cfg_provider2 = m_cfg.m_providers.back();
         eap::config_method *cfg_method2 = cfg_provider2.m_methods.front().get();
-        m_providers->InsertPage(
-            m_providers->GetSelection() + 1,
-            new _wxT(
-                cfg_provider2,
-                *cfg_method2,
-                m_providers),
-                wxEAPGetProviderName(cfg_provider2.m_name), true);
+        _wxT *page = new _wxT(cfg_provider2, *cfg_method2, m_providers);
+        m_providers->InsertPage(m_providers->GetSelection() + 1, page, wxEAPGetProviderName(cfg_provider2.m_name), true);
 
         this->Layout();
-        this->Fit();
+        this->GetSizer()->Fit(this);
+
+        // We initialized other pages in OnInitDialog(). This one was added later so it needs to be initialized.
+        // (Timers in child panels didn't start otherwise.)
+        wxInitDialogEvent event_init;
+        page->GetEventHandler()->ProcessEvent(event_init);
     }
 
 
@@ -720,7 +720,8 @@ protected:
 
     virtual void OnTimerOwn(wxTimerEvent& /*event*/)
     {
-        RetrieveOwnCredentials();
+        if (m_own_identity->IsShownOnScreen())
+            RetrieveOwnCredentials();
     }
 
 
@@ -751,6 +752,7 @@ protected:
         m_own_identity->SetValue(
             !identity.empty()  ? identity :
             m_cred_own.empty() ? _("<empty>") : _("<blank ID>"));
+        m_own_identity->Refresh();
     }
 
 

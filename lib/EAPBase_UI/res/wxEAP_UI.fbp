@@ -2358,7 +2358,7 @@
                 <property name="id">wxID_ANY</property>
                 <property name="name">m_timer_own</property>
                 <property name="oneshot">0</property>
-                <property name="period">3000</property>
+                <property name="period">5000</property>
                 <property name="permission">protected</property>
                 <event name="OnTimer">OnTimerOwn</event>
             </object>
