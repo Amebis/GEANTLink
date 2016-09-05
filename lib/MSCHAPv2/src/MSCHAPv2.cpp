@@ -103,15 +103,12 @@ eap::challenge_hash::challenge_hash(
     _In_   const challenge_mschapv2 &challenge_client,
     _In_z_ const char               *username)
 {
-    const char *domain = strchr(username, '@');
-    size_t len_username = domain ? domain - username : strlen(username);
-
     crypt_hash hash;
     if (!hash.create(cp, CALG_SHA))
         throw win_runtime_error(__FUNCTION__ " Creating SHA hash failed.");
     if (!CryptHashData(hash, (const BYTE*)&challenge_client, (DWORD)sizeof(challenge_client), 0) ||
         !CryptHashData(hash, (const BYTE*)&challenge_server, (DWORD)sizeof(challenge_server), 0) ||
-        !CryptHashData(hash, (const BYTE*)username         , (DWORD)len_username            , 0))
+        !CryptHashData(hash, (const BYTE*)username         , (DWORD)strlen(username)        , 0))
         throw win_runtime_error(__FUNCTION__ " Error hashing data.");
     unsigned char hash_val[20];
     DWORD size_hash_val = sizeof(hash_val);

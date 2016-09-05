@@ -128,11 +128,7 @@ namespace eap
         ///
         /// Generates keying material for inner authentication
         ///
-        /// \param[in] size  Number of bytes of keying material required
-        ///
-        /// \returns Keing material
-        ///
-        virtual sanitizing_blob derive_challenge(_In_ size_t size);
+        virtual void derive_challenge();
 
         ///
         /// Processes an application message

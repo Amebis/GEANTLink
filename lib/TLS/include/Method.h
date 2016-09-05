@@ -235,6 +235,11 @@ namespace eap
         ///
         virtual void derive_msk();
 
+        ///
+        /// Generates keying material for inner authentication
+        ///
+        virtual void derive_challenge();
+
         /// @}
 
 #if EAP_TLS < EAP_TLS_SCHANNEL

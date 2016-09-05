@@ -98,31 +98,6 @@ namespace eap
     class packet_tls;
 }
 
-/////
-///// Packs a TLS connection state
-/////
-///// \param[inout] cursor  Memory cursor
-///// \param[in]    val     Variable with data to pack
-/////
-//inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const eap::tls_conn_state &val);
-//
-/////
-///// Returns packed size of TLS connection state
-/////
-///// \param[in] val  Data to pack
-/////
-///// \returns Size of data when packed (in bytes)
-/////
-//inline size_t pksizeof(_In_ const eap::tls_conn_state &val);
-//
-/////
-///// Unpacks a TLS connection state
-/////
-///// \param[inout] cursor  Memory cursor
-///// \param[out]   val     Variable to receive unpacked value
-/////
-//inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ eap::tls_conn_state &val);
-
 #pragma once
 
 #include <memory>

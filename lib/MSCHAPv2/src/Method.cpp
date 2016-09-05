@@ -100,8 +100,6 @@ void eap::method_mschapv2::process_request_packet(
 
     m_module.log_event(&EAPMETHOD_PACKET_RECV, event_data((unsigned int)eap_type_legacy_mschapv2), event_data((unsigned int)dwReceivedPacketSize), event_data::blank);
 
-    process_packet(pReceivedPacket, dwReceivedPacketSize);
-
     m_phase_prev = m_phase;
     switch (m_phase) {
     case phase_init: {
@@ -109,8 +107,10 @@ void eap::method_mschapv2::process_request_packet(
         sanitizing_string identity_utf8;
         WideCharToMultiByte(CP_UTF8, 0, m_cred.m_identity.c_str(), (int)m_cred.m_identity.length(), identity_utf8, NULL, NULL);
 
-        // Calculate Peer-Challenge and Response
+        // Randomize Peer-Challenge
         m_challenge_client.randomize(m_cp);
+
+        // Calculate NT-Response
         m_nt_resp = nt_response(m_cp, m_challenge_server, m_challenge_client, identity_utf8.c_str(), m_cred.m_password.c_str());
 
         // Prepare MS-CHAP2-Response
@@ -128,16 +128,18 @@ void eap::method_mschapv2::process_request_packet(
         response.insert(response.end(), (unsigned char*)&m_nt_resp, (unsigned char*)(&m_nt_resp + 1)); // NT-Response
 
         // Diameter AVP (User-Name=1, MS-CHAP-Challenge=11/311, MS-CHAP2-Response=25/311)
-        append_avp( 1,      diameter_avp_flag_mandatory,                 identity_utf8.data(), (unsigned int )identity_utf8.size()      );
-        append_avp(11, 311, diameter_avp_flag_mandatory, (unsigned char*)&m_challenge_server , (unsigned char)sizeof(m_challenge_server));
-        append_avp(25, 311, diameter_avp_flag_mandatory,                 response.data()     , (unsigned char)response.size()           );
+        append_avp( 1,      diameter_avp_flag_mandatory,                 identity_utf8.data(), (unsigned int)identity_utf8.size()      );
+        append_avp(11, 311, diameter_avp_flag_mandatory, (unsigned char*)&m_challenge_server , (unsigned int)sizeof(m_challenge_server));
+        append_avp(25, 311, diameter_avp_flag_mandatory,                 response.data()     , (unsigned int)response.size()           );
 
         m_phase = phase_challenge_server;
         break;
     }
 
     case phase_challenge_server: {
-        // We do not need to do anything.
+        process_packet(pReceivedPacket, dwReceivedPacketSize);
+        if (m_success)
+            m_phase = phase_finished;
         break;
     }
 
@@ -214,20 +216,29 @@ void eap::method_mschapv2::process_packet(_In_bytecount_(size_pck) const void *_
             vendor = 0;
             msg = (const unsigned char*)(hdr + 1);
         }
-        const unsigned char *msg_end = pck + ntohs(*(unsigned short*)hdr->length);
+        unsigned int length = ntoh24(hdr->length);
+        const unsigned char
+            *msg_end  = pck     + length,
+            *msg_next = msg_end + (4 - length) % 4;
         if (msg_end > pck_end)
             throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Incomplete message data.");
 
         if (code == 26 && vendor == 311) {
             // MS-CHAP2-Success
-            MultiByteToWideChar(CP_UTF8, 0, (const char*)msg, (int)(msg_end - msg), msg_w);
+            if (msg[0] != m_ident)
+                throw invalid_argument(string_printf(__FUNCTION__ " Wrong MSCHAPv2 ident (expected: %u, received: %u).", m_ident, msg[0]).c_str());
+            const char *str = (const char*)(msg + 1);
+            MultiByteToWideChar(CP_UTF8, 0, str, (int)((const char*)msg_end - str), msg_w);
             int argc;
             unique_ptr<LPWSTR[], LocalFree_delete<LPWSTR[]> > argv(CommandLineToArgvW(msg_w.c_str(), &argc));
             if (!argv) argc = 0;
             process_success(argc, (const wchar_t**)argv.get());
         } else if (code == 2 && vendor == 311) {
             // MS-CHAP2-Error
-            MultiByteToWideChar(CP_UTF8, 0, (const char*)msg, (int)(msg_end - msg), msg_w);
+            if (msg[0] != m_ident)
+                throw invalid_argument(string_printf(__FUNCTION__ " Wrong MSCHAPv2 ident (expected: %u, received: %u).", m_ident, msg[0]).c_str());
+            const char *str = (const char*)(msg + 1);
+            MultiByteToWideChar(CP_UTF8, 0, str, (int)((const char*)msg_end - str), msg_w);
             int argc;
             unique_ptr<LPWSTR[], LocalFree_delete<LPWSTR[]> > argv(CommandLineToArgvW(msg_w.c_str(), &argc));
             if (!argv) argc = 0;
@@ -235,7 +246,7 @@ void eap::method_mschapv2::process_packet(_In_bytecount_(size_pck) const void *_
         } else if (hdr->flags & diameter_avp_flag_mandatory)
             throw win_runtime_error(ERROR_NOT_SUPPORTED, string_printf(__FUNCTION__ " Server sent mandatory Diameter AVP we do not support (code: %u, vendor: %u).", code, vendor).c_str());
 
-        pck = msg_end;
+        pck = msg_next;
     }
 }
 
@@ -258,7 +269,7 @@ void eap::method_mschapv2::process_success(_In_ int argc, _In_count_(argc) const
             authenticator_response resp_exp(m_cp, m_challenge_server, m_challenge_client, identity_utf8.c_str(), m_cred.m_password.c_str(), m_nt_resp);
 
             // Compare against provided authemticator response.
-            if (resp.size() != sizeof(resp_exp) || memcpy(resp.data(), &resp_exp, sizeof(resp_exp)) != 0)
+            if (resp.size() != sizeof(resp_exp) || memcmp(resp.data(), &resp_exp, sizeof(resp_exp)) != 0)
                 throw invalid_argument(__FUNCTION__ " MS-CHAP2-Success authentication response string failed.");
 
             m_success = true;

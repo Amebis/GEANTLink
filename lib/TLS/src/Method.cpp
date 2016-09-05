@@ -435,6 +435,9 @@ void eap::method_tls::process_request_packet(
         sanitizing_blob msg_finished(make_message(tls_message_type_handshake, make_finished()));
         m_packet_res.m_data.insert(m_packet_res.m_data.end(), msg_finished.begin(), msg_finished.end());
 
+        // Derive challenge for inner authentication (if any).
+        derive_challenge();
+
         if (m_handshake[tls_handshake_type_finished]) {
             // Go to application data phase. And allow piggybacking of the first data message.
             m_phase = phase_application_data;
@@ -830,6 +833,12 @@ void eap::method_tls::derive_msk()
     memcpy(&m_key_mppe_server, _key_block, sizeof(tls_random));
     _key_block += sizeof(tls_random);
 }
+
+
+void eap::method_tls::derive_challenge()
+{
+}
+
 
 #if EAP_TLS < EAP_TLS_SCHANNEL
 
@@ -1230,6 +1239,9 @@ void eap::method_tls::process_handshake()
             else
                 m_module.log_event(&EAPMETHOD_TLS_QUERY_FAILED, event_data((unsigned int)SECPKG_ATTR_CONNECTION_INFO), event_data(status), event_data::blank);
 
+            // Derive challenge for inner authentication (if any).
+            derive_challenge();
+
             m_phase = phase_application_data;
             process_application_data(m_sc_queue.data(), m_sc_queue.size());
         } else
@@ -1262,13 +1274,14 @@ void eap::method_tls::process_application_data()
 
     // Prepare input/output buffer(s).
     SecBuffer buf[] = {
-        { 0, SECBUFFER_TOKEN, NULL },
-        { 0, SECBUFFER_ALERT, NULL },
         {
             (unsigned long)m_sc_queue.size(),
             SECBUFFER_DATA,
             m_sc_queue.data()
         },
+        { 0, SECBUFFER_EMPTY, NULL },
+        { 0, SECBUFFER_EMPTY, NULL },
+        { 0, SECBUFFER_EMPTY, NULL },
     };
     SecBufferDesc buf_desc = {
         SECBUFFER_VERSION,
@@ -1279,8 +1292,17 @@ void eap::method_tls::process_application_data()
     // Decrypt the message.
     SECURITY_STATUS status = DecryptMessage(m_sc_ctx, &buf_desc, 0, NULL);
     if (status == SEC_E_OK) {
-        assert(buf[2].BufferType == SECBUFFER_DATA);
-        process_application_data(buf[2].pvBuffer, buf[2].cbBuffer);
+        // Find SECBUFFER_DATA buffer(s) and process data.
+        for (size_t i = 0; i < _countof(buf); i++)
+            if (buf[i].BufferType == SECBUFFER_DATA)
+                process_application_data(buf[i].pvBuffer, buf[i].cbBuffer);
+
+        // Find SECBUFFER_EXTRA buffer(s) and queue data for the next time.
+        std::vector<unsigned char> extra;
+        for (size_t i = 0; i < _countof(buf); i++)
+            if (buf[i].BufferType == SECBUFFER_EXTRA)
+                extra.insert(extra.end(), (unsigned char*)buf[i].pvBuffer, (unsigned char*)buf[i].pvBuffer + buf[i].cbBuffer);
+        m_sc_queue = std::move(extra);
     } else if (status == SEC_E_INCOMPLETE_MESSAGE) {
         // Schannel neeeds more data. Send ACK packet to server to send more.
     } else if (status == SEC_I_CONTEXT_EXPIRED) {
@@ -1292,16 +1314,8 @@ void eap::method_tls::process_application_data()
         m_sc_queue.clear();
         m_phase = phase_handshake_init;
         process_handshake();
-    } else if (FAILED(status)) {
-        if (m_sc_ctx.m_attrib & ISC_RET_EXTENDED_ERROR) {
-            // Send alert via EAP. Not that EAP will transmit it once we throw this is an error...
-            assert(buf[1].BufferType == SECBUFFER_ALERT);
-            assert(m_sc_ctx.m_attrib & ISC_RET_ALLOCATED_MEMORY);
-            m_packet_res.m_data.assign((const unsigned char*)buf[1].pvBuffer, (const unsigned char*)buf[1].pvBuffer + buf[1].cbBuffer);
-        }
-
+    } else if (FAILED(status))
         throw sec_runtime_error(status, __FUNCTION__ " Schannel error.");
-    }
 }
 
 #endif

@@ -445,6 +445,15 @@ inline unsigned __int64 htonll(unsigned __int64 val);
 ///
 inline void hton24(_In_ unsigned int val, _Out_ unsigned char out[3]);
 
+///
+/// Converts an 24-bit integer from TCP/IP network to host byte order.
+///
+/// \param[in] val  A 24-bit unsigned number in network byte order
+///
+/// \returns A 24-bit unsigned number in host byte order
+///
+inline unsigned int ntoh24(_In_ const unsigned char val[3]);
+
 #pragma once
 
 
@@ -1111,6 +1120,15 @@ inline void hton24(_In_ unsigned int val, _Out_ unsigned char out[3])
     out[0] = (val >> 16) & 0xff;
     out[1] = (val >>  8) & 0xff;
     out[2] = (val      ) & 0xff;
+}
+
+
+inline unsigned int ntoh24(_In_ const unsigned char val[3])
+{
+    return
+        (((unsigned int)val[0]) << 16) |
+        (((unsigned int)val[1]) <<  8) |
+        (((unsigned int)val[2])      );
 }
 
 #endif
