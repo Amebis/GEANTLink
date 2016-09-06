@@ -286,7 +286,7 @@ protected:
         int idx = m_providers->GetSelection();
         eap::config_provider &cfg_provider = ((_wxT*)m_providers->GetPage(idx))->GetProvider();
 
-        if (wxMessageBox(tstring_printf(_("Are you sure you want to permanently remove %ls provider from configuration?"), cfg_provider.m_name.c_str()), _("Warning"), wxYES_NO, this) == wxYES) {
+        if (wxMessageBox(tstring_printf(_("Are you sure you want to permanently remove %ls provider from configuration?"), wxEAPGetProviderName(cfg_provider.m_name).c_str()), _("Warning"), wxYES_NO, this) == wxYES) {
             // Delete provider.
             eap::config_connection::provider_list::iterator it(m_cfg.m_providers.begin());
             for (int i = 0; i < idx; i++, ++it);
