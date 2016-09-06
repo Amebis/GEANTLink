@@ -142,18 +142,19 @@ eap::config_method& eap::config_method::operator=(_Inout_ config_method &&other)
 eap::config_method_with_cred::config_method_with_cred(_In_ module &mod) :
     m_allow_save(true),
     m_use_preshared(false),
-    m_auth_failed(false),
+    m_last_status(status_success),
     config_method(mod)
 {
 }
 
 
 eap::config_method_with_cred::config_method_with_cred(_In_ const config_method_with_cred &other) :
-    m_allow_save(other.m_allow_save),
-    m_use_preshared(other.m_use_preshared),
-    m_preshared(other.m_preshared ? (credentials*)other.m_preshared->clone() : nullptr),
-    m_auth_failed(other.m_auth_failed),
-    config_method(other)
+    m_allow_save   (other.m_allow_save                                                    ),
+    m_use_preshared(other.m_use_preshared                                                 ),
+    m_preshared    (other.m_preshared ? (credentials*)other.m_preshared->clone() : nullptr),
+    m_last_status  (other.m_last_status                                                   ),
+    m_last_msg     (other.m_last_msg                                                      ),
+    config_method  (other                                                                 )
 {
 }
 
@@ -162,7 +163,8 @@ eap::config_method_with_cred::config_method_with_cred(_Inout_ config_method_with
     m_allow_save   (std::move(other.m_allow_save   )),
     m_use_preshared(std::move(other.m_use_preshared)),
     m_preshared    (std::move(other.m_preshared    )),
-    m_auth_failed  (std::move(other.m_auth_failed  )),
+    m_last_status  (std::move(other.m_last_status  )),
+    m_last_msg     (std::move(other.m_last_msg     )),
     config_method  (std::move(other                ))
 {
 }
@@ -175,7 +177,8 @@ eap::config_method_with_cred& eap::config_method_with_cred::operator=(_In_ const
         m_allow_save          = other.m_allow_save;
         m_use_preshared       = other.m_use_preshared;
         m_preshared.reset(other.m_preshared ? (credentials*)other.m_preshared->clone() : nullptr);
-        m_auth_failed         = other.m_auth_failed;
+        m_last_status         = other.m_last_status;
+        m_last_msg            = other.m_last_msg;
     }
 
     return *this;
@@ -189,7 +192,8 @@ eap::config_method_with_cred& eap::config_method_with_cred::operator=(_Inout_ co
         m_allow_save          = std::move(other.m_allow_save   );
         m_use_preshared       = std::move(other.m_use_preshared);
         m_preshared           = std::move(other.m_preshared    );
-        m_auth_failed         = std::move(other.m_auth_failed  );
+        m_last_status         = std::move(other.m_last_status  );
+        m_last_msg            = std::move(other.m_last_msg     );
     }
 
     return *this;
@@ -241,6 +245,9 @@ void eap::config_method_with_cred::load(_In_ IXMLDOMNode *pConfigRoot)
             // This is not really an error - merely an indication pre-shared credentials are unavailable.
         }
     }
+
+    m_last_status = status_success;
+    m_last_msg.clear();
 }
 
 
@@ -250,7 +257,8 @@ void eap::config_method_with_cred::operator<<(_Inout_ cursor_out &cursor) const
     cursor << m_allow_save;
     cursor << m_use_preshared;
     cursor << *m_preshared;
-    cursor << m_auth_failed;
+    cursor << m_last_status;
+    cursor << m_last_msg;
 }
 
 
@@ -261,7 +269,8 @@ size_t eap::config_method_with_cred::get_pk_size() const
         pksizeof(m_allow_save   ) +
         pksizeof(m_use_preshared) +
         pksizeof(*m_preshared   ) +
-        pksizeof(m_auth_failed  );
+        pksizeof(m_last_status  ) +
+        pksizeof(m_last_msg     );
 }
 
 
@@ -271,7 +280,8 @@ void eap::config_method_with_cred::operator>>(_Inout_ cursor_in &cursor)
     cursor >> m_allow_save;
     cursor >> m_use_preshared;
     cursor >> *m_preshared;
-    cursor >> m_auth_failed;
+    cursor >> m_last_status;
+    cursor >> m_last_msg;
 }
 
 

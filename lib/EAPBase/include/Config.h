@@ -352,10 +352,25 @@ namespace eap
         virtual credentials* make_credentials() const = 0;
 
     public:
-        bool m_allow_save;                          ///< Are credentials allowed to be saved to Windows Credential Manager?
-        bool m_use_preshared;                       ///< Use pre-shared credentials
-        std::unique_ptr<credentials> m_preshared;   ///< Pre-shared credentials
-        bool m_auth_failed;                         ///< Did credential fail last time?
+        bool m_allow_save;                                  ///< Are credentials allowed to be saved to Windows Credential Manager?
+        bool m_use_preshared;                               ///< Use pre-shared credentials
+        std::unique_ptr<credentials> m_preshared;           ///< Pre-shared credentials
+
+        enum status {
+            status_success = 0,                             ///< Authentication succeeded
+            status_auth_failed,                             ///< Authentication failed
+            status_cred_invalid,                            ///< Invalid credentials
+            status_cred_expired,                            ///< Credentials expired
+            status_cred_changing,                           ///< Credentials are being changed
+            status_account_disabled,                        ///< Account is disabled
+            status_account_logon_hours,                     ///< Restricted account logon hours
+            status_account_denied,                          ///< Account access is denied
+
+            // Meta statuses
+            status_cred_begin = status_cred_invalid,        ///< First credential related problem
+            status_cred_end   = status_cred_changing + 1,   ///< First problem, that is not credential related any more
+        } m_last_status;                                    ///< Status of authentication the last time
+        std::wstring m_last_msg;                            ///< Server message at the last authentication
     };
 
 
@@ -603,4 +618,22 @@ inline size_t pksizeof(const eap::config &val)
 inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ eap::config &val)
 {
     val.operator>>(cursor);
+}
+
+
+inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const eap::config_method_with_cred::status &val)
+{
+    cursor << (unsigned char)val;
+}
+
+
+inline size_t pksizeof(_In_ const eap::config_method_with_cred::status &val)
+{
+    return pksizeof((unsigned char)val);
+}
+
+
+inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ eap::config_method_with_cred::status &val)
+{
+    cursor >> (unsigned char&)val;
 }

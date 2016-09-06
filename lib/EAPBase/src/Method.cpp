@@ -68,11 +68,44 @@ void eap::method::begin_session(
     UNREFERENCED_PARAMETER(pAttributeArray);
     UNREFERENCED_PARAMETER(hTokenImpersonateUser);
     UNREFERENCED_PARAMETER(dwMaxSendPacketSize);
+
+    // Presume authentication will fail with generic protocol failure. (Pesimist!!!)
+    // We will reset once we get get_result(Success) call.
+    m_cfg.m_last_status = config_method_with_cred::status_auth_failed;
+    m_cfg.m_last_msg.clear();
 }
 
 
 void eap::method::end_session()
 {
+}
+
+
+void eap::method::get_result(
+    _In_    EapPeerMethodResultReason reason,
+    _Inout_ EapPeerMethodResult       *ppResult)
+{
+    assert(ppResult);
+
+    switch (reason) {
+    case EapPeerMethodResultSuccess: {
+        m_module.log_event(&EAPMETHOD_METHOD_SUCCESS, event_data((unsigned int)m_cfg.get_method_id()), event_data::blank);
+        m_cfg.m_last_status  = config_method_with_cred::status_success;
+        break;
+    }
+
+    case EapPeerMethodResultFailure:
+        m_module.log_event(&EAPMETHOD_METHOD_FAILURE_ERROR2, event_data((unsigned int)m_cfg.get_method_id()), event_data((unsigned int)m_cfg.m_last_status), event_data::blank);
+        break;
+
+    default:
+        throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Not supported.");
+    }
+
+    // Always ask EAP host to save the connection data. And it will save it *only* when we report "success".
+    // Don't worry. EapHost is well aware of failed authentication condition.
+    ppResult->fSaveConnectionData = TRUE;
+    ppResult->fIsSuccess          = TRUE;
 }
 
 

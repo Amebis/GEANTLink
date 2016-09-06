@@ -130,10 +130,10 @@ void eap::method_ttls::get_result(
         if (result.fSaveConnectionData)
             ppResult->fSaveConnectionData = TRUE;
 
-        if (m_inner->m_cfg.m_auth_failed) {
-            // Inner method admitted its credentials failed, so autentication must have proceeded to inner authentication already.
-            // Therefore, outer credentials must have been OK.
-            m_cfg.m_auth_failed = false;
+        if (m_inner->m_cfg.m_last_status != config_method_with_cred::status_success) {
+            // Inner method admitted problems, so autentication must have proceeded to inner authentication already.
+            // Therefore, outer authentication must have been OK.
+            m_cfg.m_last_status = config_method_with_cred::status_success;
         }
     }
 }

@@ -71,7 +71,6 @@ eap::method_tls::method_tls(_In_ module &module, _In_ config_method_tls &cfg, _I
     m_seq_num_server(0),
 #else
     m_phase(phase_unknown),
-    m_phase_prev(phase_unknown),
 #endif
     method(module, cfg, cred)
 {
@@ -121,7 +120,6 @@ eap::method_tls::method_tls(_Inout_ method_tls &&other) :
     m_sc_queue                  (std::move(other.m_sc_queue                  )),
     m_sc_ctx                    (std::move(other.m_sc_ctx                    )),
     m_phase                     (std::move(other.m_phase                     )),
-    m_phase_prev                (std::move(other.m_phase_prev                )),
 #endif
     method                      (std::move(other                             ))
 {
@@ -178,7 +176,6 @@ eap::method_tls& eap::method_tls::operator=(_Inout_ method_tls &&other)
         m_sc_queue                   = std::move(other.m_sc_queue                  );
         m_sc_ctx                     = std::move(other.m_sc_ctx                    );
         m_phase                      = std::move(other.m_phase                     );
-        m_phase_prev                 = std::move(other.m_phase_prev                );
 #endif
     }
 
@@ -446,6 +443,7 @@ void eap::method_tls::process_request_packet(
         } else {
             m_session_resumed = false;
             m_phase = phase_change_cipher_spec;
+            m_cfg.m_last_status = config_method_with_cred::status_cred_invalid; // Blame credentials if we fail beyond this point.
         }
         break;
     }
@@ -473,7 +471,6 @@ void eap::method_tls::process_request_packet(
     } else
         m_sc_queue.insert(m_sc_queue.end(), m_packet_req.m_data.begin(), m_packet_req.m_data.end());
 
-    m_phase_prev = m_phase;
     switch (m_phase) {
     case phase_handshake_init:
     case phase_handshake_cont:
@@ -511,10 +508,10 @@ void eap::method_tls::get_result(
 {
     assert(ppResult);
 
+    method::get_result(reason, ppResult);
+
     switch (reason) {
     case EapPeerMethodResultSuccess: {
-        m_module.log_event(&EAPMETHOD_METHOD_SUCCESS, event_data((unsigned int)eap_type_tls), event_data::blank);
-
         // Derive MSK/EMSK for line encryption.
         derive_msk();
 
@@ -526,9 +523,6 @@ void eap::method_tls::get_result(
         a.create_ms_mppe_key(17, (LPCBYTE)&m_key_mppe_server, sizeof(tls_random));
         m_eap_attr.push_back(std::move(a));
         m_eap_attr.push_back(eap_attr::blank);
-
-        // Clear credentials as failed.
-        m_cfg.m_auth_failed = false;
 
 #if EAP_TLS < EAP_TLS_SCHANNEL
         // Update configuration with session resumption data.
@@ -567,39 +561,15 @@ void eap::method_tls::get_result(
 
     case EapPeerMethodResultFailure:
 #if EAP_TLS < EAP_TLS_SCHANNEL
-        m_module.log_event(
-            m_phase < phase_change_cipher_spec ? &EAPMETHOD_METHOD_FAILURE_INIT :
-            m_phase < phase_application_data   ? &EAPMETHOD_METHOD_FAILURE_HANDSHAKE : &EAPMETHOD_METHOD_FAILURE,
-            event_data((unsigned int)eap_type_tls), event_data::blank);
-
-        // Mark credentials as failed, so GUI can re-prompt user.
-        // But be careful: do so only if this happened after transition from handshake to application data phase.
-        m_cfg.m_auth_failed = m_phase_prev < phase_application_data && m_phase >= phase_application_data;
-
         // Clear session resumption data.
         m_cfg.m_session_id.clear();
         m_cfg.m_master_secret.clear();
 #else
-        m_module.log_event(
-            m_phase_prev < phase_handshake_cont   ? &EAPMETHOD_METHOD_FAILURE_INIT :
-            m_phase_prev < phase_application_data ? &EAPMETHOD_METHOD_FAILURE_HANDSHAKE : &EAPMETHOD_METHOD_FAILURE,
-            event_data((unsigned int)eap_type_tls), event_data::blank);
-
-        // Mark credentials as failed, so GUI can re-prompt user.
-        // But be careful: do so only if this happened after transition from handshake to application data phase.
-        m_cfg.m_auth_failed = m_phase_prev < phase_application_data && m_phase >= phase_application_data;
-
         // TODO: Research how a Schannel session context can be cleared not to resume.
 #endif
 
         break;
-
-    default:
-        throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Not supported.");
     }
-
-    // Always ask EAP host to save the connection data.
-    ppResult->fSaveConnectionData = TRUE;
 }
 
 
@@ -1236,8 +1206,10 @@ void eap::method_tls::process_handshake()
 
             m_phase = phase_application_data;
             process_application_data(m_sc_queue.data(), m_sc_queue.size());
-        } else
+        } else {
             m_phase = phase_handshake_cont;
+            m_cfg.m_last_status = config_method_with_cred::status_cred_invalid; // Blame credentials if we fail beyond this point.
+        }
     } else if (status == SEC_E_INCOMPLETE_MESSAGE) {
         // Schannel neeeds more data. Send ACK packet to server to send more.
     } else if (FAILED(status)) {

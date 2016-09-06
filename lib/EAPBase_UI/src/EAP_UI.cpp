@@ -239,14 +239,19 @@ wxEAPProviderLockedPanel::wxEAPProviderLockedPanel(const eap::config_provider &p
 // wxEAPCredentialWarningPanel
 //////////////////////////////////////////////////////////////////////
 
-wxEAPCredentialWarningPanel::wxEAPCredentialWarningPanel(const eap::config_provider &prov, wxWindow* parent) : wxEAPNotePanel(parent)
+wxEAPCredentialWarningPanel::wxEAPCredentialWarningPanel(const eap::config_provider &prov, eap::config_method_with_cred::status status, wxWindow* parent) : wxEAPNotePanel(parent)
 {
     // Load and set icon.
     winstd::library lib_shell32;
     if (lib_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
         m_note_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(161)));
 
-    m_note_label->SetLabel(_("Previous attempt to connect failed. Please, make sure your credentials are correct, or try again later."));
+    m_note_label->SetLabel((
+        status == eap::config_method_with_cred::status_cred_invalid  ? _("Previous attempt to connect reported invalid credentials.") :
+        status == eap::config_method_with_cred::status_cred_expired  ? _("Previous attempt to connect reported your credentials expired.") :
+        status == eap::config_method_with_cred::status_cred_changing ? _("Previous attempt to connect reported your credentials are being changed.") :
+                                                                       _("Previous attempt to connect failed.")) + " " +
+        _("Please, make sure your credentials are correct, or try again later."));
     m_note_label->Wrap(449);
 
     CreateContactFields(prov);

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: EAPMethods\n"
-"POT-Creation-Date: 2016-09-02 19:08+0200\n"
+"POT-Creation-Date: 2016-09-06 14:06+0200\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
 "Last-Translator: Simon Rozman <simon.rozman@amebis.si>\n"
 "Language-Team: Amebis, d. o. o., Kamnik <info@amebis.si>\n"
@@ -253,8 +253,24 @@ msgstr ""
 msgid "Your provider"
 msgstr ""
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:249
-msgid "Previous attempt to connect failed. Please, make sure your credentials are correct, or try again later."
+#: lib/EAPBase_UI/src/EAP_UI.cpp:250
+msgid "Previous attempt to connect reported invalid credentials."
+msgstr ""
+
+#: lib/EAPBase_UI/src/EAP_UI.cpp:251
+msgid "Previous attempt to connect reported your credentials expired."
+msgstr ""
+
+#: lib/EAPBase_UI/src/EAP_UI.cpp:252
+msgid "Previous attempt to connect reported your credentials are being changed."
+msgstr ""
+
+#: lib/EAPBase_UI/src/EAP_UI.cpp:253
+msgid "Previous attempt to connect failed."
+msgstr ""
+
+#: lib/EAPBase_UI/src/EAP_UI.cpp:254
+msgid "Please, make sure your credentials are correct, or try again later."
 msgstr ""
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:17
@@ -454,7 +470,7 @@ msgstr ""
 msgid "MSCHAPv2"
 msgstr ""
 
-#: lib/TTLS_UI/src/TTLS_UI.cpp:123 lib/TTLS_UI/src/TTLS_UI.cpp:256
+#: lib/TTLS_UI/src/TTLS_UI.cpp:123 lib/TTLS_UI/src/TTLS_UI.cpp:262
 msgid "Outer Authentication"
 msgstr ""
 
@@ -476,24 +492,24 @@ msgstr ""
 msgid "Deleting credentials failed (error %u)."
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:738
+#: lib/EAPBase_UI/include/EAP_UI.h:739
 #, c-format
 msgid "<error %u>"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:742
+#: lib/EAPBase_UI/include/EAP_UI.h:743
 msgid "<error>"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:753 lib/EAPBase_UI/include/EAP_UI.h:762
+#: lib/EAPBase_UI/include/EAP_UI.h:754 lib/EAPBase_UI/include/EAP_UI.h:764
 msgid "<empty>"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:753 lib/EAPBase_UI/include/EAP_UI.h:762
+#: lib/EAPBase_UI/include/EAP_UI.h:754 lib/EAPBase_UI/include/EAP_UI.h:764
 msgid "<blank ID>"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:962
+#: lib/EAPBase_UI/include/EAP_UI.h:964
 msgid "<Your Organization>"
 msgstr ""
 

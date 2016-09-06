@@ -31,7 +31,6 @@ using namespace winstd;
 eap::method_pap::method_pap(_In_ module &module, _In_ config_method_pap &cfg, _In_ credentials_pap &cred) :
     m_cred(cred),
     m_phase(phase_unknown),
-    m_phase_prev(phase_unknown),
     method_noneap(module, cfg, cred)
 {
 }
@@ -40,7 +39,6 @@ eap::method_pap::method_pap(_In_ module &module, _In_ config_method_pap &cfg, _I
 eap::method_pap::method_pap(_Inout_ method_pap &&other) :
     m_cred       (          other.m_cred       ),
     m_phase      (std::move(other.m_phase     )),
-    m_phase_prev (std::move(other.m_phase_prev)),
     method_noneap(std::move(other             ))
 {
 }
@@ -52,7 +50,6 @@ eap::method_pap& eap::method_pap::operator=(_Inout_ method_pap &&other)
         assert(std::addressof(m_cred) == std::addressof(other.m_cred)); // Move method with same credentials only!
         (method_noneap&)*this = std::move(other             );
         m_phase               = std::move(other.m_phase     );
-        m_phase_prev          = std::move(other.m_phase_prev);
     }
 
     return *this;
@@ -82,7 +79,6 @@ void eap::method_pap::process_request_packet(
 
     m_module.log_event(&EAPMETHOD_PACKET_RECV, event_data((unsigned int)eap_type_legacy_pap), event_data((unsigned int)dwReceivedPacketSize), event_data::blank);
 
-    m_phase_prev = m_phase;
     switch (m_phase) {
     case phase_init: {
         // Convert username and password to UTF-8.
@@ -101,6 +97,7 @@ void eap::method_pap::process_request_packet(
         append_avp(2, diameter_avp_flag_mandatory, password_utf8.data(), (unsigned int)password_utf8.size());
 
         m_phase = phase_finished;
+        m_cfg.m_last_status = config_method_with_cred::status_cred_invalid; // Blame credentials if we fail beyond this point.
         break;
     }
 
@@ -110,37 +107,4 @@ void eap::method_pap::process_request_packet(
 
     pEapOutput->fAllowNotifications = TRUE;
     pEapOutput->action = EapPeerMethodResponseActionSend;
-}
-
-
-void eap::method_pap::get_result(
-    _In_    EapPeerMethodResultReason reason,
-    _Inout_ EapPeerMethodResult       *ppResult)
-{
-    assert(ppResult);
-
-    switch (reason) {
-    case EapPeerMethodResultSuccess: {
-        m_module.log_event(&EAPMETHOD_METHOD_SUCCESS, event_data((unsigned int)eap_type_legacy_pap), event_data::blank);
-        m_cfg.m_auth_failed = false;
-        break;
-    }
-
-    case EapPeerMethodResultFailure:
-        m_module.log_event(
-            m_phase_prev < phase_finished ? &EAPMETHOD_METHOD_FAILURE_INIT : &EAPMETHOD_METHOD_FAILURE,
-            event_data((unsigned int)eap_type_legacy_pap), event_data::blank);
-
-        // Mark credentials as failed, so GUI can re-prompt user.
-        // But be careful: do so only after credentials were actually tried.
-        m_cfg.m_auth_failed = m_phase_prev < phase_finished && m_phase >= phase_finished;
-
-        break;
-
-    default:
-        throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Not supported.");
-    }
-
-    // Always ask EAP host to save the connection data.
-    ppResult->fSaveConnectionData = TRUE;
 }

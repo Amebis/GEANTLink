@@ -89,24 +89,15 @@ namespace eap
             _In_                                       DWORD               dwReceivedPacketSize,
             _Inout_                                    EapPeerMethodOutput *pEapOutput);
 
-        ///
-        /// Obtains the result of an authentication session from the EAP method.
-        ///
-        /// \sa [EapPeerGetResult function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363611.aspx)
-        ///
-        virtual void get_result(
-            _In_    EapPeerMethodResultReason reason,
-            _Inout_ EapPeerMethodResult       *ppResult);
-
         /// @}
 
     protected:
-        credentials_pap &m_cred;        ///< EAP-TLS user credentials
+        credentials_pap &m_cred;    ///< EAP-TLS user credentials
 
         enum {
-            phase_unknown = -1,         ///< Unknown phase
-            phase_init = 0,             ///< Handshake initialize
-            phase_finished,             ///< Connection shut down
-        } m_phase, m_phase_prev;        ///< What phase is our communication at?
+            phase_unknown = -1,     ///< Unknown phase
+            phase_init = 0,         ///< Handshake initialize
+            phase_finished,         ///< Connection shut down
+        } m_phase;                  ///< What phase is our communication at?
     };
 }
