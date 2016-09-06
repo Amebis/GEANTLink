@@ -29,3 +29,4 @@
 
 #include <Windows.h>
 #include <EapHostError.h> // include after Windows.h
+#include <RasError.h>

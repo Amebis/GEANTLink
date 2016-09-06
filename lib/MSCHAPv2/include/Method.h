@@ -34,6 +34,8 @@ namespace eap
 
 #include "../../EAPBase/include/Method.h"
 
+#include <list>
+
 
 namespace eap
 {
@@ -89,15 +91,6 @@ namespace eap
             _In_                                       DWORD               dwReceivedPacketSize,
             _Inout_                                    EapPeerMethodOutput *pEapOutput);
 
-        ///
-        /// Obtains the result of an authentication session from the EAP method.
-        ///
-        /// \sa [EapPeerGetResult function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363611.aspx)
-        ///
-        virtual void get_result(
-            _In_    EapPeerMethodResultReason reason,
-            _Inout_ EapPeerMethodResult       *ppResult);
-
         /// @}
 
         friend class method_ttls;               // Setting of initial challenge derived from TLS PRF
@@ -116,20 +109,28 @@ namespace eap
         ///
         /// \sa [Microsoft PPP CHAP Extensions, Version 2 (Chapter 5. Success Packet)](https://tools.ietf.org/html/rfc2759#section-5)
         ///
-        /// \param[in] pck       Packet data
-        /// \param[in] size_pck  \p pck size in bytes
+        /// \param[in] argv  List of message values
         ///
-        void process_success(_In_ int argc, _In_count_(argc) const wchar_t *argv[]);
+        void process_success(_In_ const std::list<std::string> &argv);
 
         ///
         /// Processes MS-CHAP-Error AVP
         ///
         /// \sa [Microsoft PPP CHAP Extensions, Version 2 (Chapter 6. Failure Packet)](https://tools.ietf.org/html/rfc2759#section-6)
         ///
-        /// \param[in] pck       Packet data
-        /// \param[in] size_pck  \p pck size in bytes
+        /// \param[in] argv  List of message values
         ///
-        void process_error(_In_ int argc, _In_count_(argc) const wchar_t *argv[]);
+        void process_error(_In_ const std::list<std::string> &argv);
+
+        ///
+        /// Splits MS-CHAP2-Success or MS-CHAP-Error messages
+        ///
+        /// \param[in] resp   MS-CHAP2-Success or MS-CHAP-Error message (i.e. "E=648 R=1 C=d86e0aa6cb5539e5fb31dd5dc5f6898c V=3 M=Password Expired")
+        /// \param[in] count  Number of characters in \p resp
+        ///
+        /// \returns A list of individual parts of \p resp message (i.e. ("E=648", "R=1", "C=d86e0aa6cb5539e5fb31dd5dc5f6898c", "V=3", "M=Password Expired"))
+        ///
+        static std::list<std::string> parse_response(_In_count_(count) const char *resp, _In_ size_t count);
 
     protected:
         credentials_mschapv2 &m_cred;           ///< EAP-TLS user credentials
@@ -146,6 +147,6 @@ namespace eap
             phase_init = 0,                     ///< Send client challenge
             phase_challenge_server,             ///< Verify server challenge
             phase_finished,                     ///< Connection shut down
-        } m_phase, m_phase_prev;                ///< What phase is our communication at?
+        } m_phase;                              ///< What phase is our communication at?
     };
 }

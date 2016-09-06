@@ -33,7 +33,6 @@ eap::method_mschapv2::method_mschapv2(_In_ module &module, _In_ config_method_ms
     m_ident(0),
     m_success(false),
     m_phase(phase_unknown),
-    m_phase_prev(phase_unknown),
     method_noneap(module, cfg, cred)
 {
 }
@@ -48,7 +47,6 @@ eap::method_mschapv2::method_mschapv2(_Inout_ method_mschapv2 &&other) :
     m_nt_resp         (std::move(other.m_nt_resp         )),
     m_success         (std::move(other.m_success         )),
     m_phase           (std::move(other.m_phase           )),
-    m_phase_prev      (std::move(other.m_phase_prev      )),
     method_noneap     (std::move(other                   ))
 {
 }
@@ -66,7 +64,6 @@ eap::method_mschapv2& eap::method_mschapv2::operator=(_Inout_ method_mschapv2 &&
         m_nt_resp             = std::move(other.m_nt_resp         );
         m_success             = std::move(other.m_success         );
         m_phase               = std::move(other.m_phase           );
-        m_phase_prev          = std::move(other.m_phase_prev      );
     }
 
     return *this;
@@ -100,7 +97,6 @@ void eap::method_mschapv2::process_request_packet(
 
     m_module.log_event(&EAPMETHOD_PACKET_RECV, event_data((unsigned int)eap_type_legacy_mschapv2), event_data((unsigned int)dwReceivedPacketSize), event_data::blank);
 
-    m_phase_prev = m_phase;
     switch (m_phase) {
     case phase_init: {
         // Convert username to UTF-8.
@@ -133,6 +129,7 @@ void eap::method_mschapv2::process_request_packet(
         append_avp(25, 311, diameter_avp_flag_mandatory,                 response.data()     , (unsigned int)response.size()           );
 
         m_phase = phase_challenge_server;
+        m_cfg.m_last_status = config_method_with_cred::status_cred_invalid; // Blame credentials if we fail beyond this point.
         break;
     }
 
@@ -149,40 +146,6 @@ void eap::method_mschapv2::process_request_packet(
 
     pEapOutput->fAllowNotifications = TRUE;
     pEapOutput->action = EapPeerMethodResponseActionSend;
-}
-
-
-void eap::method_mschapv2::get_result(
-    _In_    EapPeerMethodResultReason reason,
-    _Inout_ EapPeerMethodResult       *ppResult)
-{
-    assert(ppResult);
-
-    switch (reason) {
-    case EapPeerMethodResultSuccess: {
-        m_module.log_event(&EAPMETHOD_METHOD_SUCCESS, event_data((unsigned int)eap_type_legacy_mschapv2), event_data::blank);
-        m_cfg.m_auth_failed = false;
-
-        break;
-    }
-
-    case EapPeerMethodResultFailure:
-        m_module.log_event(
-            m_phase_prev < phase_finished ? &EAPMETHOD_METHOD_FAILURE_INIT : &EAPMETHOD_METHOD_FAILURE,
-            event_data((unsigned int)eap_type_legacy_mschapv2), event_data::blank);
-
-        // Mark credentials as failed, so GUI can re-prompt user.
-        // But be careful: do so only after credentials were actually tried.
-        m_cfg.m_auth_failed = m_phase_prev < phase_finished && m_phase >= phase_finished;
-
-        break;
-
-    default:
-        throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Not supported.");
-    }
-
-    // Always ask EAP host to save the connection data.
-    ppResult->fSaveConnectionData = TRUE;
 }
 
 
@@ -220,21 +183,12 @@ void eap::method_mschapv2::process_packet(_In_bytecount_(size_pck) const void *_
             if (msg[0] != m_ident)
                 throw invalid_argument(string_printf(__FUNCTION__ " Wrong MSCHAPv2 ident (expected: %u, received: %u).", m_ident, msg[0]).c_str());
             const char *str = (const char*)(msg + 1);
-            MultiByteToWideChar(CP_UTF8, 0, str, (int)((const char*)msg_end - str), msg_w);
-            int argc;
-            unique_ptr<LPWSTR[], LocalFree_delete<LPWSTR[]> > argv(CommandLineToArgvW(msg_w.c_str(), &argc));
-            if (!argv) argc = 0;
-            process_success(argc, (const wchar_t**)argv.get());
+            process_success(parse_response(str, ((const char*)msg_end - str)));
         } else if (code == 2 && vendor == 311) {
             // MS-CHAP2-Error
-            if (msg[0] != m_ident)
-                throw invalid_argument(string_printf(__FUNCTION__ " Wrong MSCHAPv2 ident (expected: %u, received: %u).", m_ident, msg[0]).c_str());
+            m_ident = msg[0];
             const char *str = (const char*)(msg + 1);
-            MultiByteToWideChar(CP_UTF8, 0, str, (int)((const char*)msg_end - str), msg_w);
-            int argc;
-            unique_ptr<LPWSTR[], LocalFree_delete<LPWSTR[]> > argv(CommandLineToArgvW(msg_w.c_str(), &argc));
-            if (!argv) argc = 0;
-            process_error(argc, (const wchar_t**)argv.get());
+            process_error(parse_response(str, ((const char*)msg_end - str)));
         } else if (hdr->flags & diameter_avp_flag_mandatory)
             throw win_runtime_error(ERROR_NOT_SUPPORTED, string_printf(__FUNCTION__ " Server sent mandatory Diameter AVP we do not support (code: %u, vendor: %u).", code, vendor).c_str());
 
@@ -243,17 +197,18 @@ void eap::method_mschapv2::process_packet(_In_bytecount_(size_pck) const void *_
 }
 
 
-void eap::method_mschapv2::process_success(_In_ int argc, _In_count_(argc) const wchar_t *argv[])
+void eap::method_mschapv2::process_success(_In_ const list<string> &argv)
 {
     m_success = false;
 
-    for (int i = 0; i < argc; i++) {
-        if ((argv[i][0] == L'S' || argv[i][0] == L's') && argv[i][1] == L'=') {
+    for (list<string>::const_iterator arg = argv.cbegin(), arg_end = argv.cend(); arg != arg_end; ++arg) {
+        const string &val = *arg;
+        if ((val[0] == 'S' || val[0] == 's') && val[1] == '=') {
             // "S="
             hex_dec dec;
             sanitizing_blob resp;
             bool is_last;
-            dec.decode(resp, is_last, argv[i] + 2, (size_t)-1);
+            dec.decode(resp, is_last, val.data() + 2, (size_t)-1);
 
             // Calculate expected authenticator response.
             sanitizing_string identity_utf8;
@@ -270,13 +225,60 @@ void eap::method_mschapv2::process_success(_In_ int argc, _In_count_(argc) const
 
     if (!m_success)
         throw invalid_argument(__FUNCTION__ " MS-CHAP2-Success authentication response string not found.");
-
-    //m_module.log_event(&EAPMETHOD_TLS_ALERT, event_data((unsigned int)eap_type_tls), event_data((unsigned char)msg[0]), event_data((unsigned char)msg[1]), event_data::blank);
 }
 
 
-void eap::method_mschapv2::process_error(_In_ int argc, _In_count_(argc) const wchar_t *argv[])
+void eap::method_mschapv2::process_error(_In_ const list<string> &argv)
 {
-    UNREFERENCED_PARAMETER(argc);
-    UNREFERENCED_PARAMETER(argv);
+    for (list<string>::const_iterator arg = argv.cbegin(), arg_end = argv.cend(); arg != arg_end; ++arg) {
+        const string &val = *arg;
+        if ((val[0] == 'E' || val[0] == 'e') && val[1] == '=') {
+            DWORD dwResult = strtoul(val.data() + 2, NULL, 10);
+            m_module.log_event(&EAPMETHOD_METHOD_FAILURE_ERROR, event_data((unsigned int)eap_type_legacy_mschapv2), event_data(dwResult), event_data::blank);
+            switch (dwResult) {
+            case ERROR_ACCT_DISABLED         : m_cfg.m_last_status = config_method_with_cred::status_account_disabled   ; break;
+            case ERROR_RESTRICTED_LOGON_HOURS: m_cfg.m_last_status = config_method_with_cred::status_account_logon_hours; break;
+            case ERROR_NO_DIALIN_PERMISSION  : m_cfg.m_last_status = config_method_with_cred::status_account_denied     ; break;
+            case ERROR_PASSWD_EXPIRED        : m_cfg.m_last_status = config_method_with_cred::status_cred_expired       ; break;
+            case ERROR_CHANGING_PASSWORD     : m_cfg.m_last_status = config_method_with_cred::status_cred_changing      ; break;
+            default                          : m_cfg.m_last_status = config_method_with_cred::status_cred_invalid       ;
+            }
+        } else if ((val[0] == 'C' || val[0] == 'c') && val[1] == '=') {
+            hex_dec dec;
+            sanitizing_blob resp;
+            bool is_last;
+            dec.decode(resp, is_last, val.data() + 2, (size_t)-1);
+            if (resp.size() != sizeof(m_challenge_server))
+                throw invalid_argument(string_printf(__FUNCTION__ " Incorrect MSCHAPv2 challenge length (expected: %uB, received: %uB).", sizeof(m_challenge_server), resp.size()).c_str());
+            memcpy(&m_challenge_server, resp.data(), sizeof(m_challenge_server));
+        } else if ((val[0] == 'M' || val[0] == 'm') && val[1] == '=') {
+            MultiByteToWideChar(CP_UTF8, 0, val.data() + 2, -1, m_cfg.m_last_msg);
+            m_module.log_event(&EAPMETHOD_METHOD_FAILURE_ERROR1, event_data((unsigned int)eap_type_legacy_mschapv2), event_data(m_cfg.m_last_msg), event_data::blank);
+        }
+    }
+}
+
+
+list<string> eap::method_mschapv2::parse_response(_In_count_(count) const char *resp, _In_ size_t count)
+{
+    list<string> argv;
+
+    for (size_t i = 0; i < count && resp[i]; ) {
+        if (i + 1 < count && (resp[i] == 'M' || resp[i] == 'm') && resp[i + 1] == '=') {
+            // The message is always the last value. It may contain spaces and it spans to the end.
+            argv.push_back(string(resp + i, strnlen(resp + i, count - i)));
+            break;
+        } else if (!isspace(resp[i])) {
+            // Search for the next space and add value up to it.
+            size_t j;
+            for (j = i + 1; j < count && resp[j] && !isspace(resp[j]); j++);
+            argv.push_back(string(resp + i, j - i));
+            i = j + 1;
+        } else {
+            // Skip (multiple) spaces.
+            i++;
+        }
+    }
+
+    return argv;
 }

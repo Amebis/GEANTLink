@@ -275,30 +275,34 @@ void eap::method_ttls::process_application_data(_In_bytecount_(size_msg) const v
 #endif
         m_inner->get_response_packet(ptr_data, &size_data);
 
+        if (size_data) {
 #if EAP_TLS < EAP_TLS_SCHANNEL
-        data.resize(size_data);
-        sanitizing_blob msg_application(make_message(tls_message_type_application_data, std::move(data)));
-        m_packet_res.m_data.insert(m_packet_res.m_data.end(), msg_application.begin(), msg_application.end());
+            data.resize(size_data);
+            sanitizing_blob msg_application(make_message(tls_message_type_application_data, std::move(data)));
+            m_packet_res.m_data.insert(m_packet_res.m_data.end(), msg_application.begin(), msg_application.end());
 #else
-        // Prepare input/output buffer(s).
-        SecBuffer buf[] = {
-            {  sizes.cbHeader, SECBUFFER_STREAM_HEADER , data.data()          },
-            {       size_data, SECBUFFER_DATA          , ptr_data             },
-            { sizes.cbTrailer, SECBUFFER_STREAM_TRAILER, ptr_data + size_data },
-            {               0, SECBUFFER_EMPTY         , NULL                 },
-        };
-        SecBufferDesc buf_desc = {
-            SECBUFFER_VERSION,
-            _countof(buf),
-            buf
-        };
+            // Prepare input/output buffer(s).
+            SecBuffer buf[] = {
+                {  sizes.cbHeader, SECBUFFER_STREAM_HEADER , data.data()          },
+                {       size_data, SECBUFFER_DATA          , ptr_data             },
+                { sizes.cbTrailer, SECBUFFER_STREAM_TRAILER, ptr_data + size_data },
+                {               0, SECBUFFER_EMPTY         , NULL                 },
+            };
+            SecBufferDesc buf_desc = {
+                SECBUFFER_VERSION,
+                _countof(buf),
+                buf
+            };
 
-        // Encrypt the message.
-        status = EncryptMessage(m_sc_ctx, 0, &buf_desc, 0);
-        if (FAILED(status))
-            throw sec_runtime_error(status, __FUNCTION__ " Error encrypting message.");
-        m_packet_res.m_data.insert(m_packet_res.m_data.end(), (const unsigned char*)buf[0].pvBuffer, (const unsigned char*)buf[0].pvBuffer + buf[0].cbBuffer + buf[1].cbBuffer + buf[2].cbBuffer);
+            // Encrypt the message.
+            status = EncryptMessage(m_sc_ctx, 0, &buf_desc, 0);
+            if (FAILED(status))
+                throw sec_runtime_error(status, __FUNCTION__ " Error encrypting message.");
+            m_packet_res.m_data.insert(m_packet_res.m_data.end(), (const unsigned char*)buf[0].pvBuffer, (const unsigned char*)buf[0].pvBuffer + buf[0].cbBuffer + buf[1].cbBuffer + buf[2].cbBuffer);
 #endif
+        } else {
+            // Empty packets represent ACK message, and are not encrypted.
+        }
 
         break;
     }
