@@ -751,7 +751,6 @@ protected:
         m_own_identity->SetValue(
             !identity.empty()  ? identity :
             m_cred_own.empty() ? _("<empty>") : _("<blank ID>"));
-        m_own_identity->Refresh();
     }
 
 
