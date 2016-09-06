@@ -166,7 +166,7 @@ void eap::credentials_tls::operator>>(_Inout_ cursor_in &cursor)
 }
 
 
-void eap::credentials_tls::store(_In_z_ LPCTSTR pszTargetName) const
+void eap::credentials_tls::store(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int level) const
 {
     assert(pszTargetName);
 
@@ -179,7 +179,7 @@ void eap::credentials_tls::store(_In_z_ LPCTSTR pszTargetName) const
             throw win_runtime_error(__FUNCTION__ " CryptProtectData failed.");
     }
 
-    tstring target(target_name(pszTargetName));
+    tstring target(target_name(pszTargetName, level));
 
     // Write credentials.
     assert(cred_enc.cbData     < CRED_MAX_CREDENTIAL_BLOB_SIZE);
@@ -203,13 +203,13 @@ void eap::credentials_tls::store(_In_z_ LPCTSTR pszTargetName) const
 }
 
 
-void eap::credentials_tls::retrieve(_In_z_ LPCTSTR pszTargetName)
+void eap::credentials_tls::retrieve(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int level)
 {
     assert(pszTargetName);
 
     // Read credentials.
     unique_ptr<CREDENTIAL, CredFree_delete<CREDENTIAL> > cred;
-    if (!CredRead(target_name(pszTargetName).c_str(), CRED_TYPE_GENERIC, 0, (PCREDENTIAL*)&cred))
+    if (!CredRead(target_name(pszTargetName, level).c_str(), CRED_TYPE_GENERIC, 0, (PCREDENTIAL*)&cred))
         throw win_runtime_error(__FUNCTION__ " CredRead failed.");
 
     if (cred->CredentialBlobSize) {
@@ -240,7 +240,7 @@ void eap::credentials_tls::retrieve(_In_z_ LPCTSTR pszTargetName)
 
 LPCTSTR eap::credentials_tls::target_suffix() const
 {
-    return _T("TLS");
+    return _T("Cert");
 }
 
 
@@ -313,7 +313,7 @@ eap::credentials::source_t eap::credentials_tls::combine(
     if (pszTargetName) {
         try {
             credentials_tls cred_loaded(m_module);
-            cred_loaded.retrieve(pszTargetName);
+            cred_loaded.retrieve(pszTargetName, cfg.m_level);
 
             // Using stored credentials.
             *this = std::move(cred_loaded);

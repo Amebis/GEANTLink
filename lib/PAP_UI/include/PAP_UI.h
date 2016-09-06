@@ -20,12 +20,11 @@
 
 #include "../../EAPBase_UI/include/EAP_UI.h"
 #include "../../PAP/include/Config.h"
-#include "../../PAP/include/Credentials.h"
 
 ///
 /// PAP credential configuration panel
 ///
-typedef wxEAPCredentialsConfigPanel<eap::credentials_pap, wxPasswordCredentialsPanel<eap::credentials_pap, wxEAPCredentialsPassPanelBase> > wxPAPCredentialsConfigPanel;
+typedef wxEAPCredentialsConfigPanel<eap::credentials_pass, wxPasswordCredentialsPanel<eap::credentials_pass, wxEAPCredentialsPassPanelBase> > wxPAPCredentialsConfigPanel;
 
 ///
 /// PAP configuration panel
@@ -35,7 +34,7 @@ class wxPAPConfigPanel;
 ///
 /// PAP credential entry panel
 ///
-typedef wxPasswordCredentialsPanel<eap::credentials_pap, wxEAPCredentialsPassPanelBase> wxPAPCredentialsPanel;
+typedef wxPasswordCredentialsPanel<eap::credentials_pass, wxEAPCredentialsPassPanelBase> wxPAPCredentialsPanel;
 
 #pragma once
 

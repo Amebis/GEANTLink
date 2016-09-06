@@ -27,11 +27,9 @@
 #include "../include/TTLS.h"
 
 #include "../../PAP/include/Config.h"
-#include "../../PAP/include/Credentials.h"
 #include "../../PAP/include/Method.h"
 
 #include "../../MSCHAPv2/include/Config.h"
-#include "../../MSCHAPv2/include/Credentials.h"
 #include "../../MSCHAPv2/include/Method.h"
 #include "../../MSCHAPv2/include/MSCHAPv2.h"
 

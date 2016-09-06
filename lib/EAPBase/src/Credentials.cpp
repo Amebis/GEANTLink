@@ -197,6 +197,12 @@ eap::credentials_pass& eap::credentials_pass::operator=(_Inout_ credentials_pass
 }
 
 
+eap::config* eap::credentials_pass::clone() const
+{
+    return new credentials_pass(*this);
+}
+
+
 void eap::credentials_pass::clear()
 {
     credentials::clear();
@@ -275,7 +281,7 @@ void eap::credentials_pass::operator>>(_Inout_ cursor_in &cursor)
 }
 
 
-void eap::credentials_pass::store(_In_z_ LPCTSTR pszTargetName) const
+void eap::credentials_pass::store(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int level) const
 {
     assert(pszTargetName);
 
@@ -290,7 +296,7 @@ void eap::credentials_pass::store(_In_z_ LPCTSTR pszTargetName) const
     if (!CryptProtectData(&cred_blob, NULL, &entropy_blob, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN, &cred_enc))
         throw win_runtime_error(__FUNCTION__ " CryptProtectData failed.");
 
-    tstring target(target_name(pszTargetName));
+    tstring target(target_name(pszTargetName, level));
 
     // Write credentials.
     assert(cred_enc.cbData     < CRED_MAX_CREDENTIAL_BLOB_SIZE);
@@ -314,13 +320,13 @@ void eap::credentials_pass::store(_In_z_ LPCTSTR pszTargetName) const
 }
 
 
-void eap::credentials_pass::retrieve(_In_z_ LPCTSTR pszTargetName)
+void eap::credentials_pass::retrieve(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int level)
 {
     assert(pszTargetName);
 
     // Read credentials.
     unique_ptr<CREDENTIAL, CredFree_delete<CREDENTIAL> > cred;
-    if (!CredRead(target_name(pszTargetName).c_str(), CRED_TYPE_GENERIC, 0, (PCREDENTIAL*)&cred))
+    if (!CredRead(target_name(pszTargetName, level).c_str(), CRED_TYPE_GENERIC, 0, (PCREDENTIAL*)&cred))
         throw win_runtime_error(__FUNCTION__ " CredRead failed.");
 
     // Decrypt the password using user's key.
@@ -348,6 +354,49 @@ void eap::credentials_pass::retrieve(_In_z_ LPCTSTR pszTargetName)
         L"********"
 #endif
         );
+}
+
+
+LPCTSTR eap::credentials_pass::target_suffix() const
+{
+    return _T("pass");
+}
+
+
+eap::credentials::source_t eap::credentials_pass::combine(
+    _In_       const credentials             *cred_cached,
+    _In_       const config_method_with_cred &cfg,
+    _In_opt_z_       LPCTSTR                 pszTargetName)
+{
+    if (cred_cached) {
+        // Using EAP service cached credentials.
+        *this = *(credentials_pass*)cred_cached;
+        m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CACHED1, event_data((unsigned int)cfg.get_method_id()), event_data(credentials_pass::get_name()), event_data::blank);
+        return source_cache;
+    }
+
+    if (cfg.m_use_preshared) {
+        // Using preshared credentials.
+        *this = *(credentials_pass*)cfg.m_preshared.get();
+        m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_PRESHARED1, event_data((unsigned int)cfg.get_method_id()), event_data(credentials_pass::get_name()), event_data::blank);
+        return source_preshared;
+    }
+
+    if (pszTargetName) {
+        try {
+            credentials_pass cred_loaded(m_module);
+            cred_loaded.retrieve(pszTargetName, cfg.m_level);
+
+            // Using stored credentials.
+            *this = std::move(cred_loaded);
+            m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_STORED1, event_data((unsigned int)cfg.get_method_id()), event_data(credentials_pass::get_name()), event_data::blank);
+            return source_storage;
+        } catch (...) {
+            // Not actually an error.
+        }
+    }
+
+    return source_unknown;
 }
 
 

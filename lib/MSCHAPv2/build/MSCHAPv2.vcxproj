@@ -80,14 +80,12 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
   <ItemGroup>
     <ClInclude Include="..\include\Config.h" />
-    <ClInclude Include="..\include\Credentials.h" />
     <ClInclude Include="..\include\Method.h" />
     <ClInclude Include="..\include\MSCHAPv2.h" />
     <ClInclude Include="..\src\StdAfx.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Config.cpp" />
-    <ClCompile Include="..\src\Credentials.cpp" />
     <ClCompile Include="..\src\Method.cpp" />
     <ClCompile Include="..\src\MSCHAPv2.cpp" />
     <ClCompile Include="..\src\StdAfx.cpp">

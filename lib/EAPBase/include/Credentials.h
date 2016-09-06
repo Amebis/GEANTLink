@@ -179,28 +179,40 @@ namespace eap
         /// Save credentials to Windows Credential Manager
         ///
         /// \param[in]  pszTargetName  The name in Windows Credential Manager to store credentials as
+        /// \param[in]  level          Credential level (0=outer, 1=inner, 2=inner-inner...)
         ///
-        virtual void store(_In_z_ LPCTSTR pszTargetName) const = 0;
+        virtual void store(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int level) const = 0;
 
         ///
         /// Retrieve credentials from Windows Credential Manager
         ///
         /// \param[in]  pszTargetName  The name in Windows Credential Manager to retrieve credentials from
+        /// \param[in]  level          Credential level (0=outer, 1=inner, 2=inner-inner...)
         ///
-        virtual void retrieve(_In_z_ LPCTSTR pszTargetName) = 0;
+        virtual void retrieve(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int level) = 0;
 
         ///
         /// Returns target name for Windows Credential Manager credential name
         ///
         /// \param[in]  pszTargetName  The name in Windows Credential Manager to retrieve credentials from
+        /// \param[in]  level          Credential level (0=outer, 1=inner, 2=inner-inner...)
         ///
         /// \returns Final target name to store/retrieve credentials in Windows Credential Manager
         ///
-        inline winstd::tstring target_name(_In_z_ LPCTSTR pszTargetName) const
+        inline winstd::tstring target_name(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int level) const
         {
+            // Start with product name and given target name (identity provider usually).
             winstd::tstring target_name(_T(PRODUCT_NAME_STR) _T("/"));
             target_name += pszTargetName;
             target_name += _T('/');
+
+            // Append level of credentials.
+            TCHAR buf[20];
+            _ultot_s(level, buf, _countof(buf), 10);
+            target_name += buf;
+            target_name += _T('/');
+
+            // Append credential type.
             target_name += target_suffix();
             assert(target_name.length() < CRED_MAX_GENERIC_TARGET_NAME_LENGTH);
             return target_name;
@@ -292,6 +304,13 @@ namespace eap
         credentials_pass& operator=(_Inout_ credentials_pass &&other);
 
         ///
+        /// Clones credentials
+        ///
+        /// \returns Pointer to cloned credentials
+        ///
+        virtual config* clone() const;
+
+        ///
         /// Resets credentials
         ///
         virtual void clear();
@@ -358,17 +377,45 @@ namespace eap
         /// Save credentials to Windows Credential Manager
         ///
         /// \param[in]  pszTargetName  The name in Windows Credential Manager to store credentials as
+        /// \param[in]  level          Credential level (0=outer, 1=inner, 2=inner-inner...)
         ///
-        virtual void store(_In_z_ LPCTSTR pszTargetName) const;
+        virtual void store(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int level) const;
 
         ///
         /// Retrieve credentials from Windows Credential Manager
         ///
         /// \param[in]  pszTargetName  The name in Windows Credential Manager to retrieve credentials from
+        /// \param[in]  level          Credential level (0=outer, 1=inner, 2=inner-inner...)
         ///
-        virtual void retrieve(_In_z_ LPCTSTR pszTargetName);
+        virtual void retrieve(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int level);
+
+        ///
+        /// Return target suffix for Windows Credential Manager credential name
+        ///
+        virtual LPCTSTR target_suffix() const;
 
         /// @}
+
+        ///
+        /// Combine credentials in the following order:
+        ///
+        /// 1. Cached credentials
+        /// 2. Pre-configured credentials
+        /// 3. Stored credentials
+        ///
+        /// \param[in] cred_cached    Cached credentials (optional, can be \c NULL, must be credentials_pass* type)
+        /// \param[in] cfg            Method configuration (must be config_method_pap type)
+        /// \param[in] pszTargetName  The name in Windows Credential Manager to retrieve credentials from (optional, can be \c NULL)
+        ///
+        /// \returns
+        /// - \c source_cache      Credentials were obtained from EapHost cache
+        /// - \c source_preshared  Credentials were set by method configuration
+        /// - \c source_storage    Credentials were loaded from Windows Credential Manager
+        ///
+        virtual source_t combine(
+            _In_       const credentials             *cred_cached,
+            _In_       const config_method_with_cred &cfg,
+            _In_opt_z_       LPCTSTR                 pszTargetName);
 
     public:
         winstd::sanitizing_wstring m_password;  ///< Password

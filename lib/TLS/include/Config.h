@@ -66,9 +66,10 @@ namespace eap
         ///
         /// Constructs configuration
         ///
-        /// \param[in] mod  EAP module to use for global services
+        /// \param[in] mod    EAP module to use for global services
+        /// \param[in] level  Config level (0=outer, 1=inner, 2=inner-inner...)
         ///
-        config_method_tls(_In_ module &mod);
+        config_method_tls(_In_ module &mod, _In_ unsigned int level);
 
         ///
         /// Copies configuration

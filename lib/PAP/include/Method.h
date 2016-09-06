@@ -30,7 +30,6 @@ namespace eap
 #pragma once
 
 #include "Config.h"
-#include "Credentials.h"
 
 #include "../../EAPBase/include/Method.h"
 
@@ -47,7 +46,7 @@ namespace eap
         /// \param[in] cfg   Method configuration
         /// \param[in] cred  User credentials
         ///
-        method_pap(_In_ module &module, _In_ config_method_pap &cfg, _In_ credentials_pap &cred);
+        method_pap(_In_ module &module, _In_ config_method_pap &cfg, _In_ credentials_pass &cred);
 
         ///
         /// Moves an EAP method
@@ -92,7 +91,7 @@ namespace eap
         /// @}
 
     protected:
-        credentials_pap &m_cred;    ///< EAP-TLS user credentials
+        credentials_pass &m_cred;    ///< EAP-TLS user credentials
 
         enum {
             phase_unknown = -1,     ///< Unknown phase

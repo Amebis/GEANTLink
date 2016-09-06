@@ -29,7 +29,6 @@ namespace eap
 #pragma once
 
 #include "Config.h"
-#include "Credentials.h"
 #include "MSCHAPv2.h"
 
 #include "../../EAPBase/include/Method.h"
@@ -49,7 +48,7 @@ namespace eap
         /// \param[in] cfg   Method configuration
         /// \param[in] cred  User credentials
         ///
-        method_mschapv2(_In_ module &module, _In_ config_method_mschapv2 &cfg, _In_ credentials_mschapv2 &cred);
+        method_mschapv2(_In_ module &module, _In_ config_method_mschapv2 &cfg, _In_ credentials_pass &cred);
 
         ///
         /// Moves an EAP method
@@ -133,7 +132,7 @@ namespace eap
         static std::list<std::string> parse_response(_In_count_(count) const char *resp, _In_ size_t count);
 
     protected:
-        credentials_mschapv2 &m_cred;           ///< EAP-TLS user credentials
+        credentials_pass &m_cred;           ///< EAP-TLS user credentials
         winstd::crypt_prov m_cp;                ///< Cryptography provider for general services
 
         challenge_mschapv2 m_challenge_server;  ///< MSCHAP server challenge

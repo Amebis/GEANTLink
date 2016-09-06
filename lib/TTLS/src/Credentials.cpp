@@ -146,23 +146,23 @@ void eap::credentials_ttls::operator>>(_Inout_ cursor_in &cursor)
 }
 
 
-void eap::credentials_ttls::store(_In_z_ LPCTSTR pszTargetName) const
+void eap::credentials_ttls::store(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int level) const
 {
     assert(0); // Not that we would ever store inner&outer credentials to Windows Credential Manager joined, but for completness sake... Here we go:
 
-    credentials_tls::store(pszTargetName);
+    credentials_tls::store(pszTargetName, level);
 
-    m_inner->store(pszTargetName);
+    m_inner->store(pszTargetName, level + 1);
 }
 
 
-void eap::credentials_ttls::retrieve(_In_z_ LPCTSTR pszTargetName)
+void eap::credentials_ttls::retrieve(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int level)
 {
     assert(0); // Not that we would ever retrieve inner&outer credentials to Windows Credential Manager joined, but for completness sake... Here we go:
 
-    credentials_tls::retrieve(pszTargetName);
+    credentials_tls::retrieve(pszTargetName, level);
 
-    m_inner->retrieve(pszTargetName);
+    m_inner->retrieve(pszTargetName, level + 1);
 }
 
 

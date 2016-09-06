@@ -199,7 +199,6 @@ public:
         this->SetIcon(wxIcon(wxICON(product.ico)));
 #endif
 
-        wstring target_name;
         for (eap::config_connection::provider_list::iterator provider = m_cfg.m_providers.begin(), provider_end = m_cfg.m_providers.end(); provider != provider_end; ++provider) {
             bool is_single = provider->m_methods.size() == 1;
             std::vector<std::unique_ptr<eap::config_method> >::size_type count = 0;
@@ -682,7 +681,7 @@ protected:
         if (dlg.ShowModal() == wxID_OK && panel->GetRemember()) {
             // Write credentials to credential manager.
             try {
-                m_cred_own.store(m_prov.get_id().c_str());
+                m_cred_own.store(m_prov.get_id().c_str(), m_cfg.m_level);
                 m_has_own = TRUE;
                 UpdateOwnIdentity();
             } catch (winstd::win_runtime_error &err) {
@@ -698,7 +697,7 @@ protected:
 
     virtual void OnClearOwn(wxCommandEvent& /*event*/)
     {
-        if (CredDelete(m_cred_own.target_name(m_prov.get_id().c_str()).c_str(), CRED_TYPE_GENERIC, 0)) {
+        if (CredDelete(m_cred_own.target_name(m_prov.get_id().c_str(), m_cfg.m_level).c_str(), CRED_TYPE_GENERIC, 0)) {
             m_own_identity->Clear();
             m_has_own = false;
         } else
@@ -728,7 +727,7 @@ protected:
     void RetrieveOwnCredentials()
     {
         try {
-            m_cred_own.retrieve(m_prov.get_id().c_str());
+            m_cred_own.retrieve(m_prov.get_id().c_str(), m_cfg.m_level);
             m_has_own = true;
             UpdateOwnIdentity();
         } catch (winstd::win_runtime_error &err) {

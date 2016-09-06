@@ -40,7 +40,7 @@ static int CredWrite()
         return -1;
     }
 
-    eap::credentials_pap cred_pap(g_module);
+    eap::credentials_pass cred_pass(g_module);
 
     // Prepare identity (user name).
     {
@@ -50,7 +50,7 @@ static int CredWrite()
         bool is_last;
         dec.decode(identity_utf8, is_last, pwcArglist[1], (size_t)-1);
 
-        MultiByteToWideChar(CP_UTF8, 0, identity_utf8.data(), (int)identity_utf8.size(), cred_pap.m_identity);
+        MultiByteToWideChar(CP_UTF8, 0, identity_utf8.data(), (int)identity_utf8.size(), cred_pass.m_identity);
     }
 
     // Prepare password.
@@ -61,7 +61,7 @@ static int CredWrite()
         bool is_last;
         dec.decode(password_utf8, is_last, pwcArglist[2], (size_t)-1);
 
-        MultiByteToWideChar(CP_UTF8, 0, password_utf8.data(), (int)password_utf8.size(), cred_pap.m_password);
+        MultiByteToWideChar(CP_UTF8, 0, password_utf8.data(), (int)password_utf8.size(), cred_pass.m_password);
     }
 
     // Generate target name (aka realm).
@@ -71,7 +71,7 @@ static int CredWrite()
         target_name = pwcArglist[3];
     } else {
         // Get the realm from user name.
-        LPCWSTR _identity = cred_pap.m_identity.c_str(), domain;
+        LPCWSTR _identity = cred_pass.m_identity.c_str(), domain;
         if ((domain = wcschr(_identity, L'@')) != NULL) {
             target_name  = L"urn:RFC4282:realm:";
             target_name += domain + 1;
@@ -79,12 +79,22 @@ static int CredWrite()
             target_name = L"*";
     }
 
+    // Determine credential level.
+    unsigned int level;
+    if (nArgs > 4) {
+        // User explicitly set the level.
+        level = wcstoul(pwcArglist[4], NULL, 10);
+    } else {
+        // Set default level.
+        level = 0;
+    }
+
     // Write credentials.
 #ifdef _DEBUG
     {
-        eap::credentials_pap cred_stored(g_module);
+        eap::credentials_pass cred_stored(g_module);
         try {
-            cred_stored.retrieve(target_name.c_str());
+            cred_stored.retrieve(target_name.c_str(), level);
         } catch(win_runtime_error &err) {
             OutputDebugStr(_T("%hs (error %u)\n"), err.what(), err.number());
         } catch(...) {
@@ -93,25 +103,13 @@ static int CredWrite()
     }
 #endif
     try {
-        cred_pap.store(target_name.c_str());
+        cred_pass.store(target_name.c_str(), level);
     } catch(win_runtime_error &err) {
         OutputDebugStr(_T("%hs (error %u)\n"), err.what(), err.number());
         return 2;
     } catch(...) {
         OutputDebugStr(_T("Writing credentials failed.\n"));
         return 2;
-    }
-
-    // Store empty TLS credentials.
-    eap::credentials_tls cred_tls(g_module);
-    try {
-        cred_tls.store(target_name.c_str());
-    } catch(win_runtime_error &err) {
-        OutputDebugStr(_T("%hs (error %u)\n"), err.what(), err.number());
-        return 3;
-    } catch(...) {
-        OutputDebugStr(_T("Writing credentials failed.\n"));
-        return 3;
     }
 
     return 0;

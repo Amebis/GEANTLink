@@ -158,15 +158,17 @@ namespace eap
         /// Save credentials to Windows Credential Manager
         ///
         /// \param[in]  pszTargetName  The name in Windows Credential Manager to store credentials as
+        /// \param[in]  level          Credential level (0=outer, 1=inner, 2=inner-inner...)
         ///
-        virtual void store(_In_z_ LPCTSTR pszTargetName) const;
+        virtual void store(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int level) const;
 
         ///
         /// Retrieve credentials from Windows Credential Manager
         ///
         /// \param[in]  pszTargetName  The name in Windows Credential Manager to retrieve credentials from
+        /// \param[in]  level          Credential level (0=outer, 1=inner, 2=inner-inner...)
         ///
-        virtual void retrieve(_In_z_ LPCTSTR pszTargetName);
+        virtual void retrieve(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int level);
 
         ///
         /// Return target suffix for Windows Credential Manager credential name

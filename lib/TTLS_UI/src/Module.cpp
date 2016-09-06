@@ -52,7 +52,7 @@ eap::peer_ttls_ui::peer_ttls_ui() : peer_ui(eap_type_ttls)
 
 eap::config_method* eap::peer_ttls_ui::make_config_method()
 {
-    return new config_method_ttls(*this);
+    return new config_method_ttls(*this, 0);
 }
 
 
@@ -270,7 +270,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
                     // Write credentials to credential manager.
                     if (panel->m_outer_cred->GetRemember()) {
                         try {
-                            _cred_out->credentials_tls::store(target_name.c_str());
+                            _cred_out->credentials_tls::store(target_name.c_str(), 0);
                         } catch (winstd::win_runtime_error &err) {
                             wxLogError(winstd::tstring_printf(_("Error writing credentials to Credential Manager: %hs (error %u)"), err.what(), err.number()).c_str());
                         } catch (...) {
@@ -280,7 +280,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
 
                     if (panel->m_inner_cred->GetRemember()) {
                         try {
-                            _cred_out->m_inner->store(target_name.c_str());
+                            _cred_out->m_inner->store(target_name.c_str(), 1);
                         } catch (winstd::win_runtime_error &err) {
                             wxLogError(winstd::tstring_printf(_("Error writing credentials to Credential Manager: %hs (error %u)"), err.what(), err.number()).c_str());
                         } catch (...) {

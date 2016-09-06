@@ -28,7 +28,7 @@ using namespace winstd;
 // eap::method_mschapv2
 //////////////////////////////////////////////////////////////////////
 
-eap::method_mschapv2::method_mschapv2(_In_ module &module, _In_ config_method_mschapv2 &cfg, _In_ credentials_mschapv2 &cred) :
+eap::method_mschapv2::method_mschapv2(_In_ module &module, _In_ config_method_mschapv2 &cfg, _In_ credentials_pass &cred) :
     m_cred(cred),
     m_ident(0),
     m_success(false),

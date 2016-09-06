@@ -28,7 +28,7 @@ using namespace winstd;
 // eap::method_pap
 //////////////////////////////////////////////////////////////////////
 
-eap::method_pap::method_pap(_In_ module &module, _In_ config_method_pap &cfg, _In_ credentials_pap &cred) :
+eap::method_pap::method_pap(_In_ module &module, _In_ config_method_pap &cfg, _In_ credentials_pass &cred) :
     m_cred(cred),
     m_phase(phase_unknown),
     method_noneap(module, cfg, cred)

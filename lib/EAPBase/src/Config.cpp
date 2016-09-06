@@ -102,25 +102,33 @@ const bstr eap::config::namespace_eapmetadata(L"urn:ietf:params:xml:ns:yang:ietf
 // eap::config_method
 //////////////////////////////////////////////////////////////////////
 
-eap::config_method::config_method(_In_ module &mod) : config(mod)
+eap::config_method::config_method(_In_ module &mod, _In_ unsigned int level) :
+    m_level(level),
+    config(mod)
 {
 }
 
 
-eap::config_method::config_method(_In_ const config_method &other) : config(other)
+eap::config_method::config_method(_In_ const config_method &other) :
+    m_level(other.m_level),
+    config(other)
 {
 }
 
 
-eap::config_method::config_method(_Inout_ config_method &&other) : config(std::move(other))
+eap::config_method::config_method(_Inout_ config_method &&other) :
+    m_level(other.m_level),
+    config(std::move(other))
 {
 }
 
 
 eap::config_method& eap::config_method::operator=(_In_ const config_method &other)
 {
-    if (this != &other)
+    if (this != &other) {
+        assert(m_level == other.m_level); // Allow copy within same configuration level only.
         (config&)*this = other;
+    }
 
     return *this;
 }
@@ -128,8 +136,10 @@ eap::config_method& eap::config_method::operator=(_In_ const config_method &othe
 
 eap::config_method& eap::config_method::operator=(_Inout_ config_method &&other)
 {
-    if (this != &other)
+    if (this != &other) {
+        assert(m_level == other.m_level); // Allow move within same configuration level only.
         (config&&)*this = std::move(other);
+    }
 
     return *this;
 }
@@ -139,11 +149,11 @@ eap::config_method& eap::config_method::operator=(_Inout_ config_method &&other)
 // eap::config_method_with_cred
 //////////////////////////////////////////////////////////////////////
 
-eap::config_method_with_cred::config_method_with_cred(_In_ module &mod) :
+eap::config_method_with_cred::config_method_with_cred(_In_ module &mod, _In_ unsigned int level) :
     m_allow_save(true),
     m_use_preshared(false),
     m_last_status(status_success),
-    config_method(mod)
+    config_method(mod, level)
 {
 }
 

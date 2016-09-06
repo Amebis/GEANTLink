@@ -21,7 +21,6 @@
 #pragma once
 
 #include "../include/Config.h"
-#include "../include/Credentials.h"
 #include "../include/Method.h"
 #include "../include/MSCHAPv2.h"
 

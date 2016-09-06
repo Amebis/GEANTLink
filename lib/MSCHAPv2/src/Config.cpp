@@ -28,9 +28,9 @@ using namespace winstd;
 // eap::config_method_mschapv2
 //////////////////////////////////////////////////////////////////////
 
-eap::config_method_mschapv2::config_method_mschapv2(_In_ module &mod) : config_method_with_cred(mod)
+eap::config_method_mschapv2::config_method_mschapv2(_In_ module &mod, _In_ unsigned int level) : config_method_with_cred(mod, level)
 {
-    m_preshared.reset(new credentials_mschapv2(mod));
+    m_preshared.reset(new credentials_pass(mod));
 }
 
 
@@ -84,5 +84,5 @@ const wchar_t* eap::config_method_mschapv2::get_method_str() const
 
 eap::credentials* eap::config_method_mschapv2::make_credentials() const
 {
-    return new credentials_mschapv2(m_module);
+    return new credentials_pass(m_module);
 }

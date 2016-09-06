@@ -95,8 +95,8 @@ void wxTTLSConfigPanel::OnUpdateUI(wxUpdateUIEvent& /*event*/)
 
 wxTTLSConfigWindow::wxTTLSConfigWindow(eap::config_provider &prov, eap::config_method &cfg, wxWindow* parent) :
     m_cfg((eap::config_method_ttls&)cfg),
-    m_cfg_pap(cfg.m_module),
-    m_cfg_mschapv2(cfg.m_module),
+    m_cfg_pap(cfg.m_module, cfg.m_level + 1),
+    m_cfg_mschapv2(cfg.m_module, cfg.m_level + 1),
     wxEAPConfigWindow(prov, cfg, parent)
 {
     wxBoxSizer* sb_content;
@@ -246,13 +246,13 @@ wxTTLSCredentialsPanel::wxTTLSCredentialsPanel(const eap::config_provider &prov,
     const eap::config_method_mschapv2 *cfg_inner_mschapv2;
     if ((cfg_inner_pap = dynamic_cast<const eap::config_method_pap*>(m_cfg.m_inner.get())) != NULL) {
         eap::credentials_ttls &cred_ttls = (eap::credentials_ttls&)cred;
-        if (!cred_ttls.m_inner) cred_ttls.m_inner.reset(new eap::credentials_pap(cred.m_module));
-        m_inner_cred = new wxPAPCredentialsPanel(m_prov, *cfg_inner_pap, *(eap::credentials_pap*)cred_ttls.m_inner.get(), this, is_config);
+        if (!cred_ttls.m_inner) cred_ttls.m_inner.reset(new eap::credentials_pass(cred.m_module));
+        m_inner_cred = new wxPAPCredentialsPanel(m_prov, *cfg_inner_pap, *(eap::credentials_pass*)cred_ttls.m_inner.get(), this, is_config);
         sb_content->Add(m_inner_cred, 0, wxALL|wxEXPAND, 5);
     } else if ((cfg_inner_mschapv2 = dynamic_cast<const eap::config_method_mschapv2*>(m_cfg.m_inner.get())) != NULL) {
         eap::credentials_ttls &cred_ttls = (eap::credentials_ttls&)cred;
-        if (!cred_ttls.m_inner) cred_ttls.m_inner.reset(new eap::credentials_mschapv2(cred.m_module));
-        m_inner_cred = new wxMSCHAPv2CredentialsPanel(m_prov, *cfg_inner_mschapv2, *(eap::credentials_mschapv2*)cred_ttls.m_inner.get(), this, is_config);
+        if (!cred_ttls.m_inner) cred_ttls.m_inner.reset(new eap::credentials_pass(cred.m_module));
+        m_inner_cred = new wxMSCHAPv2CredentialsPanel(m_prov, *cfg_inner_mschapv2, *(eap::credentials_pass*)cred_ttls.m_inner.get(), this, is_config);
         sb_content->Add(m_inner_cred, 0, wxALL|wxEXPAND, 5);
     } else
         assert(0); // Unsupported inner authentication method type.
