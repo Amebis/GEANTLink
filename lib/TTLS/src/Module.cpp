@@ -270,6 +270,13 @@ void eap::peer_ttls::get_result(
     s->m_eap_attr_desc.pAttribs = s->m_method->m_eap_attr.data();
     ppResult->pAttribArray = &s->m_eap_attr_desc;
 
+    // Do not report failure to EapHost, as it will not save updated configuration then. But we need it to save it, to alert user on next connection attempt.
+    // EapHost is well aware of the failed condition.
+    //ppResult->fIsSuccess          = FALSE;
+    //ppResult->dwFailureReasonCode = EAP_E_AUTHENTICATION_FAILED;
+    ppResult->fIsSuccess          = TRUE;
+    ppResult->dwFailureReasonCode = ERROR_SUCCESS;
+
     if (ppResult->fSaveConnectionData) {
         pack(s->m_cfg, &ppResult->pConnectionData, &ppResult->dwSizeofConnectionData);
         if (s->m_blob_cfg)

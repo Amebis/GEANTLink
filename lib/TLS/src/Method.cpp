@@ -530,9 +530,6 @@ void eap::method_tls::get_result(
         // Clear credentials as failed.
         m_cfg.m_auth_failed = false;
 
-        ppResult->fIsSuccess          = TRUE;
-        ppResult->dwFailureReasonCode = ERROR_SUCCESS;
-
 #if EAP_TLS < EAP_TLS_SCHANNEL
         // Update configuration with session resumption data.
         m_cfg.m_session_id    = m_session_id;
@@ -594,11 +591,6 @@ void eap::method_tls::get_result(
 
         // TODO: Research how a Schannel session context can be cleared not to resume.
 #endif
-
-        // Do not report failure to EapHost, as it will not save updated configuration then. But we need it to save it, to alert user on next connection attempt.
-        // EapHost is well aware of the failed condition.
-        //ppResult->fIsSuccess          = FALSE;
-        //ppResult->dwFailureReasonCode = EAP_E_AUTHENTICATION_FAILED;
 
         break;
 
