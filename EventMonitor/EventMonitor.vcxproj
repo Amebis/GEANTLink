@@ -123,7 +123,34 @@
     <None Include="wxEventMonitor_UI.fbp" />
   </ItemGroup>
   <ItemGroup>
+    <POCompile Include="locale\bg_BG.po" />
+    <POCompile Include="locale\ca_ES.po" />
+    <POCompile Include="locale\cs_CZ.po" />
+    <POCompile Include="locale\cy.po" />
+    <POCompile Include="locale\de.po" />
+    <POCompile Include="locale\el.po" />
+    <POCompile Include="locale\es.po" />
+    <POCompile Include="locale\eu_ES.po" />
+    <POCompile Include="locale\fi_FI.po" />
+    <POCompile Include="locale\fr_CA.po" />
+    <POCompile Include="locale\fr_FR.po" />
+    <POCompile Include="locale\gl_ES.po" />
+    <POCompile Include="locale\hr_HR.po" />
+    <POCompile Include="locale\hu.po" />
+    <POCompile Include="locale\is.po" />
+    <POCompile Include="locale\it_IT.po" />
+    <POCompile Include="locale\lt.po" />
+    <POCompile Include="locale\nb.po" />
+    <POCompile Include="locale\nl.po" />
+    <POCompile Include="locale\pl_PL.po" />
+    <POCompile Include="locale\pt_PT.po" />
+    <POCompile Include="locale\ru_RU.po" />
+    <POCompile Include="locale\sk_SK.po" />
     <POCompile Include="locale\sl_SI.po" />
+    <POCompile Include="locale\sr.po" />
+    <POCompile Include="locale\sv.po" />
+    <POCompile Include="locale\tr.po" />
+    <POCompile Include="locale\vi.po" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

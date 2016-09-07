@@ -78,5 +78,86 @@
     <POCompile Include="locale\sl_SI.po">
       <Filter>Resource Files\Localization</Filter>
     </POCompile>
+    <POCompile Include="locale\bg_BG.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="locale\ca_ES.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="locale\cs_CZ.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="locale\cy.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="locale\de.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="locale\el.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="locale\es.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="locale\eu_ES.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="locale\fi_FI.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="locale\fr_CA.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="locale\fr_FR.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="locale\gl_ES.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="locale\hr_HR.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="locale\hu.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="locale\is.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="locale\it_IT.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="locale\lt.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="locale\nb.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="locale\nl.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="locale\pl_PL.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="locale\pt_PT.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="locale\ru_RU.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="locale\sk_SK.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="locale\sr.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="locale\sv.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="locale\tr.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="locale\vi.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
   </ItemGroup>
 </Project>
