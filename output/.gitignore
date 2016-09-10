@@ -9,5 +9,6 @@
 /GEANTLink*.dep
 /GEANTLink*.inf
 /GEANTLink*.msi
+/GEANTLink*.mst
 /GEANTLink*.out
 /GEANTLink*.rpt
