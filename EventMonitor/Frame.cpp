@@ -70,7 +70,7 @@ wxEventMonitorFrame::wxEventMonitorFrame(wxWindow* parent, wxWindowID id, const 
 
     m_menuEdit = new wxMenu();
     wxMenuItem* m_menuEditCopy;
-    m_menuEditCopy = new wxMenuItem(m_menuEdit, wxID_COPY, wxEmptyString , wxEmptyString, wxITEM_NORMAL);
+    m_menuEditCopy = new wxMenuItem(m_menuEdit, wxID_COPY, _("&Copy") + wxT('\t') + wxT("Ctrl+C"), _("Copies selected records to clipboard"), wxITEM_NORMAL);
     m_menuEditCopy->SetBitmaps(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(243), size_menu));
     m_menuEdit->Append(m_menuEditCopy);
 
