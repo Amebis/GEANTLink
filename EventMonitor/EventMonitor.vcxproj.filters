@@ -159,5 +159,8 @@
     <POCompile Include="locale\vi_VN.po">
       <Filter>Resource Files\Localization</Filter>
     </POCompile>
+    <POCompile Include="locale\ko_KR.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
   </ItemGroup>
 </Project>

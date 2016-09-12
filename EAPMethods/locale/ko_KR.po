@@ -1,0 +1,559 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: EAPMethods\n"
+"POT-Creation-Date: 2016-09-12 12:11+0200\n"
+"PO-Revision-Date: 2016-09-12 12:13+0200\n"
+"Language-Team: Amebis, d. o. o., Kamnik <info@amebis.si>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.8\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: _\n"
+"Last-Translator: Simon Rozman <simon.rozman@amebis.si>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: ko_KR\n"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:37
+msgid "+"
+msgstr "+"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:38
+msgid "Adds new provider"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:42
+msgid "-"
+msgstr "-"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:43
+msgid "Removes selected provider"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:47
+msgid "Advanced..."
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:48
+msgid "Opens dialog with provider settings"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:230 lib/EAPBase_UI/res/wxEAP_UI.cpp:355
+msgid "Client Credentials"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:241
+msgid "Manage credentials used to connect."
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:254
+msgid "Use &own credentials:"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:255
+msgid "Select this option if you have your unique credentials to connect"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:260
+msgid "Your credentials loaded from Windows Credential Manager"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:270
+msgid "&Clear Credentials"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:271
+msgid ""
+"Click to clear your credentials from Credential Manager.\n"
+"Note: You will be prompted to enter credentials when connecting."
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:275 lib/EAPBase_UI/res/wxEAP_UI.cpp:308
+msgid "&Set Credentials..."
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:276 lib/EAPBase_UI/res/wxEAP_UI.cpp:309
+msgid "Click here to set or modify your credentials"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:292
+msgid "Use &pre-shared credentials:"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:293
+msgid "Select this options if all clients connect using the same credentials"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:298
+msgid "Common (pre-shared) credentials"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:366
+msgid "Please provide your user ID and password."
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:376
+msgid "User ID:"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:381
+msgid "Enter your user name here (user@domain.org, DOMAIN\\User, etc.)"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:385
+msgid "Password:"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:390
+msgid "Enter your password here"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:397 lib/TLS_UI/res/wxTLS_UI.cpp:183
+msgid "&Remember"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:398
+msgid "Check if you would like to save username and password"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:420
+msgid "Your Organization"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:431
+msgid ""
+"Describe your organization to customize user prompts.  When organization is "
+"introduced, end-users find program messages easier to understand and act."
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:438
+msgid "Your organization &name:"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:443
+msgid ""
+"Your organization name as it will appear on helpdesk contact notifications"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:447
+msgid "(Keep it short, please)"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:457
+msgid "Helpdesk contact &information:"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:467
+msgid "¶"
+msgstr "¶"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:474
+msgid "Your helpdesk website address"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:478
+msgid "*"
+msgstr "*"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:485
+msgid "Your helpdesk e-mail address"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:489
+msgid ")"
+msgstr ")"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:496
+msgid "Your helpdesk phone number"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:524
+msgid "Provider Unique Identifier"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:535
+msgid ""
+"Assign your organization a unique ID to allow sharing the same credential "
+"set across different network profiles."
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:542
+msgid "&Namespace:"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:546
+msgid "urn:RFC4282:realm"
+msgstr "urn:RFC4282:realm"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:546
+msgid "urn:uuid"
+msgstr "urn:uuid"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:558
+msgid "Provider unique &identifier:"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:563
+msgid "Your organization ID to assign same credentials from other profiles"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:588
+msgid "Configuration Lock"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:599
+msgid ""
+"Your configuration can be locked to prevent accidental modification by end-"
+"users. Users will only be allowed to enter credentials."
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:606
+msgid ""
+"&Lock this configuration and prevent any further modification via user "
+"interface."
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:609
+msgid "(Warning: Once locked, you can not revert using this dialog!)"
+msgstr ""
+
+#: lib/EAPBase_UI/src/EAP_UI.cpp:98
+#, c-format
+msgid "%s Credentials"
+msgstr ""
+
+#: lib/EAPBase_UI/src/EAP_UI.cpp:123 lib/EAPBase_UI/include/EAP_UI.h:352
+#: lib/EAPBase_UI/include/EAP_UI.h:362 lib/EAPBase_UI/res/wxEAP_UI.h:119
+msgid "EAP Credentials"
+msgstr ""
+
+#: lib/EAPBase_UI/src/EAP_UI.cpp:166
+#, c-format
+msgid "For additional help and instructions, please contact %s at:"
+msgstr ""
+
+#: lib/EAPBase_UI/src/EAP_UI.cpp:167
+msgid "your provider"
+msgstr ""
+
+#: lib/EAPBase_UI/src/EAP_UI.cpp:186
+msgid "Open the default web browser"
+msgstr ""
+
+#: lib/EAPBase_UI/src/EAP_UI.cpp:197
+msgid "Open your e-mail program"
+msgstr ""
+
+#: lib/EAPBase_UI/src/EAP_UI.cpp:208
+msgid "Dial the phone number"
+msgstr ""
+
+#: lib/EAPBase_UI/src/EAP_UI.cpp:228
+#, c-format
+msgid ""
+"%s has pre-set parts of this configuration. Those parts are locked to "
+"prevent accidental modification."
+msgstr ""
+
+#: lib/EAPBase_UI/src/EAP_UI.cpp:229
+msgid "Your provider"
+msgstr ""
+
+#: lib/EAPBase_UI/src/EAP_UI.cpp:250
+msgid "Previous attempt to connect reported invalid credentials."
+msgstr ""
+
+#: lib/EAPBase_UI/src/EAP_UI.cpp:251
+msgid "Previous attempt to connect reported your credentials expired."
+msgstr ""
+
+#: lib/EAPBase_UI/src/EAP_UI.cpp:252
+msgid ""
+"Previous attempt to connect reported your credentials are being changed."
+msgstr ""
+
+#: lib/EAPBase_UI/src/EAP_UI.cpp:253
+msgid "Previous attempt to connect failed."
+msgstr ""
+
+#: lib/EAPBase_UI/src/EAP_UI.cpp:254
+msgid "Please, make sure your credentials are correct, or try again later."
+msgstr ""
+
+#: lib/TLS_UI/res/wxTLS_UI.cpp:17
+msgid "Server Trust"
+msgstr ""
+
+#: lib/TLS_UI/res/wxTLS_UI.cpp:28
+msgid ""
+"Describe the servers you trust to prevent credential interception in case of "
+"man-in-the-middle attacks."
+msgstr ""
+
+#: lib/TLS_UI/res/wxTLS_UI.cpp:35
+msgid "Acceptable Certificate Authorities:"
+msgstr ""
+
+#: lib/TLS_UI/res/wxTLS_UI.cpp:40
+msgid "List of certificate authorities server's certificate must be issued by"
+msgstr ""
+
+#: lib/TLS_UI/res/wxTLS_UI.cpp:47
+msgid "Add CA from Store..."
+msgstr ""
+
+#: lib/TLS_UI/res/wxTLS_UI.cpp:48
+msgid "Adds a new certificate authority from the certificate store to the list"
+msgstr ""
+
+#: lib/TLS_UI/res/wxTLS_UI.cpp:52
+msgid "Add CA from File..."
+msgstr ""
+
+#: lib/TLS_UI/res/wxTLS_UI.cpp:53
+msgid "Adds a new certificate authority from the file to the list"
+msgstr ""
+
+#: lib/TLS_UI/res/wxTLS_UI.cpp:57
+msgid "&Remove CA"
+msgstr ""
+
+#: lib/TLS_UI/res/wxTLS_UI.cpp:59
+msgid "Removes selected certificate authorities from the list"
+msgstr ""
+
+#: lib/TLS_UI/res/wxTLS_UI.cpp:72
+msgid "Acceptable server &names:"
+msgstr ""
+
+#: lib/TLS_UI/res/wxTLS_UI.cpp:77
+msgid ""
+"A semicolon delimited list of acceptable server FQDN names; blank to skip "
+"name check; Unicode characters allowed"
+msgstr ""
+
+#: lib/TLS_UI/res/wxTLS_UI.cpp:81
+msgid "(Example: foo.bar.com;server2.bar.com)"
+msgstr ""
+
+#: lib/TLS_UI/res/wxTLS_UI.cpp:120
+msgid "TLS Client Certificate"
+msgstr ""
+
+#: lib/TLS_UI/res/wxTLS_UI.cpp:131
+msgid "Please select your client certificate to use for authentication."
+msgstr ""
+
+#: lib/TLS_UI/res/wxTLS_UI.cpp:138
+msgid "Co&nnect without providing a client certificate"
+msgstr ""
+
+#: lib/TLS_UI/res/wxTLS_UI.cpp:139
+msgid ""
+"Select if your server does not require you to provide a client certificate"
+msgstr ""
+
+#: lib/TLS_UI/res/wxTLS_UI.cpp:146
+msgid "Use the following &certificate:"
+msgstr ""
+
+#: lib/TLS_UI/res/wxTLS_UI.cpp:147
+msgid "Select if you need to provide a client certificate when connecting"
+msgstr ""
+
+#: lib/TLS_UI/res/wxTLS_UI.cpp:154
+msgid "Client certificate to use for authentication"
+msgstr ""
+
+#: lib/TLS_UI/res/wxTLS_UI.cpp:167
+msgid "Custom &identity:"
+msgstr ""
+
+#: lib/TLS_UI/res/wxTLS_UI.cpp:172
+msgid ""
+"Your identity (username@domain) to override one from certificate; or blank "
+"to use one provided in certificate"
+msgstr ""
+
+#: lib/TLS_UI/res/wxTLS_UI.cpp:176
+msgid "(Example: user@contoso.com)"
+msgstr ""
+
+#: lib/TLS_UI/res/wxTLS_UI.cpp:184
+msgid "Check if you would like to save certificate selection"
+msgstr ""
+
+#: lib/TLS_UI/src/TLS_UI.cpp:118
+#, c-format
+msgid "Invalid character in host name found: %c"
+msgstr ""
+
+#: lib/TLS_UI/src/TLS_UI.cpp:118
+msgid "Validation conflict"
+msgstr ""
+
+#: lib/TLS_UI/src/TLS_UI.cpp:511
+msgid "Add Certificate"
+msgstr ""
+
+#: lib/TLS_UI/src/TLS_UI.cpp:512
+msgid "Certificate Files (*.cer;*.crt;*.der;*.p7b;*.pem)"
+msgstr ""
+
+#: lib/TLS_UI/src/TLS_UI.cpp:513
+msgid "X.509 Certificate Files (*.cer;*.crt;*.der;*.pem)"
+msgstr ""
+
+#: lib/TLS_UI/src/TLS_UI.cpp:514
+msgid "PKCS #7 Certificate Files (*.p7b)"
+msgstr ""
+
+#: lib/TLS_UI/src/TLS_UI.cpp:515
+msgid "All Files (*.*)"
+msgstr ""
+
+#: lib/TLS_UI/src/TLS_UI.cpp:531
+#, c-format
+msgid "Invalid or unsupported certificate file %s"
+msgstr ""
+
+#: lib/TLS_UI/src/TLS_UI.cpp:531
+msgid "Error"
+msgstr ""
+
+#: lib/TTLS_UI/res/wxTTLS_UI.cpp:17
+msgid "Outer Identity"
+msgstr ""
+
+#: lib/TTLS_UI/res/wxTTLS_UI.cpp:28
+msgid "Select the user ID supplicant introduces itself as to authenticator:"
+msgstr ""
+
+#: lib/TTLS_UI/res/wxTTLS_UI.cpp:35
+msgid "&True identity"
+msgstr ""
+
+#: lib/TTLS_UI/res/wxTTLS_UI.cpp:36
+msgid "Use my true user name"
+msgstr ""
+
+#: lib/TTLS_UI/res/wxTTLS_UI.cpp:40
+msgid "Use &empty outer identity (RFC 4822)"
+msgstr ""
+
+#: lib/TTLS_UI/res/wxTTLS_UI.cpp:41
+msgid "Ommit my user name and use @mydomain.org only"
+msgstr ""
+
+#: lib/TTLS_UI/res/wxTTLS_UI.cpp:48
+msgid "&Custom outer identity:"
+msgstr ""
+
+#: lib/TTLS_UI/res/wxTTLS_UI.cpp:49
+msgid "Specify custom outer identity"
+msgstr ""
+
+#: lib/TTLS_UI/res/wxTTLS_UI.cpp:54
+msgid "Custom outer identity to use"
+msgstr ""
+
+#: lib/TTLS_UI/src/Module.cpp:275 lib/TTLS_UI/src/Module.cpp:285
+#: lib/EAPBase_UI/include/EAP_UI.h:689
+#, c-format
+msgid "Error writing credentials to Credential Manager: %hs (error %u)"
+msgstr ""
+
+#: lib/TTLS_UI/src/Module.cpp:277 lib/TTLS_UI/src/Module.cpp:287
+#: lib/EAPBase_UI/include/EAP_UI.h:692
+msgid "Writing credentials failed."
+msgstr ""
+
+#: lib/TTLS_UI/src/TTLS_UI.cpp:108 lib/TTLS_UI/src/TTLS_UI.cpp:235
+msgid "Inner Authentication"
+msgstr ""
+
+#: lib/TTLS_UI/src/TTLS_UI.cpp:114
+msgid "Select inner authentication method from the list"
+msgstr ""
+
+#: lib/TTLS_UI/src/TTLS_UI.cpp:116
+msgid "PAP"
+msgstr ""
+
+#: lib/TTLS_UI/src/TTLS_UI.cpp:118
+msgid "MSCHAPv2"
+msgstr ""
+
+#: lib/TTLS_UI/src/TTLS_UI.cpp:123 lib/TTLS_UI/src/TTLS_UI.cpp:262
+msgid "Outer Authentication"
+msgstr ""
+
+#: lib/EAPBase_UI/include/EAP_UI.h:289
+#, c-format
+msgid ""
+"Are you sure you want to permanently remove %ls provider from configuration?"
+msgstr ""
+
+#: lib/EAPBase_UI/include/EAP_UI.h:289
+msgid "Warning"
+msgstr ""
+
+#: lib/EAPBase_UI/include/EAP_UI.h:549
+msgid "Provider Settings"
+msgstr ""
+
+#: lib/EAPBase_UI/include/EAP_UI.h:705
+#, c-format
+msgid "Deleting credentials failed (error %u)."
+msgstr ""
+
+#: lib/EAPBase_UI/include/EAP_UI.h:739
+#, c-format
+msgid "<error %u>"
+msgstr ""
+
+#: lib/EAPBase_UI/include/EAP_UI.h:743
+msgid "<error>"
+msgstr ""
+
+#: lib/EAPBase_UI/include/EAP_UI.h:754 lib/EAPBase_UI/include/EAP_UI.h:764
+msgid "<empty>"
+msgstr ""
+
+#: lib/EAPBase_UI/include/EAP_UI.h:754 lib/EAPBase_UI/include/EAP_UI.h:764
+msgid "<blank ID>"
+msgstr ""
+
+#: lib/EAPBase_UI/include/EAP_UI.h:964
+msgid "<Your Organization>"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.h:69
+msgid "EAP Connection Configuration"
+msgstr ""
+
+#: EAPMethods/MSIBuild/En.Win32.Release.Feature-2.idtx:3
+#: EAPMethods/MSIBuild/En.x64.Release.Feature-2.idtx:3
+msgid "1252"
+msgstr "949"
+
+#: EAPMethods/MSIBuild/En.Win32.Release.Feature-2.idtx:4
+#: EAPMethods/MSIBuild/En.x64.Release.Feature-2.idtx:4
+msgid "EAP Methods"
+msgstr ""
+
+#: EAPMethods/MSIBuild/En.Win32.Release.Feature-2.idtx:4
+#: EAPMethods/MSIBuild/En.x64.Release.Feature-2.idtx:4
+msgid "Modules to support individual EAP methods"
+msgstr ""
+
+#: EAPMethods/MSIBuild/En.Win32.Release.Feature-2.idtx:5
+#: EAPMethods/MSIBuild/En.x64.Release.Feature-2.idtx:5
+msgid "TTLS"
+msgstr ""
+
+#: EAPMethods/MSIBuild/En.Win32.Release.Feature-2.idtx:5
+#: EAPMethods/MSIBuild/En.x64.Release.Feature-2.idtx:5
+msgid "Tunneled Transport Layer Security"
+msgstr ""

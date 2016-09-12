@@ -139,6 +139,7 @@
     <POCompile Include="locale\hu_HU.po" />
     <POCompile Include="locale\is_IS.po" />
     <POCompile Include="locale\it_IT.po" />
+    <POCompile Include="locale\ko_KR.po" />
     <POCompile Include="locale\lt_LT.po" />
     <POCompile Include="locale\nb_NO.po" />
     <POCompile Include="locale\nl_NL.po" />
