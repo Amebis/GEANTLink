@@ -1,28 +1,28 @@
+# 
+#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: MSMBuild\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-09 15:12+0200\n"
-"PO-Revision-Date: \n"
-"Last-Translator: Simon Rozman <simon.rozman@amebis.si>\n"
-"Language-Team: Amebis, d. o. o., Kamnik <simon.rozman@amebis.si>\n"
-"Language: sl_SI\n"
+"Project-Id-Version: GÉANTLink MSI\n"
+"POT-Creation-Date: 2016-08-31 14:33+0200\n"
+"PO-Revision-Date: 2016-06-02 12:27+0200\n"
+"Last-Translator: Simon Rozman <simon@rozman.si>, 2016\n"
+"Language-Team: Slovenian (Slovenia) (https://www.transifex.com/eduroam_devel/teams/11799/sl_SI/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Poedit-SourceCharset: UTF-8\n"
-"X-Poedit-KeywordsList: __\n"
-"X-Poedit-Basepath: .\n"
+"Language: sl_SI\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);\n"
 "X-Generator: Poedit 1.8.8\n"
-"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n"
-"%100==4 ? 2 : 3);\n"
+"X-Poedit-Basepath: ../Main\n"
+"X-Poedit-KeywordsList: _\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SourceCharset: UTF-8\n"
 
 #: En.Win32.Release.LaunchCondition-2.idtx:4
 #: En.x64.Release.LaunchCondition-2.idtx:4
 msgid "[ProductName] requires Windows Vista or later version of Windows."
-msgstr ""
+msgstr "[ProductName] zahteva Windows Vista ali novejšo verzijo Windowsov."
 
-# Windows charset for this language (decimal)
 #: En.Win32.Release.Property-2.idtx:3 En.x64.Release.Property-2.idtx:3
 msgid "1252"
 msgstr "1250"
@@ -30,8 +30,8 @@ msgstr "1250"
 #: En.Win32.Release.Property-2.idtx:4 En.Win32.Release.Property-2.idtx:5
 #: En.x64.Release.Property-2.idtx:4 En.x64.Release.Property-2.idtx:5
 msgid "http://www.geant.org/"
-msgstr ""
+msgstr "http://www.geant.org/"
 
 #: En.Win32.Release.Property-2.idtx:6 En.x64.Release.Property-2.idtx:6
 msgid "https://github.com/Amebis/GEANTLink/releases"
-msgstr ""
+msgstr "https://github.com/Amebis/GEANTLink/releases"

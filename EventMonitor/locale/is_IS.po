@@ -1,9 +1,9 @@
-# 
-#, fuzzy
+# Translators:
+# Simon Rozman <simon@rozman.si>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: EventMonitor\n"
-"POT-Creation-Date: 2016-08-31 02:51+0200\n"
+"POT-Creation-Date: 2016-08-27 14:20+0200\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
 "Last-Translator: Simon Rozman <simon@rozman.si>, 2016\n"
 "Language-Team: Icelandic (https://www.transifex.com/eduroam_devel/teams/11799/is/)\n"
@@ -18,7 +18,7 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 
-#: App.cpp:61 Frame.h:67 MSIBuild/En.Win32.Release.Feature-2.idtx:4
+#: App.cpp:69 Frame.h:67 MSIBuild/En.Win32.Release.Feature-2.idtx:4
 #: MSIBuild/En.x64.Release.Feature-2.idtx:4
 msgid "Event Monitor"
 msgstr ""
@@ -218,6 +218,8 @@ msgid "EVENTM~1|GÉANTLink Event Monitor"
 msgstr ""
 
 #: MSIBuild/En.Win32.Release.Feature-2.idtx:4
+#: MSIBuild/En.Win32.Release.Shortcut-2.idtx:4
 #: MSIBuild/En.x64.Release.Feature-2.idtx:4
+#: MSIBuild/En.x64.Release.Shortcut-2.idtx:4
 msgid "Real-time display of internal events"
 msgstr ""

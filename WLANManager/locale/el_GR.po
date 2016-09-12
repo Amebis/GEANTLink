@@ -1,11 +1,12 @@
 # Translators:
 # Simon Rozman <simon@rozman.si>, 2016
+# Vicky Kons <vickyk@admin.grnet.gr>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: WLANManager\n"
 "POT-Creation-Date: 2016-08-28 12:03+0200\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
-"Last-Translator: Simon Rozman <simon@rozman.si>, 2016\n"
+"Last-Translator: Vicky Kons <vickyk@admin.grnet.gr>, 2016\n"
 "Language-Team: Greek (https://www.transifex.com/eduroam_devel/teams/11799/el/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -28,8 +29,10 @@ msgstr "1253"
 msgid ""
 "Helper utility to support direct shortcuts to Wireless Network Properties"
 msgstr ""
+"Βοηθιτικό πρόγραμμα για να στηρίξει τις απευθείας συντομέυσεις στις "
+"Ιδιότητες του Ασύρματου Δικτύου"
 
 #: MSIBuild/En.Win32.Release.Feature-2.idtx:4
 #: MSIBuild/En.x64.Release.Feature-2.idtx:4
 msgid "WLAN Manager"
-msgstr ""
+msgstr "WLAN Διαχειριστής"

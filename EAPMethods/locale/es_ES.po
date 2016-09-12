@@ -335,246 +335,265 @@ msgstr ""
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:35
 msgid "Acceptable Certificate Authorities:"
-msgstr ""
+msgstr "Autoridades de Certificación Aceptadas:"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:40
 msgid "List of certificate authorities server's certificate must be issued by"
 msgstr ""
+"Lista de las autoridades de certificación por las que debe ser firmado el "
+"certificado de servidor"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:47
 msgid "Add CA from Store..."
-msgstr ""
+msgstr "Añadir CA desde el almacén..."
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:48
 msgid ""
 "Adds a new certificate authority from the certificate store to the list"
 msgstr ""
+"Añade una nueva autoridad de certificación desde la lista del almacén de "
+"certificados"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:52
 msgid "Add CA from File..."
-msgstr ""
+msgstr "Añadir CA desde fichero..."
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:53
 msgid "Adds a new certificate authority from the file to the list"
 msgstr ""
+"Añadir una nueva autoridad de certificación a la lista desde un fichero"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:57
 msgid "&Remove CA"
-msgstr ""
+msgstr "&Borrar una CA"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:59
 msgid "Removes selected certificate authorities from the list"
-msgstr ""
+msgstr "Borrar las autoridades de certificación de la lista"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:72
 msgid "Acceptable server &names:"
-msgstr ""
+msgstr "Nombres de servidor &aceptables:"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:77
 msgid ""
 "A semicolon delimited list of acceptable server FQDN names; blank to skip "
 "name check; Unicode characters allowed"
 msgstr ""
+"Una lista separada por punto y coma de nombres de servidor FQDN aceptables; "
+"blanco para evitar comprobación de nombre; se admiten caracteres Unicode"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:81
 msgid "(Example: foo.bar.com;server2.bar.com)"
-msgstr ""
+msgstr "(Ejemplo: foo.bar.com;servidor2.bar.com)"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:120
 msgid "TLS Client Certificate"
-msgstr ""
+msgstr "Certificado de Cliente TLS"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:131
 msgid "Please select your client certificate to use for authentication."
 msgstr ""
+"Por favor seleccione su certificado de cliente a usar para autenticación."
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:138
 msgid "Co&nnect without providing a client certificate"
-msgstr ""
+msgstr "Co&nectar sin proporcionar un certificado de cliente"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:139
 msgid ""
 "Select if your server does not require you to provide a client certificate"
 msgstr ""
+"Seleccionar si su servidor no necesita que sea proporcionado un certificado "
+"de cliente"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:146
 msgid "Use the following &certificate:"
-msgstr ""
+msgstr "Usar el siguiente &certificado:"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:147
 msgid "Select if you need to provide a client certificate when connecting"
 msgstr ""
+"Seleccionar si se necesita proporcionar un certificado de cliente al "
+"conectarse"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:154
 msgid "Client certificate to use for authentication"
-msgstr ""
+msgstr "Certificado de cliente a utilizar para autenticación"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:167
 msgid "Custom &identity:"
-msgstr ""
+msgstr "&Identidad personalizada:"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:172
 msgid ""
 "Your identity (username@domain) to override one from certificate; or blank "
 "to use one provided in certificate"
 msgstr ""
+"Su identidad (usuario@dominio) que sobreescribirá la del certificado; o en "
+"blanco para usar la proporcionada en el certificado"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:176
 msgid "(Example: user@contoso.com)"
-msgstr ""
+msgstr "(Ejemplo: usuario@example.com)"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:184
 msgid "Check if you would like to save certificate selection"
-msgstr ""
+msgstr "Marcar si desea guardar la selección de certificado"
 
 #: lib/TLS_UI/src/TLS_UI.cpp:118
 #, c-format
 msgid "Invalid character in host name found: %c"
-msgstr ""
+msgstr "Carácter no válido en el nombre: %c"
 
 #: lib/TLS_UI/src/TLS_UI.cpp:118
 msgid "Validation conflict"
-msgstr ""
+msgstr "Conflicto de validación"
 
 #: lib/TLS_UI/src/TLS_UI.cpp:511
 msgid "Add Certificate"
-msgstr ""
+msgstr "Añadir Certificado"
 
 #: lib/TLS_UI/src/TLS_UI.cpp:512
 msgid "Certificate Files (*.cer;*.crt;*.der;*.p7b;*.pem)"
-msgstr ""
+msgstr "Ficheros de certificado (*.cer;*.crt;*.der;*.p7b;*.pem)"
 
 #: lib/TLS_UI/src/TLS_UI.cpp:513
 msgid "X.509 Certificate Files (*.cer;*.crt;*.der;*.pem)"
-msgstr ""
+msgstr "Ficheros de certificado X.509 (*.cer;*.crt;*.der;*.pem)"
 
 #: lib/TLS_UI/src/TLS_UI.cpp:514
 msgid "PKCS #7 Certificate Files (*.p7b)"
-msgstr ""
+msgstr "Ficheros de certificados PKCS #7 (*.p7b)"
 
 #: lib/TLS_UI/src/TLS_UI.cpp:515
 msgid "All Files (*.*)"
-msgstr ""
+msgstr "Todos los ficheros (*.*)"
 
 #: lib/TLS_UI/src/TLS_UI.cpp:531
 #, c-format
 msgid "Invalid or unsupported certificate file %s"
-msgstr ""
+msgstr "Fichero de certificado %s es inválido o no está soportado"
 
 #: lib/TLS_UI/src/TLS_UI.cpp:531
 msgid "Error"
-msgstr ""
+msgstr "Error"
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:17
 msgid "Outer Identity"
-msgstr ""
+msgstr "Identidad Externa"
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:28
 msgid "Select the user ID supplicant introduces itself as to authenticator:"
 msgstr ""
+"Seleccione el ID de usuario con el que el suplicante se presenta al "
+"autenticador:"
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:35
 msgid "&True identity"
-msgstr ""
+msgstr "Identidad &Real"
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:36
 msgid "Use my true user name"
-msgstr ""
+msgstr "Usar mi nombre de usuario real"
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:40
 msgid "Use &empty outer identity (RFC 4822)"
-msgstr ""
+msgstr "Usar una identidad externa &vacía (RFC 4822)"
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:41
 msgid "Ommit my user name and use @mydomain.org only"
-msgstr ""
+msgstr "Omitir mi nombre de usuario y usar @midominio.org sólo"
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:48
 msgid "&Custom outer identity:"
-msgstr ""
+msgstr "Identidad externa personalizada:"
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:49
 msgid "Specify custom outer identity"
-msgstr ""
+msgstr "Especificar identidad externa personalizada"
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:54
 msgid "Custom outer identity to use"
-msgstr ""
+msgstr "Identidad externa personalizada a usar"
 
 #: lib/TTLS_UI/src/Module.cpp:275 lib/TTLS_UI/src/Module.cpp:285
 #: lib/EAPBase_UI/include/EAP_UI.h:689
 #, c-format
 msgid "Error writing credentials to Credential Manager: %hs (error %u)"
 msgstr ""
+"Error escribiendo credenciales en el Gestor de Credenciales: %hs (error %u)"
 
 #: lib/TTLS_UI/src/Module.cpp:277 lib/TTLS_UI/src/Module.cpp:287
 #: lib/EAPBase_UI/include/EAP_UI.h:692
 msgid "Writing credentials failed."
-msgstr ""
+msgstr "Fallo escribiendo credenciales."
 
 #: lib/TTLS_UI/src/TTLS_UI.cpp:108 lib/TTLS_UI/src/TTLS_UI.cpp:235
 msgid "Inner Authentication"
-msgstr ""
+msgstr "Autenticación interna"
 
 #: lib/TTLS_UI/src/TTLS_UI.cpp:114
 msgid "Select inner authentication method from the list"
-msgstr ""
+msgstr "Seleccione un método de autenticación interna de la lista"
 
 #: lib/TTLS_UI/src/TTLS_UI.cpp:116
 msgid "PAP"
-msgstr ""
+msgstr "PAP"
 
 #: lib/TTLS_UI/src/TTLS_UI.cpp:118
 msgid "MSCHAPv2"
-msgstr ""
+msgstr "MSCHAPv2"
 
 #: lib/TTLS_UI/src/TTLS_UI.cpp:123 lib/TTLS_UI/src/TTLS_UI.cpp:262
 msgid "Outer Authentication"
-msgstr ""
+msgstr "Autenticación externa"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:289
 #, c-format
 msgid ""
 "Are you sure you want to permanently remove %ls provider from configuration?"
 msgstr ""
+"¿está seguro de que quiere borrar permanentemente la configuración del "
+"proveedor %ls?"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:289
 msgid "Warning"
-msgstr ""
+msgstr "Advertencia"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:549
 msgid "Provider Settings"
-msgstr ""
+msgstr "Configuración del proveedor"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:705
 #, c-format
 msgid "Deleting credentials failed (error %u)."
-msgstr ""
+msgstr "Fallo al borrar credenciales (error %u)."
 
 #: lib/EAPBase_UI/include/EAP_UI.h:739
 #, c-format
 msgid "<error %u>"
-msgstr ""
+msgstr "<error %u>"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:743
 msgid "<error>"
-msgstr ""
+msgstr "<error>"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:754 lib/EAPBase_UI/include/EAP_UI.h:764
 msgid "<empty>"
-msgstr ""
+msgstr "<vació>"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:754 lib/EAPBase_UI/include/EAP_UI.h:764
 msgid "<blank ID>"
-msgstr ""
+msgstr "<ID en blanco>"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:964
 msgid "<Your Organization>"
-msgstr ""
+msgstr "<Su organización>"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.h:69
 msgid "EAP Connection Configuration"
-msgstr ""
+msgstr "Configuración de conexiones EAP"
 
 #: EAPMethods/MSIBuild/En.Win32.Release.Feature-2.idtx:3
 #: EAPMethods/MSIBuild/En.x64.Release.Feature-2.idtx:3
@@ -584,19 +603,19 @@ msgstr "1252"
 #: EAPMethods/MSIBuild/En.Win32.Release.Feature-2.idtx:4
 #: EAPMethods/MSIBuild/En.x64.Release.Feature-2.idtx:4
 msgid "EAP Methods"
-msgstr ""
+msgstr "Métodos EAP"
 
 #: EAPMethods/MSIBuild/En.Win32.Release.Feature-2.idtx:4
 #: EAPMethods/MSIBuild/En.x64.Release.Feature-2.idtx:4
 msgid "Modules to support individual EAP methods"
-msgstr ""
+msgstr "Módulos para soportar métodos EAP individualmente"
 
 #: EAPMethods/MSIBuild/En.Win32.Release.Feature-2.idtx:5
 #: EAPMethods/MSIBuild/En.x64.Release.Feature-2.idtx:5
 msgid "TTLS"
-msgstr ""
+msgstr "TTLS"
 
 #: EAPMethods/MSIBuild/En.Win32.Release.Feature-2.idtx:5
 #: EAPMethods/MSIBuild/En.x64.Release.Feature-2.idtx:5
 msgid "Tunneled Transport Layer Security"
-msgstr ""
+msgstr "Tunneled Transport Layer Security"
