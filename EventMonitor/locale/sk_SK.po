@@ -1,9 +1,9 @@
-# Translators:
-# Simon Rozman <simon@rozman.si>, 2016
+# 
+#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: EventMonitor\n"
-"POT-Creation-Date: 2016-08-27 14:20+0200\n"
+"POT-Creation-Date: 2016-09-12 11:18+0200\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
 "Last-Translator: Simon Rozman <simon@rozman.si>, 2016\n"
 "Language-Team: Slovak (Slovakia) (https://www.transifex.com/eduroam_devel/teams/11799/sk_SK/)\n"
@@ -18,7 +18,7 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 
-#: App.cpp:69 Frame.h:67 MSIBuild/En.Win32.Release.Feature-2.idtx:4
+#: App.cpp:61 Frame.h:67 MSIBuild/En.Win32.Release.Feature-2.idtx:4
 #: MSIBuild/En.x64.Release.Feature-2.idtx:4
 msgid "Event Monitor"
 msgstr ""
@@ -85,6 +85,14 @@ msgstr ""
 
 #: Frame.cpp:69
 msgid "&Program"
+msgstr ""
+
+#: Frame.cpp:73
+msgid "&Copy"
+msgstr ""
+
+#: Frame.cpp:73 Frame.cpp:154
+msgid "Copies selected records to clipboard"
 msgstr ""
 
 #: Frame.cpp:78
@@ -183,10 +191,6 @@ msgstr ""
 
 #: Frame.cpp:154
 msgid "Copy"
-msgstr ""
-
-#: Frame.cpp:154
-msgid "Copies selected records to clipboard"
 msgstr ""
 
 #: Frame.cpp:156

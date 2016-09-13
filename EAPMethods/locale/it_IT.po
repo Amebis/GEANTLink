@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: EAPMethods\n"
 "POT-Creation-Date: 2016-09-06 14:06+0200\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
-"Last-Translator: Simon Rozman <simon@rozman.si>, 2016\n"
+"Last-Translator: Nunzio Napolitano <nunzio.napolitano@uniparthenope.it>, 2016\n"
 "Language-Team: Italian (Italy) (https://www.transifex.com/eduroam_devel/teams/11799/it_IT/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -24,23 +24,23 @@ msgstr ""
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:37
 msgid "+"
-msgstr ""
+msgstr "+"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:38
 msgid "Adds new provider"
-msgstr ""
+msgstr "Aggiungi nuovo provider"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:42
 msgid "-"
-msgstr ""
+msgstr "-"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:43
 msgid "Removes selected provider"
-msgstr ""
+msgstr "Rimuovi provider selezionato"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:47
 msgid "Advanced..."
-msgstr ""
+msgstr "Avanzate..."
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:48
 msgid "Opens dialog with provider settings"
@@ -48,7 +48,7 @@ msgstr ""
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:230 lib/EAPBase_UI/res/wxEAP_UI.cpp:355
 msgid "Client Credentials"
-msgstr ""
+msgstr "Credenziali del client"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:241
 msgid "Manage credentials used to connect."
@@ -102,7 +102,7 @@ msgstr ""
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:376
 msgid "User ID:"
-msgstr ""
+msgstr "Udser ID"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:381
 msgid "Enter your user name here (user@domain.org, DOMAIN\\User, etc.)"
@@ -110,7 +110,7 @@ msgstr ""
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:385
 msgid "Password:"
-msgstr ""
+msgstr "Password"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:390
 msgid "Enter your password here"
