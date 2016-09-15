@@ -35,7 +35,8 @@
       <CheckDomain>false</CheckDomain>
       <CheckCompat>false</CheckCompat>
       <CheckAccel>None</CheckAccel>
-      <OutputFile>$(OutDir)%(Filename).mo</OutputFile>
+      <LocaleRepoDir>$(OutDir)</LocaleRepoDir>
+      <OutputFile>%(LocaleRepoDir)$(ProjectName).mo</OutputFile>
       <UseFuzzy>false</UseFuzzy>
       <Alignment>1</Alignment>
       <Endianess>LSB</Endianess>

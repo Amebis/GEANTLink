@@ -39,7 +39,7 @@
     <ItemGroup Condition="'@(SelectedFiles)' != ''">
       <POCompile Remove="@(POCompile)" Condition="'%(Identity)' != '@(SelectedFiles)'" />
     </ItemGroup>
-    <Message Text="Compiling localization catalogues..." />
+    <MakeDir Directories="%(POCompile.LocaleRepoDir)"/>
     <POCompile
       Condition="'@(POCompile)' != '' and '%(POCompile.ExcludedFromBuild)' != 'true'"
       Inputs="@(POCompile)"
