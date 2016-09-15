@@ -74,6 +74,7 @@ void eap::method_pap::process_request_packet(
     _In_                                       DWORD               dwReceivedPacketSize,
     _Inout_                                    EapPeerMethodOutput *pEapOutput)
 {
+    UNREFERENCED_PARAMETER(pReceivedPacket);
     assert(pReceivedPacket || dwReceivedPacketSize == 0);
     assert(pEapOutput);
 
