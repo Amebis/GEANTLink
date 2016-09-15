@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!--
     Copyright 1991-2016 Amebis
-	Copyright 2016 GÉANT
+    Copyright 2016 GÉANT
 
     This file is part of GÉANTLink.
 
@@ -35,8 +35,7 @@
       <CheckDomain>false</CheckDomain>
       <CheckCompat>false</CheckCompat>
       <CheckAccel>None</CheckAccel>
-      <LocaleRepoDir>$(OutDir)</LocaleRepoDir>
-      <OutputFile>%(LocaleRepoDir)$(ProjectName).mo</OutputFile>
+      <OutputFile>$(OutDir)%(Filename).mo</OutputFile>
       <UseFuzzy>false</UseFuzzy>
       <Alignment>1</Alignment>
       <Endianess>LSB</Endianess>

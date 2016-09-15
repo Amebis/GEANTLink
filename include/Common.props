@@ -44,7 +44,7 @@
     </Link>
     <ResourceCompile />
     <POCompile>
-      <LocaleRepoDir>$(OutDir)..\locale\%(Filename)\</LocaleRepoDir>
+      <OutputFile>$(OutDir)..\locale\%(Filename)\$(ProjectName).mo</OutputFile>
     </POCompile>
   </ItemDefinitionGroup>
   <ItemGroup />

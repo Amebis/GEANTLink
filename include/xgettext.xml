@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!--
     Copyright 1991-2016 Amebis
-	Copyright 2016 GÉANT
+    Copyright 2016 GÉANT
 
     This file is part of GÉANTLink.
 
@@ -48,11 +48,10 @@
       <EnumValue Name="None"                                                       DisplayName="None"       Description="No check" />
       <EnumValue Name="Amperstand"   Switch="check-accelerators=&quot;&amp;&quot;" DisplayName="Amperstand" Description="Check keyborad accellerator marked with an amperstand &amp;." />
     </EnumProperty>
-    <StringProperty Category="Output"  Name="LocaleRepoDir"                       DisplayName="Locale Repository Directory" Description="Location of the locale repository directory." Subtype="folder" IncludeInCommandLine="False" />
-    <StringProperty Category="Output"  Name="OutputFile"    Switch="output-file=" DisplayName="Output File"                 Description="The name and location of the output file that compiler creates." Subtype="file" />
-    <BoolProperty   Category="Output"  Name="UseFuzzy"      Switch="use-fuzzy"    DisplayName="Use Fuzzy Entries"           Description="Use fuzzy entries in output." />
-    <IntProperty    Category="Output"  Name="Alignment"     Switch="alignment="   DisplayName="Align Strings"               Description="Align strings to given bytes (default: 1)." />
-    <EnumProperty   Category="Output"  Name="Endianess"                           DisplayName="Endianess"                   Description="Write out 32-bit numbers in the given byte order (default: platform specific).">
+    <StringProperty Category="Output"  Name="OutputFile"  Switch="output-file="        DisplayName="Output File"         Description="The name and location of the output file that compiler creates." Subtype="file" />
+    <BoolProperty   Category="Output"  Name="UseFuzzy"    Switch="use-fuzzy"           DisplayName="Use Fuzzy Entries"   Description="Use fuzzy entries in output." />
+    <IntProperty    Category="Output"  Name="Alignment"   Switch="alignment="          DisplayName="Align Strings"       Description="Align strings to given bytes (default: 1)." />
+    <EnumProperty   Category="Output"  Name="Endianess"                                DisplayName="Endianess"           Description="Write out 32-bit numbers in the given byte order (default: platform specific).">
       <EnumValue Name="LSB" Switch="endianness=little" DisplayName="LSB" Description="Least significant byte first" />
       <EnumValue Name="MSB" Switch="endianness=big"    DisplayName="MSB" Description="Most significant byte first" />
     </EnumProperty>
