@@ -3,6 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{14D5FE5B-9742-4D1F-A1E0-32E694B94AAB}"
 	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
 		include\Version.h = include\Version.h
 	EndProjectSection
 EndProject
