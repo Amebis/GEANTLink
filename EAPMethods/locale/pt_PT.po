@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: EAPMethods\n"
 "POT-Creation-Date: 2016-09-06 14:06+0200\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
-"Last-Translator: Simon Rozman <simon@rozman.si>, 2016\n"
+"Last-Translator: Pedro Simões <psimoes@fccn.pt>, 2016\n"
 "Language-Team: Portuguese (Portugal) (https://www.transifex.com/eduroam_devel/teams/11799/pt_PT/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -24,7 +24,7 @@ msgstr ""
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:37
 msgid "+"
-msgstr ""
+msgstr "+"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:38
 msgid "Adds new provider"
@@ -32,7 +32,7 @@ msgstr ""
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:42
 msgid "-"
-msgstr ""
+msgstr "-"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:43
 msgid "Removes selected provider"
@@ -40,7 +40,7 @@ msgstr ""
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:47
 msgid "Advanced..."
-msgstr ""
+msgstr "Avançadas..."
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:48
 msgid "Opens dialog with provider settings"
@@ -110,15 +110,15 @@ msgstr ""
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:385
 msgid "Password:"
-msgstr ""
+msgstr "Palavra passe:"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:390
 msgid "Enter your password here"
-msgstr ""
+msgstr "Coloque aqui a sua palavra passe"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:397 lib/TLS_UI/res/wxTLS_UI.cpp:183
 msgid "&Remember"
-msgstr ""
+msgstr "&Memorizar"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:398
 msgid "Check if you would like to save username and password"
@@ -228,12 +228,12 @@ msgstr ""
 #: lib/EAPBase_UI/src/EAP_UI.cpp:98
 #, c-format
 msgid "%s Credentials"
-msgstr ""
+msgstr "%s Credenciais"
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:123 lib/EAPBase_UI/include/EAP_UI.h:352
 #: lib/EAPBase_UI/include/EAP_UI.h:362 lib/EAPBase_UI/res/wxEAP_UI.h:119
 msgid "EAP Credentials"
-msgstr ""
+msgstr "Credenciais EAP"
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:166
 #, c-format
@@ -254,7 +254,7 @@ msgstr ""
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:208
 msgid "Dial the phone number"
-msgstr ""
+msgstr "Marcar o número de telefone"
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:228
 #, c-format

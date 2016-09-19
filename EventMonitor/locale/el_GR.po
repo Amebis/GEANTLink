@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: EventMonitor\n"
 "POT-Creation-Date: 2016-09-12 11:18+0200\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
-"Last-Translator: Vicky Kons <vickyk@admin.grnet.gr>, 2016\n"
+"Last-Translator: Zenon Mousmoulas <zenon@mousmoulas.gr>, 2016\n"
 "Language-Team: Greek (https://www.transifex.com/eduroam_devel/teams/11799/el/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -54,9 +54,9 @@ msgid ""
 "(Run As Administrator) or be a member of Performance Log Users group to "
 "start event tracing session."
 msgstr ""
-"Δεν επιτρέπεται η πρόσβαση δημιουργώντας συνεδρία: θα πρέπει να έχετε "
+"Δεν επιτρέπεται η πρόσβαση δημιουργώντας μια συνεδρία: θα πρέπει να έχετε "
 "δικαιώματα διαχειριστή (Εκτέλεση ως διαχειριστής) ή να είστε μέλος της "
-"ομάδας Perfomance Log Users για να ξεκινήσετε να εντοπίζεται μία συνεδρία."
+"ομάδας Perfomance Log Users για να ξεκινήσετε να ψάξετε μία συνεδρία."
 
 #: ETWLog.cpp:231
 #, c-format
@@ -76,7 +76,7 @@ msgstr "Σφάλμα κατά την ενεργοποίηση %s παρόχου 
 #: Frame.cpp:48 Frame.cpp:108 Frame.cpp:113 Frame.cpp:168 Frame.cpp:170
 #, c-format
 msgid "Toggles display of %s records"
-msgstr "Εναλλάσει την οθόνη %s των αρχείων"
+msgstr "Εναλλάσει την εμφάνιση/απόκρυψη των αρχείων %s"
 
 #: Frame.cpp:65
 msgid "E&xit"
@@ -92,7 +92,7 @@ msgstr "&Πρόγραμμα"
 
 #: Frame.cpp:73
 msgid "&Copy"
-msgstr ""
+msgstr "&Αντιγραφή"
 
 #: Frame.cpp:73 Frame.cpp:154
 msgid "Copies selected records to clipboard"
@@ -183,7 +183,7 @@ msgstr "%s Γραμμή εργαλείων"
 #: Frame.cpp:142 Frame.cpp:146
 #, c-format
 msgid "Toggles display of %s toolbar"
-msgstr "Εναλλάσσει την εμφάνιση %s της γραμμής εργαλείων"
+msgstr "Εναλλάσσει την εμφάνιση/απόκρυψη της γραμμής εργαλείων %s"
 
 #: Frame.cpp:142 Frame.cpp:146 Frame.cpp:185
 msgid "View"

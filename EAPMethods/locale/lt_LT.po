@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: EAPMethods\n"
 "POT-Creation-Date: 2016-09-06 14:06+0200\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
-"Last-Translator: Simon Rozman <simon@rozman.si>, 2016\n"
+"Last-Translator: Rimas Kudelis <rq@akl.lt>, 2016\n"
 "Language-Team: Lithuanian (https://www.transifex.com/eduroam_devel/teams/11799/lt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -24,132 +24,146 @@ msgstr ""
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:37
 msgid "+"
-msgstr ""
+msgstr "+"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:38
 msgid "Adds new provider"
-msgstr ""
+msgstr "Pridėti naują teikėją"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:42
 msgid "-"
-msgstr ""
+msgstr "−"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:43
 msgid "Removes selected provider"
-msgstr ""
+msgstr "Pašalinti pažymėtą teikėją"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:47
 msgid "Advanced..."
-msgstr ""
+msgstr "Išsamiau…"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:48
 msgid "Opens dialog with provider settings"
-msgstr ""
+msgstr "Atverti teikėjo parametrų langą"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:230 lib/EAPBase_UI/res/wxEAP_UI.cpp:355
 msgid "Client Credentials"
-msgstr ""
+msgstr "Kliento kredencialai"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:241
 msgid "Manage credentials used to connect."
-msgstr ""
+msgstr "Tvarkyti kredencialus, naudojamus jungiantis."
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:254
 msgid "Use &own credentials:"
-msgstr ""
+msgstr "Naudoti &savo kredencialus:"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:255
 msgid "Select this option if you have your unique credentials to connect"
 msgstr ""
+"Pažymėkite šią parinktį, jei turite savo asmeninius prisijungimo "
+"kredencialus"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:260
 msgid "Your credentials loaded from Windows Credential Manager"
-msgstr ""
+msgstr "Jūsų kredencialai įkelti iš „Windows“ kredencialų tvarkytuvo"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:270
 msgid "&Clear Credentials"
-msgstr ""
+msgstr "&Valyti kredencialus"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:271
 msgid ""
 "Click to clear your credentials from Credential Manager.\n"
 "Note: You will be prompted to enter credentials when connecting."
 msgstr ""
+"Spustelėkite, jei norite pašalinti savo kredencialus iš Kredencialų tvarkytuvo.\n"
+"Pastaba: jūsų kredencialų bus paprašyta prisijungimo metu."
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:275 lib/EAPBase_UI/res/wxEAP_UI.cpp:308
 msgid "&Set Credentials..."
-msgstr ""
+msgstr "&Nustatyti kredencialus…"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:276 lib/EAPBase_UI/res/wxEAP_UI.cpp:309
 msgid "Click here to set or modify your credentials"
-msgstr ""
+msgstr "Spustelėkite čia savo kredencialams nustatyti ar pakeisti"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:292
 msgid "Use &pre-shared credentials:"
-msgstr ""
+msgstr "Naudoti išankstinio bendrinimo kredencialus:"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:293
 msgid "Select this options if all clients connect using the same credentials"
 msgstr ""
+"Pažymėkite šią parinktį, jei visi klientai jungiasi naudodamiesi tais "
+"pačiais kredencialais"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:298
 msgid "Common (pre-shared) credentials"
-msgstr ""
+msgstr "Išankstinio bendrinimo kredencialai"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:366
 msgid "Please provide your user ID and password."
-msgstr ""
+msgstr "Įveskite savo vartotojo ID ir slaptažodį."
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:376
 msgid "User ID:"
-msgstr ""
+msgstr "Vartotojo ID:"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:381
 msgid "Enter your user name here (user@domain.org, DOMAIN\\User, etc.)"
 msgstr ""
+"Čia įveskite savo vartotojo vardą (vartotojas@domenas.lt, "
+"DOMENAS\\Vartotojas ar kt.)"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:385
 msgid "Password:"
-msgstr ""
+msgstr "Slaptažodis:"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:390
 msgid "Enter your password here"
-msgstr ""
+msgstr "Čia įveskite savo slaptažodį"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:397 lib/TLS_UI/res/wxTLS_UI.cpp:183
 msgid "&Remember"
-msgstr ""
+msgstr "Įsi&minti"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:398
 msgid "Check if you would like to save username and password"
 msgstr ""
+"Pažymėkite, jei norite, kad jūsų vartotojo vardas ir slaptažodis būtų "
+"įsiminti"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:420
 msgid "Your Organization"
-msgstr ""
+msgstr "Jūsų organizacija"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:431
 msgid ""
 "Describe your organization to customize user prompts.  When organization is "
 "introduced, end-users find program messages easier to understand and act."
 msgstr ""
+"Pristatykite savo organizaciją. Pagal tai bus tinkinamos užklausos "
+"vartotojams. Pristačius organizaciją, vartotojams bus paprasčiau suprasti "
+"programos pranešimus ir jais vadovautis."
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:438
 msgid "Your organization &name:"
-msgstr ""
+msgstr "Organizacijos &pavadinimas:"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:443
 msgid ""
 "Your organization name as it will appear on helpdesk contact notifications"
 msgstr ""
+"Organizacijos pavadinimas bus rodomas, siūlant kreiptis į pagalbos tarnybą"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:447
 msgid "(Keep it short, please)"
-msgstr ""
+msgstr "(Pasistenkite, kad jis būtų neilgas)"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:457
 msgid "Helpdesk contact &information:"
-msgstr ""
+msgstr "Pagalbos tarnybos kontaktinė &informacija:"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:467
 msgid "¶"
@@ -157,7 +171,7 @@ msgstr "¶"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:474
 msgid "Your helpdesk website address"
-msgstr ""
+msgstr "Pagalbos tarnybos svetainės adresas"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:478
 msgid "*"
@@ -165,7 +179,7 @@ msgstr "*"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:485
 msgid "Your helpdesk e-mail address"
-msgstr ""
+msgstr "Pagalbos tarnybos el. pašto adresas"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:489
 msgid ")"
@@ -173,21 +187,23 @@ msgstr ")"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:496
 msgid "Your helpdesk phone number"
-msgstr ""
+msgstr "Pagalbos tarnybos telefono numeris"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:524
 msgid "Provider Unique Identifier"
-msgstr ""
+msgstr "Teikėjo unikalus identifikatorius"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:535
 msgid ""
 "Assign your organization a unique ID to allow sharing the same credential "
 "set across different network profiles."
 msgstr ""
+"Suteikite savo organizacijai unikalų identifikatorių, kad tais pačiais "
+"kredencialais galima būtų naudotis su skirtingais tinklo profiliais."
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:542
 msgid "&Namespace:"
-msgstr ""
+msgstr "&Vardų sritis:"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:546
 msgid "urn:RFC4282:realm"
@@ -199,62 +215,68 @@ msgstr "urn:uuid"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:558
 msgid "Provider unique &identifier:"
-msgstr ""
+msgstr "Teikėjo unikalus &identifikatorius:"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:563
 msgid "Your organization ID to assign same credentials from other profiles"
 msgstr ""
+"Organizacijos identifikatorius kredencialams iš kitų profilių priskirti"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:588
 msgid "Configuration Lock"
-msgstr ""
+msgstr "Užrakinti konfigūraciją"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:599
 msgid ""
 "Your configuration can be locked to prevent accidental modification by end-"
 "users. Users will only be allowed to enter credentials."
 msgstr ""
+"Konfigūraciją galima užrakinti, siekiant išvengti atsitiktinių pakeitimų iš "
+"vartotojų pusės. Tokiu atveju vartotojams leidžiama įvesti tik kredencialus."
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:606
 msgid ""
 "&Lock this configuration and prevent any further modification via user "
 "interface."
 msgstr ""
+"Už&rakinti šią konfigūraciją ir neleisti tolesnių keitimų naudojantis "
+"vartotojo sąsaja."
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:609
 msgid "(Warning: Once locked, you can not revert using this dialog!)"
 msgstr ""
+"(Įspėjimas: užrakinę konfigūraciją, jos atrakinti šiame lange nebegalėsite!)"
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:98
 #, c-format
 msgid "%s Credentials"
-msgstr ""
+msgstr "%s kredencialai"
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:123 lib/EAPBase_UI/include/EAP_UI.h:352
 #: lib/EAPBase_UI/include/EAP_UI.h:362 lib/EAPBase_UI/res/wxEAP_UI.h:119
 msgid "EAP Credentials"
-msgstr ""
+msgstr "EAP kredencialai"
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:166
 #, c-format
 msgid "For additional help and instructions, please contact %s at:"
-msgstr ""
+msgstr "Norėdami papildomos informacijos ar pagalbos, kreipkitės į %s:"
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:167
 msgid "your provider"
-msgstr ""
+msgstr "savo teikėją"
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:186
 msgid "Open the default web browser"
-msgstr ""
+msgstr "Atverti numatytąją naršyklę"
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:197
 msgid "Open your e-mail program"
-msgstr ""
+msgstr "Atverti el. pašto programą"
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:208
 msgid "Dial the phone number"
-msgstr ""
+msgstr "Rinkti telefono numerį"
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:228
 #, c-format
@@ -262,284 +284,305 @@ msgid ""
 "%s has pre-set parts of this configuration. Those parts are locked to "
 "prevent accidental modification."
 msgstr ""
+"%s įrašė ir užrakino dalį konfigūracijos. Užrakintų parametrų keisti "
+"negalėsite."
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:229
 msgid "Your provider"
-msgstr ""
+msgstr "Jūsų teikėjas"
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:250
 msgid "Previous attempt to connect reported invalid credentials."
 msgstr ""
+"Ankstesniojo bandymo prisijungti metu grąžintas atsakymas, jog kredencialai "
+"netinkami."
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:251
 msgid "Previous attempt to connect reported your credentials expired."
 msgstr ""
+"Ankstesniojo bandymo prisijungti metu grąžintas atsakymas, jog jūsų "
+"kredencialai nebegalioja."
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:252
 msgid ""
 "Previous attempt to connect reported your credentials are being changed."
 msgstr ""
+"Ankstesniojo bandymo prisijungti metu grąžintas atsakymas, jog jūsų "
+"kredencialai yra keičiami."
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:253
 msgid "Previous attempt to connect failed."
-msgstr ""
+msgstr "Ankstesnysis bandymas prisijungti nepavyko."
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:254
 msgid "Please, make sure your credentials are correct, or try again later."
 msgstr ""
+"Įsitikinkite, jog jūsų kredencialai teisingi, arba bandykite iš naujo "
+"vėliau."
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:17
 msgid "Server Trust"
-msgstr ""
+msgstr "Patikimi serveriai"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:28
 msgid ""
 "Describe the servers you trust to prevent credential interception in case of"
 " man-in-the-middle attacks."
 msgstr ""
+"Aprašykite patikimus serverius, kad būtų išvengta neteisėto kredencialų "
+"perėmimo."
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:35
 msgid "Acceptable Certificate Authorities:"
-msgstr ""
+msgstr "Patikimos sertifikavimo tarnybos:"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:40
 msgid "List of certificate authorities server's certificate must be issued by"
 msgstr ""
+" Sertifikavimo tarnybų, galinčių išduoti serverio sertifikatą, sąrašas"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:47
 msgid "Add CA from Store..."
-msgstr ""
+msgstr "Įtraukti ST iš saugyklos…"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:48
 msgid ""
 "Adds a new certificate authority from the certificate store to the list"
 msgstr ""
+"Įtraukti į sąrašą naują sertifikavimo tarnybą iš sertifikatų saugyklos"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:52
 msgid "Add CA from File..."
-msgstr ""
+msgstr "Įtraukti ST iš failo"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:53
 msgid "Adds a new certificate authority from the file to the list"
-msgstr ""
+msgstr "Įtraukti į sąrašą naują sertifikavimo tarnybą iš failo"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:57
 msgid "&Remove CA"
-msgstr ""
+msgstr "&Šalinti ST"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:59
 msgid "Removes selected certificate authorities from the list"
-msgstr ""
+msgstr "Pašalinti pažymėtą sertifikavimo tarnybą iš sąrašo"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:72
 msgid "Acceptable server &names:"
-msgstr ""
+msgstr "Patikimi serverio &vardai:"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:77
 msgid ""
 "A semicolon delimited list of acceptable server FQDN names; blank to skip "
 "name check; Unicode characters allowed"
 msgstr ""
+"Kabliataškiais atskirtų patikimų serverių FQDN vardų sąrašas. Palikite "
+"tuščią, jei norite praleisti šį patikrinimą. Unikodo rašmenys leidžiami"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:81
 msgid "(Example: foo.bar.com;server2.bar.com)"
-msgstr ""
+msgstr "(Pvz.: vienas.įstaiga.lt;du.įstaiga.lt)"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:120
 msgid "TLS Client Certificate"
-msgstr ""
+msgstr "TLS kliento sertifikatas"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:131
 msgid "Please select your client certificate to use for authentication."
-msgstr ""
+msgstr "Pasirinkite kliento sertifikatą, naudotiną šio autentifikavimo metu."
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:138
 msgid "Co&nnect without providing a client certificate"
-msgstr ""
+msgstr "Jungtis &nepateikiant kliento sertifikavo"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:139
 msgid ""
 "Select if your server does not require you to provide a client certificate"
-msgstr ""
+msgstr "Pažymėkite, jei serveris nereikalauja pateikti kliento sertifikatą"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:146
 msgid "Use the following &certificate:"
-msgstr ""
+msgstr "Naudoti šį &sertifikatą:"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:147
 msgid "Select if you need to provide a client certificate when connecting"
-msgstr ""
+msgstr "Pažymėkite, jei jungiantis privaloma pateikti kliento sertifikatą"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:154
 msgid "Client certificate to use for authentication"
-msgstr ""
+msgstr "Kliento sertifikatas autentifikavimui"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:167
 msgid "Custom &identity:"
-msgstr ""
+msgstr "&Tinkinta tapatybė:"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:172
 msgid ""
 "Your identity (username@domain) to override one from certificate; or blank "
 "to use one provided in certificate"
 msgstr ""
+"Jūsų tapatybė (vartotojas@domenas), naudotina vietoje nurodytos sertifikate."
+" Palikite lauką tuščią sertifikate nurodytai tapatybei naudoti"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:176
 msgid "(Example: user@contoso.com)"
-msgstr ""
+msgstr "(Pvz.: vartotojas@įstaiga.lt)"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:184
 msgid "Check if you would like to save certificate selection"
-msgstr ""
+msgstr "Pažymėkite, jei norite įsiminti pasirinktą sertifikatą"
 
 #: lib/TLS_UI/src/TLS_UI.cpp:118
 #, c-format
 msgid "Invalid character in host name found: %c"
-msgstr ""
+msgstr "Kompiuterio varde aptiktas netinkamas simbolis: %c"
 
 #: lib/TLS_UI/src/TLS_UI.cpp:118
 msgid "Validation conflict"
-msgstr ""
+msgstr "Patikra nesėkminga"
 
 #: lib/TLS_UI/src/TLS_UI.cpp:511
 msgid "Add Certificate"
-msgstr ""
+msgstr "Pridėti sertifikatą"
 
 #: lib/TLS_UI/src/TLS_UI.cpp:512
 msgid "Certificate Files (*.cer;*.crt;*.der;*.p7b;*.pem)"
-msgstr ""
+msgstr "Sertifikatų failai (*.cer;*.crt;*.der;*.p7b;*.pem)"
 
 #: lib/TLS_UI/src/TLS_UI.cpp:513
 msgid "X.509 Certificate Files (*.cer;*.crt;*.der;*.pem)"
-msgstr ""
+msgstr "X.509 sertifikatų failai (*.cer;*.crt;*.der;*.pem)"
 
 #: lib/TLS_UI/src/TLS_UI.cpp:514
 msgid "PKCS #7 Certificate Files (*.p7b)"
-msgstr ""
+msgstr "PKCS #7 sertifikatų failai (*.p7b)"
 
 #: lib/TLS_UI/src/TLS_UI.cpp:515
 msgid "All Files (*.*)"
-msgstr ""
+msgstr "Visi failai (*.*)"
 
 #: lib/TLS_UI/src/TLS_UI.cpp:531
 #, c-format
 msgid "Invalid or unsupported certificate file %s"
-msgstr ""
+msgstr "Sugadintas arba nepalaikomo tipo sertifikato failas – %s"
 
 #: lib/TLS_UI/src/TLS_UI.cpp:531
 msgid "Error"
-msgstr ""
+msgstr "Klaida"
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:17
 msgid "Outer Identity"
-msgstr ""
+msgstr "Išorinė tapatybė"
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:28
 msgid "Select the user ID supplicant introduces itself as to authenticator:"
 msgstr ""
+"Pasirinkite vartotojo identifikatorių, kuriuo prieigos prašomoji biblioteka "
+"prisistatys atpažintuvui:"
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:35
 msgid "&True identity"
-msgstr ""
+msgstr "&Tikroji tapatybė"
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:36
 msgid "Use my true user name"
-msgstr ""
+msgstr "Naudoti mano tikrąjį vartotojo vardą"
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:40
 msgid "Use &empty outer identity (RFC 4822)"
-msgstr ""
+msgstr "Naudoti &tuščią išorinę tapatybę (RFC 4822)"
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:41
 msgid "Ommit my user name and use @mydomain.org only"
-msgstr ""
+msgstr "Praleisti mano naudotojo vardą ir naudoti tik @domenas.lt"
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:48
 msgid "&Custom outer identity:"
-msgstr ""
+msgstr "&Tinkinta išorinė tapatybė:"
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:49
 msgid "Specify custom outer identity"
-msgstr ""
+msgstr "Nurodykite tinkintą išorinę tapatybę"
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:54
 msgid "Custom outer identity to use"
-msgstr ""
+msgstr "Naudotina tinkinta išorinė tapatybė"
 
 #: lib/TTLS_UI/src/Module.cpp:275 lib/TTLS_UI/src/Module.cpp:285
 #: lib/EAPBase_UI/include/EAP_UI.h:689
 #, c-format
 msgid "Error writing credentials to Credential Manager: %hs (error %u)"
-msgstr ""
+msgstr "Klaida įrašant kredencialus į Kredencialų tvarkytuvą: %hs (klaida %u)"
 
 #: lib/TTLS_UI/src/Module.cpp:277 lib/TTLS_UI/src/Module.cpp:287
 #: lib/EAPBase_UI/include/EAP_UI.h:692
 msgid "Writing credentials failed."
-msgstr ""
+msgstr "Kredencialų įrašyti nepavyko."
 
 #: lib/TTLS_UI/src/TTLS_UI.cpp:108 lib/TTLS_UI/src/TTLS_UI.cpp:235
 msgid "Inner Authentication"
-msgstr ""
+msgstr "Vidinis autentifikavimas"
 
 #: lib/TTLS_UI/src/TTLS_UI.cpp:114
 msgid "Select inner authentication method from the list"
-msgstr ""
+msgstr "Pasirinkite vidinio autentifikavimo metodą iš sąrašo"
 
 #: lib/TTLS_UI/src/TTLS_UI.cpp:116
 msgid "PAP"
-msgstr ""
+msgstr "PAP"
 
 #: lib/TTLS_UI/src/TTLS_UI.cpp:118
 msgid "MSCHAPv2"
-msgstr ""
+msgstr "MSCHAPv2"
 
 #: lib/TTLS_UI/src/TTLS_UI.cpp:123 lib/TTLS_UI/src/TTLS_UI.cpp:262
 msgid "Outer Authentication"
-msgstr ""
+msgstr "Išorinis autentifikavimas"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:289
 #, c-format
 msgid ""
 "Are you sure you want to permanently remove %ls provider from configuration?"
 msgstr ""
+"Ar tikrai norite visam laikui pašalinti teikėją „%ls“ iš konfigūracijos?"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:289
 msgid "Warning"
-msgstr ""
+msgstr "Įspėjimas"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:549
 msgid "Provider Settings"
-msgstr ""
+msgstr "Teikėjo parametrai"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:705
 #, c-format
 msgid "Deleting credentials failed (error %u)."
-msgstr ""
+msgstr "Kredencialų pašalinti nepavyko (klaida %u)."
 
 #: lib/EAPBase_UI/include/EAP_UI.h:739
 #, c-format
 msgid "<error %u>"
-msgstr ""
+msgstr "<klaida %u>"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:743
 msgid "<error>"
-msgstr ""
+msgstr "<klaida>"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:754 lib/EAPBase_UI/include/EAP_UI.h:764
 msgid "<empty>"
-msgstr ""
+msgstr "<tuščias>"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:754 lib/EAPBase_UI/include/EAP_UI.h:764
 msgid "<blank ID>"
-msgstr ""
+msgstr "<tuščias ID>"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:964
 msgid "<Your Organization>"
-msgstr ""
+msgstr "<Jūsų organizacija>"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.h:69
 msgid "EAP Connection Configuration"
-msgstr ""
+msgstr "EAP ryšio konfigūracija"
 
 #: EAPMethods/MSIBuild/En.Win32.Release.Feature-2.idtx:3
 #: EAPMethods/MSIBuild/En.x64.Release.Feature-2.idtx:3
@@ -549,19 +592,19 @@ msgstr "1257"
 #: EAPMethods/MSIBuild/En.Win32.Release.Feature-2.idtx:4
 #: EAPMethods/MSIBuild/En.x64.Release.Feature-2.idtx:4
 msgid "EAP Methods"
-msgstr ""
+msgstr "EAP metodai"
 
 #: EAPMethods/MSIBuild/En.Win32.Release.Feature-2.idtx:4
 #: EAPMethods/MSIBuild/En.x64.Release.Feature-2.idtx:4
 msgid "Modules to support individual EAP methods"
-msgstr ""
+msgstr "Moduliai atskirų EAP metodų palaikymui"
 
 #: EAPMethods/MSIBuild/En.Win32.Release.Feature-2.idtx:5
 #: EAPMethods/MSIBuild/En.x64.Release.Feature-2.idtx:5
 msgid "TTLS"
-msgstr ""
+msgstr "TTLS"
 
 #: EAPMethods/MSIBuild/En.Win32.Release.Feature-2.idtx:5
 #: EAPMethods/MSIBuild/En.x64.Release.Feature-2.idtx:5
 msgid "Tunneled Transport Layer Security"
-msgstr ""
+msgstr "Tunneled Transport Layer Security"

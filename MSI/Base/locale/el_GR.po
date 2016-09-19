@@ -22,15 +22,16 @@ msgstr ""
 #: En.x64.Release.LaunchCondition-2.idtx:4
 msgid "[ProductName] requires Windows Vista or later version of Windows."
 msgstr ""
+"[Όνομα Προϊόντος] απαιτεί Windows Vista ή μεταγενέστερη έκδοση  Windows."
 
 #: En.Win32.Release.Property-2.idtx:3 En.x64.Release.Property-2.idtx:3
 msgid "1252"
-msgstr "1253"
+msgstr "1252"
 
 #: En.Win32.Release.Property-2.idtx:4 En.Win32.Release.Property-2.idtx:5
 #: En.x64.Release.Property-2.idtx:4 En.x64.Release.Property-2.idtx:5
 msgid "http://www.geant.org/"
-msgstr ""
+msgstr "http://www.geant.org/"
 
 #: En.Win32.Release.Property-2.idtx:6 En.x64.Release.Property-2.idtx:6
 msgid "https://github.com/Amebis/GEANTLink/releases"

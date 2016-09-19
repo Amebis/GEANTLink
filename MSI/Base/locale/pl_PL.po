@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: GÉANTLink MSI\n"
 "POT-Creation-Date: 2016-08-31 14:33+0200\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
-"Last-Translator: Simon Rozman <simon@rozman.si>, 2016\n"
+"Last-Translator: Tomasz Wolniewicz <tw2529@gmail.com>, 2016\n"
 "Language-Team: Polish (Poland) (https://www.transifex.com/eduroam_devel/teams/11799/pl_PL/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -21,7 +21,7 @@ msgstr ""
 #: En.Win32.Release.LaunchCondition-2.idtx:4
 #: En.x64.Release.LaunchCondition-2.idtx:4
 msgid "[ProductName] requires Windows Vista or later version of Windows."
-msgstr ""
+msgstr "[ProductName] wymaga Windows Vista albo nowszej wersji Windows."
 
 #: En.Win32.Release.Property-2.idtx:3 En.x64.Release.Property-2.idtx:3
 msgid "1252"
@@ -30,7 +30,7 @@ msgstr "1250"
 #: En.Win32.Release.Property-2.idtx:4 En.Win32.Release.Property-2.idtx:5
 #: En.x64.Release.Property-2.idtx:4 En.x64.Release.Property-2.idtx:5
 msgid "http://www.geant.org/"
-msgstr ""
+msgstr "http://www.geant.org/"
 
 #: En.Win32.Release.Property-2.idtx:6 En.x64.Release.Property-2.idtx:6
 msgid "https://github.com/Amebis/GEANTLink/releases"

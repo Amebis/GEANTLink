@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: EAPMethods\n"
 "POT-Creation-Date: 2016-09-06 14:06+0200\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
-"Last-Translator: Simon Rozman <simon@rozman.si>, 2016\n"
+"Last-Translator: Tom Ivar Myren <tom.myren@uninett.no>, 2016\n"
 "Language-Team: Norwegian Bokmål (https://www.transifex.com/eduroam_devel/teams/11799/nb/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -24,73 +24,79 @@ msgstr ""
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:37
 msgid "+"
-msgstr ""
+msgstr "+"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:38
 msgid "Adds new provider"
-msgstr ""
+msgstr "Legger til ny tilbyder"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:42
 msgid "-"
-msgstr ""
+msgstr "-"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:43
 msgid "Removes selected provider"
-msgstr ""
+msgstr "Fjerner valgte tilbyder"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:47
 msgid "Advanced..."
-msgstr ""
+msgstr "Avansert..."
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:48
 msgid "Opens dialog with provider settings"
-msgstr ""
+msgstr "Åpner dialog med tilbyder innstillinger"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:230 lib/EAPBase_UI/res/wxEAP_UI.cpp:355
 msgid "Client Credentials"
-msgstr ""
+msgstr "Påloggingsinformasjon"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:241
 msgid "Manage credentials used to connect."
-msgstr ""
+msgstr "Administrer påloggingsinformasjon som brukes til å koble til."
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:254
 msgid "Use &own credentials:"
-msgstr ""
+msgstr "Bruk &egen påloggingsinformasjon:"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:255
 msgid "Select this option if you have your unique credentials to connect"
 msgstr ""
+"Velg dette alternativet hvis du har din unike påloggingsinformasjon for å "
+"koble til"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:260
 msgid "Your credentials loaded from Windows Credential Manager"
-msgstr ""
+msgstr "Din påloggingsinformasjon lastet fra Windows Credential Manager"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:270
 msgid "&Clear Credentials"
-msgstr ""
+msgstr "&Fjern påloggingsinformasjon"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:271
 msgid ""
 "Click to clear your credentials from Credential Manager.\n"
 "Note: You will be prompted to enter credentials when connecting."
 msgstr ""
+"Klikk for å fjerne påloggingsinformasjon fra Credential Manager.\n"
+"Merk: Du vil bli bedt om å oppgi påloggingsinformasjon når du kobler til."
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:275 lib/EAPBase_UI/res/wxEAP_UI.cpp:308
 msgid "&Set Credentials..."
-msgstr ""
+msgstr "&Sett påloggingsinformasjon"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:276 lib/EAPBase_UI/res/wxEAP_UI.cpp:309
 msgid "Click here to set or modify your credentials"
-msgstr ""
+msgstr "Klikk her for å sette eller endre påloggingsinformasjon"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:292
 msgid "Use &pre-shared credentials:"
-msgstr ""
+msgstr "Bruk &pre-shared påloggingsinformasjon:"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:293
 msgid "Select this options if all clients connect using the same credentials"
 msgstr ""
+"Velg dette alternativet hvis alle klienter kobler til med samme "
+"påloggingsinformasjon"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:298
 msgid "Common (pre-shared) credentials"

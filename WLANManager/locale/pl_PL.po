@@ -35,4 +35,4 @@ msgstr ""
 #: MSIBuild/En.Win32.Release.Feature-2.idtx:4
 #: MSIBuild/En.x64.Release.Feature-2.idtx:4
 msgid "WLAN Manager"
-msgstr ""
+msgstr "Menaźer WLAN"

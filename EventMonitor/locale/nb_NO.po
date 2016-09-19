@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: EventMonitor\n"
 "POT-Creation-Date: 2016-09-12 11:18+0200\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
-"Last-Translator: Simon Rozman <simon@rozman.si>, 2016\n"
+"Last-Translator: Tom Ivar Myren <tom.myren@uninett.no>, 2016\n"
 "Language-Team: Norwegian Bokmål (https://www.transifex.com/eduroam_devel/teams/11799/nb/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -21,32 +21,32 @@ msgstr ""
 #: App.cpp:61 Frame.h:67 MSIBuild/En.Win32.Release.Feature-2.idtx:4
 #: MSIBuild/En.x64.Release.Feature-2.idtx:4
 msgid "Event Monitor"
-msgstr ""
+msgstr "Hendelses monitor"
 
 #: ETWLog.cpp:83
 #, c-format
 msgid "Error opening event trace (error %u)."
-msgstr ""
+msgstr "Feil under åpning hendelses trace (error %u)."
 
 #: ETWLog.cpp:167
 msgid "Time"
-msgstr ""
+msgstr "Tid"
 
 #: ETWLog.cpp:168
 msgid "PID"
-msgstr ""
+msgstr "PID"
 
 #: ETWLog.cpp:169
 msgid "TID"
-msgstr ""
+msgstr "TID"
 
 #: ETWLog.cpp:170
 msgid "Source"
-msgstr ""
+msgstr "Kilde"
 
 #: ETWLog.cpp:171
 msgid "Event"
-msgstr ""
+msgstr "Hendelse"
 
 #: ETWLog.cpp:228
 msgid ""
@@ -54,160 +54,163 @@ msgid ""
 "(Run As Administrator) or be a member of Performance Log Users group to "
 "start event tracing session."
 msgstr ""
+"Nektet tilgang til å lage hendelses sesjon: Du må ha administrator "
+"rettigheter (Kjør som administrator) eller være medlem av \"Performance Log "
+"Users group\" for å starte hendelses sporing sesjon."
 
 #: ETWLog.cpp:231
 #, c-format
 msgid "The %s event session already exists."
-msgstr ""
+msgstr "%s hendelses-sesjonen finnes allerede."
 
 #: ETWLog.cpp:235
 #, c-format
 msgid "Error creating event session (error %u)."
-msgstr ""
+msgstr "Feil under opprettelse av hendelses sesjon (error %u)."
 
 #: ETWLog.cpp:251 ETWLog.cpp:267 ETWLog.cpp:281
 #, c-format
 msgid "Error enabling %s event provider (error %u)."
-msgstr ""
+msgstr "Feil under aktivering av %s hendelses tilbyder (error %u)."
 
 #: Frame.cpp:48 Frame.cpp:108 Frame.cpp:113 Frame.cpp:168 Frame.cpp:170
 #, c-format
 msgid "Toggles display of %s records"
-msgstr ""
+msgstr "Veksler mellom visning av %s poster"
 
 #: Frame.cpp:65
 msgid "E&xit"
-msgstr ""
+msgstr "E&xit"
 
 #: Frame.cpp:65
 msgid "Quits this program"
-msgstr ""
+msgstr "Avslutter programmet"
 
 #: Frame.cpp:69
 msgid "&Program"
-msgstr ""
+msgstr "&Program"
 
 #: Frame.cpp:73
 msgid "&Copy"
-msgstr ""
+msgstr "&Kopier"
 
 #: Frame.cpp:73 Frame.cpp:154
 msgid "Copies selected records to clipboard"
-msgstr ""
+msgstr "Kopierer valgte poster til utklippstavlen"
 
 #: Frame.cpp:78
 msgid "Copy A&ll"
-msgstr ""
+msgstr "Kopier A%lt"
 
 #: Frame.cpp:78 Frame.cpp:156
 msgid "Copies all records to clipboard (including hidden)"
-msgstr ""
+msgstr "Kopierer alle poster til utklippstavlen (inkludert skjulte)"
 
 #: Frame.cpp:83 Frame.cpp:158
 msgid "Clear"
-msgstr ""
+msgstr "Fjern"
 
 #: Frame.cpp:83 Frame.cpp:158
 msgid "Clears all records from the log"
-msgstr ""
+msgstr "Fjerner all poster fra loggen"
 
 #: Frame.cpp:90
 msgid "Select &All"
-msgstr ""
+msgstr "Velg %Alle"
 
 #: Frame.cpp:90
 msgid "Selects all visible records"
-msgstr ""
+msgstr "Velg alle synlige poster"
 
 #: Frame.cpp:94
 msgid "Select &None"
-msgstr ""
+msgstr "Velg &Ingen"
 
 #: Frame.cpp:94
 msgid "Clears record selection"
-msgstr ""
+msgstr "Fjerner valg av poster"
 
 #: Frame.cpp:97 Frame.cpp:142
 msgid "&Edit"
-msgstr ""
+msgstr "&Rediger"
 
 #: Frame.cpp:101
 msgid "Auto &Scroll"
-msgstr ""
+msgstr "Auto &Scroll"
 
 #: Frame.cpp:101 Frame.cpp:164
 msgid "Automatically scrolls to the most recent records as they come-in"
-msgstr ""
+msgstr "Blar automatisk til nye poster etterhvert som de kommer inn"
 
 #: Frame.cpp:123 Frame.cpp:176
 msgid "Verbose"
-msgstr ""
+msgstr "Verbose"
 
 #: Frame.cpp:123 Frame.cpp:176
 msgid "Displays all levels of records"
-msgstr ""
+msgstr "Vis alle nivåer av poster"
 
 #: Frame.cpp:127 Frame.cpp:178
 msgid "Informational"
-msgstr ""
+msgstr "Informasjon"
 
 #: Frame.cpp:127 Frame.cpp:178
 msgid "Displays all records up to informational level"
-msgstr ""
+msgstr "Vis alle poster opp til nivå informasjon"
 
 #: Frame.cpp:131 Frame.cpp:180
 msgid "Warning"
-msgstr ""
+msgstr "Advarsel"
 
 #: Frame.cpp:131 Frame.cpp:180
 msgid "Displays all records up to warning level"
-msgstr ""
+msgstr "Vis alle poster opp til nivå advarsel"
 
 #: Frame.cpp:135 Frame.cpp:182
 msgid "Error"
-msgstr ""
+msgstr "Feil"
 
 #: Frame.cpp:135 Frame.cpp:182
 msgid "Displays error level records only"
-msgstr ""
+msgstr "Vis kun poster med nivå feil"
 
 #: Frame.cpp:142 Frame.cpp:146
 #, c-format
 msgid "%s toolbar"
-msgstr ""
+msgstr "%s verktøylinje"
 
 #: Frame.cpp:142 Frame.cpp:146
 #, c-format
 msgid "Toggles display of %s toolbar"
-msgstr ""
+msgstr "Veksler mellom visning av %s verktøylinje"
 
 #: Frame.cpp:142 Frame.cpp:146 Frame.cpp:185
 msgid "View"
-msgstr ""
+msgstr "Se"
 
 #: Frame.cpp:146 Frame.cpp:149
 msgid "&View"
-msgstr ""
+msgstr "&Se"
 
 #: Frame.cpp:154
 msgid "Copy"
-msgstr ""
+msgstr "Kopier"
 
 #: Frame.cpp:156
 msgid "Copy All"
-msgstr ""
+msgstr "Kopier Alt"
 
 #: Frame.cpp:161
 msgid "Edit"
-msgstr ""
+msgstr "Rediger"
 
 #: Frame.cpp:164
 msgid "Auto Scroll"
-msgstr ""
+msgstr "Auto Scroll"
 
 #: Frame.cpp:189
 msgid "Trace Log"
-msgstr ""
+msgstr "Sporingslogg"
 
 #: MSIBuild/En.Win32.Release.Feature-2.idtx:3
 #: MSIBuild/En.Win32.Release.Shortcut-2.idtx:3
@@ -219,11 +222,11 @@ msgstr "1252"
 #: MSIBuild/En.Win32.Release.Shortcut-2.idtx:4
 #: MSIBuild/En.x64.Release.Shortcut-2.idtx:4
 msgid "EVENTM~1|GÉANTLink Event Monitor"
-msgstr ""
+msgstr "EVENTM~1|GÉANTLink Hendelses monitor"
 
 #: MSIBuild/En.Win32.Release.Feature-2.idtx:4
 #: MSIBuild/En.Win32.Release.Shortcut-2.idtx:4
 #: MSIBuild/En.x64.Release.Feature-2.idtx:4
 #: MSIBuild/En.x64.Release.Shortcut-2.idtx:4
 msgid "Real-time display of internal events"
-msgstr ""
+msgstr "Sanntidsvisning av interne hendelser"

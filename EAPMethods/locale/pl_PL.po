@@ -56,7 +56,7 @@ msgstr "Zarządzaj poświadczeniami logowania."
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:254
 msgid "Use &own credentials:"
-msgstr ""
+msgstr "Użyj &własnych poświadczeń:"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:255
 msgid "Select this option if you have your unique credentials to connect"
@@ -68,17 +68,19 @@ msgstr "Twoje poświadczenia załadowane z Managera poświadczeń systemu Window
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:270
 msgid "&Clear Credentials"
-msgstr ""
+msgstr "&Usuń poświadczenia"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:271
 msgid ""
 "Click to clear your credentials from Credential Manager.\n"
 "Note: You will be prompted to enter credentials when connecting."
 msgstr ""
+"Kliknij aby usunąć poświadczenia z Menadżera poświadczeń.\n"
+"Uwaga: Przy ponownym połączeniu zostaniesz poproszony o wprowadzenie poświadczeń."
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:275 lib/EAPBase_UI/res/wxEAP_UI.cpp:308
 msgid "&Set Credentials..."
-msgstr ""
+msgstr "&Ustaw poświadczenia"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:276 lib/EAPBase_UI/res/wxEAP_UI.cpp:309
 msgid "Click here to set or modify your credentials"
@@ -86,7 +88,7 @@ msgstr "Kliknij tutaj, aby zmodyfikować poświadczenia logowania"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:292
 msgid "Use &pre-shared credentials:"
-msgstr ""
+msgstr "Użyj pre-konfigurowanych poświadczeń"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:293
 msgid "Select this options if all clients connect using the same credentials"
@@ -95,7 +97,7 @@ msgstr ""
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:298
 msgid "Common (pre-shared) credentials"
-msgstr ""
+msgstr "Wspólne (pre-konfigurowane) poświadczenia"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:366
 msgid "Please provide your user ID and password."
@@ -121,7 +123,7 @@ msgstr "Wprowadź hasło"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:397 lib/TLS_UI/res/wxTLS_UI.cpp:183
 msgid "&Remember"
-msgstr ""
+msgstr "&Zapamiętaj"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:398
 msgid "Check if you would like to save username and password"
@@ -136,10 +138,12 @@ msgid ""
 "Describe your organization to customize user prompts.  When organization is "
 "introduced, end-users find program messages easier to understand and act."
 msgstr ""
+"Opisz Twoją instytucję, aby spersonalizować komunikaty. Jeżeli instytucja "
+"jest ustawiona użytkownicy łatwiej rozumieją komunikaty i reagują na nie. "
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:438
 msgid "Your organization &name:"
-msgstr ""
+msgstr "&Nazwa Twojej instytucji:"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:443
 msgid ""
@@ -154,7 +158,7 @@ msgstr "(postaraj się, by było krótko)"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:457
 msgid "Helpdesk contact &information:"
-msgstr ""
+msgstr "&Kontakt do helpdesku"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:467
 msgid "¶"
@@ -194,7 +198,7 @@ msgstr ""
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:542
 msgid "&Namespace:"
-msgstr ""
+msgstr "&Namespace:"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:546
 msgid "urn:RFC4282:realm"
@@ -206,11 +210,13 @@ msgstr "urn:uuid"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:558
 msgid "Provider unique &identifier:"
-msgstr ""
+msgstr "Unikatowy &identyfikator Dostawcy Tożsamości:"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:563
 msgid "Your organization ID to assign same credentials from other profiles"
 msgstr ""
+"Unikatowy identyfikator Twojej instytucji umożliwiający używanie tych samych"
+" poświadczeń z innych profili"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:588
 msgid "Configuration Lock"
@@ -221,16 +227,22 @@ msgid ""
 "Your configuration can be locked to prevent accidental modification by end-"
 "users. Users will only be allowed to enter credentials."
 msgstr ""
+"Twoją konfigurację można zablokować, aby zapobiec przypadkowej modyfikacji "
+"przez użytkowników końcowych. Użytkownicy będą mogli wprowadzać "
+"poświadczenia, ale nic poza tym. "
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:606
 msgid ""
 "&Lock this configuration and prevent any further modification via user "
 "interface."
 msgstr ""
+"&Zablokuj konfigurację przed modyfikacją poprzez interfejs użytkownika."
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:609
 msgid "(Warning: Once locked, you can not revert using this dialog!)"
 msgstr ""
+"(Uwaga: Po zablokowaniu nie będziesz mógł tego wycofać przy pomocy tego "
+"interfejsu!)"
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:98
 #, c-format
@@ -269,6 +281,8 @@ msgid ""
 "%s has pre-set parts of this configuration. Those parts are locked to "
 "prevent accidental modification."
 msgstr ""
+"Ta konfiguracja dla %s jest częściowo pre-definiowana. Te części są "
+"zablokowane, aby zapobiec przypadkowej modyfikacji."
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:229
 msgid "Your provider"
@@ -320,6 +334,8 @@ msgstr "Zaufane Urzędy Certyfikacji"
 #: lib/TLS_UI/res/wxTLS_UI.cpp:40
 msgid "List of certificate authorities server's certificate must be issued by"
 msgstr ""
+"Lista urzędów certyfikacyjnych uprawnionych do wystawienia certyfikatu "
+"serwera"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:47
 msgid "Add CA from Store..."
@@ -348,13 +364,15 @@ msgstr "Usuwa z listy wybrane urzędy certyfikacji"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:72
 msgid "Acceptable server &names:"
-msgstr ""
+msgstr "Dopuszczalne &nazwy serwerów:"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:77
 msgid ""
 "A semicolon delimited list of acceptable server FQDN names; blank to skip "
 "name check; Unicode characters allowed"
 msgstr ""
+"Lista nazw domenowych serwerów rozdzielana średnikami; pusta lista oznacza "
+"brak sprawdzenia nazw; dozwolone są znaki Unicode"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:81
 msgid "(Example: foo.bar.com;server2.bar.com)"
@@ -371,7 +389,7 @@ msgstr ""
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:138
 msgid "Co&nnect without providing a client certificate"
-msgstr ""
+msgstr "&Połącz bez podawania certyfikatu klienta"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:139
 msgid ""
@@ -380,7 +398,7 @@ msgstr "Zaznacz, jeżeli Twój serwer nie wymaga podania certyfikatu klienta"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:146
 msgid "Use the following &certificate:"
-msgstr ""
+msgstr "Użyj &certyfikatu:"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:147
 msgid "Select if you need to provide a client certificate when connecting"
@@ -388,17 +406,19 @@ msgstr "Zaznacz, jeżeli w czasie łączenia musisz wskazać certyfikat klienta"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:154
 msgid "Client certificate to use for authentication"
-msgstr ""
+msgstr "Certyfikat klienta używany do uwierzytelnienia"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:167
 msgid "Custom &identity:"
-msgstr ""
+msgstr "Niestandardowy &identyfikator:"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:172
 msgid ""
 "Your identity (username@domain) to override one from certificate; or blank "
 "to use one provided in certificate"
 msgstr ""
+"Twój identyfikator (użytkownik@domena), który ma być użyty zamiast podanego "
+"w certyfikacie; pusty wpis spowoduje użycie identyfikatora z certyfikatu"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:176
 msgid "(Example: user@contoso.com)"
@@ -415,7 +435,7 @@ msgstr "W nazwie hosta znaleziono nieprawidłowy znak: %c"
 
 #: lib/TLS_UI/src/TLS_UI.cpp:118
 msgid "Validation conflict"
-msgstr ""
+msgstr "Błąd walidacji danych"
 
 #: lib/TLS_UI/src/TLS_UI.cpp:511
 msgid "Add Certificate"
@@ -458,7 +478,7 @@ msgstr ""
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:35
 msgid "&True identity"
-msgstr ""
+msgstr "&Rzeczywista tożsamość"
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:36
 msgid "Use my true user name"
@@ -466,7 +486,7 @@ msgstr "Korzystaj z mojego rzeczywistego identyfikatora"
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:40
 msgid "Use &empty outer identity (RFC 4822)"
-msgstr ""
+msgstr "Użyj &pustego identyfikatora zewnętrznego (RFC 4822)"
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:41
 msgid "Ommit my user name and use @mydomain.org only"
@@ -474,7 +494,7 @@ msgstr "Pomiń mój identyfikator i użyj tylko @mydomain.org"
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:48
 msgid "&Custom outer identity:"
-msgstr ""
+msgstr "&Niestandardowa tożsamość zewnętrzna:"
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:49
 msgid "Specify custom outer identity"
@@ -488,12 +508,12 @@ msgstr "Niestandardowy identyfikator zewnętrzny"
 #: lib/EAPBase_UI/include/EAP_UI.h:689
 #, c-format
 msgid "Error writing credentials to Credential Manager: %hs (error %u)"
-msgstr ""
+msgstr "Błąd przy zapisie poświadczeń w Menadżerze poświadczeń: %hs (błąd %u)"
 
 #: lib/TTLS_UI/src/Module.cpp:277 lib/TTLS_UI/src/Module.cpp:287
 #: lib/EAPBase_UI/include/EAP_UI.h:692
 msgid "Writing credentials failed."
-msgstr ""
+msgstr "Nie udało się zapisać poświadczeń."
 
 #: lib/TTLS_UI/src/TTLS_UI.cpp:108 lib/TTLS_UI/src/TTLS_UI.cpp:235
 msgid "Inner Authentication"
@@ -546,19 +566,19 @@ msgstr "<błąd>"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:754 lib/EAPBase_UI/include/EAP_UI.h:764
 msgid "<empty>"
-msgstr ""
+msgstr "<pusty>"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:754 lib/EAPBase_UI/include/EAP_UI.h:764
 msgid "<blank ID>"
-msgstr ""
+msgstr "<puste ID>"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:964
 msgid "<Your Organization>"
-msgstr ""
+msgstr "<Twoja Instytucja>"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.h:69
 msgid "EAP Connection Configuration"
-msgstr ""
+msgstr "Konfiguracja Połączenia EAP"
 
 #: EAPMethods/MSIBuild/En.Win32.Release.Feature-2.idtx:3
 #: EAPMethods/MSIBuild/En.x64.Release.Feature-2.idtx:3
@@ -573,7 +593,7 @@ msgstr "Metody EAP"
 #: EAPMethods/MSIBuild/En.Win32.Release.Feature-2.idtx:4
 #: EAPMethods/MSIBuild/En.x64.Release.Feature-2.idtx:4
 msgid "Modules to support individual EAP methods"
-msgstr ""
+msgstr "Moduły obsługujące konkretne metody EAP"
 
 #: EAPMethods/MSIBuild/En.Win32.Release.Feature-2.idtx:5
 #: EAPMethods/MSIBuild/En.x64.Release.Feature-2.idtx:5
