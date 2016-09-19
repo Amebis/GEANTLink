@@ -2,14 +2,14 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: EAPMethods\n"
-"POT-Creation-Date: 2016-09-06 14:06+0200\n"
+"POT-Creation-Date: 2016-09-19 10:58+0200\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
 "Last-Translator: Simon Rozman <simon.rozman@amebis.si>\n"
 "Language-Team: Amebis, d. o. o., Kamnik <info@amebis.si>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.8\n"
+"X-Generator: Poedit 1.8.9\n"
 "X-Poedit-Basepath: ../..\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-KeywordsList: _\n"
@@ -218,8 +218,8 @@ msgstr ""
 msgid "%s Credentials"
 msgstr ""
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:123 lib/EAPBase_UI/include/EAP_UI.h:352
-#: lib/EAPBase_UI/include/EAP_UI.h:362 lib/EAPBase_UI/res/wxEAP_UI.h:119
+#: lib/EAPBase_UI/src/EAP_UI.cpp:123 lib/EAPBase_UI/include/EAP_UI.h:351
+#: lib/EAPBase_UI/include/EAP_UI.h:361 lib/EAPBase_UI/res/wxEAP_UI.h:119
 msgid "EAP Credentials"
 msgstr ""
 
@@ -444,13 +444,13 @@ msgid "Custom outer identity to use"
 msgstr ""
 
 #: lib/TTLS_UI/src/Module.cpp:275 lib/TTLS_UI/src/Module.cpp:285
-#: lib/EAPBase_UI/include/EAP_UI.h:689
+#: lib/EAPBase_UI/include/EAP_UI.h:688
 #, c-format
 msgid "Error writing credentials to Credential Manager: %hs (error %u)"
 msgstr ""
 
 #: lib/TTLS_UI/src/Module.cpp:277 lib/TTLS_UI/src/Module.cpp:287
-#: lib/EAPBase_UI/include/EAP_UI.h:692
+#: lib/EAPBase_UI/include/EAP_UI.h:691
 msgid "Writing credentials failed."
 msgstr ""
 
@@ -474,42 +474,42 @@ msgstr ""
 msgid "Outer Authentication"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:289
+#: lib/EAPBase_UI/include/EAP_UI.h:288
 #, c-format
 msgid "Are you sure you want to permanently remove %ls provider from configuration?"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:289
+#: lib/EAPBase_UI/include/EAP_UI.h:288
 msgid "Warning"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:549
+#: lib/EAPBase_UI/include/EAP_UI.h:548
 msgid "Provider Settings"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:705
+#: lib/EAPBase_UI/include/EAP_UI.h:704
 #, c-format
 msgid "Deleting credentials failed (error %u)."
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:739
+#: lib/EAPBase_UI/include/EAP_UI.h:738
 #, c-format
 msgid "<error %u>"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:743
+#: lib/EAPBase_UI/include/EAP_UI.h:742
 msgid "<error>"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:754 lib/EAPBase_UI/include/EAP_UI.h:764
+#: lib/EAPBase_UI/include/EAP_UI.h:753 lib/EAPBase_UI/include/EAP_UI.h:762
 msgid "<empty>"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:754 lib/EAPBase_UI/include/EAP_UI.h:764
+#: lib/EAPBase_UI/include/EAP_UI.h:753 lib/EAPBase_UI/include/EAP_UI.h:762
 msgid "<blank ID>"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:964
+#: lib/EAPBase_UI/include/EAP_UI.h:962
 msgid "<Your Organization>"
 msgstr ""
 
@@ -517,27 +517,18 @@ msgstr ""
 msgid "EAP Connection Configuration"
 msgstr ""
 
-#: EAPMethods/MSIBuild/En.Win32.Release.Feature-2.idtx:3
-#: EAPMethods/MSIBuild/En.x64.Release.Feature-2.idtx:3
-msgid "1252"
-msgstr ""
-
-#: EAPMethods/MSIBuild/En.Win32.Release.Feature-2.idtx:4
-#: EAPMethods/MSIBuild/En.x64.Release.Feature-2.idtx:4
+#: EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
 msgid "EAP Methods"
 msgstr ""
 
-#: EAPMethods/MSIBuild/En.Win32.Release.Feature-2.idtx:4
-#: EAPMethods/MSIBuild/En.x64.Release.Feature-2.idtx:4
+#: EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
 msgid "Modules to support individual EAP methods"
 msgstr ""
 
-#: EAPMethods/MSIBuild/En.Win32.Release.Feature-2.idtx:5
-#: EAPMethods/MSIBuild/En.x64.Release.Feature-2.idtx:5
+#: EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:5
 msgid "TTLS"
 msgstr ""
 
-#: EAPMethods/MSIBuild/En.Win32.Release.Feature-2.idtx:5
-#: EAPMethods/MSIBuild/En.x64.Release.Feature-2.idtx:5
+#: EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:5
 msgid "Tunneled Transport Layer Security"
 msgstr ""
