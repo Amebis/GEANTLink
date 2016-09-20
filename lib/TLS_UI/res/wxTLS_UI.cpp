@@ -37,7 +37,7 @@ wxEAPTLSServerTrustConfigPanelBase::wxEAPTLSServerTrustConfigPanelBase( wxWindow
 	sb_root_ca->Add( m_root_ca_lbl, 0, wxEXPAND|wxBOTTOM, 5 );
 	
 	m_root_ca = new wxListBox( sb_server_trust->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, NULL, wxLB_SORT ); 
-	m_root_ca->SetToolTip( _("List of certificate authorities server's certificate must be issued by") );
+	m_root_ca->SetToolTip( _("Server's certificate must be issued by one of certificate authorities listed here") );
 	
 	sb_root_ca->Add( m_root_ca, 1, wxEXPAND|wxBOTTOM, 5 );
 	

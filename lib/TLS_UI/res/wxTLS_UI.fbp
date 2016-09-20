@@ -413,7 +413,7 @@
                                                 <property name="style">wxLB_SORT</property>
                                                 <property name="subclass"></property>
                                                 <property name="toolbar_pane">0</property>
-                                                <property name="tooltip">List of certificate authorities server&apos;s certificate must be issued by</property>
+                                                <property name="tooltip">Server&apos;s certificate must be issued by one of certificate authorities listed here</property>
                                                 <property name="validator_data_type"></property>
                                                 <property name="validator_style">wxFILTER_NONE</property>
                                                 <property name="validator_type">wxDefaultValidator</property>

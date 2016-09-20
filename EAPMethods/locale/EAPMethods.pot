@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: EAPMethods\n"
-"POT-Creation-Date: 2016-09-19 10:58+0200\n"
+"POT-Creation-Date: 2016-09-20 11:05+0200\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
 "Last-Translator: Simon Rozman <simon.rozman@amebis.si>\n"
 "Language-Team: Amebis, d. o. o., Kamnik <info@amebis.si>\n"
@@ -286,7 +286,7 @@ msgid "Acceptable Certificate Authorities:"
 msgstr ""
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:40
-msgid "List of certificate authorities server's certificate must be issued by"
+msgid "Server's certificate must be issued by one of certificate authorities listed here"
 msgstr ""
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:47
@@ -518,17 +518,21 @@ msgid "EAP Connection Configuration"
 msgstr ""
 
 #: EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
+#: EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
 msgid "EAP Methods"
 msgstr ""
 
 #: EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
+#: EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
 msgid "Modules to support individual EAP methods"
 msgstr ""
 
 #: EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:5
+#: EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:5
 msgid "TTLS"
 msgstr ""
 
 #: EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:5
+#: EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:5
 msgid "Tunneled Transport Layer Security"
 msgstr ""
