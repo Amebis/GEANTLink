@@ -308,11 +308,11 @@ bool wxFQDNListValidator::Parse(const wxString &val_in, size_t i_start, size_t i
 
 
 //////////////////////////////////////////////////////////////////////
-// wxTLSCredentialsPanel
+// wxEAPCredentialsPromptTLSPanel
 //////////////////////////////////////////////////////////////////////
 
-wxTLSCredentialsPanel::wxTLSCredentialsPanel(const eap::config_provider &prov, const eap::config_method_with_cred &cfg, eap::credentials_tls &cred, wxWindow* parent, bool is_config) :
-    wxEAPCredentialsPanel<eap::credentials_tls, wxTLSCredentialsPanelBase>(prov, cfg, cred, parent, is_config)
+wxEAPCredentialsPromptTLSPanel::wxEAPCredentialsPromptTLSPanel(const eap::config_provider &prov, const eap::config_method_with_cred &cfg, eap::credentials_tls &cred, wxWindow* parent, bool is_config) :
+    wxEAPCredentialsPanel<eap::credentials_tls, wxEAPCredentialsPromptTLSPanelBase>(prov, cfg, cred, parent, is_config)
 {
     // Load and set icon.
     winstd::library lib_shell32;
@@ -321,7 +321,7 @@ wxTLSCredentialsPanel::wxTLSCredentialsPanel(const eap::config_provider &prov, c
 }
 
 
-bool wxTLSCredentialsPanel::TransferDataToWindow()
+bool wxEAPCredentialsPromptTLSPanel::TransferDataToWindow()
 {
     // Populate certificate list.
     bool is_found = false;
@@ -361,11 +361,11 @@ bool wxTLSCredentialsPanel::TransferDataToWindow()
 
     m_identity->SetValue(m_cred.m_identity);
 
-    return wxEAPCredentialsPanel<eap::credentials_tls, wxTLSCredentialsPanelBase>::TransferDataToWindow();
+    return wxEAPCredentialsPanel<eap::credentials_tls, wxEAPCredentialsPromptTLSPanelBase>::TransferDataToWindow();
 }
 
 
-bool wxTLSCredentialsPanel::TransferDataFromWindow()
+bool wxEAPCredentialsPromptTLSPanel::TransferDataFromWindow()
 {
     if (m_cert_none->GetValue())
         m_cred.m_cert.free();
@@ -381,11 +381,11 @@ bool wxTLSCredentialsPanel::TransferDataFromWindow()
 
     // Inherited TransferDataFromWindow() calls m_cred.store().
     // Therefore, call it only now, that m_cred is set.
-    return wxEAPCredentialsPanel<eap::credentials_tls, wxTLSCredentialsPanelBase>::TransferDataFromWindow();
+    return wxEAPCredentialsPanel<eap::credentials_tls, wxEAPCredentialsPromptTLSPanelBase>::TransferDataFromWindow();
 }
 
 
-void wxTLSCredentialsPanel::OnUpdateUI(wxUpdateUIEvent& /*event*/)
+void wxEAPCredentialsPromptTLSPanel::OnUpdateUI(wxUpdateUIEvent& /*event*/)
 {
     if (!m_is_config && m_cfg.m_use_cred) {
         // Credential prompt mode & Using configured credentials
@@ -579,7 +579,7 @@ wxTLSConfigPanel::wxTLSConfigPanel(const eap::config_provider &prov, eap::config
     m_server_trust = new wxTLSServerTrustPanel(prov, cfg, this);
     sb_content->Add(m_server_trust, 0, wxDOWN|wxEXPAND, 5);
 
-    m_credentials = new wxTLSCredentialsConfigPanel(prov, cfg, this);
+    m_credentials = new wxEAPCredentialsPromptTLSConfigPanel(prov, cfg, this);
     sb_content->Add(m_credentials, 0, wxUP|wxEXPAND, 5);
 
     this->SetSizer(sb_content);

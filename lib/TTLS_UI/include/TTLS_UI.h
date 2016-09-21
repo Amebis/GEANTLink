@@ -137,7 +137,7 @@ protected:
     /// \endcond
 
 public:
-    wxTLSCredentialsPanel *m_outer_cred;        ///< Outer credentials panel
+    wxEAPCredentialsPromptTLSPanel *m_outer_cred;        ///< Outer credentials panel
     wxEAPCredentialsPanelBase *m_inner_cred;    ///< Inner credentials panel
 
 protected:

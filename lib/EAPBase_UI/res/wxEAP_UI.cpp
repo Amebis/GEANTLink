@@ -349,7 +349,7 @@ wxEAPCredentialsConfigPanelBase::~wxEAPCredentialsConfigPanelBase()
 	
 }
 
-wxEAPCredentialsPassPanelBase::wxEAPCredentialsPassPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxEAPCredentialsPanelBase( parent, id, pos, size, style )
+wxEAPCredentialsPromptPassPanelBase::wxEAPCredentialsPromptPassPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxEAPCredentialsPanelBase( parent, id, pos, size, style )
 {
 	wxStaticBoxSizer* sb_credentials;
 	sb_credentials = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Client Credentials") ), wxVERTICAL );
@@ -410,7 +410,7 @@ wxEAPCredentialsPassPanelBase::wxEAPCredentialsPassPanelBase( wxWindow* parent, 
 	this->Layout();
 }
 
-wxEAPCredentialsPassPanelBase::~wxEAPCredentialsPassPanelBase()
+wxEAPCredentialsPromptPassPanelBase::~wxEAPCredentialsPromptPassPanelBase()
 {
 }
 

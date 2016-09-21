@@ -904,12 +904,12 @@ protected:
             m_password      ->Enable(false);
         }
 
-        return wxEAPCredentialsPanel<_Tcred, wxEAPCredentialsPassPanelBase>::TransferDataToWindow();
+        return wxEAPCredentialsPanel<_Tcred, wxEAPCredentialsPromptPassPanelBase>::TransferDataToWindow();
     }
 
     virtual bool TransferDataFromWindow()
     {
-        if (!wxEAPCredentialsPanel<_Tcred, wxEAPCredentialsPassPanelBase>::TransferDataFromWindow())
+        if (!wxEAPCredentialsPanel<_Tcred, wxEAPCredentialsPromptPassPanelBase>::TransferDataFromWindow())
             return false;
 
         m_cred.m_identity = m_identity->GetValue();
