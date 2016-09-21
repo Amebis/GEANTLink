@@ -1016,7 +1016,7 @@
             <property name="name">wxEAPCredentialsPromptTLSPanelBase</property>
             <property name="pos"></property>
             <property name="size">500,-1</property>
-            <property name="subclass"></property>
+            <property name="subclass">wxEAPCredentialsPanelBase; ../../EAPBase_UI/include/wxEAP_UIBase.h</property>
             <property name="tooltip"></property>
             <property name="window_extra_style"></property>
             <property name="window_name"></property>

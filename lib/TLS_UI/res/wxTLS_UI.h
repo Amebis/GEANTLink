@@ -11,6 +11,9 @@
 #include <wx/artprov.h>
 #include <wx/xrc/xmlres.h>
 #include <wx/intl.h>
+class wxEAPCredentialsPanelBase;
+
+#include "../../EAPBase_UI/include/wxEAP_UIBase.h"
 #include <wx/bitmap.h>
 #include <wx/image.h>
 #include <wx/icon.h>
@@ -70,7 +73,7 @@ class wxEAPTLSServerTrustConfigPanelBase : public wxPanel
 ///////////////////////////////////////////////////////////////////////////////
 /// Class wxEAPCredentialsPromptTLSPanelBase
 ///////////////////////////////////////////////////////////////////////////////
-class wxEAPCredentialsPromptTLSPanelBase : public wxPanel 
+class wxEAPCredentialsPromptTLSPanelBase : public wxEAPCredentialsPanelBase
 {
 	private:
 	
