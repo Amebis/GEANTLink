@@ -30,7 +30,6 @@ class wxEAPCredentialsPanelBase;
 #include <wx/textctrl.h>
 #include <wx/statbox.h>
 #include <wx/panel.h>
-#include <wx/radiobut.h>
 #include <wx/choice.h>
 #include <wx/checkbox.h>
 
@@ -79,10 +78,8 @@ class wxEAPCredentialsPromptTLSPanelBase : public wxEAPCredentialsPanelBase
 	
 	protected:
 		wxStaticBitmap* m_credentials_icon;
-		wxStaticText* m_credentials_label;
-		wxRadioButton* m_cert_none;
-		wxRadioButton* m_cert_select;
-		wxChoice* m_cert_select_val;
+		wxStaticText* m_certificate_label;
+		wxChoice* m_certificate;
 		wxStaticText* m_identity_label;
 		wxTextCtrl* m_identity;
 		wxStaticText* m_identity_note;

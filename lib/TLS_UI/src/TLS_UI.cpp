@@ -324,6 +324,7 @@ wxEAPCredentialsPromptTLSPanel::wxEAPCredentialsPromptTLSPanel(const eap::config
 bool wxEAPCredentialsPromptTLSPanel::TransferDataToWindow()
 {
     // Populate certificate list.
+    m_certificate->Append(_("<empty>"));
     bool is_found = false;
     winstd::cert_store store;
     if (store.create(CERT_STORE_PROV_SYSTEM, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, (HCRYPTPROV)NULL, CERT_SYSTEM_STORE_CURRENT_USER, _T("My"))) {
@@ -343,21 +344,16 @@ bool wxEAPCredentialsPromptTLSPanel::TransferDataToWindow()
                 m_cred.m_cert->cbCertEncoded == data->m_cert->cbCertEncoded &&
                 memcmp(m_cred.m_cert->pbCertEncoded, data->m_cert->pbCertEncoded, m_cred.m_cert->cbCertEncoded) == 0;
             winstd::tstring name(std::move(eap::get_cert_title(cert)));
-            int i = m_cert_select_val->Append(name, data.release());
+            int i = m_certificate->Append(name, data.release());
             if (is_selected) {
-                m_cert_select_val->SetSelection(i);
+                m_certificate->SetSelection(i);
                 is_found = true;
             }
         }
     }
 
-    if (is_found) {
-        m_cert_select->SetValue(true);
-    } else {
-        m_cert_none->SetValue(true);
-        if (!m_cert_select_val->IsEmpty())
-            m_cert_select_val->SetSelection(0);
-    }
+    if (!is_found)
+        m_certificate->SetSelection(0);
 
     m_identity->SetValue(m_cred.m_identity);
 
@@ -367,15 +363,11 @@ bool wxEAPCredentialsPromptTLSPanel::TransferDataToWindow()
 
 bool wxEAPCredentialsPromptTLSPanel::TransferDataFromWindow()
 {
-    if (m_cert_none->GetValue())
+    const wxCertificateClientData *data = dynamic_cast<const wxCertificateClientData*>(m_certificate->GetClientObject(m_certificate->GetSelection()));
+    if (data)
+        m_cred.m_cert.attach_duplicated(data->m_cert);
+    else
         m_cred.m_cert.free();
-    else {
-        const wxCertificateClientData *data = dynamic_cast<const wxCertificateClientData*>(m_cert_select_val->GetClientObject(m_cert_select_val->GetSelection()));
-        if (data)
-            m_cred.m_cert.attach_duplicated(data->m_cert);
-        else
-            m_cred.m_cert.free();
-    }
 
     m_cred.m_identity = m_identity->GetValue();
 
@@ -389,20 +381,12 @@ void wxEAPCredentialsPromptTLSPanel::OnUpdateUI(wxUpdateUIEvent& /*event*/)
 {
     if (!m_is_config && m_cfg.m_use_cred) {
         // Credential prompt mode & Using configured credentials
-        // To avoid run-away selection of radio buttons, disable the selected one last.
-        if (m_cert_none->GetValue()) {
-            m_cert_select->Enable(false);
-            m_cert_none  ->Enable(false);
-        } else {
-            m_cert_none  ->Enable(false);
-            m_cert_select->Enable(false);
-        }
-        m_cert_select_val->Enable(false);
-        m_identity->Enable(false);
+        m_certificate->Enable(false);
+        m_identity   ->Enable(false);
     } else {
-        // Configuration mode or using own credentials. Selectively enable/disable controls.
-        m_cert_select_val->Enable(m_cert_select->GetValue());
-        m_identity->Enable(true);
+        // Configuration mode or using own credentials. Enable controls.
+        m_certificate->Enable(true);
+        m_identity   ->Enable(true);
     }
 }
 
