@@ -387,8 +387,8 @@ bool wxTLSCredentialsPanel::TransferDataFromWindow()
 
 void wxTLSCredentialsPanel::OnUpdateUI(wxUpdateUIEvent& /*event*/)
 {
-    if (!m_is_config && m_cfg.m_use_preshared) {
-        // Credential prompt mode & Using pre-shared credentials
+    if (!m_is_config && m_cfg.m_use_cred) {
+        // Credential prompt mode & Using configured credentials
         // To avoid run-away selection of radio buttons, disable the selected one last.
         if (m_cert_none->GetValue()) {
             m_cert_select->Enable(false);

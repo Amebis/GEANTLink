@@ -358,8 +358,8 @@ namespace eap
 
     public:
         bool m_allow_save;                                  ///< Are credentials allowed to be saved to Windows Credential Manager?
-        bool m_use_preshared;                               ///< Use pre-shared credentials
-        std::unique_ptr<credentials> m_preshared;           ///< Pre-shared credentials
+        bool m_use_cred;                                    ///< Use configured credentials
+        std::unique_ptr<credentials> m_cred;                ///< Configured credentials
 
         enum status {
             status_success = 0,                             ///< Authentication succeeded

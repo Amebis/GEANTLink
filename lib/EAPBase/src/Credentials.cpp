@@ -375,11 +375,11 @@ eap::credentials::source_t eap::credentials_pass::combine(
         return source_cache;
     }
 
-    if (cfg.m_use_preshared) {
-        // Using preshared credentials.
-        *this = *(credentials_pass*)cfg.m_preshared.get();
-        m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_PRESHARED1, event_data((unsigned int)cfg.get_method_id()), event_data(credentials_pass::get_name()), event_data::blank);
-        return source_preshared;
+    if (cfg.m_use_cred) {
+        // Using configured credentials.
+        *this = *(credentials_pass*)cfg.m_cred.get();
+        m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CONFIG1, event_data((unsigned int)cfg.get_method_id()), event_data(credentials_pass::get_name()), event_data::blank);
+        return source_config;
     }
 
     if (pszTargetName) {

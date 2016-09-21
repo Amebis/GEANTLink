@@ -303,11 +303,11 @@ eap::credentials::source_t eap::credentials_tls::combine(
         return source_cache;
     }
 
-    if (cfg.m_use_preshared) {
-        // Using preshared credentials.
-        *this = *(credentials_tls*)cfg.m_preshared.get();
-        m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_PRESHARED2, event_data((unsigned int)eap_type_tls), event_data(credentials_tls::get_name()), event_data(pszTargetName), event_data::blank);
-        return source_preshared;
+    if (cfg.m_use_cred) {
+        // Using configured credentials.
+        *this = *(credentials_tls*)cfg.m_cred.get();
+        m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CONFIG2, event_data((unsigned int)eap_type_tls), event_data(credentials_tls::get_name()), event_data(pszTargetName), event_data::blank);
+        return source_config;
     }
 
     if (pszTargetName) {

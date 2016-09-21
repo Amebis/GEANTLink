@@ -68,7 +68,7 @@ tstring eap::get_cert_title(PCCERT_CONTEXT cert)
 
 eap::config_method_tls::config_method_tls(_In_ module &mod, _In_ unsigned int level) : config_method_with_cred(mod, level)
 {
-    m_preshared.reset(new credentials_tls(mod));
+    m_cred.reset(new credentials_tls(mod));
 }
 
 

@@ -67,7 +67,7 @@ namespace eap
         enum source_t {
             source_unknown = -1, ///< Unknown source
             source_cache = 0,    ///< Credentials were obtained from EapHost cache
-            source_preshared,    ///< Credentials were set by method configuration
+            source_config,       ///< Credentials were set by method configuration
             source_storage       ///< Credentials were loaded from Windows Credential Manager
         };
 
@@ -247,9 +247,9 @@ namespace eap
         /// \param[in] pszTargetName  The name in Windows Credential Manager to retrieve credentials from (optional, can be \c NULL)
         ///
         /// \returns
-        /// - \c source_cache      Credentials were obtained from EapHost cache
-        /// - \c source_preshared  Credentials were set by method configuration
-        /// - \c source_storage    Credentials were loaded from Windows Credential Manager
+        /// - \c source_cache   Credentials were obtained from EapHost cache
+        /// - \c source_config  Credentials were set by method configuration
+        /// - \c source_storage Credentials were loaded from Windows Credential Manager
         ///
         virtual source_t combine(
             _In_       const credentials             *cred_cached,
@@ -408,9 +408,9 @@ namespace eap
         /// \param[in] pszTargetName  The name in Windows Credential Manager to retrieve credentials from (optional, can be \c NULL)
         ///
         /// \returns
-        /// - \c source_cache      Credentials were obtained from EapHost cache
-        /// - \c source_preshared  Credentials were set by method configuration
-        /// - \c source_storage    Credentials were loaded from Windows Credential Manager
+        /// - \c source_cache   Credentials were obtained from EapHost cache
+        /// - \c source_config  Credentials were set by method configuration
+        /// - \c source_storage Credentials were loaded from Windows Credential Manager
         ///
         virtual source_t combine(
             _In_       const credentials             *cred_cached,

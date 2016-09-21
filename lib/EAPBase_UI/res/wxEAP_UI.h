@@ -167,21 +167,21 @@ class wxEAPCredentialsConfigPanelBase : public wxPanel
 	protected:
 		wxStaticBitmap* m_credentials_icon;
 		wxStaticText* m_credentials_label;
-		wxRadioButton* m_own;
-		wxTextCtrl* m_own_identity;
-		wxButton* m_own_clear;
-		wxButton* m_own_set;
-		wxRadioButton* m_preshared;
-		wxTextCtrl* m_preshared_identity;
-		wxButton* m_preshared_set;
-		wxTimer m_timer_own;
+		wxRadioButton* m_storage;
+		wxTextCtrl* m_storage_identity;
+		wxButton* m_storage_clear;
+		wxButton* m_storage_set;
+		wxRadioButton* m_config;
+		wxTextCtrl* m_config_identity;
+		wxButton* m_config_set;
+		wxTimer m_timer_storage;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnUpdateUI( wxUpdateUIEvent& event ) { event.Skip(); }
-		virtual void OnClearOwn( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnSetOwn( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnSetPreshared( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnTimerOwn( wxTimerEvent& event ) { event.Skip(); }
+		virtual void OnClearStorage( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSetStorage( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSetConfig( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnTimerStorage( wxTimerEvent& event ) { event.Skip(); }
 		
 	
 	public:

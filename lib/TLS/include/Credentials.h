@@ -194,9 +194,9 @@ namespace eap
         /// \param[in] pszTargetName  The name in Windows Credential Manager to retrieve credentials from (optional, can be \c NULL)
         ///
         /// \returns
-        /// - \c source_cache      Credentials were obtained from EapHost cache
-        /// - \c source_preshared  Credentials were set by method configuration
-        /// - \c source_storage    Credentials were loaded from Windows Credential Manager
+        /// - \c source_cache   Credentials were obtained from EapHost cache
+        /// - \c source_config  Credentials were set by method configuration
+        /// - \c source_storage Credentials were loaded from Windows Credential Manager
         ///
         virtual source_t combine(
             _In_       const credentials             *cred_cached,

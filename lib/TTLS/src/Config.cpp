@@ -32,8 +32,8 @@ eap::config_method_ttls::config_method_ttls(_In_ module &mod, _In_ unsigned int 
     m_inner(new config_method_pap(mod, level + 1)),
     config_method_tls(mod, level)
 {
-    // TTLS is using blank pre-shared credentials per default.
-    m_use_preshared = true;
+    // TTLS is using blank configured credentials per default.
+    m_use_cred = true;
 }
 
 
@@ -124,17 +124,17 @@ void eap::config_method_ttls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode 
     {
         com_obj<IXMLDOMNode> pXmlElClientSideCredential;
         if (SUCCEEDED(hr = eapxml::select_node(pConfigRoot, bstr(L"eap-metadata:ClientSideCredential"), &pXmlElClientSideCredential))) {
-            // Fix 1: Pre-shared outer credentials in draft-winter-opsawg-eap-metadata has some bizarre presence/absence/blank logic for EAP-TTLS methods only.
+            // Fix 1: Configured outer credentials in draft-winter-opsawg-eap-metadata has some bizarre presence/absence/blank logic for EAP-TTLS methods only.
             // To keep our code clean, we do some post-processing, to make draft compliant XML on output, while keeping things simple on the inside.
-            if (m_use_preshared && m_preshared->empty()) {
-                // For empty pre-shared client certificate <ClientCertificate/> must not be present.
+            if (m_use_cred && m_cred->empty()) {
+                // For empty configured client certificate <ClientCertificate/> must not be present.
                 com_obj<IXMLDOMNode> pXmlElClientCertificate;
                 if (SUCCEEDED(hr = eapxml::select_node(pXmlElClientSideCredential, bstr(L"eap-metadata:ClientCertificate"), &pXmlElClientCertificate))) {
                     com_obj<IXMLDOMNode> pXmlElClientCertificateOld;
                     hr = pXmlElClientSideCredential->removeChild(pXmlElClientCertificate, &pXmlElClientCertificateOld);
                 }
-            } else if (!m_use_preshared) {
-                // When not using pre-shared (user must supply one), add empty <ClientCertificate/>.
+            } else if (!m_use_cred) {
+                // When not using configured client certificate (user must supply one), add empty <ClientCertificate/>.
                 com_obj<IXMLDOMElement> pXmlElClientCertificate;
                 hr = eapxml::create_element(pDoc, pXmlElClientSideCredential, bstr(L"eap-metadata:ClientCertificate"), bstr(L"ClientCertificate"), namespace_eapmetadata, &pXmlElClientCertificate);
             }
@@ -153,18 +153,18 @@ void eap::config_method_ttls::load(_In_ IXMLDOMNode *pConfigRoot)
         if (SUCCEEDED(hr = eapxml::select_node(pConfigRoot, bstr(L"eap-metadata:ClientSideCredential"), &pXmlElClientSideCredential))) {
             com_obj<IXMLDOMDocument> pDoc;
             if (SUCCEEDED(hr = pXmlElClientSideCredential->get_ownerDocument(&pDoc))) {
-                // Fix 1: Pre-shared outer credentials in draft-winter-opsawg-eap-metadata has some bizarre presence/absence/blank logic for EAP-TTLS methods only.
+                // Fix 1: Configured outer credentials in draft-winter-opsawg-eap-metadata has some bizarre presence/absence/blank logic for EAP-TTLS methods only.
                 // To keep our code clean, we do some pre-processing, to accept draft compliant XML on input, while keeping things simple on the inside.
                 com_obj<IXMLDOMNode> pXmlElClientCertificate;
                 if (SUCCEEDED(hr = eapxml::select_node(pXmlElClientSideCredential, bstr(L"eap-metadata:ClientCertificate"), &pXmlElClientCertificate))) {
                     VARIANT_BOOL has_children;
                     if (SUCCEEDED(hr = pXmlElClientCertificate->hasChildNodes(&has_children)) && !has_children) {
-                        // Empty <ClientCertificate/> means: do not use pre-shared credentials.
+                        // Empty <ClientCertificate/> means: do not use configured credentials.
                         com_obj<IXMLDOMNode> pXmlElClientCertificateOld;
                         hr = pXmlElClientSideCredential->removeChild(pXmlElClientCertificate, &pXmlElClientCertificateOld);
                     }
                 } else {
-                    // Nonexisting <ClientSideCredential> means: use blank pre-shared credentials.
+                    // Nonexisting <ClientSideCredential> means: use blank configured credentials.
                     com_obj<IXMLDOMElement> pXmlElClientCertificate;
                     hr = eapxml::create_element(pDoc, pXmlElClientSideCredential, bstr(L"eap-metadata:ClientCertificate"), bstr(L"ClientCertificate"), namespace_eapmetadata, &pXmlElClientCertificate);
                 }

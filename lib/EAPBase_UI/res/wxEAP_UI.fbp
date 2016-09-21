@@ -1664,7 +1664,7 @@
                                             <property name="proportion">0</property>
                                             <object class="wxBoxSizer" expanded="1">
                                                 <property name="minimum_size"></property>
-                                                <property name="name">sz_own</property>
+                                                <property name="name">sz_storage</property>
                                                 <property name="orient">wxVERTICAL</property>
                                                 <property name="permission">none</property>
                                                 <object class="sizeritem" expanded="1">
@@ -1673,7 +1673,7 @@
                                                     <property name="proportion">1</property>
                                                     <object class="wxBoxSizer" expanded="1">
                                                         <property name="minimum_size"></property>
-                                                        <property name="name">sz_own_inner</property>
+                                                        <property name="name">sz_storage_inner</property>
                                                         <property name="orient">wxHORIZONTAL</property>
                                                         <property name="permission">none</property>
                                                         <object class="sizeritem" expanded="1">
@@ -1716,7 +1716,7 @@
                                                                 <property name="minimize_button">0</property>
                                                                 <property name="minimum_size"></property>
                                                                 <property name="moveable">1</property>
-                                                                <property name="name">m_own</property>
+                                                                <property name="name">m_storage</property>
                                                                 <property name="pane_border">1</property>
                                                                 <property name="pane_position"></property>
                                                                 <property name="pane_size"></property>
@@ -1804,7 +1804,7 @@
                                                                 <property name="minimize_button">0</property>
                                                                 <property name="minimum_size"></property>
                                                                 <property name="moveable">1</property>
-                                                                <property name="name">m_own_identity</property>
+                                                                <property name="name">m_storage_identity</property>
                                                                 <property name="pane_border">1</property>
                                                                 <property name="pane_position"></property>
                                                                 <property name="pane_size"></property>
@@ -1863,7 +1863,7 @@
                                                     <property name="proportion">0</property>
                                                     <object class="wxBoxSizer" expanded="1">
                                                         <property name="minimum_size"></property>
-                                                        <property name="name">sb_buttons_own</property>
+                                                        <property name="name">sb_buttons_storage</property>
                                                         <property name="orient">wxHORIZONTAL</property>
                                                         <property name="permission">none</property>
                                                         <object class="sizeritem" expanded="1">
@@ -1907,7 +1907,7 @@
                                                                 <property name="minimize_button">0</property>
                                                                 <property name="minimum_size"></property>
                                                                 <property name="moveable">1</property>
-                                                                <property name="name">m_own_clear</property>
+                                                                <property name="name">m_storage_clear</property>
                                                                 <property name="pane_border">1</property>
                                                                 <property name="pane_position"></property>
                                                                 <property name="pane_size"></property>
@@ -1928,7 +1928,7 @@
                                                                 <property name="window_extra_style"></property>
                                                                 <property name="window_name"></property>
                                                                 <property name="window_style"></property>
-                                                                <event name="OnButtonClick">OnClearOwn</event>
+                                                                <event name="OnButtonClick">OnClearStorage</event>
                                                                 <event name="OnChar"></event>
                                                                 <event name="OnEnterWindow"></event>
                                                                 <event name="OnEraseBackground"></event>
@@ -1995,7 +1995,7 @@
                                                                 <property name="minimize_button">0</property>
                                                                 <property name="minimum_size"></property>
                                                                 <property name="moveable">1</property>
-                                                                <property name="name">m_own_set</property>
+                                                                <property name="name">m_storage_set</property>
                                                                 <property name="pane_border">1</property>
                                                                 <property name="pane_position"></property>
                                                                 <property name="pane_size"></property>
@@ -2016,7 +2016,7 @@
                                                                 <property name="window_extra_style"></property>
                                                                 <property name="window_name"></property>
                                                                 <property name="window_style"></property>
-                                                                <event name="OnButtonClick">OnSetOwn</event>
+                                                                <event name="OnButtonClick">OnSetStorage</event>
                                                                 <event name="OnChar"></event>
                                                                 <event name="OnEnterWindow"></event>
                                                                 <event name="OnEraseBackground"></event>
@@ -2052,7 +2052,7 @@
                                             <property name="proportion">0</property>
                                             <object class="wxBoxSizer" expanded="1">
                                                 <property name="minimum_size"></property>
-                                                <property name="name">sz_preshared</property>
+                                                <property name="name">sz_config</property>
                                                 <property name="orient">wxVERTICAL</property>
                                                 <property name="permission">none</property>
                                                 <object class="sizeritem" expanded="1">
@@ -2061,7 +2061,7 @@
                                                     <property name="proportion">1</property>
                                                     <object class="wxBoxSizer" expanded="1">
                                                         <property name="minimum_size"></property>
-                                                        <property name="name">sz_preshared_inner</property>
+                                                        <property name="name">sz_config_inner</property>
                                                         <property name="orient">wxHORIZONTAL</property>
                                                         <property name="permission">none</property>
                                                         <object class="sizeritem" expanded="1">
@@ -2104,7 +2104,7 @@
                                                                 <property name="minimize_button">0</property>
                                                                 <property name="minimum_size"></property>
                                                                 <property name="moveable">1</property>
-                                                                <property name="name">m_preshared</property>
+                                                                <property name="name">m_config</property>
                                                                 <property name="pane_border">1</property>
                                                                 <property name="pane_position"></property>
                                                                 <property name="pane_size"></property>
@@ -2192,7 +2192,7 @@
                                                                 <property name="minimize_button">0</property>
                                                                 <property name="minimum_size"></property>
                                                                 <property name="moveable">1</property>
-                                                                <property name="name">m_preshared_identity</property>
+                                                                <property name="name">m_config_identity</property>
                                                                 <property name="pane_border">1</property>
                                                                 <property name="pane_position"></property>
                                                                 <property name="pane_size"></property>
@@ -2251,7 +2251,7 @@
                                                     <property name="proportion">0</property>
                                                     <object class="wxBoxSizer" expanded="1">
                                                         <property name="minimum_size"></property>
-                                                        <property name="name">sb_buttons_preshared</property>
+                                                        <property name="name">sb_buttons_config</property>
                                                         <property name="orient">wxHORIZONTAL</property>
                                                         <property name="permission">none</property>
                                                         <object class="sizeritem" expanded="1">
@@ -2295,7 +2295,7 @@
                                                                 <property name="minimize_button">0</property>
                                                                 <property name="minimum_size"></property>
                                                                 <property name="moveable">1</property>
-                                                                <property name="name">m_preshared_set</property>
+                                                                <property name="name">m_config_set</property>
                                                                 <property name="pane_border">1</property>
                                                                 <property name="pane_position"></property>
                                                                 <property name="pane_size"></property>
@@ -2316,7 +2316,7 @@
                                                                 <property name="window_extra_style"></property>
                                                                 <property name="window_name"></property>
                                                                 <property name="window_style"></property>
-                                                                <event name="OnButtonClick">OnSetPreshared</event>
+                                                                <event name="OnButtonClick">OnSetConfig</event>
                                                                 <event name="OnChar"></event>
                                                                 <event name="OnEnterWindow"></event>
                                                                 <event name="OnEraseBackground"></event>
@@ -2356,11 +2356,11 @@
             <object class="wxTimer" expanded="1">
                 <property name="enabled">0</property>
                 <property name="id">wxID_ANY</property>
-                <property name="name">m_timer_own</property>
+                <property name="name">m_timer_storage</property>
                 <property name="oneshot">0</property>
                 <property name="period">5000</property>
                 <property name="permission">protected</property>
-                <event name="OnTimer">OnTimerOwn</event>
+                <event name="OnTimer">OnTimerStorage</event>
             </object>
         </object>
         <object class="Panel" expanded="1">

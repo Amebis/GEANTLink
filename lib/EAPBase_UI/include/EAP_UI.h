@@ -569,9 +569,9 @@ public:
     wxEAPCredentialsConfigPanel(const eap::config_provider &prov, eap::config_method_with_cred &cfg, wxWindow *parent) :
         m_prov(prov),
         m_cfg(cfg),
-        m_has_own(false),
-        m_cred_own(cfg.m_module),
-        m_cred_preshared(cfg.m_module),
+        m_has_storage(false),
+        m_cred_storage(cfg.m_module),
+        m_cred_config(cfg.m_module),
         wxEAPCredentialsConfigPanelBase(parent)
     {
         // Load and set icon.
@@ -585,7 +585,7 @@ public:
     ///
     inline void SetFocusFromKbd()
     {
-        m_own->SetFocusFromKbd();
+        m_storage->SetFocusFromKbd();
     }
 
 protected:
@@ -593,18 +593,18 @@ protected:
 
     virtual bool TransferDataToWindow()
     {
-        if (!m_cfg.m_use_preshared)
-            m_own->SetValue(true);
+        if (!m_cfg.m_use_cred)
+            m_storage->SetValue(true);
         else
-            m_preshared->SetValue(true);
+            m_config->SetValue(true);
 
         if (m_cfg.m_allow_save) {
-            RetrieveOwnCredentials();
-            m_timer_own.Start(3000);
+            RetrieveStorageCredentials();
+            m_timer_storage.Start(3000);
         }
 
-        m_cred_preshared = *(_Tcred*)m_cfg.m_preshared.get();
-        UpdatePresharedIdentity();
+        m_cred_config = *(_Tcred*)m_cfg.m_cred.get();
+        UpdateConfigIdentity();
 
         return wxEAPCredentialsConfigPanelBase::TransferDataToWindow();
     }
@@ -616,8 +616,8 @@ protected:
 
         if (!m_prov.m_read_only) {
             // This is not a provider-locked configuration. Save the data.
-            m_cfg.m_use_preshared = !m_own->GetValue();
-            *m_cfg.m_preshared    = m_cred_preshared;
+            m_cfg.m_use_cred = !m_storage->GetValue();
+            *m_cfg.m_cred    = m_cred_config;
         }
 
         return true;
@@ -627,139 +627,139 @@ protected:
     virtual void OnUpdateUI(wxUpdateUIEvent& /*event*/)
     {
         if (m_cfg.m_allow_save) {
-            if (m_own->GetValue()) {
-                m_own_identity->Enable(true);
-                m_own_set     ->Enable(true);
-                m_own_clear   ->Enable(m_has_own);
+            if (m_storage->GetValue()) {
+                m_storage_identity->Enable(true);
+                m_storage_set     ->Enable(true);
+                m_storage_clear   ->Enable(m_has_storage);
             } else {
-                m_own_identity->Enable(false);
-                m_own_set     ->Enable(false);
-                m_own_clear   ->Enable(false);
+                m_storage_identity->Enable(false);
+                m_storage_set     ->Enable(false);
+                m_storage_clear   ->Enable(false);
             }
         } else {
-            m_own_identity->Enable(false);
-            m_own_set     ->Enable(false);
-            m_own_clear   ->Enable(false);
+            m_storage_identity->Enable(false);
+            m_storage_set     ->Enable(false);
+            m_storage_clear   ->Enable(false);
         }
 
         if (m_prov.m_read_only) {
             // This is provider-locked configuration. Disable controls.
             // To avoid run-away selection of radio buttons, disable the selected one last.
-            if (m_own->GetValue()) {
-                m_preshared->Enable(false);
-                m_own      ->Enable(false);
+            if (m_storage->GetValue()) {
+                m_config ->Enable(false);
+                m_storage->Enable(false);
             } else {
-                m_own      ->Enable(false);
-                m_preshared->Enable(false);
+                m_storage->Enable(false);
+                m_config ->Enable(false);
             }
-            m_preshared_identity->Enable(false);
-            m_preshared_set     ->Enable(false);
+            m_config_identity->Enable(false);
+            m_config_set     ->Enable(false);
         } else {
             // This is not a provider-locked configuration. Selectively enable/disable controls.
-            m_own      ->Enable(true);
-            m_preshared->Enable(true);
-            if (m_own->GetValue()) {
-                m_preshared_identity->Enable(false);
-                m_preshared_set     ->Enable(false);
+            m_storage->Enable(true);
+            m_config->Enable(true);
+            if (m_storage->GetValue()) {
+                m_config_identity->Enable(false);
+                m_config_set     ->Enable(false);
             } else {
-                m_preshared_identity->Enable(true);
-                m_preshared_set     ->Enable(true);
+                m_config_identity->Enable(true);
+                m_config_set     ->Enable(true);
             }
         }
     }
 
 
-    virtual void OnSetOwn(wxCommandEvent& /*event*/)
+    virtual void OnSetStorage(wxCommandEvent& /*event*/)
     {
         // Read credentials from Credential Manager.
-        RetrieveOwnCredentials();
+        RetrieveStorageCredentials();
 
         // Display credential prompt.
         wxEAPCredentialsDialog dlg(m_prov, this);
-        _wxT *panel = new _wxT(m_prov, m_cfg, m_cred_own, &dlg, true);
+        _wxT *panel = new _wxT(m_prov, m_cfg, m_cred_storage, &dlg, true);
         dlg.AddContent(panel);
         if (dlg.ShowModal() == wxID_OK && panel->GetRemember()) {
             // Write credentials to credential manager.
             try {
-                m_cred_own.store(m_prov.get_id().c_str(), m_cfg.m_level);
-                m_has_own = TRUE;
-                UpdateOwnIdentity();
+                m_cred_storage.store(m_prov.get_id().c_str(), m_cfg.m_level);
+                m_has_storage = TRUE;
+                UpdateStorageIdentity();
             } catch (winstd::win_runtime_error &err) {
                 wxLogError(winstd::tstring_printf(_("Error writing credentials to Credential Manager: %hs (error %u)"), err.what(), err.number()).c_str());
-                RetrieveOwnCredentials();
+                RetrieveStorageCredentials();
             } catch (...) {
                 wxLogError(_("Writing credentials failed."));
-                RetrieveOwnCredentials();
+                RetrieveStorageCredentials();
             }
         }
     }
 
 
-    virtual void OnClearOwn(wxCommandEvent& /*event*/)
+    virtual void OnClearStorage(wxCommandEvent& /*event*/)
     {
-        if (CredDelete(m_cred_own.target_name(m_prov.get_id().c_str(), m_cfg.m_level).c_str(), CRED_TYPE_GENERIC, 0)) {
-            m_own_identity->Clear();
-            m_has_own = false;
+        if (CredDelete(m_cred_storage.target_name(m_prov.get_id().c_str(), m_cfg.m_level).c_str(), CRED_TYPE_GENERIC, 0)) {
+            m_storage_identity->Clear();
+            m_has_storage = false;
         } else
             wxLogError(_("Deleting credentials failed (error %u)."), GetLastError());
     }
 
 
-    virtual void OnSetPreshared(wxCommandEvent& /*event*/)
+    virtual void OnSetConfig(wxCommandEvent& /*event*/)
     {
         wxEAPCredentialsDialog dlg(m_prov, this);
 
-        _wxT *panel = new _wxT(m_prov, m_cfg, m_cred_preshared, &dlg, true);
+        _wxT *panel = new _wxT(m_prov, m_cfg, m_cred_config, &dlg, true);
 
         dlg.AddContent(panel);
         if (dlg.ShowModal() == wxID_OK)
-            UpdatePresharedIdentity();
+            UpdateConfigIdentity();
     }
 
 
-    virtual void OnTimerOwn(wxTimerEvent& /*event*/)
+    virtual void OnTimerStorage(wxTimerEvent& /*event*/)
     {
-        if (m_own_identity->IsShownOnScreen())
-            RetrieveOwnCredentials();
+        if (m_storage_identity->IsShownOnScreen())
+            RetrieveStorageCredentials();
     }
 
 
-    void RetrieveOwnCredentials()
+    void RetrieveStorageCredentials()
     {
         try {
-            m_cred_own.retrieve(m_prov.get_id().c_str(), m_cfg.m_level);
-            m_has_own = true;
-            UpdateOwnIdentity();
+            m_cred_storage.retrieve(m_prov.get_id().c_str(), m_cfg.m_level);
+            m_has_storage = true;
+            UpdateStorageIdentity();
         } catch (winstd::win_runtime_error &err) {
             if (err.number() == ERROR_NOT_FOUND) {
-                m_own_identity->Clear();
-                m_has_own = false;
+                m_storage_identity->Clear();
+                m_has_storage = false;
             } else {
-                m_own_identity->SetValue(wxString::Format(_("<error %u>"), err.number()));
-                m_has_own = true;
+                m_storage_identity->SetValue(wxString::Format(_("<error %u>"), err.number()));
+                m_has_storage = true;
             }
         } catch (...) {
-            m_own_identity->SetValue(_("<error>"));
-            m_has_own = true;
+            m_storage_identity->SetValue(_("<error>"));
+            m_has_storage = true;
         }
     }
 
 
-    inline void UpdateOwnIdentity()
+    inline void UpdateStorageIdentity()
     {
-        wxString identity(m_cred_own.get_identity());
-        m_own_identity->SetValue(
+        wxString identity(m_cred_storage.get_identity());
+        m_storage_identity->SetValue(
             !identity.empty()  ? identity :
-            m_cred_own.empty() ? _("<empty>") : _("<blank ID>"));
+            m_cred_storage.empty() ? _("<empty>") : _("<blank ID>"));
     }
 
 
-    inline void UpdatePresharedIdentity()
+    inline void UpdateConfigIdentity()
     {
-        wxString identity(m_cred_preshared.get_identity());
-        m_preshared_identity->SetValue(
-            !identity.empty()        ? identity :
-            m_cred_preshared.empty() ? _("<empty>") : _("<blank ID>"));
+        wxString identity(m_cred_config.get_identity());
+        m_config_identity->SetValue(
+            !identity.empty()  ? identity :
+            m_cred_config.empty() ? _("<empty>") : _("<blank ID>"));
     }
 
     /// \endcond
@@ -769,9 +769,9 @@ protected:
     eap::config_method_with_cred &m_cfg;    ///< EAP method configuration
 
 private:
-    bool m_has_own;                         ///< Does the user has (some sort of) credentials stored in Credential Manager?
-    _Tcred m_cred_own;                      ///< Temporary own credential data
-    _Tcred m_cred_preshared;                ///< Temporary pre-shared credential data
+    bool m_has_storage;                     ///< Does the user has (some sort of) credentials stored in Credential Manager?
+    _Tcred m_cred_storage;                  ///< Temporary own credential data
+    _Tcred m_cred_config;                   ///< Temporary config credential data
 };
 
 
@@ -822,8 +822,8 @@ protected:
             // Always store credentials (somewhere).
             m_remember->SetValue(true);
             m_remember->Enable(false);
-        } else if (m_cfg.m_use_preshared) {
-            // Credential prompt mode & Using pre-shared credentials
+        } else if (m_cfg.m_use_cred) {
+            // Credential prompt mode & Using configured credentials
             m_remember->SetValue(false);
             m_remember->Enable(false);
         } else if (!m_cfg.m_allow_save) {
@@ -896,8 +896,8 @@ protected:
         m_identity->SetSelection(0, -1);
         m_password->SetValue(m_cred.m_password.empty() ? wxEmptyString : s_dummy_password);
 
-        if (!m_is_config && m_cfg.m_use_preshared) {
-            // Credential prompt mode & Using pre-shared credentials
+        if (!m_is_config && m_cfg.m_use_cred) {
+            // Credential prompt mode & Using configured credentials
             m_identity_label->Enable(false);
             m_identity      ->Enable(false);
             m_password_label->Enable(false);

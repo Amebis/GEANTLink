@@ -30,7 +30,7 @@ using namespace winstd;
 
 eap::config_method_pap::config_method_pap(_In_ module &mod, _In_ unsigned int level) : config_method_with_cred(mod, level)
 {
-    m_preshared.reset(new credentials_pass(mod));
+    m_cred.reset(new credentials_pass(mod));
 }
 
 
