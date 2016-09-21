@@ -800,48 +800,33 @@ public:
         m_is_config(is_config),
         _Tbase(parent)
     {
+        if (!is_config && !m_cfg.m_use_cred && m_cfg.m_allow_save) {
+            m_remember = new wxCheckBox(m_sb_credentials->GetStaticBox(), wxID_ANY, _("&Remember"));
+            m_remember->SetHelpText(_("Check if you would like to save credentials"));
+            m_sb_credentials_vert->Add(m_remember, 0, wxALL|wxEXPAND, 5);
+        } else
+            m_remember = NULL;
     }
 
     virtual void SetRemember(bool val)
     {
-        return m_remember->SetValue(val);
+        if (m_remember)
+            m_remember->SetValue(val);
     }
 
     virtual bool GetRemember() const
     {
-        return m_remember->GetValue();
+        return m_remember ?
+            m_remember->GetValue() :
+            !m_cfg.m_use_cred && m_cfg.m_allow_save;
     }
-
-protected:
-    /// \cond internal
-
-    virtual bool TransferDataToWindow()
-    {
-        if (m_is_config) {
-            // Configuration mode
-            // Always store credentials (somewhere).
-            m_remember->SetValue(true);
-            m_remember->Enable(false);
-        } else if (m_cfg.m_use_cred) {
-            // Credential prompt mode & Using configured credentials
-            m_remember->SetValue(false);
-            m_remember->Enable(false);
-        } else if (!m_cfg.m_allow_save) {
-            // Credential prompt mode & using own credentials & saving is not allowed
-            m_remember->SetValue(false);
-            m_remember->Enable(false);
-        }
-
-        return _Tbase::TransferDataToWindow();
-    }
-
-    /// \endcond
 
 protected:
     const eap::config_provider &m_prov;         ///< Provider configuration
     const eap::config_method_with_cred &m_cfg;  ///< Method configuration
     _Tcred &m_cred;                             ///< Credentials
     bool m_is_config;                           ///< Is this a configuration dialog?
+    wxCheckBox *m_remember;                     ///< "Remember" checkbox
 };
 
 

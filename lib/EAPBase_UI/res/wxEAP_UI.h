@@ -34,8 +34,8 @@ class wxEAPBannerPanel;
 #include <wx/textctrl.h>
 #include <wx/statbox.h>
 #include <wx/timer.h>
-#include <wx/checkbox.h>
 #include <wx/choice.h>
+#include <wx/checkbox.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -199,13 +199,14 @@ class wxEAPCredentialsPromptPassPanelBase : public wxEAPCredentialsPanelBase
 	private:
 	
 	protected:
+		wxStaticBoxSizer* m_sb_credentials;
 		wxStaticBitmap* m_credentials_icon;
+		wxBoxSizer* m_sb_credentials_vert;
 		wxStaticText* m_credentials_label;
 		wxStaticText* m_identity_label;
 		wxTextCtrl* m_identity;
 		wxStaticText* m_password_label;
 		wxTextCtrl* m_password;
-		wxCheckBox* m_remember;
 	
 	public:
 		

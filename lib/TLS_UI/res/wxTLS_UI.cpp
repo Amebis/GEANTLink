@@ -116,61 +116,54 @@ wxEAPTLSServerTrustConfigPanelBase::~wxEAPTLSServerTrustConfigPanelBase()
 
 wxEAPCredentialsPromptTLSPanelBase::wxEAPCredentialsPromptTLSPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxEAPCredentialsPanelBase( parent, id, pos, size, style )
 {
-	wxStaticBoxSizer* sb_credentials;
-	sb_credentials = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("TLS Client Certificate") ), wxVERTICAL );
+	m_sb_credentials = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("TLS Client Certificate") ), wxVERTICAL );
 	
 	wxBoxSizer* sb_credentials_horiz;
 	sb_credentials_horiz = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_credentials_icon = new wxStaticBitmap( sb_credentials->GetStaticBox(), wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
+	m_credentials_icon = new wxStaticBitmap( m_sb_credentials->GetStaticBox(), wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
 	sb_credentials_horiz->Add( m_credentials_icon, 0, wxALL, 5 );
 	
-	wxBoxSizer* sb_credentials_vert;
-	sb_credentials_vert = new wxBoxSizer( wxVERTICAL );
+	m_sb_credentials_vert = new wxBoxSizer( wxVERTICAL );
 	
-	m_certificate_label = new wxStaticText( sb_credentials->GetStaticBox(), wxID_ANY, _("Please select your client &certificate to use for authentication."), wxDefaultPosition, wxDefaultSize, 0 );
+	m_certificate_label = new wxStaticText( m_sb_credentials->GetStaticBox(), wxID_ANY, _("Please select your client &certificate to use for authentication."), wxDefaultPosition, wxDefaultSize, 0 );
 	m_certificate_label->Wrap( 440 );
-	sb_credentials_vert->Add( m_certificate_label, 0, wxEXPAND|wxTOP|wxRIGHT|wxLEFT, 5 );
+	m_sb_credentials_vert->Add( m_certificate_label, 0, wxEXPAND|wxTOP|wxRIGHT|wxLEFT, 5 );
 	
 	wxArrayString m_certificateChoices;
-	m_certificate = new wxChoice( sb_credentials->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxDefaultSize, m_certificateChoices, wxCB_SORT );
+	m_certificate = new wxChoice( m_sb_credentials->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxDefaultSize, m_certificateChoices, wxCB_SORT );
 	m_certificate->SetSelection( 0 );
 	m_certificate->SetToolTip( _("Client certificate to use for authentication") );
 	
-	sb_credentials_vert->Add( m_certificate, 0, wxEXPAND|wxALL, 5 );
+	m_sb_credentials_vert->Add( m_certificate, 0, wxEXPAND|wxALL, 5 );
 	
 	wxBoxSizer* sb_identity;
 	sb_identity = new wxBoxSizer( wxVERTICAL );
 	
-	m_identity_label = new wxStaticText( sb_credentials->GetStaticBox(), wxID_ANY, _("Custom &identity:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_identity_label = new wxStaticText( m_sb_credentials->GetStaticBox(), wxID_ANY, _("Custom &identity:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_identity_label->Wrap( -1 );
 	sb_identity->Add( m_identity_label, 0, wxBOTTOM, 5 );
 	
-	m_identity = new wxTextCtrl( sb_credentials->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_identity = new wxTextCtrl( m_sb_credentials->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	m_identity->SetToolTip( _("Your identity (username@domain) to override one from certificate; or blank to use one provided in certificate") );
 	
 	sb_identity->Add( m_identity, 0, wxEXPAND|wxBOTTOM, 5 );
 	
-	m_identity_note = new wxStaticText( sb_credentials->GetStaticBox(), wxID_ANY, _("(Example: user@contoso.com)"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_identity_note = new wxStaticText( m_sb_credentials->GetStaticBox(), wxID_ANY, _("(Example: user@contoso.com)"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_identity_note->Wrap( -1 );
 	sb_identity->Add( m_identity_note, 0, wxALIGN_RIGHT, 5 );
 	
 	
-	sb_credentials_vert->Add( sb_identity, 0, wxEXPAND|wxALL, 5 );
-	
-	m_remember = new wxCheckBox( sb_credentials->GetStaticBox(), wxID_ANY, _("&Remember"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_remember->SetHelpText( _("Check if you would like to save certificate selection") );
-	
-	sb_credentials_vert->Add( m_remember, 0, wxALL|wxEXPAND, 5 );
+	m_sb_credentials_vert->Add( sb_identity, 0, wxEXPAND|wxALL, 5 );
 	
 	
-	sb_credentials_horiz->Add( sb_credentials_vert, 1, wxEXPAND, 5 );
+	sb_credentials_horiz->Add( m_sb_credentials_vert, 1, wxEXPAND, 5 );
 	
 	
-	sb_credentials->Add( sb_credentials_horiz, 0, wxEXPAND, 5 );
+	m_sb_credentials->Add( sb_credentials_horiz, 0, wxEXPAND, 5 );
 	
 	
-	this->SetSizer( sb_credentials );
+	this->SetSizer( m_sb_credentials );
 	this->Layout();
 	
 	// Connect Events

@@ -31,7 +31,6 @@ class wxEAPCredentialsPanelBase;
 #include <wx/statbox.h>
 #include <wx/panel.h>
 #include <wx/choice.h>
-#include <wx/checkbox.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -77,13 +76,14 @@ class wxEAPCredentialsPromptTLSPanelBase : public wxEAPCredentialsPanelBase
 	private:
 	
 	protected:
+		wxStaticBoxSizer* m_sb_credentials;
 		wxStaticBitmap* m_credentials_icon;
+		wxBoxSizer* m_sb_credentials_vert;
 		wxStaticText* m_certificate_label;
 		wxChoice* m_certificate;
 		wxStaticText* m_identity_label;
 		wxTextCtrl* m_identity;
 		wxStaticText* m_identity_note;
-		wxCheckBox* m_remember;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnUpdateUI( wxUpdateUIEvent& event ) { event.Skip(); }
