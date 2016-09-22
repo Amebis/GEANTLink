@@ -114,7 +114,7 @@ wxEAPTLSServerTrustConfigPanelBase::~wxEAPTLSServerTrustConfigPanelBase()
 	
 }
 
-wxEAPCredentialsPromptTLSPanelBase::wxEAPCredentialsPromptTLSPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxEAPCredentialsPanelBase( parent, id, pos, size, style )
+wxTLSCredentialsPanelBase::wxTLSCredentialsPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxEAPCredentialsPanelBase( parent, id, pos, size, style )
 {
 	m_sb_credentials = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("TLS Client Certificate") ), wxVERTICAL );
 	
@@ -167,12 +167,12 @@ wxEAPCredentialsPromptTLSPanelBase::wxEAPCredentialsPromptTLSPanelBase( wxWindow
 	this->Layout();
 	
 	// Connect Events
-	this->Connect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( wxEAPCredentialsPromptTLSPanelBase::OnUpdateUI ) );
+	this->Connect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( wxTLSCredentialsPanelBase::OnUpdateUI ) );
 }
 
-wxEAPCredentialsPromptTLSPanelBase::~wxEAPCredentialsPromptTLSPanelBase()
+wxTLSCredentialsPanelBase::~wxTLSCredentialsPanelBase()
 {
 	// Disconnect Events
-	this->Disconnect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( wxEAPCredentialsPromptTLSPanelBase::OnUpdateUI ) );
+	this->Disconnect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( wxTLSCredentialsPanelBase::OnUpdateUI ) );
 	
 }

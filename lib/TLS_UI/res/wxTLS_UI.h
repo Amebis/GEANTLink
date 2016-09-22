@@ -69,9 +69,9 @@ class wxEAPTLSServerTrustConfigPanelBase : public wxPanel
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class wxEAPCredentialsPromptTLSPanelBase
+/// Class wxTLSCredentialsPanelBase
 ///////////////////////////////////////////////////////////////////////////////
-class wxEAPCredentialsPromptTLSPanelBase : public wxEAPCredentialsPanelBase
+class wxTLSCredentialsPanelBase : public wxEAPCredentialsPanelBase
 {
 	private:
 	
@@ -91,8 +91,8 @@ class wxEAPCredentialsPromptTLSPanelBase : public wxEAPCredentialsPanelBase
 	
 	public:
 		
-		wxEAPCredentialsPromptTLSPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL ); 
-		~wxEAPCredentialsPromptTLSPanelBase();
+		wxTLSCredentialsPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL ); 
+		~wxTLSCredentialsPanelBase();
 	
 };
 
