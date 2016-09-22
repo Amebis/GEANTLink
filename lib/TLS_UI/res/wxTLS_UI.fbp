@@ -40,7 +40,7 @@
             <property name="id">wxID_ANY</property>
             <property name="maximum_size"></property>
             <property name="minimum_size"></property>
-            <property name="name">wxEAPTLSServerTrustConfigPanelBase</property>
+            <property name="name">wxTLSServerTrustPanelBase</property>
             <property name="pos"></property>
             <property name="size">500,-1</property>
             <property name="subclass"></property>

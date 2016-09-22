@@ -95,7 +95,7 @@ template <class _Tcred, class _wxT> class wxEAPCredentialsConfigPanel;
 ///
 /// Helper template for all credential entry panels
 ///
-template <class _Tcred, class _Tbase> class wxEAPCredentialsPromptPanel;
+template <class _Tcred, class _Tbase> class wxEAPCredentialsPanel;
 
 ///
 /// Generic password credential entry panel
@@ -776,11 +776,11 @@ private:
 
 
 template <class _Tcred, class _Tbase>
-class wxEAPCredentialsPromptPanel : public _Tbase
+class wxEAPCredentialsPanel : public _Tbase
 {
 private:
     /// \cond internal
-    typedef wxEAPCredentialsPromptPanel<_Tcred, _Tbase> _Tthis;
+    typedef wxEAPCredentialsPanel<_Tcred, _Tbase> _Tthis;
     /// \endcond
 
 public:
@@ -793,7 +793,7 @@ public:
     /// \param[in]    parent      Parent window
     /// \param[in]    is_config   Is this panel used to pre-enter credentials? When \c true, the "Remember" checkbox is always selected and disabled.
     ///
-    wxEAPCredentialsPromptPanel(const eap::config_provider &prov, const eap::config_method_with_cred &cfg, _Tcred &cred, wxWindow* parent, bool is_config = false) :
+    wxEAPCredentialsPanel(const eap::config_provider &prov, const eap::config_method_with_cred &cfg, _Tcred &cred, wxWindow* parent, bool is_config = false) :
         m_prov(prov),
         m_cfg(cfg),
         m_cred(cred),
@@ -831,7 +831,7 @@ protected:
 
 
 template <class _Tcred, class _Tbase>
-class wxPasswordCredentialsPanel : public wxEAPCredentialsPromptPanel<_Tcred, _Tbase>
+class wxPasswordCredentialsPanel : public wxEAPCredentialsPanel<_Tcred, _Tbase>
 {
 public:
     ///
@@ -844,7 +844,7 @@ public:
     /// \param[in]    is_config  Is this panel used to pre-enter credentials? When \c true, the "Remember" checkbox is always selected and disabled.
     ///
     wxPasswordCredentialsPanel(const eap::config_provider &prov, const eap::config_method_with_cred &cfg, _Tcred &cred, wxWindow* parent, bool is_config = false) :
-        wxEAPCredentialsPromptPanel<_Tcred, _Tbase>(prov, cfg, cred, parent, is_config)
+        wxEAPCredentialsPanel<_Tcred, _Tbase>(prov, cfg, cred, parent, is_config)
     {
         // Load and set icon.
         winstd::library lib_shell32;
@@ -889,12 +889,12 @@ protected:
             m_password      ->Enable(false);
         }
 
-        return wxEAPCredentialsPromptPanel<_Tcred, wxPasswordCredentialsPanelBase>::TransferDataToWindow();
+        return wxEAPCredentialsPanel<_Tcred, wxPasswordCredentialsPanelBase>::TransferDataToWindow();
     }
 
     virtual bool TransferDataFromWindow()
     {
-        if (!wxEAPCredentialsPromptPanel<_Tcred, wxPasswordCredentialsPanelBase>::TransferDataFromWindow())
+        if (!wxEAPCredentialsPanel<_Tcred, wxPasswordCredentialsPanelBase>::TransferDataFromWindow())
             return false;
 
         m_cred.m_identity = m_identity->GetValue();

@@ -312,7 +312,7 @@ bool wxFQDNListValidator::Parse(const wxString &val_in, size_t i_start, size_t i
 //////////////////////////////////////////////////////////////////////
 
 wxTLSCredentialsPanel::wxTLSCredentialsPanel(const eap::config_provider &prov, const eap::config_method_with_cred &cfg, eap::credentials_tls &cred, wxWindow* parent, bool is_config) :
-    wxEAPCredentialsPromptPanel<eap::credentials_tls, wxTLSCredentialsPanelBase>(prov, cfg, cred, parent, is_config)
+    wxEAPCredentialsPanel<eap::credentials_tls, wxTLSCredentialsPanelBase>(prov, cfg, cred, parent, is_config)
 {
     // Load and set icon.
     winstd::library lib_shell32;
@@ -357,7 +357,7 @@ bool wxTLSCredentialsPanel::TransferDataToWindow()
 
     m_identity->SetValue(m_cred.m_identity);
 
-    return wxEAPCredentialsPromptPanel<eap::credentials_tls, wxTLSCredentialsPanelBase>::TransferDataToWindow();
+    return wxEAPCredentialsPanel<eap::credentials_tls, wxTLSCredentialsPanelBase>::TransferDataToWindow();
 }
 
 
@@ -373,7 +373,7 @@ bool wxTLSCredentialsPanel::TransferDataFromWindow()
 
     // Inherited TransferDataFromWindow() calls m_cred.store().
     // Therefore, call it only now, that m_cred is set.
-    return wxEAPCredentialsPromptPanel<eap::credentials_tls, wxTLSCredentialsPanelBase>::TransferDataFromWindow();
+    return wxEAPCredentialsPanel<eap::credentials_tls, wxTLSCredentialsPanelBase>::TransferDataFromWindow();
 }
 
 
@@ -398,7 +398,7 @@ void wxTLSCredentialsPanel::OnUpdateUI(wxUpdateUIEvent& /*event*/)
 wxTLSServerTrustPanel::wxTLSServerTrustPanel(const eap::config_provider &prov, eap::config_method_tls &cfg, wxWindow* parent) :
     m_prov(prov),
     m_cfg(cfg),
-    wxEAPTLSServerTrustConfigPanelBase(parent)
+    wxTLSServerTrustPanelBase(parent)
 {
     // Load and set icon.
     winstd::library lib_certmgr;
@@ -420,13 +420,13 @@ bool wxTLSServerTrustPanel::TransferDataToWindow()
     // Set server acceptable names. The edit control will get populated by validator.
     m_server_names_val = m_cfg.m_server_names;
 
-    return wxEAPTLSServerTrustConfigPanelBase::TransferDataToWindow();
+    return wxTLSServerTrustPanelBase::TransferDataToWindow();
 }
 
 
 bool wxTLSServerTrustPanel::TransferDataFromWindow()
 {
-    wxCHECK(wxEAPTLSServerTrustConfigPanelBase::TransferDataFromWindow(), false);
+    wxCHECK(wxTLSServerTrustPanelBase::TransferDataFromWindow(), false);
 
     if (!m_prov.m_read_only) {
         // This is not a provider-locked configuration. Save the data.
