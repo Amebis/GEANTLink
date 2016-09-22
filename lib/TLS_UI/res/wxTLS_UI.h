@@ -83,7 +83,6 @@ class wxTLSCredentialsPanelBase : public wxEAPCredentialsPanelBase
 		wxChoice* m_certificate;
 		wxStaticText* m_identity_label;
 		wxTextCtrl* m_identity;
-		wxStaticText* m_identity_note;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnUpdateUI( wxUpdateUIEvent& event ) { event.Skip(); }

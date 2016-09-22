@@ -147,11 +147,7 @@ wxTLSCredentialsPanelBase::wxTLSCredentialsPanelBase( wxWindow* parent, wxWindow
 	m_identity = new wxTextCtrl( m_sb_credentials->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	m_identity->SetToolTip( _("Your identity (username@domain) to override one from certificate; or blank to use one provided in certificate") );
 	
-	sb_identity->Add( m_identity, 0, wxEXPAND|wxBOTTOM, 5 );
-	
-	m_identity_note = new wxStaticText( m_sb_credentials->GetStaticBox(), wxID_ANY, _("(Example: user@contoso.com)"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_identity_note->Wrap( -1 );
-	sb_identity->Add( m_identity_note, 0, wxALIGN_RIGHT, 5 );
+	sb_identity->Add( m_identity, 0, wxEXPAND, 5 );
 	
 	
 	m_sb_credentials_vert->Add( sb_identity, 0, wxEXPAND|wxALL, 5 );
