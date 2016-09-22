@@ -889,12 +889,12 @@ protected:
             m_password      ->Enable(false);
         }
 
-        return wxEAPCredentialsPromptPanel<_Tcred, wxEAPCredentialsPromptPassPanelBase>::TransferDataToWindow();
+        return wxEAPCredentialsPromptPanel<_Tcred, wxPasswordCredentialsPanelBase>::TransferDataToWindow();
     }
 
     virtual bool TransferDataFromWindow()
     {
-        if (!wxEAPCredentialsPromptPanel<_Tcred, wxEAPCredentialsPromptPassPanelBase>::TransferDataFromWindow())
+        if (!wxEAPCredentialsPromptPanel<_Tcred, wxPasswordCredentialsPanelBase>::TransferDataFromWindow())
             return false;
 
         m_cred.m_identity = m_identity->GetValue();

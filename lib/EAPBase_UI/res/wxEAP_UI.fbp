@@ -2377,7 +2377,7 @@
             <property name="id">wxID_ANY</property>
             <property name="maximum_size"></property>
             <property name="minimum_size"></property>
-            <property name="name">wxEAPCredentialsPromptPassPanelBase</property>
+            <property name="name">wxPasswordCredentialsPanelBase</property>
             <property name="pos"></property>
             <property name="size">500,-1</property>
             <property name="subclass">wxEAPCredentialsPanelBase; ../include/wxEAP_UIBase.h</property>

@@ -192,9 +192,9 @@ class wxEAPCredentialsConfigPanelBase : public wxPanel
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class wxEAPCredentialsPromptPassPanelBase
+/// Class wxPasswordCredentialsPanelBase
 ///////////////////////////////////////////////////////////////////////////////
-class wxEAPCredentialsPromptPassPanelBase : public wxEAPCredentialsPanelBase
+class wxPasswordCredentialsPanelBase : public wxEAPCredentialsPanelBase
 {
 	private:
 	
@@ -210,8 +210,8 @@ class wxEAPCredentialsPromptPassPanelBase : public wxEAPCredentialsPanelBase
 	
 	public:
 		
-		wxEAPCredentialsPromptPassPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL ); 
-		~wxEAPCredentialsPromptPassPanelBase();
+		wxPasswordCredentialsPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL ); 
+		~wxPasswordCredentialsPanelBase();
 	
 };
 
