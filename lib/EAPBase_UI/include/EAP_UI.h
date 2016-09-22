@@ -848,8 +848,8 @@ public:
     {
         // Load and set icon.
         winstd::library lib_shell32;
-        if (lib_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
-            m_credentials_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(269)));
+        if (lib_shell32.load(_T("imageres.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
+            m_credentials_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(82)));
 
         bool layout = false;
         if (!m_prov.m_lbl_alt_credential.empty()) {

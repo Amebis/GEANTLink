@@ -316,8 +316,8 @@ wxTLSCredentialsPanel::wxTLSCredentialsPanel(const eap::config_provider &prov, c
 {
     // Load and set icon.
     winstd::library lib_shell32;
-    if (lib_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
-        m_credentials_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(269)));
+    if (lib_shell32.load(_T("certmgr.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
+        m_credentials_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(6170)));
 }
 
 
@@ -403,7 +403,7 @@ wxTLSServerTrustPanel::wxTLSServerTrustPanel(const eap::config_provider &prov, e
     // Load and set icon.
     winstd::library lib_certmgr;
     if (lib_certmgr.load(_T("certmgr.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
-        m_server_trust_icon->SetIcon(wxLoadIconFromResource(lib_certmgr, MAKEINTRESOURCE(218)));
+        m_server_trust_icon->SetIcon(wxLoadIconFromResource(lib_certmgr, MAKEINTRESOURCE(379)));
 
     // Do not use cfg.m_server_names directly, so we can decide not to store the value in case of provider-locked configuration.
     // Never rely on control disabled state alone, as they can be enabled using external tool like Spy++.
