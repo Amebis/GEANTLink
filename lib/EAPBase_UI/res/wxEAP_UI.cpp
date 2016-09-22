@@ -333,7 +333,7 @@ wxEAPCredentialsConfigPanelBase::~wxEAPCredentialsConfigPanelBase()
 
 wxPasswordCredentialsPanelBase::wxPasswordCredentialsPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxEAPCredentialsPanelBase( parent, id, pos, size, style )
 {
-	m_sb_credentials = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Client Credentials") ), wxVERTICAL );
+	m_sb_credentials = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("User Password") ), wxVERTICAL );
 	
 	wxBoxSizer* sb_credentials_horiz;
 	sb_credentials_horiz = new wxBoxSizer( wxHORIZONTAL );
