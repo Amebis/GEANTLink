@@ -224,9 +224,9 @@ void wxTTLSConfigWindow::OnUpdateUI(wxUpdateUIEvent& /*event*/)
 // wxTTLSCredentialsPanel
 //////////////////////////////////////////////////////////////////////
 
-wxTTLSCredentialsPanel::wxTTLSCredentialsPanel(const eap::config_provider &prov, const eap::config_method &cfg, eap::credentials &cred, wxWindow* parent, bool is_config) :
+wxTTLSCredentialsPanel::wxTTLSCredentialsPanel(const eap::config_provider &prov, const eap::config_method_ttls &cfg, eap::credentials_ttls &cred, wxWindow* parent, bool is_config) :
     m_prov(prov),
-    m_cfg((eap::config_method_ttls&)cfg),
+    m_cfg(cfg),
     wxPanel(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize)
 {
     wxBoxSizer* sb_content;
@@ -245,14 +245,12 @@ wxTTLSCredentialsPanel::wxTTLSCredentialsPanel(const eap::config_provider &prov,
     const eap::config_method_pap *cfg_inner_pap;
     const eap::config_method_mschapv2 *cfg_inner_mschapv2;
     if ((cfg_inner_pap = dynamic_cast<const eap::config_method_pap*>(m_cfg.m_inner.get())) != NULL) {
-        eap::credentials_ttls &cred_ttls = (eap::credentials_ttls&)cred;
-        if (!cred_ttls.m_inner) cred_ttls.m_inner.reset(new eap::credentials_pass(cred.m_module));
-        m_inner_cred = new wxPAPCredentialsPanel(m_prov, *cfg_inner_pap, *(eap::credentials_pass*)cred_ttls.m_inner.get(), this, is_config);
+        if (!cred.m_inner) cred.m_inner.reset(new eap::credentials_pass(cred.m_module));
+        m_inner_cred = new wxPAPCredentialsPanel(m_prov, *cfg_inner_pap, *(eap::credentials_pass*)cred.m_inner.get(), this, is_config);
         sb_content->Add(m_inner_cred, 0, wxALL|wxEXPAND, 5);
     } else if ((cfg_inner_mschapv2 = dynamic_cast<const eap::config_method_mschapv2*>(m_cfg.m_inner.get())) != NULL) {
-        eap::credentials_ttls &cred_ttls = (eap::credentials_ttls&)cred;
-        if (!cred_ttls.m_inner) cred_ttls.m_inner.reset(new eap::credentials_pass(cred.m_module));
-        m_inner_cred = new wxMSCHAPv2CredentialsPanel(m_prov, *cfg_inner_mschapv2, *(eap::credentials_pass*)cred_ttls.m_inner.get(), this, is_config);
+        if (!cred.m_inner) cred.m_inner.reset(new eap::credentials_pass(cred.m_module));
+        m_inner_cred = new wxMSCHAPv2CredentialsPanel(m_prov, *cfg_inner_mschapv2, *(eap::credentials_pass*)cred.m_inner.get(), this, is_config);
         sb_content->Add(m_inner_cred, 0, wxALL|wxEXPAND, 5);
     } else
         assert(0); // Unsupported inner authentication method type.
@@ -267,7 +265,7 @@ wxTTLSCredentialsPanel::wxTTLSCredentialsPanel(const eap::config_provider &prov,
     if (eap::config_method_with_cred::status_cred_begin <= m_cfg.m_last_status && m_cfg.m_last_status < eap::config_method_with_cred::status_cred_end)
         sb_content->Add(new wxEAPCredentialWarningPanel(m_prov, m_cfg.m_last_status, this), 0, wxALL|wxEXPAND, 5);
 
-    m_outer_cred = new wxEAPCredentialsPromptTLSPanel(m_prov, (const eap::config_method_tls&)m_cfg, (eap::credentials_tls&)cred, this, is_config);
+    m_outer_cred = new wxEAPCredentialsPromptTLSPanel(m_prov, m_cfg, cred, this, is_config);
     sb_content->Add(m_outer_cred, 0, wxALL|wxEXPAND, 5);
 
     this->SetSizer(sb_content);
