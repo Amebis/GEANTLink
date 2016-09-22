@@ -238,31 +238,22 @@ wxEAPCredentialsConfigPanelBase::wxEAPCredentialsConfigPanelBase( wxWindow* pare
 	wxBoxSizer* sb_credentials_vert;
 	sb_credentials_vert = new wxBoxSizer( wxVERTICAL );
 	
-	m_credentials_label = new wxStaticText( sb_credentials->GetStaticBox(), wxID_ANY, _("Manage credentials used to connect."), wxDefaultPosition, wxDefaultSize, 0 );
+	m_credentials_label = new wxStaticText( sb_credentials->GetStaticBox(), wxID_ANY, _("Select the source where your username, password, or certificate used to connect are stored."), wxDefaultPosition, wxDefaultSize, 0 );
 	m_credentials_label->Wrap( 440 );
 	sb_credentials_vert->Add( m_credentials_label, 0, wxALL|wxEXPAND, 5 );
 	
-	wxBoxSizer* sb_cred_radio;
-	sb_cred_radio = new wxBoxSizer( wxVERTICAL );
+	m_storage = new wxRadioButton( sb_credentials->GetStaticBox(), wxID_ANY, _("Use credentials from Credential &Manager:"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP );
+	m_storage->SetToolTip( _("Select this option if you would like to use credentials stored in Windows Credential Manager") );
+	
+	sb_credentials_vert->Add( m_storage, 0, wxEXPAND|wxTOP|wxRIGHT|wxLEFT, 5 );
 	
 	wxBoxSizer* sz_storage;
 	sz_storage = new wxBoxSizer( wxVERTICAL );
 	
-	wxBoxSizer* sz_storage_inner;
-	sz_storage_inner = new wxBoxSizer( wxHORIZONTAL );
-	
-	m_storage = new wxRadioButton( sb_credentials->GetStaticBox(), wxID_ANY, _("Use &own credentials:"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP );
-	m_storage->SetToolTip( _("Select this option if you have your unique credentials to connect") );
-	
-	sz_storage_inner->Add( m_storage, 2, wxEXPAND, 5 );
-	
 	m_storage_identity = new wxTextCtrl( sb_credentials->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY );
-	m_storage_identity->SetToolTip( _("Your credentials loaded from Windows Credential Manager") );
+	m_storage_identity->SetToolTip( _("Your present credentials stored in Windows Credential Manager") );
 	
-	sz_storage_inner->Add( m_storage_identity, 3, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
-	
-	
-	sz_storage->Add( sz_storage_inner, 1, wxEXPAND|wxBOTTOM, 5 );
+	sz_storage->Add( m_storage_identity, 3, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	wxBoxSizer* sb_buttons_storage;
 	sb_buttons_storage = new wxBoxSizer( wxHORIZONTAL );
@@ -278,29 +269,23 @@ wxEAPCredentialsConfigPanelBase::wxEAPCredentialsConfigPanelBase( wxWindow* pare
 	sb_buttons_storage->Add( m_storage_set, 0, wxLEFT, 5 );
 	
 	
-	sz_storage->Add( sb_buttons_storage, 0, wxALIGN_RIGHT, 5 );
+	sz_storage->Add( sb_buttons_storage, 0, wxALIGN_RIGHT|wxTOP, 5 );
 	
 	
-	sb_cred_radio->Add( sz_storage, 0, wxEXPAND|wxBOTTOM, 5 );
+	sb_credentials_vert->Add( sz_storage, 0, wxEXPAND|wxALL, 5 );
+	
+	m_config = new wxRadioButton( sb_credentials->GetStaticBox(), wxID_ANY, _("Use credentials from &profile configuration:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_config->SetToolTip( _("Select this option if you would like to store credentials as a part of  profile configuration") );
+	
+	sb_credentials_vert->Add( m_config, 0, wxEXPAND|wxTOP|wxRIGHT|wxLEFT, 5 );
 	
 	wxBoxSizer* sz_config;
 	sz_config = new wxBoxSizer( wxVERTICAL );
 	
-	wxBoxSizer* sz_config_inner;
-	sz_config_inner = new wxBoxSizer( wxHORIZONTAL );
-	
-	m_config = new wxRadioButton( sb_credentials->GetStaticBox(), wxID_ANY, _("Use &pre-shared credentials:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_config->SetToolTip( _("Select this options if all clients connect using the same credentials") );
-	
-	sz_config_inner->Add( m_config, 2, wxEXPAND, 5 );
-	
 	m_config_identity = new wxTextCtrl( sb_credentials->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY );
-	m_config_identity->SetToolTip( _("Common (pre-shared) credentials") );
+	m_config_identity->SetToolTip( _("Profile configuration credentials") );
 	
-	sz_config_inner->Add( m_config_identity, 3, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
-	
-	
-	sz_config->Add( sz_config_inner, 1, wxEXPAND|wxBOTTOM, 5 );
+	sz_config->Add( m_config_identity, 3, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	wxBoxSizer* sb_buttons_config;
 	sb_buttons_config = new wxBoxSizer( wxHORIZONTAL );
@@ -311,13 +296,10 @@ wxEAPCredentialsConfigPanelBase::wxEAPCredentialsConfigPanelBase( wxWindow* pare
 	sb_buttons_config->Add( m_config_set, 0, 0, 5 );
 	
 	
-	sz_config->Add( sb_buttons_config, 0, wxALIGN_RIGHT, 5 );
+	sz_config->Add( sb_buttons_config, 0, wxALIGN_RIGHT|wxTOP, 5 );
 	
 	
-	sb_cred_radio->Add( sz_config, 0, wxEXPAND|wxTOP, 5 );
-	
-	
-	sb_credentials_vert->Add( sb_cred_radio, 0, wxEXPAND|wxALL, 5 );
+	sb_credentials_vert->Add( sz_config, 0, wxEXPAND|wxALL, 5 );
 	
 	
 	sb_credentials_horiz->Add( sb_credentials_vert, 1, wxEXPAND, 5 );
