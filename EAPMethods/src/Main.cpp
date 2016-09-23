@@ -755,7 +755,7 @@ DWORD WINAPI EapPeerCredentialsXml2Blob(
     else {
         // <Credentials>
         com_obj<IXMLDOMNode> pXmlElCredentials;
-        if (FAILED(eapxml::select_node(pCredentialsDoc, bstr(L"//EapHostUserCredentials/Credentials"), &pXmlElCredentials))) {
+        if (FAILED(eapxml::select_node(pCredentialsDoc, bstr(L"//EapHostUserCredentials/Credentials"), pXmlElCredentials))) {
             g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_NOT_FOUND, _T(__FUNCTION__) _T(" Error selecting <EapHostUserCredentials><Credentials> element.")));
             return dwResult;
         }

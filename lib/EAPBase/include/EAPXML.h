@@ -18,6 +18,8 @@
     along with GÉANTLink. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <WinStd/COM.h>
+
 #include <MsXml.h>
 #include <msxml6.h>
 #include <sal.h>
@@ -27,31 +29,31 @@
 
 namespace eapxml
 {
-    inline HRESULT get_document(_In_ IXMLDOMNode *pXmlNode, _Out_ IXMLDOMDocument2 **ppXmlDoc);
-    inline HRESULT select_node(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrNodeName, _Out_ IXMLDOMNode **ppXmlNode);
-    inline HRESULT select_nodes(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrNodeName, _Out_ IXMLDOMNodeList **ppXmlNodes);
-    inline HRESULT select_element(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _Out_ IXMLDOMElement **ppXmlElement);
-    inline HRESULT create_element(_In_ IXMLDOMDocument *pDoc, _In_z_ const BSTR bstrElementName, _In_z_ const BSTR bstrNamespace, _Out_ IXMLDOMElement **ppXmlElement);
-    inline HRESULT create_element(_In_ IXMLDOMDocument *pDoc, IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementNameSelect, _In_z_ const BSTR bstrElementNameCreate, _In_z_ const BSTR bstrNamespace, _Out_ IXMLDOMElement **ppXmlElement);
+    inline HRESULT get_document(_In_ IXMLDOMNode *pXmlNode, _Out_ winstd::com_obj<IXMLDOMDocument2> &ppXmlDoc);
+    inline HRESULT select_node(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrNodeName, _Out_ winstd::com_obj<IXMLDOMNode> &ppXmlNode);
+    inline HRESULT select_nodes(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrNodeName, _Out_ winstd::com_obj<IXMLDOMNodeList> &ppXmlNodes);
+    inline HRESULT select_element(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _Out_ winstd::com_obj<IXMLDOMElement> &ppXmlElement);
+    inline HRESULT create_element(_In_ IXMLDOMDocument *pDoc, _In_z_ const BSTR bstrElementName, _In_z_ const BSTR bstrNamespace, _Out_ winstd::com_obj<IXMLDOMElement> &ppXmlElement);
+    inline HRESULT create_element(_In_ IXMLDOMDocument *pDoc, IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementNameSelect, _In_z_ const BSTR bstrElementNameCreate, _In_z_ const BSTR bstrNamespace, _Out_ winstd::com_obj<IXMLDOMElement> &ppXmlElement);
     inline bool has_parent(_In_ IXMLDOMNode *pXmlNode);
-    inline HRESULT get_element_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _Out_ BSTR *pbstrValue, _Out_opt_ IXMLDOMElement **ppXmlElement = NULL);
-    template<class _Traits, class _Ax> inline HRESULT get_element_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _Out_ std::basic_string<wchar_t, _Traits, _Ax> &sValue, _Out_opt_ IXMLDOMElement **ppXmlElement = NULL);
-    inline HRESULT get_element_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _Out_ DWORD *pdwValue, _Out_opt_ IXMLDOMElement **ppXmlElement = NULL);
-    inline HRESULT get_element_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _Out_ bool *pbValue, _Out_opt_ IXMLDOMElement **ppXmlElement = NULL);
-    template<class _Ty, class _Ax> inline HRESULT get_element_base64(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _Out_ std::vector<_Ty, _Ax> &aValue, _Out_opt_ IXMLDOMElement **ppXmlElement = NULL);
-    template<class _Ty, class _Ax> inline HRESULT get_element_hex(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _Out_ std::vector<_Ty, _Ax> &aValue, _Out_opt_ IXMLDOMElement **ppXmlElement = NULL);
-    inline HRESULT get_element_localized(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _In_z_ LPCWSTR pszLang, _Out_ BSTR *pbstrValue, _Out_opt_ IXMLDOMElement **ppXmlElement = NULL);
-    template<class _Traits, class _Ax> inline HRESULT get_element_localized(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _In_z_ LPCWSTR pszLang, _Out_ std::basic_string<wchar_t, _Traits, _Ax> &sValue, _Out_opt_ IXMLDOMElement **ppXmlElement = NULL);
-    inline HRESULT put_element(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _Out_ IXMLDOMElement **ppXmlElement);
-    inline HRESULT put_element_value(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _In_z_ const BSTR bstrValue, _Out_opt_ IXMLDOMElement **ppXmlElement = NULL);
-    inline HRESULT put_element_value(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _In_ DWORD dwValue, _Out_opt_ IXMLDOMElement **ppXmlElement = NULL);
-    inline HRESULT put_element_value(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _In_ bool bValue, _Out_opt_ IXMLDOMElement **ppXmlElement = NULL);
-    inline HRESULT put_element_base64(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _In_count_(nValueLen) LPCVOID pValue, _In_ SIZE_T nValueLen, _Out_opt_ IXMLDOMElement **ppXmlElement = NULL);
-    inline HRESULT put_element_hex(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _In_count_(nValueLen) LPCVOID pValue, _In_ SIZE_T nValueLen, _Out_opt_ IXMLDOMElement **ppXmlElement = NULL);
-    inline HRESULT get_attrib_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrAttributeName, _Out_ BSTR *pbstrValue);
+    inline HRESULT get_element_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _Out_ winstd::bstr &pbstrValue, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement = NULL);
+    template<class _Traits, class _Ax> inline HRESULT get_element_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _Out_ std::basic_string<wchar_t, _Traits, _Ax> &sValue, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement = NULL);
+    inline HRESULT get_element_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _Out_ DWORD &pdwValue, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement = NULL);
+    inline HRESULT get_element_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _Out_ bool &pbValue, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement = NULL);
+    template<class _Ty, class _Ax> inline HRESULT get_element_base64(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _Out_ std::vector<_Ty, _Ax> &aValue, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement = NULL);
+    template<class _Ty, class _Ax> inline HRESULT get_element_hex(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _Out_ std::vector<_Ty, _Ax> &aValue, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement = NULL);
+    inline HRESULT get_element_localized(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _In_z_ LPCWSTR pszLang, _Out_ winstd::bstr &pbstrValue, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement = NULL);
+    template<class _Traits, class _Ax> inline HRESULT get_element_localized(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _In_z_ LPCWSTR pszLang, _Out_ std::basic_string<wchar_t, _Traits, _Ax> &sValue, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement = NULL);
+    inline HRESULT put_element(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _Out_ winstd::com_obj<IXMLDOMElement> &ppXmlElement);
+    inline HRESULT put_element_value(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _In_z_ const BSTR bstrValue, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement = NULL);
+    inline HRESULT put_element_value(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _In_ DWORD dwValue, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement = NULL);
+    inline HRESULT put_element_value(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _In_ bool bValue, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement = NULL);
+    inline HRESULT put_element_base64(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _In_count_(nValueLen) LPCVOID pValue, _In_ SIZE_T nValueLen, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement = NULL);
+    inline HRESULT put_element_hex(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _In_count_(nValueLen) LPCVOID pValue, _In_ SIZE_T nValueLen, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement = NULL);
+    inline HRESULT get_attrib_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrAttributeName, _Out_ winstd::bstr &pbstrValue);
     template<class _Traits, class _Ax> inline HRESULT get_attrib_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrAttributeName, _Out_ std::basic_string<wchar_t, _Traits, _Ax> &sValue);
-    inline HRESULT get_attrib_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrAttributeName, _Out_ DWORD *pdwValue);
-    inline HRESULT get_attrib_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrAttributeName, _Out_ bool *pbValue);
+    inline HRESULT get_attrib_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrAttributeName, _Out_ DWORD &pdwValue);
+    inline HRESULT get_attrib_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrAttributeName, _Out_ bool &pbValue);
     template<class _Ty, class _Ax> inline HRESULT get_attrib_base64(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrAttributeName, _Out_ std::vector<_Ty, _Ax> &aValue);
     template<class _Ty, class _Ax> inline HRESULT get_attrib_hex(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrAttributeName, _Out_ std::vector<_Ty, _Ax> &aValue);
     inline HRESULT put_attrib_value(_In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrAttributeName, _In_opt_z_ _In_z_ const BSTR bstrValue);
@@ -65,7 +67,6 @@ namespace eapxml
 #pragma once
 
 #include <WinStd/Base64.h>
-#include <WinStd/COM.h>
 #include <WinStd/Hex.h>
 
 #include <assert.h>
@@ -73,10 +74,9 @@ namespace eapxml
 
 namespace eapxml
 {
-    inline HRESULT get_document(_In_ IXMLDOMNode *pXmlNode, _Out_ IXMLDOMDocument2 **ppXmlDoc)
+    inline HRESULT get_document(_In_ IXMLDOMNode *pXmlNode, _Out_ winstd::com_obj<IXMLDOMDocument2> &ppXmlDoc)
     {
         assert(pXmlNode);
-        assert(ppXmlDoc);
 
         HRESULT hr;
         winstd::com_obj<IXMLDOMDocument> doc;
@@ -87,50 +87,51 @@ namespace eapxml
     }
 
 
-    inline HRESULT select_node(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrNodeName, _Out_ IXMLDOMNode **ppXmlNode)
+    inline HRESULT select_node(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrNodeName, _Out_ winstd::com_obj<IXMLDOMNode> &ppXmlNode)
     {
         assert(pXmlParent);
-        assert(ppXmlNode);
 
         HRESULT hr;
+        IXMLDOMNode *pXmlNode;
 
-        return
-            SUCCEEDED(hr = pXmlParent->selectSingleNode(bstrNodeName, ppXmlNode)) ?
-            *ppXmlNode ? S_OK : E_NOT_SET : hr;
+        if (SUCCEEDED(hr = pXmlParent->selectSingleNode(bstrNodeName, &pXmlNode))) {
+            ppXmlNode.attach(pXmlNode);
+            return pXmlNode ? S_OK : E_NOT_SET;
+        } else
+            return hr;
     }
 
 
-    inline HRESULT select_nodes(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrNodeName, _Out_ IXMLDOMNodeList **ppXmlNodes)
+    inline HRESULT select_nodes(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrNodeName, _Out_ winstd::com_obj<IXMLDOMNodeList> &ppXmlNodes)
     {
         assert(pXmlParent);
-        assert(ppXmlNodes);
 
         HRESULT hr;
+        IXMLDOMNodeList *pXmlNodes;
 
-        return
-            SUCCEEDED(hr = pXmlParent->selectNodes(bstrNodeName, ppXmlNodes)) ?
-            *ppXmlNodes ? S_OK : E_NOT_SET : hr;
+        if (SUCCEEDED(hr = pXmlParent->selectNodes(bstrNodeName, &pXmlNodes))) {
+            ppXmlNodes.attach(pXmlNodes);
+            return pXmlNodes ? S_OK : E_NOT_SET;
+        } else
+            return hr;
     }
 
 
-    inline HRESULT select_element(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _Out_ IXMLDOMElement **ppXmlElement)
+    inline HRESULT select_element(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _Out_ winstd::com_obj<IXMLDOMElement> &ppXmlElement)
     {
-        assert(ppXmlElement);
-
         HRESULT hr;
         winstd::com_obj<IXMLDOMNode> pXmlNode;
 
         return
-            SUCCEEDED(hr = select_node(pXmlParent, bstrElementName, &pXmlNode)) ?
+            SUCCEEDED(hr = select_node(pXmlParent, bstrElementName, pXmlNode)) ?
             SUCCEEDED(hr = pXmlNode.query_interface(ppXmlElement)) ?
-            *ppXmlElement ? S_OK : E_NOT_SET : hr : hr;
+            ppXmlElement ? S_OK : E_NOT_SET : hr : hr;
     }
 
 
-    inline HRESULT create_element(_In_ IXMLDOMDocument *pDoc, _In_z_ const BSTR bstrElementName, _In_z_ const BSTR bstrNamespace, _Out_ IXMLDOMElement **ppXmlElement)
+    inline HRESULT create_element(_In_ IXMLDOMDocument *pDoc, _In_z_ const BSTR bstrElementName, _In_z_ const BSTR bstrNamespace, _Out_ winstd::com_obj<IXMLDOMElement> &ppXmlElement)
     {
         assert(pDoc);
-        assert(ppXmlElement);
 
         static const winstd::variant varNodeTypeEl(NODE_ELEMENT);
         HRESULT hr;
@@ -139,22 +140,21 @@ namespace eapxml
         return
             SUCCEEDED(hr = pDoc->createNode(varNodeTypeEl, bstrElementName, bstrNamespace, &pXmlNode)) ?
             SUCCEEDED(hr = pXmlNode.query_interface(ppXmlElement)) ?
-            *ppXmlElement ? S_OK : E_NOT_SET : hr : hr;
+            ppXmlElement ? S_OK : E_NOT_SET : hr : hr;
     }
 
 
-    inline HRESULT create_element(_In_ IXMLDOMDocument *pDoc, IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementNameSelect, _In_z_ const BSTR bstrElementNameCreate, _In_z_ const BSTR bstrNamespace, _Out_ IXMLDOMElement **ppXmlElement)
+    inline HRESULT create_element(_In_ IXMLDOMDocument *pDoc, IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementNameSelect, _In_z_ const BSTR bstrElementNameCreate, _In_z_ const BSTR bstrNamespace, _Out_ winstd::com_obj<IXMLDOMElement> &ppXmlElement)
     {
         assert(pDoc);
         assert(pXmlParent);
-        assert(ppXmlElement);
 
         HRESULT hr;
 
         return
             SUCCEEDED(hr = select_element(pXmlParent, bstrElementNameSelect, ppXmlElement)) ? S_OK :
             SUCCEEDED(hr = create_element(pDoc, bstrElementNameCreate, bstrNamespace, ppXmlElement)) ?
-            SUCCEEDED(hr = pXmlParent->appendChild(*ppXmlElement, NULL)) ? S_OK : hr : hr;
+            SUCCEEDED(hr = pXmlParent->appendChild(ppXmlElement, NULL)) ? S_OK : hr : hr;
     }
 
 
@@ -168,64 +168,57 @@ namespace eapxml
     }
 
 
-    inline HRESULT get_element_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _Out_ BSTR *pbstrValue, _Out_opt_ IXMLDOMElement **ppXmlElement)
+    inline HRESULT get_element_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _Out_ winstd::bstr &pbstrValue, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement)
     {
-        assert(pbstrValue);
-
         HRESULT hr;
         winstd::com_obj<IXMLDOMElement> pXmlElement;
+        BSTR bstrValue;
 
-        if (ppXmlElement)
-            *ppXmlElement = NULL;
-
-        if (SUCCEEDED(hr = select_element(pXmlParent, bstrElementName, &pXmlElement)) &&
-            SUCCEEDED(hr = pXmlElement->get_text(pbstrValue)))
+        if (SUCCEEDED(hr = select_element(pXmlParent, bstrElementName, pXmlElement)) &&
+            SUCCEEDED(hr = pXmlElement->get_text(&bstrValue)))
         {
+            pbstrValue.attach(bstrValue);
             if (ppXmlElement)
-                *ppXmlElement = pXmlElement.detach();
-            return *pbstrValue ? S_OK : E_NOT_SET;
+                *ppXmlElement = std::move(pXmlElement);
+            return bstrValue ? S_OK : E_NOT_SET;
         } else
             return hr;
     }
 
 
     template<class _Traits, class _Ax>
-    inline HRESULT get_element_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _Out_ std::basic_string<wchar_t, _Traits, _Ax> &sValue, _Out_opt_ IXMLDOMElement **ppXmlElement)
+    inline HRESULT get_element_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _Out_ std::basic_string<wchar_t, _Traits, _Ax> &sValue, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement)
     {
         winstd::bstr bstr;
-        HRESULT hr = get_element_value(pXmlParent, bstrElementName, &bstr, ppXmlElement);
+        HRESULT hr = get_element_value(pXmlParent, bstrElementName, bstr, ppXmlElement);
         if (SUCCEEDED(hr))
             sValue.assign(bstr, bstr.length());
         return hr;
     }
 
 
-    inline HRESULT get_element_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _Out_ DWORD *pdwValue, _Out_opt_ IXMLDOMElement **ppXmlElement)
+    inline HRESULT get_element_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _Out_ DWORD &pdwValue, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement)
     {
-        assert(pdwValue);
-
         winstd::bstr bstr;
-        HRESULT hr = get_element_value(pXmlParent, bstrElementName, &bstr, ppXmlElement);
+        HRESULT hr = get_element_value(pXmlParent, bstrElementName, bstr, ppXmlElement);
         if (SUCCEEDED(hr))
-            *pdwValue = wcstoul(bstr, NULL, 10);
+            pdwValue = wcstoul(bstr, NULL, 10);
         return hr;
     }
 
 
-    inline HRESULT get_element_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _Out_ bool *pbValue, _Out_opt_ IXMLDOMElement **ppXmlElement)
+    inline HRESULT get_element_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _Out_ bool &pbValue, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement)
     {
-        assert(pbValue);
-
         winstd::bstr bstr;
-        HRESULT hr = get_element_value(pXmlParent, bstrElementName, &bstr, ppXmlElement);
+        HRESULT hr = get_element_value(pXmlParent, bstrElementName, bstr, ppXmlElement);
         if (SUCCEEDED(hr)) {
             if (CompareStringEx(LOCALE_NAME_INVARIANT, NORM_IGNORECASE, bstr, bstr.length(), L"true" , -1, NULL, NULL, 0) == CSTR_EQUAL ||
                 CompareStringEx(LOCALE_NAME_INVARIANT, NORM_IGNORECASE, bstr, bstr.length(), L"1"    , -1, NULL, NULL, 0) == CSTR_EQUAL)
-                *pbValue = true;
+                pbValue = true;
             else if (
                 CompareStringEx(LOCALE_NAME_INVARIANT, NORM_IGNORECASE, bstr, bstr.length(), L"false", -1, NULL, NULL, 0) == CSTR_EQUAL ||
                 CompareStringEx(LOCALE_NAME_INVARIANT, NORM_IGNORECASE, bstr, bstr.length(), L"0"    , -1, NULL, NULL, 0) == CSTR_EQUAL)
-                *pbValue = false;
+                pbValue = false;
             else
                 hr = E_NOT_VALID_STATE;
         }
@@ -235,10 +228,10 @@ namespace eapxml
 
 
     template<class _Ty, class _Ax>
-    inline HRESULT get_element_base64(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _Out_ std::vector<_Ty, _Ax> &aValue, _Out_opt_ IXMLDOMElement **ppXmlElement)
+    inline HRESULT get_element_base64(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _Out_ std::vector<_Ty, _Ax> &aValue, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement)
     {
         winstd::bstr bstr;
-        HRESULT hr = get_element_value(pXmlParent, bstrElementName, &bstr, ppXmlElement);
+        HRESULT hr = get_element_value(pXmlParent, bstrElementName, bstr, ppXmlElement);
         if (SUCCEEDED(hr)) {
             winstd::base64_dec dec;
             bool is_last;
@@ -250,10 +243,10 @@ namespace eapxml
 
 
     template<class _Ty, class _Ax>
-    inline HRESULT get_element_hex(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _Out_ std::vector<_Ty, _Ax> &aValue, _Out_opt_ IXMLDOMElement **ppXmlElement)
+    inline HRESULT get_element_hex(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _Out_ std::vector<_Ty, _Ax> &aValue, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement)
     {
         winstd::bstr bstr;
-        HRESULT hr = get_element_value(pXmlParent, bstrElementName, &bstr, ppXmlElement);
+        HRESULT hr = get_element_value(pXmlParent, bstrElementName, bstr, ppXmlElement);
         if (SUCCEEDED(hr)) {
             winstd::hex_dec dec;
             bool is_last;
@@ -264,33 +257,29 @@ namespace eapxml
     }
 
 
-    inline HRESULT get_element_localized(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _In_z_ LPCWSTR pszLang, _Out_ BSTR *pbstrValue, _Out_opt_ IXMLDOMElement **ppXmlElement)
+    inline HRESULT get_element_localized(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _In_z_ LPCWSTR pszLang, _Out_ winstd::bstr &pbstrValue, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement)
     {
-        assert(pbstrValue);
-
         HRESULT hr;
         winstd::com_obj<IXMLDOMElement> pXmlElement;
 
-        if (ppXmlElement)
-            *ppXmlElement = NULL;
-
-        if (FAILED(hr = select_element(pXmlParent, bstrElementName, &pXmlElement)))
+        if (FAILED(hr = select_element(pXmlParent, bstrElementName, pXmlElement)))
             return hr;
 
-        if (ppXmlElement) {
-            pXmlElement->AddRef();
+        if (ppXmlElement)
             *ppXmlElement = pXmlElement;
-        }
 
         winstd::com_obj<IXMLDOMNodeList> pXmlListLocalizedText;
         long lCount = 0;
-        if (FAILED(select_nodes(pXmlElement, winstd::bstr(L"eap-metadata:localized-text"), &pXmlListLocalizedText)) ||
+        if (FAILED(select_nodes(pXmlElement, winstd::bstr(L"eap-metadata:localized-text"), pXmlListLocalizedText)) ||
             FAILED(pXmlListLocalizedText->get_length(&lCount)) ||
             lCount <= 0)
         {
-            return
-                SUCCEEDED(hr = pXmlElement->get_text(pbstrValue)) ?
-                *pbstrValue ? S_OK : E_NOT_SET : hr;
+            BSTR bstr;
+            if (SUCCEEDED(hr = pXmlElement->get_text(&bstr))) {
+                pbstrValue.attach(bstr);
+                return bstr ? S_OK : E_NOT_SET;
+            } else
+                return hr;
         }
 
         winstd::bstr bstrDefault, bstrEn;
@@ -298,11 +287,11 @@ namespace eapxml
             if (i >= lCount) {
                 if (bstrDefault != NULL) {
                     // Return "C" localization.
-                    *pbstrValue = bstrDefault.detach();
+                    pbstrValue = std::move(bstrDefault);
                     return S_OK;
                 } else if (bstrEn != NULL) {
                     // Return "en" localization.
-                    *pbstrValue = bstrEn.detach();
+                    pbstrValue = std::move(bstrEn);
                     return S_OK;
                 } else
                     return ERROR_NOT_FOUND;
@@ -314,21 +303,21 @@ namespace eapxml
             {
                 // Read <lang>.
                 winstd::bstr bstrLang;
-                if (FAILED(get_element_value(pXmlElLocalizedText, winstd::bstr(L"eap-metadata:lang"), &bstrLang)) ||
+                if (FAILED(get_element_value(pXmlElLocalizedText, winstd::bstr(L"eap-metadata:lang"), bstrLang)) ||
                     CompareStringEx(LOCALE_NAME_INVARIANT, NORM_IGNORECASE, bstrLang, bstrLang.length(), L"C" , -1, NULL, NULL, 0) == CSTR_EQUAL)
                 {
                     // <lang> is missing or "C" language found.
                     winstd::bstr bstr;
-                    if (SUCCEEDED(hr = get_element_value(pXmlElLocalizedText, winstd::bstr(L"eap-metadata:text"), &bstr)))
-                        bstrDefault.attach(bstr.detach());
+                    if (SUCCEEDED(hr = get_element_value(pXmlElLocalizedText, winstd::bstr(L"eap-metadata:text"), bstr)))
+                        bstrDefault = std::move(bstr);
                 } else if (CompareStringEx(LOCALE_NAME_INVARIANT, NORM_IGNORECASE, bstrLang, bstrLang.length(), pszLang, -1, NULL, NULL, 0) == CSTR_EQUAL) {
                     // Found an exact match.
                     return get_element_value(pXmlElLocalizedText, winstd::bstr(L"eap-metadata:text"), pbstrValue);
                 } else if (CompareStringEx(LOCALE_NAME_INVARIANT, NORM_IGNORECASE, bstrLang, bstrLang.length(), L"en", -1, NULL, NULL, 0) == CSTR_EQUAL) {
                     // "en" language found.
                     winstd::bstr bstr;
-                    if (SUCCEEDED(hr = get_element_value(pXmlElLocalizedText, winstd::bstr(L"eap-metadata:text"), &bstr)))
-                        bstrEn.attach(bstr.detach());
+                    if (SUCCEEDED(hr = get_element_value(pXmlElLocalizedText, winstd::bstr(L"eap-metadata:text"), bstr)))
+                        bstrEn = std::move(bstr);
                 }
             }
         }
@@ -336,17 +325,17 @@ namespace eapxml
 
 
     template<class _Traits, class _Ax>
-    inline HRESULT get_element_localized(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _In_z_ LPCWSTR pszLang, _Out_ std::basic_string<wchar_t, _Traits, _Ax> &sValue, _Out_opt_ IXMLDOMElement **ppXmlElement)
+    inline HRESULT get_element_localized(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _In_z_ LPCWSTR pszLang, _Out_ std::basic_string<wchar_t, _Traits, _Ax> &sValue, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement)
     {
         winstd::bstr bstr;
-        HRESULT hr = get_element_localized(pXmlParent, bstrElementName, pszLang, &bstr, ppXmlElement);
+        HRESULT hr = get_element_localized(pXmlParent, bstrElementName, pszLang, bstr, ppXmlElement);
         if (SUCCEEDED(hr))
             sValue.assign(bstr, bstr.length());
         return hr;
     }
 
 
-    inline HRESULT put_element(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _Out_ IXMLDOMElement **ppXmlElement)
+    inline HRESULT put_element(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _Out_ winstd::com_obj<IXMLDOMElement> &ppXmlElement)
     {
         assert(pDoc);
         assert(pCurrentDOMNode);
@@ -363,7 +352,7 @@ namespace eapxml
     }
 
 
-    inline HRESULT put_element_value(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _In_z_ const BSTR bstrValue, _Out_opt_ IXMLDOMElement **ppXmlElement)
+    inline HRESULT put_element_value(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _In_z_ const BSTR bstrValue, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement)
     {
         assert(pDoc);
 
@@ -378,26 +367,26 @@ namespace eapxml
             SUCCEEDED(hr = pCurrentDOMNode->appendChild(pXmlEl, NULL)))
         {
             if (ppXmlElement)
-                pXmlEl.query_interface(ppXmlElement);
+                pXmlEl.query_interface(*ppXmlElement);
             return S_OK;
         } else
             return hr;
     }
 
 
-    inline HRESULT put_element_value(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _In_ DWORD dwValue, _Out_opt_ IXMLDOMElement **ppXmlElement)
+    inline HRESULT put_element_value(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _In_ DWORD dwValue, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement)
     {
         return put_element_value(pDoc, pCurrentDOMNode, bstrElementName, bstrNamespace, winstd::bstr(winstd::wstring_printf(L"%d", dwValue)), ppXmlElement);
     }
 
 
-    inline HRESULT put_element_value(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _In_ bool bValue, _Out_opt_ IXMLDOMElement **ppXmlElement)
+    inline HRESULT put_element_value(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _In_ bool bValue, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement)
     {
         return put_element_value(pDoc, pCurrentDOMNode, bstrElementName, bstrNamespace, winstd::bstr(bValue ? L"true": L"false"), ppXmlElement);
     }
 
 
-    inline HRESULT put_element_base64(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _In_count_(nValueLen) LPCVOID pValue, _In_ SIZE_T nValueLen, _Out_opt_ IXMLDOMElement **ppXmlElement)
+    inline HRESULT put_element_base64(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _In_count_(nValueLen) LPCVOID pValue, _In_ SIZE_T nValueLen, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement)
     {
         std::wstring sBase64;
         winstd::base64_enc enc;
@@ -406,7 +395,7 @@ namespace eapxml
     }
 
 
-    inline HRESULT put_element_hex(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _In_count_(nValueLen) LPCVOID pValue, _In_ SIZE_T nValueLen, _Out_opt_ IXMLDOMElement **ppXmlElement)
+    inline HRESULT put_element_hex(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _In_count_(nValueLen) LPCVOID pValue, _In_ SIZE_T nValueLen, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement)
     {
         std::wstring sHex;
         winstd::hex_enc enc;
@@ -415,10 +404,8 @@ namespace eapxml
     }
 
 
-    inline HRESULT get_attrib_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrAttributeName, _Out_ BSTR *pbstrValue)
+    inline HRESULT get_attrib_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrAttributeName, _Out_ winstd::bstr &pbstrValue)
     {
-        assert(pbstrValue);
-
         HRESULT hr;
         winstd::com_obj<IXMLDOMNamedNodeMap> pXmlAttributes;
         winstd::com_obj<IXMLDOMNode> pXmlAt;
@@ -426,11 +413,11 @@ namespace eapxml
         V_VT(&varValue) = VT_EMPTY;
 
         return
-            SUCCEEDED(hr = pXmlParent->get_attributes(&pXmlAttributes)) ?
+            SUCCEEDED(hr = pXmlParent->get_attributes(&pXmlAttributes)) &&
             SUCCEEDED(hr = pXmlAttributes->getNamedItem(bstrAttributeName, &pXmlAt)) ?
             pXmlAt ?
             SUCCEEDED(hr = pXmlAt->get_nodeValue(&varValue)) ?
-            V_VT(&varValue) == VT_BSTR ? *pbstrValue = V_BSTR(&varValue), S_OK : E_UNEXPECTED : hr : E_NOT_SET : hr : hr;
+            V_VT(&varValue) == VT_BSTR ? pbstrValue.attach(V_BSTR(&varValue)), V_VT(&varValue) = VT_EMPTY, S_OK : E_UNEXPECTED : hr : E_NOT_SET : hr;
     }
 
 
@@ -438,39 +425,37 @@ namespace eapxml
     inline HRESULT get_attrib_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrAttributeName, _Out_ std::basic_string<wchar_t, _Traits, _Ax> &sValue)
     {
         winstd::bstr bstr;
-        HRESULT hr = get_attrib_value(pXmlParent, bstrAttributeName, &bstr);
+        HRESULT hr = get_attrib_value(pXmlParent, bstrAttributeName, bstr);
         if (SUCCEEDED(hr))
             sValue.assign(bstr, bstr.length());
         return hr;
     }
 
 
-    inline HRESULT get_attrib_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrAttributeName, _Out_ DWORD *pdwValue)
+    inline HRESULT get_attrib_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrAttributeName, _Out_ DWORD &pdwValue)
     {
-        assert(pdwValue);
-
         winstd::bstr bstr;
-        HRESULT hr = get_attrib_value(pXmlParent, bstrAttributeName, &bstr);
+        HRESULT hr = get_attrib_value(pXmlParent, bstrAttributeName, bstr);
         if (SUCCEEDED(hr))
-            *pdwValue = wcstoul(bstr, NULL, 10);
+            pdwValue = wcstoul(bstr, NULL, 10);
         return hr;
     }
 
 
-    inline HRESULT get_attrib_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrAttributeName, _Out_ bool *pbValue)
+    inline HRESULT get_attrib_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrAttributeName, _Out_ bool &pbValue)
     {
         assert(pbValue);
 
         winstd::bstr bstr;
-        HRESULT hr = get_attrib_value(pXmlParent, bstrAttributeName, &bstr);
+        HRESULT hr = get_attrib_value(pXmlParent, bstrAttributeName, bstr);
         if (SUCCEEDED(hr)) {
             if (CompareStringEx(LOCALE_NAME_INVARIANT, NORM_IGNORECASE, bstr, bstr.length(), L"true" , -1, NULL, NULL, 0) == CSTR_EQUAL ||
                 CompareStringEx(LOCALE_NAME_INVARIANT, NORM_IGNORECASE, bstr, bstr.length(), L"1"    , -1, NULL, NULL, 0) == CSTR_EQUAL)
-                *pbValue = true;
+                pbValue = true;
             else if (
                 CompareStringEx(LOCALE_NAME_INVARIANT, NORM_IGNORECASE, bstr, bstr.length(), L"false", -1, NULL, NULL, 0) == CSTR_EQUAL ||
                 CompareStringEx(LOCALE_NAME_INVARIANT, NORM_IGNORECASE, bstr, bstr.length(), L"0"    , -1, NULL, NULL, 0) == CSTR_EQUAL)
-                *pbValue = false;
+                pbValue = false;
             else
                 hr = E_NOT_VALID_STATE;
         }

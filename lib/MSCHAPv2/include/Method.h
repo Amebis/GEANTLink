@@ -40,6 +40,8 @@ namespace eap
 {
     class method_mschapv2 : public method_noneap
     {
+        WINSTD_NONCOPYABLE(method_mschapv2)
+
     public:
         ///
         /// Constructs an EAP method
@@ -132,7 +134,7 @@ namespace eap
         static std::list<std::string> parse_response(_In_count_(count) const char *resp, _In_ size_t count);
 
     protected:
-        credentials_pass &m_cred;           ///< EAP-TLS user credentials
+        credentials_pass &m_cred;               ///< Method user credentials
         winstd::crypt_prov m_cp;                ///< Cryptography provider for general services
 
         challenge_mschapv2 m_challenge_server;  ///< MSCHAP server challenge

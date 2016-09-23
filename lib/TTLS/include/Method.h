@@ -40,6 +40,8 @@ namespace eap
 {
     class method_ttls : public method_tls
     {
+        WINSTD_NONCOPYABLE(method_ttls)
+
     public:
         ///
         /// Constructs an EAP method

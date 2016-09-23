@@ -46,6 +46,8 @@ namespace eap
 {
     class method_tls : public method
     {
+        WINSTD_NONCOPYABLE(method_tls)
+
     public:
 #pragma pack(push)
 #pragma pack(1)

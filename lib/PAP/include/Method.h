@@ -38,6 +38,8 @@ namespace eap
 {
     class method_pap : public method_noneap
     {
+        WINSTD_NONCOPYABLE(method_pap)
+
     public:
         ///
         /// Constructs an EAP method
@@ -91,7 +93,7 @@ namespace eap
         /// @}
 
     protected:
-        credentials_pass &m_cred;    ///< EAP-TLS user credentials
+        credentials_pass &m_cred;    ///< Method user credentials
 
         enum {
             phase_unknown = -1,     ///< Unknown phase

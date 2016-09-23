@@ -223,7 +223,7 @@ void eap::method_tls::begin_session(
     }
 
     // Prepare client credentials for Schannel.
-    PCCERT_CONTEXT certs[] = { m_cred.m_cert ? m_cred.m_cert : NULL };
+    PCCERT_CONTEXT certs[] = { m_cred.m_cert ? (PCCERT_CONTEXT)m_cred.m_cert : NULL };
     SCHANNEL_CRED cred = {
         SCHANNEL_CRED_VERSION,                                                // dwVersion
         m_cred.m_cert ? 1 : 0,                                                // cCreds

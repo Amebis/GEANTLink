@@ -51,6 +51,8 @@ namespace eap
 {
     class method
     {
+        WINSTD_NONCOPYABLE(method)
+
     public:
         ///
         /// Constructs an EAP method
@@ -128,11 +130,6 @@ namespace eap
 
         /// @}
 
-    private:
-        // This class is noncopyable.
-        method(_In_ const method &other);
-        method& operator=(_In_ const method &other);
-
     public:
         module &m_module;                           ///< EAP module
         config_method_with_cred &m_cfg;             ///< Connection configuration
@@ -143,6 +140,8 @@ namespace eap
 
     class method_noneap : public method
     {
+        WINSTD_NONCOPYABLE(method_noneap)
+
     public:
         ///
         /// Constructs an EAP method

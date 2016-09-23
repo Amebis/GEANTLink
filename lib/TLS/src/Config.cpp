@@ -145,13 +145,13 @@ void eap::config_method_tls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *
 
     // <ServerSideCredential>
     com_obj<IXMLDOMElement> pXmlElServerSideCredential;
-    if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:ServerSideCredential"), bstr(L"ServerSideCredential"), namespace_eapmetadata, &pXmlElServerSideCredential)))
+    if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:ServerSideCredential"), bstr(L"ServerSideCredential"), namespace_eapmetadata, pXmlElServerSideCredential)))
         throw com_runtime_error(hr, __FUNCTION__ " Error creating <ServerSideCredential> element.");
 
     for (list<cert_context>::const_iterator i = m_trusted_root_ca.begin(), i_end = m_trusted_root_ca.end(); i != i_end; ++i) {
         // <CA>
         com_obj<IXMLDOMElement> pXmlElCA;
-        if (FAILED(hr = eapxml::create_element(pDoc, bstr(L"CA"), namespace_eapmetadata, &pXmlElCA)))
+        if (FAILED(hr = eapxml::create_element(pDoc, bstr(L"CA"), namespace_eapmetadata, pXmlElCA)))
             throw com_runtime_error(hr, __FUNCTION__ " Error creating <CA> element.");
 
         // <CA>/<format>
@@ -188,19 +188,19 @@ void eap::config_method_tls::load(_In_ IXMLDOMNode *pConfigRoot)
 
     // <ServerSideCredential>
     com_obj<IXMLDOMElement> pXmlElServerSideCredential;
-    if (SUCCEEDED(eapxml::select_element(pConfigRoot, bstr(L"eap-metadata:ServerSideCredential"), &pXmlElServerSideCredential))) {
+    if (SUCCEEDED(eapxml::select_element(pConfigRoot, bstr(L"eap-metadata:ServerSideCredential"), pXmlElServerSideCredential))) {
         std::wstring xpathServerSideCredential(xpath + L"/ServerSideCredential");
 
         // <CA>
         com_obj<IXMLDOMNodeList> pXmlListCAs;
         long lCACount = 0;
-        if (SUCCEEDED(eapxml::select_nodes(pXmlElServerSideCredential, bstr(L"eap-metadata:CA"), &pXmlListCAs)) && SUCCEEDED(pXmlListCAs->get_length(&lCACount))) {
+        if (SUCCEEDED(eapxml::select_nodes(pXmlElServerSideCredential, bstr(L"eap-metadata:CA"), pXmlListCAs)) && SUCCEEDED(pXmlListCAs->get_length(&lCACount))) {
             for (long j = 0; j < lCACount; j++) {
                 // Load CA certificate.
                 com_obj<IXMLDOMNode> pXmlElCA;
                 pXmlListCAs->get_item(j, &pXmlElCA);
                 bstr bstrFormat;
-                if (FAILED(eapxml::get_element_value(pXmlElCA, bstr(L"eap-metadata:format"), &bstrFormat))) {
+                if (FAILED(eapxml::get_element_value(pXmlElCA, bstr(L"eap-metadata:format"), bstrFormat))) {
                     // <format> not specified.
                     continue;
                 }
@@ -229,7 +229,7 @@ void eap::config_method_tls::load(_In_ IXMLDOMNode *pConfigRoot)
         // <ServerName>
         com_obj<IXMLDOMNodeList> pXmlListServerIDs;
         long lServerIDCount = 0;
-        if (SUCCEEDED(eapxml::select_nodes(pXmlElServerSideCredential, bstr(L"eap-metadata:ServerName"), &pXmlListServerIDs)) && SUCCEEDED(pXmlListServerIDs->get_length(&lServerIDCount))) {
+        if (SUCCEEDED(eapxml::select_nodes(pXmlElServerSideCredential, bstr(L"eap-metadata:ServerName"), pXmlListServerIDs)) && SUCCEEDED(pXmlListServerIDs->get_length(&lServerIDCount))) {
             for (long j = 0; j < lServerIDCount; j++) {
                 // Load server name (<ServerName>).
                 com_obj<IXMLDOMNode> pXmlElServerID;

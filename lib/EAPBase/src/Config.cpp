@@ -219,7 +219,7 @@ void eap::config_method_with_cred::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOM
 
     // <ClientSideCredential>
     winstd::com_obj<IXMLDOMElement> pXmlElClientSideCredential;
-    if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, winstd::bstr(L"eap-metadata:ClientSideCredential"), winstd::bstr(L"ClientSideCredential"), namespace_eapmetadata, &pXmlElClientSideCredential)))
+    if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, winstd::bstr(L"eap-metadata:ClientSideCredential"), winstd::bstr(L"ClientSideCredential"), namespace_eapmetadata, pXmlElClientSideCredential)))
         throw com_runtime_error(hr, __FUNCTION__ " Error creating <ClientSideCredential> element.");
 
     // <ClientSideCredential>/<allow-save>
@@ -241,11 +241,11 @@ void eap::config_method_with_cred::load(_In_ IXMLDOMNode *pConfigRoot)
 
     // <ClientSideCredential>
     winstd::com_obj<IXMLDOMElement> pXmlElClientSideCredential;
-    if (SUCCEEDED(eapxml::select_element(pConfigRoot, winstd::bstr(L"eap-metadata:ClientSideCredential"), &pXmlElClientSideCredential))) {
+    if (SUCCEEDED(eapxml::select_element(pConfigRoot, winstd::bstr(L"eap-metadata:ClientSideCredential"), pXmlElClientSideCredential))) {
         std::wstring xpath(eapxml::get_xpath(pXmlElClientSideCredential));
 
         // <allow-save>
-        eapxml::get_element_value(pXmlElClientSideCredential, winstd::bstr(L"eap-metadata:allow-save"), &m_allow_save);
+        eapxml::get_element_value(pXmlElClientSideCredential, winstd::bstr(L"eap-metadata:allow-save"), m_allow_save);
         m_module.log_config((xpath + L"/allow-save").c_str(), m_allow_save);
 
         try {
@@ -416,7 +416,7 @@ void eap::config_provider::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pC
 
     // <ProviderInfo>
     com_obj<IXMLDOMElement> pXmlElProviderInfo;
-    if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:ProviderInfo"), bstr(L"ProviderInfo"), namespace_eapmetadata, &pXmlElProviderInfo)))
+    if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:ProviderInfo"), bstr(L"ProviderInfo"), namespace_eapmetadata, pXmlElProviderInfo)))
         throw com_runtime_error(hr, __FUNCTION__ " Error creating <ProviderInfo> element.");
 
     // <ProviderInfo>/<DisplayName>
@@ -426,7 +426,7 @@ void eap::config_provider::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pC
 
     // <ProviderInfo>/<Helpdesk>
     com_obj<IXMLDOMElement> pXmlElHelpdesk;
-    if (FAILED(hr = eapxml::create_element(pDoc, pXmlElProviderInfo, bstr(L"eap-metadata:Helpdesk"), bstr(L"Helpdesk"), namespace_eapmetadata, &pXmlElHelpdesk)))
+    if (FAILED(hr = eapxml::create_element(pDoc, pXmlElProviderInfo, bstr(L"eap-metadata:Helpdesk"), bstr(L"Helpdesk"), namespace_eapmetadata, pXmlElHelpdesk)))
         throw com_runtime_error(hr, __FUNCTION__ " Error creating <Helpdesk> element.");
 
     // <ProviderInfo>/<Helpdesk>/<EmailAddress>
@@ -461,13 +461,13 @@ void eap::config_provider::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pC
 
     // <AuthenticationMethods>
     com_obj<IXMLDOMElement> pXmlElAuthenticationMethods;
-    if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:AuthenticationMethods"), bstr(L"AuthenticationMethods"), namespace_eapmetadata, &pXmlElAuthenticationMethods)))
+    if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:AuthenticationMethods"), bstr(L"AuthenticationMethods"), namespace_eapmetadata, pXmlElAuthenticationMethods)))
         throw com_runtime_error(hr, __FUNCTION__ " Error creating <AuthenticationMethods> element.");
 
     for (vector<unique_ptr<config_method> >::const_iterator method = m_methods.cbegin(), method_end = m_methods.cend(); method != method_end; ++method) {
         // <AuthenticationMethod>
         com_obj<IXMLDOMElement> pXmlElAuthenticationMethod;
-        if (FAILED(hr = eapxml::create_element(pDoc, bstr(L"AuthenticationMethod"), namespace_eapmetadata, &pXmlElAuthenticationMethod)))
+        if (FAILED(hr = eapxml::create_element(pDoc, bstr(L"AuthenticationMethod"), namespace_eapmetadata, pXmlElAuthenticationMethod)))
             throw com_runtime_error(hr, __FUNCTION__ " Error creating <AuthenticationMethod> element.");
 
         // <AuthenticationMethod>/...
@@ -498,7 +498,7 @@ void eap::config_provider::load(_In_ IXMLDOMNode *pConfigRoot)
     m_module.log_config((xpath + L" ID").c_str(), m_id.c_str());
 
     // <read-only>
-    if (FAILED(hr = eapxml::get_element_value(pConfigRoot, bstr(L"eap-metadata:read-only"), &m_read_only)))
+    if (FAILED(hr = eapxml::get_element_value(pConfigRoot, bstr(L"eap-metadata:read-only"), m_read_only)))
         m_read_only = true;
     m_module.log_config((xpath + L"/read-only").c_str(), m_read_only);
 
@@ -511,7 +511,7 @@ void eap::config_provider::load(_In_ IXMLDOMNode *pConfigRoot)
     m_lbl_alt_identity.clear();
     m_lbl_alt_password.clear();
     com_obj<IXMLDOMElement> pXmlElProviderInfo;
-    if (SUCCEEDED(eapxml::select_element(pConfigRoot, bstr(L"eap-metadata:ProviderInfo"), &pXmlElProviderInfo))) {
+    if (SUCCEEDED(eapxml::select_element(pConfigRoot, bstr(L"eap-metadata:ProviderInfo"), pXmlElProviderInfo))) {
         wstring lang;
         LoadString(m_module.m_instance, 2, lang);
         wstring xpathProviderInfo(xpath + L"/ProviderInfo");
@@ -521,7 +521,7 @@ void eap::config_provider::load(_In_ IXMLDOMNode *pConfigRoot)
         m_module.log_config((xpathProviderInfo + L"/DisplayName").c_str(), m_name.c_str());
 
         com_obj<IXMLDOMElement> pXmlElHelpdesk;
-        if (SUCCEEDED(eapxml::select_element(pXmlElProviderInfo, bstr(L"eap-metadata:Helpdesk"), &pXmlElHelpdesk))) {
+        if (SUCCEEDED(eapxml::select_element(pXmlElProviderInfo, bstr(L"eap-metadata:Helpdesk"), pXmlElHelpdesk))) {
             wstring xpathHelpdesk(xpathProviderInfo + L"/Helpdesk");
 
             // <Helpdesk>/<EmailAddress>
@@ -553,7 +553,7 @@ void eap::config_provider::load(_In_ IXMLDOMNode *pConfigRoot)
     // Iterate authentication methods (<AuthenticationMethods>).
     m_methods.clear();
     com_obj<IXMLDOMNodeList> pXmlListMethods;
-    if (FAILED(hr = eapxml::select_nodes(pConfigRoot, bstr(L"eap-metadata:AuthenticationMethods/eap-metadata:AuthenticationMethod"), &pXmlListMethods)))
+    if (FAILED(hr = eapxml::select_nodes(pConfigRoot, bstr(L"eap-metadata:AuthenticationMethods/eap-metadata:AuthenticationMethod"), pXmlListMethods)))
         throw com_runtime_error(hr, __FUNCTION__ " Error selecting <AuthenticationMethods>/<AuthenticationMethod> elements.");
     long lCount = 0;
     pXmlListMethods->get_length(&lCount);
@@ -565,7 +565,7 @@ void eap::config_provider::load(_In_ IXMLDOMNode *pConfigRoot)
 
         // Check EAP method type (<EAPMethod>).
         DWORD dwMethodID;
-        if (SUCCEEDED(eapxml::get_element_value(pXmlElMethod, bstr(L"eap-metadata:EAPMethod"), &dwMethodID))) {
+        if (SUCCEEDED(eapxml::get_element_value(pXmlElMethod, bstr(L"eap-metadata:EAPMethod"), dwMethodID))) {
             if ((eap_type_t)dwMethodID != cfg->get_method_id()) {
                 // Wrong type.
                 continue;
@@ -705,13 +705,13 @@ void eap::config_connection::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *
 
     // Create <EAPIdentityProviderList> node.
     com_obj<IXMLDOMElement> pXmlElIdentityProviderList;
-    if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:EAPIdentityProviderList"), bstr(L"EAPIdentityProviderList"), namespace_eapmetadata, &pXmlElIdentityProviderList)))
+    if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:EAPIdentityProviderList"), bstr(L"EAPIdentityProviderList"), namespace_eapmetadata, pXmlElIdentityProviderList)))
         throw com_runtime_error(hr, __FUNCTION__ " Error creating <EAPIdentityProviderList> element.");
 
     for (provider_list::const_iterator provider = m_providers.cbegin(), provider_end = m_providers.cend(); provider != provider_end; ++provider) {
         // <EAPIdentityProvider>
         com_obj<IXMLDOMElement> pXmlElIdentityProvider;
-        if (FAILED(hr = eapxml::create_element(pDoc, bstr(L"EAPIdentityProvider"), namespace_eapmetadata, &pXmlElIdentityProvider)))
+        if (FAILED(hr = eapxml::create_element(pDoc, bstr(L"EAPIdentityProvider"), namespace_eapmetadata, pXmlElIdentityProvider)))
             throw com_runtime_error(hr, __FUNCTION__ " Error creating <EAPIdentityProvider> element.");
 
         // <EAPIdentityProvider>/...
@@ -732,7 +732,7 @@ void eap::config_connection::load(_In_ IXMLDOMNode *pConfigRoot)
 
     // Iterate authentication providers (<EAPIdentityProvider>).
     com_obj<IXMLDOMNodeList> pXmlListProviders;
-    if (FAILED(hr = eapxml::select_nodes(pConfigRoot, bstr(L"eap-metadata:EAPIdentityProviderList/eap-metadata:EAPIdentityProvider"), &pXmlListProviders)))
+    if (FAILED(hr = eapxml::select_nodes(pConfigRoot, bstr(L"eap-metadata:EAPIdentityProviderList/eap-metadata:EAPIdentityProvider"), pXmlListProviders)))
         throw com_runtime_error(hr, __FUNCTION__ " Error selecting <EAPIdentityProviderList><EAPIdentityProvider> elements.");
     long lCount = 0;
     pXmlListProviders->get_length(&lCount);

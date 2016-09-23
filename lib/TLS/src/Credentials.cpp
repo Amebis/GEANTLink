@@ -99,7 +99,7 @@ void eap::credentials_tls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pC
 
     // <ClientCertificate>
     com_obj<IXMLDOMElement> pXmlElClientCertificate;
-    if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:ClientCertificate"), bstr(L"ClientCertificate"), namespace_eapmetadata, &pXmlElClientCertificate)))
+    if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:ClientCertificate"), bstr(L"ClientCertificate"), namespace_eapmetadata, pXmlElClientCertificate)))
         throw com_runtime_error(hr, __FUNCTION__ " Error creating <ClientCertificate> element.");
 
     if (m_cert) {
@@ -127,12 +127,12 @@ void eap::credentials_tls::load(_In_ IXMLDOMNode *pConfigRoot)
 
     // <ClientCertificate>
     com_obj<IXMLDOMElement> pXmlElClientCertificate;
-    if (FAILED(hr = eapxml::select_element(pConfigRoot, bstr(L"eap-metadata:ClientCertificate"), &pXmlElClientCertificate)))
+    if (FAILED(hr = eapxml::select_element(pConfigRoot, bstr(L"eap-metadata:ClientCertificate"), pXmlElClientCertificate)))
         throw com_runtime_error(hr, __FUNCTION__ " Error reading <ClientCertificate> element.");
 
     // <ClientCertificate>/<format>
     bstr bstrFormat;
-    if (SUCCEEDED(eapxml::get_element_value(pXmlElClientCertificate, bstr(L"eap-metadata:format"), &bstrFormat))) {
+    if (SUCCEEDED(eapxml::get_element_value(pXmlElClientCertificate, bstr(L"eap-metadata:format"), bstrFormat))) {
         if (CompareStringEx(LOCALE_NAME_INVARIANT, NORM_IGNORECASE, bstrFormat, bstrFormat.length(), L"PEM", -1, NULL, NULL, 0) == CSTR_EQUAL) {
             // <ClientCertificate>/<cert-data>
             vector<unsigned char> aData;

@@ -133,7 +133,7 @@ DWORD WINAPI EapPeerConfigXml2Blob(
         // <Config>
         pConfigDoc->setProperty(bstr(L"SelectionNamespaces"), variant(L"xmlns:eaphostconfig=\"http://www.microsoft.com/provisioning/EapHostConfig\""));
         com_obj<IXMLDOMElement> pXmlElConfig;
-        if (FAILED(eapxml::select_element(pConfigDoc, bstr(L"//eaphostconfig:Config"), &pXmlElConfig))) {
+        if (FAILED(eapxml::select_element(pConfigDoc, bstr(L"//eaphostconfig:Config"), pXmlElConfig))) {
             g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" Error reading <Config> element.")));
             return dwResult;
         }
@@ -215,7 +215,7 @@ DWORD WINAPI EapPeerConfigBlob2Xml(
         // Select <Config> node.
         com_obj<IXMLDOMNode> pXmlElConfig;
         pConfigDoc->setProperty(bstr(L"SelectionNamespaces"), variant(L"xmlns:eaphostconfig=\"http://www.microsoft.com/provisioning/EapHostConfig\""));
-        if (FAILED(eapxml::select_node(pConfigDoc, bstr(L"eaphostconfig:Config"), &pXmlElConfig))) {
+        if (FAILED(eapxml::select_node(pConfigDoc, bstr(L"eaphostconfig:Config"), pXmlElConfig))) {
             g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_NOT_FOUND, _T(__FUNCTION__) _T(" Error selecting <Config> element.")));
             return dwResult;
         }

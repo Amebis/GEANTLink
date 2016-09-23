@@ -244,7 +244,7 @@ void eap::credentials_pass::load(_In_ IXMLDOMNode *pConfigRoot)
     std::wstring xpath(eapxml::get_xpath(pConfigRoot));
 
     bstr pass;
-    if (FAILED(hr = eapxml::get_element_value(pConfigRoot, bstr(L"eap-metadata:Password"), &pass)))
+    if (FAILED(hr = eapxml::get_element_value(pConfigRoot, bstr(L"eap-metadata:Password"), pass)))
         throw com_runtime_error(hr, __FUNCTION__ " Error reading <Password> element.");
     m_password = pass;
     SecureZeroMemory((BSTR)pass, sizeof(OLECHAR)*pass.length());
@@ -542,7 +542,7 @@ void eap::credentials_connection::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMN
 
     // Create <EAPIdentityProvider> node.
     com_obj<IXMLDOMElement> pXmlElIdentityProvider;
-    if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:EAPIdentityProvider"), bstr(L"EAPIdentityProvider"), namespace_eapmetadata, &pXmlElIdentityProvider)))
+    if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:EAPIdentityProvider"), bstr(L"EAPIdentityProvider"), namespace_eapmetadata, pXmlElIdentityProvider)))
         throw com_runtime_error(hr, __FUNCTION__ " Error creating <EAPIdentityProvider> element.");
 
     // namespace
@@ -568,7 +568,7 @@ void eap::credentials_connection::load(_In_ IXMLDOMNode *pConfigRoot)
 
     // <EAPIdentityProvider>
     winstd::com_obj<IXMLDOMElement> pXmlElClientSideCredential;
-    if (FAILED(hr = eapxml::select_element(pConfigRoot, winstd::bstr(L"eap-metadata:EAPIdentityProvider"), &pXmlElClientSideCredential)))
+    if (FAILED(hr = eapxml::select_element(pConfigRoot, winstd::bstr(L"eap-metadata:EAPIdentityProvider"), pXmlElClientSideCredential)))
         throw com_runtime_error(hr, __FUNCTION__ " Error loading <EAPIdentityProvider> element.");
 
     std::wstring xpath(eapxml::get_xpath(pXmlElClientSideCredential));

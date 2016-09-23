@@ -37,6 +37,8 @@ namespace eap
 {
     class peer_ttls : public peer
     {
+        WINSTD_NONCOPYABLE(peer_ttls)
+
     public:
         ///
         /// Constructs a EAP TTLS peer module
