@@ -770,7 +770,7 @@ protected:
 
 private:
     bool m_has_storage;                     ///< Does the user has (some sort of) credentials stored in Credential Manager?
-    _Tcred m_cred_storage;                  ///< Temporary own credential data
+    _Tcred m_cred_storage;                  ///< Temporary stored credential data
     _Tcred m_cred_config;                   ///< Temporary config credential data
 };
 
@@ -791,7 +791,7 @@ public:
     /// \param[in]    cfg         Configuration data
     /// \param[inout] cred        Credentials data
     /// \param[in]    parent      Parent window
-    /// \param[in]    is_config   Is this panel used to pre-enter credentials? When \c true, the "Remember" checkbox is always selected and disabled.
+    /// \param[in]    is_config   Is this panel used to config credentials?
     ///
     wxEAPCredentialsPanel(const eap::config_provider &prov, const eap::config_method_with_cred &cfg, _Tcred &cred, wxWindow* parent, bool is_config = false) :
         m_prov(prov),
@@ -841,7 +841,7 @@ public:
     /// \param[in]    cfg        Configuration data
     /// \param[inout] cred       Credentials data
     /// \param[in]    parent     Parent window
-    /// \param[in]    is_config  Is this panel used to pre-enter credentials? When \c true, the "Remember" checkbox is always selected and disabled.
+    /// \param[in]    is_config  Is this panel used to config credentials?
     ///
     wxPasswordCredentialsPanel(const eap::config_provider &prov, const eap::config_method_with_cred &cfg, _Tcred &cred, wxWindow* parent, bool is_config = false) :
         wxEAPCredentialsPanel<_Tcred, _Tbase>(prov, cfg, cred, parent, is_config)

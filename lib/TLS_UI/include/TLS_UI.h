@@ -68,7 +68,7 @@ class wxTLSServerTrustPanel;
 ///
 /// TLS credentials configuration panel
 ///
-typedef wxEAPCredentialsConfigPanel<eap::credentials_tls, wxTLSCredentialsPanel> wxEAPCredentialsPromptTLSConfigPanel;
+typedef wxEAPCredentialsConfigPanel<eap::credentials_tls, wxTLSCredentialsPanel> wxTLSCredentialsConfigPanel;
 
 ///
 /// TLS configuration panel
@@ -258,7 +258,7 @@ public:
     /// \param[in]    cfg        Configuration data
     /// \param[inout] cred       Credentials data
     /// \param[in]    parent     Parent window
-    /// \param[in]    is_config  Is this panel used to pre-enter credentials? When \c true, the "Remember" checkbox is always selected and disabled.
+    /// \param[in]    is_config  Is this panel used to config credentials?
     ///
     wxTLSCredentialsPanel(const eap::config_provider &prov, const eap::config_method_with_cred &cfg, eap::credentials_tls &cred, wxWindow* parent, bool is_config = false);
 
@@ -330,8 +330,8 @@ protected:
     /// \endcond
 
 protected:
-    const eap::config_provider &m_prov;          ///< EAP provider
-    eap::config_method_tls &m_cfg;               ///< TLS configuration
-    wxTLSServerTrustPanel *m_server_trust;       ///< Server trust configuration panel
-    wxEAPCredentialsPromptTLSConfigPanel *m_credentials;  ///< Credentials configuration panel
+    const eap::config_provider &m_prov;         ///< EAP provider
+    eap::config_method_tls &m_cfg;              ///< TLS configuration
+    wxTLSServerTrustPanel *m_server_trust;      ///< Server trust configuration panel
+    wxTLSCredentialsConfigPanel *m_credentials; ///< Credentials configuration panel
 };

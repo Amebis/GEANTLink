@@ -384,7 +384,7 @@ void wxTLSCredentialsPanel::OnUpdateUI(wxUpdateUIEvent& /*event*/)
         m_certificate->Enable(false);
         m_identity   ->Enable(false);
     } else {
-        // Configuration mode or using own credentials. Enable controls.
+        // Configuration mode or using stored credentials. Enable controls.
         m_certificate->Enable(true);
         m_identity   ->Enable(true);
     }
@@ -563,7 +563,7 @@ wxTLSConfigPanel::wxTLSConfigPanel(const eap::config_provider &prov, eap::config
     m_server_trust = new wxTLSServerTrustPanel(prov, cfg, this);
     sb_content->Add(m_server_trust, 0, wxDOWN|wxEXPAND, 5);
 
-    m_credentials = new wxEAPCredentialsPromptTLSConfigPanel(prov, cfg, this);
+    m_credentials = new wxTLSCredentialsConfigPanel(prov, cfg, this);
     sb_content->Add(m_credentials, 0, wxUP|wxEXPAND, 5);
 
     this->SetSizer(sb_content);
