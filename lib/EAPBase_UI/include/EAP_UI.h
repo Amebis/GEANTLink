@@ -617,7 +617,7 @@ protected:
         if (!m_prov.m_read_only) {
             // This is not a provider-locked configuration. Save the data.
             m_cfg.m_use_cred = !m_storage->GetValue();
-            *m_cfg.m_cred    = m_cred_config;
+            *(_Tcred*)m_cfg.m_cred.get() = m_cred_config;
         }
 
         return true;
