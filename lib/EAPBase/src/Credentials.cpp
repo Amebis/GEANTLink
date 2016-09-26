@@ -106,7 +106,7 @@ void eap::credentials::load(_In_ IXMLDOMNode *pConfigRoot)
 
     config::load(pConfigRoot);
 
-    std::wstring xpath(eapxml::get_xpath(pConfigRoot));
+    wstring xpath(eapxml::get_xpath(pConfigRoot));
 
     if (FAILED(hr = eapxml::get_element_value(pConfigRoot, bstr(L"eap-metadata:UserName"), m_identity)))
         m_identity.clear();
@@ -225,12 +225,18 @@ void eap::credentials_pass::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *p
 
     HRESULT hr;
 
+    // Prepare cryptographics provider.
+    crypt_prov cp;
+    if (!cp.create(NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
+        throw win_runtime_error(__FUNCTION__ " CryptAcquireContext failed.");
+
     // <Password>
-    bstr pass(m_password);
-    hr = eapxml::put_element_value(pDoc, pConfigRoot, bstr(L"Password"), namespace_eapmetadata, pass);
-    SecureZeroMemory((BSTR)pass, sizeof(OLECHAR)*pass.length());
-    if (FAILED(hr))
+    vector<unsigned char> password_enc(std::move(m_module.encrypt_md5(cp, m_password)));
+    com_obj<IXMLDOMElement> pXmlElPassword;
+    if (FAILED(hr = eapxml::put_element_base64(pDoc, pConfigRoot, bstr(L"Password"), namespace_eapmetadata, password_enc.data(), password_enc.size(), std::addressof(pXmlElPassword))))
         throw com_runtime_error(hr, __FUNCTION__ " Error creating <Password> element.");
+
+    pXmlElPassword->setAttribute(bstr(L"encryption"), variant(_L(PRODUCT_NAME_STR)));
 }
 
 
@@ -241,13 +247,35 @@ void eap::credentials_pass::load(_In_ IXMLDOMNode *pConfigRoot)
 
     credentials::load(pConfigRoot);
 
-    std::wstring xpath(eapxml::get_xpath(pConfigRoot));
+    wstring xpath(eapxml::get_xpath(pConfigRoot));
 
-    bstr pass;
-    if (FAILED(hr = eapxml::get_element_value(pConfigRoot, bstr(L"eap-metadata:Password"), pass)))
+    // <Password>
+    bstr password, encryption;
+    com_obj<IXMLDOMElement> pXmlElPassword;
+    if (FAILED(hr = eapxml::get_element_value(pConfigRoot, bstr(L"eap-metadata:Password"), password, std::addressof(pXmlElPassword))))
         throw com_runtime_error(hr, __FUNCTION__ " Error reading <Password> element.");
-    m_password = pass;
-    SecureZeroMemory((BSTR)pass, sizeof(OLECHAR)*pass.length());
+
+    if (SUCCEEDED(eapxml::get_attrib_value(pXmlElPassword, bstr(L"encryption"), encryption)) &&
+        CompareStringEx(LOCALE_NAME_INVARIANT, NORM_IGNORECASE, encryption, encryption.length(), _L(PRODUCT_NAME_STR), -1, NULL, NULL, 0) == CSTR_EQUAL)
+    {
+        // Decrypt password.
+
+        // Decode Base64.
+        winstd::base64_dec dec;
+        bool is_last;
+        std::vector<unsigned char> password_enc;
+        dec.decode(password_enc, is_last, (BSTR)password, password.length());
+
+        // Prepare cryptographics provider.
+        crypt_prov cp;
+        if (!cp.create(NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
+            throw win_runtime_error(__FUNCTION__ " CryptAcquireContext failed.");
+
+        m_password = m_module.decrypt_str_md5<std::char_traits<wchar_t>, sanitizing_allocator<wchar_t> >(cp, password_enc.data(), password_enc.size());
+    } else {
+        m_password = password;
+        SecureZeroMemory((BSTR)password, sizeof(OLECHAR)*password.length());
+    }
 
     m_module.log_config((xpath + L"/Password").c_str(),
 #ifdef _DEBUG
@@ -567,11 +595,11 @@ void eap::credentials_connection::load(_In_ IXMLDOMNode *pConfigRoot)
     config::load(pConfigRoot);
 
     // <EAPIdentityProvider>
-    winstd::com_obj<IXMLDOMElement> pXmlElClientSideCredential;
-    if (FAILED(hr = eapxml::select_element(pConfigRoot, winstd::bstr(L"eap-metadata:EAPIdentityProvider"), pXmlElClientSideCredential)))
+    com_obj<IXMLDOMElement> pXmlElClientSideCredential;
+    if (FAILED(hr = eapxml::select_element(pConfigRoot, bstr(L"eap-metadata:EAPIdentityProvider"), pXmlElClientSideCredential)))
         throw com_runtime_error(hr, __FUNCTION__ " Error loading <EAPIdentityProvider> element.");
 
-    std::wstring xpath(eapxml::get_xpath(pXmlElClientSideCredential));
+    wstring xpath(eapxml::get_xpath(pXmlElClientSideCredential));
 
     // namespace
     m_namespace.clear();
