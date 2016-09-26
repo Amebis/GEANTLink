@@ -339,7 +339,9 @@ namespace eap
             if (!CryptDecrypt(key_aes, hHash, TRUE, 0, buf))
                 throw win_runtime_error(__FUNCTION__ " CryptDecrypt failed.");
 
-            return std::vector<_Ty, _Ax>(buf);
+            std::vector<_Ty, _Ax> buf_res;
+            buf_res.assign(buf.cbegin(), buf.cend());
+            return buf_res;
         }
 
 
@@ -429,7 +431,7 @@ namespace eap
         template<class _Elem, class _Traits, class _Ax>
         std::basic_string<_Elem, _Traits, _Ax> decrypt_str_md5(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size) const
         {
-            std::vector<_Elem, sanitizing_allocator<_Elem> > buf(std::move(decrypt_md5(hProv, data, size)));
+            std::vector<_Elem, sanitizing_allocator<_Elem> > buf(std::move(decrypt_md5<_Elem, sanitizing_allocator<_Elem> >(hProv, data, size)));
             return std::basic_string<_Elem, _Traits, _Ax>(buf.data(), buf.size());
         }
 
@@ -446,7 +448,7 @@ namespace eap
         template<class _Traits, class _Ax>
         std::basic_string<wchar_t, _Traits, _Ax> decrypt_str_md5(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size) const
         {
-            winstd::sanitizing_string buf(std::move(decrypt_str_md5(hProv, data, size)));
+            winstd::sanitizing_string buf(std::move(decrypt_str_md5<char, std::char_traits<char>, sanitizing_allocator<char> >(hProv, data, size)));
             std::basic_string<wchar_t, _Traits, _Ax> dec;
             MultiByteToWideChar(CP_UTF8, 0, buf.data(), (int)buf.size(), dec);
             return dec;
