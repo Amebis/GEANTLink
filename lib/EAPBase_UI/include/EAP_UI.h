@@ -199,6 +199,10 @@ public:
         this->SetIcon(wxIcon(wxICON(product.ico)));
 #endif
 
+        // Set banner title.
+        std::unique_ptr<eap::config_method> cfg_dummy(cfg.m_module.make_config_method());
+        m_banner->m_title->SetLabel(wxString::Format("%s %s", wxT(PRODUCT_NAME_STR), cfg_dummy->get_method_str()));
+
         for (eap::config_connection::provider_list::iterator provider = m_cfg.m_providers.begin(), provider_end = m_cfg.m_providers.end(); provider != provider_end; ++provider) {
             bool is_single = provider->m_methods.size() == 1;
             std::vector<std::unique_ptr<eap::config_method> >::size_type count = 0;

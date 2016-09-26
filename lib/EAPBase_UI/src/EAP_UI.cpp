@@ -27,7 +27,6 @@
 
 wxEAPBannerPanel::wxEAPBannerPanel(wxWindow* parent) : wxEAPBannerPanelBase(parent)
 {
-    m_title->SetLabelText(wxT(PRODUCT_NAME_STR));
 }
 
 
