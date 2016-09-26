@@ -383,10 +383,16 @@ wxPasswordCredentialsPanelBase::wxPasswordCredentialsPanelBase( wxWindow* parent
 	
 	this->SetSizer( m_sb_credentials );
 	this->Layout();
+	
+	// Connect Events
+	m_password->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( wxPasswordCredentialsPanelBase::OnPasswordText ), NULL, this );
 }
 
 wxPasswordCredentialsPanelBase::~wxPasswordCredentialsPanelBase()
 {
+	// Disconnect Events
+	m_password->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( wxPasswordCredentialsPanelBase::OnPasswordText ), NULL, this );
+	
 }
 
 wxEAPProviderContactInfoPanelBase::wxEAPProviderContactInfoPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )

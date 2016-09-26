@@ -844,6 +844,7 @@ public:
     /// \param[in]    is_config  Is this panel used to config credentials?
     ///
     wxPasswordCredentialsPanel(const eap::config_provider &prov, const eap::config_method_with_cred &cfg, _Tcred &cred, wxWindow* parent, bool is_config = false) :
+        m_password_set(false),
         wxEAPCredentialsPanel<_Tcred, _Tbase>(prov, cfg, cred, parent, is_config)
     {
         // Load and set icon.
@@ -879,7 +880,8 @@ protected:
     {
         m_identity->SetValue(m_cred.m_identity);
         m_identity->SetSelection(0, -1);
-        m_password->SetValue(m_cred.m_password.empty() ? wxEmptyString : s_dummy_password);
+        m_password->SetValue(m_cred.m_password.empty() ? wxEmptyString : wxT("dummypass"));
+        m_password_set = false;
 
         if (!m_is_config && m_cfg.m_use_cred) {
             // Credential prompt mode & Using configured credentials
@@ -898,23 +900,22 @@ protected:
             return false;
 
         m_cred.m_identity = m_identity->GetValue();
-        wxString pass = m_password->GetValue();
-        if (pass.compare(s_dummy_password) != 0) {
-            m_cred.m_password = pass;
-            pass.assign(pass.length(), wxT('*'));
-        }
+        if (m_password_set)
+            m_cred.m_password = m_password->GetValue();
 
         return true;
+    }
+
+    virtual void OnPasswordText(wxCommandEvent& /*event*/)
+    {
+        m_password_set = true;
     }
 
     /// \endcond
 
 private:
-    static const wxStringCharType *s_dummy_password;
+    bool m_password_set;
 };
-
-template <class _Tcred, class _Tbase>
-const wxStringCharType *wxPasswordCredentialsPanel<_Tcred, _Tbase>::s_dummy_password = wxT("dummypass");
 
 
 inline wxIcon wxLoadIconFromResource(HINSTANCE hinst, PCWSTR pszName, int cx, int cy)

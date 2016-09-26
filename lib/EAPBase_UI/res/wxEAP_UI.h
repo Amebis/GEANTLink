@@ -207,6 +207,10 @@ class wxPasswordCredentialsPanelBase : public wxEAPCredentialsPanelBase
 		wxTextCtrl* m_identity;
 		wxStaticText* m_password_label;
 		wxTextCtrl* m_password;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnPasswordText( wxCommandEvent& event ) { event.Skip(); }
+		
 	
 	public:
 		
