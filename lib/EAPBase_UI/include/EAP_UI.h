@@ -711,6 +711,7 @@ protected:
 
         if (CredDelete(m_cred_storage.target_name(m_prov.get_id().c_str(), m_cfg.m_level).c_str(), CRED_TYPE_GENERIC, 0)) {
             m_storage_identity->Clear();
+            m_cred_storage.clear();
             m_has_storage = false;
         } else
             wxLogError(_("Deleting credentials failed (error %u)."), GetLastError());
@@ -747,6 +748,7 @@ protected:
         } catch (winstd::win_runtime_error &err) {
             if (err.number() == ERROR_NOT_FOUND) {
                 m_storage_identity->Clear();
+                m_cred_storage.clear();
                 m_has_storage = false;
             } else {
                 m_storage_identity->SetValue(wxString::Format(_("<error %u>"), err.number()));
