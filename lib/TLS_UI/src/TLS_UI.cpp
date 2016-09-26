@@ -324,7 +324,7 @@ wxTLSCredentialsPanel::wxTLSCredentialsPanel(const eap::config_provider &prov, c
 bool wxTLSCredentialsPanel::TransferDataToWindow()
 {
     // Populate certificate list.
-    m_certificate->Append(_("<empty>"));
+    m_certificate->Append(_("<empty>"), (wxCertificateClientData*)NULL);
     bool is_found = false;
     winstd::cert_store store;
     if (store.create(CERT_STORE_PROV_SYSTEM, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, (HCRYPTPROV)NULL, CERT_SYSTEM_STORE_CURRENT_USER, _T("My"))) {
@@ -363,7 +363,12 @@ bool wxTLSCredentialsPanel::TransferDataToWindow()
 
 bool wxTLSCredentialsPanel::TransferDataFromWindow()
 {
-    const wxCertificateClientData *data = dynamic_cast<const wxCertificateClientData*>(m_certificate->GetClientObject(m_certificate->GetSelection()));
+    // Check if m_certificate control has selected item, and has client object data (at least one user certificate on the list). Then try to get the data from selected item.
+    int sel = m_certificate->GetSelection();
+    const wxCertificateClientData *data =
+        sel != wxNOT_FOUND && m_certificate->HasClientObjectData() ?
+            dynamic_cast<const wxCertificateClientData*>(m_certificate->GetClientObject(sel)) :
+            NULL;
     if (data)
         m_cred.m_cert.attach_duplicated(data->m_cert);
     else
