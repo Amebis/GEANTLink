@@ -677,6 +677,8 @@ protected:
 
     virtual void OnSetStorage(wxCommandEvent& /*event*/)
     {
+        m_timer_storage.Stop();
+
         // Read credentials from Credential Manager.
         RetrieveStorageCredentials();
 
@@ -698,16 +700,22 @@ protected:
                 RetrieveStorageCredentials();
             }
         }
+
+        m_timer_storage.Start(3000);
     }
 
 
     virtual void OnClearStorage(wxCommandEvent& /*event*/)
     {
+        m_timer_storage.Stop();
+
         if (CredDelete(m_cred_storage.target_name(m_prov.get_id().c_str(), m_cfg.m_level).c_str(), CRED_TYPE_GENERIC, 0)) {
             m_storage_identity->Clear();
             m_has_storage = false;
         } else
             wxLogError(_("Deleting credentials failed (error %u)."), GetLastError());
+
+        m_timer_storage.Start(3000);
     }
 
 
