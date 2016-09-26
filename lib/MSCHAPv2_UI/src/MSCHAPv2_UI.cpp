@@ -30,7 +30,7 @@ wxMSCHAPv2ConfigPanel::wxMSCHAPv2ConfigPanel(const eap::config_provider &prov, e
     wxBoxSizer* sb_content;
     sb_content = new wxBoxSizer( wxVERTICAL );
 
-    m_credentials = new wxMSCHAPv2CredentialsConfigPanel(prov, cfg, this);
+    m_credentials = new wxMSCHAPv2CredentialsConfigPanel(prov, cfg, this, _("MSCHAPv2 User ID and Password"));
     sb_content->Add(m_credentials, 0, wxEXPAND, 5);
 
     this->SetSizer(sb_content);

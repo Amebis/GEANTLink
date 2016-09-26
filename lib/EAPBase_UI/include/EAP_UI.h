@@ -566,7 +566,7 @@ public:
     /// \param[inout] cfg     Configuration data
     /// \param[in]    parent  Parent window
     ///
-    wxEAPCredentialsConfigPanel(const eap::config_provider &prov, eap::config_method_with_cred &cfg, wxWindow *parent) :
+    wxEAPCredentialsConfigPanel(const eap::config_provider &prov, eap::config_method_with_cred &cfg, wxWindow *parent, const wxString &method = wxEmptyString) :
         m_prov(prov),
         m_cfg(cfg),
         m_has_storage(false),
@@ -574,6 +574,8 @@ public:
         m_cred_config(cfg.m_module),
         wxEAPCredentialsConfigPanelBase(parent)
     {
+        m_sb_credentials->GetStaticBox()->SetLabel(method.empty() ? wxString::Format(_("%s User Credentials"), cfg.get_method_str()) : method);
+
         // Load and set icon.
         winstd::library lib_shell32;
         if (lib_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))

@@ -165,6 +165,7 @@ class wxEAPCredentialsConfigPanelBase : public wxPanel
 	private:
 	
 	protected:
+		wxStaticBoxSizer* m_sb_credentials;
 		wxStaticBitmap* m_credentials_icon;
 		wxStaticText* m_credentials_label;
 		wxRadioButton* m_storage;
