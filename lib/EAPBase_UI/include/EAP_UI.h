@@ -436,7 +436,7 @@ public:
     ///
     /// Constructs a notice pannel and set the title text
     ///
-    wxEAPCredentialWarningPanel(const eap::config_provider &prov, eap::config_method_with_cred::status status, wxWindow* parent);
+    wxEAPCredentialWarningPanel(const eap::config_provider &prov, eap::config_method_with_cred::status_t status, wxWindow* parent);
 };
 
 

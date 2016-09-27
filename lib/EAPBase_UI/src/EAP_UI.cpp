@@ -238,7 +238,7 @@ wxEAPProviderLockedPanel::wxEAPProviderLockedPanel(const eap::config_provider &p
 // wxEAPCredentialWarningPanel
 //////////////////////////////////////////////////////////////////////
 
-wxEAPCredentialWarningPanel::wxEAPCredentialWarningPanel(const eap::config_provider &prov, eap::config_method_with_cred::status status, wxWindow* parent) : wxEAPNotePanel(parent)
+wxEAPCredentialWarningPanel::wxEAPCredentialWarningPanel(const eap::config_provider &prov, eap::config_method_with_cred::status_t status, wxWindow* parent) : wxEAPNotePanel(parent)
 {
     // Load and set icon.
     winstd::library lib_shell32;
