@@ -265,6 +265,17 @@ namespace eap
     {
     public:
         ///
+        /// Password encryption method when loaded/saved to profile configuration XML
+        ///
+        enum enc_alg_t {
+            enc_alg_unknown = -1,   ///< Unknown encryption
+            enc_alg_none = 0,       ///< Unencrypted
+            enc_alg_geantlink,      ///< GÉANTLink module encryption
+            enc_alg_kph,            ///< KPH encryption
+        };
+
+    public:
+        ///
         /// Constructs credentials
         ///
         /// \param[in] mod  EAP module to use for global services
@@ -419,6 +430,7 @@ namespace eap
 
     public:
         winstd::sanitizing_wstring m_password;  ///< Password
+        enc_alg_t m_enc_alg;                    ///< Encryption algorithm used for XML password keeping
 
     private:
         /// \cond internal
@@ -554,4 +566,22 @@ namespace eap
         std::wstring m_id;                      ///< Provider ID
         std::unique_ptr<credentials> m_cred;    ///< Credentials
     };
+}
+
+
+inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const eap::credentials_pass::enc_alg_t &val)
+{
+    cursor << (unsigned char)val;
+}
+
+
+inline size_t pksizeof(_In_ const eap::credentials_pass::enc_alg_t &val)
+{
+    return pksizeof((unsigned char)val);
+}
+
+
+inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ eap::credentials_pass::enc_alg_t &val)
+{
+    cursor >> (unsigned char&)val;
 }

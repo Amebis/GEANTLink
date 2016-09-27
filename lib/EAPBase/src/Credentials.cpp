@@ -27,6 +27,17 @@ using namespace winstd;
 
 
 //////////////////////////////////////////////////////////////////////
+// Internal functions
+//////////////////////////////////////////////////////////////////////
+
+inline static unsigned char kph_gen_cyro_key(_In_ int keycode, _In_ size_t index);
+template<class _Elem, class _Traits, class _Ax> inline static basic_string<_Elem, _Traits, _Ax> kph_encode(_In_ unsigned char data);
+template<class _Elem> inline static unsigned char kph_decode(_In_ const _Elem str[2]);
+template<class _Elem, class _Traits, class _Ax> inline static basic_string<_Elem, _Traits, _Ax> kph_encrypt(_In_ HCRYPTPROV hProv, _In_z_ const char *src);
+template<class _Elem> inline static sanitizing_string kph_decrypt(_In_z_ const _Elem *src);
+
+
+//////////////////////////////////////////////////////////////////////
 // eap::credentials
 //////////////////////////////////////////////////////////////////////
 
@@ -156,21 +167,25 @@ tstring eap::credentials::get_name() const
 // eap::credentials_pass
 //////////////////////////////////////////////////////////////////////
 
-eap::credentials_pass::credentials_pass(_In_ module &mod) : credentials(mod)
+eap::credentials_pass::credentials_pass(_In_ module &mod) :
+    m_enc_alg(enc_alg_geantlink),
+    credentials(mod)
 {
 }
 
 
 eap::credentials_pass::credentials_pass(_In_ const credentials_pass &other) :
-    m_password(other.m_password),
-    credentials(other)
+    m_password (other.m_password),
+    m_enc_alg  (other.m_enc_alg ),
+    credentials(other           )
 {
 }
 
 
 eap::credentials_pass::credentials_pass(_Inout_ credentials_pass &&other) :
-    m_password(std::move(other.m_password)),
-    credentials(std::move(other))
+    m_password (std::move(other.m_password)),
+    m_enc_alg  (std::move(other.m_enc_alg )),
+    credentials(std::move(other           ))
 {
 }
 
@@ -178,8 +193,9 @@ eap::credentials_pass::credentials_pass(_Inout_ credentials_pass &&other) :
 eap::credentials_pass& eap::credentials_pass::operator=(_In_ const credentials_pass &other)
 {
     if (this != &other) {
-        (credentials&)*this = other;
+        (credentials&)*this = other           ;
         m_password          = other.m_password;
+        m_enc_alg           = other.m_enc_alg ;
     }
 
     return *this;
@@ -189,8 +205,9 @@ eap::credentials_pass& eap::credentials_pass::operator=(_In_ const credentials_p
 eap::credentials_pass& eap::credentials_pass::operator=(_Inout_ credentials_pass &&other)
 {
     if (this != &other) {
-        (credentials&)*this = std::move(other);
+        (credentials&)*this = std::move(other           );
         m_password          = std::move(other.m_password);
+        m_enc_alg           = std::move(other.m_enc_alg );
     }
 
     return *this;
@@ -231,12 +248,28 @@ void eap::credentials_pass::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *p
         throw win_runtime_error(__FUNCTION__ " CryptAcquireContext failed.");
 
     // <Password>
-    vector<unsigned char> password_enc(std::move(m_module.encrypt_md5(cp, m_password)));
-    com_obj<IXMLDOMElement> pXmlElPassword;
-    if (FAILED(hr = eapxml::put_element_base64(pDoc, pConfigRoot, bstr(L"Password"), namespace_eapmetadata, password_enc.data(), password_enc.size(), std::addressof(pXmlElPassword))))
-        throw com_runtime_error(hr, __FUNCTION__ " Error creating <Password> element.");
+    switch (m_enc_alg) {
+    case enc_alg_kph: {
+        sanitizing_string password_utf8;
+        WideCharToMultiByte(CP_UTF8, 0, m_password.c_str(), -1, password_utf8, NULL, NULL);
+        wstring password_enc(std::move(kph_encrypt<wchar_t, char_traits<wchar_t>, allocator<wchar_t> >(cp, password_utf8.c_str())));
+        com_obj<IXMLDOMElement> pXmlElPassword;
+        if (FAILED(hr = eapxml::put_element_value(pDoc, pConfigRoot, bstr(L"Password"), namespace_eapmetadata, bstr(password_enc), std::addressof(pXmlElPassword))))
+            throw com_runtime_error(hr, __FUNCTION__ " Error creating <Password> element.");
 
-    pXmlElPassword->setAttribute(bstr(L"encryption"), variant(_L(PRODUCT_NAME_STR)));
+        pXmlElPassword->setAttribute(bstr(L"encryption"), variant(_L("KPH")));
+        break;
+    }
+
+    default:
+        // Use default encryption method for all others (including unencrypted).
+        vector<unsigned char> password_enc(std::move(m_module.encrypt_md5(cp, m_password)));
+        com_obj<IXMLDOMElement> pXmlElPassword;
+        if (FAILED(hr = eapxml::put_element_base64(pDoc, pConfigRoot, bstr(L"Password"), namespace_eapmetadata, password_enc.data(), password_enc.size(), std::addressof(pXmlElPassword))))
+            throw com_runtime_error(hr, __FUNCTION__ " Error creating <Password> element.");
+
+        pXmlElPassword->setAttribute(bstr(L"encryption"), variant(_L(PRODUCT_NAME_STR)));
+    }
 }
 
 
@@ -255,15 +288,14 @@ void eap::credentials_pass::load(_In_ IXMLDOMNode *pConfigRoot)
     if (FAILED(hr = eapxml::get_element_value(pConfigRoot, bstr(L"eap-metadata:Password"), password, std::addressof(pXmlElPassword))))
         throw com_runtime_error(hr, __FUNCTION__ " Error reading <Password> element.");
 
-    if (SUCCEEDED(eapxml::get_attrib_value(pXmlElPassword, bstr(L"encryption"), encryption)) &&
-        CompareStringEx(LOCALE_NAME_INVARIANT, NORM_IGNORECASE, encryption, encryption.length(), _L(PRODUCT_NAME_STR), -1, NULL, NULL, 0) == CSTR_EQUAL)
-    {
-        // Decrypt password.
+    if (FAILED(eapxml::get_attrib_value(pXmlElPassword, bstr(L"encryption"), encryption)))
+        encryption = NULL;
 
+    if (encryption && CompareStringEx(LOCALE_NAME_INVARIANT, NORM_IGNORECASE, encryption, encryption.length(), _L(PRODUCT_NAME_STR), -1, NULL, NULL, 0) == CSTR_EQUAL) {
         // Decode Base64.
         winstd::base64_dec dec;
         bool is_last;
-        std::vector<unsigned char> password_enc;
+        vector<unsigned char> password_enc;
         dec.decode(password_enc, is_last, (BSTR)password, password.length());
 
         // Prepare cryptographics provider.
@@ -271,9 +303,19 @@ void eap::credentials_pass::load(_In_ IXMLDOMNode *pConfigRoot)
         if (!cp.create(NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
             throw win_runtime_error(__FUNCTION__ " CryptAcquireContext failed.");
 
-        m_password = m_module.decrypt_str_md5<std::char_traits<wchar_t>, sanitizing_allocator<wchar_t> >(cp, password_enc.data(), password_enc.size());
+        m_password = m_module.decrypt_str_md5<char_traits<wchar_t>, sanitizing_allocator<wchar_t> >(cp, password_enc.data(), password_enc.size());
+        m_enc_alg  = enc_alg_geantlink;
+    } else if (encryption && CompareStringEx(LOCALE_NAME_INVARIANT, NORM_IGNORECASE, encryption, encryption.length(), _L("KPH"), -1, NULL, NULL, 0) == CSTR_EQUAL) {
+        // Decrypt password.
+        sanitizing_string password_utf8(std::move(kph_decrypt<OLECHAR>(password)));
+        MultiByteToWideChar(CP_UTF8, 0, password_utf8.c_str(), -1, m_password);
+        m_enc_alg = enc_alg_kph;
+    } else if (encryption && encryption[0]) {
+        // Encryption is defined but unrecognized.
+        throw invalid_argument(string_printf(__FUNCTION__ " Unsupported <Password> encryption method (encryption: %ls).", (BSTR)encryption));
     } else {
         m_password = password;
+        m_enc_alg  = enc_alg_none;
         SecureZeroMemory((BSTR)password, sizeof(OLECHAR)*password.length());
     }
 
@@ -291,6 +333,7 @@ void eap::credentials_pass::operator<<(_Inout_ cursor_out &cursor) const
 {
     credentials::operator<<(cursor);
     cursor << m_password;
+    cursor << m_enc_alg ;
 }
 
 
@@ -298,7 +341,8 @@ size_t eap::credentials_pass::get_pk_size() const
 {
     return
         credentials::get_pk_size() +
-        pksizeof(m_password);
+        pksizeof(m_password) +
+        pksizeof(m_enc_alg );
 }
 
 
@@ -306,6 +350,7 @@ void eap::credentials_pass::operator>>(_Inout_ cursor_in &cursor)
 {
     credentials::operator>>(cursor);
     cursor >> m_password;
+    cursor >> m_enc_alg ;
 }
 
 
@@ -669,4 +714,118 @@ void eap::credentials_connection::operator>>(_Inout_ cursor_in &cursor)
         } else
             throw invalid_argument(string_printf(__FUNCTION__ " Credentials do not match to any provider within this connection configuration (provider: %ls).", get_id().c_str()).c_str());
     }
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// kph_gen_cyro_key
+//////////////////////////////////////////////////////////////////////
+
+inline static unsigned char kph_gen_cyro_key(_In_ int keycode, _In_ size_t index)
+{
+    // Initialize seed.
+    int seed = (keycode / 1000)* 100000;
+    keycode = seed * seed;
+
+    // Iterate seeding.
+    for (size_t i = 0; i <= index; i++) {
+        seed = (keycode / 1000)* 100000;
+        keycode = seed * seed;
+    }
+
+    return ((keycode >> 8) + (keycode & 0xff)) & 0xff;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// kph_encode
+//////////////////////////////////////////////////////////////////////
+
+template<class _Elem, class _Traits, class _Ax>
+inline static basic_string<_Elem, _Traits, _Ax> kph_encode(_In_ unsigned char data)
+{
+    // Encode one byte of data.
+    _Elem str[3] = {
+        'A' + (data >> 4       ),
+        'a' + (data      & 0x0f),
+    };
+    return str;
+} 
+
+
+//////////////////////////////////////////////////////////////////////
+// kph_decode
+//////////////////////////////////////////////////////////////////////
+
+template<class _Elem>
+inline static unsigned char kph_decode(_In_ const _Elem str[2])
+{
+    // Decode one byte of data.
+    return
+        (((unsigned char)str[0] - 'A') << 4) |
+        (((unsigned char)str[1] - 'a')     );
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// kph_encrypt
+//////////////////////////////////////////////////////////////////////
+
+template<class _Elem, class _Traits, class _Ax>
+inline static basic_string<_Elem, _Traits, _Ax> kph_encrypt(_In_ HCRYPTPROV hProv, _In_z_ const char *src)
+{
+    basic_string<_Elem, _Traits, _Ax> str;
+    unsigned short key[8];
+
+    // Generate the key.
+    if (!CryptGenRandom(hProv, sizeof(key), (BYTE*)key))
+        throw win_runtime_error(__FUNCTION__ " Error generating key.");
+
+    // Write the key.
+    for (int i = 0; i < 8; i++) {
+        str += kph_encode<_Elem, _Traits, _Ax>((key[i] >> 8) & 0xff);
+        str += kph_encode<_Elem, _Traits, _Ax>((key[i]     ) & 0xff);
+    }
+
+    // Encrypt source.
+    for (size_t k = 1; *src; k++, src++) {
+        unsigned char p = (unsigned char)*src;
+        for (int i = 0; i < 8; i++)
+            p ^= kph_gen_cyro_key(key[i], k);
+        str += kph_encode<_Elem, _Traits, _Ax>(p);
+    }
+
+    return str;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// kph_decrypt
+//////////////////////////////////////////////////////////////////////
+
+template<class _Elem>
+inline static sanitizing_string kph_decrypt(_In_z_ const _Elem *src)
+{
+    sanitizing_string str;
+    unsigned short key[8];
+
+    // Restore key.
+    for(int i = 0; i < 8; i++, src += 4) {
+        if (!src[0] || !src[1] || !src[2] || !src[3])
+            throw invalid_argument(__FUNCTION__ " Source is incomplete.");
+        key[i] =
+            ((unsigned short)kph_decode(src    ) << 8) |
+            ((unsigned short)kph_decode(src + 2)     );
+    }
+
+    for (size_t k = 1; *src; k++, src += 2) {
+        if (!src[0] || !src[1])
+            throw invalid_argument(__FUNCTION__ " Source is incomplete.");
+        unsigned char p = kph_decode(src);
+        for(int i = 0; i < 8; i++)
+            p ^= kph_gen_cyro_key(key[i], k);
+        str += (char)p;
+    }
+
+    return str;
 }
