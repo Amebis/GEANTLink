@@ -765,7 +765,7 @@ protected:
     {
         wxString identity(m_cred_storage.get_identity());
         m_storage_identity->SetValue(
-            !identity.empty()  ? identity :
+            !identity.empty() ? identity :
             m_cred_storage.empty() ? _("<empty>") : _("<blank ID>"));
     }
 
@@ -774,7 +774,7 @@ protected:
     {
         wxString identity(m_cred_config.get_identity());
         m_config_identity->SetValue(
-            !identity.empty()  ? identity :
+            !identity.empty() ? identity :
             m_cred_config.empty() ? _("<empty>") : _("<blank ID>"));
     }
 
