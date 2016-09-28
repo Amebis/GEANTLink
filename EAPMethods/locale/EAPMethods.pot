@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: EAPMethods\n"
-"POT-Creation-Date: 2016-09-27 20:15+0200\n"
+"POT-Creation-Date: 2016-09-28 13:27+0200\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
 "Last-Translator: Simon Rozman <simon.rozman@amebis.si>\n"
 "Language-Team: Amebis, d. o. o., Kamnik <info@amebis.si>\n"
@@ -14,10 +14,11 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-KeywordsList: _\n"
 "X-Poedit-SearchPath-0: lib/EAPBase_UI\n"
-"X-Poedit-SearchPath-1: lib/PAP_UI\n"
-"X-Poedit-SearchPath-2: lib/TLS_UI\n"
-"X-Poedit-SearchPath-3: lib/TTLS_UI\n"
-"X-Poedit-SearchPath-4: EAPMethods\n"
+"X-Poedit-SearchPath-1: lib/MSCHAPv2_UI\n"
+"X-Poedit-SearchPath-2: lib/PAP_UI\n"
+"X-Poedit-SearchPath-3: lib/TLS_UI\n"
+"X-Poedit-SearchPath-4: lib/TTLS_UI\n"
+"X-Poedit-SearchPath-5: EAPMethods\n"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:37
 msgid "+"
@@ -270,6 +271,10 @@ msgstr ""
 msgid "Please, make sure your credentials are correct, or try again later."
 msgstr ""
 
+#: lib/MSCHAPv2_UI/src/MSCHAPv2_UI.cpp:33
+msgid "MSCHAPv2 User ID and Password"
+msgstr ""
+
 #: lib/PAP_UI/src/PAP_UI.cpp:33
 msgid "PAP User ID and Password"
 msgstr ""
@@ -425,13 +430,13 @@ msgstr ""
 msgid "Custom outer identity to use"
 msgstr ""
 
-#: lib/TTLS_UI/src/Module.cpp:275 lib/TTLS_UI/src/Module.cpp:285
+#: lib/TTLS_UI/src/Module.cpp:274 lib/TTLS_UI/src/Module.cpp:284
 #: lib/EAPBase_UI/include/EAP_UI.h:696
 #, c-format
 msgid "Error writing credentials to Credential Manager: %hs (error %u)"
 msgstr ""
 
-#: lib/TTLS_UI/src/Module.cpp:277 lib/TTLS_UI/src/Module.cpp:287
+#: lib/TTLS_UI/src/Module.cpp:276 lib/TTLS_UI/src/Module.cpp:286
 #: lib/EAPBase_UI/include/EAP_UI.h:699
 msgid "Writing credentials failed."
 msgstr ""
