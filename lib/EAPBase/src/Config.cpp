@@ -150,8 +150,8 @@ eap::config_method& eap::config_method::operator=(_Inout_ config_method &&other)
 //////////////////////////////////////////////////////////////////////
 
 eap::config_method_with_cred::config_method_with_cred(_In_ module &mod, _In_ unsigned int level) :
-    m_allow_save(true),
-    m_use_cred(false),
+    m_allow_save (true),
+    m_use_cred   (false),
     m_last_status(status_success),
     config_method(mod, level)
 {
@@ -159,12 +159,12 @@ eap::config_method_with_cred::config_method_with_cred(_In_ module &mod, _In_ uns
 
 
 eap::config_method_with_cred::config_method_with_cred(_In_ const config_method_with_cred &other) :
-    m_allow_save   (other.m_allow_save                                          ),
-    m_use_cred     (other.m_use_cred                                            ),
-    m_cred         (other.m_cred ? (credentials*)other.m_cred->clone() : nullptr),
-    m_last_status  (other.m_last_status                                         ),
-    m_last_msg     (other.m_last_msg                                            ),
-    config_method  (other                                                       )
+    m_allow_save (other.m_allow_save                                          ),
+    m_use_cred   (other.m_use_cred                                            ),
+    m_cred       (other.m_cred ? (credentials*)other.m_cred->clone() : nullptr),
+    m_last_status(other.m_last_status                                         ),
+    m_last_msg   (other.m_last_msg                                            ),
+    config_method(other                                                       )
 {
 }
 
