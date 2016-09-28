@@ -686,7 +686,7 @@ protected:
         wxEAPCredentialsDialog dlg(m_prov, this);
         _wxT *panel = new _wxT(m_prov, m_cfg, m_cred_storage, &dlg, true);
         dlg.AddContent(panel);
-        if (dlg.ShowModal() == wxID_OK && panel->GetRemember()) {
+        if (dlg.ShowModal() == wxID_OK) {
             // Write credentials to credential manager.
             try {
                 m_cred_storage.store(m_prov.get_id().c_str(), m_cfg.m_level);
