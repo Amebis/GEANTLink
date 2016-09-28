@@ -381,19 +381,19 @@ const eap::config_method_ttls* eap::peer_ttls::combine_credentials(
         credentials_ttls *cred = (credentials_ttls*)cfg_method->make_credentials();
         cred_out.m_cred.reset(cred);
 #ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
-        bool is_own = cred_in.m_cred && cred_in.match(*cfg_prov);
+        bool has_cached = cred_in.m_cred && cred_in.match(*cfg_prov);
 #endif
 
         // Combine outer credentials.
         LPCTSTR _target_name = (dwFlags & EAP_FLAG_GUEST_ACCESS) == 0 ? target_name.c_str() : NULL;
         eap::credentials::source_t src_outer = cred->credentials_tls::combine(
 #ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
-            is_own ? cred_in.m_cred.get() : NULL,
+            has_cached ? cred_in.m_cred.get() : NULL,
 #else
             NULL,
 #endif
             *cfg_method,
-            _target_name);
+            cfg_method->m_allow_save ? _target_name : NULL);
         if (src_outer == eap::credentials::source_unknown) {
             log_event(&EAPMETHOD_TRACE_EVT_CRED_UNKNOWN3, event_data(target_name), event_data((unsigned int)eap_type_tls), event_data::blank);
             continue;
@@ -402,12 +402,12 @@ const eap::config_method_ttls* eap::peer_ttls::combine_credentials(
         // Combine inner credentials.
         eap::credentials::source_t src_inner = cred->m_inner->combine(
 #ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
-            is_own ? ((credentials_ttls*)cred_in.m_cred.get())->m_inner.get() : NULL,
+            has_cached ? ((credentials_ttls*)cred_in.m_cred.get())->m_inner.get() : NULL,
 #else
             NULL,
 #endif
             *cfg_method->m_inner,
-            _target_name);
+            cfg_method->m_inner->m_allow_save ? _target_name : NULL);
         if (src_inner == eap::credentials::source_unknown) {
             log_event(&EAPMETHOD_TRACE_EVT_CRED_UNKNOWN3, event_data(target_name), event_data((unsigned int)cfg_method->m_inner->get_method_id()), event_data::blank);
             continue;
