@@ -205,6 +205,12 @@ void eap::peer_ttls_ui::invoke_identity_ui(
                 bool has_cached = cred_in.m_cred && cred_in.match(*cfg_prov);
 #endif
 
+                if (dwFlags & EAP_FLAG_GUEST_ACCESS) {
+                    // Disable credential saving for guests.
+                    cfg_method->         m_allow_save = false;
+                    cfg_method->m_inner->m_allow_save = false;
+                }
+
                 // Combine outer credentials.
                 eap::credentials::source_t src_outer = _cred_method->credentials_tls::combine(
 #ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
@@ -213,7 +219,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
                     NULL,
 #endif
                     *cfg_method,
-                    _target_name);
+                    cfg_method->m_allow_save ? target_name.c_str() : NULL);
 
                 // Combine inner credentials.
                 eap::credentials::source_t src_inner = _cred_method->m_inner->combine(
@@ -223,13 +229,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
                     NULL,
 #endif
                     *cfg_method->m_inner,
-                    _target_name);
-
-                if (dwFlags & EAP_FLAG_GUEST_ACCESS) {
-                    // Disable credential saving for guests.
-                    cfg_method->m_allow_save = false;
-                    cfg_method->m_inner->m_allow_save = false;
-                }
+                    cfg_method->m_inner->m_allow_save ? target_name.c_str() : NULL);
 
                 // Create method credentials panel.
                 wxTTLSCredentialsPanel *panel = new wxTTLSCredentialsPanel(*cfg_prov, *cfg_method, *_cred_method, dlg.m_providers);
