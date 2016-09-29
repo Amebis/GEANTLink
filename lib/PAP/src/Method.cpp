@@ -98,7 +98,7 @@ void eap::method_pap::process_request_packet(
         append_avp(2, diameter_avp_flag_mandatory, password_utf8.data(), (unsigned int)password_utf8.size());
 
         m_phase = phase_finished;
-        m_cfg.m_last_status = config_method_with_cred::status_cred_invalid; // Blame credentials if we fail beyond this point.
+        m_cfg.m_last_status = config_method::status_cred_invalid; // Blame credentials if we fail beyond this point.
         break;
     }
 

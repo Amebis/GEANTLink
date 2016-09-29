@@ -129,7 +129,7 @@ void eap::method_mschapv2::process_request_packet(
         append_avp(25, 311, diameter_avp_flag_mandatory,                 response.data()     , (unsigned int)response.size()           );
 
         m_phase = phase_challenge_server;
-        m_cfg.m_last_status = config_method_with_cred::status_cred_invalid; // Blame credentials if we fail beyond this point.
+        m_cfg.m_last_status = config_method::status_cred_invalid; // Blame credentials if we fail beyond this point.
         break;
     }
 
@@ -236,12 +236,12 @@ void eap::method_mschapv2::process_error(_In_ const list<string> &argv)
             DWORD dwResult = strtoul(val.data() + 2, NULL, 10);
             m_module.log_event(&EAPMETHOD_METHOD_FAILURE_ERROR, event_data((unsigned int)eap_type_legacy_mschapv2), event_data(dwResult), event_data::blank);
             switch (dwResult) {
-            case ERROR_ACCT_DISABLED         : m_cfg.m_last_status = config_method_with_cred::status_account_disabled   ; break;
-            case ERROR_RESTRICTED_LOGON_HOURS: m_cfg.m_last_status = config_method_with_cred::status_account_logon_hours; break;
-            case ERROR_NO_DIALIN_PERMISSION  : m_cfg.m_last_status = config_method_with_cred::status_account_denied     ; break;
-            case ERROR_PASSWD_EXPIRED        : m_cfg.m_last_status = config_method_with_cred::status_cred_expired       ; break;
-            case ERROR_CHANGING_PASSWORD     : m_cfg.m_last_status = config_method_with_cred::status_cred_changing      ; break;
-            default                          : m_cfg.m_last_status = config_method_with_cred::status_cred_invalid       ;
+            case ERROR_ACCT_DISABLED         : m_cfg.m_last_status = config_method::status_account_disabled   ; break;
+            case ERROR_RESTRICTED_LOGON_HOURS: m_cfg.m_last_status = config_method::status_account_logon_hours; break;
+            case ERROR_NO_DIALIN_PERMISSION  : m_cfg.m_last_status = config_method::status_account_denied     ; break;
+            case ERROR_PASSWD_EXPIRED        : m_cfg.m_last_status = config_method::status_cred_expired       ; break;
+            case ERROR_CHANGING_PASSWORD     : m_cfg.m_last_status = config_method::status_cred_changing      ; break;
+            default                          : m_cfg.m_last_status = config_method::status_cred_invalid       ;
             }
         } else if ((val[0] == 'C' || val[0] == 'c') && val[1] == '=') {
             hex_dec dec;

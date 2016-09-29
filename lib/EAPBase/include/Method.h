@@ -61,7 +61,7 @@ namespace eap
         /// \param[in] cfg   Method configuration
         /// \param[in] cred  User credentials
         ///
-        method(_In_ module &module, _In_ config_method_with_cred &cfg, _In_ credentials &cred);
+        method(_In_ module &module, _In_ config_method &cfg, _In_ credentials &cred);
 
         ///
         /// Moves an EAP method
@@ -132,7 +132,7 @@ namespace eap
 
     public:
         module &m_module;                           ///< EAP module
-        config_method_with_cred &m_cfg;             ///< Connection configuration
+        config_method &m_cfg;                       ///< Connection configuration
         credentials &m_cred;                        ///< User credentials
         std::vector<winstd::eap_attr> m_eap_attr;   ///< EAP attributes
     };
@@ -150,7 +150,7 @@ namespace eap
         /// \param[in] cfg   Method configuration
         /// \param[in] cred  User credentials
         ///
-        method_noneap(_In_ module &module, _In_ config_method_with_cred &cfg, _In_ credentials &cred);
+        method_noneap(_In_ module &module, _In_ config_method &cfg, _In_ credentials &cred);
 
         ///
         /// Moves an EAP method

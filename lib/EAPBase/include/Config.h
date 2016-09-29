@@ -203,6 +203,25 @@ namespace eap
     {
     public:
         ///
+        /// Authentication attempt status
+        ///
+        enum status_t {
+            status_success = 0,                             ///< Authentication succeeded
+            status_auth_failed,                             ///< Authentication failed
+            status_cred_invalid,                            ///< Invalid credentials
+            status_cred_expired,                            ///< Credentials expired
+            status_cred_changing,                           ///< Credentials are being changed
+            status_account_disabled,                        ///< Account is disabled
+            status_account_logon_hours,                     ///< Restricted account logon hours
+            status_account_denied,                          ///< Account access is denied
+
+            // Meta statuses
+            status_cred_begin = status_cred_invalid,        ///< First credential related problem
+            status_cred_end   = status_cred_changing + 1,   ///< First problem, that is not credential related any more
+        };
+
+    public:
+        ///
         /// Constructs configuration
         ///
         /// \param[in] mod    EAP module to use for global services
@@ -242,6 +261,52 @@ namespace eap
         ///
         config_method& operator=(_Inout_ config_method &&other);
 
+        /// \name XML configuration management
+        /// @{
+
+        ///
+        /// Save to XML document
+        ///
+        /// \param[in]  pDoc         XML document
+        /// \param[in]  pConfigRoot  Suggested root element for saving
+        ///
+        virtual void save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot) const;
+
+        ///
+        /// Load from XML document
+        ///
+        /// \param[in]  pConfigRoot  Root element for loading
+        ///
+        virtual void load(_In_ IXMLDOMNode *pConfigRoot);
+
+        /// @}
+
+        /// \name BLOB management
+        /// @{
+
+        ///
+        /// Packs a configuration
+        ///
+        /// \param[inout] cursor  Memory cursor
+        ///
+        virtual void operator<<(_Inout_ cursor_out &cursor) const;
+
+        ///
+        /// Returns packed size of a configuration
+        ///
+        /// \returns Size of data when packed (in bytes)
+        ///
+        virtual size_t get_pk_size() const;
+
+        ///
+        /// Unpacks a configuration
+        ///
+        /// \param[inout] cursor  Memory cursor
+        ///
+        virtual void operator>>(_Inout_ cursor_in &cursor);
+
+        /// @}
+
         ///
         /// Returns EAP method type of this configuration
         ///
@@ -256,6 +321,9 @@ namespace eap
 
     public:
         const unsigned int m_level; ///< Config level (0=outer, 1=inner, 2=inner-inner...)
+        bool m_allow_save;          ///< Are credentials allowed to be saved to Windows Credential Manager?
+        status_t m_last_status;     ///< Status of authentication the last time
+        std::wstring m_last_msg;    ///< Server message at the last authentication
     };
 
 
@@ -264,25 +332,6 @@ namespace eap
 
     class config_method_with_cred : public config_method
     {
-    public:
-        ///
-        /// Authentication attempt status
-        ///
-        enum status_t {
-            status_success = 0,                             ///< Authentication succeeded
-            status_auth_failed,                             ///< Authentication failed
-            status_cred_invalid,                            ///< Invalid credentials
-            status_cred_expired,                            ///< Credentials expired
-            status_cred_changing,                           ///< Credentials are being changed
-            status_account_disabled,                        ///< Account is disabled
-            status_account_logon_hours,                     ///< Restricted account logon hours
-            status_account_denied,                          ///< Account access is denied
-
-            // Meta statuses
-            status_cred_begin = status_cred_invalid,        ///< First credential related problem
-            status_cred_end   = status_cred_changing + 1,   ///< First problem, that is not credential related any more
-        };
-
     public:
         ///
         /// Constructs configuration
@@ -376,11 +425,8 @@ namespace eap
         virtual credentials* make_credentials() const = 0;
 
     public:
-        bool m_allow_save;                                  ///< Are credentials allowed to be saved to Windows Credential Manager?
-        bool m_use_cred;                                    ///< Use configured credentials
-        std::unique_ptr<credentials> m_cred;                ///< Configured credentials
-        status_t m_last_status;                             ///< Status of authentication the last time
-        std::wstring m_last_msg;                            ///< Server message at the last authentication
+        bool m_use_cred;                        ///< Use configured credentials
+        std::unique_ptr<credentials> m_cred;    ///< Configured credentials
     };
 
 
@@ -631,19 +677,19 @@ inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ eap::config &val)
 }
 
 
-inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const eap::config_method_with_cred::status_t &val)
+inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const eap::config_method::status_t &val)
 {
     cursor << (unsigned char)val;
 }
 
 
-inline size_t pksizeof(_In_ const eap::config_method_with_cred::status_t &val)
+inline size_t pksizeof(_In_ const eap::config_method::status_t &val)
 {
     return pksizeof((unsigned char)val);
 }
 
 
-inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ eap::config_method_with_cred::status_t &val)
+inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ eap::config_method::status_t &val)
 {
     cursor >> (unsigned char&)val;
 }

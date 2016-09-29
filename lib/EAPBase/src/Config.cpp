@@ -103,22 +103,30 @@ const bstr eap::config::namespace_eapmetadata(L"urn:ietf:params:xml:ns:yang:ietf
 //////////////////////////////////////////////////////////////////////
 
 eap::config_method::config_method(_In_ module &mod, _In_ unsigned int level) :
-    m_level(level),
-    config(mod)
+    m_level      (level),
+    m_allow_save (true),
+    m_last_status(status_success),
+    config       (mod)
 {
 }
 
 
 eap::config_method::config_method(_In_ const config_method &other) :
-    m_level(other.m_level),
-    config(other)
+    m_level      (other.m_level      ),
+    m_allow_save (other.m_allow_save ),
+    m_last_status(other.m_last_status),
+    m_last_msg   (other.m_last_msg   ),
+    config       (other              )
 {
 }
 
 
 eap::config_method::config_method(_Inout_ config_method &&other) :
-    m_level(other.m_level),
-    config(std::move(other))
+    m_level      (std::move(other.m_level      )),
+    m_allow_save (std::move(other.m_allow_save )),
+    m_last_status(std::move(other.m_last_status)),
+    m_last_msg   (std::move(other.m_last_msg   )),
+    config       (std::move(other              ))
 {
 }
 
@@ -128,6 +136,9 @@ eap::config_method& eap::config_method::operator=(_In_ const config_method &othe
     if (this != &other) {
         assert(m_level == other.m_level); // Allow copy within same configuration level only.
         (config&)*this = other;
+        m_allow_save   = other.m_allow_save;
+        m_last_status  = other.m_last_status;
+        m_last_msg     = other.m_last_msg;
     }
 
     return *this;
@@ -138,82 +149,22 @@ eap::config_method& eap::config_method::operator=(_Inout_ config_method &&other)
 {
     if (this != &other) {
         assert(m_level == other.m_level); // Allow move within same configuration level only.
-        (config&&)*this = std::move(other);
+        (config&&)*this = std::move(other              );
+        m_allow_save    = std::move(other.m_allow_save );
+        m_last_status   = std::move(other.m_last_status);
+        m_last_msg      = std::move(other.m_last_msg   );
     }
 
     return *this;
 }
 
 
-//////////////////////////////////////////////////////////////////////
-// eap::config_method_with_cred
-//////////////////////////////////////////////////////////////////////
-
-eap::config_method_with_cred::config_method_with_cred(_In_ module &mod, _In_ unsigned int level) :
-    m_allow_save (true),
-    m_use_cred   (false),
-    m_last_status(status_success),
-    config_method(mod, level)
-{
-}
-
-
-eap::config_method_with_cred::config_method_with_cred(_In_ const config_method_with_cred &other) :
-    m_allow_save (other.m_allow_save                                          ),
-    m_use_cred   (other.m_use_cred                                            ),
-    m_cred       (other.m_cred ? (credentials*)other.m_cred->clone() : nullptr),
-    m_last_status(other.m_last_status                                         ),
-    m_last_msg   (other.m_last_msg                                            ),
-    config_method(other                                                       )
-{
-}
-
-
-eap::config_method_with_cred::config_method_with_cred(_Inout_ config_method_with_cred &&other) :
-    m_allow_save (std::move(other.m_allow_save )),
-    m_use_cred   (std::move(other.m_use_cred   )),
-    m_cred       (std::move(other.m_cred       )),
-    m_last_status(std::move(other.m_last_status)),
-    m_last_msg   (std::move(other.m_last_msg   )),
-    config_method(std::move(other              ))
-{
-}
-
-
-eap::config_method_with_cred& eap::config_method_with_cred::operator=(_In_ const config_method_with_cred &other)
-{
-    if (this != &other) {
-        (config_method&)*this = other;
-        m_allow_save          = other.m_allow_save;
-        m_use_cred            = other.m_use_cred;
-        m_cred.reset(other.m_cred ? (credentials*)other.m_cred->clone() : nullptr);
-        m_last_status         = other.m_last_status;
-        m_last_msg            = other.m_last_msg;
-    }
-
-    return *this;
-}
-
-
-eap::config_method_with_cred& eap::config_method_with_cred::operator=(_Inout_ config_method_with_cred &&other)
-{
-    if (this != &other) {
-        (config_method&)*this = std::move(other              );
-        m_allow_save          = std::move(other.m_allow_save );
-        m_use_cred            = std::move(other.m_use_cred   );
-        m_cred                = std::move(other.m_cred       );
-        m_last_status         = std::move(other.m_last_status);
-        m_last_msg            = std::move(other.m_last_msg   );
-    }
-
-    return *this;
-}
-
-
-void eap::config_method_with_cred::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot) const
+void eap::config_method::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot) const
 {
     assert(pDoc);
     assert(pConfigRoot);
+
+    config::save(pDoc, pConfigRoot);
 
     HRESULT hr;
 
@@ -225,19 +176,16 @@ void eap::config_method_with_cred::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOM
     // <ClientSideCredential>/<allow-save>
     if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElClientSideCredential, winstd::bstr(L"allow-save"), namespace_eapmetadata, m_allow_save)))
         throw com_runtime_error(hr, __FUNCTION__ " Error creating <allow-save> element.");
-
-    if (m_use_cred)
-        m_cred->save(pDoc, pXmlElClientSideCredential);
 }
 
 
-void eap::config_method_with_cred::load(_In_ IXMLDOMNode *pConfigRoot)
+void eap::config_method::load(_In_ IXMLDOMNode *pConfigRoot)
 {
     assert(pConfigRoot);
 
+    config::load(pConfigRoot);
+
     m_allow_save = true;
-    m_use_cred   = false;
-    m_cred->clear();
 
     // <ClientSideCredential>
     winstd::com_obj<IXMLDOMElement> pXmlElClientSideCredential;
@@ -247,6 +195,125 @@ void eap::config_method_with_cred::load(_In_ IXMLDOMNode *pConfigRoot)
         // <allow-save>
         eapxml::get_element_value(pXmlElClientSideCredential, winstd::bstr(L"eap-metadata:allow-save"), m_allow_save);
         m_module.log_config((xpath + L"/allow-save").c_str(), m_allow_save);
+    }
+
+    m_last_status = status_success;
+    m_last_msg.clear();
+}
+
+
+void eap::config_method::operator<<(_Inout_ cursor_out &cursor) const
+{
+    config::operator<<(cursor);
+    cursor << m_allow_save;
+    cursor << m_last_status;
+    cursor << m_last_msg;
+}
+
+
+size_t eap::config_method::get_pk_size() const
+{
+    return
+        config::get_pk_size() +
+        pksizeof(m_allow_save ) +
+        pksizeof(m_last_status) +
+        pksizeof(m_last_msg   );
+}
+
+
+void eap::config_method::operator>>(_Inout_ cursor_in &cursor)
+{
+    config::operator>>(cursor);
+    cursor >> m_allow_save;
+    cursor >> m_last_status;
+    cursor >> m_last_msg;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// eap::config_method_with_cred
+//////////////////////////////////////////////////////////////////////
+
+eap::config_method_with_cred::config_method_with_cred(_In_ module &mod, _In_ unsigned int level) :
+    m_use_cred   (false),
+    config_method(mod, level)
+{
+}
+
+
+eap::config_method_with_cred::config_method_with_cred(_In_ const config_method_with_cred &other) :
+    m_use_cred   (other.m_use_cred                                            ),
+    m_cred       (other.m_cred ? (credentials*)other.m_cred->clone() : nullptr),
+    config_method(other                                                       )
+{
+}
+
+
+eap::config_method_with_cred::config_method_with_cred(_Inout_ config_method_with_cred &&other) :
+    m_use_cred   (std::move(other.m_use_cred)),
+    m_cred       (std::move(other.m_cred    )),
+    config_method(std::move(other           ))
+{
+}
+
+
+eap::config_method_with_cred& eap::config_method_with_cred::operator=(_In_ const config_method_with_cred &other)
+{
+    if (this != &other) {
+        (config_method&)*this = other;
+        m_use_cred            = other.m_use_cred;
+        m_cred.reset(other.m_cred ? (credentials*)other.m_cred->clone() : nullptr);
+    }
+
+    return *this;
+}
+
+
+eap::config_method_with_cred& eap::config_method_with_cred::operator=(_Inout_ config_method_with_cred &&other)
+{
+    if (this != &other) {
+        (config_method&)*this = std::move(other           );
+        m_use_cred            = std::move(other.m_use_cred);
+        m_cred                = std::move(other.m_cred    );
+    }
+
+    return *this;
+}
+
+
+void eap::config_method_with_cred::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot) const
+{
+    assert(pDoc);
+    assert(pConfigRoot);
+
+    config_method::save(pDoc, pConfigRoot);
+
+    HRESULT hr;
+
+    if (m_use_cred) {
+        // <ClientSideCredential>
+        winstd::com_obj<IXMLDOMElement> pXmlElClientSideCredential;
+        if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, winstd::bstr(L"eap-metadata:ClientSideCredential"), winstd::bstr(L"ClientSideCredential"), namespace_eapmetadata, pXmlElClientSideCredential)))
+            throw com_runtime_error(hr, __FUNCTION__ " Error creating <ClientSideCredential> element.");
+
+        m_cred->save(pDoc, pXmlElClientSideCredential);
+    }
+}
+
+
+void eap::config_method_with_cred::load(_In_ IXMLDOMNode *pConfigRoot)
+{
+    assert(pConfigRoot);
+
+    config_method::load(pConfigRoot);
+
+    m_use_cred   = false;
+    m_cred->clear();
+
+    // <ClientSideCredential>
+    winstd::com_obj<IXMLDOMElement> pXmlElClientSideCredential;
+    if (SUCCEEDED(eapxml::select_element(pConfigRoot, winstd::bstr(L"eap-metadata:ClientSideCredential"), pXmlElClientSideCredential))) {
+        std::wstring xpath(eapxml::get_xpath(pXmlElClientSideCredential));
 
         try {
             m_cred->load(pXmlElClientSideCredential);
@@ -255,20 +322,14 @@ void eap::config_method_with_cred::load(_In_ IXMLDOMNode *pConfigRoot)
             // This is not really an error - merely an indication configured credentials are unavailable.
         }
     }
-
-    m_last_status = status_success;
-    m_last_msg.clear();
 }
 
 
 void eap::config_method_with_cred::operator<<(_Inout_ cursor_out &cursor) const
 {
     config_method::operator<<(cursor);
-    cursor << m_allow_save;
     cursor << m_use_cred;
     cursor << *m_cred;
-    cursor << m_last_status;
-    cursor << m_last_msg;
 }
 
 
@@ -276,22 +337,16 @@ size_t eap::config_method_with_cred::get_pk_size() const
 {
     return
         config_method::get_pk_size() +
-        pksizeof(m_allow_save ) +
-        pksizeof(m_use_cred   ) +
-        pksizeof(*m_cred      ) +
-        pksizeof(m_last_status) +
-        pksizeof(m_last_msg   );
+        pksizeof(m_use_cred) +
+        pksizeof(*m_cred   );
 }
 
 
 void eap::config_method_with_cred::operator>>(_Inout_ cursor_in &cursor)
 {
     config_method::operator>>(cursor);
-    cursor >> m_allow_save;
     cursor >> m_use_cred;
     cursor >> *m_cred;
-    cursor >> m_last_status;
-    cursor >> m_last_msg;
 }
 
 

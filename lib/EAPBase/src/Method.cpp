@@ -28,7 +28,7 @@ using namespace winstd;
 // eap::method
 //////////////////////////////////////////////////////////////////////
 
-eap::method::method(_In_ module &module, _In_ config_method_with_cred &cfg, _In_ credentials &cred) :
+eap::method::method(_In_ module &module, _In_ config_method &cfg, _In_ credentials &cred) :
     m_module(module),
     m_cfg(cfg),
     m_cred(cred)
@@ -71,7 +71,7 @@ void eap::method::begin_session(
 
     // Presume authentication will fail with generic protocol failure. (Pesimist!!!)
     // We will reset once we get get_result(Success) call.
-    m_cfg.m_last_status = config_method_with_cred::status_auth_failed;
+    m_cfg.m_last_status = config_method::status_auth_failed;
     m_cfg.m_last_msg.clear();
 }
 
@@ -90,7 +90,7 @@ void eap::method::get_result(
     switch (reason) {
     case EapPeerMethodResultSuccess: {
         m_module.log_event(&EAPMETHOD_METHOD_SUCCESS, event_data((unsigned int)m_cfg.get_method_id()), event_data::blank);
-        m_cfg.m_last_status  = config_method_with_cred::status_success;
+        m_cfg.m_last_status  = config_method::status_success;
         break;
     }
 
@@ -113,7 +113,7 @@ void eap::method::get_result(
 // eap::method_noneap
 //////////////////////////////////////////////////////////////////////
 
-eap::method_noneap::method_noneap(_In_ module &module, _In_ config_method_with_cred &cfg, _In_ credentials &cred) : method(module, cfg, cred)
+eap::method_noneap::method_noneap(_In_ module &module, _In_ config_method &cfg, _In_ credentials &cred) : method(module, cfg, cred)
 {
 }
 

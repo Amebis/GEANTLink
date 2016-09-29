@@ -93,7 +93,7 @@ namespace eap
         /// @}
 
     protected:
-        credentials_pass &m_cred;    ///< Method user credentials
+        credentials_pass &m_cred;   ///< Method user credentials
 
         enum {
             phase_unknown = -1,     ///< Unknown phase

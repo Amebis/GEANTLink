@@ -40,7 +40,7 @@ wxTTLSCredentialsPanel::wxTTLSCredentialsPanel(const eap::config_provider &prov,
 
     assert(m_cfg.m_inner);
 
-    if (eap::config_method_with_cred::status_cred_begin <= m_cfg.m_inner->m_last_status && m_cfg.m_inner->m_last_status < eap::config_method_with_cred::status_cred_end)
+    if (eap::config_method::status_cred_begin <= m_cfg.m_inner->m_last_status && m_cfg.m_inner->m_last_status < eap::config_method::status_cred_end)
         sb_content->Add(new wxEAPCredentialWarningPanel(m_prov, m_cfg.m_inner->m_last_status, this), 0, wxALL|wxEXPAND, 5);
 
     const eap::config_method_pap *cfg_inner_pap;
@@ -63,7 +63,7 @@ wxTTLSCredentialsPanel::wxTTLSCredentialsPanel(const eap::config_provider &prov,
     m_outer_title->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_INACTIVECAPTION ) );
     sb_content->Add(m_outer_title, 0, wxALL|wxALIGN_RIGHT, 5);
 
-    if (eap::config_method_with_cred::status_cred_begin <= m_cfg.m_last_status && m_cfg.m_last_status < eap::config_method_with_cred::status_cred_end)
+    if (eap::config_method::status_cred_begin <= m_cfg.m_last_status && m_cfg.m_last_status < eap::config_method::status_cred_end)
         sb_content->Add(new wxEAPCredentialWarningPanel(m_prov, m_cfg.m_last_status, this), 0, wxALL|wxEXPAND, 5);
 
     m_outer_cred = new wxTLSCredentialsPanel(m_prov, m_cfg, cred, this, is_config);

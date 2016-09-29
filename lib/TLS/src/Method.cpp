@@ -443,7 +443,7 @@ void eap::method_tls::process_request_packet(
         } else {
             m_session_resumed = false;
             m_phase = phase_change_cipher_spec;
-            m_cfg.m_last_status = config_method_with_cred::status_cred_invalid; // Blame credentials if we fail beyond this point.
+            m_cfg.m_last_status = config_method::status_cred_invalid; // Blame credentials if we fail beyond this point.
         }
         break;
     }
@@ -1208,7 +1208,7 @@ void eap::method_tls::process_handshake()
             process_application_data(m_sc_queue.data(), m_sc_queue.size());
         } else {
             m_phase = phase_handshake_cont;
-            m_cfg.m_last_status = config_method_with_cred::status_cred_invalid; // Blame credentials if we fail beyond this point.
+            m_cfg.m_last_status = config_method::status_cred_invalid; // Blame credentials if we fail beyond this point.
         }
     } else if (status == SEC_E_INCOMPLETE_MESSAGE) {
         // Schannel neeeds more data. Send ACK packet to server to send more.
@@ -1289,8 +1289,6 @@ void eap::method_tls::process_application_data(_In_bytecount_(size_msg) const vo
 {
     UNREFERENCED_PARAMETER(msg);
     UNREFERENCED_PARAMETER(size_msg);
-
-    // TODO: Parse application data (Diameter AVP)
 }
 
 
