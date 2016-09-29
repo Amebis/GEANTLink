@@ -132,6 +132,7 @@ protected:
     virtual bool TransferDataFromWindow();
     virtual void OnInitDialog(wxInitDialogEvent& event);
     virtual void OnUpdateUI(wxUpdateUIEvent& event);
+    virtual void OnInnerTypeChoice(wxCommandEvent& event);
     /// \endcond
 
 protected:
