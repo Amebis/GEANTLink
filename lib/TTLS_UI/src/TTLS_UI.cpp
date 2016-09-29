@@ -170,6 +170,7 @@ wxTTLSConfigWindow::wxTTLSConfigWindow(eap::config_provider &prov, eap::config_m
     m_cfg((eap::config_method_ttls&)cfg),
     m_cfg_pap(cfg.m_module, cfg.m_level + 1),
     m_cfg_mschapv2(cfg.m_module, cfg.m_level + 1),
+    m_cfg_eapmsg(cfg.m_module, cfg.m_level + 1),
     wxEAPConfigWindow(prov, cfg, parent)
 {
     wxBoxSizer* sb_content;
@@ -189,6 +190,8 @@ wxTTLSConfigWindow::wxTTLSConfigWindow(eap::config_provider &prov, eap::config_m
     m_inner_type->AddPage(panel_pap, _("PAP"));
     wxMSCHAPv2ConfigPanel *panel_mschapv2 = new wxMSCHAPv2ConfigPanel(m_prov, m_cfg_mschapv2, m_inner_type);
     m_inner_type->AddPage(panel_mschapv2, _("MSCHAPv2"));
+    wxEAPMsgConfigPanel *panel_eapmsg = new wxEAPMsgConfigPanel(m_prov, m_cfg_eapmsg, m_inner_type);
+    m_inner_type->AddPage(panel_eapmsg, _("EAP"));
     sb_content->Add(m_inner_type, 0, wxALL|wxEXPAND, 5);
 
     sb_content->Add(20, 20, 1, wxALL|wxEXPAND, 5);
