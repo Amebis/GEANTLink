@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: EAPMethods\n"
-"POT-Creation-Date: 2016-09-28 13:27+0200\n"
+"POT-Creation-Date: 2016-09-29 14:07+0200\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
 "Last-Translator: Simon Rozman <simon.rozman@amebis.si>\n"
 "Language-Team: Amebis, d. o. o., Kamnik <info@amebis.si>\n"
@@ -14,11 +14,12 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-KeywordsList: _\n"
 "X-Poedit-SearchPath-0: lib/EAPBase_UI\n"
-"X-Poedit-SearchPath-1: lib/MSCHAPv2_UI\n"
-"X-Poedit-SearchPath-2: lib/PAP_UI\n"
-"X-Poedit-SearchPath-3: lib/TLS_UI\n"
-"X-Poedit-SearchPath-4: lib/TTLS_UI\n"
-"X-Poedit-SearchPath-5: EAPMethods\n"
+"X-Poedit-SearchPath-1: lib/EAPMsg_UI\n"
+"X-Poedit-SearchPath-2: lib/MSCHAPv2_UI\n"
+"X-Poedit-SearchPath-3: lib/PAP_UI\n"
+"X-Poedit-SearchPath-4: lib/TLS_UI\n"
+"X-Poedit-SearchPath-5: lib/TTLS_UI\n"
+"X-Poedit-SearchPath-6: EAPMethods\n"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:37
 msgid "+"
@@ -269,6 +270,18 @@ msgstr ""
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:253
 msgid "Please, make sure your credentials are correct, or try again later."
+msgstr ""
+
+#: lib/EAPMsg_UI/res/wxEAPMsg_UI.cpp:17
+msgid "Inner EAP Method"
+msgstr ""
+
+#: lib/EAPMsg_UI/res/wxEAPMsg_UI.cpp:28
+msgid "Select and configure inner EAP method"
+msgstr ""
+
+#: lib/EAPMsg_UI/res/wxEAPMsg_UI.cpp:40
+msgid "&Settings"
 msgstr ""
 
 #: lib/MSCHAPv2_UI/src/MSCHAPv2_UI.cpp:33
