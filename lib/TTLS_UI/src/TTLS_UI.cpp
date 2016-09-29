@@ -222,12 +222,14 @@ wxTTLSConfigWindow::wxTTLSConfigWindow(eap::config_provider &prov, eap::config_m
     panel_pap->SetFocusFromKbd();
 
     this->Connect(wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxTTLSConfigWindow::OnUpdateUI));
+    m_inner_type->Connect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(wxTTLSConfigWindow::OnInnerTypeChoice), NULL, this);
 }
 
 
 wxTTLSConfigWindow::~wxTTLSConfigWindow()
 {
     this->Disconnect(wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxTTLSConfigWindow::OnUpdateUI));
+    m_inner_type->Disconnect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(wxTTLSConfigWindow::OnInnerTypeChoice), NULL, this);
 }
 
 
@@ -293,4 +295,10 @@ void wxTTLSConfigWindow::OnInitDialog(wxInitDialogEvent& event)
 void wxTTLSConfigWindow::OnUpdateUI(wxUpdateUIEvent& /*event*/)
 {
     m_inner_type->GetChoiceCtrl()->Enable(!m_prov.m_read_only);
+}
+
+
+void wxTTLSConfigWindow::OnInnerTypeChoice(wxCommandEvent& /*event*/)
+{
+    Layout();
 }
