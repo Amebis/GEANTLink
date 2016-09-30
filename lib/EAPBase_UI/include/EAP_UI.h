@@ -258,8 +258,10 @@ protected:
     }
 
 
-    virtual void OnProvAdd(wxCommandEvent& /*event*/)
+    virtual void OnProvAdd(wxCommandEvent& event)
     {
+        wxEAPConfigDialogBase::OnProvAdd(event);
+
         // One method
         std::unique_ptr<eap::config_method> cfg_method(m_cfg.m_module.make_config_method());
 
@@ -288,8 +290,10 @@ protected:
     }
 
 
-    virtual void OnProvRemove(wxCommandEvent& /*event*/)
+    virtual void OnProvRemove(wxCommandEvent& event)
     {
+        wxEAPConfigDialogBase::OnProvRemove(event);
+
         int idx = m_providers->GetSelection();
         eap::config_provider &cfg_provider = ((_wxT*)m_providers->GetPage(idx))->GetProvider();
 
@@ -308,8 +312,10 @@ protected:
     }
 
 
-    virtual void OnProvAdvanced(wxCommandEvent& /*event*/)
+    virtual void OnProvAdvanced(wxCommandEvent& event)
     {
+        wxEAPConfigDialogBase::OnProvAdvanced(event);
+
         int idx = m_providers->GetSelection();
         eap::config_provider &cfg_provider = ((_wxT*)m_providers->GetPage(idx))->GetProvider();
 
@@ -681,8 +687,10 @@ protected:
     }
 
 
-    virtual void OnSetStorage(wxCommandEvent& /*event*/)
+    virtual void OnSetStorage(wxCommandEvent& event)
     {
+        wxEAPCredentialsConfigPanelBase::OnSetStorage(event);
+
         m_timer_storage.Stop();
 
         // Read credentials from Credential Manager.
@@ -711,8 +719,10 @@ protected:
     }
 
 
-    virtual void OnClearStorage(wxCommandEvent& /*event*/)
+    virtual void OnClearStorage(wxCommandEvent& event)
     {
+        wxEAPCredentialsConfigPanelBase::OnClearStorage(event);
+
         m_timer_storage.Stop();
 
         if (CredDelete(m_cred_storage.target_name(m_prov.get_id().c_str(), m_cfg.m_level).c_str(), CRED_TYPE_GENERIC, 0)) {
@@ -726,8 +736,10 @@ protected:
     }
 
 
-    virtual void OnSetConfig(wxCommandEvent& /*event*/)
+    virtual void OnSetConfig(wxCommandEvent& event)
     {
+        wxEAPCredentialsConfigPanelBase::OnSetConfig(event);
+
         wxEAPCredentialsDialog dlg(m_prov, this);
 
         _wxT *panel = new _wxT(m_prov, m_cfg, m_cred_config, &dlg, true);
@@ -738,8 +750,10 @@ protected:
     }
 
 
-    virtual void OnTimerStorage(wxTimerEvent& /*event*/)
+    virtual void OnTimerStorage(wxTimerEvent& event)
     {
+        wxEAPCredentialsConfigPanelBase::OnTimerStorage(event);
+
         if (m_storage_identity->IsShownOnScreen())
             RetrieveStorageCredentials();
     }
@@ -928,8 +942,10 @@ protected:
         return true;
     }
 
-    virtual void OnPasswordText(wxCommandEvent& /*event*/)
+    virtual void OnPasswordText(wxCommandEvent& event)
     {
+        wxEAPCredentialsPanel<_Tcred, _Tbase>::OnPasswordText(event);
+
         m_password_set = true;
     }
 
