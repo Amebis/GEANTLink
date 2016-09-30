@@ -468,7 +468,7 @@ void wxTLSServerTrustPanel::OnUpdateUI(wxUpdateUIEvent& event)
         // This is not a provider-locked configuration. Selectively enable/disable controls.
         m_root_ca_add_store->Enable(true);
         m_root_ca_add_file ->Enable(true);
-        m_root_ca_remove   ->Enable(ListBox_GetSelCount(m_root_ca->GetHWND()) ? true : false); // *
+        m_root_ca_remove   ->Enable(m_root_ca->HasMultipleSelection() && ListBox_GetSelCount(m_root_ca->GetHWND()) > 0 || m_root_ca->GetSelection() != wxNOT_FOUND); // *
         m_server_names     ->Enable(true);
 
         // * ListBox_GetSelCount() is not cross-platform, but this is Windows EAP Supplicant,
