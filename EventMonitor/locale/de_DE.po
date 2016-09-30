@@ -3,7 +3,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: EventMonitor\n"
-"POT-Creation-Date: 2016-09-12 11:18+0200\n"
+"POT-Creation-Date: 2016-09-19 11:14+0200\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
 "Last-Translator: eduroam_devel <stefan.winter@restena.lu>, 2016\n"
 "Language-Team: German (https://www.transifex.com/eduroam_devel/teams/11799/de/)\n"
@@ -12,16 +12,16 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 1.8.8\n"
+"X-Generator: Poedit 1.8.9\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: _\n"
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 
-#: App.cpp:61 Frame.h:67 MSIBuild/En.Win32.Release.Feature-2.idtx:4
-#: MSIBuild/En.x64.Release.Feature-2.idtx:4
+#: App.cpp:61 Frame.h:67 MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
+#: MSIBuild/en_US.x64.Release.Feature-2.idtx:4
 msgid "Event Monitor"
-msgstr "Ereignismonitor"
+msgstr "Ereignisanzeige"
 
 #: ETWLog.cpp:83
 #, c-format
@@ -54,20 +54,20 @@ msgid ""
 "(Run As Administrator) or be a member of Performance Log Users group to "
 "start event tracing session."
 msgstr ""
-"Zugriff verweigert: Die Sitzung konnte nicht eröffnet werden. Sie benötigen "
-"Administratorprivilegien (Als Administrator ausführen) oder müssen in der "
-"Benutzergruppe Leistungsprotokollbenutzer sein um eine Ereignislogsitzung zu"
-" eröffnen."
+"Zugriff verweigert: Für die Sitzung konnte kein Eintrag im Ereignislog "
+"angelegt werden. Sie benötigen Administratorenrechte (Als Administrator "
+"ausführen) oder müssen in der Benutzergruppe Leistungsprotokollbenutzer sein"
+" um eine Ereignislogsitzung zu eröffnen."
 
 #: ETWLog.cpp:231
 #, c-format
 msgid "The %s event session already exists."
-msgstr "Die Ereignislogsitzung %s existiert bereits."
+msgstr "Es besteht bereits ein Eintrag für für die Sitzung %s"
 
 #: ETWLog.cpp:235
 #, c-format
 msgid "Error creating event session (error %u)."
-msgstr "Fehler beim eröffnen der Ereignislogsitzung (Fehler %u)."
+msgstr "Fehler beim Erstellen der Ereignislogsitzung (Fehler %u)."
 
 #: ETWLog.cpp:251 ETWLog.cpp:267 ETWLog.cpp:281
 #, c-format
@@ -150,7 +150,7 @@ msgstr "Ausführlich"
 
 #: Frame.cpp:123 Frame.cpp:176
 msgid "Displays all levels of records"
-msgstr "Zeigt Ereignisse aller Stufen an"
+msgstr "Zeigt alle Einträge im Ereignisslog an"
 
 #: Frame.cpp:127 Frame.cpp:178
 msgid "Informational"
@@ -158,8 +158,7 @@ msgstr "Information"
 
 #: Frame.cpp:127 Frame.cpp:178
 msgid "Displays all records up to informational level"
-msgstr ""
-"Zeigt alle Ereignisse an, die auf Stufe Information oder wichtiger sind."
+msgstr "Zeigt alle Einträge der Stufe Information oder wichtiger an."
 
 #: Frame.cpp:131 Frame.cpp:180
 msgid "Warning"
@@ -167,7 +166,7 @@ msgstr "Warnung"
 
 #: Frame.cpp:131 Frame.cpp:180
 msgid "Displays all records up to warning level"
-msgstr "Zeigt alle Ereignisse an, die auf Stufe Warnung oder wichtiger sind."
+msgstr "Zeigt alle Einträge der Stufe Warnung oder wichtiger an."
 
 #: Frame.cpp:135 Frame.cpp:182
 msgid "Error"
@@ -175,7 +174,7 @@ msgstr "Fehler"
 
 #: Frame.cpp:135 Frame.cpp:182
 msgid "Displays error level records only"
-msgstr "Zeigt nur Ereignesse der Stufe Fehler an"
+msgstr "Zeigt nur die Fehlermeldungen an"
 
 #: Frame.cpp:142 Frame.cpp:146
 #, c-format
@@ -215,21 +214,14 @@ msgstr "Automatischer Bildlauf"
 msgid "Trace Log"
 msgstr "Ereignislog"
 
-#: MSIBuild/En.Win32.Release.Feature-2.idtx:3
-#: MSIBuild/En.Win32.Release.Shortcut-2.idtx:3
-#: MSIBuild/En.x64.Release.Feature-2.idtx:3
-#: MSIBuild/En.x64.Release.Shortcut-2.idtx:3
-msgid "1252"
-msgstr "1252"
-
-#: MSIBuild/En.Win32.Release.Shortcut-2.idtx:4
-#: MSIBuild/En.x64.Release.Shortcut-2.idtx:4
-msgid "EVENTM~1|GÉANTLink Event Monitor"
-msgstr "EVENTM~1|GÉANTLink Ereignismonitor"
-
-#: MSIBuild/En.Win32.Release.Feature-2.idtx:4
-#: MSIBuild/En.Win32.Release.Shortcut-2.idtx:4
-#: MSIBuild/En.x64.Release.Feature-2.idtx:4
-#: MSIBuild/En.x64.Release.Shortcut-2.idtx:4
+#: MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
+#: MSIBuild/en_US.Win32.Release.Shortcut-2.idtx:4
+#: MSIBuild/en_US.x64.Release.Feature-2.idtx:4
+#: MSIBuild/en_US.x64.Release.Shortcut-2.idtx:4
 msgid "Real-time display of internal events"
 msgstr "Echtzeitanzeige der internen Ereignisse"
+
+#: MSIBuild/en_US.Win32.Release.Shortcut-2.idtx:4
+#: MSIBuild/en_US.x64.Release.Shortcut-2.idtx:4
+msgid "EVENTM~1|GÉANTLink Event Monitor"
+msgstr "EVENTM~1|GÉANTLink Ereignismonitor"
