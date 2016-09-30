@@ -1306,6 +1306,16 @@ void eap::method_tls::verify_server_trust() const
         throw sec_runtime_error(status, __FUNCTION__ " Error retrieving server certificate from Schannel.");
 #endif
 
+    for (list<cert_context>::const_iterator c = m_cfg.m_trusted_root_ca.cbegin(), c_end = m_cfg.m_trusted_root_ca.cend(); c != c_end; ++c) {
+        if (cert->cbCertEncoded == (*c)->cbCertEncoded &&
+            memcmp(cert->pbCertEncoded, (*c)->pbCertEncoded, cert->cbCertEncoded) == 0)
+        {
+            // Server certificate found directly on the trusted root CA list.
+            m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_TRUSTED_EX, event_data::blank);
+            return;
+        }
+    }
+
     // Check server name.
     if (!m_cfg.m_server_names.empty()) {
         bool
