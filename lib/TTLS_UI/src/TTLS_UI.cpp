@@ -144,8 +144,10 @@ bool wxTTLSConfigPanel::TransferDataFromWindow()
 }
 
 
-void wxTTLSConfigPanel::OnUpdateUI(wxUpdateUIEvent& /*event*/)
+void wxTTLSConfigPanel::OnUpdateUI(wxUpdateUIEvent& event)
 {
+    wxTTLSConfigPanelBase::OnUpdateUI(event);
+
     if (m_prov.m_read_only) {
         // This is provider-locked configuration. Disable controls.
         m_outer_identity_same      ->Enable(false);
@@ -287,7 +289,9 @@ void wxTTLSConfigWindow::OnInitDialog(wxInitDialogEvent& event)
 }
 
 
-void wxTTLSConfigWindow::OnUpdateUI(wxUpdateUIEvent& /*event*/)
+void wxTTLSConfigWindow::OnUpdateUI(wxUpdateUIEvent& event)
 {
     m_inner_type->GetChoiceCtrl()->Enable(!m_prov.m_read_only);
+
+    event.Skip();
 }
