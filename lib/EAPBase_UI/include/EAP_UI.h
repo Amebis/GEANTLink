@@ -231,6 +231,8 @@ protected:
 
     virtual void OnInitDialog(wxInitDialogEvent& event)
     {
+        wxEAPConfigDialogBase::OnInitDialog(event);
+
         // Forward the event to child panels.
         for (wxWindowList::compatibility_iterator provider = m_providers->GetChildren().GetFirst(); provider; provider = provider->GetNext()) {
             wxWindow *prov = wxDynamicCast(provider->GetData(), wxWindow);
