@@ -240,8 +240,10 @@ protected:
     }
 
 
-    virtual void OnUpdateUI(wxUpdateUIEvent& /*event*/)
+    virtual void OnUpdateUI(wxUpdateUIEvent& event)
     {
+        wxEAPConfigDialogBase::OnUpdateUI(event);
+
         int idx = m_providers->GetSelection();
         if (idx != wxNOT_FOUND) {
             eap::config_provider &cfg_provider = ((_wxT*)m_providers->GetPage(idx))->GetProvider();
@@ -630,8 +632,10 @@ protected:
     }
 
 
-    virtual void OnUpdateUI(wxUpdateUIEvent& /*event*/)
+    virtual void OnUpdateUI(wxUpdateUIEvent& event)
     {
+        wxEAPCredentialsConfigPanelBase::OnUpdateUI(event);
+
         if (m_cfg.m_allow_save) {
             if (m_storage->GetValue()) {
                 m_storage_identity->Enable(true);

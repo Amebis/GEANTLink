@@ -382,8 +382,10 @@ bool wxTLSCredentialsPanel::TransferDataFromWindow()
 }
 
 
-void wxTLSCredentialsPanel::OnUpdateUI(wxUpdateUIEvent& /*event*/)
+void wxTLSCredentialsPanel::OnUpdateUI(wxUpdateUIEvent& event)
 {
+    wxEAPCredentialsPanel<eap::credentials_tls, wxTLSCredentialsPanelBase>::OnUpdateUI(event);
+
     if (!m_is_config && m_cfg.m_use_cred) {
         // Credential prompt mode & Using configured credentials
         m_certificate->Enable(false);
@@ -452,8 +454,10 @@ bool wxTLSServerTrustPanel::TransferDataFromWindow()
 }
 
 
-void wxTLSServerTrustPanel::OnUpdateUI(wxUpdateUIEvent& /*event*/)
+void wxTLSServerTrustPanel::OnUpdateUI(wxUpdateUIEvent& event)
 {
+    wxTLSServerTrustPanelBase::OnUpdateUI(event);
+
     if (m_prov.m_read_only) {
         // This is provider-locked configuration. Disable controls.
         m_root_ca_add_store->Enable(false);
