@@ -81,6 +81,8 @@ void wxEAPGeneralDialog::AddContent(wxPanel *content)
 
 void wxEAPGeneralDialog::OnInitDialog(wxInitDialogEvent& event)
 {
+    wxEAPGeneralDialogBase::OnInitDialog(event);
+
     for (wxSizerItemList::compatibility_iterator panel = m_panels->GetChildren().GetFirst(); panel; panel = panel->GetNext())
         panel->GetData()->GetWindow()->GetEventHandler()->ProcessEvent(event);
 }
@@ -127,6 +129,8 @@ wxEAPCredentialsConnectionDialog::wxEAPCredentialsConnectionDialog(wxWindow *par
 
 void wxEAPCredentialsConnectionDialog::OnInitDialog(wxInitDialogEvent& event)
 {
+    wxEAPCredentialsConnectionDialogBase::OnInitDialog(event);
+
     // Forward the event to child panels.
     for (wxWindowList::compatibility_iterator provider = m_providers->GetChildren().GetFirst(); provider; provider = provider->GetNext()) {
         wxWindow *prov = wxDynamicCast(provider->GetData(), wxWindow);
@@ -282,10 +286,12 @@ wxEAPConfigWindow::~wxEAPConfigWindow()
 }
 
 
-void wxEAPConfigWindow::OnInitDialog(wxInitDialogEvent& /*event*/)
+void wxEAPConfigWindow::OnInitDialog(wxInitDialogEvent& event)
 {
     // Call TransferDataToWindow() manually, as wxScrolledWindow somehow skips that.
     TransferDataToWindow();
+
+    event.Skip();
 }
 
 
