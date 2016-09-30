@@ -261,9 +261,10 @@ wxEventMonitorFrame::~wxEventMonitorFrame()
 }
 
 
-void wxEventMonitorFrame::OnExit(wxCommandEvent& /*event*/)
+void wxEventMonitorFrame::OnExit(wxCommandEvent& event)
 {
     Close();
+    event.Skip();
 }
 
 

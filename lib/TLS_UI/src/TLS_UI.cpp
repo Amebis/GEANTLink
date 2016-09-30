@@ -480,14 +480,18 @@ void wxTLSServerTrustPanel::OnUpdateUI(wxUpdateUIEvent& event)
 
 void wxTLSServerTrustPanel::OnRootCADClick(wxCommandEvent& event)
 {
+    wxTLSServerTrustPanelBase::OnRootCADClick(event);
+
     wxCertificateClientData *cert = dynamic_cast<wxCertificateClientData*>(event.GetClientObject());
     if (cert)
         CryptUIDlgViewContext(CERT_STORE_CERTIFICATE_CONTEXT, cert->m_cert, this->GetHWND(), NULL, 0, NULL);
 }
 
 
-void wxTLSServerTrustPanel::OnRootCAAddStore(wxCommandEvent& /*event*/)
+void wxTLSServerTrustPanel::OnRootCAAddStore(wxCommandEvent& event)
 {
+    wxTLSServerTrustPanelBase::OnRootCAAddStore(event);
+
     winstd::cert_store store;
     if (store.create(NULL, _T("ROOT"))) {
         winstd::cert_context cert;
@@ -500,6 +504,8 @@ void wxTLSServerTrustPanel::OnRootCAAddStore(wxCommandEvent& /*event*/)
 
 void wxTLSServerTrustPanel::OnRootCAAddFile(wxCommandEvent& event)
 {
+    wxTLSServerTrustPanelBase::OnRootCAAddFile(event);
+
     const wxString separator(wxT("|"));
     wxFileDialog open_dialog(this, _("Add Certificate"), wxEmptyString, wxEmptyString,
         _("Certificate Files (*.cer;*.crt;*.der;*.p7b;*.pem)") + separator + wxT("*.cer;*.crt;*.der;*.p7b;*.pem") + separator +
@@ -507,10 +513,8 @@ void wxTLSServerTrustPanel::OnRootCAAddFile(wxCommandEvent& event)
         _("PKCS #7 Certificate Files (*.p7b)") + separator + wxT("*.p7b") + separator +
         _("All Files (*.*)") + separator + wxT("*.*"),
         wxFD_OPEN|wxFD_FILE_MUST_EXIST|wxFD_MULTIPLE);
-    if (open_dialog.ShowModal() == wxID_CANCEL) {
-        event.Skip();
+    if (open_dialog.ShowModal() == wxID_CANCEL)
         return;
-    }
 
     wxArrayString paths;
     open_dialog.GetPaths(paths);
@@ -526,8 +530,10 @@ void wxTLSServerTrustPanel::OnRootCAAddFile(wxCommandEvent& event)
 }
 
 
-void wxTLSServerTrustPanel::OnRootCARemove(wxCommandEvent& /*event*/)
+void wxTLSServerTrustPanel::OnRootCARemove(wxCommandEvent& event)
 {
+    wxTLSServerTrustPanelBase::OnRootCARemove(event);
+
     wxArrayInt selections;
     for (int i = m_root_ca->GetSelections(selections); i--; )
         m_root_ca->Delete(selections[i]);
