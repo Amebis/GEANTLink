@@ -22,6 +22,11 @@
 #include "../../EAPMsg/include/Config.h"
 
 ///
+/// Helper class for auto-destroyable EAP_METHOD_TYPE used in wxWidget's item containers
+///
+class wxEAPMethodTypeClientData;
+
+///
 /// Inner EAP method config panel
 ///
 class wxEAPMsgMethodConfigPanel;
@@ -46,6 +51,20 @@ class wxEAPMsgConfigPanel;
 #include <Windows.h>
 
 
+class wxEAPMethodTypeClientData : public wxClientData
+{
+public:
+    ///
+    /// Constructs client data object with existing handle
+    ///
+    wxEAPMethodTypeClientData(const EAP_METHOD_TYPE &type, DWORD properties);
+
+public:
+    EAP_METHOD_TYPE m_type; ///< EapHost method type
+    DWORD m_properties;     ///< Method properties
+};
+
+
 class wxEAPMsgMethodConfigPanel : public wxEAPMsgMethodConfigPanelBase
 {
 public:
@@ -57,6 +76,12 @@ public:
     /// \param[in   ] parent  Parent window
     ///
     wxEAPMsgMethodConfigPanel(const eap::config_provider &prov, eap::config_method_eapmsg &cfg, wxWindow *parent);
+
+protected:
+    /// \cond internal
+    virtual void OnUpdateUI(wxUpdateUIEvent& event);
+    virtual void OnSettings(wxCommandEvent& event);
+    /// \endcond
 };
 
 

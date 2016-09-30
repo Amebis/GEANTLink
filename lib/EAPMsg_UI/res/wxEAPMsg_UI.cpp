@@ -54,12 +54,14 @@ wxEAPMsgMethodConfigPanelBase::wxEAPMsgMethodConfigPanelBase( wxWindow* parent, 
 	this->Layout();
 	
 	// Connect Events
+	this->Connect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( wxEAPMsgMethodConfigPanelBase::OnUpdateUI ) );
 	m_settings->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPMsgMethodConfigPanelBase::OnSettings ), NULL, this );
 }
 
 wxEAPMsgMethodConfigPanelBase::~wxEAPMsgMethodConfigPanelBase()
 {
 	// Disconnect Events
+	this->Disconnect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( wxEAPMsgMethodConfigPanelBase::OnUpdateUI ) );
 	m_settings->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPMsgMethodConfigPanelBase::OnSettings ), NULL, this );
 	
 }

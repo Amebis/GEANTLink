@@ -20,6 +20,19 @@
 
 #include "StdAfx.h"
 
+#pragma comment(lib, "Eappcfg.lib")
+
+
+//////////////////////////////////////////////////////////////////////
+// wxEAPMsgMethodConfigPanel
+//////////////////////////////////////////////////////////////////////
+
+wxEAPMethodTypeClientData::wxEAPMethodTypeClientData(const EAP_METHOD_TYPE &type, DWORD properties) :
+    m_type(type),
+    m_properties(properties)
+{
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // wxEAPMsgMethodConfigPanel
@@ -34,6 +47,48 @@ wxEAPMsgMethodConfigPanel::wxEAPMsgMethodConfigPanel(const eap::config_provider 
     winstd::library lib_shell32;
     if (lib_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
         m_method_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(175)));
+
+    winstd::eap_method_info_array methods;
+    std::unique_ptr<EAP_ERROR, winstd::EapHostPeerFreeErrorMemory_delete> error;
+    DWORD dwResult = EapHostPeerGetMethods(&methods, &std::addressof(error)->_Myptr);
+    if (dwResult == ERROR_SUCCESS) {
+        for (DWORD i = 0; i < methods.dwNumberOfMethods; i++)
+            m_method->Append(methods.pEapMethods[i].pwszFriendlyName, new wxEAPMethodTypeClientData(methods.pEapMethods[i].eaptype, methods.pEapMethods[i].eapProperties));
+    } else if (error)
+        wxLogError(_("Enumerating EAP methods failed (error %u, %s, %s)."), error->dwWinError, error->pRootCauseString, error->pRepairString);
+    else
+        wxLogError(_("Enumerating EAP methods failed (error %u)."), dwResult);
+}
+
+
+void wxEAPMsgMethodConfigPanel::OnUpdateUI(wxUpdateUIEvent& event)
+{
+    wxEAPMsgMethodConfigPanelBase::OnUpdateUI(event);
+
+    int sel = m_method->GetSelection();
+    const wxEAPMethodTypeClientData *data =
+        sel != wxNOT_FOUND && m_method->HasClientObjectData() ?
+            dynamic_cast<const wxEAPMethodTypeClientData*>(m_method->GetClientObject(sel)) :
+            NULL;
+    m_settings->Enable(data && (data->m_properties & eapPropSupportsConfig));
+}
+
+
+void wxEAPMsgMethodConfigPanel::OnSettings(wxCommandEvent& event)
+{
+    wxEAPMsgMethodConfigPanelBase::OnSettings(event);
+
+    int sel = m_method->GetSelection();
+    const wxEAPMethodTypeClientData *data =
+        sel != wxNOT_FOUND && m_method->HasClientObjectData() ?
+            dynamic_cast<const wxEAPMethodTypeClientData*>(m_method->GetClientObject(sel)) :
+            NULL;
+    if (data && (data->m_properties & eapPropSupportsConfig)) {
+        DWORD cfg_data_size = 0;
+        std::unique_ptr<BYTE[], winstd::EapHostPeerFreeMemory_delete> cfg_data;
+        std::unique_ptr<EAP_ERROR, winstd::EapHostPeerFreeErrorMemory_delete> error;
+        DWORD dwResult = EapHostPeerInvokeConfigUI(GetHWND(), 0, data->m_type, 0, NULL, &cfg_data_size, &std::addressof(cfg_data)->_Myptr, &std::addressof(error)->_Myptr);
+    }
 }
 
 

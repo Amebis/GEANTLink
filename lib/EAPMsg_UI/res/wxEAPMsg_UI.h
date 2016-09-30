@@ -43,6 +43,7 @@ class wxEAPMsgMethodConfigPanelBase : public wxPanel
 		wxButton* m_settings;
 		
 		// Virtual event handlers, overide them in your derived class
+		virtual void OnUpdateUI( wxUpdateUIEvent& event ) { event.Skip(); }
 		virtual void OnSettings( wxCommandEvent& event ) { event.Skip(); }
 		
 	
