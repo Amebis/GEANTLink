@@ -1,35 +1,33 @@
-# Translators:
-# Simon Rozman <simon@rozman.si>, 2016
+# 
+#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: WLANManager\n"
-"POT-Creation-Date: 2016-08-28 12:03+0200\n"
+"POT-Creation-Date: 2016-09-19 11:22+0200\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
-"Last-Translator: Simon Rozman <simon@rozman.si>, 2016\n"
 "Language-Team: Galician (Spain) (https://www.transifex.com/eduroam_devel/teams/11799/gl_ES/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: gl_ES\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 1.8.8\n"
+"X-Generator: Poedit 1.8.9\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: _\n"
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 
-#: MSIBuild/En.Win32.Release.Feature-2.idtx:3
-#: MSIBuild/En.x64.Release.Feature-2.idtx:3
-msgid "1252"
-msgstr "1252"
-
-#: MSIBuild/En.Win32.Release.Feature-2.idtx:4
-#: MSIBuild/En.x64.Release.Feature-2.idtx:4
-msgid ""
-"Helper utility to support direct shortcuts to Wireless Network Properties"
+#: MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
+#: MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
+#: MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
+#: MSIBuild/en_US.x64.Release.Feature-2.idtx:4
+msgid "WLAN Manager"
 msgstr ""
 
-#: MSIBuild/En.Win32.Release.Feature-2.idtx:4
-#: MSIBuild/En.x64.Release.Feature-2.idtx:4
-msgid "WLAN Manager"
+#: MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
+#: MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
+#: MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
+#: MSIBuild/en_US.x64.Release.Feature-2.idtx:4
+msgid ""
+"Helper utility to support direct shortcuts to Wireless Network Properties"
 msgstr ""

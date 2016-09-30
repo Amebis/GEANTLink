@@ -3,7 +3,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: GÉANTLink MSI\n"
-"POT-Creation-Date: 2016-08-31 14:33+0200\n"
+"POT-Creation-Date: 2016-09-19 11:20+0200\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
 "Last-Translator: Simon Rozman <simon@rozman.si>, 2016\n"
 "Language-Team: Welsh (https://www.transifex.com/eduroam_devel/teams/11799/cy/)\n"
@@ -12,26 +12,22 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: cy\n"
 "Plural-Forms: nplurals=4; plural=(n==1) ? 0 : (n==2) ? 1 : (n != 8 && n != 11) ? 2 : 3;\n"
-"X-Generator: Poedit 1.8.8\n"
+"X-Generator: Poedit 1.8.9\n"
 "X-Poedit-Basepath: ../Main\n"
 "X-Poedit-KeywordsList: _\n"
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 
-#: En.Win32.Release.LaunchCondition-2.idtx:4
-#: En.x64.Release.LaunchCondition-2.idtx:4
+#: en_US.Win32.Release.LaunchCondition-2.idtx:4
+#: en_US.x64.Release.LaunchCondition-2.idtx:4
 msgid "[ProductName] requires Windows Vista or later version of Windows."
 msgstr ""
 
-#: En.Win32.Release.Property-2.idtx:3 En.x64.Release.Property-2.idtx:3
-msgid "1252"
-msgstr "1252"
-
-#: En.Win32.Release.Property-2.idtx:4 En.Win32.Release.Property-2.idtx:5
-#: En.x64.Release.Property-2.idtx:4 En.x64.Release.Property-2.idtx:5
+#: en_US.Win32.Release.Property-2.idtx:4 en_US.Win32.Release.Property-2.idtx:5
+#: en_US.x64.Release.Property-2.idtx:4 en_US.x64.Release.Property-2.idtx:5
 msgid "http://www.geant.org/"
 msgstr ""
 
-#: En.Win32.Release.Property-2.idtx:6 En.x64.Release.Property-2.idtx:6
+#: en_US.Win32.Release.Property-2.idtx:6 en_US.x64.Release.Property-2.idtx:6
 msgid "https://github.com/Amebis/GEANTLink/releases"
 msgstr "https://github.com/Amebis/GEANTLink/releases"

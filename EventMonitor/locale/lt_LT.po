@@ -3,7 +3,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: EventMonitor\n"
-"POT-Creation-Date: 2016-09-12 11:18+0200\n"
+"POT-Creation-Date: 2016-09-19 11:14+0200\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
 "Last-Translator: Rimas Kudelis <rq@akl.lt>, 2016\n"
 "Language-Team: Lithuanian (https://www.transifex.com/eduroam_devel/teams/11799/lt/)\n"
@@ -12,14 +12,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: lt\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Generator: Poedit 1.8.8\n"
+"X-Generator: Poedit 1.8.9\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: _\n"
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 
-#: App.cpp:61 Frame.h:67 MSIBuild/En.Win32.Release.Feature-2.idtx:4
-#: MSIBuild/En.x64.Release.Feature-2.idtx:4
+#: App.cpp:61 Frame.h:67 MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
+#: MSIBuild/en_US.x64.Release.Feature-2.idtx:4
 msgid "Event Monitor"
 msgstr "Įvykių stebėjimo programa"
 
@@ -211,21 +211,14 @@ msgstr "Automatinė slinktis"
 msgid "Trace Log"
 msgstr "Sekimo žurnalas"
 
-#: MSIBuild/En.Win32.Release.Feature-2.idtx:3
-#: MSIBuild/En.Win32.Release.Shortcut-2.idtx:3
-#: MSIBuild/En.x64.Release.Feature-2.idtx:3
-#: MSIBuild/En.x64.Release.Shortcut-2.idtx:3
-msgid "1252"
-msgstr "1257"
-
-#: MSIBuild/En.Win32.Release.Shortcut-2.idtx:4
-#: MSIBuild/En.x64.Release.Shortcut-2.idtx:4
-msgid "EVENTM~1|GÉANTLink Event Monitor"
-msgstr "EVENTM~1|„GÉANTLink“ įvykių stebėjimo programa"
-
-#: MSIBuild/En.Win32.Release.Feature-2.idtx:4
-#: MSIBuild/En.Win32.Release.Shortcut-2.idtx:4
-#: MSIBuild/En.x64.Release.Feature-2.idtx:4
-#: MSIBuild/En.x64.Release.Shortcut-2.idtx:4
+#: MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
+#: MSIBuild/en_US.Win32.Release.Shortcut-2.idtx:4
+#: MSIBuild/en_US.x64.Release.Feature-2.idtx:4
+#: MSIBuild/en_US.x64.Release.Shortcut-2.idtx:4
 msgid "Real-time display of internal events"
 msgstr "Vidinių įvykių stebėjimas tikruoju laiku"
+
+#: MSIBuild/en_US.Win32.Release.Shortcut-2.idtx:4
+#: MSIBuild/en_US.x64.Release.Shortcut-2.idtx:4
+msgid "EVENTM~1|GÉANTLink Event Monitor"
+msgstr "EVENTM~1|„GÉANTLink“ įvykių stebėjimo programa"
