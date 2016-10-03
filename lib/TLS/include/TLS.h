@@ -96,11 +96,18 @@ namespace eap
     /// EAP-TLS packet
     ///
     class packet_tls;
+
+    ///
+    /// TLS map of handshake messages received
+    ///
+    class tls_handshake_flags;
 }
 
 #pragma once
 
 #include <memory>
+
+#include <assert.h>
 
 
 namespace eap
@@ -614,5 +621,51 @@ namespace eap
 
     public:
         unsigned char m_flags;  ///< Packet flags
+    };
+
+
+    class tls_handshake_flags
+    {
+    public:
+        ///
+        /// Constructs an empty set of flags
+        ///
+        inline tls_handshake_flags()
+        {
+            memset(m_flags, 0, sizeof(m_flags));
+        }
+
+        ///
+        /// Empty set of flags
+        ///
+        inline void clear()
+        {
+            memset(m_flags, 0, sizeof(m_flags));
+        }
+
+        ///
+        /// Set particular flag
+        ///
+        /// \param[in] type  TLS handshake message to set its flag
+        ///
+        inline void set(_In_ tls_handshake_type_t type)
+        {
+            assert(tls_handshake_type_min <= type && type < tls_handshake_type_max);
+            m_flags[type] = true;
+        }
+
+        ///
+        /// Get particular flag
+        ///
+        /// \param[in] type  TLS handshake message to get its flag
+        ///
+        inline bool operator[](_In_ tls_handshake_type_t type) const
+        {
+            assert(tls_handshake_type_min <= type && type < tls_handshake_type_max);
+            return m_flags[type];
+        }
+
+    protected:
+        bool m_flags[tls_handshake_type_max];   ///< Set of flags
     };
 }

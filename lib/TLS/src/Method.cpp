@@ -65,6 +65,10 @@ eap::method_tls::method_tls(_In_ module &module, _In_ config_method_tls &cfg, _I
     m_cred(cred),
     m_user_ctx(NULL),
 #if EAP_TLS < EAP_TLS_SCHANNEL
+    m_tls_version(tls_version_1_2),
+#ifdef _DEBUG
+    m_alg_prf(0),
+#endif
     m_session_resumed(false),
     m_phase(phase_unknown),
     m_seq_num_client(0),
@@ -74,12 +78,6 @@ eap::method_tls::method_tls(_In_ module &module, _In_ config_method_tls &cfg, _I
 #endif
     method(module, cfg, cred)
 {
-#if EAP_TLS < EAP_TLS_SCHANNEL
-    m_tls_version = tls_version_1_2;
-#ifdef _DEBUG
-    memset(m_handshake, 0, sizeof(m_handshake));
-#endif
-#endif
 }
 
 
@@ -111,6 +109,7 @@ eap::method_tls::method_tls(_Inout_ method_tls &&other) :
     m_hash_handshake_msgs_md5   (std::move(other.m_hash_handshake_msgs_md5   )),
     m_hash_handshake_msgs_sha1  (std::move(other.m_hash_handshake_msgs_sha1  )),
     m_hash_handshake_msgs_sha256(std::move(other.m_hash_handshake_msgs_sha256)),
+    m_handshake                 (std::move(other.m_handshake                 )),
     m_phase                     (std::move(other.m_phase                     )),
     m_seq_num_client            (std::move(other.m_seq_num_client            )),
     m_seq_num_server            (std::move(other.m_seq_num_server            )),
@@ -123,12 +122,6 @@ eap::method_tls::method_tls(_Inout_ method_tls &&other) :
 #endif
     method                      (std::move(other                             ))
 {
-#if EAP_TLS < EAP_TLS_SCHANNEL
-    memcpy(m_handshake, other.m_handshake, sizeof(m_handshake));
-#ifdef _DEBUG
-    memset(other.m_handshake, 0, sizeof(m_handshake));
-#endif
-#endif
 }
 
 
@@ -162,14 +155,10 @@ eap::method_tls& eap::method_tls::operator=(_Inout_ method_tls &&other)
         m_hash_handshake_msgs_md5    = std::move(other.m_hash_handshake_msgs_md5   );
         m_hash_handshake_msgs_sha1   = std::move(other.m_hash_handshake_msgs_sha1  );
         m_hash_handshake_msgs_sha256 = std::move(other.m_hash_handshake_msgs_sha256);
+        m_handshake                  = std::move(other.m_handshake                 );
         m_phase                      = std::move(other.m_phase                     );
         m_seq_num_client             = std::move(other.m_seq_num_client            );
         m_seq_num_server             = std::move(other.m_seq_num_server            );
-
-        memcpy(m_handshake, other.m_handshake, sizeof(m_handshake));
-#ifdef _DEBUG
-        memset(other.m_handshake, 0, sizeof(m_handshake));
-#endif
 #else
         m_sc_target_name             = std::move(other.m_sc_target_name            );
         m_sc_cred                    = std::move(other.m_sc_cred                   );
@@ -310,7 +299,7 @@ void eap::method_tls::process_request_packet(
         m_key_mppe_server.clear();
     } else {
         // Process the packet.
-        memset(m_handshake, 0, sizeof(m_handshake));
+        m_handshake.clear();
         m_packet_res.m_data.clear();
         process_packet(m_packet_req.m_data.data(), m_packet_req.m_data.size());
     }
@@ -1103,7 +1092,7 @@ void eap::method_tls::process_handshake(_In_bytecount_(size_msg) const void *_ms
 
         if (type < tls_handshake_type_max) {
             // Set the flag this handshake message was received.
-            m_handshake[type] = true;
+            m_handshake.set(type);
         }
 
         if (type != tls_handshake_type_hello_request) {
