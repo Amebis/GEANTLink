@@ -461,7 +461,7 @@ namespace eap
         winstd::crypt_hash m_hash_handshake_msgs_sha1;          ///< Running SHA-1 hash of handshake messages
         winstd::crypt_hash m_hash_handshake_msgs_sha256;        ///< Running SHA-256 hash of handshake messages
 
-        bool m_handshake[tls_handshake_type_max];               ///< Handshake flags (map od handshake messages received)
+        tls_handshake_flags m_handshake;                        ///< Handshake flags (map od handshake messages received)
 
         enum {
             phase_unknown = -1,                                 ///< Unknown phase
