@@ -29,8 +29,6 @@ using namespace winstd;
 //////////////////////////////////////////////////////////////////////
 
 eap::method_ttls::method_ttls(_In_ module &module, _In_ config_method_ttls &cfg, _In_ credentials_ttls &cred) :
-    m_cfg(cfg),
-    m_cred(cred),
     m_version(version_0),
     method_tls(module, cfg, cred)
 {
@@ -38,8 +36,6 @@ eap::method_ttls::method_ttls(_In_ module &module, _In_ config_method_ttls &cfg,
 
 
 eap::method_ttls::method_ttls(_Inout_ method_ttls &&other) :
-    m_cfg     (          other.m_cfg     ),
-    m_cred    (          other.m_cred    ),
     m_version (std::move(other.m_version)),
     m_inner   (std::move(other.m_inner  )),
     method_tls(std::move(other          ))
@@ -68,9 +64,9 @@ void eap::method_ttls::begin_session(
     method_tls::begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
 
     // Initialize inner method.
-    switch (m_cfg.m_inner->get_method_id()) {
-    case eap_type_legacy_pap     : m_inner.reset(new method_pap     (m_module, (config_method_pap     &)*m_cfg.m_inner, (credentials_pass     &)*m_cred.m_inner.get())); break;
-    case eap_type_legacy_mschapv2: m_inner.reset(new method_mschapv2(m_module, (config_method_mschapv2&)*m_cfg.m_inner, (credentials_pass&)*m_cred.m_inner.get())); break;
+    switch (dynamic_cast<config_method_ttls&>(m_cfg).m_inner->get_method_id()) {
+    case eap_type_legacy_pap     : m_inner.reset(new method_pap     (m_module, (config_method_pap     &)*dynamic_cast<config_method_ttls&>(m_cfg).m_inner, (credentials_pass&)*dynamic_cast<credentials_ttls&>(m_cred).m_inner.get())); break;
+    case eap_type_legacy_mschapv2: m_inner.reset(new method_mschapv2(m_module, (config_method_mschapv2&)*dynamic_cast<config_method_ttls&>(m_cfg).m_inner, (credentials_pass&)*dynamic_cast<credentials_ttls&>(m_cred).m_inner.get())); break;
     default: throw invalid_argument(__FUNCTION__ " Unsupported inner authentication method.");
     }
     m_inner->begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, MAXDWORD);

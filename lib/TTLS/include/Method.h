@@ -141,9 +141,6 @@ namespace eap
         virtual void process_application_data(_In_bytecount_(size_msg) const void *msg, _In_ size_t size_msg);
 
     protected:
-        config_method_ttls &m_cfg;          ///< EAP-TTLS method configuration
-        credentials_ttls &m_cred;           ///< EAP-TTLS credentials
-
         #pragma warning(suppress: 4480)
         enum version_t :unsigned char {
             version_0 = 0,                  ///< EAP-TTLS v0
