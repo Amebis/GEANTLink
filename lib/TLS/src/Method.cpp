@@ -243,7 +243,7 @@ void eap::method_tls::begin_session(
         SCH_CRED_MANUAL_CRED_VALIDATION                                   |   // dwFlags: Prevent Schannel verify server certificate (we want to use custom root CA store and multiple name checking)
 #endif
         SCH_CRED_CACHE_ONLY_URL_RETRIEVAL_ON_CREATE                       |   // dwFlags: Do not attempt online revocation check - we do not expect to have network connection yet
-        SCH_CRED_IGNORE_NO_REVOCATION_CHECK                               |   // dwFlags: Ignore no-revocation-check errors (TODO: Test if this flag is required.)
+        SCH_CRED_IGNORE_NO_REVOCATION_CHECK                               |   // dwFlags: Ignore no-revocation-check errors - as we cannot check for revocation, it makes little sense to insist certificate has to have revocation set-up
         SCH_CRED_IGNORE_REVOCATION_OFFLINE                                |   // dwFlags: Ignore offline-revocation errors - we do not expect to have network connection yet
         SCH_CRED_NO_DEFAULT_CREDS                                         |   // dwFlags: If client certificate we provided is not acceptable, do not try to select one on your own
         (m_cfg.m_server_names.empty() ? SCH_CRED_NO_SERVERNAME_CHECK : 0) |   // dwFlags: When no expected server name is given, do not do the server name check.
@@ -565,7 +565,7 @@ void eap::method_tls::get_result(
         m_cfg.m_session_id.clear();
         m_cfg.m_master_secret.clear();
 #else
-        // TODO: Research how a Schannel session context can be cleared not to resume.
+        // TODO: Research how a Schannel session context can be cleared not to resume. However, until we find a way how to make Schannel resume session in the first place, we can safely ignore this.
 #endif
 
         break;
