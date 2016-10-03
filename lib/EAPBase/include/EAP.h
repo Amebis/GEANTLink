@@ -772,7 +772,7 @@ inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const unsigned int 
 {
     eap::cursor_out::ptr_type ptr_end = cursor.ptr + sizeof(unsigned int);
     assert(ptr_end <= cursor.ptr_end);
-    *(unsigned int*)cursor.ptr = val;
+    *reinterpret_cast<unsigned int*>(cursor.ptr) = val;
     cursor.ptr = ptr_end;
 }
 
@@ -788,7 +788,7 @@ inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ unsigned int &val)
 {
     eap::cursor_in::ptr_type ptr_end = cursor.ptr + sizeof(unsigned int);
     assert(ptr_end <= cursor.ptr_end);
-    val = *(unsigned int*)cursor.ptr;
+    val = *reinterpret_cast<const unsigned int*>(cursor.ptr);
     cursor.ptr = ptr_end;
 }
 

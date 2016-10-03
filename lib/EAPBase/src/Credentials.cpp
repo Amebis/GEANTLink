@@ -363,8 +363,8 @@ void eap::credentials_pass::store(_In_z_ LPCTSTR pszTargetName, _In_ unsigned in
     WideCharToMultiByte(CP_UTF8, 0, m_password.c_str(), (int)m_password.length(), cred_utf8, NULL, NULL);
 
     // Encrypt the password using user's key.
-    DATA_BLOB cred_blob    = { (DWORD)cred_utf8.size() , (LPBYTE)cred_utf8.data() };
-    DATA_BLOB entropy_blob = {        sizeof(s_entropy), (LPBYTE)s_entropy        };
+    DATA_BLOB cred_blob    = { (DWORD)cred_utf8.size() , const_cast<LPBYTE>(reinterpret_cast<LPCBYTE>(cred_utf8.data())) };
+    DATA_BLOB entropy_blob = {        sizeof(s_entropy), const_cast<LPBYTE>(                          s_entropy        ) };
     data_blob cred_enc;
     if (!CryptProtectData(&cred_blob, NULL, &entropy_blob, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN, &cred_enc))
         throw win_runtime_error(__FUNCTION__ " CryptProtectData failed.");
@@ -375,18 +375,18 @@ void eap::credentials_pass::store(_In_z_ LPCTSTR pszTargetName, _In_ unsigned in
     assert(cred_enc.cbData     < CRED_MAX_CREDENTIAL_BLOB_SIZE);
     assert(m_identity.length() < CRED_MAX_USERNAME_LENGTH     );
     CREDENTIAL cred = {
-        0,                          // Flags
-        CRED_TYPE_GENERIC,          // Type
-        (LPTSTR)target.c_str(),     // TargetName
-        _T(""),                     // Comment
-        { 0, 0 },                   // LastWritten
-        cred_enc.cbData,            // CredentialBlobSize
-        cred_enc.pbData,            // CredentialBlob
-        CRED_PERSIST_ENTERPRISE,    // Persist
-        0,                          // AttributeCount
-        NULL,                       // Attributes
-        NULL,                       // TargetAlias
-        (LPTSTR)m_identity.c_str()  // UserName
+        0,                                     // Flags
+        CRED_TYPE_GENERIC,                     // Type
+        const_cast<LPTSTR>(target.c_str()),    // TargetName
+        _T(""),                                // Comment
+        { 0, 0 },                              // LastWritten
+        cred_enc.cbData,                       // CredentialBlobSize
+        cred_enc.pbData,                       // CredentialBlob
+        CRED_PERSIST_ENTERPRISE,               // Persist
+        0,                                     // AttributeCount
+        NULL,                                  // Attributes
+        NULL,                                  // TargetAlias
+        const_cast<LPTSTR>(m_identity.c_str()) // UserName
     };
     if (!CredWrite(&cred, 0))
         throw win_runtime_error(__FUNCTION__ " CredWrite failed.");
@@ -403,14 +403,14 @@ void eap::credentials_pass::retrieve(_In_z_ LPCTSTR pszTargetName, _In_ unsigned
         throw win_runtime_error(__FUNCTION__ " CredRead failed.");
 
     // Decrypt the password using user's key.
-    DATA_BLOB cred_enc     = { cred->CredentialBlobSize,         cred->CredentialBlob };
-    DATA_BLOB entropy_blob = { sizeof(s_entropy)       , (LPBYTE)s_entropy            };
+    DATA_BLOB cred_enc     = { cred->CredentialBlobSize, cred->CredentialBlob          };
+    DATA_BLOB entropy_blob = { sizeof(s_entropy)       , const_cast<LPBYTE>(s_entropy) };
     data_blob cred_int;
     if (!CryptUnprotectData(&cred_enc, NULL, &entropy_blob, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN | CRYPTPROTECT_VERIFY_PROTECTION, &cred_int))
         throw win_runtime_error(__FUNCTION__ " CryptUnprotectData failed.");
 
     // Convert password from UTF-8.
-    MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)cred_int.pbData, (int)cred_int.cbData, m_password);
+    MultiByteToWideChar(CP_UTF8, 0, reinterpret_cast<LPCSTR>(cred_int.pbData), (int)cred_int.cbData, m_password);
     SecureZeroMemory(cred_int.pbData, cred_int.cbData);
 
     if (cred->UserName)
@@ -443,14 +443,14 @@ eap::credentials::source_t eap::credentials_pass::combine(
 {
     if (cred_cached) {
         // Using EAP service cached credentials.
-        *this = *(credentials_pass*)cred_cached;
+        *this = *dynamic_cast<const credentials_pass*>(cred_cached);
         m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CACHED1, event_data((unsigned int)cfg.get_method_id()), event_data(credentials_pass::get_name()), event_data::blank);
         return source_cache;
     }
 
     if (cfg.m_use_cred) {
         // Using configured credentials.
-        *this = *(credentials_pass*)cfg.m_cred.get();
+        *this = *dynamic_cast<const credentials_pass*>(cfg.m_cred.get());
         m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CONFIG1, event_data((unsigned int)cfg.get_method_id()), event_data(credentials_pass::get_name()), event_data::blank);
         return source_config;
     }
@@ -553,11 +553,11 @@ eap::credentials_connection::credentials_connection(_In_ module &mod, _In_ const
 
 
 eap::credentials_connection::credentials_connection(_In_ const credentials_connection &other) :
-    m_cfg      (other.m_cfg      ),
-    m_namespace(other.m_namespace),
-    m_id       (other.m_id       ),
-    m_cred     (other.m_cred ? (credentials*)other.m_cred->clone() : nullptr),
-    config     (other            )
+    m_cfg      (other.m_cfg                                                               ),
+    m_namespace(other.m_namespace                                                         ),
+    m_id       (other.m_id                                                                ),
+    m_cred     (other.m_cred ? dynamic_cast<credentials*>(other.m_cred->clone()) : nullptr),
+    config     (other                                                                     )
 {
 }
 
@@ -578,7 +578,7 @@ eap::credentials_connection& eap::credentials_connection::operator=(_In_ const c
         (config&)*this = other;
         m_namespace    = other.m_namespace;
         m_id           = other.m_id;
-        m_cred.reset(other.m_cred ? (credentials*)other.m_cred->clone() : nullptr);
+        m_cred.reset(other.m_cred ? dynamic_cast<credentials*>(other.m_cred->clone()) : nullptr);
     }
 
     return *this;

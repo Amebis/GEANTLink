@@ -455,7 +455,7 @@ eap::monitor_ui::monitor_ui(_In_ HINSTANCE module, _In_ const GUID &guid) :
     if (!wnd_class)
         throw win_runtime_error(__FUNCTION__ " Error registering master monitor window class.");
     tstring_guid guid_str(guid);
-    HWND hwnd_master = FindWindowEx(HWND_MESSAGE, NULL, (LPCTSTR)wnd_class, guid_str.c_str());
+    HWND hwnd_master = FindWindowEx(HWND_MESSAGE, NULL, reinterpret_cast<LPCTSTR>(wnd_class), guid_str.c_str());
     if (hwnd_master) {
         // Another monitor is already running.
         m_is_master = false;
@@ -484,18 +484,18 @@ eap::monitor_ui::monitor_ui(_In_ HINSTANCE module, _In_ const GUID &guid) :
     }
 
     m_hwnd = CreateWindowEx(
-        0,                  // dwExStyle
-        (LPCTSTR)wnd_class, // lpClassName
-        guid_str.c_str(),   // lpWindowName
-        0,                  // dwStyle
-        0,                  // x
-        0,                  // y
-        0,                  // nWidth
-        0,                  // nHeight
-        HWND_MESSAGE,       // hWndParent
-        NULL,               // hMenu
-        module,             // hInstance
-        this);              // lpParam
+        0,                                    // dwExStyle
+        reinterpret_cast<LPCTSTR>(wnd_class), // lpClassName
+        guid_str.c_str(),                     // lpWindowName
+        0,                                    // dwStyle
+        0,                                    // x
+        0,                                    // y
+        0,                                    // nWidth
+        0,                                    // nHeight
+        HWND_MESSAGE,                         // hWndParent
+        NULL,                                 // hMenu
+        module,                               // hInstance
+        this);                                // lpParam
 
     if (!m_is_master) {
         // Notify master we are waiting him.
@@ -575,7 +575,7 @@ LRESULT eap::monitor_ui::winproc(
     } else if (msg == s_msg_finish) {
         // Master finished.
         assert(!m_is_master);
-        m_data.assign((const unsigned char*)lparam, (const unsigned char*)lparam + wparam);
+        m_data.assign(reinterpret_cast<const unsigned char*>(lparam), reinterpret_cast<const unsigned char*>(lparam) + wparam);
 
         // Finish slave too.
         DestroyWindow(m_hwnd);

@@ -242,9 +242,9 @@ eap::config_method_with_cred::config_method_with_cred(_In_ module &mod, _In_ uns
 
 
 eap::config_method_with_cred::config_method_with_cred(_In_ const config_method_with_cred &other) :
-    m_use_cred   (other.m_use_cred                                            ),
-    m_cred       (other.m_cred ? (credentials*)other.m_cred->clone() : nullptr),
-    config_method(other                                                       )
+    m_use_cred   (other.m_use_cred                                                          ),
+    m_cred       (other.m_cred ? dynamic_cast<credentials*>(other.m_cred->clone()) : nullptr),
+    config_method(other                                                                     )
 {
 }
 
@@ -262,7 +262,7 @@ eap::config_method_with_cred& eap::config_method_with_cred::operator=(_In_ const
     if (this != &other) {
         (config_method&)*this = other;
         m_use_cred            = other.m_use_cred;
-        m_cred.reset(other.m_cred ? (credentials*)other.m_cred->clone() : nullptr);
+        m_cred.reset(other.m_cred ? dynamic_cast<credentials*>(other.m_cred->clone()) : nullptr);
     }
 
     return *this;
@@ -376,7 +376,7 @@ eap::config_provider::config_provider(_In_ const config_provider &other) :
 {
     m_methods.reserve(other.m_methods.size());
     for (vector<unique_ptr<config_method> >::const_iterator method = other.m_methods.cbegin(), method_end = other.m_methods.cend(); method != method_end; ++method)
-        m_methods.push_back(std::move(unique_ptr<config_method>(*method ? (config_method*)method->get()->clone() : nullptr)));
+        m_methods.push_back(std::move(unique_ptr<config_method>(*method ? dynamic_cast<config_method*>(method->get()->clone()) : nullptr)));
 }
 
 
@@ -415,7 +415,7 @@ eap::config_provider& eap::config_provider::operator=(_In_ const config_provider
         m_methods.clear();
         m_methods.reserve(other.m_methods.size());
         for (vector<unique_ptr<config_method> >::const_iterator method = other.m_methods.cbegin(), method_end = other.m_methods.cend(); method != method_end; ++method)
-            m_methods.push_back(std::move(unique_ptr<config_method>(*method ? (config_method*)method->get()->clone() : nullptr)));
+            m_methods.push_back(std::move(unique_ptr<config_method>(*method ? dynamic_cast<config_method*>(method->get()->clone()) : nullptr)));
     }
 
     return *this;

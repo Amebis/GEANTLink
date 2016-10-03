@@ -119,14 +119,14 @@ void eap::method_mschapv2::process_request_packet(
             sizeof(nt_response));        // Response
         response.push_back(m_ident);
         response.push_back(0); // Flags
-        response.insert(response.end(), (unsigned char*)&m_challenge_client, (unsigned char*)(&m_challenge_client + 1)); // Peer-Challenge
+        response.insert(response.end(), reinterpret_cast<const unsigned char*>(&m_challenge_client), reinterpret_cast<const unsigned char*>(&m_challenge_client + 1)); // Peer-Challenge
         response.insert(response.end(), 8, 0); // Reserved
-        response.insert(response.end(), (unsigned char*)&m_nt_resp, (unsigned char*)(&m_nt_resp + 1)); // NT-Response
+        response.insert(response.end(), reinterpret_cast<const unsigned char*>(&m_nt_resp), reinterpret_cast<const unsigned char*>(&m_nt_resp + 1)); // NT-Response
 
         // Diameter AVP (User-Name=1, MS-CHAP-Challenge=11/311, MS-CHAP2-Response=25/311)
-        append_avp( 1,      diameter_avp_flag_mandatory,                 identity_utf8.data(), (unsigned int)identity_utf8.size()      );
-        append_avp(11, 311, diameter_avp_flag_mandatory, (unsigned char*)&m_challenge_server , (unsigned int)sizeof(m_challenge_server));
-        append_avp(25, 311, diameter_avp_flag_mandatory,                 response.data()     , (unsigned int)response.size()           );
+        append_avp( 1,      diameter_avp_flag_mandatory,                                         identity_utf8.data(), (unsigned int)identity_utf8.size()      );
+        append_avp(11, 311, diameter_avp_flag_mandatory, reinterpret_cast<const unsigned char*>(&m_challenge_server) , (unsigned int)sizeof(m_challenge_server));
+        append_avp(25, 311, diameter_avp_flag_mandatory,                                         response.data()     , (unsigned int)response.size()           );
 
         m_phase = phase_challenge_server;
         m_cfg.m_last_status = config_method::status_cred_invalid; // Blame credentials if we fail beyond this point.
@@ -154,22 +154,22 @@ void eap::method_mschapv2::process_packet(_In_bytecount_(size_pck) const void *_
     sanitizing_blob data;
     wstring msg_w;
 
-    for (const unsigned char *pck = (const unsigned char*)_pck, *pck_end = pck + size_pck; pck < pck_end; ) {
+    for (const unsigned char *pck = reinterpret_cast<const unsigned char*>(_pck), *pck_end = pck + size_pck; pck < pck_end; ) {
         if (pck + sizeof(diameter_avp_header) > pck_end)
             throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Incomplete message header.");
-        const diameter_avp_header *hdr = (const diameter_avp_header*)pck;
-        unsigned int code = ntohl(*(unsigned int*)hdr->code);
+        const diameter_avp_header *hdr = reinterpret_cast<const diameter_avp_header*>(pck);
+        unsigned int code = ntohl(*reinterpret_cast<const unsigned int*>(hdr->code));
         unsigned int vendor;
         const unsigned char *msg;
         if (hdr->flags & diameter_avp_flag_vendor) {
             if (pck + sizeof(diameter_avp_header_ven) > pck_end)
                 throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Incomplete message header.");
-            const diameter_avp_header_ven *hdr_ven = (const diameter_avp_header_ven*)pck;
-            vendor = ntohl(*(unsigned int*)hdr_ven->vendor);
-            msg = (const unsigned char*)(hdr_ven + 1);
+            const diameter_avp_header_ven *hdr_ven = reinterpret_cast<const diameter_avp_header_ven*>(pck);
+            vendor = ntohl(*reinterpret_cast<const unsigned int*>(hdr_ven->vendor));
+            msg = reinterpret_cast<const unsigned char*>(hdr_ven + 1);
         } else {
             vendor = 0;
-            msg = (const unsigned char*)(hdr + 1);
+            msg = reinterpret_cast<const unsigned char*>(hdr + 1);
         }
         unsigned int length = ntoh24(hdr->length);
         const unsigned char
@@ -182,13 +182,13 @@ void eap::method_mschapv2::process_packet(_In_bytecount_(size_pck) const void *_
             // MS-CHAP2-Success
             if (msg[0] != m_ident)
                 throw invalid_argument(string_printf(__FUNCTION__ " Wrong MSCHAPv2 ident (expected: %u, received: %u).", m_ident, msg[0]).c_str());
-            const char *str = (const char*)(msg + 1);
-            process_success(parse_response(str, ((const char*)msg_end - str)));
+            const char *str = reinterpret_cast<const char*>(msg + 1);
+            process_success(parse_response(str, (reinterpret_cast<const char*>(msg_end) - str)));
         } else if (code == 2 && vendor == 311) {
             // MS-CHAP2-Error
             m_ident = msg[0];
-            const char *str = (const char*)(msg + 1);
-            process_error(parse_response(str, ((const char*)msg_end - str)));
+            const char *str = reinterpret_cast<const char*>(msg + 1);
+            process_error(parse_response(str, (reinterpret_cast<const char*>(msg_end) - str)));
         } else if (hdr->flags & diameter_avp_flag_mandatory)
             throw win_runtime_error(ERROR_NOT_SUPPORTED, string_printf(__FUNCTION__ " Server sent mandatory Diameter AVP we do not support (code: %u, vendor: %u).", code, vendor).c_str());
 

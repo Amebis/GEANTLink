@@ -376,8 +376,8 @@ void eap::method_tls::process_request_packet(
             // Derive master secret.
             static const unsigned char s_label[] = "master secret";
             sanitizing_blob seed(s_label, s_label + _countof(s_label) - 1);
-            seed.insert(seed.end(), (const unsigned char*)&m_random_client, (const unsigned char*)(&m_random_client + 1));
-            seed.insert(seed.end(), (const unsigned char*)&m_random_server, (const unsigned char*)(&m_random_server + 1));
+            seed.insert(seed.end(), reinterpret_cast<const unsigned char*>(&m_random_client), reinterpret_cast<const unsigned char*>(&m_random_client + 1));
+            seed.insert(seed.end(), reinterpret_cast<const unsigned char*>(&m_random_server), reinterpret_cast<const unsigned char*>(&m_random_server + 1));
             memcpy(&m_master_secret, prf(m_cp, m_alg_prf, pms, seed, sizeof(tls_master_secret)).data(), sizeof(tls_master_secret));
 
             // Create client key exchange message, and append to packet.
@@ -396,8 +396,8 @@ void eap::method_tls::process_request_packet(
         // Derive client side keys.
         static const unsigned char s_label[] = "key expansion";
         sanitizing_blob seed(s_label, s_label + _countof(s_label) - 1);
-        seed.insert(seed.end(), (const unsigned char*)&m_random_server, (const unsigned char*)(&m_random_server + 1));
-        seed.insert(seed.end(), (const unsigned char*)&m_random_client, (const unsigned char*)(&m_random_client + 1));
+        seed.insert(seed.end(), reinterpret_cast<const unsigned char*>(&m_random_server), reinterpret_cast<const unsigned char*>(&m_random_server + 1));
+        seed.insert(seed.end(), reinterpret_cast<const unsigned char*>(&m_random_client), reinterpret_cast<const unsigned char*>(&m_random_client + 1));
         sanitizing_blob key_block(prf(m_cp, m_alg_prf, m_master_secret, seed,
             2*m_state_client_pending.m_size_mac_key +  // client_write_MAC_secret & server_write_MAC_secret (SHA1)
             2*m_state_client_pending.m_size_enc_key +  // client_write_key        & server_write_key
@@ -518,9 +518,9 @@ void eap::method_tls::get_result(
         // Fill array with RADIUS attributes.
         eap_attr a;
         m_eap_attr.reserve(m_eap_attr.size() + 3);
-        a.create_ms_mppe_key(16, (LPCBYTE)&m_key_mppe_client, sizeof(tls_random));
+        a.create_ms_mppe_key(16, reinterpret_cast<LPCBYTE>(&m_key_mppe_client), sizeof(tls_random));
         m_eap_attr.push_back(std::move(a));
-        a.create_ms_mppe_key(17, (LPCBYTE)&m_key_mppe_server, sizeof(tls_random));
+        a.create_ms_mppe_key(17, reinterpret_cast<LPCBYTE>(&m_key_mppe_server), sizeof(tls_random));
         m_eap_attr.push_back(std::move(a));
         m_eap_attr.push_back(eap_attr::blank);
 
@@ -552,7 +552,7 @@ void eap::method_tls::get_result(
                 NULL,
                 &buf_out_desc);
             if (SUCCEEDED(status))
-                m_packet_res.m_data.insert(m_packet_res.m_data.end(), (const unsigned char*)buf_out[0].pvBuffer, (const unsigned char*)buf_out[0].pvBuffer + buf_out[0].cbBuffer);
+                m_packet_res.m_data.insert(m_packet_res.m_data.end(), reinterpret_cast<const unsigned char*>(buf_out[0].pvBuffer), reinterpret_cast<const unsigned char*>(buf_out[0].pvBuffer) + buf_out[0].cbBuffer);
         }
 #endif
 
@@ -594,14 +594,14 @@ eap::sanitizing_blob eap::method_tls::make_client_hello()
     // SSL header
     assert(size_data <= 0xffffff);
     unsigned int ssl_header = htonl((tls_handshake_type_client_hello << 24) | (unsigned int)size_data);
-    msg.insert(msg.end(), (unsigned char*)&ssl_header, (unsigned char*)(&ssl_header + 1));
+    msg.insert(msg.end(), reinterpret_cast<const unsigned char*>(&ssl_header), reinterpret_cast<const unsigned char*>(&ssl_header + 1));
 
     // SSL version
-    msg.insert(msg.end(), (unsigned char*)&m_tls_version, (unsigned char*)(&m_tls_version + 1));
+    msg.insert(msg.end(), reinterpret_cast<const unsigned char*>(&m_tls_version), reinterpret_cast<const unsigned char*>(&m_tls_version + 1));
 
     // Generate client random and add it to the message
     m_random_client.randomize(m_cp);
-    msg.insert(msg.end(), (unsigned char*)&m_random_client, (unsigned char*)(&m_random_client + 1));
+    msg.insert(msg.end(), reinterpret_cast<const unsigned char*>(&m_random_client), reinterpret_cast<const unsigned char*>(&m_random_client + 1));
 
     // Session ID
     assert(m_session_id.size() <= 32);
@@ -610,7 +610,7 @@ eap::sanitizing_blob eap::method_tls::make_client_hello()
 
     // Cypher suite list
     unsigned short size_cipher_suite2 = htons((unsigned short)sizeof(s_cipher_suite));
-    msg.insert(msg.end(), (unsigned char*)&size_cipher_suite2, (unsigned char*)(&size_cipher_suite2 + 1));
+    msg.insert(msg.end(), reinterpret_cast<const unsigned char*>(&size_cipher_suite2), reinterpret_cast<const unsigned char*>(&size_cipher_suite2 + 1));
     msg.insert(msg.end(), s_cipher_suite, s_cipher_suite + _countof(s_cipher_suite));
 
     // Compression
@@ -638,7 +638,7 @@ eap::sanitizing_blob eap::method_tls::make_client_cert() const
     // SSL header
     assert(size_data <= 0xffffff);
     unsigned int ssl_header = htonl((tls_handshake_type_certificate << 24) | (unsigned int)size_data);
-    msg.insert(msg.end(), (unsigned char*)&ssl_header, (unsigned char*)(&ssl_header + 1));
+    msg.insert(msg.end(), reinterpret_cast<const unsigned char*>(&ssl_header), reinterpret_cast<const unsigned char*>(&ssl_header + 1));
 
     // List size
     assert(size_list <= 0xffffff);
@@ -663,7 +663,7 @@ eap::sanitizing_blob eap::method_tls::make_client_cert() const
 eap::sanitizing_blob eap::method_tls::make_client_key_exchange(_In_ const tls_master_secret &pms) const
 {
     // Encrypt pre-master key with server public key first.
-    sanitizing_blob pms_enc((const unsigned char*)&pms, (const unsigned char*)(&pms + 1));
+    sanitizing_blob pms_enc(reinterpret_cast<const unsigned char*>(&pms), reinterpret_cast<const unsigned char*>(&pms + 1));
     crypt_key key;
     if (!key.import_public(m_cp_enc_client, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, &(m_server_cert_chain.front()->pCertInfo->SubjectPublicKeyInfo)))
         throw win_runtime_error(__FUNCTION__ " Error importing server's public key.");
@@ -681,7 +681,7 @@ eap::sanitizing_blob eap::method_tls::make_client_key_exchange(_In_ const tls_ma
     // SSL header
     assert(size_data <= 0xffffff);
     unsigned int ssl_header = htonl((tls_handshake_type_client_key_exchange << 24) | (unsigned int)size_data);
-    msg.insert(msg.end(), (unsigned char*)&ssl_header, (unsigned char*)(&ssl_header + 1));
+    msg.insert(msg.end(), reinterpret_cast<const unsigned char*>(&ssl_header), reinterpret_cast<const unsigned char*>(&ssl_header + 1));
 
     // Encrypted pre master secret size
     assert(size_pms_enc <= 0xffff);
@@ -707,7 +707,7 @@ eap::sanitizing_blob eap::method_tls::make_finished() const
 
     // SSL header
     unsigned int ssl_header = htonl((unsigned int)(tls_handshake_type_finished << 24) | 12);
-    msg.insert(msg.end(), (unsigned char*)&ssl_header, (unsigned char*)(&ssl_header + 1));
+    msg.insert(msg.end(), reinterpret_cast<const unsigned char*>(&ssl_header), reinterpret_cast<const unsigned char*>(&ssl_header + 1));
 
     // Create label + hash MD5 + hash SHA-1 seed.
     crypt_hash hash;
@@ -760,7 +760,7 @@ eap::sanitizing_blob eap::method_tls::make_message(_In_ tls_message_type_t type,
 
     sanitizing_blob msg;
     msg.reserve(sizeof(message_header) + size_data);
-    msg.assign((const unsigned char*)&hdr, (const unsigned char*)(&hdr + 1));
+    msg.assign(reinterpret_cast<const unsigned char*>(&hdr), reinterpret_cast<const unsigned char*>(&hdr + 1));
     msg.insert(msg.end(), data.begin(), data.end());
     return msg;
 }
@@ -774,8 +774,8 @@ void eap::method_tls::derive_msk()
 #if EAP_TLS < EAP_TLS_SCHANNEL
     static const unsigned char s_label[] = "client EAP encryption";
     sanitizing_blob seed(s_label, s_label + _countof(s_label) - 1);
-    seed.insert(seed.end(), (const unsigned char*)&m_random_client, (const unsigned char*)(&m_random_client + 1));
-    seed.insert(seed.end(), (const unsigned char*)&m_random_server, (const unsigned char*)(&m_random_server + 1));
+    seed.insert(seed.end(), reinterpret_cast<const unsigned char*>(&m_random_client), reinterpret_cast<const unsigned char*>(&m_random_client + 1));
+    seed.insert(seed.end(), reinterpret_cast<const unsigned char*>(&m_random_server), reinterpret_cast<const unsigned char*>(&m_random_server + 1));
     sanitizing_blob key_block(prf(m_cp, m_alg_prf, m_master_secret, seed, 2*sizeof(tls_random)));
     _key_block = key_block.data();
 #else
@@ -808,13 +808,13 @@ void eap::method_tls::process_packet(_In_bytecount_(size_pck) const void *_pck, 
 {
     sanitizing_blob data;
 
-    for (const unsigned char *pck = (const unsigned char*)_pck, *pck_end = pck + size_pck; pck < pck_end; ) {
+    for (const unsigned char *pck = reinterpret_cast<const unsigned char*>(_pck), *pck_end = pck + size_pck; pck < pck_end; ) {
         if (pck + 5 > pck_end)
             throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Incomplete message header.");
         const message_header *hdr = (const message_header*)pck;
         const unsigned char
-            *msg     = (const unsigned char*)(hdr + 1),
-            *msg_end = msg + ntohs(*(unsigned short*)hdr->length);
+            *msg     = reinterpret_cast<const unsigned char*>(hdr + 1),
+            *msg_end = msg + ntohs(*reinterpret_cast<const unsigned short*>(hdr->length));
         if (msg_end > pck_end)
             throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Incomplete message data.");
 
@@ -870,7 +870,7 @@ void eap::method_tls::process_change_cipher_spec(_In_bytecount_(size_msg) const 
     if (size_msg < 1)
         throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Incomplete change cipher spec.");
 
-    const unsigned char *msg = (const unsigned char*)_msg;
+    const unsigned char *msg = reinterpret_cast<const unsigned char*>(_msg);
     if (msg[0] != 1)
         throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, string_printf(__FUNCTION__ " Invalid change cipher spec message (expected 1, received %u).", msg[0]));
 
@@ -885,8 +885,8 @@ void eap::method_tls::process_change_cipher_spec(_In_bytecount_(size_msg) const 
 
     static const unsigned char s_label[] = "key expansion";
     sanitizing_blob seed(s_label, s_label + _countof(s_label) - 1);
-    seed.insert(seed.end(), (const unsigned char*)&m_random_server, (const unsigned char*)(&m_random_server + 1));
-    seed.insert(seed.end(), (const unsigned char*)&m_random_client, (const unsigned char*)(&m_random_client + 1));
+    seed.insert(seed.end(), reinterpret_cast<const unsigned char*>(&m_random_server), reinterpret_cast<const unsigned char*>(&m_random_server + 1));
+    seed.insert(seed.end(), reinterpret_cast<const unsigned char*>(&m_random_client), reinterpret_cast<const unsigned char*>(&m_random_client + 1));
     sanitizing_blob key_block(prf(m_cp, m_alg_prf, m_master_secret, seed,
         2*m_state_server_pending.m_size_mac_key +  // client_write_MAC_secret & server_write_MAC_secret (SHA1)
         2*m_state_server_pending.m_size_enc_key +  // client_write_key        & server_write_key
@@ -928,7 +928,7 @@ void eap::method_tls::process_alert(_In_bytecount_(size_msg) const void *_msg, _
     if (size_msg < 2)
         throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Incomplete alert.");
 
-    const unsigned char *msg = (const unsigned char*)_msg;
+    const unsigned char *msg = reinterpret_cast<const unsigned char*>(_msg);
 
     m_module.log_event(&EAPMETHOD_TLS_ALERT, event_data((unsigned int)eap_type_tls), event_data((unsigned char)msg[0]), event_data((unsigned char)msg[1]), event_data::blank);
 
@@ -941,11 +941,11 @@ void eap::method_tls::process_alert(_In_bytecount_(size_msg) const void *_msg, _
 
 void eap::method_tls::process_handshake(_In_bytecount_(size_msg) const void *_msg, _In_ size_t size_msg)
 {
-    for (const unsigned char *msg = (const unsigned char*)_msg, *msg_end = msg + size_msg; msg < msg_end; ) {
+    for (const unsigned char *msg = reinterpret_cast<const unsigned char*>(_msg), *msg_end = msg + size_msg; msg < msg_end; ) {
         // Parse record header.
         if (msg + sizeof(unsigned int) > msg_end)
             throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Incomplete record header.");
-        unsigned int hdr = ntohl(*(unsigned int*)msg);
+        unsigned int hdr = ntohl(*reinterpret_cast<const unsigned int*>(msg));
         const unsigned char
             *rec     = msg + sizeof(unsigned int),
             *rec_end = rec + (hdr & 0xffffff);
@@ -959,9 +959,9 @@ void eap::method_tls::process_handshake(_In_bytecount_(size_msg) const void *_ms
                 // TLS version
                 if (rec + 2 > rec_end)
                     throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Server SSL/TLS version missing or incomplete.");
-                else if (*(tls_version*)rec < tls_version_1_0 || m_tls_version < *(tls_version*)rec)
+                else if (*reinterpret_cast<const tls_version*>(rec) < tls_version_1_0 || m_tls_version < *reinterpret_cast<const tls_version*>(rec))
                     throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Unsupported SSL/TLS version.");
-                m_tls_version = *(tls_version*)rec;
+                m_tls_version = *reinterpret_cast<const tls_version*>(rec);
                 m_alg_prf = m_tls_version < tls_version_1_2 ? CALG_TLS1PRF : CALG_SHA_256;
                 rec += 2;
 
@@ -1171,7 +1171,7 @@ void eap::method_tls::process_handshake()
         // Send Schannel's token via EAP.
         assert(buf_out[0].BufferType == SECBUFFER_TOKEN);
         assert(m_sc_ctx.m_attrib & ISC_RET_ALLOCATED_MEMORY);
-        m_packet_res.m_data.assign((const unsigned char*)buf_out[0].pvBuffer, (const unsigned char*)buf_out[0].pvBuffer + buf_out[0].cbBuffer);
+        m_packet_res.m_data.assign(reinterpret_cast<const unsigned char*>(buf_out[0].pvBuffer), reinterpret_cast<const unsigned char*>(buf_out[0].pvBuffer) + buf_out[0].cbBuffer);
         if (buf_in[1].BufferType == SECBUFFER_EXTRA) {
             // Server appended extra data.
             m_sc_queue.erase(m_sc_queue.begin(), m_sc_queue.end() - buf_in[1].cbBuffer);
@@ -1217,7 +1217,7 @@ void eap::method_tls::process_handshake()
             // Send alert via EAP. Not that EAP will transmit it once we throw this is an error...
             assert(buf_out[1].BufferType == SECBUFFER_ALERT);
             assert(m_sc_ctx.m_attrib & ISC_RET_ALLOCATED_MEMORY);
-            m_packet_res.m_data.assign((const unsigned char*)buf_out[1].pvBuffer, (const unsigned char*)buf_out[1].pvBuffer + buf_out[1].cbBuffer);
+            m_packet_res.m_data.assign(reinterpret_cast<const unsigned char*>(buf_out[1].pvBuffer), reinterpret_cast<const unsigned char*>(buf_out[1].pvBuffer) + buf_out[1].cbBuffer);
         }
 
         throw sec_runtime_error(status, __FUNCTION__ " Schannel error.");
@@ -1265,7 +1265,7 @@ void eap::method_tls::process_application_data()
         std::vector<unsigned char> extra;
         for (size_t i = 0; i < _countof(buf); i++)
             if (buf[i].BufferType == SECBUFFER_EXTRA)
-                extra.insert(extra.end(), (unsigned char*)buf[i].pvBuffer, (unsigned char*)buf[i].pvBuffer + buf[i].cbBuffer);
+                extra.insert(extra.end(), reinterpret_cast<const unsigned char*>(buf[i].pvBuffer), reinterpret_cast<const unsigned char*>(buf[i].pvBuffer) + buf[i].cbBuffer);
         m_sc_queue = std::move(extra);
     } else if (status == SEC_E_INCOMPLETE_MESSAGE) {
         // Schannel neeeds more data. Send ACK packet to server to send more.
@@ -1647,7 +1647,7 @@ eap::sanitizing_blob eap::method_tls::prf(
             size_S2 = size_S1;
         const void
             *S1 = &secret,
-            *S2 = (const unsigned char*)&secret + (sizeof(tls_master_secret) - size_S2);
+            *S2 = reinterpret_cast<const unsigned char*>(&secret) + (sizeof(tls_master_secret) - size_S2);
 
         // Precalculate HMAC padding for speed.
         hmac_padding
@@ -1656,8 +1656,8 @@ eap::sanitizing_blob eap::method_tls::prf(
 
         // Prepare A for p_hash.
         sanitizing_blob
-            A1((unsigned char*)seed, (unsigned char*)seed + size_seed),
-            A2((unsigned char*)seed, (unsigned char*)seed + size_seed);
+            A1(reinterpret_cast<const unsigned char*>(seed), reinterpret_cast<const unsigned char*>(seed) + size_seed),
+            A2(reinterpret_cast<const unsigned char*>(seed), reinterpret_cast<const unsigned char*>(seed) + size_seed);
 
         sanitizing_blob
             hmac1,
@@ -1706,7 +1706,7 @@ eap::sanitizing_blob eap::method_tls::prf(
         hmac_padding padding(cp, alg, &secret, sizeof(tls_master_secret));
 
         // Prepare A for p_hash.
-        sanitizing_blob A((unsigned char*)seed, (unsigned char*)seed + size_seed);
+        sanitizing_blob A(reinterpret_cast<const unsigned char*>(seed), reinterpret_cast<const unsigned char*>(seed) + size_seed);
 
         sanitizing_blob hmac;
         for (size_t i = 0; i < size; ) {
@@ -1759,8 +1759,8 @@ HCRYPTKEY eap::method_tls::create_key(
     };
     sanitizing_blob key_blob;
     key_blob.reserve(sizeof(key_blob_prefix) + size_secret);
-    key_blob.assign((const unsigned char*)&prefix, (const unsigned char*)(&prefix + 1));
-    key_blob.insert(key_blob.end(), (const unsigned char*)secret, (const unsigned char*)secret + size_secret);
+    key_blob.assign(                reinterpret_cast<const unsigned char*>(&prefix), reinterpret_cast<const unsigned char*>(&prefix + 1));
+    key_blob.insert(key_blob.end(), reinterpret_cast<const unsigned char*>( secret), reinterpret_cast<const unsigned char*>(secret) + size_secret);
 
     // Import the key.
     winstd::crypt_key key_out;
@@ -1795,7 +1795,7 @@ HCRYPTKEY eap::method_tls::create_key(
 #pragma pack(pop)
     sanitizing_blob key_blob;
     key_blob.reserve(sizeof(key_blob_prefix) + size_key);
-    key_blob.assign((const unsigned char*)&prefix, (const unsigned char*)(&prefix + 1));
+    key_blob.assign(reinterpret_cast<const unsigned char*>(&prefix), reinterpret_cast<const unsigned char*>(&prefix + 1));
 
     // Key in EME-PKCS1-v1_5 (RFC 3447).
     key_blob.push_back(0); // Initial zero
@@ -1818,7 +1818,7 @@ HCRYPTKEY eap::method_tls::create_key(
     key_blob.push_back(0); // PS and M zero delimiter
 
     // M
-    key_blob.insert(key_blob.end(), (const unsigned char*)secret, (const unsigned char*)secret + size_secret);
+    key_blob.insert(key_blob.end(), reinterpret_cast<const unsigned char*>(secret), reinterpret_cast<const unsigned char*>(secret) + size_secret);
 
 #ifdef _HOST_LOW_ENDIAN
     std::reverse(key_blob.end() - size_key, key_blob.end());

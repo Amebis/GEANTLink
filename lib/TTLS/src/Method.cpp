@@ -157,8 +157,8 @@ void eap::method_ttls::derive_msk()
     //
     static const unsigned char s_label[] = "ttls keying material";
     sanitizing_blob seed(s_label, s_label + _countof(s_label) - 1);
-    seed.insert(seed.end(), (const unsigned char*)&m_random_client, (const unsigned char*)(&m_random_client + 1));
-    seed.insert(seed.end(), (const unsigned char*)&m_random_server, (const unsigned char*)(&m_random_server + 1));
+    seed.insert(seed.end(), reinterpret_cast<const unsigned char*>(&m_random_client), reinterpret_cast<const unsigned char*>(&m_random_client + 1));
+    seed.insert(seed.end(), reinterpret_cast<const unsigned char*>(&m_random_server), reinterpret_cast<const unsigned char*>(&m_random_server + 1));
     sanitizing_blob key_block(prf(m_cp, CALG_TLS1PRF, m_master_secret, seed, 2*sizeof(tls_random)));
     _key_block = key_block.data();
 #else
@@ -197,8 +197,8 @@ void eap::method_ttls::derive_challenge()
 #if EAP_TLS < EAP_TLS_SCHANNEL
         static const unsigned char s_label[] = "ttls challenge";
         sanitizing_blob seed(s_label, s_label + _countof(s_label) - 1);
-        seed.insert(seed.end(), (const unsigned char*)&m_random_client, (const unsigned char*)(&m_random_client + 1));
-        seed.insert(seed.end(), (const unsigned char*)&m_random_server, (const unsigned char*)(&m_random_server + 1));
+        seed.insert(seed.end(), reinterpret_cast<const unsigned char*>(&m_random_client), reinterpret_cast<const unsigned char*>(&m_random_client + 1));
+        seed.insert(seed.end(), reinterpret_cast<const unsigned char*>(&m_random_server), reinterpret_cast<const unsigned char*>(&m_random_server + 1));
         sanitizing_blob keying(prf(m_cp, CALG_TLS1PRF, m_master_secret, seed, sizeof(challenge_mschapv2) + 1));
         memcpy(&inner_mschapv2->m_challenge_server, keying.data(), sizeof(challenge_mschapv2));
         inner_mschapv2->m_ident = keying[sizeof(challenge_mschapv2) + 0];
@@ -294,7 +294,7 @@ void eap::method_ttls::process_application_data(_In_bytecount_(size_msg) const v
             status = EncryptMessage(m_sc_ctx, 0, &buf_desc, 0);
             if (FAILED(status))
                 throw sec_runtime_error(status, __FUNCTION__ " Error encrypting message.");
-            m_packet_res.m_data.insert(m_packet_res.m_data.end(), (const unsigned char*)buf[0].pvBuffer, (const unsigned char*)buf[0].pvBuffer + buf[0].cbBuffer + buf[1].cbBuffer + buf[2].cbBuffer);
+            m_packet_res.m_data.insert(m_packet_res.m_data.end(), reinterpret_cast<const unsigned char*>(buf[0].pvBuffer), reinterpret_cast<const unsigned char*>(buf[0].pvBuffer) + buf[0].cbBuffer + buf[1].cbBuffer + buf[2].cbBuffer);
 #endif
         } else {
             // Empty packets represent ACK message, and are not encrypted.

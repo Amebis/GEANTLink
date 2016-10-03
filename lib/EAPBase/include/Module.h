@@ -330,12 +330,12 @@ namespace eap
 
             // Import the 256-bit AES session key.
             winstd::crypt_key key_aes;
-            if (!CryptImportKey(hProv, (LPCBYTE)data, 268, key_rsa, 0, &key_aes))
+            if (!CryptImportKey(hProv, reinterpret_cast<LPCBYTE>(data), 268, key_rsa, 0, &key_aes))
                 throw win_runtime_error(__FUNCTION__ " CryptImportKey failed.");
 
             // Decrypt the data using AES session key.
             std::vector<unsigned char, winstd::sanitizing_allocator<unsigned char> > buf;
-            buf.assign((const unsigned char*)data + 268, (const unsigned char*)data + size);
+            buf.assign(reinterpret_cast<const unsigned char*>(data) + 268, reinterpret_cast<const unsigned char*>(data) + size);
             if (!CryptDecrypt(key_aes, hHash, TRUE, 0, buf))
                 throw win_runtime_error(__FUNCTION__ " CryptDecrypt failed.");
 
@@ -412,7 +412,7 @@ namespace eap
             std::vector<unsigned char> hash_bin;
             if (!CryptGetHashParam(hash, HP_HASHVAL, hash_bin, 0))
                 throw win_runtime_error(__FUNCTION__ " Calculating MD5 hash failed.");
-            if (memcmp((unsigned char*)data + enc_size, hash_bin.data(), dwHashSize) != 0)
+            if (memcmp(reinterpret_cast<const unsigned char*>(data) + enc_size, hash_bin.data(), dwHashSize) != 0)
                 throw invalid_argument(__FUNCTION__ " Invalid encrypted data.");
 
             return dec;
