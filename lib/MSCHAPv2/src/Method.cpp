@@ -151,9 +151,6 @@ void eap::method_mschapv2::process_request_packet(
 
 void eap::method_mschapv2::process_packet(_In_bytecount_(size_pck) const void *_pck, _In_ size_t size_pck)
 {
-    sanitizing_blob data;
-    wstring msg_w;
-
     for (const unsigned char *pck = reinterpret_cast<const unsigned char*>(_pck), *pck_end = pck + size_pck; pck < pck_end; ) {
         if (pck + sizeof(diameter_avp_header) > pck_end)
             throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Incomplete message header.");
