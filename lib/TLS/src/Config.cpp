@@ -148,7 +148,7 @@ void eap::config_method_tls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *
     if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:ServerSideCredential"), bstr(L"ServerSideCredential"), namespace_eapmetadata, pXmlElServerSideCredential)))
         throw com_runtime_error(hr, __FUNCTION__ " Error creating <ServerSideCredential> element.");
 
-    for (list<cert_context>::const_iterator i = m_trusted_root_ca.begin(), i_end = m_trusted_root_ca.end(); i != i_end; ++i) {
+    for (auto i = m_trusted_root_ca.cbegin(), i_end = m_trusted_root_ca.cend(); i != i_end; ++i) {
         // <CA>
         com_obj<IXMLDOMElement> pXmlElCA;
         if (FAILED(hr = eapxml::create_element(pDoc, bstr(L"CA"), namespace_eapmetadata, pXmlElCA)))
@@ -168,7 +168,7 @@ void eap::config_method_tls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *
     }
 
     // <ServerName>
-    for (list<wstring>::const_iterator i = m_server_names.begin(), i_end = m_server_names.end(); i != i_end; ++i) {
+    for (auto i = m_server_names.cbegin(), i_end = m_server_names.cend(); i != i_end; ++i) {
         if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElServerSideCredential, bstr(L"ServerName"), namespace_eapmetadata, bstr(*i))))
             throw com_runtime_error(hr, __FUNCTION__ " Error creating <ServerName> element.");
     }
@@ -221,7 +221,7 @@ void eap::config_method_tls::load(_In_ IXMLDOMNode *pConfigRoot)
 
             // Log loaded CA certificates.
             list<tstring> cert_names;
-            for (std::list<winstd::cert_context>::const_iterator cert = m_trusted_root_ca.cbegin(), cert_end = m_trusted_root_ca.cend(); cert != cert_end; ++cert)
+            for (auto cert = m_trusted_root_ca.cbegin(), cert_end = m_trusted_root_ca.cend(); cert != cert_end; ++cert)
                 cert_names.push_back(std::move(get_cert_title(*cert)));
             m_module.log_config((xpathServerSideCredential + L"/CA").c_str(), cert_names);
         }
@@ -311,7 +311,7 @@ bool eap::config_method_tls::add_trusted_ca(_In_  DWORD dwCertEncodingType, _In_
         return false;
     }
 
-    for (list<cert_context>::const_iterator i = m_trusted_root_ca.cbegin(), i_end = m_trusted_root_ca.cend();; ++i) {
+    for (auto i = m_trusted_root_ca.cbegin(), i_end = m_trusted_root_ca.cend();; ++i) {
         if (i != i_end) {
             if (*i == cert) {
                 // This certificate is already on the list.

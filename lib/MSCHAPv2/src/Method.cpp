@@ -198,7 +198,7 @@ void eap::method_mschapv2::process_success(_In_ const list<string> &argv)
 {
     m_success = false;
 
-    for (list<string>::const_iterator arg = argv.cbegin(), arg_end = argv.cend(); arg != arg_end; ++arg) {
+    for (auto arg = argv.cbegin(), arg_end = argv.cend(); arg != arg_end; ++arg) {
         const string &val = *arg;
         if ((val[0] == 'S' || val[0] == 's') && val[1] == '=') {
             // "S="
@@ -227,7 +227,7 @@ void eap::method_mschapv2::process_success(_In_ const list<string> &argv)
 
 void eap::method_mschapv2::process_error(_In_ const list<string> &argv)
 {
-    for (list<string>::const_iterator arg = argv.cbegin(), arg_end = argv.cend(); arg != arg_end; ++arg) {
+    for (auto arg = argv.cbegin(), arg_end = argv.cend(); arg != arg_end; ++arg) {
         const string &val = *arg;
         if ((val[0] == 'E' || val[0] == 'e') && val[1] == '=') {
             DWORD dwResult = strtoul(val.data() + 2, NULL, 10);

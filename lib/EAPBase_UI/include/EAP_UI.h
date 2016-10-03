@@ -203,10 +203,10 @@ public:
         std::unique_ptr<eap::config_method> cfg_dummy(cfg.m_module.make_config_method());
         m_banner->m_title->SetLabel(wxString::Format("%s %s", wxT(PRODUCT_NAME_STR), cfg_dummy->get_method_str()));
 
-        for (eap::config_connection::provider_list::iterator provider = m_cfg.m_providers.begin(), provider_end = m_cfg.m_providers.end(); provider != provider_end; ++provider) {
+        for (auto provider = m_cfg.m_providers.begin(), provider_end = m_cfg.m_providers.end(); provider != provider_end; ++provider) {
             bool is_single = provider->m_methods.size() == 1;
             std::vector<std::unique_ptr<eap::config_method> >::size_type count = 0;
-            std::vector<std::unique_ptr<eap::config_method> >::iterator method = provider->m_methods.begin(), method_end = provider->m_methods.end();
+            auto method = provider->m_methods.begin(), method_end = provider->m_methods.end();
             for (; method != method_end; ++method, count++) {
                 m_providers->AddPage(
                     new _wxT(
@@ -299,7 +299,7 @@ protected:
 
         if (wxMessageBox(tstring_printf(_("Are you sure you want to permanently remove %ls provider from configuration?"), wxEAPGetProviderName(cfg_provider.m_name).c_str()), _("Warning"), wxYES_NO, this) == wxYES) {
             // Delete provider.
-            eap::config_connection::provider_list::iterator it(m_cfg.m_providers.begin());
+            auto it = m_cfg.m_providers.begin();
             for (int i = 0; i < idx; i++, ++it);
             m_cfg.m_providers.erase(it);
             m_providers->DeletePage(idx);

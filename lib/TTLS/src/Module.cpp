@@ -204,7 +204,7 @@ EAP_SESSION_HANDLE eap::peer_ttls::begin_session(
 
     config_method_ttls *cfg_method;
 
-    for (config_connection::provider_list::iterator cfg_prov = s->m_cfg.m_providers.begin(), cfg_prov_end = s->m_cfg.m_providers.end();; ++cfg_prov) {
+    for (auto cfg_prov = s->m_cfg.m_providers.begin(), cfg_prov_end = s->m_cfg.m_providers.end();; ++cfg_prov) {
         if (cfg_prov != cfg_prov_end) {
             if (s->m_cred.match(*cfg_prov)) {
                 // Matching provider found.
@@ -366,7 +366,7 @@ const eap::config_method_ttls* eap::peer_ttls::combine_credentials(
 
     user_impersonator impersonating(hTokenImpersonateUser);
 
-    for (config_connection::provider_list::const_iterator cfg_prov = cfg.m_providers.cbegin(), cfg_prov_end = cfg.m_providers.cend(); cfg_prov != cfg_prov_end; ++cfg_prov) {
+    for (auto cfg_prov = cfg.m_providers.cbegin(), cfg_prov_end = cfg.m_providers.cend(); cfg_prov != cfg_prov_end; ++cfg_prov) {
         wstring target_name(std::move(cfg_prov->get_id()));
 
         // Get method configuration.

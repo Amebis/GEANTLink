@@ -657,7 +657,7 @@ void eap::credentials_connection::load(_In_ IXMLDOMNode *pConfigRoot)
     m_module.log_config((xpath + L" ID").c_str(), m_id.c_str());
 
     // Look-up the provider.
-    for (config_connection::provider_list::const_iterator cfg_prov = m_cfg.m_providers.cbegin(), cfg_prov_end = m_cfg.m_providers.cend(); ; ++cfg_prov) {
+    for (auto cfg_prov = m_cfg.m_providers.cbegin(), cfg_prov_end = m_cfg.m_providers.cend(); ; ++cfg_prov) {
         if (cfg_prov != cfg_prov_end) {
             if (match(*cfg_prov)) {
                 // Matching provider found. Create matching blank credential set, then load.
@@ -700,7 +700,7 @@ void eap::credentials_connection::operator>>(_Inout_ cursor_in &cursor)
     cursor >> m_id       ;
 
     // Look-up the provider.
-    for (config_connection::provider_list::const_iterator cfg_prov = m_cfg.m_providers.cbegin(), cfg_prov_end = m_cfg.m_providers.cend(); ; ++cfg_prov) {
+    for (auto cfg_prov = m_cfg.m_providers.cbegin(), cfg_prov_end = m_cfg.m_providers.cend(); ; ++cfg_prov) {
         if (cfg_prov != cfg_prov_end) {
             if (match(*cfg_prov)) {
                 // Matching provider found. Create matching blank credential set, then read.

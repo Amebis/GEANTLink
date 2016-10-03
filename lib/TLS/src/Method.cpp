@@ -199,7 +199,7 @@ void eap::method_tls::begin_session(
 #else
     // Build (expected) server name(s) for Schannel.
     m_sc_target_name.clear();
-    for (list<wstring>::const_iterator name = m_cfg.m_server_names.cbegin(), name_end = m_cfg.m_server_names.cend(); name != name_end; ++name) {
+    for (auto name = m_cfg.m_server_names.cbegin(), name_end = m_cfg.m_server_names.cend(); name != name_end; ++name) {
         if (name != m_cfg.m_server_names.cbegin())
             m_sc_target_name += _T(';');
 #ifdef _UNICODE
@@ -1294,7 +1294,7 @@ void eap::method_tls::verify_server_trust() const
         throw sec_runtime_error(status, __FUNCTION__ " Error retrieving server certificate from Schannel.");
 #endif
 
-    for (list<cert_context>::const_iterator c = m_cfg.m_trusted_root_ca.cbegin(), c_end = m_cfg.m_trusted_root_ca.cend(); c != c_end; ++c) {
+    for (auto c = m_cfg.m_trusted_root_ca.cbegin(), c_end = m_cfg.m_trusted_root_ca.cend(); c != c_end; ++c) {
         if (cert->cbCertEncoded == (*c)->cbCertEncoded &&
             memcmp(cert->pbCertEncoded, (*c)->pbCertEncoded, cert->cbCertEncoded) == 0)
         {
@@ -1343,7 +1343,7 @@ void eap::method_tls::verify_server_trust() const
             }
             has_san = true;
 
-            for (list<wstring>::const_iterator s = m_cfg.m_server_names.cbegin(), s_end = m_cfg.m_server_names.cend(); !found && s != s_end; ++s) {
+            for (auto s = m_cfg.m_server_names.cbegin(), s_end = m_cfg.m_server_names.cend(); !found && s != s_end; ++s) {
                 for (DWORD idx_entry = 0; !found && idx_entry < san_info->cAltEntry; idx_entry++) {
                     if (san_info->rgAltEntry[idx_entry].dwAltNameChoice == CERT_ALT_NAME_DNS_NAME &&
                         _wcsicmp(s->c_str(), san_info->rgAltEntry[idx_entry].pwszDNSName) == 0)
@@ -1361,7 +1361,7 @@ void eap::method_tls::verify_server_trust() const
             if (!CertGetNameStringW(cert, CERT_NAME_DNS_TYPE, CERT_NAME_STR_ENABLE_PUNYCODE_FLAG, NULL, subj))
                 throw win_runtime_error(__FUNCTION__ " Error retrieving server's certificate subject name.");
 
-            for (list<wstring>::const_iterator s = m_cfg.m_server_names.cbegin(), s_end = m_cfg.m_server_names.cend(); !found && s != s_end; ++s) {
+            for (auto s = m_cfg.m_server_names.cbegin(), s_end = m_cfg.m_server_names.cend(); !found && s != s_end; ++s) {
                 if (_wcsicmp(s->c_str(), subj.c_str()) == 0) {
                     m_module.log_event(&EAPMETHOD_TLS_SERVER_NAME_TRUSTED1, event_data(subj), event_data::blank);
                     found = true;
@@ -1381,12 +1381,12 @@ void eap::method_tls::verify_server_trust() const
     cert_store store;
     if (!store.create(CERT_STORE_PROV_MEMORY, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, NULL, 0, NULL))
         throw win_runtime_error(__FUNCTION__ " Error creating temporary certificate store.");
-    for (list<cert_context>::const_iterator c = m_cfg.m_trusted_root_ca.cbegin(), c_end = m_cfg.m_trusted_root_ca.cend(); c != c_end; ++c)
+    for (auto c = m_cfg.m_trusted_root_ca.cbegin(), c_end = m_cfg.m_trusted_root_ca.cend(); c != c_end; ++c)
         CertAddCertificateContextToStore(store, *c, CERT_STORE_ADD_REPLACE_EXISTING, NULL);
 
     // Add all intermediate certificates from the server's certificate chain.
 #if EAP_TLS < EAP_TLS_SCHANNEL
-    for (list<cert_context>::const_iterator c = m_server_cert_chain.cbegin(), c_end = m_server_cert_chain.cend(); ++c != c_end;) {
+    for (auto c = m_server_cert_chain.cbegin(), c_end = m_server_cert_chain.cend(); ++c != c_end;) {
         const cert_context &_c = *c;
         if (_c->pCertInfo->Issuer.cbData == _c->pCertInfo->Subject.cbData &&
             memcmp(_c->pCertInfo->Issuer.pbData, _c->pCertInfo->Subject.pbData, _c->pCertInfo->Issuer.cbData) == 0)
@@ -1453,7 +1453,7 @@ void eap::method_tls::verify_server_trust() const
         throw sec_runtime_error(SEC_E_CERT_UNKNOWN, __FUNCTION__ " Can not verify empty certificate chain.");
 
     PCCERT_CONTEXT cert_root = context->rgpChain[0]->rgpElement[context->rgpChain[0]->cElement-1]->pCertContext;
-    for (list<cert_context>::const_iterator c = m_cfg.m_trusted_root_ca.cbegin(), c_end = m_cfg.m_trusted_root_ca.cend();; ++c) {
+    for (auto c = m_cfg.m_trusted_root_ca.cbegin(), c_end = m_cfg.m_trusted_root_ca.cend();; ++c) {
         if (c != c_end) {
             if (cert_root->cbCertEncoded == (*c)->cbCertEncoded &&
                 memcmp(cert_root->pbCertEncoded, (*c)->pbCertEncoded, cert_root->cbCertEncoded) == 0)

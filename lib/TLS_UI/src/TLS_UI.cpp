@@ -246,7 +246,7 @@ bool wxFQDNListValidator::TransferToWindow()
 
     if (m_val) {
         wxString str;
-        for (std::list<std::wstring>::const_iterator name = m_val->cbegin(), name_end = m_val->cend(); name != name_end; ++name) {
+        for (auto name = m_val->cbegin(), name_end = m_val->cend(); name != name_end; ++name) {
             if (!str.IsEmpty()) str += wxT("; ");
             str += *name;
         }
@@ -421,7 +421,7 @@ wxTLSServerTrustPanel::wxTLSServerTrustPanel(const eap::config_provider &prov, e
 bool wxTLSServerTrustPanel::TransferDataToWindow()
 {
     // Populate trusted CA list.
-    for (std::list<winstd::cert_context>::const_iterator cert = m_cfg.m_trusted_root_ca.cbegin(), cert_end = m_cfg.m_trusted_root_ca.cend(); cert != cert_end; ++cert)
+    for (auto cert = m_cfg.m_trusted_root_ca.cbegin(), cert_end = m_cfg.m_trusted_root_ca.cend(); cert != cert_end; ++cert)
         m_root_ca->Append(wxString(eap::get_cert_title(*cert)), new wxCertificateClientData(cert->duplicate()));
 
     // Set server acceptable names. The edit control will get populated by validator.

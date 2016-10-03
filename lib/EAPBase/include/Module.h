@@ -162,7 +162,7 @@ namespace eap
             desc.reserve(count + 2);
             desc.push_back(winstd::event_data(              name ));
             desc.push_back(winstd::event_data((unsigned int)count));
-            for (std::list<std::basic_string<char, _Traits, _Ax>, _Ax_list>::const_iterator v = value.cbegin(), v_end = value.cend(); v != v_end; ++v)
+            for (auto v = value.cbegin(), v_end = value.cend(); v != v_end; ++v)
                 desc.push_back(winstd::event_data(*v));
 
             m_ep.write(&EAPMETHOD_TRACE_EVT_CFG_VALUE_ANSI_STRING_ARRAY, (ULONG)desc.size(), desc.data());
@@ -180,7 +180,7 @@ namespace eap
             desc.reserve(count + 2);
             desc.push_back(winstd::event_data(              name ));
             desc.push_back(winstd::event_data((unsigned int)count));
-            for (std::list<std::basic_string<wchar_t, _Traits, _Ax>, _Ax_list>::const_iterator v = value.cbegin(), v_end = value.cend(); v != v_end; ++v)
+            for (auto v = value.cbegin(), v_end = value.cend(); v != v_end; ++v)
                 desc.push_back(winstd::event_data(*v));
 
             m_ep.write(&EAPMETHOD_TRACE_EVT_CFG_VALUE_UNICODE_STRING_ARRAY, (ULONG)desc.size(), desc.data());
