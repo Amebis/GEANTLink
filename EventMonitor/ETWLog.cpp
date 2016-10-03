@@ -92,7 +92,7 @@ wxEventTraceProcessorThread::wxEventTraceProcessorThread(wxEvtHandler *parent, c
 
 wxEventTraceProcessorThread::~wxEventTraceProcessorThread()
 {
-    for (vector<TRACEHANDLE>::iterator trace = m_traces.begin(), trace_end = m_traces.end(); trace != trace_end; ++trace) {
+    for (auto trace = m_traces.begin(), trace_end = m_traces.end(); trace != trace_end; ++trace) {
         TRACEHANDLE &h = *trace;
         if (h) {
             // Close trace.
@@ -104,7 +104,7 @@ wxEventTraceProcessorThread::~wxEventTraceProcessorThread()
 
 void wxEventTraceProcessorThread::Abort()
 {
-    for (vector<TRACEHANDLE>::iterator trace = m_traces.begin(), trace_end = m_traces.end(); trace != trace_end; ++trace) {
+    for (auto trace = m_traces.begin(), trace_end = m_traces.end(); trace != trace_end; ++trace) {
         TRACEHANDLE &h = *trace;
         if (h) {
             // Close trace.
@@ -415,7 +415,7 @@ void wxETWListCtrl::RebuildItems()
 
     // Rebuild the index.
     m_rec_idx.clear();
-    set<size_t>::const_iterator selection_end = selection.end(), focus_end = focus.end();
+    auto selection_end = selection.cend(), focus_end = focus.cend();
     vector<long> selection_out, focus_out;
     long center_out = -1;
     for (size_t i = 0, n = m_rec_db.size(); i < n; i++) {
@@ -709,7 +709,7 @@ void wxPersistentETWListCtrl::Save() const
     SaveValue(wxT("ScrollAuto"), wnd->m_scroll_auto);
 
     wxString data_str;
-    for (wxETWListCtrl::guidset::const_iterator src = wnd->m_sources.cbegin(), src_end = wnd->m_sources.cend(); src != src_end; ++src)
+    for (auto src = wnd->m_sources.cbegin(), src_end = wnd->m_sources.cend(); src != src_end; ++src)
         data_str += tstring_guid(*src);
     SaveValue(wxT("Sources"), data_str);
 

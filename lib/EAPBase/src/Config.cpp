@@ -375,7 +375,7 @@ eap::config_provider::config_provider(_In_ const config_provider &other) :
     config              (other                     )
 {
     m_methods.reserve(other.m_methods.size());
-    for (vector<unique_ptr<config_method> >::const_iterator method = other.m_methods.cbegin(), method_end = other.m_methods.cend(); method != method_end; ++method)
+    for (auto method = other.m_methods.cbegin(), method_end = other.m_methods.cend(); method != method_end; ++method)
         m_methods.push_back(std::move(unique_ptr<config_method>(*method ? dynamic_cast<config_method*>(method->get()->clone()) : nullptr)));
 }
 
@@ -414,7 +414,7 @@ eap::config_provider& eap::config_provider::operator=(_In_ const config_provider
 
         m_methods.clear();
         m_methods.reserve(other.m_methods.size());
-        for (vector<unique_ptr<config_method> >::const_iterator method = other.m_methods.cbegin(), method_end = other.m_methods.cend(); method != method_end; ++method)
+        for (auto method = other.m_methods.cbegin(), method_end = other.m_methods.cend(); method != method_end; ++method)
             m_methods.push_back(std::move(unique_ptr<config_method>(*method ? dynamic_cast<config_method*>(method->get()->clone()) : nullptr)));
     }
 
@@ -519,7 +519,7 @@ void eap::config_provider::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pC
     if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:AuthenticationMethods"), bstr(L"AuthenticationMethods"), namespace_eapmetadata, pXmlElAuthenticationMethods)))
         throw com_runtime_error(hr, __FUNCTION__ " Error creating <AuthenticationMethods> element.");
 
-    for (vector<unique_ptr<config_method> >::const_iterator method = m_methods.cbegin(), method_end = m_methods.cend(); method != method_end; ++method) {
+    for (auto method = m_methods.cbegin(), method_end = m_methods.cend(); method != method_end; ++method) {
         // <AuthenticationMethod>
         com_obj<IXMLDOMElement> pXmlElAuthenticationMethod;
         if (FAILED(hr = eapxml::create_element(pDoc, bstr(L"AuthenticationMethod"), namespace_eapmetadata, pXmlElAuthenticationMethod)))
@@ -685,11 +685,12 @@ void eap::config_provider::operator>>(_Inout_ cursor_in &cursor)
     cursor >> m_lbl_alt_identity  ;
     cursor >> m_lbl_alt_password  ;
 
-    list<config_method>::size_type count;
-    bool is_nonnull;
+    list<config_method>::size_type i, count;
     cursor >> count;
     m_methods.clear();
-    for (list<config_method>::size_type i = 0; i < count; i++) {
+    m_methods.reserve(count);
+    for (i = 0; i < count; i++) {
+        bool is_nonnull;
         cursor >> is_nonnull;
         if (is_nonnull) {
             unique_ptr<config_method> el(m_module.make_config_method());
@@ -763,7 +764,7 @@ void eap::config_connection::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *
     if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:EAPIdentityProviderList"), bstr(L"EAPIdentityProviderList"), namespace_eapmetadata, pXmlElIdentityProviderList)))
         throw com_runtime_error(hr, __FUNCTION__ " Error creating <EAPIdentityProviderList> element.");
 
-    for (provider_list::const_iterator provider = m_providers.cbegin(), provider_end = m_providers.cend(); provider != provider_end; ++provider) {
+    for (auto provider = m_providers.cbegin(), provider_end = m_providers.cend(); provider != provider_end; ++provider) {
         // <EAPIdentityProvider>
         com_obj<IXMLDOMElement> pXmlElIdentityProvider;
         if (FAILED(hr = eapxml::create_element(pDoc, bstr(L"EAPIdentityProvider"), namespace_eapmetadata, pXmlElIdentityProvider)))
@@ -825,10 +826,10 @@ void eap::config_connection::operator>>(_Inout_ cursor_in &cursor)
 {
     config::operator>>(cursor);
 
-    provider_list::size_type count;
+    provider_list::size_type i, count;
     cursor >> count;
     m_providers.clear();
-    for (provider_list::size_type i = 0; i < count; i++) {
+    for (i = 0; i < count; i++) {
         config_provider el(m_module);
         cursor >> el;
         m_providers.push_back(std::move(el));

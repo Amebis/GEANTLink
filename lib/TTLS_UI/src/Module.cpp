@@ -184,7 +184,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
             // Create credentials dialog and populate it with providers.
             bool combined = false;
             wxEAPCredentialsConnectionDialog dlg(&parent);
-            for (config_connection::provider_list::iterator cfg_prov = cfg.m_providers.begin(), cfg_prov_end = cfg.m_providers.end(); cfg_prov != cfg_prov_end; ++cfg_prov) {
+            for (auto cfg_prov = cfg.m_providers.begin(), cfg_prov_end = cfg.m_providers.end(); cfg_prov != cfg_prov_end; ++cfg_prov) {
                 wstring target_name(std::move(cfg_prov->get_id()));
 
                 // Get method configuration.

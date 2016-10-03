@@ -720,7 +720,7 @@ namespace eap
 
 inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const bool &val)
 {
-    eap::cursor_out::ptr_type ptr_end = cursor.ptr + 1;
+    auto ptr_end = cursor.ptr + 1;
     assert(ptr_end <= cursor.ptr_end);
     *cursor.ptr = val ? 1 : 0;
     cursor.ptr = ptr_end;
@@ -736,7 +736,7 @@ inline size_t pksizeof(_In_ const bool &val)
 
 inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ bool &val)
 {
-    eap::cursor_in::ptr_type ptr_end = cursor.ptr + 1;
+    auto ptr_end = cursor.ptr + 1;
     assert(ptr_end <= cursor.ptr_end);
     val = *cursor.ptr ? true : false;
     cursor.ptr = ptr_end;
@@ -745,7 +745,7 @@ inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ bool &val)
 
 inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const unsigned char &val)
 {
-    eap::cursor_out::ptr_type ptr_end = cursor.ptr + 1;
+    auto ptr_end = cursor.ptr + 1;
     assert(ptr_end <= cursor.ptr_end);
     *cursor.ptr = val;
     cursor.ptr = ptr_end;
@@ -761,7 +761,7 @@ inline size_t pksizeof(_In_ const unsigned char &val)
 
 inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ unsigned char &val)
 {
-    eap::cursor_in::ptr_type ptr_end = cursor.ptr + 1;
+    auto ptr_end = cursor.ptr + 1;
     assert(ptr_end <= cursor.ptr_end);
     val = *cursor.ptr;
     cursor.ptr = ptr_end;
@@ -770,7 +770,7 @@ inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ unsigned char &val)
 
 inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const unsigned int &val)
 {
-    eap::cursor_out::ptr_type ptr_end = cursor.ptr + sizeof(unsigned int);
+    auto ptr_end = cursor.ptr + sizeof(unsigned int);
     assert(ptr_end <= cursor.ptr_end);
     *reinterpret_cast<unsigned int*>(cursor.ptr) = val;
     cursor.ptr = ptr_end;
@@ -786,7 +786,7 @@ inline size_t pksizeof(_In_ const unsigned int &val)
 
 inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ unsigned int &val)
 {
-    eap::cursor_in::ptr_type ptr_end = cursor.ptr + sizeof(unsigned int);
+    auto ptr_end = cursor.ptr + sizeof(unsigned int);
     assert(ptr_end <= cursor.ptr_end);
     val = *reinterpret_cast<const unsigned int*>(cursor.ptr);
     cursor.ptr = ptr_end;
@@ -796,7 +796,7 @@ inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ unsigned int &val)
 #ifdef _WIN64
 inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const size_t &val)
 {
-    eap::cursor_out::ptr_type ptr_end = cursor.ptr + sizeof(size_t);
+    auto ptr_end = cursor.ptr + sizeof(size_t);
     assert(ptr_end <= cursor.ptr_end);
     *(size_t*)cursor.ptr = val;
     cursor.ptr = ptr_end;
@@ -812,7 +812,7 @@ inline size_t pksizeof(_In_ const size_t &val)
 
 inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ size_t &val)
 {
-    eap::cursor_in::ptr_type ptr_end = cursor.ptr + sizeof(size_t);
+    auto ptr_end = cursor.ptr + sizeof(size_t);
     assert(ptr_end <= cursor.ptr_end);
     val = *(size_t*)cursor.ptr;
     cursor.ptr = ptr_end;
@@ -823,10 +823,10 @@ inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ size_t &val)
 template<class _Elem, class _Traits, class _Ax>
 inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const std::basic_string<_Elem, _Traits, _Ax> &val)
 {
-    std::basic_string<_Elem, _Traits, _Ax>::size_type count = val.length();
+    size_t count = val.length();
     assert(strlen(val.c_str()) == count); // String should not contain zero terminators.
     size_t size = sizeof(_Elem)*(count + 1);
-    eap::cursor_out::ptr_type ptr_end = cursor.ptr + size;
+    auto ptr_end = cursor.ptr + size;
     assert(ptr_end <= cursor.ptr_end);
     memcpy(cursor.ptr, (const _Elem*)val.c_str(), size);
     cursor.ptr = ptr_end;
@@ -844,7 +844,7 @@ template<class _Elem, class _Traits, class _Ax>
 inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ std::basic_string<_Elem, _Traits, _Ax> &val)
 {
     size_t count_max = cursor.ptr_end - cursor.ptr;
-    std::basic_string<_Elem, _Traits, _Ax>::size_type count = strnlen((const _Elem*&)cursor.ptr, count_max);
+    size_t count = strnlen((const _Elem*&)cursor.ptr, count_max);
     assert(count < count_max); // String should be zero terminated.
     val.assign((const _Elem*&)cursor.ptr, count);
     cursor.ptr += sizeof(_Elem)*(count + 1);
@@ -879,13 +879,13 @@ inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ std::basic_string<w
 template<class _Ty, class _Ax>
 inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const std::vector<_Ty, _Ax> &val)
 {
-    std::vector<_Ty, _Ax>::size_type count = val.size();
+    auto count = val.size();
     cursor << count;
 
     // Since we do not know wheter vector elements are primitives or objects, iterate instead of memcpy.
     // For performance critical vectors of flat opaque data types write specialized template instantiation.
-    for (std::vector<_Ty, _Ax>::size_type i = 0; i < count; i++)
-        cursor << val[i];
+    for (auto i = val.cbegin(), i_end = val.cend(); i != i_end; ++i)
+        cursor << *i;
 }
 
 
@@ -894,10 +894,10 @@ inline size_t pksizeof(const std::vector<_Ty, _Ax> &val)
 {
     // Since we do not know wheter vector elements are primitives or objects, iterate instead of sizeof().
     // For performance critical vectors of flat opaque data types write specialized template instantiation.
-    std::vector<_Ty, _Ax>::size_type count = val.size();
+    auto count = val.size();
     size_t size = pksizeof(count);
-    for (std::vector<_Ty, _Ax>::size_type i = 0; i < count; i++)
-        size += pksizeof(val[i]);
+    for (auto i = val.cbegin(), i_end = val.cend(); i != i_end; ++i)
+        size += pksizeof(*i);
     return size;
 }
 
@@ -905,14 +905,14 @@ inline size_t pksizeof(const std::vector<_Ty, _Ax> &val)
 template<class _Ty, class _Ax>
 inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ std::vector<_Ty, _Ax> &val)
 {
-    std::vector<_Ty, _Ax>::size_type count;
+    std::vector<_Ty, _Ax>::size_type i, count;
     cursor >> count;
 
     // Since we do not know wheter vector elements are primitives or objects, iterate instead of assign().
     // For performance critical vectors of flat opaque data types write specialized template instantiation.
     val.clear();
     val.reserve(count);
-    for (std::vector<_Ty, _Ax>::size_type i = 0; i < count; i++) {
+    for (i = 0; i < count; i++) {
         _Ty el;
         cursor >> el;
         val.push_back(el);
@@ -923,12 +923,12 @@ inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ std::vector<_Ty, _A
 template<class _Ty, class _Ax>
 inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const std::list<_Ty, _Ax> &val)
 {
-    std::list<_Ty, _Ax>::size_type count = val.size();
+    auto count = val.size();
     cursor << count;
 
     // Since we do not know wheter list elements are primitives or objects, iterate instead of memcpy.
     // For performance critical vectors of flat opaque data types write specialized template instantiation.
-    for (std::list<_Ty, _Ax>::const_iterator i = val.cbegin(), i_end = val.cend(); i != i_end; ++i)
+    for (auto i = val.cbegin(), i_end = val.cend(); i != i_end; ++i)
         cursor << *i;
 }
 
@@ -938,9 +938,9 @@ inline size_t pksizeof(const std::list<_Ty, _Ax> &val)
 {
     // Since we do not know wheter list elements are primitives or objects, iterate instead of sizeof().
     // For performance critical vectors of flat opaque data types write specialized template instantiation.
-    std::list<_Ty, _Ax>::size_type count = val.size();
+    auto count = val.size();
     size_t size = pksizeof(count);
-    for (std::list<_Ty, _Ax>::const_iterator i = val.cbegin(), i_end = val.cend(); i != i_end; ++i)
+    for (auto i = val.cbegin(), i_end = val.cend(); i != i_end; ++i)
         size += pksizeof(*i);
     return size;
 }
@@ -949,13 +949,11 @@ inline size_t pksizeof(const std::list<_Ty, _Ax> &val)
 template<class _Ty, class _Ax>
 inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ std::list<_Ty, _Ax> &val)
 {
-    std::list<_Ty, _Ax>::size_type count;
+    std::list<_Ty, _Ax>::size_type i, count;
     cursor >> count;
 
-    // Since we do not know wheter list elements are primitives or objects, iterate instead of assign().
-    // For performance critical vectors of flat opaque data types write specialized template instantiation.
     val.clear();
-    for (std::list<_Ty, _Ax>::size_type i = 0; i < count; i++) {
+    for (i = 0; i < count; i++) {
         _Ty el;
         cursor >> el;
         val.push_back(el);
@@ -990,7 +988,7 @@ inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const winstd::cert_
     if (val) {
         cursor << (unsigned int)val->dwCertEncodingType;
         cursor << (unsigned int)val->cbCertEncoded     ;
-        eap::cursor_out::ptr_type ptr_end = cursor.ptr + val->cbCertEncoded;
+        auto ptr_end = cursor.ptr + val->cbCertEncoded;
         assert(ptr_end <= cursor.ptr_end);
         memcpy(cursor.ptr, val->pbCertEncoded, val->cbCertEncoded);
         cursor.ptr = ptr_end;
@@ -1022,7 +1020,7 @@ inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ winstd::cert_contex
     cursor >> (unsigned int&)dwCertEncodedSize;
 
     if (dwCertEncodedSize) {
-        eap::cursor_in::ptr_type ptr_end = cursor.ptr + dwCertEncodedSize;
+        auto ptr_end = cursor.ptr + dwCertEncodedSize;
         assert(ptr_end <= cursor.ptr_end);
         val.create(dwCertEncodingType, (BYTE*)cursor.ptr, dwCertEncodedSize);
         cursor.ptr = ptr_end;
@@ -1052,7 +1050,7 @@ inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ winstd::eap_type_t 
 template<size_t N>
 inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const eap::sanitizing_blob_f<N> &val)
 {
-    eap::cursor_out::ptr_type ptr_end = cursor.ptr + sizeof(eap::sanitizing_blob_f<N>);
+    auto ptr_end = cursor.ptr + sizeof(eap::sanitizing_blob_f<N>);
     assert(ptr_end <= cursor.ptr_end);
     memcpy(cursor.ptr, val.data, sizeof(eap::sanitizing_blob_f<N>));
     cursor.ptr = ptr_end;
@@ -1070,7 +1068,7 @@ inline size_t pksizeof(_In_ const eap::sanitizing_blob_f<N> &val)
 template<size_t N>
 inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ eap::sanitizing_blob_f<N> &val)
 {
-    eap::cursor_in::ptr_type ptr_end = cursor.ptr + sizeof(eap::sanitizing_blob_f<N>);
+    auto ptr_end = cursor.ptr + sizeof(eap::sanitizing_blob_f<N>);
     assert(ptr_end <= cursor.ptr_end);
     memcpy(val.data, cursor.ptr, sizeof(eap::sanitizing_blob_f<N>));
     cursor.ptr = ptr_end;
@@ -1079,7 +1077,7 @@ inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ eap::sanitizing_blo
 
 inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const GUID &val)
 {
-    eap::cursor_out::ptr_type ptr_end = cursor.ptr + sizeof(GUID);
+    auto ptr_end = cursor.ptr + sizeof(GUID);
     assert(ptr_end <= cursor.ptr_end);
     memcpy(cursor.ptr, &val, sizeof(GUID));
     cursor.ptr = ptr_end;
@@ -1095,7 +1093,7 @@ inline size_t pksizeof(_In_ const GUID &val)
 
 inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ GUID &val)
 {
-    eap::cursor_in::ptr_type ptr_end = cursor.ptr + sizeof(GUID);
+    auto ptr_end = cursor.ptr + sizeof(GUID);
     assert(ptr_end <= cursor.ptr_end);
     memcpy(&val, cursor.ptr, sizeof(GUID));
     cursor.ptr = ptr_end;

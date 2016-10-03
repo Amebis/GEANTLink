@@ -528,7 +528,7 @@ void eap::monitor_ui::release_slaves(_In_bytecount_(size) const void *data, _In_
 {
     assert(!size || data);
 
-    for (list<HWND>::const_iterator slave = m_slaves.begin(), slave_end = m_slaves.end(); slave != slave_end; ++slave) {
+    for (auto slave = m_slaves.cbegin(), slave_end = m_slaves.cend(); slave != slave_end; ++slave) {
         // Get slave's PID.
         DWORD pid_slave;
         GetWindowThreadProcessId(*slave, &pid_slave);

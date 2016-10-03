@@ -161,7 +161,7 @@ public:
 
     inline void EnableSource(const GUID &guid, bool enable = true)
     {
-        guidset::iterator s = m_sources.find(guid);
+        auto s = m_sources.find(guid);
         if (enable) {
             if (s == m_sources.end()) {
                 m_sources.insert(guid);
