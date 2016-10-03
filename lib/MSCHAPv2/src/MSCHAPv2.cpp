@@ -45,7 +45,7 @@ crypt_key eap::create_des_key(_In_ HCRYPTPROV cp, _In_count_(size) const unsigne
     };
     sanitizing_blob key_blob;
     key_blob.reserve(sizeof(key_blob_prefix) + 8);
-    key_blob.assign((const unsigned char*)&s_prefix, (const unsigned char*)(&s_prefix + 1));
+    key_blob.assign(reinterpret_cast<const unsigned char*>(&s_prefix), reinterpret_cast<const unsigned char*>(&s_prefix + 1));
 
     // Inject parity bits.
     unsigned char out = 0, parity = 1;
@@ -215,7 +215,7 @@ eap::nt_response::nt_response(
     static const DWORD mode_ecb = CRYPT_MODE_ECB;
 
     // DesEncrypt(Challenge, 1st 7-octets of ZPasswordHash, giving 1st 8-octets of Response)
-    key = create_des_key(cp, (const unsigned char*)&hash_pwd, 7);
+    key = create_des_key(cp, reinterpret_cast<const unsigned char*>(&hash_pwd), 7);
     if (!CryptSetKeyParam(key, KP_MODE, (const BYTE*)&mode_ecb, 0))
         throw win_runtime_error(__FUNCTION__ " Error setting ECB mode.");
     memcpy(data, &challenge, 8);
@@ -224,7 +224,7 @@ eap::nt_response::nt_response(
         throw win_runtime_error(__FUNCTION__ " Error encrypting message 1/3.");
 
     // DesEncrypt(Challenge, 2nd 7-octets of ZPasswordHash, giving 2nd 8-octets of Response)
-    key = create_des_key(cp, (const unsigned char*)&hash_pwd + 7, 7);
+    key = create_des_key(cp, reinterpret_cast<const unsigned char*>(&hash_pwd) + 7, 7);
     if (!CryptSetKeyParam(key, KP_MODE, (const BYTE*)&mode_ecb, 0))
         throw win_runtime_error(__FUNCTION__ " Error setting ECB mode.");
     memcpy(data + 8, &challenge, 8);
@@ -233,7 +233,7 @@ eap::nt_response::nt_response(
         throw win_runtime_error(__FUNCTION__ " Error encrypting message 2/3.");
 
     // DesEncrypt(Challenge, 2nd 7-octets of ZPasswordHash, giving 2nd 8-octets of Response)
-    key = create_des_key(cp, (const unsigned char*)&hash_pwd + 14, 2);
+    key = create_des_key(cp, reinterpret_cast<const unsigned char*>(&hash_pwd) + 14, 2);
     if (!CryptSetKeyParam(key, KP_MODE, (const BYTE*)&mode_ecb, 0))
         throw win_runtime_error(__FUNCTION__ " Error setting ECB mode.");
     memcpy(data + 16, &challenge, 8);

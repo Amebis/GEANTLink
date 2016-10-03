@@ -173,8 +173,8 @@ void eap::credentials_tls::store(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int
     data_blob cred_enc;
     if (m_cert) {
         // Encrypt the certificate using user's key.
-        DATA_BLOB cred_blob    = { m_cert->cbCertEncoded,         m_cert->pbCertEncoded };
-        DATA_BLOB entropy_blob = { sizeof(s_entropy)    , (LPBYTE)s_entropy             };
+        DATA_BLOB cred_blob    = { m_cert->cbCertEncoded, m_cert->pbCertEncoded         };
+        DATA_BLOB entropy_blob = { sizeof(s_entropy)    , const_cast<LPBYTE>(s_entropy) };
         if (!CryptProtectData(&cred_blob, NULL, &entropy_blob, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN, &cred_enc))
             throw win_runtime_error(__FUNCTION__ " CryptProtectData failed.");
     }
@@ -185,18 +185,18 @@ void eap::credentials_tls::store(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int
     assert(cred_enc.cbData     < CRED_MAX_CREDENTIAL_BLOB_SIZE);
     assert(m_identity.length() < CRED_MAX_USERNAME_LENGTH     );
     CREDENTIAL cred = {
-        0,                          // Flags
-        CRED_TYPE_GENERIC,          // Type
-        (LPTSTR)target.c_str(),     // TargetName
-        _T(""),                     // Comment
-        { 0, 0 },                   // LastWritten
-        cred_enc.cbData,            // CredentialBlobSize
-        cred_enc.pbData,            // CredentialBlob
-        CRED_PERSIST_ENTERPRISE,    // Persist
-        0,                          // AttributeCount
-        NULL,                       // Attributes
-        NULL,                       // TargetAlias
-        (LPTSTR)m_identity.c_str()  // UserName
+        0,                                     // Flags
+        CRED_TYPE_GENERIC,                     // Type
+        const_cast<LPTSTR>(target.c_str()),    // TargetName
+        _T(""),                                // Comment
+        { 0, 0 },                              // LastWritten
+        cred_enc.cbData,                       // CredentialBlobSize
+        cred_enc.pbData,                       // CredentialBlob
+        CRED_PERSIST_ENTERPRISE,               // Persist
+        0,                                     // AttributeCount
+        NULL,                                  // Attributes
+        NULL,                                  // TargetAlias
+        const_cast<LPTSTR>(m_identity.c_str()) // UserName
     };
     if (!CredWrite(&cred, 0))
         throw win_runtime_error(__FUNCTION__ " CredWrite failed.");
@@ -214,8 +214,8 @@ void eap::credentials_tls::retrieve(_In_z_ LPCTSTR pszTargetName, _In_ unsigned 
 
     if (cred->CredentialBlobSize) {
         // Decrypt the certificate using user's key.
-        DATA_BLOB cred_enc     = { cred->CredentialBlobSize, cred->CredentialBlob };
-        DATA_BLOB entropy_blob = { sizeof(s_entropy)       , (LPBYTE)s_entropy    };
+        DATA_BLOB cred_enc     = { cred->CredentialBlobSize, cred->CredentialBlob          };
+        DATA_BLOB entropy_blob = { sizeof(s_entropy)       , const_cast<LPBYTE>(s_entropy) };
         data_blob cred_int;
         if (!CryptUnprotectData(&cred_enc, NULL, &entropy_blob, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN | CRYPTPROTECT_VERIFY_PROTECTION, &cred_int))
             throw win_runtime_error(__FUNCTION__ " CryptUnprotectData failed.");
@@ -298,14 +298,14 @@ eap::credentials::source_t eap::credentials_tls::combine(
 {
     if (cred_cached) {
         // Using EAP service cached credentials.
-        *this = *(credentials_tls*)cred_cached;
+        *this = *dynamic_cast<const credentials_tls*>(cred_cached);
         m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CACHED2, event_data((unsigned int)eap_type_tls), event_data(credentials_tls::get_name()), event_data(pszTargetName), event_data::blank);
         return source_cache;
     }
 
     if (cfg.m_use_cred) {
         // Using configured credentials.
-        *this = *(credentials_tls*)cfg.m_cred.get();
+        *this = *dynamic_cast<const credentials_tls*>(cfg.m_cred.get());
         m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CONFIG2, event_data((unsigned int)eap_type_tls), event_data(credentials_tls::get_name()), event_data(pszTargetName), event_data::blank);
         return source_config;
     }

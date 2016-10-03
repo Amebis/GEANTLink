@@ -77,7 +77,7 @@ wxEventTraceProcessorThread::wxEventTraceProcessorThread(wxEvtHandler *parent, c
 
     for (size_t i = 0, i_end = sessions.GetCount(); i < i_end; i++) {
         // Open trace.
-        tlf.LoggerName = (LPTSTR)(LPCTSTR)(sessions[i]);
+        tlf.LoggerName = const_cast<LPTSTR>((LPCTSTR)(sessions[i]));
         event_trace trace;
         if (!trace.create(&tlf)) {
             wxLogError(_("Error opening event trace (error %u)."), GetLastError());
@@ -207,7 +207,7 @@ wxETWListCtrl::wxETWListCtrl(wxWindow *parent, wxWindowID id, const wxPoint& pos
             ulSizeName    = (ULONG)((name    .length() + 1)*sizeof(TCHAR)),
             //ulSizeLogFile = (ULONG)((log_file.length() + 1)*sizeof(TCHAR)),
             ulSize        = sizeof(EVENT_TRACE_PROPERTIES) + ulSizeName /*+ ulSizeLogFile*/;
-        unique_ptr<EVENT_TRACE_PROPERTIES> properties((EVENT_TRACE_PROPERTIES*)new char[ulSize]);
+        unique_ptr<EVENT_TRACE_PROPERTIES> properties(reinterpret_cast<EVENT_TRACE_PROPERTIES*>(new char[ulSize]));
         wxASSERT_MSG(properties, wxT("error allocating session properties memory"));
 
         // Initialize properties.
@@ -220,7 +220,7 @@ wxETWListCtrl::wxETWListCtrl(wxWindow *parent, wxWindowID id, const wxPoint& pos
         properties->MaximumFileSize     = 1;  // 1 MB
         properties->LoggerNameOffset    = sizeof(EVENT_TRACE_PROPERTIES);
         //properties->LogFileNameOffset   = sizeof(EVENT_TRACE_PROPERTIES) + ulSizeName;
-        //memcpy((LPTSTR)((char*)properties.get() + properties->LogFileNameOffset), log_file.c_str(), ulSizeLogFile);
+        //memcpy(reinterpret_cast<char*>(properties.get()) + properties->LogFileNameOffset, log_file.c_str(), ulSizeLogFile);
 
         if ((ulResult = m_session.create(name.c_str(), properties.get())) == ERROR_SUCCESS) {
             break;
@@ -605,7 +605,7 @@ wxString wxETWListCtrl::OnGetItemText(const event_rec &rec, long column) const
             if (info->DecodingSource != DecodingSourceWPP) {
                 if (rec.EventHeader.Flags & EVENT_HEADER_FLAG_STRING_ONLY) {
                     // This is a string-only event. Print it.
-                    return (LPCWSTR)rec.UserData;
+                    return reinterpret_cast<LPCWSTR>(rec.UserData);
                 } else {
                     // This is not a string-only event. Prepare parameters.
 
@@ -621,12 +621,12 @@ wxString wxETWListCtrl::OnGetItemText(const event_rec &rec, long column) const
 
                     if (info->EventMessageOffset) {
                         // Format the message.
-                        return wstring_msg(0, (LPCTSTR)((LPCBYTE)info.get() + info->EventMessageOffset), props_msg.data()).c_str();
+                        return wstring_msg(0, reinterpret_cast<LPCTSTR>(reinterpret_cast<LPCBYTE>(info.get()) + info->EventMessageOffset), props_msg.data()).c_str();
                     }
                 }
             } else if (info->EventMessageOffset) {
                 // This is a WPP event.
-                return (LPCWSTR)((LPCBYTE)info.get() + info->EventMessageOffset);
+                return reinterpret_cast<LPCWSTR>(reinterpret_cast<LPCBYTE>(info.get()) + info->EventMessageOffset);
             }
         }
     }
@@ -816,21 +816,21 @@ static tstring DataToString(_In_ USHORT InType, _In_ USHORT OutType, _In_count_(
         case TDH_INTYPE_ANSICHAR: {
             // Convert strings from ANSI code page, all others (JSON, XML etc.) from UTF-8
             wstring str;
-            MultiByteToWideChar(OutType == TDH_OUTTYPE_STRING ? CP_ACP : CP_UTF8, 0, (LPCSTR)pData, (int)nDataSize, str);
+            MultiByteToWideChar(OutType == TDH_OUTTYPE_STRING ? CP_ACP : CP_UTF8, 0, reinterpret_cast<LPCSTR>(pData), (int)nDataSize, str);
             return tstring_printf(_T("%ls"), str.c_str());
         }
 
         case TDH_INTYPE_COUNTEDSTRING:
-            return DataToString(TDH_INTYPE_NONNULLTERMINATEDSTRING, OutType, (LPCBYTE)((PUSHORT)pData + 1), *(PUSHORT)pData, pMapInfo, nPtrSize);
+            return DataToString(TDH_INTYPE_NONNULLTERMINATEDSTRING, OutType, reinterpret_cast<LPCBYTE>((PUSHORT)pData + 1), *(PUSHORT)pData, pMapInfo, nPtrSize);
 
         case TDH_INTYPE_COUNTEDANSISTRING:
-            return DataToString(TDH_INTYPE_NONNULLTERMINATEDANSISTRING, OutType, (LPCBYTE)((PUSHORT)pData + 1), *(PUSHORT)pData, pMapInfo, nPtrSize);
+            return DataToString(TDH_INTYPE_NONNULLTERMINATEDANSISTRING, OutType, reinterpret_cast<LPCBYTE>((PUSHORT)pData + 1), *(PUSHORT)pData, pMapInfo, nPtrSize);
 
         case TDH_INTYPE_REVERSEDCOUNTEDSTRING:
-            return DataToString(TDH_INTYPE_NONNULLTERMINATEDSTRING, OutType, (LPCBYTE)((PUSHORT)pData + 1), MAKEWORD(HIBYTE(*(PUSHORT)pData), LOBYTE(*(PUSHORT)pData)), pMapInfo, nPtrSize);
+            return DataToString(TDH_INTYPE_NONNULLTERMINATEDSTRING, OutType, reinterpret_cast<LPCBYTE>((PUSHORT)pData + 1), MAKEWORD(HIBYTE(*(PUSHORT)pData), LOBYTE(*(PUSHORT)pData)), pMapInfo, nPtrSize);
 
         case TDH_INTYPE_REVERSEDCOUNTEDANSISTRING:
-            return DataToString(TDH_INTYPE_NONNULLTERMINATEDANSISTRING, OutType, (LPCBYTE)((PUSHORT)pData + 1), MAKEWORD(HIBYTE(*(PUSHORT)pData), LOBYTE(*(PUSHORT)pData)), pMapInfo, nPtrSize);
+            return DataToString(TDH_INTYPE_NONNULLTERMINATEDANSISTRING, OutType, reinterpret_cast<LPCBYTE>((PUSHORT)pData + 1), MAKEWORD(HIBYTE(*(PUSHORT)pData), LOBYTE(*(PUSHORT)pData)), pMapInfo, nPtrSize);
 
         case TDH_INTYPE_INT8:
             assert(nDataSize >= sizeof(CHAR));
@@ -966,7 +966,7 @@ static tstring DataToString(_In_ USHORT InType, _In_ USHORT OutType, _In_count_(
             SYSTEMTIME st, st_local;
             FileTimeToSystemTime((PFILETIME)pData, &st);
             SystemTimeToTzSpecificLocalTime(NULL, &st, &st_local);
-            return DataToString(TDH_INTYPE_SYSTEMTIME, OutType, (LPCBYTE)&st_local, sizeof(st_local), pMapInfo, nPtrSize);
+            return DataToString(TDH_INTYPE_SYSTEMTIME, OutType, reinterpret_cast<LPCBYTE>(&st_local), sizeof(st_local), pMapInfo, nPtrSize);
         }
 
         case TDH_INTYPE_SYSTEMTIME:
@@ -1019,7 +1019,7 @@ static ULONG GetArraySize(PEVENT_RECORD pEvent, PTRACE_EVENT_INFO pInfo, ULONG i
         ULONG ulResult;
 
         // Get array count property.
-        PROPERTY_DATA_DESCRIPTOR data_desc = { (ULONGLONG)((LPBYTE)pInfo + pInfo->EventPropertyInfoArray[pInfo->EventPropertyInfoArray[i].countPropertyIndex].NameOffset), ULONG_MAX };
+        PROPERTY_DATA_DESCRIPTOR data_desc = { (ULONGLONG)(reinterpret_cast<LPBYTE>(pInfo) + pInfo->EventPropertyInfoArray[pInfo->EventPropertyInfoArray[i].countPropertyIndex].NameOffset), ULONG_MAX };
         vector<unsigned char> count;
         if ((ulResult = TdhGetProperty(pEvent, 0, NULL, 1, &data_desc, count)) != ERROR_SUCCESS)
             return ulResult;
@@ -1059,8 +1059,8 @@ static tstring PropertyToString(PEVENT_RECORD pEvent, PTRACE_EVENT_INFO pInfo, U
             if (out_nonfirst) out += _T(", "); else out_nonfirst = true;
             out += _T('(');
             for (USHORT j = pInfo->EventPropertyInfoArray[ulPropIndex].structType.StructStartIndex, usLastMember = pInfo->EventPropertyInfoArray[ulPropIndex].structType.StructStartIndex + pInfo->EventPropertyInfoArray[ulPropIndex].structType.NumOfStructMembers; j < usLastMember; j++) {
-                out += tstring_printf(_T("%ls: "), (LPBYTE)pInfo + pInfo->EventPropertyInfoArray[j].NameOffset);
-                out += PropertyToString(pEvent, pInfo, j, (LPWSTR)((LPBYTE)(pInfo) + pInfo->EventPropertyInfoArray[ulPropIndex].NameOffset), k, nPtrSize);
+                out += tstring_printf(_T("%ls: "), reinterpret_cast<LPBYTE>(pInfo) + pInfo->EventPropertyInfoArray[j].NameOffset);
+                out += PropertyToString(pEvent, pInfo, j, reinterpret_cast<LPWSTR>(reinterpret_cast<LPBYTE>(pInfo) + pInfo->EventPropertyInfoArray[ulPropIndex].NameOffset), k, nPtrSize);
             }
             out += _T(')');
         } else {
@@ -1078,12 +1078,12 @@ static tstring PropertyToString(PEVENT_RECORD pEvent, PTRACE_EVENT_INFO pInfo, U
                     // The first descriptor in the array identifies the name of the structure and the second 
                     // descriptor defines the member of the structure whose data you want to retrieve. 
                     PROPERTY_DATA_DESCRIPTOR data_desc[2] = {
-                        { (ULONGLONG)pStructureName                                                         , ulStructIndex },
-                        { (ULONGLONG)((LPBYTE)pInfo + pInfo->EventPropertyInfoArray[ulPropIndex].NameOffset), k             }
+                        { (ULONGLONG)pStructureName                                                                           , ulStructIndex },
+                        { (ULONGLONG)(reinterpret_cast<LPBYTE>(pInfo) + pInfo->EventPropertyInfoArray[ulPropIndex].NameOffset), k             }
                     };
                     ulResult = TdhGetProperty(pEvent, 0, NULL, _countof(data_desc), data_desc, data);
                 } else {
-                    PROPERTY_DATA_DESCRIPTOR data_desc = { (ULONGLONG)((LPBYTE)pInfo + pInfo->EventPropertyInfoArray[ulPropIndex].NameOffset), k };
+                    PROPERTY_DATA_DESCRIPTOR data_desc = { (ULONGLONG)(reinterpret_cast<LPBYTE>(pInfo) + pInfo->EventPropertyInfoArray[ulPropIndex].NameOffset), k };
                     ulResult = TdhGetProperty(pEvent, 0, NULL, 1, &data_desc, data);
                 }
                 if (ulResult == ERROR_EVT_INVALID_EVENT_DATA) {
@@ -1094,7 +1094,7 @@ static tstring PropertyToString(PEVENT_RECORD pEvent, PTRACE_EVENT_INFO pInfo, U
 
                 // Get the name/value mapping if the property specifies a value map.
                 unique_ptr<EVENT_MAP_INFO> map_info;
-                ulResult = TdhGetEventMapInformation(pEvent, (LPWSTR)((LPBYTE)pInfo + pInfo->EventPropertyInfoArray[ulPropIndex].nonStructType.MapNameOffset), map_info);
+                ulResult = TdhGetEventMapInformation(pEvent, reinterpret_cast<LPWSTR>(reinterpret_cast<LPBYTE>(pInfo) + pInfo->EventPropertyInfoArray[ulPropIndex].nonStructType.MapNameOffset), map_info);
                 if (ulResult == ERROR_NOT_FOUND) {
                     // name/value mapping not found. Not an error actually.
                     assert(!map_info);
@@ -1105,7 +1105,7 @@ static tstring PropertyToString(PEVENT_RECORD pEvent, PTRACE_EVENT_INFO pInfo, U
                     // in the EVENT_MAP_ENTRY structure. Replace the trailing space with a null-
                     // terminating character, so that the bit mapped strings are correctly formatted.
                     for (ULONG i = 0; i < map_info->EntryCount; i++) {
-                        LPWSTR str = (LPWSTR)((PBYTE)map_info.get() + map_info->MapEntryArray[i].OutputOffset);
+                        LPWSTR str = reinterpret_cast<LPWSTR>((PBYTE)map_info.get() + map_info->MapEntryArray[i].OutputOffset);
                         SIZE_T len = wcslen(str);
                         if (len) str[len - 1] = 0;
                     }

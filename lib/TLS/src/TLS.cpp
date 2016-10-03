@@ -496,11 +496,11 @@ bool eap::packet_tls::append_frag(_In_ const EapPacket *pck)
     if (pck->Data[1] & flags_req_length_incl) {
         // Length field is included.
         packet_data_ptr  = pck->Data + 6;
-        size_packet_data = ntohs(*(unsigned short*)pck->Length) - 10;
+        size_packet_data = ntohs(*reinterpret_cast<const unsigned short*>(pck->Length)) - 10;
     } else {
         // Length field not included.
         packet_data_ptr  = pck->Data + 2;
-        size_packet_data = ntohs(*(unsigned short*)pck->Length) - 6;
+        size_packet_data = ntohs(*reinterpret_cast<const unsigned short*>(pck->Length)) - 6;
     }
 
     // Do the EAP-TLS defragmentation.
@@ -509,7 +509,7 @@ bool eap::packet_tls::append_frag(_In_ const EapPacket *pck)
             // Start a new packet.
             if (pck->Data[1] & flags_req_length_incl) {
                 // Preallocate data according to the Length field.
-                size_t size_tot  = ntohl(*(unsigned int*)(pck->Data + 2));
+                size_t size_tot  = ntohl(*reinterpret_cast<const unsigned int*>(pck->Data + 2));
                 m_data.reserve(size_tot);
                 //m_module.log_event(&EAPMETHOD_PACKET_RECV_FRAG_FIRST, event_data((unsigned int)eap_type_tls), event_data((unsigned int)size_packet_data), event_data((unsigned int)size_tot), event_data::blank);
             } else {
@@ -561,7 +561,7 @@ unsigned short eap::packet_tls::get_frag(_Out_bytecap_(size_pck) EapPacket *pck,
         } else {
             // But it should be fragmented.
             m_flags |= flags_res_length_incl | flags_res_more_frag;
-            *(unsigned int*)(pck->Data + 2) = htonl(size_packet);
+            *reinterpret_cast<unsigned int*>(pck->Data + 2) = htonl(size_packet);
             data_dst    = pck->Data + 6;
             size_data   = size_packet_limit - 10;
             size_packet = size_packet_limit;
@@ -585,7 +585,7 @@ unsigned short eap::packet_tls::get_frag(_Out_bytecap_(size_pck) EapPacket *pck,
 
     pck->Code = (BYTE)m_code;
     pck->Id   = m_id;
-    *(unsigned short*)pck->Length = htons((unsigned short)size_packet);
+    *reinterpret_cast<unsigned short*>(pck->Length) = htons((unsigned short)size_packet);
     pck->Data[0] = (BYTE)eap_type_tls;
     pck->Data[1] = m_flags;
     memcpy(data_dst, m_data.data(), size_data);

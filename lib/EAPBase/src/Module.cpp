@@ -69,13 +69,13 @@ EAP_ERROR* eap::module::make_error(_In_ DWORD dwErrorCode, _In_opt_z_ LPCWSTR ps
     pError->repairGuid                = pRepairGuid    != NULL ? *pRepairGuid    : GUID_NULL;
     pError->helpLinkGuid              = pHelpLinkGuid  != NULL ? *pHelpLinkGuid  : GUID_NULL;
     if (nRootCauseSize) {
-        pError->pRootCauseString = (LPWSTR)p;
+        pError->pRootCauseString = const_cast<LPWSTR>(reinterpret_cast<LPCWSTR>(p));
         memcpy(pError->pRootCauseString, pszRootCauseString, nRootCauseSize);
         p += nRootCauseSize;
     } else
         pError->pRootCauseString = NULL;
     if (nRepairStringSize) {
-        pError->pRepairString = (LPWSTR)p;
+        pError->pRepairString = const_cast<LPWSTR>(reinterpret_cast<LPCWSTR>(p));
         memcpy(pError->pRepairString, pszRepairString, nRepairStringSize);
         p += nRepairStringSize;
     } else
@@ -201,7 +201,7 @@ std::vector<unsigned char> eap::module::encrypt(_In_ HCRYPTPROV hProv, _In_bytec
     std::vector<unsigned char> enc(buf.begin(), buf.end());
 
     // Pre-allocate memory to allow space, as encryption will grow the data.
-    buf.assign((const unsigned char*)data, (const unsigned char*)data + size);
+    buf.assign(reinterpret_cast<const unsigned char*>(data), reinterpret_cast<const unsigned char*>(data) + size);
     DWORD dwBlockLen;
     if (!CryptGetKeyParam(key_aes, KP_BLOCKLEN, dwBlockLen, 0)) dwBlockLen = 0;
     buf.reserve((size + dwBlockLen) / dwBlockLen * dwBlockLen);

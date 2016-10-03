@@ -35,7 +35,7 @@ eap::credentials_ttls::credentials_ttls(_In_ module &mod) :
 
 
 eap::credentials_ttls::credentials_ttls(_In_ const credentials_ttls &other) :
-    m_inner(other.m_inner ? (credentials*)other.m_inner->clone() : nullptr),
+    m_inner(other.m_inner ? dynamic_cast<credentials*>(other.m_inner->clone()) : nullptr),
     credentials_tls(other)
 {
 }
@@ -52,7 +52,7 @@ eap::credentials_ttls& eap::credentials_ttls::operator=(_In_ const credentials_t
 {
     if (this != &other) {
         (credentials_tls&)*this = other;
-        m_inner.reset(other.m_inner ? (credentials*)other.m_inner->clone() : nullptr);
+        m_inner.reset(other.m_inner ? dynamic_cast<credentials*>(other.m_inner->clone()) : nullptr);
     }
 
     return *this;

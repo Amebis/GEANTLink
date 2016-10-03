@@ -248,7 +248,7 @@ protected:
 
         int idx = m_providers->GetSelection();
         if (idx != wxNOT_FOUND) {
-            eap::config_provider &cfg_provider = ((_wxT*)m_providers->GetPage(idx))->GetProvider();
+            eap::config_provider &cfg_provider = dynamic_cast<_wxT*>(m_providers->GetPage(idx))->GetProvider();
             m_prov_remove->Enable(true);
             m_prov_advanced->Enable(!cfg_provider.m_read_only);
         } else {
@@ -295,7 +295,7 @@ protected:
         wxEAPConfigDialogBase::OnProvRemove(event);
 
         int idx = m_providers->GetSelection();
-        eap::config_provider &cfg_provider = ((_wxT*)m_providers->GetPage(idx))->GetProvider();
+        eap::config_provider &cfg_provider = dynamic_cast<_wxT*>(m_providers->GetPage(idx))->GetProvider();
 
         if (wxMessageBox(tstring_printf(_("Are you sure you want to permanently remove %ls provider from configuration?"), wxEAPGetProviderName(cfg_provider.m_name).c_str()), _("Warning"), wxYES_NO, this) == wxYES) {
             // Delete provider.
@@ -317,7 +317,7 @@ protected:
         wxEAPConfigDialogBase::OnProvAdvanced(event);
 
         int idx = m_providers->GetSelection();
-        eap::config_provider &cfg_provider = ((_wxT*)m_providers->GetPage(idx))->GetProvider();
+        eap::config_provider &cfg_provider = dynamic_cast<_wxT*>(m_providers->GetPage(idx))->GetProvider();
 
         wxEAPConfigProvider dlg(cfg_provider, this);
         if (dlg.ShowModal() == wxID_OK)

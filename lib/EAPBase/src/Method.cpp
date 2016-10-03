@@ -169,13 +169,13 @@ void eap::method_noneap::append_avp(_In_ unsigned int code, _In_ unsigned char f
 
     // Diameter AVP header
     diameter_avp_header hdr;
-    *(unsigned int*)hdr.code = htonl(code);
+    *reinterpret_cast<unsigned int*>(hdr.code) = htonl(code);
     hdr.flags = flags;
     hton24(size_outer, hdr.length);
-    m_packet_res.insert(m_packet_res.end(), (unsigned char*)&hdr, (unsigned char*)(&hdr + 1));
+    m_packet_res.insert(m_packet_res.end(), reinterpret_cast<const unsigned char*>(&hdr), reinterpret_cast<const unsigned char*>(&hdr + 1));
 
     // Data
-    m_packet_res.insert(m_packet_res.end(), (unsigned char*)data, (unsigned char*)data + size);
+    m_packet_res.insert(m_packet_res.end(), reinterpret_cast<const unsigned char*>(data), reinterpret_cast<const unsigned char*>(data) + size);
     m_packet_res.insert(m_packet_res.end(), padding, 0);
 }
 
@@ -195,13 +195,13 @@ void eap::method_noneap::append_avp(_In_ unsigned int code, _In_ unsigned int ve
 
     // Diameter AVP header
     diameter_avp_header_ven hdr;
-    *(unsigned int*)hdr.code = htonl(code);
+    *reinterpret_cast<unsigned int*>(hdr.code) = htonl(code);
     hdr.flags = flags | diameter_avp_flag_vendor;
     hton24(size_outer, hdr.length);
-    *(unsigned int*)hdr.vendor = htonl(vendor_id);
-    m_packet_res.insert(m_packet_res.end(), (unsigned char*)&hdr, (unsigned char*)(&hdr + 1));
+    *reinterpret_cast<unsigned int*>(hdr.vendor) = htonl(vendor_id);
+    m_packet_res.insert(m_packet_res.end(), reinterpret_cast<const unsigned char*>(&hdr), reinterpret_cast<const unsigned char*>(&hdr + 1));
 
     // Data
-    m_packet_res.insert(m_packet_res.end(), (unsigned char*)data, (unsigned char*)data + size);
+    m_packet_res.insert(m_packet_res.end(), reinterpret_cast<const unsigned char*>(data), reinterpret_cast<const unsigned char*>(data) + size);
     m_packet_res.insert(m_packet_res.end(), padding, 0);
 }
