@@ -54,7 +54,6 @@ public:
     //virtual int OnExit();
 
 public:
-    wxEventMonitorFrame *m_mainWnd; ///< Main window
     wxLocale             m_locale;  ///< Current locale
 };
 

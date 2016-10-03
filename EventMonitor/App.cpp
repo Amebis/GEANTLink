@@ -70,9 +70,9 @@ bool wxEventMonitorApp::OnInit()
     }
 #endif
 
-    m_mainWnd = new wxEventMonitorFrame(NULL);
-    wxPersistentRegisterAndRestore<wxEventMonitorFrame>(m_mainWnd);
-    m_mainWnd->Show();
+    wxEventMonitorFrame *mainWnd = new wxEventMonitorFrame(NULL);
+    wxPersistentRegisterAndRestore<wxEventMonitorFrame>(mainWnd);
+    mainWnd->Show();
 
     return true;
 }
