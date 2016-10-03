@@ -257,8 +257,7 @@ void eap::method_tls::process_request_packet(
     // Is this a valid EAP-TLS packet?
     if (dwReceivedPacketSize < 6)
         throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Packet is too small. EAP-%s packets should be at least 6B.");
-    //else if (pReceivedPacket->Data[0] != eap_type_tls) // Skip method check, to allow TTLS extension.
-    //    throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, string_printf(__FUNCTION__ " Packet is not EAP-TLS (expected: %u, received: %u).", eap_type_tls, pReceivedPacket->Data[0]));
+    // Don't check packet method type, to allow TTLS extension.
 
     if (!m_packet_req.append_frag((const EapPacket*)pReceivedPacket)) {
         // This was not the only/last fragment. Reply with ACK packet.
