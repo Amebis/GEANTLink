@@ -169,7 +169,6 @@ void wxTTLSConfigPanel::OnUpdateUI(wxUpdateUIEvent& event)
 //////////////////////////////////////////////////////////////////////
 
 wxTTLSConfigWindow::wxTTLSConfigWindow(eap::config_provider &prov, eap::config_method &cfg, wxWindow* parent) :
-    m_cfg((eap::config_method_ttls&)cfg),
     m_cfg_pap(cfg.m_module, cfg.m_level + 1),
     m_cfg_mschapv2(cfg.m_module, cfg.m_level + 1),
     wxEAPConfigWindow(prov, cfg, parent)
@@ -200,10 +199,10 @@ wxTTLSConfigWindow::wxTTLSConfigWindow(eap::config_provider &prov, eap::config_m
     m_outer_title->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_INACTIVECAPTION ) );
     sb_content->Add(m_outer_title, 0, wxALL|wxALIGN_RIGHT, 5);
 
-    m_outer_identity = new wxTTLSConfigPanel(m_prov, m_cfg, this);
+    m_outer_identity = new wxTTLSConfigPanel(m_prov, dynamic_cast<eap::config_method_ttls&>(m_cfg), this);
     sb_content->Add(m_outer_identity, 0, wxALL|wxEXPAND, 5);
 
-    m_tls = new wxTLSConfigPanel(m_prov, m_cfg, this);
+    m_tls = new wxTLSConfigPanel(m_prov, dynamic_cast<eap::config_method_tls&>(m_cfg), this);
     sb_content->Add(m_tls, 0, wxALL|wxEXPAND, 5);
 
     wxSize size = sb_content->CalcMin();
@@ -232,14 +231,14 @@ wxTTLSConfigWindow::~wxTTLSConfigWindow()
 
 bool wxTTLSConfigWindow::TransferDataToWindow()
 {
-    switch (m_cfg.m_inner->get_method_id()) {
+    switch (((eap::config_method_ttls&)m_cfg).m_inner->get_method_id()) {
     case winstd::eap_type_legacy_pap:
-        m_cfg_pap = *(eap::config_method_pap*)m_cfg.m_inner.get();
+        m_cfg_pap = *(eap::config_method_pap*)((eap::config_method_ttls&)m_cfg).m_inner.get();
         m_inner_type->SetSelection(0); // 0=PAP
         break;
 
     case winstd::eap_type_legacy_mschapv2:
-        m_cfg_mschapv2 = *(eap::config_method_mschapv2*)m_cfg.m_inner.get();
+        m_cfg_mschapv2 = *(eap::config_method_mschapv2*)((eap::config_method_ttls&)m_cfg).m_inner.get();
         m_inner_type->SetSelection(1); // 1=MSCHAPv2
         break;
 
@@ -261,11 +260,11 @@ bool wxTTLSConfigWindow::TransferDataFromWindow()
         // This is not a provider-locked configuration. Save the data.
         switch (m_inner_type->GetSelection()) {
         case 0: // 0=PAP
-            m_cfg.m_inner.reset(new eap::config_method_pap(m_cfg_pap));
+            ((eap::config_method_ttls&)m_cfg).m_inner.reset(new eap::config_method_pap(m_cfg_pap));
             break;
 
         case 1: // 1=MSCHAPv2
-            m_cfg.m_inner.reset(new eap::config_method_mschapv2(m_cfg_mschapv2));
+            ((eap::config_method_ttls&)m_cfg).m_inner.reset(new eap::config_method_mschapv2(m_cfg_mschapv2));
             break;
 
         default:

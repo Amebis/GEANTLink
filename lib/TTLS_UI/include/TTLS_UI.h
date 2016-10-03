@@ -135,7 +135,6 @@ protected:
     /// \endcond
 
 protected:
-    eap::config_method_ttls &m_cfg;         ///< TTLS configuration
     wxStaticText *m_outer_title;            ///< Outer authentication title
     wxTTLSConfigPanel *m_outer_identity;    ///< Outer identity configuration panel
     wxTLSConfigPanel *m_tls;                ///< TLS configuration panel
