@@ -60,8 +60,9 @@ public:
     wxEAPMethodTypeClientData(const EAP_METHOD_TYPE &type, DWORD properties);
 
 public:
-    EAP_METHOD_TYPE m_type; ///< EapHost method type
-    DWORD m_properties;     ///< Method properties
+    EAP_METHOD_TYPE m_type;             ///< EapHost method type
+    DWORD m_properties;                 ///< Method properties
+    eap::sanitizing_blob m_cfg_blob;    ///< Method configuration BLOB
 };
 
 
@@ -79,9 +80,14 @@ public:
 
 protected:
     /// \cond internal
+    virtual bool TransferDataToWindow();
+    virtual bool TransferDataFromWindow();
     virtual void OnUpdateUI(wxUpdateUIEvent& event);
     virtual void OnSettings(wxCommandEvent& event);
     /// \endcond
+
+protected:
+    eap::config_method_eapmsg &m_cfg;   ///< Method configuration
 };
 
 

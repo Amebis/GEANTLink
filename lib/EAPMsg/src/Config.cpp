@@ -35,15 +35,17 @@ eap::config_method_eapmsg::config_method_eapmsg(_In_ module &mod, _In_ unsigned 
 
 
 eap::config_method_eapmsg::config_method_eapmsg(_In_ const config_method_eapmsg &other) :
-    m_type(other.m_type),
-    config_method(other)
+    m_type       (other.m_type    ),
+    m_cfg_blob   (other.m_cfg_blob),
+    config_method(other           )
 {
 }
 
 
 eap::config_method_eapmsg::config_method_eapmsg(_Inout_ config_method_eapmsg &&other) :
-    m_type(std::move(other.m_type)),
-    config_method(std::move(other))
+    m_type       (std::move(other.m_type    )),
+    m_cfg_blob   (std::move(other.m_cfg_blob)),
+    config_method(std::move(other           ))
 {
 }
 
@@ -53,6 +55,7 @@ eap::config_method_eapmsg& eap::config_method_eapmsg::operator=(_In_ const confi
     if (this != &other) {
         (config_method&)*this = other;
         m_type                = other.m_type;
+        m_cfg_blob            = other.m_cfg_blob;
     }
 
     return *this;
@@ -62,8 +65,9 @@ eap::config_method_eapmsg& eap::config_method_eapmsg::operator=(_In_ const confi
 eap::config_method_eapmsg& eap::config_method_eapmsg::operator=(_Inout_ config_method_eapmsg &&other)
 {
     if (this != &other) {
-        (config_method&&)*this = std::move(other);
-        m_type                 = std::move(other.m_type);
+        (config_method&&)*this = std::move(other           );
+        m_type                 = std::move(other.m_type    );
+        m_cfg_blob             = std::move(other.m_cfg_blob);
     }
 
     return *this;
@@ -84,6 +88,6 @@ eap_type_t eap::config_method_eapmsg::get_method_id() const
 
 const wchar_t* eap::config_method_eapmsg::get_method_str() const
 {
-    // TODO: Query registry for EAP method name (PeerFriendlyName).
+    // TODO: Query registry for EAP method name (PeerFriendlyName using RegLoadMUIString()).
     return L"EAPMsg";
 }

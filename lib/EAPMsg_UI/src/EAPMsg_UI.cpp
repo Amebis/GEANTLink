@@ -38,10 +38,11 @@ wxEAPMethodTypeClientData::wxEAPMethodTypeClientData(const EAP_METHOD_TYPE &type
 // wxEAPMsgMethodConfigPanel
 //////////////////////////////////////////////////////////////////////
 
-wxEAPMsgMethodConfigPanel::wxEAPMsgMethodConfigPanel(const eap::config_provider &prov, eap::config_method_eapmsg &cfg, wxWindow *parent) : wxEAPMsgMethodConfigPanelBase(parent)
+wxEAPMsgMethodConfigPanel::wxEAPMsgMethodConfigPanel(const eap::config_provider &prov, eap::config_method_eapmsg &cfg, wxWindow *parent) :
+    m_cfg(cfg),
+    wxEAPMsgMethodConfigPanelBase(parent)
 {
     UNREFERENCED_PARAMETER(prov);
-    UNREFERENCED_PARAMETER(cfg);
 
     // Load and set icon.
     winstd::library lib_shell32;
@@ -49,8 +50,8 @@ wxEAPMsgMethodConfigPanel::wxEAPMsgMethodConfigPanel(const eap::config_provider 
         m_method_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(175)));
 
     winstd::eap_method_info_array methods;
-    std::unique_ptr<EAP_ERROR, winstd::EapHostPeerFreeErrorMemory_delete> error;
-    DWORD dwResult = EapHostPeerGetMethods(&methods, &std::addressof(error)->_Myptr);
+    winstd::eap_error error;
+    DWORD dwResult = EapHostPeerGetMethods(&methods, &error._Myptr);
     if (dwResult == ERROR_SUCCESS) {
         for (DWORD i = 0; i < methods.dwNumberOfMethods; i++)
             m_method->Append(methods.pEapMethods[i].pwszFriendlyName, new wxEAPMethodTypeClientData(methods.pEapMethods[i].eaptype, methods.pEapMethods[i].eapProperties));
@@ -58,6 +59,42 @@ wxEAPMsgMethodConfigPanel::wxEAPMsgMethodConfigPanel(const eap::config_provider 
         wxLogError(_("Enumerating EAP methods failed (error %u, %s, %s)."), error->dwWinError, error->pRootCauseString, error->pRepairString);
     else
         wxLogError(_("Enumerating EAP methods failed (error %u)."), dwResult);
+}
+
+
+bool wxEAPMsgMethodConfigPanel::TransferDataToWindow()
+{
+    if (m_method->HasClientObjectData()) {
+        // Find configured method and set its selection and configuration BLOB.
+        for (unsigned int i = 0, n = m_method->GetCount(); i < n; i++) {
+            wxEAPMethodTypeClientData *data = dynamic_cast<wxEAPMethodTypeClientData*>(m_method->GetClientObject(i));
+            if (data->m_type == m_cfg.m_type) {
+                m_method->SetSelection(i);
+                data->m_cfg_blob = m_cfg.m_cfg_blob;
+            }
+        }
+    }
+
+    return wxEAPMsgMethodConfigPanelBase::TransferDataToWindow();
+}
+
+
+bool wxEAPMsgMethodConfigPanel::TransferDataFromWindow()
+{
+    wxCHECK(wxEAPMsgMethodConfigPanelBase::TransferDataFromWindow(), false);
+
+    int sel = m_method->GetSelection();
+    const wxEAPMethodTypeClientData *data =
+        sel != wxNOT_FOUND && m_method->HasClientObjectData() ?
+            dynamic_cast<const wxEAPMethodTypeClientData*>(m_method->GetClientObject(sel)) :
+            NULL;
+    if (data) {
+        // Save method selection and configuration.
+        m_cfg.m_type     = data->m_type;
+        m_cfg.m_cfg_blob = data->m_cfg_blob;
+    }
+
+    return true;
 }
 
 
@@ -79,15 +116,24 @@ void wxEAPMsgMethodConfigPanel::OnSettings(wxCommandEvent& event)
     wxEAPMsgMethodConfigPanelBase::OnSettings(event);
 
     int sel = m_method->GetSelection();
-    const wxEAPMethodTypeClientData *data =
+    wxEAPMethodTypeClientData *data =
         sel != wxNOT_FOUND && m_method->HasClientObjectData() ?
-            dynamic_cast<const wxEAPMethodTypeClientData*>(m_method->GetClientObject(sel)) :
+            dynamic_cast<wxEAPMethodTypeClientData*>(m_method->GetClientObject(sel)) :
             NULL;
     if (data && (data->m_properties & eapPropSupportsConfig)) {
         DWORD cfg_data_size = 0;
-        std::unique_ptr<BYTE[], winstd::EapHostPeerFreeMemory_delete> cfg_data;
-        std::unique_ptr<EAP_ERROR, winstd::EapHostPeerFreeErrorMemory_delete> error;
-        DWORD dwResult = EapHostPeerInvokeConfigUI(GetHWND(), 0, data->m_type, 0, NULL, &cfg_data_size, &std::addressof(cfg_data)->_Myptr, &std::addressof(error)->_Myptr);
+        winstd::eap_blob cfg_data;
+        winstd::eap_error error;
+        DWORD dwResult = EapHostPeerInvokeConfigUI(GetHWND(), 0, data->m_type, (DWORD)data->m_cfg_blob.size(), data->m_cfg_blob.data(), &cfg_data_size, &cfg_data._Myptr, &error._Myptr);
+        if (dwResult == ERROR_SUCCESS) {
+            const BYTE *_cfg_data = cfg_data.get();
+            data->m_cfg_blob.assign(_cfg_data, _cfg_data + cfg_data_size);
+        } else if (dwResult == ERROR_CANCELLED) {
+            // Not really an error.
+        } else if (error)
+            wxLogError(_("Configuring EAP method failed (error %u, %s, %s)."), error->dwWinError, error->pRootCauseString, error->pRepairString);
+        else
+            wxLogError(_("Configuring EAP method failed (error %u)."), dwResult);
     }
 }
 

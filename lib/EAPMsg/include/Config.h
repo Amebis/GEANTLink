@@ -100,6 +100,7 @@ namespace eap
         virtual const wchar_t* get_method_str() const;
 
     public:
-        EAP_METHOD_TYPE m_type;
+        EAP_METHOD_TYPE m_type;     ///< EapHost method type: (EAP type, vendor ID, vendor type, author ID) tuple
+        sanitizing_blob m_cfg_blob; ///< Method configuration BLOB
     };
 }
