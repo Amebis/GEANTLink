@@ -64,9 +64,11 @@ void eap::method_ttls::begin_session(
     method_tls::begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
 
     // Initialize inner method.
-    switch (dynamic_cast<config_method_ttls&>(m_cfg).m_inner->get_method_id()) {
-    case eap_type_legacy_pap     : m_inner.reset(new method_pap     (m_module, (config_method_pap     &)*dynamic_cast<config_method_ttls&>(m_cfg).m_inner, (credentials_pass&)*dynamic_cast<credentials_ttls&>(m_cred).m_inner.get())); break;
-    case eap_type_legacy_mschapv2: m_inner.reset(new method_mschapv2(m_module, (config_method_mschapv2&)*dynamic_cast<config_method_ttls&>(m_cfg).m_inner, (credentials_pass&)*dynamic_cast<credentials_ttls&>(m_cred).m_inner.get())); break;
+    auto * cfg_inner = dynamic_cast<config_method_ttls&>(m_cfg ).m_inner.get();
+    auto *cred_inner = dynamic_cast<credentials_ttls  &>(m_cred).m_inner.get();
+    switch (cfg_inner->get_method_id()) {
+    case eap_type_legacy_pap     : m_inner.reset(new method_pap     (m_module, dynamic_cast<config_method_pap     &>(*cfg_inner), dynamic_cast<credentials_pass&>(*cred_inner))); break;
+    case eap_type_legacy_mschapv2: m_inner.reset(new method_mschapv2(m_module, dynamic_cast<config_method_mschapv2&>(*cfg_inner), dynamic_cast<credentials_pass&>(*cred_inner))); break;
     default: throw invalid_argument(__FUNCTION__ " Unsupported inner authentication method.");
     }
     m_inner->begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, MAXDWORD);
