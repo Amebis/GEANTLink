@@ -89,7 +89,26 @@ namespace eap
         ///
         virtual config* clone() const;
 
+        /// \name XML configuration management
+        /// @{
+
         ///
+        /// Save to XML document
+        ///
+        /// \param[in]  pDoc         XML document
+        /// \param[in]  pConfigRoot  Suggested root element for saving
+        ///
+        virtual void save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot) const;
+
+        ///
+        /// Load from XML document
+        ///
+        /// \param[in]  pConfigRoot  Root element for loading
+        ///
+        virtual void load(_In_ IXMLDOMNode *pConfigRoot);
+
+        /// @}
+
         /// \name BLOB management
         /// @{
 

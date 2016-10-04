@@ -80,6 +80,59 @@ eap::config* eap::config_method_eapmsg::clone() const
 }
 
 
+void eap::config_method_eapmsg::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot) const
+{
+    assert(pDoc);
+    assert(pConfigRoot);
+
+    config_method::save(pDoc, pConfigRoot);
+
+    // Convert configuration BLOB to XML using EapHost (and ultimately method peer's EapPeerConfigBlob2Xml).
+    com_obj<IXMLDOMDocument2> pConfigDoc;
+    eap_error error;
+    DWORD dwResult = EapHostPeerConfigBlob2Xml(0, m_type, (DWORD)m_cfg_blob.size(), const_cast<BYTE*>(m_cfg_blob.data()), &pConfigDoc, &error._Myptr);
+    if (dwResult == ERROR_SUCCESS) {
+        HRESULT hr;
+
+        com_obj<IXMLDOMElement> pXmlElConfigDoc;
+        if (FAILED(hr = pConfigDoc->get_documentElement(&pXmlElConfigDoc)))
+            throw com_runtime_error(hr, __FUNCTION__ " Error getting XML document element.");
+
+        // Insert method configuration into our XML configuration.
+        if (FAILED(hr = pConfigRoot->appendChild(pXmlElConfigDoc, NULL)))
+            throw com_runtime_error(hr, __FUNCTION__ " Error appending configuration document element.");
+    } else if (error)
+        throw eap_runtime_error(*error  , __FUNCTION__ " EapHostPeerConfigBlob2Xml failed.");
+    else
+        throw win_runtime_error(dwResult, __FUNCTION__ " EapHostPeerConfigBlob2Xml failed.");
+}
+
+
+void eap::config_method_eapmsg::load(_In_ IXMLDOMNode *pConfigRoot)
+{
+    assert(pConfigRoot);
+
+    config_method::load(pConfigRoot);
+
+    // <EapHostConfig>
+    winstd::com_obj<IXMLDOMElement> pXmlElEapHostConfig;
+    if (SUCCEEDED(eapxml::select_element(pConfigRoot, winstd::bstr(L"eaphostconfig:EapHostConfig"), pXmlElEapHostConfig))) {
+        // Convert configuration XML to BLOB using EapHost (and ultimately method peer's EapPeerConfigXml2Blob).
+        DWORD cfg_data_size = 0;
+        eap_blob cfg_data;
+        eap_error error;
+        DWORD dwResult = EapHostPeerConfigXml2Blob(0, pXmlElEapHostConfig, &cfg_data_size, &cfg_data._Myptr, &m_type, &error._Myptr);
+        if (dwResult == ERROR_SUCCESS) {
+            const BYTE *_cfg_data = cfg_data.get();
+            m_cfg_blob.assign(_cfg_data, _cfg_data + cfg_data_size);
+        } else if (error)
+            throw eap_runtime_error(*error  , __FUNCTION__ " EapHostPeerConfigBlob2Xml failed.");
+        else
+            throw win_runtime_error(dwResult, __FUNCTION__ " EapHostPeerConfigBlob2Xml failed.");
+    }
+}
+
+
 void eap::config_method_eapmsg::operator<<(_Inout_ cursor_out &cursor) const
 {
     config_method::operator<<(cursor);
