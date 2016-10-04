@@ -91,6 +91,12 @@ EAP_ERROR* eap::module::make_error(_In_ std::exception &err) const
     MultiByteToWideChar(CP_ACP, 0, err.what(), -1, what);
 
     {
+        eap_runtime_error *e = dynamic_cast<eap_runtime_error*>(&err);
+        if (e)
+            return make_error(e->number(), e->root_cause(), e->repair(), e->reason(), &e->root_cause_id(), &e->repair_id(), &e->help_link_id());
+    }
+
+    {
         win_runtime_error *e = dynamic_cast<win_runtime_error*>(&err);
         if (e)
             return make_error(e->number(), what.c_str());
