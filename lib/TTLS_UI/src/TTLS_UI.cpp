@@ -238,15 +238,15 @@ bool wxTTLSConfigWindow::TransferDataToWindow()
 
     auto *cfg_inner_eapmsg = dynamic_cast<eap::config_method_eapmsg*>(cfg_ttls.m_inner.get());
     if (!cfg_inner_eapmsg) {
-        // Legacy inner methods
+        // Native inner methods
         switch (cfg_ttls.m_inner->get_method_id()) {
         case winstd::eap_type_legacy_pap:
-            m_cfg_pap = *(eap::config_method_pap*)cfg_ttls.m_inner.get();
+            m_cfg_pap = dynamic_cast<eap::config_method_pap&>(*cfg_ttls.m_inner);
             m_inner_type->SetSelection(0); // 0=PAP
             break;
 
         case winstd::eap_type_legacy_mschapv2:
-            m_cfg_mschapv2 = *(eap::config_method_mschapv2*)cfg_ttls.m_inner.get();
+            m_cfg_mschapv2 = dynamic_cast<eap::config_method_mschapv2&>(*cfg_ttls.m_inner);
             m_inner_type->SetSelection(1); // 1=MSCHAPv2
             break;
 
@@ -254,7 +254,7 @@ bool wxTTLSConfigWindow::TransferDataToWindow()
             wxFAIL_MSG(wxT("Unsupported inner authentication method type."));
         }
     } else {
-        // EAP inner method
+        // EapHost inner method
         m_cfg_eapmsg = *cfg_inner_eapmsg;
         m_inner_type->SetSelection(2); // 2=EAP
     }
