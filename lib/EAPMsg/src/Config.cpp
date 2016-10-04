@@ -80,6 +80,31 @@ eap::config* eap::config_method_eapmsg::clone() const
 }
 
 
+void eap::config_method_eapmsg::operator<<(_Inout_ cursor_out &cursor) const
+{
+    config_method::operator<<(cursor);
+    cursor << m_type    ;
+    cursor << m_cfg_blob;
+}
+
+
+size_t eap::config_method_eapmsg::get_pk_size() const
+{
+    return
+        config_method::get_pk_size() +
+        pksizeof(m_type    ) +
+        pksizeof(m_cfg_blob);
+}
+
+
+void eap::config_method_eapmsg::operator>>(_Inout_ cursor_in &cursor)
+{
+    config_method::operator>>(cursor);
+    cursor >> m_type    ;
+    cursor >> m_cfg_blob;
+}
+
+
 eap_type_t eap::config_method_eapmsg::get_method_id() const
 {
     return (eap_type_t)m_type.eapType.type;

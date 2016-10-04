@@ -90,6 +90,33 @@ namespace eap
         virtual config* clone() const;
 
         ///
+        /// \name BLOB management
+        /// @{
+
+        ///
+        /// Packs a configuration
+        ///
+        /// \param[inout] cursor  Memory cursor
+        ///
+        virtual void operator<<(_Inout_ cursor_out &cursor) const;
+
+        ///
+        /// Returns packed size of a configuration
+        ///
+        /// \returns Size of data when packed (in bytes)
+        ///
+        virtual size_t get_pk_size() const;
+
+        ///
+        /// Unpacks a configuration
+        ///
+        /// \param[inout] cursor  Memory cursor
+        ///
+        virtual void operator>>(_Inout_ cursor_in &cursor);
+
+        /// @}
+
+        ///
         /// Returns EAP method type of this configuration
         ///
         virtual winstd::eap_type_t get_method_id() const;

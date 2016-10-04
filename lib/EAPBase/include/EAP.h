@@ -426,6 +426,31 @@ inline size_t pksizeof(_In_ const GUID &val);
 ///
 inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ GUID &val);
 
+///
+/// Packs a EAP_METHOD_TYPE
+///
+/// \param[inout] cursor  Memory cursor
+/// \param[in]    val     Variable with data to pack
+///
+inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const EAP_METHOD_TYPE &val);
+
+///
+/// Returns packed size of a EAP_METHOD_TYPE
+///
+/// \param[in] val  Data to pack
+///
+/// \returns Size of data when packed (in bytes)
+///
+inline size_t pksizeof(_In_ const EAP_METHOD_TYPE &val);
+
+///
+/// Unpacks a EAP_METHOD_TYPE
+///
+/// \param[inout] cursor  Memory cursor
+/// \param[out]   val     Variable to receive unpacked value
+///
+inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ EAP_METHOD_TYPE &val);
+
 #ifndef htonll
 ///
 /// Converts an unsigned __int64 from host to TCP/IP network byte order.
@@ -1096,6 +1121,31 @@ inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ GUID &val)
     auto ptr_end = cursor.ptr + sizeof(GUID);
     assert(ptr_end <= cursor.ptr_end);
     memcpy(&val, cursor.ptr, sizeof(GUID));
+    cursor.ptr = ptr_end;
+}
+
+
+inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const EAP_METHOD_TYPE &val)
+{
+    auto ptr_end = cursor.ptr + sizeof(EAP_METHOD_TYPE);
+    assert(ptr_end <= cursor.ptr_end);
+    memcpy(cursor.ptr, &val, sizeof(EAP_METHOD_TYPE));
+    cursor.ptr = ptr_end;
+}
+
+
+inline size_t pksizeof(_In_ const EAP_METHOD_TYPE &val)
+{
+    UNREFERENCED_PARAMETER(val);
+    return sizeof(EAP_METHOD_TYPE);
+}
+
+
+inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ EAP_METHOD_TYPE &val)
+{
+    auto ptr_end = cursor.ptr + sizeof(EAP_METHOD_TYPE);
+    assert(ptr_end <= cursor.ptr_end);
+    memcpy(&val, cursor.ptr, sizeof(EAP_METHOD_TYPE));
     cursor.ptr = ptr_end;
 }
 
