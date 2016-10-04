@@ -292,9 +292,9 @@ std::wstring eap::credentials_tls::get_identity() const
 
 
 eap::credentials::source_t eap::credentials_tls::combine(
-    _In_       const credentials             *cred_cached,
-    _In_       const config_method_with_cred &cfg,
-    _In_opt_z_       LPCTSTR                 pszTargetName)
+    _In_opt_   const credentials   *cred_cached,
+    _In_       const config_method &cfg,
+    _In_opt_z_       LPCTSTR       pszTargetName)
 {
     if (cred_cached) {
         // Using EAP service cached credentials.
@@ -303,9 +303,10 @@ eap::credentials::source_t eap::credentials_tls::combine(
         return source_cache;
     }
 
-    if (cfg.m_use_cred) {
+    auto const *cfg_with_cred = dynamic_cast<const config_method_with_cred*>(&cfg);
+    if (cfg_with_cred->m_use_cred) {
         // Using configured credentials.
-        *this = *dynamic_cast<const credentials_tls*>(cfg.m_cred.get());
+        *this = *dynamic_cast<const credentials_tls*>(cfg_with_cred->m_cred.get());
         m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CONFIG2, event_data((unsigned int)eap_type_tls), event_data(credentials_tls::get_name()), event_data(pszTargetName), event_data::blank);
         return source_config;
     }

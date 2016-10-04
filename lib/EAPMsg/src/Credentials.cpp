@@ -242,9 +242,9 @@ std::wstring eap::credentials_eapmsg::get_identity() const
 
 
 eap::credentials::source_t eap::credentials_eapmsg::combine(
-    _In_       const credentials             *cred_cached,
-    _In_       const config_method_with_cred &cfg,
-    _In_opt_z_       LPCTSTR                 pszTargetName)
+    _In_opt_   const credentials   *cred_cached,
+    _In_       const config_method &cfg,
+    _In_opt_z_       LPCTSTR       pszTargetName)
 {
     UNREFERENCED_PARAMETER(cfg);
 
@@ -254,6 +254,9 @@ eap::credentials::source_t eap::credentials_eapmsg::combine(
         m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CACHED2, event_data((unsigned int)eap_type_tls), event_data(credentials_eapmsg::get_name()), event_data(pszTargetName), event_data::blank);
         return source_cache;
     }
+
+    // We do not store inner EAP method credentials inside configuration.
+    // Therefore, we skip configured credentials.
 
     if (pszTargetName) {
         try {

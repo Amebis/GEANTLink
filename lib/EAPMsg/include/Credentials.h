@@ -186,7 +186,7 @@ namespace eap
         /// Combine credentials in the following order:
         ///
         /// 1. Cached credentials
-        /// 2. Pre-configured credentials
+        /// 2. Configured credentials (if \p cfg is derived from config_method_with_cred)
         /// 3. Stored credentials
         ///
         /// \param[in] cred_cached    Cached credentials (optional, can be \c NULL, must be credentials_eapmsg* type)
@@ -199,9 +199,9 @@ namespace eap
         /// - \c source_storage Credentials were loaded from Windows Credential Manager
         ///
         virtual source_t combine(
-            _In_       const credentials             *cred_cached,
-            _In_       const config_method_with_cred &cfg,
-            _In_opt_z_       LPCTSTR                 pszTargetName);
+            _In_opt_   const credentials   *cred_cached,
+            _In_       const config_method &cfg,
+            _In_opt_z_       LPCTSTR       pszTargetName);
 
     public:
         sanitizing_blob m_cred; ///< Client credentials

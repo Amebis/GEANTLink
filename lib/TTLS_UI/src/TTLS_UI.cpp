@@ -43,7 +43,7 @@ wxTTLSCredentialsPanel::wxTTLSCredentialsPanel(const eap::config_provider &prov,
     if (eap::config_method::status_cred_begin <= m_cfg.m_inner->m_last_status && m_cfg.m_inner->m_last_status < eap::config_method::status_cred_end)
         sb_content->Add(new wxEAPCredentialWarningPanel(m_prov, m_cfg.m_inner->m_last_status, this), 0, wxALL|wxEXPAND, 5);
 
-    const eap::config_method_pap *cfg_inner_pap;
+    const eap::config_method_pap      *cfg_inner_pap;
     const eap::config_method_mschapv2 *cfg_inner_mschapv2;
     if ((cfg_inner_pap = dynamic_cast<const eap::config_method_pap*>(m_cfg.m_inner.get())) != NULL) {
         if (!cred.m_inner) cred.m_inner.reset(new eap::credentials_pass(cred.m_module));
@@ -169,9 +169,9 @@ void wxTTLSConfigPanel::OnUpdateUI(wxUpdateUIEvent& event)
 //////////////////////////////////////////////////////////////////////
 
 wxTTLSConfigWindow::wxTTLSConfigWindow(eap::config_provider &prov, eap::config_method &cfg, wxWindow* parent) :
-    m_cfg_pap(cfg.m_module, cfg.m_level + 1),
+    m_cfg_pap     (cfg.m_module, cfg.m_level + 1),
     m_cfg_mschapv2(cfg.m_module, cfg.m_level + 1),
-    m_cfg_eapmsg(cfg.m_module, cfg.m_level + 1),
+    m_cfg_eapmsg  (cfg.m_module, cfg.m_level + 1),
     wxEAPConfigWindow(prov, cfg, parent)
 {
     wxBoxSizer* sb_content;
@@ -234,19 +234,29 @@ wxTTLSConfigWindow::~wxTTLSConfigWindow()
 
 bool wxTTLSConfigWindow::TransferDataToWindow()
 {
-    switch (dynamic_cast<eap::config_method_ttls&>(m_cfg).m_inner->get_method_id()) {
-    case winstd::eap_type_legacy_pap:
-        m_cfg_pap = *(eap::config_method_pap*)dynamic_cast<eap::config_method_ttls&>(m_cfg).m_inner.get();
-        m_inner_type->SetSelection(0); // 0=PAP
-        break;
+    auto &cfg_ttls = dynamic_cast<eap::config_method_ttls&>(m_cfg);
 
-    case winstd::eap_type_legacy_mschapv2:
-        m_cfg_mschapv2 = *(eap::config_method_mschapv2*)dynamic_cast<eap::config_method_ttls&>(m_cfg).m_inner.get();
-        m_inner_type->SetSelection(1); // 1=MSCHAPv2
-        break;
+    auto *cfg_inner_eapmsg = dynamic_cast<eap::config_method_eapmsg*>(cfg_ttls.m_inner.get());
+    if (!cfg_inner_eapmsg) {
+        // Legacy inner methods
+        switch (cfg_ttls.m_inner->get_method_id()) {
+        case winstd::eap_type_legacy_pap:
+            m_cfg_pap = *(eap::config_method_pap*)cfg_ttls.m_inner.get();
+            m_inner_type->SetSelection(0); // 0=PAP
+            break;
 
-    default:
-        wxFAIL_MSG(wxT("Unsupported inner authentication method type."));
+        case winstd::eap_type_legacy_mschapv2:
+            m_cfg_mschapv2 = *(eap::config_method_mschapv2*)cfg_ttls.m_inner.get();
+            m_inner_type->SetSelection(1); // 1=MSCHAPv2
+            break;
+
+        default:
+            wxFAIL_MSG(wxT("Unsupported inner authentication method type."));
+        }
+    } else {
+        // EAP inner method
+        m_cfg_eapmsg = *cfg_inner_eapmsg;
+        m_inner_type->SetSelection(2); // 2=EAP
     }
 
     // Do not invoke inherited TransferDataToWindow(), as it will call others TransferDataToWindow().
@@ -259,15 +269,21 @@ bool wxTTLSConfigWindow::TransferDataFromWindow()
 {
     wxCHECK(wxScrolledWindow::TransferDataFromWindow(), false);
 
+    auto &cfg_ttls = dynamic_cast<eap::config_method_ttls&>(m_cfg);
+
     if (!m_prov.m_read_only) {
         // This is not a provider-locked configuration. Save the data.
         switch (m_inner_type->GetSelection()) {
         case 0: // 0=PAP
-            dynamic_cast<eap::config_method_ttls&>(m_cfg).m_inner.reset(new eap::config_method_pap(m_cfg_pap));
+            cfg_ttls.m_inner.reset(new eap::config_method_pap(m_cfg_pap));
             break;
 
         case 1: // 1=MSCHAPv2
-            dynamic_cast<eap::config_method_ttls&>(m_cfg).m_inner.reset(new eap::config_method_mschapv2(m_cfg_mschapv2));
+            cfg_ttls.m_inner.reset(new eap::config_method_mschapv2(m_cfg_mschapv2));
+            break;
+
+        case 2: // 2=EAP
+            cfg_ttls.m_inner.reset(new eap::config_method_eapmsg(m_cfg_eapmsg));
             break;
 
         default:

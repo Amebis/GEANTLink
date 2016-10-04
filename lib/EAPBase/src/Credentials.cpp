@@ -437,9 +437,9 @@ LPCTSTR eap::credentials_pass::target_suffix() const
 
 
 eap::credentials::source_t eap::credentials_pass::combine(
-    _In_       const credentials             *cred_cached,
-    _In_       const config_method_with_cred &cfg,
-    _In_opt_z_       LPCTSTR                 pszTargetName)
+    _In_opt_   const credentials   *cred_cached,
+    _In_       const config_method &cfg,
+    _In_opt_z_       LPCTSTR       pszTargetName)
 {
     if (cred_cached) {
         // Using EAP service cached credentials.
@@ -448,9 +448,10 @@ eap::credentials::source_t eap::credentials_pass::combine(
         return source_cache;
     }
 
-    if (cfg.m_use_cred) {
+    auto const *cfg_with_cred = dynamic_cast<const config_method_with_cred*>(&cfg);
+    if (cfg_with_cred && cfg_with_cred->m_use_cred) {
         // Using configured credentials.
-        *this = *dynamic_cast<const credentials_pass*>(cfg.m_cred.get());
+        *this = *dynamic_cast<const credentials_pass*>(cfg_with_cred->m_cred.get());
         m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CONFIG1, event_data((unsigned int)cfg.get_method_id()), event_data(credentials_pass::get_name()), event_data::blank);
         return source_config;
     }

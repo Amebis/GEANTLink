@@ -172,7 +172,7 @@ namespace eap {
         std::wstring get_public_identity(const credentials_ttls &cred) const;
 
     public:
-        std::unique_ptr<config_method_with_cred> m_inner;   ///< Inner authentication configuration
-        std::wstring m_anonymous_identity;                  ///< Anonymous identity
+        std::unique_ptr<config_method> m_inner; ///< Inner authentication configuration
+        std::wstring m_anonymous_identity;      ///< Anonymous identity
     };
 }

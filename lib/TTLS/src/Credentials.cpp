@@ -179,9 +179,9 @@ wstring eap::credentials_ttls::get_identity() const
 
 
 eap::credentials::source_t eap::credentials_ttls::combine(
-    _In_       const credentials             *cred_cached,
-    _In_       const config_method_with_cred &cfg,
-    _In_opt_z_       LPCTSTR                 pszTargetName)
+    _In_opt_   const credentials   *cred_cached,
+    _In_       const config_method &cfg,
+    _In_opt_z_       LPCTSTR       pszTargetName)
 {
     // Combine outer credentials.
     source_t src_outer = credentials_tls::combine(

@@ -257,7 +257,8 @@ const wchar_t* eap::config_method_ttls::get_method_str() const
 eap::credentials* eap::config_method_ttls::make_credentials() const
 {
     credentials_ttls *cred = new credentials_ttls(m_module);
-    cred->m_inner.reset(m_inner->make_credentials());
+    auto *cfg_inner = dynamic_cast<const config_method_with_cred*>(m_inner.get());
+    cred->m_inner.reset(cfg_inner ? cfg_inner->make_credentials() : nullptr);
     return cred;
 }
 
