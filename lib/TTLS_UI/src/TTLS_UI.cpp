@@ -234,14 +234,14 @@ wxTTLSConfigWindow::~wxTTLSConfigWindow()
 
 bool wxTTLSConfigWindow::TransferDataToWindow()
 {
-    switch (((eap::config_method_ttls&)m_cfg).m_inner->get_method_id()) {
+    switch (dynamic_cast<eap::config_method_ttls&>(m_cfg).m_inner->get_method_id()) {
     case winstd::eap_type_legacy_pap:
-        m_cfg_pap = *(eap::config_method_pap*)((eap::config_method_ttls&)m_cfg).m_inner.get();
+        m_cfg_pap = *(eap::config_method_pap*)dynamic_cast<eap::config_method_ttls&>(m_cfg).m_inner.get();
         m_inner_type->SetSelection(0); // 0=PAP
         break;
 
     case winstd::eap_type_legacy_mschapv2:
-        m_cfg_mschapv2 = *(eap::config_method_mschapv2*)((eap::config_method_ttls&)m_cfg).m_inner.get();
+        m_cfg_mschapv2 = *(eap::config_method_mschapv2*)dynamic_cast<eap::config_method_ttls&>(m_cfg).m_inner.get();
         m_inner_type->SetSelection(1); // 1=MSCHAPv2
         break;
 
@@ -263,11 +263,11 @@ bool wxTTLSConfigWindow::TransferDataFromWindow()
         // This is not a provider-locked configuration. Save the data.
         switch (m_inner_type->GetSelection()) {
         case 0: // 0=PAP
-            ((eap::config_method_ttls&)m_cfg).m_inner.reset(new eap::config_method_pap(m_cfg_pap));
+            dynamic_cast<eap::config_method_ttls&>(m_cfg).m_inner.reset(new eap::config_method_pap(m_cfg_pap));
             break;
 
         case 1: // 1=MSCHAPv2
-            ((eap::config_method_ttls&)m_cfg).m_inner.reset(new eap::config_method_mschapv2(m_cfg_mschapv2));
+            dynamic_cast<eap::config_method_ttls&>(m_cfg).m_inner.reset(new eap::config_method_mschapv2(m_cfg_mschapv2));
             break;
 
         default:

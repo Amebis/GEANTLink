@@ -98,7 +98,7 @@ void eap::peer_ttls::get_identity(
     }
 
     // Build our identity. ;)
-    wstring identity(std::move(cfg_method->get_public_identity((const credentials_ttls&)*cred_out.m_cred)));
+    wstring identity(std::move(cfg_method->get_public_identity(*dynamic_cast<const credentials_ttls*>(cred_out.m_cred.get()))));
     log_event(&EAPMETHOD_TRACE_EVT_CRED_OUTER_ID1, event_data((unsigned int)eap_type_ttls), event_data(identity), event_data::blank);
     size_t size = sizeof(WCHAR)*(identity.length() + 1);
     *ppwszIdentity = (WCHAR*)alloc_memory(size);
@@ -218,7 +218,7 @@ EAP_SESSION_HANDLE eap::peer_ttls::begin_session(
     }
 
     // We have configuration, we have credentials, create method.
-    s->m_method.reset(new method_ttls(*this, *cfg_method, *(credentials_ttls*)s->m_cred.m_cred.get()));
+    s->m_method.reset(new method_ttls(*this, *cfg_method, *dynamic_cast<credentials_ttls*>(s->m_cred.m_cred.get())));
 
     // Initialize method.
     s->m_method->begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
@@ -378,7 +378,7 @@ const eap::config_method_ttls* eap::peer_ttls::combine_credentials(
         assert(cfg_method);
 
         // Combine credentials. We could use eap::credentials_ttls() to do all the work, but we would not know which credentials is missing then.
-        credentials_ttls *cred = (credentials_ttls*)cfg_method->make_credentials();
+        credentials_ttls *cred = dynamic_cast<credentials_ttls*>(cfg_method->make_credentials());
         cred_out.m_cred.reset(cred);
 #ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
         bool has_cached = cred_in.m_cred && cred_in.match(*cfg_prov);
@@ -402,7 +402,7 @@ const eap::config_method_ttls* eap::peer_ttls::combine_credentials(
         // Combine inner credentials.
         eap::credentials::source_t src_inner = cred->m_inner->combine(
 #ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
-            has_cached ? ((credentials_ttls*)cred_in.m_cred.get())->m_inner.get() : NULL,
+            has_cached ? dynamic_cast<credentials_ttls*>(cred_in.m_cred.get())->m_inner.get() : NULL,
 #else
             NULL,
 #endif
