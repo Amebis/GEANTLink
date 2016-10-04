@@ -157,14 +157,14 @@ namespace eap {
         ///
         /// \param[in] eap_type  EAP type
         ///
-        config_method_with_cred* make_config_method(_In_ winstd::eap_type_t eap_type) const;
+        config_method* make_config_method(_In_ winstd::eap_type_t eap_type) const;
 
         ///
         /// Makes a new inner method config
         ///
         /// \param[in] eap_type  EAP type
         ///
-        config_method_with_cred* make_config_method(_In_ const wchar_t *eap_type) const;
+        config_method* make_config_method(_In_ const wchar_t *eap_type) const;
 
         ///
         /// Generates public identity using current configuration and given credentials
