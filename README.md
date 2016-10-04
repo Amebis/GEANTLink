@@ -13,7 +13,7 @@ Suite of EAP supplicants for Windows - IEEE 802.1X plug-ins for enterprise netwo
 - _MsiDb.Exe_ and other command line utilities for MSI packaging distributed as a part of Microsoft Windows SDK (installed with Visual Studio). Add SDK's _Bin_ folder to path.
 
 ### wxWidgets
-GÉANTLink is using wxWidgets v3.0.2 static libraries. Unfortunately, dynamic libraries (DLL) variant is available as a binary download only. Therefore static libraries needs to be compiled from [source](https://github.com/wxWidgets/wxWidgets).
+GÉANTLink is using wxWidgets v3.0.2 static libraries. Unfortunately, only dynamic libraries (DLL) variant is available as a binary download. Therefore static libraries needs to be compiled from [source](https://github.com/wxWidgets/wxWidgets).
 
 #### Compiling wxWidgets Win32 static libraries
 1. Start _Visual Studio Command Prompt (2010)_
@@ -52,13 +52,17 @@ Next, one must configure a network profile actually using GÉANTLink for the aut
 GÉANTLink EAP modules are divided into two DLLs: backend (i.e. _EAPTTLS.dll_) and GUI (i.e. _EAPTTLSUI.dll_).
 
 ##### Backend DLL
-The backend DLL is loaded by _Eap3Host.exe_ process when connecting to the network. One approach to debug the module is to start Visual C++ elevated, open _VS10Solution.sln_, and attach to running _Eap3Host.exe_ process.
-On initial connection attempt _Eap3Host.exe_ will load the DLL and will not release it until _EapHost_ service is restarted.
-To debug early life of our backend DLL, uncomment `Sleep(10000)` in `DllMain()` of the module, and set breakpoints. This should give you plenty of time to attach the debugger to _Eap3Host.exe_ process before our DLL starts servicing authentication.
+The backend DLL is loaded by _Eap3Host.exe_ process when connecting to the network. One approach to debug the module is to start Visual C++ elevated, open _VS10Solution.sln_, and attach to the running _Eap3Host.exe_ process.
+
+On initial connection attempt _Eap3Host.exe_ will load the DLL and will not release it until _EapHost_ service is restarted. To release our DLL (i.e. for rebuild) you have to restart _EapHost_ service manually or run `nmake register` again.
+
+To debug early life of our backend DLL, uncomment `Sleep(10000)` in `DllMain()` of the module, and set breakpoints. This should give you plenty of time to catch emerging _Eap3Host.exe_ process and attach the debugger to it before our DLL starts servicing authentication.
 
 ##### GUI DLL
 The GUI DLL is loaded by _DllHost.exe_ process on XML profile configuration import/export and when interactive user interface is required.
+
 A few seconds after desired function call has finished, _DllHost.exe_ terminates and releases the DLL.
+
 To debug early life of our GUI DLL, uncomment `Sleep(10000)` in `DllMain()` of the module, and set breakpoints. This should give you plenty of time to attach the debugger to _DllHost.exe_ process before our DLL starts.
 
 #### Building in command line
