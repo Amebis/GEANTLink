@@ -130,8 +130,10 @@ DWORD WINAPI EapPeerConfigXml2Blob(
     else if (!pdwConnectionDataOutSize)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pdwConnectionDataOutSize is NULL.")));
     else {
+        // Configure XML selection namespaces used.
+        pConfigDoc->setProperty(bstr(L"SelectionNamespaces"), variant(L"xmlns:eap-metadata=\"urn:ietf:params:xml:ns:yang:ietf-eap-metadata\" xmlns:eaphostconfig=\"http://www.microsoft.com/provisioning/EapHostConfig\""));
+
         // <Config>
-        pConfigDoc->setProperty(bstr(L"SelectionNamespaces"), variant(L"xmlns:eaphostconfig=\"http://www.microsoft.com/provisioning/EapHostConfig\""));
         com_obj<IXMLDOMElement> pXmlElConfig;
         if (FAILED(eapxml::select_element(pConfigDoc, bstr(L"//eaphostconfig:Config"), pXmlElConfig))) {
             g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" Error reading <Config> element.")));
@@ -139,7 +141,6 @@ DWORD WINAPI EapPeerConfigXml2Blob(
         }
 
         // Load configuration.
-        pConfigDoc->setProperty(bstr(L"SelectionNamespaces"), variant(L"xmlns:eap-metadata=\"urn:ietf:params:xml:ns:yang:ietf-eap-metadata\""));
         try {
             g_peer.config_xml2blob(dwFlags, pXmlElConfig, pConnectionDataOut, pdwConnectionDataOutSize);
         } catch (std::exception &err) {
@@ -212,9 +213,11 @@ DWORD WINAPI EapPeerConfigBlob2Xml(
             return dwResult;
         }
 
+        // Configure XML selection namespaces used.
+        pConfigDoc->setProperty(bstr(L"SelectionNamespaces"), variant(L"xmlns:eap-metadata=\"urn:ietf:params:xml:ns:yang:ietf-eap-metadata\" xmlns:eaphostconfig=\"http://www.microsoft.com/provisioning/EapHostConfig\""));
+
         // Select <Config> node.
         com_obj<IXMLDOMNode> pXmlElConfig;
-        pConfigDoc->setProperty(bstr(L"SelectionNamespaces"), variant(L"xmlns:eaphostconfig=\"http://www.microsoft.com/provisioning/EapHostConfig\""));
         if (FAILED(eapxml::select_node(pConfigDoc, bstr(L"eaphostconfig:Config"), pXmlElConfig))) {
             g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_NOT_FOUND, _T(__FUNCTION__) _T(" Error selecting <Config> element.")));
             return dwResult;
