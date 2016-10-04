@@ -34,15 +34,15 @@ eap::credentials_eapmsg::credentials_eapmsg(_In_ module &mod) : credentials(mod)
 
 
 eap::credentials_eapmsg::credentials_eapmsg(_In_ const credentials_eapmsg &other) :
-    m_cred(other.m_cred),
-    credentials(other)
+    m_cred_blob(other.m_cred_blob),
+    credentials(other            )
 {
 }
 
 
 eap::credentials_eapmsg::credentials_eapmsg(_Inout_ credentials_eapmsg &&other) :
-    m_cred(std::move(other.m_cred)),
-    credentials(std::move(other))
+    m_cred_blob(std::move(other.m_cred_blob)),
+    credentials(std::move(other            ))
 {
 }
 
@@ -51,7 +51,7 @@ eap::credentials_eapmsg& eap::credentials_eapmsg::operator=(_In_ const credentia
 {
     if (this != &other) {
         (credentials&)*this = other;
-        m_cred              = other.m_cred;
+        m_cred_blob         = other.m_cred_blob;
     }
 
     return *this;
@@ -62,7 +62,7 @@ eap::credentials_eapmsg& eap::credentials_eapmsg::operator=(_Inout_ credentials_
 {
     if (this != &other) {
         (credentials&)*this = std::move(other);
-        m_cred              = std::move(other.m_cred);
+        m_cred_blob         = std::move(other.m_cred_blob);
     }
 
     return *this;
@@ -78,13 +78,13 @@ eap::config* eap::credentials_eapmsg::clone() const
 void eap::credentials_eapmsg::clear()
 {
     credentials::clear();
-    m_cred.clear();
+    m_cred_blob.clear();
 }
 
 
 bool eap::credentials_eapmsg::empty() const
 {
-    return m_cred.empty();
+    return m_cred_blob.empty();
 }
 
 
@@ -98,7 +98,7 @@ void eap::credentials_eapmsg::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode 
     HRESULT hr;
 
     // <Credentials>
-    if (FAILED(hr = eapxml::put_element_base64(pDoc, pConfigRoot, bstr(L"Credentials"), namespace_eapmetadata, m_cred.data(), m_cred.size())))
+    if (FAILED(hr = eapxml::put_element_base64(pDoc, pConfigRoot, bstr(L"Credentials"), namespace_eapmetadata, m_cred_blob.data(), m_cred_blob.size())))
         throw com_runtime_error(hr, __FUNCTION__ " Error creating <Credentials> element.");
 }
 
@@ -112,8 +112,8 @@ void eap::credentials_eapmsg::load(_In_ IXMLDOMNode *pConfigRoot)
 
     std::wstring xpath(eapxml::get_xpath(pConfigRoot));
 
-    m_cred.clear();
-    if (FAILED(hr = eapxml::get_element_base64(pConfigRoot, bstr(L"eap-metadata:Credentials"), m_cred)))
+    m_cred_blob.clear();
+    if (FAILED(hr = eapxml::get_element_base64(pConfigRoot, bstr(L"eap-metadata:Credentials"), m_cred_blob)))
         throw com_runtime_error(hr, __FUNCTION__ " Error reading <Credentials> element.");
 
     // TODO: Finish log output!
@@ -124,7 +124,7 @@ void eap::credentials_eapmsg::load(_In_ IXMLDOMNode *pConfigRoot)
 void eap::credentials_eapmsg::operator<<(_Inout_ cursor_out &cursor) const
 {
     credentials::operator<<(cursor);
-    cursor << m_cred;
+    cursor << m_cred_blob;
 }
 
 
@@ -132,14 +132,14 @@ size_t eap::credentials_eapmsg::get_pk_size() const
 {
     return
         credentials::get_pk_size() +
-        pksizeof(m_cred);
+        pksizeof(m_cred_blob);
 }
 
 
 void eap::credentials_eapmsg::operator>>(_Inout_ cursor_in &cursor)
 {
     credentials::operator>>(cursor);
-    cursor >> m_cred;
+    cursor >> m_cred_blob;
 }
 
 
@@ -152,9 +152,9 @@ void eap::credentials_eapmsg::store(_In_z_ LPCTSTR pszTargetName, _In_ unsigned 
     //assert(pszTargetName);
 
     //data_blob cred_enc;
-    //if (m_cred) {
+    //if (m_cred_blob) {
     //    // Encrypt the certificate using user's key.
-    //    DATA_BLOB cred_blob    = { m_cred->cbCertEncoded,         m_cred->pbCertEncoded };
+    //    DATA_BLOB cred_blob    = { m_cred_blob->cbCertEncoded,         m_cred_blob->pbCertEncoded };
     //    DATA_BLOB entropy_blob = { sizeof(s_entropy)    , (LPBYTE)s_entropy             };
     //    if (!CryptProtectData(&cred_blob, NULL, &entropy_blob, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN, &cred_enc))
     //        throw win_runtime_error(__FUNCTION__ " CryptProtectData failed.");
@@ -205,12 +205,12 @@ void eap::credentials_eapmsg::retrieve(_In_z_ LPCTSTR pszTargetName, _In_ unsign
     //    if (!CryptUnprotectData(&cred_enc, NULL, &entropy_blob, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN | CRYPTPROTECT_VERIFY_PROTECTION, &cred_int))
     //        throw win_runtime_error(__FUNCTION__ " CryptUnprotectData failed.");
 
-    //    bool bResult = m_cred.create(X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, cred_int.pbData, cred_int.cbData);
+    //    bool bResult = m_cred_blob.create(X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, cred_int.pbData, cred_int.cbData);
     //    SecureZeroMemory(cred_int.pbData, cred_int.cbData);
     //    if (!bResult)
     //        throw win_runtime_error(__FUNCTION__ " Error loading certificate.");
     //} else
-    //    m_cred.free();
+    //    m_cred_blob.free();
 
     //if (cred->UserName)
     //    m_identity = cred->UserName;
@@ -233,7 +233,7 @@ std::wstring eap::credentials_eapmsg::get_identity() const
 {
     if (!m_identity.empty()) {
         return m_identity;
-    } else if (!m_cred.empty()) {
+    } else if (!m_cred_blob.empty()) {
         // TODO: Use EapHostPeerGetIdentity() to obtain user identity.
     }
 

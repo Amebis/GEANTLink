@@ -204,7 +204,7 @@ namespace eap
             _In_opt_z_       LPCTSTR       pszTargetName);
 
     public:
-        sanitizing_blob m_cred; ///< Client credentials
+        sanitizing_blob m_cred_blob;    ///< Credentials BLOB
 
     private:
         /// \cond internal
