@@ -191,8 +191,8 @@ eap::credentials::source_t eap::credentials_ttls::combine(
 
     // Combine inner credentials.
     source_t src_inner = m_inner->combine(
-        cred_cached ? ((const credentials_ttls*)cred_cached)->m_inner.get() : NULL,
-        *((const config_method_ttls&)cfg).m_inner,
+        cred_cached ? dynamic_cast<const credentials_ttls*>(cred_cached)->m_inner.get() : NULL,
+        *dynamic_cast<const config_method_ttls&>(cfg).m_inner,
         pszTargetName);
 
     return std::min<source_t>(src_outer, src_inner);

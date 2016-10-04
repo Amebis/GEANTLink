@@ -199,7 +199,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
                 credentials_connection cred_method(*this, cfg);
                 cred_method.m_namespace = cfg_prov->m_namespace;
                 cred_method.m_id        = cfg_prov->m_id;
-                credentials_ttls *_cred_method = (credentials_ttls*)cfg_method->make_credentials();
+                credentials_ttls *_cred_method = dynamic_cast<credentials_ttls*>(cfg_method->make_credentials());
                 cred_method.m_cred.reset(_cred_method);
 #ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
                 bool has_cached = cred_in.m_cred && cred_in.match(*cfg_prov);
@@ -224,7 +224,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
                 // Combine inner credentials.
                 eap::credentials::source_t src_inner = _cred_method->m_inner->combine(
 #ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
-                    has_cached ? ((credentials_ttls*)cred_in.m_cred.get())->m_inner.get() : NULL,
+                    has_cached ? dynamic_cast<credentials_ttls*>(cred_in.m_cred.get())->m_inner.get() : NULL,
 #else
                     NULL,
 #endif
@@ -299,7 +299,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
         throw win_runtime_error(ERROR_CANCELLED, __FUNCTION__ " Cancelled.");
 
     // Build our identity. ;)
-    wstring identity(std::move(cfg_method->get_public_identity((const credentials_ttls&)*cred_out.m_cred)));
+    wstring identity(std::move(cfg_method->get_public_identity(*dynamic_cast<const credentials_ttls*>(cred_out.m_cred.get()))));
     log_event(&EAPMETHOD_TRACE_EVT_CRED_OUTER_ID1, event_data((unsigned int)eap_type_ttls), event_data(identity), event_data::blank);
     size_t size = sizeof(WCHAR)*(identity.length() + 1);
     *ppwszIdentity = (WCHAR*)alloc_memory(size);
