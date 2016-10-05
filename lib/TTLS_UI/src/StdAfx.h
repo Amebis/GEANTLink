@@ -29,5 +29,7 @@
 #include "../../PAP_UI/include/PAP_UI.h"
 #include "../../MSCHAPv2_UI/include/MSCHAPv2_UI.h"
 
+#include <wxex/common.h>
+
 #include <wx/app.h>
 #include <wx/thread.h>
