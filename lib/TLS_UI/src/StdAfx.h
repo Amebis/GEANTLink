@@ -26,4 +26,6 @@
 
 #include "../include/TLS_UI.h"
 
+#include <wxex/valnet.h>
+
 #include <WindowsX.h>
