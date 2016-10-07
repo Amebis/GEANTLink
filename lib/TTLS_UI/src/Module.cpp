@@ -344,7 +344,7 @@ wxInitializerPeer::wxInitializerPeer(_In_ HINSTANCE instance)
     // Do our wxWidgets configuration and localization initialization.
     wxInitializeConfig();
     if (wxInitializeLocale(s_locale)) {
-        //s_locale.AddCatalog(wxT("wxExtend") wxT(wxExtendVersion));
+        s_locale.AddCatalog(wxT("wxExtend") wxT(wxExtendVersion));
         s_locale.AddCatalog(wxT("EAPTTLSUI"));
     }
 }

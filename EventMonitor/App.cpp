@@ -52,7 +52,7 @@ bool wxEventMonitorApp::OnInit()
         return false;
 
     if (wxInitializeLocale(m_locale)) {
-        //wxVERIFY(m_locale.AddCatalog(wxT("wxExtend") wxT(wxExtendVersion)));
+        wxVERIFY(m_locale.AddCatalog(wxT("wxExtend") wxT(wxExtendVersion)));
         wxVERIFY(m_locale.AddCatalog(wxT("EventMonitor")));
     }
 

@@ -136,6 +136,9 @@
     <ProjectReference Include="..\..\lib\WinStd\build\WinStd.vcxproj">
       <Project>{47399d91-7eb9-41de-b521-514ba5db0c43}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\lib\wxExtend\build\wxExtendLib.vcxproj">
+      <Project>{d3e29951-d9f5-486d-a167-20ae8e90b1fa}</Project>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\build\EAPMethodUI.def" />

@@ -24,6 +24,7 @@
 
 #include <WinStd/Common.h>
 
+#include <wx/arrstr.h>
 #include <wx/filedlg.h>
 #include <wx/msgdlg.h>
 
@@ -39,21 +40,6 @@
 /// Helper class for auto-destroyable certificates used in wxWidget's item containers
 ///
 class wxCertificateClientData;
-
-///
-/// Validator for host name
-///
-class wxHostNameValidator;
-
-///
-/// Validator for FQDN
-///
-class wxFQDNValidator;
-
-///
-/// Validator for FQDN lists
-///
-class wxFQDNListValidator;
 
 ///
 /// TLS credential panel
@@ -107,144 +93,6 @@ public:
 
 public:
     PCCERT_CONTEXT m_cert;  ///< Certificate
-};
-
-
-class wxHostNameValidator : public wxValidator
-{
-    wxDECLARE_DYNAMIC_CLASS(wxHostNameValidator);
-    wxDECLARE_NO_ASSIGN_CLASS(wxHostNameValidator);
-
-public:
-    ///
-    /// Construct the validator with a value to store data
-    ///
-    wxHostNameValidator(std::wstring *val = NULL);
-
-    ///
-    /// Copy constructor
-    ///
-    wxHostNameValidator(const wxHostNameValidator &other);
-
-    ///
-    /// Copies this validator
-    ///
-    virtual wxObject* Clone() const;
-
-    ///
-    /// Validates the value
-    ///
-    virtual bool Validate(wxWindow *parent);
-
-    ///
-    /// Transfers the value to the window
-    ///
-    virtual bool TransferToWindow();
-
-    ///
-    /// Transfers the value from the window
-    ///
-    virtual bool TransferFromWindow();
-
-    ///
-    /// Parses FQDN value
-    ///
-    static bool Parse(const wxString &val_in, size_t i_start, size_t i_end, wxTextCtrl *ctrl, wxWindow *parent, std::wstring *val_out = NULL);
-
-protected:
-    std::wstring *m_val; ///< Pointer to variable to receive control's parsed value
-};
-
-
-class wxFQDNValidator : public wxValidator
-{
-    wxDECLARE_DYNAMIC_CLASS(wxFQDNValidator);
-    wxDECLARE_NO_ASSIGN_CLASS(wxFQDNValidator);
-
-public:
-    ///
-    /// Construct the validator with a value to store data
-    ///
-    wxFQDNValidator(std::wstring *val = NULL);
-
-    ///
-    /// Copy constructor
-    ///
-    wxFQDNValidator(const wxFQDNValidator &other);
-
-    ///
-    /// Copies this validator
-    ///
-    virtual wxObject* Clone() const;
-
-    ///
-    /// Validates the value
-    ///
-    virtual bool Validate(wxWindow *parent);
-
-    ///
-    /// Transfers the value to the window
-    ///
-    virtual bool TransferToWindow();
-
-    ///
-    /// Transfers the value from the window
-    ///
-    virtual bool TransferFromWindow();
-
-    ///
-    /// Parses FQDN value
-    ///
-    static bool Parse(const wxString &val_in, size_t i_start, size_t i_end, wxTextCtrl *ctrl, wxWindow *parent, std::wstring *val_out = NULL);
-
-protected:
-    std::wstring *m_val; ///< Pointer to variable to receive control's parsed value
-};
-
-
-class wxFQDNListValidator : public wxValidator
-{
-    wxDECLARE_DYNAMIC_CLASS(wxFQDNListValidator);
-    wxDECLARE_NO_ASSIGN_CLASS(wxFQDNListValidator);
-
-public:
-    ///
-    /// Construct the validator with a value to store data
-    ///
-    wxFQDNListValidator(std::list<std::wstring> *val = NULL);
-
-    ///
-    /// Copy constructor
-    ///
-    wxFQDNListValidator(const wxFQDNListValidator &other);
-
-    ///
-    /// Copies this validator
-    ///
-    virtual wxObject* Clone() const;
-
-    ///
-    /// Validates the value
-    ///
-    virtual bool Validate(wxWindow *parent);
-
-    ///
-    /// Transfers the value to the window
-    ///
-    virtual bool TransferToWindow();
-
-    ///
-    /// Transfers the value from the window
-    ///
-    virtual bool TransferFromWindow();
-
-    ///
-    /// Parses FQDN list value
-    ///
-    static bool Parse(const wxString &val_in, size_t i_start, size_t i_end, wxTextCtrl *ctrl, wxWindow *parent, std::list<std::wstring> *val_out = NULL);
-
-protected:
-    std::list<std::wstring> *m_val;  ///< Pointer to variable to receive control's parsed value
 };
 
 
@@ -302,9 +150,9 @@ protected:
     bool AddRootCA(PCCERT_CONTEXT cert);
 
 protected:
-    const eap::config_provider &m_prov;         ///< EAP provider
-    eap::config_method_tls &m_cfg;              ///< TLS configuration
-    std::list<std::wstring> m_server_names_val; ///< Acceptable authenticating server names
+    const eap::config_provider &m_prov; ///< EAP provider
+    eap::config_method_tls &m_cfg;      ///< TLS configuration
+    wxArrayString m_server_names_val;   ///< Acceptable authenticating server names
 };
 
 
