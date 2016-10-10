@@ -264,19 +264,19 @@ eap::credentials::source_t eap::credentials_eapmsg::combine(
         src = source_cache;
     }
 
-    if (src == source_unknown && pszTargetName) {
-        try {
-            credentials_eapmsg cred_loaded(m_module);
-            cred_loaded.retrieve(pszTargetName, cfg.m_level);
+    //if (src == source_unknown && pszTargetName) {
+    //    try {
+    //        credentials_eapmsg cred_loaded(m_module);
+    //        cred_loaded.retrieve(pszTargetName, cfg.m_level);
 
-            // Using stored credentials.
-            *this = std::move(cred_loaded);
-            m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_STORED2, event_data((unsigned int)cfg.get_method_id()), event_data(get_name()), event_data(pszTargetName), event_data::blank);
-            src = source_storage;
-        } catch (...) {
-            // Not actually an error.
-        }
-    }
+    //        // Using stored credentials.
+    //        *this = std::move(cred_loaded);
+    //        m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_STORED2, event_data((unsigned int)cfg.get_method_id()), event_data(get_name()), event_data(pszTargetName), event_data::blank);
+    //        src = source_storage;
+    //    } catch (...) {
+    //        // Not actually an error.
+    //    }
+    //}
 
     auto const *cfg_eapmsg = dynamic_cast<const config_method_eapmsg*>(&cfg);
     BOOL fInvokeUI = FALSE;
