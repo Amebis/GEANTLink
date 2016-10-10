@@ -41,4 +41,6 @@
 #include <WinStd/EAP.h>
 
 #include <EapHostError.h>
+#include <EapHostPeerTypes.h>
+#include <eappapis.h>
 #include <schannel.h>

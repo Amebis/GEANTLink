@@ -20,6 +20,8 @@
 
 #include "StdAfx.h"
 
+#pragma comment(lib, "Eappprxy.lib")
+
 using namespace std;
 using namespace winstd;
 
@@ -50,11 +52,18 @@ void eap::peer_ttls::initialize()
     if (MsiQueryFeatureState(_T(PRODUCT_VERSION_GUID), _T("featEAPTTLS")) != INSTALLSTATE_UNKNOWN)
         MsiUseFeature(_T(PRODUCT_VERSION_GUID), _T("featEAPTTLS"));
 #endif
+
+    // Initialize EapHost for EAPMsg based inner authentication methods.
+    DWORD dwResult = EapHostPeerInitialize();
+    if (dwResult != ERROR_SUCCESS)
+        throw win_runtime_error(dwResult, __FUNCTION__ " EapHostPeerConfigBlob2Xml failed.");
 }
 
 
 void eap::peer_ttls::shutdown()
 {
+    // Uninitialize EapHost. It was initialized for EAPMsg based inner authentication methods.
+    EapHostPeerUninitialize();
 }
 
 
@@ -364,8 +373,6 @@ const eap::config_method_ttls* eap::peer_ttls::combine_credentials(
     UNREFERENCED_PARAMETER(dwUserDataSize);
 #endif
 
-    user_impersonator impersonating(hTokenImpersonateUser);
-
     for (auto cfg_prov = cfg.m_providers.cbegin(), cfg_prov_end = cfg.m_providers.cend(); cfg_prov != cfg_prov_end; ++cfg_prov) {
         wstring target_name(std::move(cfg_prov->get_id()));
 
@@ -387,6 +394,8 @@ const eap::config_method_ttls* eap::peer_ttls::combine_credentials(
         // Combine outer credentials.
         LPCTSTR _target_name = (dwFlags & EAP_FLAG_GUEST_ACCESS) == 0 ? target_name.c_str() : NULL;
         eap::credentials::source_t src_outer = cred->credentials_tls::combine(
+            dwFlags,
+            hTokenImpersonateUser,
 #ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
             has_cached ? cred_in.m_cred.get() : NULL,
 #else
@@ -401,6 +410,8 @@ const eap::config_method_ttls* eap::peer_ttls::combine_credentials(
 
         // Combine inner credentials.
         eap::credentials::source_t src_inner = cred->m_inner->combine(
+            dwFlags,
+            hTokenImpersonateUser,
 #ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
             has_cached ? dynamic_cast<credentials_ttls*>(cred_in.m_cred.get())->m_inner.get() : NULL,
 #else
