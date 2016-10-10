@@ -50,25 +50,30 @@ msgstr "Ανοίγει ένα παράθυρο διαλόγου με τις ρυ
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:229 lib/EAPBase_UI/include/EAP_UI.h:581
 #, c-format
 msgid "%s User Credentials"
-msgstr ""
+msgstr "%s Διαπιστευτήρια Χρήστη"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:240
 msgid "Select the source where your credentials used to connect are stored."
 msgstr ""
+"Επιλέξτε την πηγή όπου είναι αποθηκευμένα τα διαπιστευτήριά σας που "
+"χρησιμοποιείται για τη σύνδεση."
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:244
 msgid "Use credentials from Credential &Manager:"
-msgstr ""
+msgstr "Χρησιμοποιήστε τα διαπιστευτήρια από τον Credential &Manager:"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:245
 msgid ""
 "Select this option if you would like to use credentials stored in Windows "
 "Credential Manager"
 msgstr ""
+"Επιλέξτε αυτήν την επιλογή αν θέλετε να χρησιμοποιήσετε τα διαπιστευτήρια "
+"που αποθηκεύονται στο Windows Credential Manager"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:253
 msgid "Your present credentials stored in Windows Credential Manager"
 msgstr ""
+"Τα παρόντα διαπιστευτήρια είναι αποθηκευμένα στο Windows Credential Manager"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:260
 msgid "&Clear Credentials"
@@ -93,21 +98,23 @@ msgstr ""
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:276
 msgid "Use credentials from &profile configuration:"
-msgstr ""
+msgstr "Χρησιμοποιήστε τα διαπιστευτήρια από το &προφίλ ρύθμισης παραμέτρων:"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:277
 msgid ""
 "Select this option if you would like to store credentials as a part of  "
 "profile configuration"
 msgstr ""
+"Επιλέξτε αυτήν την επιλογή αν θέλετε να αποθηκεύσετε τα διαπιστευτήρια ως "
+"μέρος της διαμόρφωσης προφίλ"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:285
 msgid "Profile configuration credentials"
-msgstr ""
+msgstr "Προφίλ ρύθμισης διαπιστευτηρίων"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:335
 msgid "User ID and Password"
-msgstr ""
+msgstr "ID χρήστη και κωδικός πρόσβασης"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:345
 msgid "Please provide your user ID and password."
@@ -322,11 +329,11 @@ msgstr ""
 
 #: lib/MSCHAPv2_UI/src/MSCHAPv2_UI.cpp:33
 msgid "MSCHAPv2 User ID and Password"
-msgstr ""
+msgstr "MSCHAPv2 ID χρήστη και κωδικός πρόσβασης"
 
 #: lib/PAP_UI/src/PAP_UI.cpp:33
 msgid "PAP User ID and Password"
-msgstr ""
+msgstr "PAP ID χρήστη και κωδικός πρόσβασης"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:17
 msgid "Server Trust"
@@ -349,6 +356,8 @@ msgid ""
 "Server's certificate must be issued by one of certificate authorities listed"
 " here"
 msgstr ""
+"Το πιστοποιητικό του διακομιστή πρέπει να εκδίδεται από μία από τις αρχές "
+"έκδοσης πιστοποιητικών που αναφέρονται εδώ"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:47
 msgid "Add CA from Store..."
@@ -396,11 +405,13 @@ msgstr "(Παράδειγμα: foo.bar.com;server2.bar.com)"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:119 lib/TLS_UI/src/TLS_UI.cpp:571
 msgid "User Certificate"
-msgstr ""
+msgstr "Πιστοποιητικό χρήστη"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:129
 msgid "Please select your &certificate to use for authentication."
 msgstr ""
+"Επιλέξτε το &πιστοποιητικό σας που θα χρησιμοποιηθεί για τον έλεγχο "
+"ταυτότητας."
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:136
 msgid "Client certificate to use for authentication"
@@ -574,7 +585,7 @@ msgstr "&Υπενθύμιση"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:821
 msgid "Check if you would like to save credentials"
-msgstr ""
+msgstr "Ελέγξτε αν θέλετε να αποθηκεύσετε τα διαπιστευτήρια"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:964
 msgid "<Your Organization>"
