@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: EAPMethods\n"
 "POT-Creation-Date: 2016-09-28 13:27+0200\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
-"Last-Translator: Simon Rozman <simon@rozman.si>, 2016\n"
+"Last-Translator: University of Ruse <support@uni-ruse.bg>, 2016\n"
 "Language-Team: Bulgarian (Bulgaria) (https://www.transifex.com/eduroam_devel/teams/11799/bg_BG/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -25,27 +25,27 @@ msgstr ""
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:37
 msgid "+"
-msgstr ""
+msgstr "+"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:38
 msgid "Adds new provider"
-msgstr ""
+msgstr "Добавяне на нов доставчик"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:42
 msgid "-"
-msgstr ""
+msgstr "-"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:43
 msgid "Removes selected provider"
-msgstr ""
+msgstr "Премахване на избрания доставчик"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:47
 msgid "Advanced..."
-msgstr ""
+msgstr "За напреднали ..."
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:48
 msgid "Opens dialog with provider settings"
-msgstr ""
+msgstr "Отваряне на диалог за настройки на доставчика"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:229 lib/EAPBase_UI/include/EAP_UI.h:581
 #, c-format
@@ -104,7 +104,7 @@ msgstr ""
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:335
 msgid "User ID and Password"
-msgstr ""
+msgstr "Потребителско ID и парола"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:345
 msgid "Please provide your user ID and password."
@@ -112,23 +112,24 @@ msgstr ""
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:355
 msgid "User ID:"
-msgstr ""
+msgstr "Потребителско ID:"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:360
 msgid "Enter your user name here (user@domain.org, DOMAIN\\User, etc.)"
 msgstr ""
+"Въведете Вашето потребителско име тук (user@domain.org, DOMAIN\\User, т.н.)"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:364
 msgid "Password:"
-msgstr ""
+msgstr "Парола:"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:369
 msgid "Enter your password here"
-msgstr ""
+msgstr "Въведете Вашата парола тук"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:400
 msgid "Your Organization"
-msgstr ""
+msgstr "Вашата организация"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:411
 msgid ""
@@ -138,7 +139,7 @@ msgstr ""
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:418
 msgid "Your organization &name:"
-msgstr ""
+msgstr "Вашата организация &name:"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:423
 msgid ""
