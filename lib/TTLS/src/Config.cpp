@@ -38,7 +38,7 @@ eap::config_method_ttls::config_method_ttls(_In_ module &mod, _In_ unsigned int 
 
 
 eap::config_method_ttls::config_method_ttls(const _In_ config_method_ttls &other) :
-    m_inner(other.m_inner ? dynamic_cast<config_method_with_cred*>(other.m_inner->clone()) : nullptr),
+    m_inner(other.m_inner ? dynamic_cast<config_method*>(other.m_inner->clone()) : nullptr),
     m_anonymous_identity(other.m_anonymous_identity),
     config_method_tls(other)
 {
@@ -57,7 +57,7 @@ eap::config_method_ttls& eap::config_method_ttls::operator=(const _In_ config_me
 {
     if (this != &other) {
         (config_method_tls&)*this = other;
-        m_inner.reset(other.m_inner ? dynamic_cast<config_method_with_cred*>(other.m_inner->clone()) : nullptr);
+        m_inner.reset(other.m_inner ? dynamic_cast<config_method*>(other.m_inner->clone()) : nullptr);
         m_anonymous_identity  = other.m_anonymous_identity;
     }
 
@@ -257,8 +257,7 @@ const wchar_t* eap::config_method_ttls::get_method_str() const
 eap::credentials* eap::config_method_ttls::make_credentials() const
 {
     credentials_ttls *cred = new credentials_ttls(m_module);
-    auto *cfg_inner = dynamic_cast<const config_method_with_cred*>(m_inner.get());
-    cred->m_inner.reset(cfg_inner ? cfg_inner->make_credentials() : nullptr);
+    cred->m_inner.reset(m_inner->make_credentials());
     return cred;
 }
 

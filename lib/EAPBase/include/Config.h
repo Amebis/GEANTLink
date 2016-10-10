@@ -199,6 +199,9 @@ namespace eap
     };
 
 
+    class credentials;
+
+
     class config_method : public config
     {
     public:
@@ -319,15 +322,17 @@ namespace eap
         ///
         virtual const wchar_t* get_method_str() const = 0;
 
+        ///
+        /// Creates a blank set of credentials suitable for this method
+        ///
+        virtual credentials* make_credentials() const = 0;
+
     public:
         const unsigned int m_level; ///< Config level (0=outer, 1=inner, 2=inner-inner...)
         bool m_allow_save;          ///< Are credentials allowed to be saved to Windows Credential Manager?
         status_t m_last_status;     ///< Status of authentication the last time
         std::wstring m_last_msg;    ///< Server message at the last authentication
     };
-
-
-    class credentials;
 
 
     class config_method_with_cred : public config_method
@@ -418,11 +423,6 @@ namespace eap
         virtual void operator>>(_Inout_ cursor_in &cursor);
 
         /// @}
-
-        ///
-        /// Creates a blank set of credentials suitable for this method
-        ///
-        virtual credentials* make_credentials() const = 0;
 
     public:
         bool m_use_cred;                        ///< Use configured credentials

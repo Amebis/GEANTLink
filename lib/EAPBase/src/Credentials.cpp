@@ -664,8 +664,7 @@ void eap::credentials_connection::load(_In_ IXMLDOMNode *pConfigRoot)
                 // Matching provider found. Create matching blank credential set, then load.
                 if (cfg_prov->m_methods.empty())
                     throw invalid_argument(string_printf(__FUNCTION__ " %ls provider has no methods.", cfg_prov->get_id().c_str()).c_str());
-                const config_method_with_cred *cfg_method = dynamic_cast<const config_method_with_cred*>(cfg_prov->m_methods.front().get());
-                m_cred.reset(cfg_method->make_credentials());
+                m_cred.reset(cfg_prov->m_methods.front().get()->make_credentials());
                 m_cred->load(pXmlElClientSideCredential);
                 break;
             }
@@ -707,8 +706,7 @@ void eap::credentials_connection::operator>>(_Inout_ cursor_in &cursor)
                 // Matching provider found. Create matching blank credential set, then read.
                 if (cfg_prov->m_methods.empty())
                     throw invalid_argument(string_printf(__FUNCTION__ " %ls provider has no methods.", cfg_prov->get_id().c_str()).c_str());
-                const config_method_with_cred *cfg_method = dynamic_cast<const config_method_with_cred*>(cfg_prov->m_methods.front().get());
-                m_cred.reset(cfg_method->make_credentials());
+                m_cred.reset(cfg_prov->m_methods.front().get()->make_credentials());
                 cursor >> *m_cred;
                 break;
             }

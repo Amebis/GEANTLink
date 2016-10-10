@@ -169,3 +169,9 @@ const wchar_t* eap::config_method_eapmsg::get_method_str() const
     // TODO: Query registry for EAP method name (PeerFriendlyName using RegLoadMUIString()).
     return L"EAPMsg";
 }
+
+
+eap::credentials* eap::config_method_eapmsg::make_credentials() const
+{
+    return new credentials_eapmsg(m_module);
+}
