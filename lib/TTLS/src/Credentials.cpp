@@ -179,18 +179,24 @@ wstring eap::credentials_ttls::get_identity() const
 
 
 eap::credentials::source_t eap::credentials_ttls::combine(
+    _In_             DWORD         dwFlags,
+    _In_             HANDLE        hTokenImpersonateUser,
     _In_opt_   const credentials   *cred_cached,
     _In_       const config_method &cfg,
     _In_opt_z_       LPCTSTR       pszTargetName)
 {
     // Combine outer credentials.
     source_t src_outer = credentials_tls::combine(
+        dwFlags,
+        hTokenImpersonateUser,
         cred_cached,
         cfg,
         pszTargetName);
 
     // Combine inner credentials.
     source_t src_inner = m_inner->combine(
+        dwFlags,
+        hTokenImpersonateUser,
         cred_cached ? dynamic_cast<const credentials_ttls*>(cred_cached)->m_inner.get() : NULL,
         *dynamic_cast<const config_method_ttls&>(cfg).m_inner,
         pszTargetName);

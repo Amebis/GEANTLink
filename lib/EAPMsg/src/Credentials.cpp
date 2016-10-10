@@ -20,6 +20,8 @@
 
 #include "StdAfx.h"
 
+#pragma comment(lib, "Eappprxy.lib")
+
 using namespace std;
 using namespace winstd;
 
@@ -242,34 +244,72 @@ std::wstring eap::credentials_eapmsg::get_identity() const
 
 
 eap::credentials::source_t eap::credentials_eapmsg::combine(
+    _In_             DWORD         dwFlags,
+    _In_             HANDLE        hTokenImpersonateUser,
     _In_opt_   const credentials   *cred_cached,
     _In_       const config_method &cfg,
     _In_opt_z_       LPCTSTR       pszTargetName)
 {
-    UNREFERENCED_PARAMETER(cfg);
+    // When cached credentials are available, EapHost calls EapPeerGetIdentity() anyway.
+    // This allows each peer to decide to reuse or drop cached credentials itself.
+    // To mimic that behaviour, we do the same:
+    // 1. Retrieve credentials from cache (or store)
+    // 2. Call EapHostPeerGetIdentity()
+    source_t src = source_unknown;
 
     if (cred_cached) {
         // Using EAP service cached credentials.
         *this = *(credentials_eapmsg*)cred_cached;
-        m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CACHED2, event_data((unsigned int)eap_type_tls), event_data(credentials_eapmsg::get_name()), event_data(pszTargetName), event_data::blank);
-        return source_cache;
+        m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CACHED2, event_data((unsigned int)cfg.get_method_id()), event_data(get_name()), event_data(pszTargetName), event_data::blank);
+        src = source_cache;
     }
 
-    // We do not store inner EAP method credentials inside configuration.
-    // Therefore, we skip configured credentials.
-
-    if (pszTargetName) {
+    if (src == source_unknown && pszTargetName) {
         try {
             credentials_eapmsg cred_loaded(m_module);
             cred_loaded.retrieve(pszTargetName, cfg.m_level);
 
             // Using stored credentials.
             *this = std::move(cred_loaded);
-            m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_STORED2, event_data((unsigned int)eap_type_tls), event_data(credentials_eapmsg::get_name()), event_data(pszTargetName), event_data::blank);
-            return source_storage;
+            m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_STORED2, event_data((unsigned int)cfg.get_method_id()), event_data(get_name()), event_data(pszTargetName), event_data::blank);
+            src = source_storage;
         } catch (...) {
             // Not actually an error.
         }
+    }
+
+    auto const *cfg_eapmsg = dynamic_cast<const config_method_eapmsg*>(&cfg);
+    BOOL fInvokeUI = FALSE;
+    DWORD cred_data_size = 0;
+    eap_blob_runtime cred_data;
+    unique_ptr<WCHAR[], EapHostPeerFreeRuntimeMemory_delete> identity;
+    eap_error error;
+    DWORD dwResult = EapHostPeerGetIdentity(
+        0,
+        dwFlags,
+        cfg_eapmsg->m_type,
+        (DWORD)cfg_eapmsg->m_cfg_blob.size(), cfg_eapmsg->m_cfg_blob.data(),
+        src != source_unknown ? (DWORD)m_cred_blob.size() : 0, src != source_unknown ? m_cred_blob.data() : NULL,
+        hTokenImpersonateUser,
+        &fInvokeUI,
+        &cred_data_size, &cred_data._Myptr,
+        &identity._Myptr,
+        &error._Myptr,
+        NULL);
+    if (dwResult == ERROR_SUCCESS) {
+        if (identity && !fInvokeUI) {
+            // Inner EAP method provided identity and does not require additional UI prompt.
+            m_identity = identity.get();
+            m_cred_blob.assign(cred_data.get(), cred_data.get() + cred_data_size);
+            m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_EAPMSG, event_data((unsigned int)cfg.get_method_id()), event_data(get_name()), event_data(pszTargetName), event_data::blank);
+            return source_lower;
+        }
+    } else if (error) {
+        // An EAP error in inner EAP method occurred.
+        m_module.log_error(error.get());
+    } else {
+        // A runtime error in inner EAP method occurred.
+        m_module.log_event(&EAPMETHOD_TRACE_EVT_WIN_ERROR, event_data((unsigned int)dwResult), event_data(__FUNCTION__ " EapHostPeerGetIdentity failed."), event_data::blank);
     }
 
     return source_unknown;

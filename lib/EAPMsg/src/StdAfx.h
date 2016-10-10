@@ -26,3 +26,5 @@
 
 #include <Windows.h>
 #include <EapHostError.h> // include after Windows.h
+#include <EapHostPeerTypes.h>
+#include <eappapis.h>

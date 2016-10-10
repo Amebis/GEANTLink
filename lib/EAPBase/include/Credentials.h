@@ -68,7 +68,8 @@ namespace eap
             source_unknown = -1, ///< Unknown source
             source_cache = 0,    ///< Credentials were obtained from EapHost cache
             source_config,       ///< Credentials were set by method configuration
-            source_storage       ///< Credentials were loaded from Windows Credential Manager
+            source_storage,      ///< Credentials were loaded from Windows Credential Manager
+            source_lower,        ///< Credentials were set by lower EAP method
         };
 
 
@@ -242,9 +243,11 @@ namespace eap
         /// 2. Configured credentials (if \p cfg is derived from config_method_with_cred)
         /// 3. Stored credentials
         ///
-        /// \param[in] cred_cached    Cached credentials (optional, can be \c NULL, must be the same type of credentials as `this`)
-        /// \param[in] cfg            Method configuration (must be the same type of configuration as `this` credentials belong to)
-        /// \param[in] pszTargetName  The name in Windows Credential Manager to retrieve credentials from (optional, can be \c NULL)
+        /// \param[in] dwFlags                A combination of [EAP flags](https://msdn.microsoft.com/en-us/library/windows/desktop/bb891975.aspx) that describe the EAP authentication session behavior
+        /// \param[in] hTokenImpersonateUser  Impersonation token for a logged-on user to collect user-related information
+        /// \param[in] cred_cached            Cached credentials (optional, can be \c NULL, must be the same type of credentials as `this`)
+        /// \param[in] cfg                    Method configuration (must be the same type of configuration as `this` credentials belong to)
+        /// \param[in] pszTargetName          The name in Windows Credential Manager to retrieve credentials from (optional, can be \c NULL)
         ///
         /// \returns
         /// - \c source_cache   Credentials were obtained from EapHost cache
@@ -252,6 +255,8 @@ namespace eap
         /// - \c source_storage Credentials were loaded from Windows Credential Manager
         ///
         virtual source_t combine(
+            _In_             DWORD         dwFlags,
+            _In_             HANDLE        hTokenImpersonateUser,
             _In_opt_   const credentials   *cred_cached,
             _In_       const config_method &cfg,
             _In_opt_z_       LPCTSTR       pszTargetName) = 0;
@@ -414,9 +419,11 @@ namespace eap
         /// 2. Configured credentials (if \p cfg is derived from config_method_with_cred)
         /// 3. Stored credentials
         ///
-        /// \param[in] cred_cached    Cached credentials (optional, can be \c NULL, must be credentials_pass* type)
-        /// \param[in] cfg            Method configuration (optional, can be \c NULL, must be config_method_pap type)
-        /// \param[in] pszTargetName  The name in Windows Credential Manager to retrieve credentials from (optional, can be \c NULL)
+        /// \param[in] dwFlags                A combination of [EAP flags](https://msdn.microsoft.com/en-us/library/windows/desktop/bb891975.aspx) that describe the EAP authentication session behavior
+        /// \param[in] hTokenImpersonateUser  Impersonation token for a logged-on user to collect user-related information
+        /// \param[in] cred_cached            Cached credentials (optional, can be \c NULL, must be credentials_eapmsg* type)
+        /// \param[in] cfg                    Method configuration (unused, as must be as config_method_eapmsg is not derived from config_method_with_cred)
+        /// \param[in] pszTargetName          The name in Windows Credential Manager to retrieve credentials from (optional, can be \c NULL)
         ///
         /// \returns
         /// - \c source_cache   Credentials were obtained from EapHost cache
@@ -424,6 +431,8 @@ namespace eap
         /// - \c source_storage Credentials were loaded from Windows Credential Manager
         ///
         virtual source_t combine(
+            _In_             DWORD         dwFlags,
+            _In_             HANDLE        hTokenImpersonateUser,
             _In_opt_   const credentials   *cred_cached,
             _In_       const config_method &cfg,
             _In_opt_z_       LPCTSTR       pszTargetName);

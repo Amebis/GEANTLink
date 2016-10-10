@@ -437,10 +437,14 @@ LPCTSTR eap::credentials_pass::target_suffix() const
 
 
 eap::credentials::source_t eap::credentials_pass::combine(
+    _In_             DWORD         dwFlags,
+    _In_             HANDLE        hTokenImpersonateUser,
     _In_opt_   const credentials   *cred_cached,
     _In_       const config_method &cfg,
     _In_opt_z_       LPCTSTR       pszTargetName)
 {
+    UNREFERENCED_PARAMETER(dwFlags);
+
     if (cred_cached) {
         // Using EAP service cached credentials.
         *this = *dynamic_cast<const credentials_pass*>(cred_cached);
@@ -457,6 +461,9 @@ eap::credentials::source_t eap::credentials_pass::combine(
     }
 
     if (pszTargetName) {
+        // Switch user context.
+        user_impersonator impersonating(hTokenImpersonateUser);
+
         try {
             credentials_pass cred_loaded(m_module);
             cred_loaded.retrieve(pszTargetName, cfg.m_level);
