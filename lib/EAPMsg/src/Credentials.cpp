@@ -278,7 +278,7 @@ eap::credentials::source_t eap::credentials_eapmsg::combine(
     //    }
     //}
 
-    auto const *cfg_eapmsg = dynamic_cast<const config_method_eapmsg*>(&cfg);
+    auto cfg_eapmsg = dynamic_cast<const config_method_eapmsg*>(&cfg);
     BOOL fInvokeUI = FALSE;
     DWORD cred_data_size = 0;
     eap_blob_runtime cred_data;

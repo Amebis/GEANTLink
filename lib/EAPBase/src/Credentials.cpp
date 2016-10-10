@@ -452,7 +452,7 @@ eap::credentials::source_t eap::credentials_pass::combine(
         return source_cache;
     }
 
-    auto const *cfg_with_cred = dynamic_cast<const config_method_with_cred*>(&cfg);
+    auto cfg_with_cred = dynamic_cast<const config_method_with_cred*>(&cfg);
     if (cfg_with_cred && cfg_with_cred->m_use_cred) {
         // Using configured credentials.
         *this = *dynamic_cast<const credentials_pass*>(cfg_with_cred->m_cred.get());

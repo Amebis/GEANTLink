@@ -64,9 +64,9 @@ void eap::method_ttls::begin_session(
     method_tls::begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
 
     // Initialize inner method.
-    auto * cfg_inner       = dynamic_cast<config_method_ttls  &>(m_cfg ).m_inner.get();
-    auto *cred_inner       = dynamic_cast<credentials_ttls    &>(m_cred).m_inner.get();
-    auto *cfg_inner_eapmsg = dynamic_cast<config_method_eapmsg*>(cfg_inner);
+    auto  cfg_inner       = dynamic_cast<config_method_ttls  &>(m_cfg ).m_inner.get();
+    auto cred_inner       = dynamic_cast<credentials_ttls    &>(m_cred).m_inner.get();
+    auto cfg_inner_eapmsg = dynamic_cast<config_method_eapmsg*>(cfg_inner);
     if (!cfg_inner_eapmsg) {
         // Native inner methods
         switch (cfg_inner->get_method_id()) {

@@ -307,7 +307,7 @@ eap::credentials::source_t eap::credentials_tls::combine(
         return source_cache;
     }
 
-    auto const *cfg_with_cred = dynamic_cast<const config_method_with_cred*>(&cfg);
+    auto cfg_with_cred = dynamic_cast<const config_method_with_cred*>(&cfg);
     if (cfg_with_cred->m_use_cred) {
         // Using configured credentials.
         *this = *dynamic_cast<const credentials_tls*>(cfg_with_cred->m_cred.get());
