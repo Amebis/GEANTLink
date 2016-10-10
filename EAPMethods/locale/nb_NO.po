@@ -50,25 +50,27 @@ msgstr "Åpner dialog med tilbyder innstillinger"
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:229 lib/EAPBase_UI/include/EAP_UI.h:581
 #, c-format
 msgid "%s User Credentials"
-msgstr ""
+msgstr "%s Påloggingsinformasjon"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:240
 msgid "Select the source where your credentials used to connect are stored."
-msgstr ""
+msgstr "Velg kilden for din påloggingsinformasjon"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:244
 msgid "Use credentials from Credential &Manager:"
-msgstr ""
+msgstr "Bruk brukerdetaljer fra Credential &Manager:"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:245
 msgid ""
 "Select this option if you would like to use credentials stored in Windows "
 "Credential Manager"
 msgstr ""
+"Velg denne opsjonen om du vil bruke brukerinformasjon lagret i Windows "
+"Credential Manager"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:253
 msgid "Your present credentials stored in Windows Credential Manager"
-msgstr ""
+msgstr "Din nåværende brukerinformasjon i Windows Credential Manager"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:260
 msgid "&Clear Credentials"
@@ -92,68 +94,74 @@ msgstr "Klikk her for å sette eller endre påloggingsinformasjon"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:276
 msgid "Use credentials from &profile configuration:"
-msgstr ""
+msgstr "Bruk brukerinformasjon fra &profil konfigurasjon:"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:277
 msgid ""
 "Select this option if you would like to store credentials as a part of  "
 "profile configuration"
 msgstr ""
+"Velg denne opsjonen om du vil lagre brukerinformasjon som en del av profil "
+"konfigurasjon"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:285
 msgid "Profile configuration credentials"
-msgstr ""
+msgstr "Profil konfigurasjon brukerinformasjon"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:335
 msgid "User ID and Password"
-msgstr ""
+msgstr "Bruker ID og passord"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:345
 msgid "Please provide your user ID and password."
-msgstr ""
+msgstr "Vennligst oppgi bruker ID og passord."
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:355
 msgid "User ID:"
-msgstr ""
+msgstr "Bruker ID:"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:360
 msgid "Enter your user name here (user@domain.org, DOMAIN\\User, etc.)"
-msgstr ""
+msgstr "Oppgi ditt brukernavn (bruker@domain.org, DOMIAN\\User, etc)"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:364
 msgid "Password:"
-msgstr ""
+msgstr "Passord:"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:369
 msgid "Enter your password here"
-msgstr ""
+msgstr "Oppgi ditt passord"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:400
 msgid "Your Organization"
-msgstr ""
+msgstr "Din organisasjon"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:411
 msgid ""
 "Describe your organization to customize user prompts.  When organization is "
 "introduced, end-users find program messages easier to understand and act."
 msgstr ""
+"Beskriv din organisasjon for å tilpasse ledetekster til brukere. Når "
+"organisasjon introduseres vil sluttbrukere lettere forstå meldinger fra "
+"programmet og kan gi korrekt respons."
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:418
 msgid "Your organization &name:"
-msgstr ""
+msgstr "Din organisasjons %navn:"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:423
 msgid ""
 "Your organization name as it will appear on helpdesk contact notifications"
 msgstr ""
+"Din organisasjons navn som det vil fremkomme på kontakt helpdesk varslinger"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:427
 msgid "(Keep it short, please)"
-msgstr ""
+msgstr "(Vennligst, vær kort)"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:437
 msgid "Helpdesk contact &information:"
-msgstr ""
+msgstr "Helpdesk kontakt&informasjon:"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:447
 msgid "¶"
@@ -161,7 +169,7 @@ msgstr "¶"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:454
 msgid "Your helpdesk website address"
-msgstr ""
+msgstr "Nettadresse til din helpdesk"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:458
 msgid "*"
@@ -169,7 +177,7 @@ msgstr "*"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:465
 msgid "Your helpdesk e-mail address"
-msgstr ""
+msgstr "E-post adresse til din helpdesk"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:469
 msgid ")"
@@ -177,21 +185,23 @@ msgstr ")"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:476
 msgid "Your helpdesk phone number"
-msgstr ""
+msgstr "Telefonnummer til din helpdesk"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:504
 msgid "Provider Unique Identifier"
-msgstr ""
+msgstr "Oppgi unik identifikator"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:515
 msgid ""
 "Assign your organization a unique ID to allow sharing the same credential "
 "set across different network profiles."
 msgstr ""
+"Tildel din organisasjon en unik ID for å tillate bruk av de samme "
+"brukeropplysninger i forskjellige nettverksprofiler"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:522
 msgid "&Namespace:"
-msgstr ""
+msgstr "&Namespace:"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:526
 msgid "urn:RFC4282:realm"
@@ -203,62 +213,67 @@ msgstr "urn:uuid"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:538
 msgid "Provider unique &identifier:"
-msgstr ""
+msgstr "Oppgi unik &identifikator:"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:543
 msgid "Your organization ID to assign same credentials from other profiles"
 msgstr ""
+"Din organisasjons ID for å kunne bruke de samme brukeropplysninger i andre "
+"profiler"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:568
 msgid "Configuration Lock"
-msgstr ""
+msgstr "Konfigurasjonslås"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:579
 msgid ""
 "Your configuration can be locked to prevent accidental modification by end-"
 "users. Users will only be allowed to enter credentials."
 msgstr ""
+"Din konfigurasjon kan låses for å hindre utilsiktet modifikasjon av "
+"sluttbrukere. Brukere vil kun kunne oppgi brukerinformasjon."
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:586
 msgid ""
 "&Lock this configuration and prevent any further modification via user "
 "interface."
 msgstr ""
+"&Lås denne konfigurasjonen og hindre modifikasjon via brukergrensesnitt."
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:589
 msgid "(Warning: Once locked, you can not revert using this dialog!)"
-msgstr ""
+msgstr "(Advarsel: Når låst, kan du ikke gå tilbake til denne dialogen!)"
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:97
 #, c-format
 msgid "%s Credentials"
-msgstr ""
+msgstr "%s Brukeropplysninger"
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:122 lib/EAPBase_UI/include/EAP_UI.h:355
 #: lib/EAPBase_UI/include/EAP_UI.h:365 lib/EAPBase_UI/res/wxEAP_UI.h:119
 msgid "EAP Credentials"
-msgstr ""
+msgstr "EAP brukeropplysninger"
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:165
 #, c-format
 msgid "For additional help and instructions, please contact %s at:"
-msgstr ""
+msgstr "For mer hjelp og instruksjoner, kontakt %s via:"
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:166
 msgid "your provider"
-msgstr ""
+msgstr "Din tilbyder"
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:185
 msgid "Open the default web browser"
-msgstr ""
+msgstr "Åpne standard nettleser"
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:196
 msgid "Open your e-mail program"
-msgstr ""
+msgstr "Åpne e-post program"
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:207
 msgid "Dial the phone number"
-msgstr ""
+msgstr "Ring telefon"
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:227
 #, c-format
@@ -266,303 +281,322 @@ msgid ""
 "%s has pre-set parts of this configuration. Those parts are locked to "
 "prevent accidental modification."
 msgstr ""
+"%s har pre-satt deler av denne konfigurasjonen. De delene er låst for å "
+"hindre utilsiktet modifikasjon."
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:228
 msgid "Your provider"
-msgstr ""
+msgstr "Din tibyder"
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:249
 msgid "Previous attempt to connect reported invalid credentials."
-msgstr ""
+msgstr "Tidligere forsøk på tilkobling rapporterte feil brukeropplysninger."
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:250
 msgid "Previous attempt to connect reported your credentials expired."
 msgstr ""
+"Tidligere forsøk på tilkobling rapporterte brukeropplysninger utløpt på dato"
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:251
 msgid ""
 "Previous attempt to connect reported your credentials are being changed."
 msgstr ""
+"Tidligere forsøk på tilkobling rapporterte at dine brukeropplysninger blir "
+"endret. "
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:252
 msgid "Previous attempt to connect failed."
-msgstr ""
+msgstr "Tidligere forsøk på tilkobling feilet."
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:253
 msgid "Please, make sure your credentials are correct, or try again later."
 msgstr ""
+"Vennligst sjekk at dine brukeropplysninger er korrekt, eller prøv igjen "
+"senere."
 
 #: lib/MSCHAPv2_UI/src/MSCHAPv2_UI.cpp:33
 msgid "MSCHAPv2 User ID and Password"
-msgstr ""
+msgstr "MSCHAPv2 bruker ID and passord"
 
 #: lib/PAP_UI/src/PAP_UI.cpp:33
 msgid "PAP User ID and Password"
-msgstr ""
+msgstr "PAP bruker ID og passord"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:17
 msgid "Server Trust"
-msgstr ""
+msgstr "Server Trust"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:28
 msgid ""
 "Describe the servers you trust to prevent credential interception in case of"
 " man-in-the-middle attacks."
 msgstr ""
+"Beskriv tjenere du stoler på for å hindre tyveri av brukeropplysninger i "
+"tilfelle et man-in-the-middle angrep."
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:35
 msgid "Acceptable Certificate Authorities:"
-msgstr ""
+msgstr "Akseptable sertifikat utstedere:"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:40
 msgid ""
 "Server's certificate must be issued by one of certificate authorities listed"
 " here"
 msgstr ""
+"Tjeneren's sertifikat må være utstedt av en av sertifikat utstederene listet"
+" her"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:47
 msgid "Add CA from Store..."
-msgstr ""
+msgstr "Legg til CA fra ..."
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:48
 msgid ""
 "Adds a new certificate authority from the certificate store to the list"
-msgstr ""
+msgstr "Legg til en ny sertifikat utsteder i listen"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:52
 msgid "Add CA from File..."
-msgstr ""
+msgstr "Legg til CA fra fil..."
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:53
 msgid "Adds a new certificate authority from the file to the list"
-msgstr ""
+msgstr "Legger til en ny CA fra filen til listen"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:57
 msgid "&Remove CA"
-msgstr ""
+msgstr "&Fjern CA"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:59
 msgid "Removes selected certificate authorities from the list"
-msgstr ""
+msgstr "Fjerner valgte CA fra listen"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:72
 msgid "Acceptable server &names:"
-msgstr ""
+msgstr "Aksepterte tjener&navn:"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:77
 msgid ""
 "A semicolon delimited list of acceptable server FQDN names; blank to skip "
 "name check; Unicode characters allowed"
 msgstr ""
+"En semikolon separert liste med aksepterte tjener FQDN navn; blank for å "
+"hoppe over navne sjekk; Unicode tegn er tillatt"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:81
 msgid "(Example: foo.bar.com;server2.bar.com)"
-msgstr ""
+msgstr "(Eksempel: foo.bar.com;server2.bar.com)"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:119 lib/TLS_UI/src/TLS_UI.cpp:571
 msgid "User Certificate"
-msgstr ""
+msgstr "Bruker sertifikat"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:129
 msgid "Please select your &certificate to use for authentication."
-msgstr ""
+msgstr "Vennligst velg ditt &sertifikat for autentisering."
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:136
 msgid "Client certificate to use for authentication"
-msgstr ""
+msgstr "Klientsertifikat for autentisering "
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:143
 msgid "Custom &identity:"
-msgstr ""
+msgstr "Tilpasset &identitet:"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:148
 msgid ""
 "Your identity (username@domain) to override one from certificate; or blank "
 "to use one provided in certificate"
 msgstr ""
+"Din identitet (brukernavn@domene) for overskriving av sertifikat; eller tomt"
+" for å bruke den fra sertifikatet. "
 
 #: lib/TLS_UI/src/TLS_UI.cpp:118
 #, c-format
 msgid "Invalid character in host name found: %c"
-msgstr ""
+msgstr "Ugyldig tegn funnet i navn: %c"
 
 #: lib/TLS_UI/src/TLS_UI.cpp:118
 msgid "Validation conflict"
-msgstr ""
+msgstr "Valideringskonflikt"
 
 #: lib/TLS_UI/src/TLS_UI.cpp:327 lib/EAPBase_UI/include/EAP_UI.h:769
 #: lib/EAPBase_UI/include/EAP_UI.h:778
 msgid "<empty>"
-msgstr ""
+msgstr "<tom>"
 
 #: lib/TLS_UI/src/TLS_UI.cpp:500
 msgid "Add Certificate"
-msgstr ""
+msgstr "Legg til sertifikat"
 
 #: lib/TLS_UI/src/TLS_UI.cpp:501
 msgid "Certificate Files (*.cer;*.crt;*.der;*.p7b;*.pem)"
-msgstr ""
+msgstr "Sertifikat filer  (*.cer;*.crt;*.der;*.p7b;*.pem)"
 
 #: lib/TLS_UI/src/TLS_UI.cpp:502
 msgid "X.509 Certificate Files (*.cer;*.crt;*.der;*.pem)"
-msgstr ""
+msgstr "X.509 sertifikat filer (*.cer;*.crt;*.der;*.pem)"
 
 #: lib/TLS_UI/src/TLS_UI.cpp:503
 msgid "PKCS #7 Certificate Files (*.p7b)"
-msgstr ""
+msgstr "PKCS #7 sertifikat filer (*.p7b)"
 
 #: lib/TLS_UI/src/TLS_UI.cpp:504
 msgid "All Files (*.*)"
-msgstr ""
+msgstr "Alle filer (*.*)"
 
 #: lib/TLS_UI/src/TLS_UI.cpp:520
 #, c-format
 msgid "Invalid or unsupported certificate file %s"
-msgstr ""
+msgstr "Ugyldig eller ikke støttet sertifikat fil %s"
 
 #: lib/TLS_UI/src/TLS_UI.cpp:520
 msgid "Error"
-msgstr ""
+msgstr "Feil"
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:17
 msgid "Outer Identity"
-msgstr ""
+msgstr "Ytre identitet"
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:28
 msgid "Select the user ID supplicant introduces itself as to authenticator:"
 msgstr ""
+"Velg den bruker ID som supplikat introduserer seg som til autentikator:"
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:35
 msgid "&True identity"
-msgstr ""
+msgstr "&Faktisk identitet"
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:36
 msgid "Use my true user name"
-msgstr ""
+msgstr "Bruke mitt faktiske brukernavn"
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:40
 msgid "Use &empty outer identity (RFC 4822)"
-msgstr ""
+msgstr "Bruk &tom ytre identitet (RFC 4822)"
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:41
 msgid "Ommit my user name and use @mydomain.org only"
-msgstr ""
+msgstr "Utelat mitt brukernavn og bruk kun @mydomian.org"
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:48
 msgid "&Custom outer identity:"
-msgstr ""
+msgstr "&Tilpasset ytre identitet:"
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:49
 msgid "Specify custom outer identity"
-msgstr ""
+msgstr "Spesifiser tilpasset ytre identitet"
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:54
 msgid "Custom outer identity to use"
-msgstr ""
+msgstr "Tilpasset ytre identitet som brukes"
 
 #: lib/TTLS_UI/src/Module.cpp:274 lib/TTLS_UI/src/Module.cpp:284
 #: lib/EAPBase_UI/include/EAP_UI.h:696
 #, c-format
 msgid "Error writing credentials to Credential Manager: %hs (error %u)"
 msgstr ""
+"Feil under skriving av brukeropplysninger til Credential Manager: %hs (feil "
+"%u)"
 
 #: lib/TTLS_UI/src/Module.cpp:276 lib/TTLS_UI/src/Module.cpp:286
 #: lib/EAPBase_UI/include/EAP_UI.h:699
 msgid "Writing credentials failed."
-msgstr ""
+msgstr "Skriving av brukeropplysninger feilet."
 
 #: lib/TTLS_UI/src/TTLS_UI.cpp:36 lib/TTLS_UI/src/TTLS_UI.cpp:181
 msgid "Inner Authentication"
-msgstr ""
+msgstr "Indre autentisering"
 
 #: lib/TTLS_UI/src/TTLS_UI.cpp:61 lib/TTLS_UI/src/TTLS_UI.cpp:196
 msgid "Outer Authentication"
-msgstr ""
+msgstr "Ytre autentisering"
 
 #: lib/TTLS_UI/src/TTLS_UI.cpp:187
 msgid "Select inner authentication method from the list"
-msgstr ""
+msgstr "Velg den indre autentiseringsmetoden fra listen"
 
 #: lib/TTLS_UI/src/TTLS_UI.cpp:189
 msgid "PAP"
-msgstr ""
+msgstr "PAP"
 
 #: lib/TTLS_UI/src/TTLS_UI.cpp:191
 msgid "MSCHAPv2"
-msgstr ""
+msgstr "MSCHAPv2"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:292
 #, c-format
 msgid ""
 "Are you sure you want to permanently remove %ls provider from configuration?"
 msgstr ""
+"Er du sikker på at du vil fjerne tilbyder %ls permanent fra konfigurasjonen?"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:292
 msgid "Warning"
-msgstr ""
+msgstr "Advarsel"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:552
 msgid "Provider Settings"
-msgstr ""
+msgstr "Tilbyder innstillinger"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:717
 #, c-format
 msgid "Deleting credentials failed (error %u)."
-msgstr ""
+msgstr "Sletting av brukeropplysninger feilet (feil %u)"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:754
 #, c-format
 msgid "<error %u>"
-msgstr ""
+msgstr "<feil %u>"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:758
 msgid "<error>"
-msgstr ""
+msgstr "<feil>"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:769 lib/EAPBase_UI/include/EAP_UI.h:778
 msgid "<blank ID>"
-msgstr ""
+msgstr "<blank ID>"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:820
 msgid "&Remember"
-msgstr ""
+msgstr "&Husk"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:821
 msgid "Check if you would like to save credentials"
-msgstr ""
+msgstr "Huk av om du vil lagre brukeropplysninger "
 
 #: lib/EAPBase_UI/include/EAP_UI.h:964
 msgid "<Your Organization>"
-msgstr ""
+msgstr "<Din organisasjon>"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.h:69
 msgid "EAP Connection Configuration"
-msgstr ""
+msgstr "Konfigurasjon av EAP forbindelse"
 
 #: EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
 #: EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
 #: EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
 #: EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
 msgid "EAP Methods"
-msgstr ""
+msgstr "EAP Metoder"
 
 #: EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
 #: EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
 #: EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
 #: EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
 msgid "Modules to support individual EAP methods"
-msgstr ""
+msgstr "Moduler for støtte av individuelle EAP metoder"
 
 #: EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:5
 #: EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:5
 #: EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:5
 #: EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:5
 msgid "TTLS"
-msgstr ""
+msgstr "TTLS"
 
 #: EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:5
 #: EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:5
 #: EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:5
 #: EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:5
 msgid "Tunneled Transport Layer Security"
-msgstr ""
+msgstr "Tunneled Transport Layer Security"

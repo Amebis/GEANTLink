@@ -50,57 +50,71 @@ msgstr "Отваряне на диалог за настройки на дост
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:229 lib/EAPBase_UI/include/EAP_UI.h:581
 #, c-format
 msgid "%s User Credentials"
-msgstr ""
+msgstr "%s Удостоверения за самолочност на потребителя"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:240
 msgid "Select the source where your credentials used to connect are stored."
 msgstr ""
+"Изберете източника, съхраняващ Вашите удостоверения за самоличност за "
+"свързване."
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:244
 msgid "Use credentials from Credential &Manager:"
-msgstr ""
+msgstr "Използвайте удостоверения за самоличност от Credential &Manager:"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:245
 msgid ""
 "Select this option if you would like to use credentials stored in Windows "
 "Credential Manager"
 msgstr ""
+"Изберете тази опция, ако желаете да използвате удостоверения за "
+"самосличност, съхранявани в Windows Credential Manager"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:253
 msgid "Your present credentials stored in Windows Credential Manager"
 msgstr ""
+"Вашите настоящи удостоверения за самоличност са съхранени в Windows "
+"Credential Manager"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:260
 msgid "&Clear Credentials"
-msgstr ""
+msgstr "&Изчистете удостоверенията за самоличност"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:261
 msgid ""
 "Click to clear your credentials from Credential Manager.\n"
 "Note: You will be prompted to enter credentials when connecting."
 msgstr ""
+"Кликнете, за да изчистите Вашите удостоверения за самоличност от  Credential Manager.\n"
+"\n"
+"Забележка: Когато се свързвате, ще Ви бъде поискано да въведете удостоверения за самоличност."
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:265 lib/EAPBase_UI/res/wxEAP_UI.cpp:292
 msgid "&Set Credentials..."
-msgstr ""
+msgstr "&Настройте удостоверения за самоличност ..."
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:266 lib/EAPBase_UI/res/wxEAP_UI.cpp:293
 msgid "Click here to set or modify your credentials"
 msgstr ""
+"Кликнете тук, за да настроите или модифицирате Вашите удостоверения за "
+"самоличност"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:276
 msgid "Use credentials from &profile configuration:"
 msgstr ""
+"Използвайте удостоверения за самоличност от &конфигурацията на профила:"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:277
 msgid ""
 "Select this option if you would like to store credentials as a part of  "
 "profile configuration"
 msgstr ""
+"Изберете тази опция, ако желаете да съхраните удостоверенията за самоличност"
+" като част от конфигурацията на профила"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:285
 msgid "Profile configuration credentials"
-msgstr ""
+msgstr "Конфигуриране на удостоверенията за самоличност на профила"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:335
 msgid "User ID and Password"
@@ -108,7 +122,7 @@ msgstr "Потребителско ID и парола"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:345
 msgid "Please provide your user ID and password."
-msgstr ""
+msgstr "Моля въведете Вашият потребителски ID и парола."
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:355
 msgid "User ID:"
@@ -136,6 +150,9 @@ msgid ""
 "Describe your organization to customize user prompts.  When organization is "
 "introduced, end-users find program messages easier to understand and act."
 msgstr ""
+"Опишете Вашата организация, за да персонализираме подсказките за "
+"потребителя. Когато е въведена организация, програмните съобщения ще бъдат "
+"по-лесни за разбиране от крайния потербител."
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:418
 msgid "Your organization &name:"
@@ -145,14 +162,15 @@ msgstr "Вашата организация &name:"
 msgid ""
 "Your organization name as it will appear on helpdesk contact notifications"
 msgstr ""
+"Името на организацията Ви както ще бъде изписано в контактите за помощ"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:427
 msgid "(Keep it short, please)"
-msgstr ""
+msgstr "(Бъдете кратки, моля)"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:437
 msgid "Helpdesk contact &information:"
-msgstr ""
+msgstr "Контакти за помощ &информация:"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:447
 msgid "¶"
@@ -160,7 +178,7 @@ msgstr "¶"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:454
 msgid "Your helpdesk website address"
-msgstr ""
+msgstr "Уебсайт адреса за помощ"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:458
 msgid "*"
@@ -168,7 +186,7 @@ msgstr "*"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:465
 msgid "Your helpdesk e-mail address"
-msgstr ""
+msgstr "E-mail адреса за помощ"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:469
 msgid ")"
@@ -176,21 +194,24 @@ msgstr ")"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:476
 msgid "Your helpdesk phone number"
-msgstr ""
+msgstr "Телефонен номер за помощ"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:504
 msgid "Provider Unique Identifier"
-msgstr ""
+msgstr "Доставчик на уникален идентификатор"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:515
 msgid ""
 "Assign your organization a unique ID to allow sharing the same credential "
 "set across different network profiles."
 msgstr ""
+"Определете уникален ID на Вашата организация, за да разрешите споделяне на "
+"същите удостоверения за самоличност, настроени между различните мрежови "
+"профили."
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:522
 msgid "&Namespace:"
-msgstr ""
+msgstr "&Пространство от имена:"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:526
 msgid "urn:RFC4282:realm"
@@ -202,62 +223,71 @@ msgstr "urn:uuid"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:538
 msgid "Provider unique &identifier:"
-msgstr ""
+msgstr "Доставчик на уникален &идентификатор:"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:543
 msgid "Your organization ID to assign same credentials from other profiles"
 msgstr ""
+"ID на Вашата организация за определяне на същите удостоверения за "
+"самоличност от другите профили"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:568
 msgid "Configuration Lock"
-msgstr ""
+msgstr "Заключване на конфигурацията"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:579
 msgid ""
 "Your configuration can be locked to prevent accidental modification by end-"
 "users. Users will only be allowed to enter credentials."
 msgstr ""
+"Вашата конфигурация може да бъде заключена, за да се предотврати случайното "
+"й модифициране от крайните потребители. На потребителите ще им бъде "
+"позволено единствено да въвеждат удостоверения за самоличност. "
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:586
 msgid ""
 "&Lock this configuration and prevent any further modification via user "
 "interface."
 msgstr ""
+"&Заключете тази конфигурация и предотвратете всякакви по-нататъшни "
+"модификации посредством потребителския интерфейс."
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:589
 msgid "(Warning: Once locked, you can not revert using this dialog!)"
 msgstr ""
+"(Внимание: Веднъж заключен, не може да се върнете назад, използвайки този "
+"диалог!)"
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:97
 #, c-format
 msgid "%s Credentials"
-msgstr ""
+msgstr "%s Удостоверения за самоличност"
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:122 lib/EAPBase_UI/include/EAP_UI.h:355
 #: lib/EAPBase_UI/include/EAP_UI.h:365 lib/EAPBase_UI/res/wxEAP_UI.h:119
 msgid "EAP Credentials"
-msgstr ""
+msgstr "EAP удостоверения за самоличност"
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:165
 #, c-format
 msgid "For additional help and instructions, please contact %s at:"
-msgstr ""
+msgstr "За допълнителна помощ и инструкции, моля свържете се с %s на:"
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:166
 msgid "your provider"
-msgstr ""
+msgstr "Вашият доставчик"
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:185
 msgid "Open the default web browser"
-msgstr ""
+msgstr "Отворете уеб браузера по подразбиране"
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:196
 msgid "Open your e-mail program"
-msgstr ""
+msgstr "Отворете Вашата програма за електронна поща"
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:207
 msgid "Dial the phone number"
-msgstr ""
+msgstr "Наберете телефонният номер"
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:227
 #, c-format
@@ -265,102 +295,121 @@ msgid ""
 "%s has pre-set parts of this configuration. Those parts are locked to "
 "prevent accidental modification."
 msgstr ""
+"%s има предварително настроени части на тази конфигурация. Тези части са "
+"заключени, за да се предотврати инцидентно модифициране."
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:228
 msgid "Your provider"
-msgstr ""
+msgstr "Вашият доставчик"
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:249
 msgid "Previous attempt to connect reported invalid credentials."
 msgstr ""
+"Предишният опит за свързване докладва невалидни удостоверения за "
+"самоличност."
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:250
 msgid "Previous attempt to connect reported your credentials expired."
 msgstr ""
+"Предишният опит за свързване докладва, че Вашите удостоверения за "
+"самоличност са изтекли."
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:251
 msgid ""
 "Previous attempt to connect reported your credentials are being changed."
 msgstr ""
+"Предишният опит за свързване докладва, че Вашите удостоверения за "
+"самоличност са били променени."
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:252
 msgid "Previous attempt to connect failed."
-msgstr ""
+msgstr "Предишният опит за свързване е неуспешен."
 
 #: lib/EAPBase_UI/src/EAP_UI.cpp:253
 msgid "Please, make sure your credentials are correct, or try again later."
 msgstr ""
+"Моля уверете се, че удостоверенията Ви за самоличност са коректни или "
+"опитайте отново по-късно."
 
 #: lib/MSCHAPv2_UI/src/MSCHAPv2_UI.cpp:33
 msgid "MSCHAPv2 User ID and Password"
-msgstr ""
+msgstr "MSCHAPv2 потребителски ID и парола"
 
 #: lib/PAP_UI/src/PAP_UI.cpp:33
 msgid "PAP User ID and Password"
-msgstr ""
+msgstr "PAP потребителски ID и парола"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:17
 msgid "Server Trust"
-msgstr ""
+msgstr "Верен сървър"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:28
 msgid ""
 "Describe the servers you trust to prevent credential interception in case of"
 " man-in-the-middle attacks."
 msgstr ""
+"Опишете сървърите, на които вярвате, за да предотвратите прихващане на "
+"удостоверения за самоличност, в случай на man-in-the-middle атаки."
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:35
 msgid "Acceptable Certificate Authorities:"
-msgstr ""
+msgstr "Допустими Certificate Authorities:"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:40
 msgid ""
 "Server's certificate must be issued by one of certificate authorities listed"
 " here"
 msgstr ""
+"Сертификатът на сървъра трябва да бъде издаден от един от изброените тук "
+"certificate authorities"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:47
 msgid "Add CA from Store..."
-msgstr ""
+msgstr "Добавете CA от ..."
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:48
 msgid ""
 "Adds a new certificate authority from the certificate store to the list"
 msgstr ""
+"Добавяне към списъка на нов certificate authority от хранилището със "
+"сертификати"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:52
 msgid "Add CA from File..."
-msgstr ""
+msgstr "Добавете CA от файл ..."
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:53
 msgid "Adds a new certificate authority from the file to the list"
-msgstr ""
+msgstr "Добавяне към списъка на нов certificate authority от файл"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:57
 msgid "&Remove CA"
-msgstr ""
+msgstr "&Премахнете CA"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:59
 msgid "Removes selected certificate authorities from the list"
-msgstr ""
+msgstr "Премахване на избраните certificate authorities от списъка"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:72
 msgid "Acceptable server &names:"
-msgstr ""
+msgstr "Допустими сървър &имена:"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:77
 msgid ""
 "A semicolon delimited list of acceptable server FQDN names; blank to skip "
 "name check; Unicode characters allowed"
 msgstr ""
+"Допустимите FQDN имена на сървъри са разделени с точка и запетая; оставете "
+"непопълнено, за да пропуснете проверката на името; позволени са уникод "
+"символи"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:81
 msgid "(Example: foo.bar.com;server2.bar.com)"
-msgstr ""
+msgstr "(Например: foo.bar.com;server2.bar.com)"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:119 lib/TLS_UI/src/TLS_UI.cpp:571
 msgid "User Certificate"
-msgstr ""
+msgstr "Потребителски сертификат"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:129
 msgid "Please select your &certificate to use for authentication."
@@ -387,24 +436,24 @@ msgstr ""
 
 #: lib/TLS_UI/src/TLS_UI.cpp:118
 msgid "Validation conflict"
-msgstr ""
+msgstr "Проверка на конфликт"
 
 #: lib/TLS_UI/src/TLS_UI.cpp:327 lib/EAPBase_UI/include/EAP_UI.h:769
 #: lib/EAPBase_UI/include/EAP_UI.h:778
 msgid "<empty>"
-msgstr ""
+msgstr "<празно>"
 
 #: lib/TLS_UI/src/TLS_UI.cpp:500
 msgid "Add Certificate"
-msgstr ""
+msgstr "Добавете сертификат"
 
 #: lib/TLS_UI/src/TLS_UI.cpp:501
 msgid "Certificate Files (*.cer;*.crt;*.der;*.p7b;*.pem)"
-msgstr ""
+msgstr "Файлове на сертификати (*.cer;*.crt;*.der;*.p7b;*.pem)"
 
 #: lib/TLS_UI/src/TLS_UI.cpp:502
 msgid "X.509 Certificate Files (*.cer;*.crt;*.der;*.pem)"
-msgstr ""
+msgstr "X.509 файлове на сертификати (*.cer;*.crt;*.der;*.pem)"
 
 #: lib/TLS_UI/src/TLS_UI.cpp:503
 msgid "PKCS #7 Certificate Files (*.p7b)"
@@ -412,20 +461,20 @@ msgstr ""
 
 #: lib/TLS_UI/src/TLS_UI.cpp:504
 msgid "All Files (*.*)"
-msgstr ""
+msgstr "Всички файлове (*.*)"
 
 #: lib/TLS_UI/src/TLS_UI.cpp:520
 #, c-format
 msgid "Invalid or unsupported certificate file %s"
-msgstr ""
+msgstr "Невалиден или неподдържан файл на сертификат %s"
 
 #: lib/TLS_UI/src/TLS_UI.cpp:520
 msgid "Error"
-msgstr ""
+msgstr "Грешка"
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:17
 msgid "Outer Identity"
-msgstr ""
+msgstr "Външна самоличност"
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:28
 msgid "Select the user ID supplicant introduces itself as to authenticator:"
@@ -476,7 +525,7 @@ msgstr ""
 
 #: lib/TTLS_UI/src/TTLS_UI.cpp:61 lib/TTLS_UI/src/TTLS_UI.cpp:196
 msgid "Outer Authentication"
-msgstr ""
+msgstr "Външна аутентикация"
 
 #: lib/TTLS_UI/src/TTLS_UI.cpp:187
 msgid "Select inner authentication method from the list"
@@ -484,11 +533,11 @@ msgstr ""
 
 #: lib/TTLS_UI/src/TTLS_UI.cpp:189
 msgid "PAP"
-msgstr ""
+msgstr "PAP"
 
 #: lib/TTLS_UI/src/TTLS_UI.cpp:191
 msgid "MSCHAPv2"
-msgstr ""
+msgstr "MSCHAPv2"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:292
 #, c-format
@@ -498,7 +547,7 @@ msgstr ""
 
 #: lib/EAPBase_UI/include/EAP_UI.h:292
 msgid "Warning"
-msgstr ""
+msgstr "Предупреждение"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:552
 msgid "Provider Settings"
@@ -508,60 +557,61 @@ msgstr ""
 #, c-format
 msgid "Deleting credentials failed (error %u)."
 msgstr ""
+"Изтриването на удостоверенията за замоличност е неуспешно (грешка %u)."
 
 #: lib/EAPBase_UI/include/EAP_UI.h:754
 #, c-format
 msgid "<error %u>"
-msgstr ""
+msgstr "<грешка %u>"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:758
 msgid "<error>"
-msgstr ""
+msgstr "<грешка>"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:769 lib/EAPBase_UI/include/EAP_UI.h:778
 msgid "<blank ID>"
-msgstr ""
+msgstr "<непопълнен ID>"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:820
 msgid "&Remember"
-msgstr ""
+msgstr "&Запомнете"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:821
 msgid "Check if you would like to save credentials"
-msgstr ""
+msgstr "Отметнете, ако желаете да запазите удостоверенията за замоличност"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:964
 msgid "<Your Organization>"
-msgstr ""
+msgstr "<Вашата организация>"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.h:69
 msgid "EAP Connection Configuration"
-msgstr ""
+msgstr "Конфигуриране на EAP свързване"
 
 #: EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
 #: EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
 #: EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
 #: EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
 msgid "EAP Methods"
-msgstr ""
+msgstr "EAP методи"
 
 #: EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
 #: EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
 #: EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
 #: EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
 msgid "Modules to support individual EAP methods"
-msgstr ""
+msgstr "Модули за поддръжка на индивидуални EAP методи"
 
 #: EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:5
 #: EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:5
 #: EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:5
 #: EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:5
 msgid "TTLS"
-msgstr ""
+msgstr "TTLS"
 
 #: EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:5
 #: EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:5
 #: EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:5
 #: EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:5
 msgid "Tunneled Transport Layer Security"
-msgstr ""
+msgstr "Tunneled Transport Layer Security"
