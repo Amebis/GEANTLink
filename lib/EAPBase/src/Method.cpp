@@ -109,6 +109,55 @@ void eap::method::get_result(
 }
 
 
+void eap::method::get_ui_context(
+    _Inout_ BYTE  **ppUIContextData,
+    _Inout_ DWORD *pdwUIContextDataSize)
+{
+    assert(ppUIContextData);
+    assert(pdwUIContextDataSize);
+
+    // Default implementation returns blank context data.
+    *ppUIContextData      = NULL;
+    *pdwUIContextDataSize = 0;
+}
+
+
+void eap::method::set_ui_context(
+    _In_count_(dwUIContextDataSize) const BYTE                *pUIContextData,
+    _In_                                  DWORD               dwUIContextDataSize,
+    _In_                            const EapPeerMethodOutput *pEapOutput)
+{
+    UNREFERENCED_PARAMETER(pUIContextData);
+    UNREFERENCED_PARAMETER(dwUIContextDataSize);
+    UNREFERENCED_PARAMETER(pEapOutput);
+
+    // Default implementation does nothing with context data.
+}
+
+
+void eap::method::get_response_attributes(_Inout_ EapAttributes *pAttribs)
+{
+    assert(pAttribs);
+
+    // Default implementation returns no EAP attributes.
+    pAttribs->dwNumberOfAttributes = 0;
+    pAttribs->pAttribs             = NULL;
+}
+
+
+void eap::method::set_response_attributes(
+    _In_ const EapAttributes       *pAttribs,
+    _Inout_    EapPeerMethodOutput *pEapOutput)
+{
+    UNREFERENCED_PARAMETER(pAttribs);
+    assert(pEapOutput);
+
+    // Default implementation discards the EAP attributes.
+    pEapOutput->action              = EapPeerMethodResponseActionDiscard;
+    pEapOutput->fAllowNotifications = FALSE;
+}
+
+
 //////////////////////////////////////////////////////////////////////
 // eap::method_noneap
 //////////////////////////////////////////////////////////////////////

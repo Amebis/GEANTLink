@@ -144,6 +144,49 @@ void eap::method_ttls::get_result(
 }
 
 
+void eap::method_ttls::get_ui_context(
+    _Inout_ BYTE  **ppUIContextData,
+    _Inout_ DWORD *pdwUIContextDataSize)
+{
+    UNREFERENCED_PARAMETER(ppUIContextData);
+    UNREFERENCED_PARAMETER(pdwUIContextDataSize);
+
+    throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Not supported.");
+}
+
+
+void eap::method_ttls::set_ui_context(
+    _In_count_(dwUIContextDataSize) const BYTE                *pUIContextData,
+    _In_                                  DWORD               dwUIContextDataSize,
+    _In_                            const EapPeerMethodOutput *pEapOutput)
+{
+    UNREFERENCED_PARAMETER(pUIContextData);
+    UNREFERENCED_PARAMETER(dwUIContextDataSize);
+    UNREFERENCED_PARAMETER(pEapOutput);
+
+    throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Not supported.");
+}
+
+
+void eap::method_ttls::get_response_attributes(_Inout_ EapAttributes *pAttribs)
+{
+    UNREFERENCED_PARAMETER(pAttribs);
+
+    throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Not supported.");
+}
+
+
+void eap::method_ttls::set_response_attributes(
+    _In_ const EapAttributes       *pAttribs,
+    _Inout_    EapPeerMethodOutput *pEapOutput)
+{
+    UNREFERENCED_PARAMETER(pAttribs);
+    UNREFERENCED_PARAMETER(pEapOutput);
+
+    throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Not supported.");
+}
+
+
 void eap::method_ttls::derive_msk()
 {
     const unsigned char *_key_block;

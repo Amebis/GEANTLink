@@ -241,7 +241,7 @@ void eap::peer_ttls::end_session(_In_ EAP_SESSION_HANDLE hSession)
     assert(hSession);
 
     // End the session.
-    session *s = static_cast<session*>(hSession);
+    auto s = static_cast<session*>(hSession);
     //s->end(ppEapError);
     delete s;
 }
@@ -272,7 +272,7 @@ void eap::peer_ttls::get_result(
     _In_    EapPeerMethodResultReason reason,
     _Inout_ EapPeerMethodResult       *ppResult)
 {
-    session *s = static_cast<session*>(hSession);
+    auto s = static_cast<session*>(hSession);
 
     s->m_method->get_result(reason, ppResult);
     s->m_eap_attr_desc.dwNumberOfAttributes = (DWORD)s->m_method->m_eap_attr.size();
@@ -308,11 +308,7 @@ void eap::peer_ttls::get_ui_context(
     _Inout_ BYTE               **ppUIContextData,
     _Inout_ DWORD              *pdwUIContextDataSize)
 {
-    UNREFERENCED_PARAMETER(hSession);
-    UNREFERENCED_PARAMETER(ppUIContextData);
-    UNREFERENCED_PARAMETER(pdwUIContextDataSize);
-
-    throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Not supported.");
+    static_cast<session*>(hSession)->m_method->get_ui_context(ppUIContextData, pdwUIContextDataSize);
 }
 
 
@@ -322,12 +318,7 @@ void eap::peer_ttls::set_ui_context(
     _In_                                  DWORD               dwUIContextDataSize,
     _In_                            const EapPeerMethodOutput *pEapOutput)
 {
-    UNREFERENCED_PARAMETER(hSession);
-    UNREFERENCED_PARAMETER(pUIContextData);
-    UNREFERENCED_PARAMETER(dwUIContextDataSize);
-    UNREFERENCED_PARAMETER(pEapOutput);
-
-    throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Not supported.");
+    static_cast<session*>(hSession)->m_method->set_ui_context(pUIContextData, dwUIContextDataSize, pEapOutput);
 }
 
 
@@ -335,10 +326,7 @@ void eap::peer_ttls::get_response_attributes(
     _In_    EAP_SESSION_HANDLE hSession,
     _Inout_ EapAttributes      *pAttribs)
 {
-    UNREFERENCED_PARAMETER(hSession);
-    UNREFERENCED_PARAMETER(pAttribs);
-
-    throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Not supported.");
+    static_cast<session*>(hSession)->m_method->get_response_attributes(pAttribs);
 }
 
 
@@ -347,11 +335,7 @@ void eap::peer_ttls::set_response_attributes(
             _In_ const EapAttributes       *pAttribs,
             _Inout_    EapPeerMethodOutput *pEapOutput)
 {
-    UNREFERENCED_PARAMETER(hSession);
-    UNREFERENCED_PARAMETER(pAttribs);
-    UNREFERENCED_PARAMETER(pEapOutput);
-
-    throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Not supported.");
+    static_cast<session*>(hSession)->m_method->set_response_attributes(pAttribs, pEapOutput);
 }
 
 

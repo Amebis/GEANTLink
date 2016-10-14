@@ -130,6 +130,55 @@ namespace eap
 
         /// @}
 
+        /// \name User Interaction
+        /// @{
+
+        ///
+        /// Obtains the user interface context from the EAP method.
+        ///
+        /// \note This function is always followed by the `EapPeerInvokeInteractiveUI()` function, which is followed by the `EapPeerSetUIContext()` function.
+        ///
+        /// \sa [EapPeerGetUIContext function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363612.aspx)
+        ///
+        virtual void get_ui_context(
+            _Inout_ BYTE  **ppUIContextData,
+            _Inout_ DWORD *pdwUIContextDataSize);
+
+        ///
+        /// Provides a user interface context to the EAP method.
+        ///
+        /// \note This function is called after the UI has been raised through the `EapPeerGetUIContext()` function.
+        ///
+        /// \sa [EapPeerSetUIContext function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363626.aspx)
+        ///
+        virtual void set_ui_context(
+            _In_count_(dwUIContextDataSize) const BYTE                *pUIContextData,
+            _In_                                  DWORD               dwUIContextDataSize,
+            _In_                            const EapPeerMethodOutput *pEapOutput);
+
+        /// @}
+
+        /// \name EAP Response Attributes
+        /// @{
+
+        ///
+        /// Obtains an array of EAP response attributes from the EAP method.
+        ///
+        /// \sa [EapPeerGetResponseAttributes function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363609.aspx)
+        ///
+        virtual void get_response_attributes(_Inout_ EapAttributes *pAttribs);
+
+        ///
+        /// Provides an updated array of EAP response attributes to the EAP method.
+        ///
+        /// \sa [EapPeerSetResponseAttributes function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363625.aspx)
+        ///
+        virtual void set_response_attributes(
+            _In_ const EapAttributes       *pAttribs,
+            _Inout_    EapPeerMethodOutput *pEapOutput);
+
+        /// @}
+
     public:
         module &m_module;                           ///< EAP module
         config_method &m_cfg;                       ///< Connection configuration
