@@ -234,7 +234,7 @@ wxTTLSConfigWindow::~wxTTLSConfigWindow()
 
 bool wxTTLSConfigWindow::TransferDataToWindow()
 {
-    auto cfg_ttls = dynamic_cast<eap::config_method_ttls&>(m_cfg);
+    auto &cfg_ttls = dynamic_cast<eap::config_method_ttls&>(m_cfg);
 
     auto cfg_inner_eapmsg = dynamic_cast<eap::config_method_eapmsg*>(cfg_ttls.m_inner.get());
     if (!cfg_inner_eapmsg) {
@@ -269,7 +269,7 @@ bool wxTTLSConfigWindow::TransferDataFromWindow()
 {
     wxCHECK(wxScrolledWindow::TransferDataFromWindow(), false);
 
-    auto cfg_ttls = dynamic_cast<eap::config_method_ttls&>(m_cfg);
+    auto &cfg_ttls = dynamic_cast<eap::config_method_ttls&>(m_cfg);
 
     if (!m_prov.m_read_only) {
         // This is not a provider-locked configuration. Save the data.
