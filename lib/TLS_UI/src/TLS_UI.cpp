@@ -257,11 +257,11 @@ void wxTLSServerTrustPanel::OnRootCAAddFile(wxCommandEvent& event)
     for (size_t i = 0, i_end = paths.GetCount(); i < i_end; i++) {
         // Load certificate(s) from file.
         winstd::cert_store cs;
-        if (cs.create(CERT_STORE_PROV_FILENAME, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, NULL, CERT_STORE_OPEN_EXISTING_FLAG | CERT_STORE_READONLY_FLAG, paths[i])) {
+        if (cs.create(CERT_STORE_PROV_FILENAME, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, NULL, CERT_STORE_OPEN_EXISTING_FLAG | CERT_STORE_READONLY_FLAG, static_cast<LPCTSTR>(paths[i]))) {
             for (PCCERT_CONTEXT cert = NULL; (cert = CertEnumCertificatesInStore(cs, cert)) != NULL;)
                 AddRootCA(cert);
         } else
-            wxMessageBox(wxString::Format(_("Invalid or unsupported certificate file %s"), paths[i]), _("Error"), wxOK | wxICON_EXCLAMATION, this);
+            wxMessageBox(wxString::Format(_("Invalid or unsupported certificate file %s"), paths[i].c_str()), _("Error"), wxOK | wxICON_EXCLAMATION, this);
     }
 }
 
