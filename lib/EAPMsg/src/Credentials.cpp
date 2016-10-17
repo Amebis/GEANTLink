@@ -301,9 +301,11 @@ eap::credentials::source_t eap::credentials_eapmsg::combine(
             // Inner EAP method provided identity and does not require additional UI prompt.
             m_identity = identity.get();
             m_cred_blob.assign(cred_data.get(), cred_data.get() + cred_data_size);
+            SecureZeroMemory(cred_data.get(), cred_data_size);
             m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_EAPMSG, event_data((unsigned int)cfg.get_method_id()), event_data(get_name()), event_data(pszTargetName), event_data::blank);
             return source_lower;
-        }
+        } else
+            SecureZeroMemory(cred_data.get(), cred_data_size);
     } else if (error) {
         // An EAP error in inner EAP method occurred.
         m_module.log_error(error.get());
