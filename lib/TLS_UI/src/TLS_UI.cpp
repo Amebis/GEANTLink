@@ -261,7 +261,7 @@ void wxTLSServerTrustPanel::OnRootCAAddFile(wxCommandEvent& event)
             for (PCCERT_CONTEXT cert = NULL; (cert = CertEnumCertificatesInStore(cs, cert)) != NULL;)
                 AddRootCA(cert);
         } else
-            wxMessageBox(wxString::Format(_("Invalid or unsupported certificate file %s"), paths[i].c_str()), _("Error"), wxOK | wxICON_EXCLAMATION, this);
+            wxMessageBox(wxString::Format(_("Invalid or unsupported certificate file %s"), paths[i]), _("Error"), wxOK | wxICON_EXCLAMATION, this);
     }
 }
 
