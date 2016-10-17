@@ -5,6 +5,7 @@ msgstr ""
 "Project-Id-Version: EventMonitor\n"
 "POT-Creation-Date: 2016-09-19 11:14+0200\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
+"Last-Translator: eduki <ecercos@xtec.cat>, 2016\n"
 "Language-Team: Catalan (Spain) (https://www.transifex.com/eduroam_devel/teams/11799/ca_ES/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -20,32 +21,32 @@ msgstr ""
 #: App.cpp:61 Frame.h:67 MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
 #: MSIBuild/en_US.x64.Release.Feature-2.idtx:4
 msgid "Event Monitor"
-msgstr ""
+msgstr "Monitor de Successos"
 
 #: ETWLog.cpp:83
 #, c-format
 msgid "Error opening event trace (error %u)."
-msgstr ""
+msgstr "Error obrint la traça (error %u)."
 
 #: ETWLog.cpp:167
 msgid "Time"
-msgstr ""
+msgstr "Temps"
 
 #: ETWLog.cpp:168
 msgid "PID"
-msgstr ""
+msgstr "PID"
 
 #: ETWLog.cpp:169
 msgid "TID"
-msgstr ""
+msgstr "TID"
 
 #: ETWLog.cpp:170
 msgid "Source"
-msgstr ""
+msgstr "Font"
 
 #: ETWLog.cpp:171
 msgid "Event"
-msgstr ""
+msgstr "Succés"
 
 #: ETWLog.cpp:228
 msgid ""
@@ -53,169 +54,173 @@ msgid ""
 "(Run As Administrator) or be a member of Performance Log Users group to "
 "start event tracing session."
 msgstr ""
+"Accés denegat creant sessió de successos: necessiteu privilegis "
+"administratius (Executa com Administrador) o bé ser membre del grup "
+"d'usuaris del Log de Rendiment per iniciar una sessió de traces de "
+"successos."
 
 #: ETWLog.cpp:231
 #, c-format
 msgid "The %s event session already exists."
-msgstr ""
+msgstr "La sessió de successos %s ja existeix."
 
 #: ETWLog.cpp:235
 #, c-format
 msgid "Error creating event session (error %u)."
-msgstr ""
+msgstr "Error creant la sessió de successos (error %u)."
 
 #: ETWLog.cpp:251 ETWLog.cpp:267 ETWLog.cpp:281
 #, c-format
 msgid "Error enabling %s event provider (error %u)."
-msgstr ""
+msgstr "Error habilitant el proveidor de successos %s (error %u)."
 
 #: Frame.cpp:48 Frame.cpp:108 Frame.cpp:113 Frame.cpp:168 Frame.cpp:170
 #, c-format
 msgid "Toggles display of %s records"
-msgstr ""
+msgstr "Canvia la visualització de %s registres"
 
 #: Frame.cpp:65
 msgid "E&xit"
-msgstr ""
+msgstr "S&ortida"
 
 #: Frame.cpp:65
 msgid "Quits this program"
-msgstr ""
+msgstr "Surt del programa"
 
 #: Frame.cpp:69
 msgid "&Program"
-msgstr ""
+msgstr "&Programa"
 
 #: Frame.cpp:73
 msgid "&Copy"
-msgstr ""
+msgstr "&Copia"
 
 #: Frame.cpp:73 Frame.cpp:154
 msgid "Copies selected records to clipboard"
-msgstr ""
+msgstr "Copia els registres seleccionats al portapapers"
 
 #: Frame.cpp:78
 msgid "Copy A&ll"
-msgstr ""
+msgstr "Copia T&ot"
 
 #: Frame.cpp:78 Frame.cpp:156
 msgid "Copies all records to clipboard (including hidden)"
-msgstr ""
+msgstr "Copia tots els registres al portapapers (incloent els amagats)"
 
 #: Frame.cpp:83 Frame.cpp:158
 msgid "Clear"
-msgstr ""
+msgstr "Neteja"
 
 #: Frame.cpp:83 Frame.cpp:158
 msgid "Clears all records from the log"
-msgstr ""
+msgstr "Esborra tots els registres del log"
 
 #: Frame.cpp:90
 msgid "Select &All"
-msgstr ""
+msgstr "Selecciona-ho &Tot"
 
 #: Frame.cpp:90
 msgid "Selects all visible records"
-msgstr ""
+msgstr "Selecciona tots els registres visibles"
 
 #: Frame.cpp:94
 msgid "Select &None"
-msgstr ""
+msgstr "&Esborrar selecció"
 
 #: Frame.cpp:94
 msgid "Clears record selection"
-msgstr ""
+msgstr "Esborra la selecció de registres"
 
 #: Frame.cpp:97 Frame.cpp:142
 msgid "&Edit"
-msgstr ""
+msgstr "&Edita"
 
 #: Frame.cpp:101
 msgid "Auto &Scroll"
-msgstr ""
+msgstr "Auto &Scroll"
 
 #: Frame.cpp:101 Frame.cpp:164
 msgid "Automatically scrolls to the most recent records as they come-in"
-msgstr ""
+msgstr "Mostra automàticament els registres més recents així que arriben"
 
 #: Frame.cpp:123 Frame.cpp:176
 msgid "Verbose"
-msgstr ""
+msgstr "Detallat"
 
 #: Frame.cpp:123 Frame.cpp:176
 msgid "Displays all levels of records"
-msgstr ""
+msgstr "Mostra tots els nivells de registre"
 
 #: Frame.cpp:127 Frame.cpp:178
 msgid "Informational"
-msgstr ""
+msgstr "Informatiu"
 
 #: Frame.cpp:127 Frame.cpp:178
 msgid "Displays all records up to informational level"
-msgstr ""
+msgstr "Mostra els registres fins al nivell informatiu"
 
 #: Frame.cpp:131 Frame.cpp:180
 msgid "Warning"
-msgstr ""
+msgstr "Alerta"
 
 #: Frame.cpp:131 Frame.cpp:180
 msgid "Displays all records up to warning level"
-msgstr ""
+msgstr "Mostra els registres fins al nivell d'alerta"
 
 #: Frame.cpp:135 Frame.cpp:182
 msgid "Error"
-msgstr ""
+msgstr "Error"
 
 #: Frame.cpp:135 Frame.cpp:182
 msgid "Displays error level records only"
-msgstr ""
+msgstr "Mostra només els registres d'error"
 
 #: Frame.cpp:142 Frame.cpp:146
 #, c-format
 msgid "%s toolbar"
-msgstr ""
+msgstr "Barra %s"
 
 #: Frame.cpp:142 Frame.cpp:146
 #, c-format
 msgid "Toggles display of %s toolbar"
-msgstr ""
+msgstr "Alterna la visió de la barra %s"
 
 #: Frame.cpp:142 Frame.cpp:146 Frame.cpp:185
 msgid "View"
-msgstr ""
+msgstr "Vista"
 
 #: Frame.cpp:146 Frame.cpp:149
 msgid "&View"
-msgstr ""
+msgstr "&Vista"
 
 #: Frame.cpp:154
 msgid "Copy"
-msgstr ""
+msgstr "Copia"
 
 #: Frame.cpp:156
 msgid "Copy All"
-msgstr ""
+msgstr "Copia-ho tot"
 
 #: Frame.cpp:161
 msgid "Edit"
-msgstr ""
+msgstr "Edita"
 
 #: Frame.cpp:164
 msgid "Auto Scroll"
-msgstr ""
+msgstr "Auto Scroll"
 
 #: Frame.cpp:189
 msgid "Trace Log"
-msgstr ""
+msgstr "Registre de traces"
 
 #: MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
 #: MSIBuild/en_US.Win32.Release.Shortcut-2.idtx:4
 #: MSIBuild/en_US.x64.Release.Feature-2.idtx:4
 #: MSIBuild/en_US.x64.Release.Shortcut-2.idtx:4
 msgid "Real-time display of internal events"
-msgstr ""
+msgstr "Mostra en temps real dels successos interns"
 
 #: MSIBuild/en_US.Win32.Release.Shortcut-2.idtx:4
 #: MSIBuild/en_US.x64.Release.Shortcut-2.idtx:4
 msgid "EVENTM~1|GÉANTLink Event Monitor"
-msgstr ""
+msgstr "EVENTM~1|GÉANTLink Monitor de successos"

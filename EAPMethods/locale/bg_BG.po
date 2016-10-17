@@ -413,26 +413,28 @@ msgstr "Потребителски сертификат"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:129
 msgid "Please select your &certificate to use for authentication."
-msgstr ""
+msgstr "Моля изберете Вашия &сертификат, за да се аутентикирате."
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:136
 msgid "Client certificate to use for authentication"
-msgstr ""
+msgstr "Клиентски сертификат за аутентикация"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:143
 msgid "Custom &identity:"
-msgstr ""
+msgstr "Клиентска &самоличност:"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:148
 msgid ""
 "Your identity (username@domain) to override one from certificate; or blank "
 "to use one provided in certificate"
 msgstr ""
+"Вашата самоличност (username@domain) да препокрие един от сертификатите; или"
+" оставете непопълнено, за да използвате една от предоставените в сертификата"
 
 #: lib/TLS_UI/src/TLS_UI.cpp:118
 #, c-format
 msgid "Invalid character in host name found: %c"
-msgstr ""
+msgstr "Открит е невалиден символ в името на хоста: %c"
 
 #: lib/TLS_UI/src/TLS_UI.cpp:118
 msgid "Validation conflict"
@@ -457,7 +459,7 @@ msgstr "X.509 файлове на сертификати (*.cer;*.crt;*.der;*.pe
 
 #: lib/TLS_UI/src/TLS_UI.cpp:503
 msgid "PKCS #7 Certificate Files (*.p7b)"
-msgstr ""
+msgstr "PKCS #7 файлови сертификати (*.p7b)"
 
 #: lib/TLS_UI/src/TLS_UI.cpp:504
 msgid "All Files (*.*)"
@@ -478,50 +480,52 @@ msgstr "Външна самоличност"
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:28
 msgid "Select the user ID supplicant introduces itself as to authenticator:"
-msgstr ""
+msgstr "Изберете потребителски ID, за да се удостоверите:"
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:35
 msgid "&True identity"
-msgstr ""
+msgstr "&Истинска самоличност"
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:36
 msgid "Use my true user name"
-msgstr ""
+msgstr "Използвай моето истинско потребителско име"
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:40
 msgid "Use &empty outer identity (RFC 4822)"
-msgstr ""
+msgstr "Използвай &празна външна самоличност (RFC 4822)"
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:41
 msgid "Ommit my user name and use @mydomain.org only"
-msgstr ""
+msgstr "Пропусни моето потребителско име и използвай само @mydomain.org"
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:48
 msgid "&Custom outer identity:"
-msgstr ""
+msgstr "&Клиентска външна самоличност:"
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:49
 msgid "Specify custom outer identity"
-msgstr ""
+msgstr "Специфицирай клиентска външна самоличност"
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:54
 msgid "Custom outer identity to use"
-msgstr ""
+msgstr "Клиентска външна самоличност да се използва"
 
 #: lib/TTLS_UI/src/Module.cpp:274 lib/TTLS_UI/src/Module.cpp:284
 #: lib/EAPBase_UI/include/EAP_UI.h:696
 #, c-format
 msgid "Error writing credentials to Credential Manager: %hs (error %u)"
 msgstr ""
+"Грешка при запис на удостоверения за самоличност в Credential Manager: %hs "
+"(error %u)"
 
 #: lib/TTLS_UI/src/Module.cpp:276 lib/TTLS_UI/src/Module.cpp:286
 #: lib/EAPBase_UI/include/EAP_UI.h:699
 msgid "Writing credentials failed."
-msgstr ""
+msgstr "Записването на удостоверенията за самоличност е неуспешно "
 
 #: lib/TTLS_UI/src/TTLS_UI.cpp:36 lib/TTLS_UI/src/TTLS_UI.cpp:181
 msgid "Inner Authentication"
-msgstr ""
+msgstr "Вътрешна аутентикация"
 
 #: lib/TTLS_UI/src/TTLS_UI.cpp:61 lib/TTLS_UI/src/TTLS_UI.cpp:196
 msgid "Outer Authentication"
@@ -529,7 +533,7 @@ msgstr "Външна аутентикация"
 
 #: lib/TTLS_UI/src/TTLS_UI.cpp:187
 msgid "Select inner authentication method from the list"
-msgstr ""
+msgstr "Изберете метод за вътрешна аутентикация от списъка"
 
 #: lib/TTLS_UI/src/TTLS_UI.cpp:189
 msgid "PAP"
@@ -544,6 +548,8 @@ msgstr "MSCHAPv2"
 msgid ""
 "Are you sure you want to permanently remove %ls provider from configuration?"
 msgstr ""
+"Сигурни ли сте, че искате да изтриете за постоянно %ls доставчика от "
+"конфигурацията?"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:292
 msgid "Warning"
@@ -551,13 +557,13 @@ msgstr "Предупреждение"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:552
 msgid "Provider Settings"
-msgstr ""
+msgstr "Настройки на доставчика"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:717
 #, c-format
 msgid "Deleting credentials failed (error %u)."
 msgstr ""
-"Изтриването на удостоверенията за замоличност е неуспешно (грешка %u)."
+"Изтриването на удостоверенията за самоличност е неуспешно (грешка %u)."
 
 #: lib/EAPBase_UI/include/EAP_UI.h:754
 #, c-format
