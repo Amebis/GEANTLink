@@ -100,7 +100,7 @@ class wxTLSCredentialsPanel : public wxEAPCredentialsPanel<eap::credentials_tls,
 {
 public:
     ///
-    /// Constructs a configuration panel
+    /// Constructs a TLS credentials panel
     ///
     /// \param[in]    prov       Provider configuration data
     /// \param[in]    cfg        Configuration data
