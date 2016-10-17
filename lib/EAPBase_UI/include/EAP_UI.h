@@ -48,11 +48,6 @@ class wxEAPGeneralDialog;
 class wxEAPCredentialsDialog;
 
 ///
-/// EAP connection credential dialog
-///
-class wxEAPCredentialsConnectionDialog;
-
-///
 /// EAP general note
 ///
 class wxEAPNotePanel;
@@ -101,6 +96,11 @@ template <class _Tcred, class _Tbase> class wxEAPCredentialsPanel;
 /// Generic password credential entry panel
 ///
 template <class _Tcred, class _Tbase> class wxPasswordCredentialsPanel;
+
+///
+/// EAP provider select dialog
+///
+class wxEAPProviderSelectDialog;
 
 ///
 /// Loads icon from resource
@@ -361,18 +361,32 @@ public:
 };
 
 
-class wxEAPCredentialsConnectionDialog : public wxEAPCredentialsConnectionDialogBase
+class wxEAPProviderSelectDialog : public wxEAPProviderSelectDialogBase
 {
 public:
     ///
-    /// Constructs a credential dialog
+    /// Constructs a provider select dialog
     ///
-    wxEAPCredentialsConnectionDialog(wxWindow *parent, wxWindowID id = wxID_ANY, const wxString &title = _("EAP Credentials"), const wxPoint &pos = wxDefaultPosition, const wxSize &size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE);
+    /// \param[inout] cfg     Connection configuration
+    /// \param[in]    parent  Parent window
+    ///
+    wxEAPProviderSelectDialog(eap::config_connection &cfg, wxWindow* parent);
+
+    ///
+    /// Returns pointer to selected provider or NULL if no provider is selected.
+    ///
+    inline eap::config_provider* GetSelection() const
+    {
+        return m_selected;
+    }
 
 protected:
     /// \cond internal
-    virtual void OnInitDialog(wxInitDialogEvent& event);
+    virtual void OnProvSelect(wxCommandEvent& event);
     /// \endcond
+
+protected:
+    eap::config_provider* m_selected;   ///< Pointer to selected provider (or NULL if none selected).
 };
 
 
@@ -809,20 +823,15 @@ private:
 template <class _Tcred, class _Tbase>
 class wxEAPCredentialsPanel : public _Tbase
 {
-private:
-    /// \cond internal
-    typedef wxEAPCredentialsPanel<_Tcred, _Tbase> _Tthis;
-    /// \endcond
-
 public:
     ///
     /// Constructs a credentials panel
     ///
-    /// \param[in]    prov        Provider configuration data
-    /// \param[in]    cfg         Configuration data
-    /// \param[inout] cred        Credentials data
-    /// \param[in]    parent      Parent window
-    /// \param[in]    is_config   Is this panel used to config credentials?
+    /// \param[in]    prov       Provider configuration data
+    /// \param[in]    cfg        Configuration data
+    /// \param[inout] cred       Credentials data
+    /// \param[in]    parent     Parent window
+    /// \param[in]    is_config  Is this panel used to config credentials?
     ///
     wxEAPCredentialsPanel(const eap::config_provider &prov, const eap::config_method_with_cred &cfg, _Tcred &cred, wxWindow* parent, bool is_config = false) :
         m_prov(prov),

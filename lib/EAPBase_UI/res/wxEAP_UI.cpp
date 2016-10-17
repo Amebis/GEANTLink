@@ -607,3 +607,43 @@ wxEAPProviderLockPanelBase::wxEAPProviderLockPanelBase( wxWindow* parent, wxWind
 wxEAPProviderLockPanelBase::~wxEAPProviderLockPanelBase()
 {
 }
+
+wxEAPProviderSelectDialogBase::wxEAPProviderSelectDialogBase( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxBoxSizer* sb_content;
+	sb_content = new wxBoxSizer( wxVERTICAL );
+	
+	m_banner = new wxEAPBannerPanel( this );
+	
+	sb_content->Add( m_banner, 0, wxEXPAND|wxBOTTOM, 5 );
+	
+	m_providers = new wxBoxSizer( wxVERTICAL );
+	
+	m_providers->SetMinSize( wxSize( 350,-1 ) ); 
+	
+	sb_content->Add( m_providers, 1, wxEXPAND|wxALL, 5 );
+	
+	m_buttons = new wxStdDialogButtonSizer();
+	m_buttonsCancel = new wxButton( this, wxID_CANCEL );
+	m_buttons->AddButton( m_buttonsCancel );
+	m_buttons->Realize();
+	
+	sb_content->Add( m_buttons, 0, wxEXPAND|wxALL, 5 );
+	
+	
+	this->SetSizer( sb_content );
+	this->Layout();
+	sb_content->Fit( this );
+	
+	// Connect Events
+	this->Connect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( wxEAPProviderSelectDialogBase::OnInitDialog ) );
+}
+
+wxEAPProviderSelectDialogBase::~wxEAPProviderSelectDialogBase()
+{
+	// Disconnect Events
+	this->Disconnect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( wxEAPProviderSelectDialogBase::OnInitDialog ) );
+	
+}

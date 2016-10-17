@@ -19,11 +19,6 @@
 */
 
 ///
-/// TTLS credential panel
-///
-class wxTTLSCredentialsPanel;
-
-///
 /// TTLS configuration panel
 ///
 class wxTTLSConfigPanel;
@@ -51,42 +46,6 @@ class wxTTLSConfigWindow;
 #include <wx/stattext.h>
 
 #include <Windows.h>
-
-
-class wxTTLSCredentialsPanel : public wxPanel
-{
-public:
-    ///
-    /// Constructs a configuration panel
-    ///
-    /// \param[in]    prov       Provider configuration data
-    /// \param[in]    cfg        Configuration data
-    /// \param[inout] cred       Credentials data
-    /// \param[in]    parent     Parent window
-    /// \param[in]    is_config  Is this panel used to config credentials?
-    ///
-    wxTTLSCredentialsPanel(const eap::config_provider &prov, const eap::config_method_ttls &cfg, eap::credentials_ttls &cred, wxWindow* parent, bool is_config = false);
-
-    ///
-    /// Destructs the configuration panel
-    ///
-    virtual ~wxTTLSCredentialsPanel();
-
-protected:
-    /// \cond internal
-    virtual void OnInitDialog(wxInitDialogEvent& event);
-    /// \endcond
-
-public:
-    wxTLSCredentialsPanel *m_outer_cred;        ///< Outer credentials panel
-    wxEAPCredentialsPanelBase *m_inner_cred;    ///< Inner credentials panel
-
-protected:
-    const eap::config_provider &m_prov;         ///< EAP provider
-    const eap::config_method_ttls &m_cfg;       ///< TTLS configuration
-    wxStaticText *m_outer_title;                ///< Outer authentication title
-    wxStaticText *m_inner_title;                ///< Inner authentication title
-};
 
 
 class wxTTLSConfigPanel : public wxTTLSConfigPanelBase

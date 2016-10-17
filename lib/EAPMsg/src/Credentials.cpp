@@ -237,6 +237,7 @@ std::wstring eap::credentials_eapmsg::get_identity() const
         return m_identity;
     } else if (!m_cred_blob.empty()) {
         // TODO: Use EapHostPeerGetIdentity() to obtain user identity.
+        assert(0);
     }
 
     return L"";

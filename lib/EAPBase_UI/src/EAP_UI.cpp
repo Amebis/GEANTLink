@@ -101,46 +101,6 @@ wxEAPCredentialsDialog::wxEAPCredentialsDialog(const eap::config_provider &prov,
 
 
 //////////////////////////////////////////////////////////////////////
-// wxEAPCredentialsConnectionDialog
-//////////////////////////////////////////////////////////////////////
-
-wxEAPCredentialsConnectionDialog::wxEAPCredentialsConnectionDialog(wxWindow *parent, wxWindowID id, const wxString &title, const wxPoint &pos, const wxSize &size, long style) :
-    wxEAPCredentialsConnectionDialogBase(parent, id, title, pos, size, style)
-{
-    // Set extra style here, as wxFormBuilder overrides all default flags.
-    this->SetExtraStyle(this->GetExtraStyle() | wxWS_EX_VALIDATE_RECURSIVELY);
-
-    // Load window icons.
-#ifdef __WINDOWS__
-    wxIconBundle icons;
-    icons.AddIcon(wxIcon(wxT("product.ico"), wxBITMAP_TYPE_ICO_RESOURCE, ::GetSystemMetrics(SM_CXSMICON), ::GetSystemMetrics(SM_CYSMICON)));
-    icons.AddIcon(wxIcon(wxT("product.ico"), wxBITMAP_TYPE_ICO_RESOURCE, ::GetSystemMetrics(SM_CXICON  ), ::GetSystemMetrics(SM_CYICON  )));
-    this->SetIcons(icons);
-#else
-    this->SetIcon(wxIcon(wxICON(product.ico)));
-#endif
-
-    // Set banner title.
-    m_banner->m_title->SetLabel(_("EAP Credentials"));
-
-    m_buttonsOK->SetDefault();
-}
-
-
-void wxEAPCredentialsConnectionDialog::OnInitDialog(wxInitDialogEvent& event)
-{
-    wxEAPCredentialsConnectionDialogBase::OnInitDialog(event);
-
-    // Forward the event to child panels.
-    for (wxWindowList::compatibility_iterator provider = m_providers->GetChildren().GetFirst(); provider; provider = provider->GetNext()) {
-        wxWindow *prov = wxDynamicCast(provider->GetData(), wxWindow);
-        if (prov)
-            prov->GetEventHandler()->ProcessEvent(event);
-    }
-}
-
-
-//////////////////////////////////////////////////////////////////////
 // wxEAPNotePanel
 //////////////////////////////////////////////////////////////////////
 
@@ -423,6 +383,39 @@ wxEAPConfigProvider::wxEAPConfigProvider(eap::config_provider &prov, wxWindow *p
     AddContent(m_lock);
 
     m_contact->m_provider_name->SetFocusFromKbd();
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// wxEAPProviderSelectDialog
+//////////////////////////////////////////////////////////////////////
+
+wxEAPProviderSelectDialog::wxEAPProviderSelectDialog(eap::config_connection &cfg, wxWindow *parent) :
+    m_selected(NULL),
+    wxEAPProviderSelectDialogBase(parent)
+{
+    // Set banner title.
+    std::unique_ptr<eap::config_method> cfg_dummy(cfg.m_module.make_config_method());
+    m_banner->m_title->SetLabel(wxString::Format("%s %s", wxT(PRODUCT_NAME_STR), cfg_dummy->get_method_str()));
+
+    for (auto prov = cfg.m_providers.cbegin(), prov_end = cfg.m_providers.cend(); prov != prov_end; ++prov) {
+        wxCommandLinkButton *btn = new wxCommandLinkButton(this, wxID_ANY, wxEAPGetProviderName(prov->m_name));
+        m_providers->Add(btn, 0, wxALL|wxEXPAND, 5);
+
+        btn->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(wxEAPProviderSelectDialog::OnProvSelect), new wxVariant((void*)&*prov), this);
+    }
+
+    this->Layout();
+    this->GetSizer()->Fit(this);
+}
+
+
+void wxEAPProviderSelectDialog::OnProvSelect(wxCommandEvent& event)
+{
+    // Set selected provider and dismiss dialog.
+    m_selected = static_cast<eap::config_provider*>(dynamic_cast<const wxVariant*>(event.GetEventUserData())->GetVoidPtr());
+    this->EndModal(wxID_OK);
+    event.Skip();
 }
 
 

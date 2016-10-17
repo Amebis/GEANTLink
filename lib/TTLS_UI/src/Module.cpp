@@ -164,10 +164,8 @@ void eap::peer_ttls_ui::invoke_identity_ui(
 #endif
 
     credentials_connection cred_out(*this, cfg);
+    config_provider *cfg_prov = NULL;
     config_method_ttls *cfg_method = NULL;
-
-    vector<pair<config_method_ttls*, credentials_connection> > cred_method_store;
-    cred_method_store.reserve(cfg.m_providers.size());
 
     int result;
     {
@@ -181,26 +179,35 @@ void eap::peer_ttls_ui::invoke_identity_ui(
             parent.AdoptAttributesFromHWND();
             wxTopLevelWindows.Append(&parent);
 
-            // Create credentials dialog and populate it with providers.
-            bool combined = false;
-            wxEAPCredentialsConnectionDialog dlg(&parent);
-            for (auto cfg_prov = cfg.m_providers.begin(), cfg_prov_end = cfg.m_providers.end(); cfg_prov != cfg_prov_end; ++cfg_prov) {
-                wstring target_name(std::move(cfg_prov->get_id()));
+            if (cfg.m_providers.size() > 1) {
+                // Multiple identity providers: User has to select one first.
+                wxEAPProviderSelectDialog dlg(cfg, &parent);
 
-                // Get method configuration.
-                if (cfg_prov->m_methods.empty()) {
-                    log_event(&EAPMETHOD_TRACE_EVT_CRED_NO_METHOD, event_data(target_name), event_data::blank);
-                    continue;
+                // Centre and display dialog.
+                dlg.Centre(wxBOTH);
+                if ((result = dlg.ShowModal()) == wxID_OK) {
+                    cfg_prov = dlg.GetSelection();
+                    assert(cfg_prov);
                 }
-                config_method_ttls *cfg_method = dynamic_cast<config_method_ttls*>(cfg_prov->m_methods.front().get());
+            } else if (!cfg.m_providers.empty()) {
+                // Single identity provider. No need to ask user to select one.
+                result = wxID_OK;
+                cfg_prov = &cfg.m_providers.front();
+            } else {
+                // No identity provider. Bail out.
+                result = wxID_CANCEL;
+            }
+
+            if (cfg_prov) {
+                // The identity provider is selected.
+                cfg_method = dynamic_cast<config_method_ttls*>(cfg_prov->m_methods.front().get());
                 assert(cfg_method);
 
-                // Prepare new set of credentials for given provider.
-                credentials_connection cred_method(*this, cfg);
-                cred_method.m_namespace = cfg_prov->m_namespace;
-                cred_method.m_id        = cfg_prov->m_id;
-                credentials_ttls *_cred_method = dynamic_cast<credentials_ttls*>(cfg_method->make_credentials());
-                cred_method.m_cred.reset(_cred_method);
+                // Configure output credentials.
+                cred_out.m_namespace = cfg_prov->m_namespace;
+                cred_out.m_id        = cfg_prov->m_id;
+                auto cred = dynamic_cast<credentials_ttls*>(cfg_method->make_credentials());
+                cred_out.m_cred.reset(cred);
 #ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
                 bool has_cached = cred_in.m_cred && cred_in.match(*cfg_prov);
 #endif
@@ -212,7 +219,8 @@ void eap::peer_ttls_ui::invoke_identity_ui(
                 }
 
                 // Combine outer credentials.
-                eap::credentials::source_t src_outer = _cred_method->credentials_tls::combine(
+                wstring target_name(std::move(cfg_prov->get_id()));
+                eap::credentials::source_t src_outer = cred->credentials_tls::combine(
                     dwFlags,
                     NULL,
 #ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
@@ -222,76 +230,124 @@ void eap::peer_ttls_ui::invoke_identity_ui(
 #endif
                     *cfg_method,
                     cfg_method->m_allow_save ? target_name.c_str() : NULL);
+                if (src_outer == eap::credentials::source_unknown ||
+                    src_outer != eap::credentials::source_config && eap::config_method::status_cred_begin <= cfg_method->m_last_status && cfg_method->m_last_status < eap::config_method::status_cred_end)
+                {
+                    // Build dialog to prompt for outer credentials.
+                    wxEAPCredentialsDialog dlg(*cfg_prov, &parent);
+                    if (eap::config_method::status_cred_begin <= cfg_method->m_last_status && cfg_method->m_last_status < eap::config_method::status_cred_end)
+                        dlg.AddContent(new wxEAPCredentialWarningPanel(*cfg_prov, cfg_method->m_last_status, &dlg));
+                    auto panel = new wxTLSCredentialsPanel(*cfg_prov, *cfg_method, *cred, &dlg, false);
+                    panel->SetRemember(src_outer == eap::credentials::source_storage);
+                    dlg.AddContent(panel);
 
-                // Combine inner credentials.
-                eap::credentials::source_t src_inner = _cred_method->m_inner->combine(
-                    dwFlags,
-                    NULL,
+                    // Update dialog layout.
+                    dlg.Layout();
+                    dlg.GetSizer()->Fit(&dlg);
+
+                    // Centre and display dialog.
+                    dlg.Centre(wxBOTH);
+                    if ((result = dlg.ShowModal()) == wxID_OK) {
+                        // Write credentials to credential manager.
+                        if (panel->GetRemember()) {
+                            try {
+                                cred->credentials_tls::store(target_name.c_str(), 0);
+                            } catch (winstd::win_runtime_error &err) {
+                                wxLogError(winstd::tstring_printf(_("Error writing credentials to Credential Manager: %hs (error %u)"), err.what(), err.number()).c_str());
+                            } catch (...) {
+                                wxLogError(_("Writing credentials failed."));
+                            }
+                        }
+                    }
+                } else
+                    result = wxID_OK;
+
+                if (result == wxID_OK) {
+                    // Combine inner credentials.
+                    eap::credentials::source_t src_inner = cred->m_inner->combine(
+                        dwFlags,
+                        NULL,
 #ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
-                    has_cached ? dynamic_cast<credentials_ttls*>(cred_in.m_cred.get())->m_inner.get() : NULL,
+                        has_cached ? dynamic_cast<credentials_ttls*>(cred_in.m_cred.get())->m_inner.get() : NULL,
 #else
-                    NULL,
+                        NULL,
 #endif
-                    *cfg_method->m_inner,
-                    cfg_method->m_inner->m_allow_save ? target_name.c_str() : NULL);
+                        *cfg_method->m_inner,
+                        cfg_method->m_inner->m_allow_save ? target_name.c_str() : NULL);
+                    if (src_inner == eap::credentials::source_unknown ||
+                        src_inner != eap::credentials::source_config && eap::config_method::status_cred_begin <= cfg_method->m_inner->m_last_status && cfg_method->m_inner->m_last_status < eap::config_method::status_cred_end)
+                    {
+                        // Prompt for inner credentials.
+                        auto cfg_inner_eapmsg = dynamic_cast<config_method_eapmsg*>(cfg_method->m_inner.get());
+                        if (!cfg_inner_eapmsg) {
+                            // Native inner methods. Build dialog to prompt for inner credentials.
+                            wxEAPCredentialsDialog dlg(*cfg_prov, &parent);
+                            if (eap::config_method::status_cred_begin <= cfg_method->m_inner->m_last_status && cfg_method->m_inner->m_last_status < eap::config_method::status_cred_end)
+                                dlg.AddContent(new wxEAPCredentialWarningPanel(*cfg_prov, cfg_method->m_inner->m_last_status, &dlg));
+                            wxEAPCredentialsPanelBase *panel = NULL;
+                            const eap::config_method_pap      *cfg_inner_pap;
+                            const eap::config_method_mschapv2 *cfg_inner_mschapv2;
+                            if ((cfg_inner_pap = dynamic_cast<const eap::config_method_pap*>(cfg_method->m_inner.get())) != NULL)
+                                panel = new wxPAPCredentialsPanel(*cfg_prov, *cfg_inner_pap, *dynamic_cast<eap::credentials_pass*>(cred->m_inner.get()), &dlg, false);
+                            else if ((cfg_inner_mschapv2 = dynamic_cast<const eap::config_method_mschapv2*>(cfg_method->m_inner.get())) != NULL)
+                                panel = new wxMSCHAPv2CredentialsPanel(*cfg_prov, *cfg_inner_mschapv2, *dynamic_cast<eap::credentials_pass*>(cred->m_inner.get()), &dlg, false);
+                            else
+                                assert(0); // Unsupported inner authentication method type.
+                            panel->SetRemember(src_inner == eap::credentials::source_storage);
+                            dlg.AddContent(panel);
 
-                // Create method credentials panel.
-                wxTTLSCredentialsPanel *panel = new wxTTLSCredentialsPanel(*cfg_prov, *cfg_method, *_cred_method, dlg.m_providers);
+                            // Update dialog layout.
+                            dlg.Layout();
+                            dlg.GetSizer()->Fit(&dlg);
 
-                // Set "Remember" checkboxes according to credential source,
-                panel->m_outer_cred->SetRemember(src_outer == eap::credentials::source_storage);
-                panel->m_inner_cred->SetRemember(src_inner == eap::credentials::source_storage);
-
-                // Add panel to choice-book. Select the first one to have known sources.
-                if (!combined && src_outer != eap::credentials::source_unknown && src_inner != eap::credentials::source_unknown) {
-                    if (dlg.m_providers->AddPage(panel, wxEAPGetProviderName(cfg_prov->m_name), true)) {
-                        cred_method_store.push_back(pair<config_method_ttls*, credentials_connection>(cfg_method, std::move(cred_method)));
-                        combined = true;
-                    }
-                } else
-                    if (dlg.m_providers->AddPage(panel, wxEAPGetProviderName(cfg_prov->m_name), false))
-                        cred_method_store.push_back(pair<config_method_ttls*, credentials_connection>(cfg_method, std::move(cred_method)));
-            }
-
-            // Update dialog layout.
-            dlg.Layout();
-            dlg.GetSizer()->Fit(&dlg);
-
-            // Centre and display dialog.
-            dlg.Centre(wxBOTH);
-            result = dlg.ShowModal();
-            if (result == wxID_OK) {
-                int idx_prov = dlg.m_providers->GetSelection();
-                if (idx_prov != wxNOT_FOUND) {
-                    wxTTLSCredentialsPanel *panel = dynamic_cast<wxTTLSCredentialsPanel*>(dlg.m_providers->GetPage(idx_prov));
-                    pair<config_method_ttls*, credentials_connection> &res = cred_method_store[idx_prov];
-                    cfg_method = res.first;
-                    cred_out = res.second;
-                    credentials_ttls *_cred_out = dynamic_cast<credentials_ttls*>(cred_out.m_cred.get());
-                    wstring target_name(std::move(cred_out.get_id()));
-
-                    // Write credentials to credential manager.
-                    if (panel->m_outer_cred->GetRemember()) {
-                        try {
-                            _cred_out->credentials_tls::store(target_name.c_str(), 0);
-                        } catch (winstd::win_runtime_error &err) {
-                            wxLogError(winstd::tstring_printf(_("Error writing credentials to Credential Manager: %hs (error %u)"), err.what(), err.number()).c_str());
-                        } catch (...) {
-                            wxLogError(_("Writing credentials failed."));
+                            // Centre and display dialog.
+                            dlg.Centre(wxBOTH);
+                            if ((result = dlg.ShowModal()) == wxID_OK) {
+                                // Write credentials to credential manager.
+                                if (panel->GetRemember()) {
+                                    try {
+                                        cred->m_inner->store(target_name.c_str(), 1);
+                                    } catch (winstd::win_runtime_error &err) {
+                                        wxLogError(winstd::tstring_printf(_("Error writing credentials to Credential Manager: %hs (error %u)"), err.what(), err.number()).c_str());
+                                    } catch (...) {
+                                        wxLogError(_("Writing credentials failed."));
+                                    }
+                                }
+                            }
+                        } else {
+                            // EapHost inner method
+                            auto cred_inner = dynamic_cast<eap::credentials_eapmsg*>(cred->m_inner.get());
+                            DWORD cred_data_size = 0;
+                            winstd::eap_blob cred_data;
+                            unique_ptr<WCHAR[], EapHostPeerFreeRuntimeMemory_delete> identity;
+                            winstd::eap_error error;
+                            DWORD dwResult = EapHostPeerInvokeIdentityUI(
+                                0,
+                                cfg_inner_eapmsg->m_type,
+                                dwFlags,
+                                hwndParent,
+                                (DWORD)cfg_inner_eapmsg->m_cfg_blob.size(), cfg_inner_eapmsg->m_cfg_blob.data(),
+                                (DWORD)cred_inner->m_cred_blob.size(), cred_inner->m_cred_blob.data(),
+                                &cred_data_size, &cred_data._Myptr,
+                                &identity._Myptr,
+                                &error._Myptr,
+                                NULL);
+                            if (dwResult == ERROR_SUCCESS) {
+                                // Inner EAP method provided credentials.
+                                cred_inner->m_identity = identity.get();
+                                cred_inner->m_cred_blob.assign(cred_data.get(), cred_data.get() + cred_data_size);
+                                SecureZeroMemory(cred_data.get(), cred_data_size);
+                            } else if (dwResult == ERROR_CANCELLED) {
+                                // Not really an error.
+                                result = wxID_CANCEL;
+                            } else if (error)
+                                wxLogError(_("Invoking EAP identity failed (error %u, %s, %s)."), error->dwWinError, error->pRootCauseString, error->pRepairString);
+                            else
+                                wxLogError(_("Invoking EAP identity failed (error %u)."), dwResult);
                         }
-                    }
-
-                    if (panel->m_inner_cred->GetRemember()) {
-                        try {
-                            _cred_out->m_inner->store(target_name.c_str(), 1);
-                        } catch (winstd::win_runtime_error &err) {
-                            wxLogError(winstd::tstring_printf(_("Error writing credentials to Credential Manager: %hs (error %u)"), err.what(), err.number()).c_str());
-                        } catch (...) {
-                            wxLogError(_("Writing credentials failed."));
-                        }
-                    }
-                } else
-                    result = wxID_CANCEL;
+                    } else
+                        result = wxID_OK;
+                }
             }
 
             wxTopLevelWindows.DeleteObject(&parent);

@@ -290,4 +290,28 @@ class wxEAPProviderLockPanelBase : public wxPanel
 	
 };
 
+///////////////////////////////////////////////////////////////////////////////
+/// Class wxEAPProviderSelectDialogBase
+///////////////////////////////////////////////////////////////////////////////
+class wxEAPProviderSelectDialogBase : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxEAPBannerPanel *m_banner;
+		wxBoxSizer* m_providers;
+		wxStdDialogButtonSizer* m_buttons;
+		wxButton* m_buttonsCancel;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnInitDialog( wxInitDialogEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		wxEAPProviderSelectDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("EAP Identity Provider"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
+		~wxEAPProviderSelectDialogBase();
+	
+};
+
 #endif //__WXEAP_UI_H__
