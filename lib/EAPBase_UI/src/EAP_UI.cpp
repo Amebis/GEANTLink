@@ -96,7 +96,7 @@ wxEAPCredentialsDialog::wxEAPCredentialsDialog(const eap::config_provider &prov,
     wxEAPGeneralDialog(parent, id, title, pos, size, style)
 {
     // Set banner title.
-    m_banner->m_title->SetLabel(wxString::Format(_("%s Credentials"), wxEAPGetProviderName(prov.m_name).c_str()));
+    m_banner->m_title->SetLabel(wxString::Format(_("%s Credentials"), wxEAPGetProviderName(prov.m_name)));
 }
 
 

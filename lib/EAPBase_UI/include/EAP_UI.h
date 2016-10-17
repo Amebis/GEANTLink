@@ -210,7 +210,7 @@ public:
                         m_providers),
                     is_single ?
                         wxEAPGetProviderName(provider->m_name) :
-                        winstd::tstring_printf(_T("%s (%u)"), wxEAPGetProviderName(provider->m_name), count));
+                        winstd::tstring_printf(_T("%s (%u)"), static_cast<LPCTSTR>(wxEAPGetProviderName(provider->m_name)), count));
             }
         }
 
@@ -292,7 +292,7 @@ protected:
         int idx = m_providers->GetSelection();
         eap::config_provider &cfg_provider = dynamic_cast<_wxT*>(m_providers->GetPage(idx))->GetProvider();
 
-        if (wxMessageBox(tstring_printf(_("Are you sure you want to permanently remove %ls provider from configuration?"), wxEAPGetProviderName(cfg_provider.m_name).c_str()), _("Warning"), wxYES_NO, this) == wxYES) {
+        if (wxMessageBox(tstring_printf(_("Are you sure you want to permanently remove %ls provider from configuration?"), static_cast<LPCTSTR>(wxEAPGetProviderName(cfg_provider.m_name))), _("Warning"), wxYES_NO, this) == wxYES) {
             // Delete provider.
             auto it = m_cfg.m_providers.begin();
             for (int i = 0; i < idx; i++, ++it);
