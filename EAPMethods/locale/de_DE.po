@@ -542,9 +542,9 @@ msgstr "MSCHAPv2"
 #: lib/EAPBase_UI/include/EAP_UI.h:292
 #, c-format
 msgid ""
-"Are you sure you want to permanently remove %ls provider from configuration?"
+"Are you sure you want to permanently remove %s provider from configuration?"
 msgstr ""
-"Sind Sie sicher, dass Sie den Identitätsprovider %ls aus der Konfiguration "
+"Sind Sie sicher, dass Sie den Identitätsprovider %s aus der Konfiguration "
 "löschen möchten?"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:292

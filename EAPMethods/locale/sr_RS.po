@@ -537,9 +537,9 @@ msgstr "MSCHAPv2"
 #: lib/EAPBase_UI/include/EAP_UI.h:292
 #, c-format
 msgid ""
-"Are you sure you want to permanently remove %ls provider from configuration?"
+"Are you sure you want to permanently remove %s provider from configuration?"
 msgstr ""
-"Da li ste sigurni da želite da trajno uklonite %ls provajdera iz "
+"Da li ste sigurni da želite da trajno uklonite %s provajdera iz "
 "konfiguracije?"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:292
