@@ -527,9 +527,9 @@ msgstr "MSCHAPv2"
 #: lib/EAPBase_UI/include/EAP_UI.h:292
 #, c-format
 msgid ""
-"Are you sure you want to permanently remove %ls provider from configuration?"
+"Are you sure you want to permanently remove %s provider from configuration?"
 msgstr ""
-"Ar tikrai norite visam laikui pašalinti teikėją „%ls“ iš konfigūracijos?"
+"Ar tikrai norite visam laikui pašalinti teikėją „%s“ iš konfigūracijos?"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:292
 msgid "Warning"
