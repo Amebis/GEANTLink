@@ -781,7 +781,7 @@ namespace eap
         virtual void set_response_attributes(
             _In_       EAP_SESSION_HANDLE  hSession,
             _In_ const EapAttributes       *pAttribs,
-            _Inout_    EapPeerMethodOutput *pEapOutput) = 0;
+            _Out_      EapPeerMethodOutput *pEapOutput) = 0;
 
         /// @}
     };
