@@ -492,11 +492,11 @@ void eap::method_tls::get_response_packet(
 
 void eap::method_tls::get_result(
     _In_    EapPeerMethodResultReason reason,
-    _Inout_ EapPeerMethodResult       *ppResult)
+    _Inout_ EapPeerMethodResult       *pResult)
 {
-    assert(ppResult);
+    assert(pResult);
 
-    method::get_result(reason, ppResult);
+    method::get_result(reason, pResult);
 
     switch (reason) {
     case EapPeerMethodResultSuccess: {

@@ -123,17 +123,17 @@ void eap::method_ttls::get_response_packet(
 
 void eap::method_ttls::get_result(
     _In_    EapPeerMethodResultReason reason,
-    _Inout_ EapPeerMethodResult       *ppResult)
+    _Inout_ EapPeerMethodResult       *pResult)
 {
     // Do the TLS.
-    method_tls::get_result(reason, ppResult);
+    method_tls::get_result(reason, pResult);
 
     if (m_phase == phase_application_data) {
         // Get inner method result.
         EapPeerMethodResult result = {};
         m_inner->get_result(reason, &result);
         if (result.fSaveConnectionData)
-            ppResult->fSaveConnectionData = TRUE;
+            pResult->fSaveConnectionData = TRUE;
 
         if (m_inner->m_cfg.m_last_status != config_method::status_success) {
             // Inner method admitted problems, so autentication must have proceeded to inner authentication already.

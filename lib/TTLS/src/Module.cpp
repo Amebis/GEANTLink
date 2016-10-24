@@ -270,35 +270,35 @@ void eap::peer_ttls::get_response_packet(
 void eap::peer_ttls::get_result(
     _In_    EAP_SESSION_HANDLE        hSession,
     _In_    EapPeerMethodResultReason reason,
-    _Inout_ EapPeerMethodResult       *ppResult)
+    _Inout_ EapPeerMethodResult       *pResult)
 {
     auto s = static_cast<session*>(hSession);
 
-    s->m_method->get_result(reason, ppResult);
+    s->m_method->get_result(reason, pResult);
     s->m_eap_attr_desc.dwNumberOfAttributes = (DWORD)s->m_method->m_eap_attr.size();
     s->m_eap_attr_desc.pAttribs = s->m_method->m_eap_attr.data();
-    ppResult->pAttribArray = &s->m_eap_attr_desc;
+    pResult->pAttribArray = &s->m_eap_attr_desc;
 
     // Do not report failure to EapHost, as it will not save updated configuration then. But we need it to save it, to alert user on next connection attempt.
     // EapHost is well aware of the failed condition.
-    //ppResult->fIsSuccess          = FALSE;
-    //ppResult->dwFailureReasonCode = EAP_E_AUTHENTICATION_FAILED;
-    ppResult->fIsSuccess          = TRUE;
-    ppResult->dwFailureReasonCode = ERROR_SUCCESS;
+    //pResult->fIsSuccess          = FALSE;
+    //pResult->dwFailureReasonCode = EAP_E_AUTHENTICATION_FAILED;
+    pResult->fIsSuccess          = TRUE;
+    pResult->dwFailureReasonCode = ERROR_SUCCESS;
 
-    if (ppResult->fSaveConnectionData) {
-        pack(s->m_cfg, &ppResult->pConnectionData, &ppResult->dwSizeofConnectionData);
+    if (pResult->fSaveConnectionData) {
+        pack(s->m_cfg, &pResult->pConnectionData, &pResult->dwSizeofConnectionData);
         if (s->m_blob_cfg)
             free_memory(s->m_blob_cfg);
-        s->m_blob_cfg = ppResult->pConnectionData;
+        s->m_blob_cfg = pResult->pConnectionData;
     }
 
 #ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
-    ppResult->fSaveUserData = TRUE;
-    pack(s->m_cred, &ppResult->pUserData, &ppResult->dwSizeofUserData);
+    pResult->fSaveUserData = TRUE;
+    pack(s->m_cred, &pResult->pUserData, &pResult->dwSizeofUserData);
     if (s->m_blob_cred)
         free_memory(s->m_blob_cred);
-    s->m_blob_cred = ppResult->pUserData;
+    s->m_blob_cred = pResult->pUserData;
 #endif
 }
 

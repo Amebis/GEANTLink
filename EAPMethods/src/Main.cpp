@@ -449,7 +449,7 @@ DWORD APIENTRY EapPeerGetResponsePacket(
 DWORD APIENTRY EapPeerGetResult(
     _In_  EAP_SESSION_HANDLE        hSession,
     _In_  EapPeerMethodResultReason reason,
-    _Out_ EapPeerMethodResult       *ppResult,
+    _Out_ EapPeerMethodResult       *pResult,
     _Out_ EAP_ERROR                 **ppEapError)
 {
     DWORD dwResult = ERROR_SUCCESS;
@@ -466,11 +466,11 @@ DWORD APIENTRY EapPeerGetResult(
 
     if (!hSession)
         g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" hSession is NULL.")));
-    else if (!ppResult)
-        g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" ppResult is NULL.")));
+    else if (!pResult)
+        g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pResult is NULL.")));
     else {
         try {
-            g_peer.get_result(hSession, reason, ppResult);
+            g_peer.get_result(hSession, reason, pResult);
         } catch (std::exception &err) {
             g_peer.log_error(*ppEapError = g_peer.make_error(err));
             dwResult = (*ppEapError)->dwWinError;

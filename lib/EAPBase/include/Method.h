@@ -126,7 +126,7 @@ namespace eap
         ///
         virtual void get_result(
             _In_    EapPeerMethodResultReason reason,
-            _Inout_ EapPeerMethodResult       *ppResult);
+            _Inout_ EapPeerMethodResult       *pResult);
 
         /// @}
 

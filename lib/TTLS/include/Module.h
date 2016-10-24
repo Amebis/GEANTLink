@@ -165,7 +165,7 @@ namespace eap
         virtual void get_result(
             _In_    EAP_SESSION_HANDLE        hSession,
             _In_    EapPeerMethodResultReason reason,
-            _Inout_ EapPeerMethodResult       *ppResult);
+            _Inout_ EapPeerMethodResult       *pResult);
 
         ///
         /// Obtains the user interface context from the EAP method.
