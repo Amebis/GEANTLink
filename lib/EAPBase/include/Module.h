@@ -717,7 +717,7 @@ namespace eap
             _In_                                       EAP_SESSION_HANDLE  hSession,
             _In_bytecount_(dwReceivedPacketSize) const EapPacket           *pReceivedPacket,
             _In_                                       DWORD               dwReceivedPacketSize,
-            _Inout_                                    EapPeerMethodOutput *pEapOutput) = 0;
+            _Out_                                      EapPeerMethodOutput *pEapOutput) = 0;
 
         ///
         /// Obtains a response packet from the EAP method.

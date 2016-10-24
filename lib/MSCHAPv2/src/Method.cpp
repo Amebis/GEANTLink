@@ -90,7 +90,7 @@ void eap::method_mschapv2::begin_session(
 void eap::method_mschapv2::process_request_packet(
     _In_bytecount_(dwReceivedPacketSize) const void                *pReceivedPacket,
     _In_                                       DWORD               dwReceivedPacketSize,
-    _Inout_                                    EapPeerMethodOutput *pEapOutput)
+    _Out_                                      EapPeerMethodOutput *pEapOutput)
 {
     assert(pReceivedPacket || dwReceivedPacketSize == 0);
     assert(pEapOutput);
