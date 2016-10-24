@@ -29,16 +29,14 @@ using namespace winstd;
 //////////////////////////////////////////////////////////////////////
 
 eap::method_eapmsg::method_eapmsg(_In_ module &module, _In_ config_method_eapmsg &cfg, _In_ credentials_eapmsg &cred) :
-    m_cred(cred),
-    m_phase(phase_unknown),
+    m_session_id(0),
     method_noneap(module, cfg, cred)
 {
 }
 
 
 eap::method_eapmsg::method_eapmsg(_Inout_ method_eapmsg &&other) :
-    m_cred       (          other.m_cred       ),
-    m_phase      (std::move(other.m_phase     )),
+    m_session_id (std::move(other.m_session_id)),
     method_noneap(std::move(other             ))
 {
 }
@@ -47,9 +45,8 @@ eap::method_eapmsg::method_eapmsg(_Inout_ method_eapmsg &&other) :
 eap::method_eapmsg& eap::method_eapmsg::operator=(_Inout_ method_eapmsg &&other)
 {
     if (this != std::addressof(other)) {
-        assert(std::addressof(m_cred) == std::addressof(other.m_cred)); // Move method with same credentials only!
         (method_noneap&)*this = std::move(other             );
-        m_phase               = std::move(other.m_phase     );
+        m_session_id          = std::move(other.m_session_id);
     }
 
     return *this;
@@ -62,10 +59,46 @@ void eap::method_eapmsg::begin_session(
     _In_        HANDLE        hTokenImpersonateUser,
     _In_opt_    DWORD         dwMaxSendPacketSize)
 {
-    method_noneap::begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
+    // Create EapHost peer session using available connection data (m_cfg) and user data (m_cred).
+    auto &cfg  = dynamic_cast<config_method_eapmsg&>(m_cfg);
+    auto &cred = dynamic_cast<credentials_eapmsg  &>(m_cred);
+    eap_error_runtime error;
+    DWORD dwResult = EapHostPeerBeginSession(
+        dwFlags,
+        cfg.m_type,
+        pAttributeArray,
+        hTokenImpersonateUser,
+        (DWORD)cfg.m_cfg_blob.size(),
+        cfg.m_cfg_blob.data(),
+        (DWORD)cred.m_cred_blob.size(),
+        cred.m_cred_blob.data(),
+        dwMaxSendPacketSize,
+        NULL, NULL, NULL,
+        &m_session_id,
+        &error._Myptr);
+    if (dwResult == ERROR_SUCCESS) {
+        // Session succesfully created.
+        method_noneap::begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
 
-    m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)m_cfg.get_method_id()), event_data::blank);
-    m_phase = phase_init;
+        m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)m_cfg.get_method_id()), event_data::blank);
+    } else if (error)
+        throw eap_runtime_error(*error  , __FUNCTION__ " EapHostPeerBeginSession failed.");
+    else
+        throw win_runtime_error(dwResult, __FUNCTION__ " EapHostPeerBeginSession failed.");
+}
+
+
+void eap::method_eapmsg::end_session()
+{
+    // End EapHost peer session.
+    eap_error_runtime error;
+    DWORD dwResult = EapHostPeerEndSession(m_session_id, &error._Myptr);
+    if (dwResult == ERROR_SUCCESS) {
+        // Session successfuly ended.
+    } else if (error)
+        throw eap_runtime_error(*error  , __FUNCTION__ " EapHostPeerEndSession failed.");
+    else
+        throw win_runtime_error(dwResult, __FUNCTION__ " EapHostPeerEndSession failed.");
 }
 
 
@@ -74,39 +107,171 @@ void eap::method_eapmsg::process_request_packet(
     _In_                                       DWORD               dwReceivedPacketSize,
     _Out_                                      EapPeerMethodOutput *pEapOutput)
 {
-    UNREFERENCED_PARAMETER(pReceivedPacket);
     assert(pReceivedPacket || dwReceivedPacketSize == 0);
     assert(pEapOutput);
 
     m_module.log_event(&EAPMETHOD_PACKET_RECV, event_data((unsigned int)m_cfg.get_method_id()), event_data((unsigned int)dwReceivedPacketSize), event_data::blank);
 
-    // TODO: Finish!
-    //switch (m_phase) {
-    //case phase_init: {
-    //    // Convert username and password to UTF-8.
-    //    sanitizing_string identity_utf8, password_utf8;
-    //    WideCharToMultiByte(CP_UTF8, 0, m_cred.m_identity.c_str(), (int)m_cred.m_identity.length(), identity_utf8, NULL, NULL);
-    //    WideCharToMultiByte(CP_UTF8, 0, m_cred.m_password.c_str(), (int)m_cred.m_password.length(), password_utf8, NULL, NULL);
+    // Let EapHost peer process the packet.
+    EapHostPeerResponseAction action;
+    eap_error_runtime error;
+    DWORD dwResult = EapHostPeerProcessReceivedPacket(
+        m_session_id,
+        dwReceivedPacketSize,
+        reinterpret_cast<const BYTE*>(pReceivedPacket),
+        &action,
+        &error._Myptr);
+    if (dwResult == ERROR_SUCCESS) {
+        // Packet successfuly processed.
+        action_to_output(action, pEapOutput);
+    } else if (error)
+        throw eap_runtime_error(*error  , __FUNCTION__ " EapHostPeerProcessReceivedPacket failed.");
+    else
+        throw win_runtime_error(dwResult, __FUNCTION__ " EapHostPeerProcessReceivedPacket failed.");
+}
 
-    //    // EAPMsg passwords must be padded to 16B boundary according to RFC 5281. Will not add random extra padding here, as length obfuscation should be done by outer transport layers.
-    //    size_t padding_password_ex = (16 - password_utf8.length()) % 16;
-    //    password_utf8.append(padding_password_ex, 0);
 
-    //    m_packet_res.clear();
+void eap::method_eapmsg::get_response_packet(
+    _Inout_bytecap_(*dwSendPacketSize) void  *pSendPacket,
+    _Inout_                            DWORD *pdwSendPacketSize)
+{
+    assert(pdwSendPacketSize);
+    assert(pSendPacket || !*pdwSendPacketSize);
 
-    //    // Diameter AVP (User-Name=1, User-Password=2)
-    //    append_avp(1, diameter_avp_flag_mandatory, identity_utf8.data(), (unsigned int)identity_utf8.size());
-    //    append_avp(2, diameter_avp_flag_mandatory, password_utf8.data(), (unsigned int)password_utf8.size());
+    // Let EapHost peer prepare response packet.
+    DWORD size_max = *pdwSendPacketSize;
+    eap_blob_runtime packet;
+    eap_error_runtime error;
+    DWORD dwResult = EapHostPeerGetSendPacket(
+        m_session_id,
+        pdwSendPacketSize,
+        &packet._Myptr,
+        &error._Myptr);
+    if (dwResult == ERROR_SUCCESS) {
+        // Packet successfuly prepared.
+        memcpy_s(pSendPacket, size_max, packet.get(), *pdwSendPacketSize);
+    } else if (error)
+        throw eap_runtime_error(*error  , __FUNCTION__ " EapHostPeerGetSendPacket failed.");
+    else
+        throw win_runtime_error(dwResult, __FUNCTION__ " EapHostPeerGetSendPacket failed.");
+}
 
-    //    m_phase = phase_finished;
-    //    m_cfg.m_last_status = config_method::status_cred_invalid; // Blame credentials if we fail beyond this point.
-    //    break;
-    //}
 
-    //case phase_finished:
-    //    break;
-    //}
+void eap::method_eapmsg::get_result(
+    _In_    EapPeerMethodResultReason reason,
+    _Inout_ EapPeerMethodResult       *pResult)
+{
+    assert(pResult);
 
-    pEapOutput->fAllowNotifications = TRUE;
-    pEapOutput->action = EapPeerMethodResponseActionSend;
+    if (reason == EapPeerMethodResultSuccess) {
+        // Let EapHost peer return result.
+        eap_error_runtime error;
+        EapHostPeerMethodResult result = {};
+        DWORD dwResult = EapHostPeerGetResult(
+            m_session_id,
+            EapHostPeerMethodResultFromMethod,
+            &result,
+            &error._Myptr);
+        if (dwResult == ERROR_SUCCESS) {
+            // Result successfuly returned.
+            pResult->fIsSuccess          = result.fIsSuccess;
+            pResult->dwFailureReasonCode = result.dwFailureReasonCode;
+            pResult->pAttribArray        = result.pAttribArray;
+            pResult->pEapError           = result.pEapError;
+
+            if (result.fSaveConnectionData)
+                dynamic_cast<config_method_eapmsg&>(m_cfg).m_cfg_blob.assign(result.pConnectionData, result.pConnectionData + result.dwSizeofConnectionData);
+
+            if (result.fSaveUserData)
+                dynamic_cast<credentials_eapmsg  &>(m_cred).m_cred_blob.assign(result.pUserData, result.pUserData + result.dwSizeofUserData);
+        } else if (error)
+            throw eap_runtime_error(*error  , __FUNCTION__ " EapHostPeerGetResult failed.");
+        else
+            throw win_runtime_error(dwResult, __FUNCTION__ " EapHostPeerGetResult failed.");
+    }
+}
+
+
+void eap::method_eapmsg::get_ui_context(
+    _Inout_ BYTE  **ppUIContextData,
+    _Inout_ DWORD *pdwUIContextDataSize)
+{
+    // Get EapHost peer UI context data.
+    eap_error_runtime error;
+    DWORD dwResult = EapHostPeerGetUIContext(
+        m_session_id,
+        pdwUIContextDataSize,
+        ppUIContextData,
+        &error._Myptr);
+    if (dwResult == ERROR_SUCCESS) {
+        // UI context data successfuly returned.
+    } else if (error)
+        throw eap_runtime_error(*error  , __FUNCTION__ " EapHostPeerGetUIContext failed.");
+    else
+        throw win_runtime_error(dwResult, __FUNCTION__ " EapHostPeerGetUIContext failed.");
+}
+
+
+void eap::method_eapmsg::set_ui_context(
+    _In_count_(dwUIContextDataSize) const BYTE                *pUIContextData,
+    _In_                                  DWORD               dwUIContextDataSize,
+    _Out_                                 EapPeerMethodOutput *pEapOutput)
+{
+    assert(pEapOutput);
+
+    // Set EapHost peer UI context data.
+    EapHostPeerResponseAction action;
+    eap_error_runtime error;
+    DWORD dwResult = EapHostPeerSetUIContext(
+        m_session_id,
+        dwUIContextDataSize,
+        pUIContextData,
+        &action,
+        &error._Myptr);
+    if (dwResult == ERROR_SUCCESS) {
+        // UI context data successfuly returned.
+        action_to_output(action, pEapOutput);
+    } else if (error)
+        throw eap_runtime_error(*error  , __FUNCTION__ " EapHostPeerSetUIContext failed.");
+    else
+        throw win_runtime_error(dwResult, __FUNCTION__ " EapHostPeerSetUIContext failed.");
+}
+
+
+void eap::method_eapmsg::get_response_attributes(_Inout_ EapAttributes *pAttribs)
+{
+    // Get response attributes from EapHost peer.
+    eap_error_runtime error;
+    DWORD dwResult = EapHostPeerGetResponseAttributes(
+        m_session_id,
+        pAttribs,
+        &error._Myptr);
+    if (dwResult == ERROR_SUCCESS) {
+        // Response attributes successfuly returned.
+    } else if (error)
+        throw eap_runtime_error(*error  , __FUNCTION__ " EapHostPeerGetResponseAttributes failed.");
+    else
+        throw win_runtime_error(dwResult, __FUNCTION__ " EapHostPeerGetResponseAttributes failed.");
+}
+
+
+void eap::method_eapmsg::set_response_attributes(
+    _In_ const EapAttributes       *pAttribs,
+    _Out_      EapPeerMethodOutput *pEapOutput)
+{
+    // Set response attributes for EapHost peer.
+    EapHostPeerResponseAction action;
+    eap_error_runtime error;
+    DWORD dwResult = EapHostPeerSetResponseAttributes(
+        m_session_id,
+        pAttribs,
+        &action,
+        &error._Myptr);
+    if (dwResult == ERROR_SUCCESS) {
+        // Response attributes successfuly set.
+        action_to_output(action, pEapOutput);
+    } else if (error)
+        throw eap_runtime_error(*error  , __FUNCTION__ " EapHostPeerGetResponseAttributes failed.");
+    else
+        throw win_runtime_error(dwResult, __FUNCTION__ " EapHostPeerGetResponseAttributes failed.");
 }

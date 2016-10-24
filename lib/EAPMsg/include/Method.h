@@ -82,6 +82,13 @@ namespace eap
             _In_opt_    DWORD         dwMaxSendPacketSize = MAXDWORD);
 
         ///
+        /// Ends an EAP authentication session for the EAP method.
+        ///
+        /// \sa [EapPeerEndSession function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363604.aspx)
+        ///
+        virtual void end_session();
+
+        ///
         /// Processes a packet received by EapHost from a supplicant.
         ///
         /// \sa [EapPeerProcessRequestPacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363621.aspx)
@@ -91,15 +98,103 @@ namespace eap
             _In_                                       DWORD               dwReceivedPacketSize,
             _Out_                                      EapPeerMethodOutput *pEapOutput);
 
+        ///
+        /// Obtains a response packet from the EAP method.
+        ///
+        /// \sa [EapPeerGetResponsePacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363610.aspx)
+        ///
+        virtual void get_response_packet(
+            _Inout_bytecap_(*dwSendPacketSize) void  *pSendPacket,
+            _Inout_                            DWORD *pdwSendPacketSize);
+
+        ///
+        /// Obtains the result of an authentication session from the EAP method.
+        ///
+        /// \sa [EapPeerGetResult function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363611.aspx)
+        ///
+        virtual void get_result(
+            _In_    EapPeerMethodResultReason reason,
+            _Inout_ EapPeerMethodResult       *pResult);
+
+        /// @}
+
+        /// \name User Interaction
+        /// @{
+
+        ///
+        /// Obtains the user interface context from the EAP method.
+        ///
+        /// \note This function is always followed by the `EapPeerInvokeInteractiveUI()` function, which is followed by the `EapPeerSetUIContext()` function.
+        ///
+        /// \sa [EapPeerGetUIContext function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363612.aspx)
+        ///
+        virtual void get_ui_context(
+            _Inout_ BYTE  **ppUIContextData,
+            _Inout_ DWORD *pdwUIContextDataSize);
+
+        ///
+        /// Provides a user interface context to the EAP method.
+        ///
+        /// \note This function is called after the UI has been raised through the `EapPeerGetUIContext()` function.
+        ///
+        /// \sa [EapPeerSetUIContext function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363626.aspx)
+        ///
+        virtual void set_ui_context(
+            _In_count_(dwUIContextDataSize) const BYTE                *pUIContextData,
+            _In_                                  DWORD               dwUIContextDataSize,
+            _Out_                                 EapPeerMethodOutput *pEapOutput);
+
+        /// @}
+
+        /// \name EAP Response Attributes
+        /// @{
+
+        ///
+        /// Obtains an array of EAP response attributes from the EAP method.
+        ///
+        /// \sa [EapPeerGetResponseAttributes function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363609.aspx)
+        ///
+        virtual void get_response_attributes(_Inout_ EapAttributes *pAttribs);
+
+        ///
+        /// Provides an updated array of EAP response attributes to the EAP method.
+        ///
+        /// \sa [EapPeerSetResponseAttributes function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363625.aspx)
+        ///
+        virtual void set_response_attributes(
+            _In_ const EapAttributes       *pAttribs,
+            _Out_      EapPeerMethodOutput *pEapOutput);
+
         /// @}
 
     protected:
-        credentials_eapmsg &m_cred; ///< Method user credentials
+        ///
+        /// Converts EapHost peer action to output structure.
+        ///
+        /// \param[in ] action      EapHost peer action
+        /// \param[out] pEapOutput  EAP method output structure
+        ///
+        inline void action_to_output(
+            _In_   EapHostPeerResponseAction action,
+            _Out_  EapPeerMethodOutput       *pEapOutput)
+        {
+            switch (action) {
+                case EapHostPeerResponseDiscard            : pEapOutput->action = EapPeerMethodResponseActionDiscard ; break;
+                case EapHostPeerResponseSend               : pEapOutput->action = EapPeerMethodResponseActionSend    ; break;
+                case EapHostPeerResponseResult             : pEapOutput->action = EapPeerMethodResponseActionResult  ; break;
+                case EapHostPeerResponseInvokeUi           : pEapOutput->action = EapPeerMethodResponseActionInvokeUI; break;
+                case EapHostPeerResponseRespond            : pEapOutput->action = EapPeerMethodResponseActionRespond ; break;
+                case EapHostPeerResponseStartAuthentication: pEapOutput->action = EapPeerMethodResponseActionDiscard ; break; // The session could not be found. So the supplicant either needs to start session again with the same packet or discard the packet.
+                case EapHostPeerResponseNone               : pEapOutput->action = EapPeerMethodResponseActionNone    ; break;
+                default                                    : throw std::invalid_argument(winstd::string_printf(__FUNCTION__ " Unknown action (%u).", action).c_str());
+            }
+            pEapOutput->fAllowNotifications = TRUE;
+        }
 
-        enum {
-            phase_unknown = -1,     ///< Unknown phase
-            phase_init = 0,         ///< Handshake initialize
-            phase_finished,         ///< Connection shut down
-        } m_phase;                  ///< What phase is our communication at?
+    protected:
+        EAP_SESSIONID m_session_id;     ///< EAP session ID
+
+        sanitizing_blob m_ctx_req_blob; ///< Inner UI context request
+        sanitizing_blob m_ctx_res_blob; ///< Inner UI context response
     };
 }
