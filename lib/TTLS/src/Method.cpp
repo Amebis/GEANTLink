@@ -178,7 +178,7 @@ void eap::method_ttls::get_response_attributes(_Inout_ EapAttributes *pAttribs)
 
 void eap::method_ttls::set_response_attributes(
     _In_ const EapAttributes       *pAttribs,
-    _Inout_    EapPeerMethodOutput *pEapOutput)
+    _Out_      EapPeerMethodOutput *pEapOutput)
 {
     UNREFERENCED_PARAMETER(pAttribs);
     UNREFERENCED_PARAMETER(pEapOutput);

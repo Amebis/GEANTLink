@@ -164,7 +164,7 @@ namespace eap
         ///
         virtual void set_response_attributes(
             _In_ const EapAttributes       *pAttribs,
-            _Inout_    EapPeerMethodOutput *pEapOutput);
+            _Out_      EapPeerMethodOutput *pEapOutput);
 
         /// @}
 

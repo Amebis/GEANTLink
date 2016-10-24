@@ -331,9 +331,9 @@ void eap::peer_ttls::get_response_attributes(
 
 
 void eap::peer_ttls::set_response_attributes(
-            _In_       EAP_SESSION_HANDLE  hSession,
-            _In_ const EapAttributes       *pAttribs,
-            _Inout_    EapPeerMethodOutput *pEapOutput)
+    _In_       EAP_SESSION_HANDLE  hSession,
+    _In_ const EapAttributes       *pAttribs,
+    _Out_      EapPeerMethodOutput *pEapOutput)
 {
     static_cast<session*>(hSession)->m_method->set_response_attributes(pAttribs, pEapOutput);
 }
