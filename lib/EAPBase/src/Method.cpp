@@ -83,9 +83,9 @@ void eap::method::end_session()
 
 void eap::method::get_result(
     _In_    EapPeerMethodResultReason reason,
-    _Inout_ EapPeerMethodResult       *ppResult)
+    _Inout_ EapPeerMethodResult       *pResult)
 {
-    assert(ppResult);
+    assert(pResult);
 
     switch (reason) {
     case EapPeerMethodResultSuccess: {
@@ -104,8 +104,8 @@ void eap::method::get_result(
 
     // Always ask EAP host to save the connection data. And it will save it *only* when we report "success".
     // Don't worry. EapHost is well aware of failed authentication condition.
-    ppResult->fSaveConnectionData = TRUE;
-    ppResult->fIsSuccess          = TRUE;
+    pResult->fSaveConnectionData = TRUE;
+    pResult->fIsSuccess          = TRUE;
 }
 
 
