@@ -537,11 +537,11 @@ DWORD APIENTRY EapPeerGetUIContext(
 /// \sa [EapPeerSetUIContext function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363626.aspx)
 ///
 DWORD APIENTRY EapPeerSetUIContext(
-    _In_                                      EAP_SESSION_HANDLE  hSession,
-    _In_                                      DWORD               dwUIContextDataSize,
-    _In_count_(dwUIContextDataSize)   const   BYTE                *pUIContextData,
-    _In_                            /*const*/ EapPeerMethodOutput *pEapOutput,
-    _Out_                                     EAP_ERROR           **ppEapError)
+    _In_                                  EAP_SESSION_HANDLE  hSession,
+    _In_                                  DWORD               dwUIContextDataSize,
+    _In_count_(dwUIContextDataSize) const BYTE                *pUIContextData,
+    _Out_                                 EapPeerMethodOutput *pEapOutput,
+    _Out_                                 EAP_ERROR           **ppEapError)
 {
     DWORD dwResult = ERROR_SUCCESS;
     event_fn_auto_ret<DWORD> event_auto(g_peer.get_event_fn_auto(__FUNCTION__, dwResult));

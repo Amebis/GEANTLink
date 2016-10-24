@@ -311,7 +311,7 @@ void eap::peer_ttls::set_ui_context(
     _In_                                  EAP_SESSION_HANDLE  hSession,
     _In_count_(dwUIContextDataSize) const BYTE                *pUIContextData,
     _In_                                  DWORD               dwUIContextDataSize,
-    _In_                            const EapPeerMethodOutput *pEapOutput)
+    _Out_                                 EapPeerMethodOutput *pEapOutput)
 {
     UNREFERENCED_PARAMETER(hSession);
     UNREFERENCED_PARAMETER(pUIContextData);
