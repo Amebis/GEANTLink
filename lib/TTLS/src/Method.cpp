@@ -85,7 +85,7 @@ void eap::method_ttls::end_session()
 void eap::method_ttls::process_request_packet(
     _In_bytecount_(dwReceivedPacketSize) const void                *pReceivedPacket,
     _In_                                       DWORD               dwReceivedPacketSize,
-    _Inout_                                    EapPeerMethodOutput *pEapOutput)
+    _Out_                                      EapPeerMethodOutput *pEapOutput)
 {
     if (((const EapPacket*)pReceivedPacket)->Code == EapCodeRequest && (((const EapPacket*)pReceivedPacket)->Data[1] & packet_ttls::flags_start)) {
         // This is a start EAP-TTLS packet.

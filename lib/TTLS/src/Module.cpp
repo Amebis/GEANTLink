@@ -242,7 +242,7 @@ void eap::peer_ttls::process_request_packet(
     _In_                                       EAP_SESSION_HANDLE  hSession,
     _In_bytecount_(dwReceivedPacketSize) const EapPacket           *pReceivedPacket,
     _In_                                       DWORD               dwReceivedPacketSize,
-    _Inout_                                    EapPeerMethodOutput *pEapOutput)
+    _Out_                                      EapPeerMethodOutput *pEapOutput)
 {
     assert(dwReceivedPacketSize == ntohs(*(WORD*)pReceivedPacket->Length));
     static_cast<session*>(hSession)->m_method->process_request_packet(pReceivedPacket, dwReceivedPacketSize, pEapOutput);
