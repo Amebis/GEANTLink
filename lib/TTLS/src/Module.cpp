@@ -316,7 +316,7 @@ void eap::peer_ttls::set_ui_context(
     _In_                                  EAP_SESSION_HANDLE  hSession,
     _In_count_(dwUIContextDataSize) const BYTE                *pUIContextData,
     _In_                                  DWORD               dwUIContextDataSize,
-    _In_                            const EapPeerMethodOutput *pEapOutput)
+    _Out_                                 EapPeerMethodOutput *pEapOutput)
 {
     static_cast<session*>(hSession)->m_method->set_ui_context(pUIContextData, dwUIContextDataSize, pEapOutput);
 }

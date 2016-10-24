@@ -154,7 +154,7 @@ namespace eap
         virtual void set_ui_context(
             _In_count_(dwUIContextDataSize) const BYTE                *pUIContextData,
             _In_                                  DWORD               dwUIContextDataSize,
-            _In_                            const EapPeerMethodOutput *pEapOutput);
+            _Out_                                 EapPeerMethodOutput *pEapOutput);
 
         /// @}
 

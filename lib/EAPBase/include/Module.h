@@ -762,7 +762,7 @@ namespace eap
             _In_                                  EAP_SESSION_HANDLE  hSession,
             _In_count_(dwUIContextDataSize) const BYTE                *pUIContextData,
             _In_                                  DWORD               dwUIContextDataSize,
-            _In_                            const EapPeerMethodOutput *pEapOutput) = 0;
+            _Out_                                 EapPeerMethodOutput *pEapOutput) = 0;
 
         ///
         /// Obtains an array of EAP response attributes from the EAP method.
