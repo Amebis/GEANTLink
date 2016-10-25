@@ -231,19 +231,6 @@ LPCTSTR eap::credentials_eaphost::target_suffix() const
 }
 
 
-std::wstring eap::credentials_eaphost::get_identity() const
-{
-    if (!m_identity.empty()) {
-        return m_identity;
-    } else if (!m_cred_blob.empty()) {
-        // TODO: Use EapHostPeerGetIdentity() to obtain user identity.
-        assert(0);
-    }
-
-    return L"";
-}
-
-
 eap::credentials::source_t eap::credentials_eaphost::combine(
     _In_             DWORD         dwFlags,
     _In_             HANDLE        hTokenImpersonateUser,

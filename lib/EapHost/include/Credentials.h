@@ -178,11 +178,6 @@ namespace eap
         /// @}
 
         ///
-        /// Returns credential identity.
-        ///
-        virtual std::wstring get_identity() const;
-
-        ///
         /// Combine credentials in the following order:
         ///
         /// 1. Cached credentials
