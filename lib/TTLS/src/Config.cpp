@@ -267,7 +267,7 @@ eap::config_method* eap::config_method_ttls::make_config_method(_In_ winstd::eap
     switch (eap_type) {
     case eap_type_legacy_pap     : return new config_method_pap     (m_module, m_level + 1);
     case eap_type_legacy_mschapv2: return new config_method_mschapv2(m_module, m_level + 1);
-    default                      : return new config_method_eapmsg  (m_module, m_level + 1); // EAPMsg handles all other method types
+    default                      : return new config_method_eaphost (m_module, m_level + 1); // EapHost peer method handles all other method types
     }
 }
 
@@ -276,7 +276,7 @@ eap::config_method* eap::config_method_ttls::make_config_method(_In_ const wchar
 {
          if (_wcsicmp(eap_type, L"PAP"     ) == 0) return new config_method_pap     (m_module, m_level + 1);
     else if (_wcsicmp(eap_type, L"MSCHAPv2") == 0) return new config_method_mschapv2(m_module, m_level + 1);
-    else if (_wcsicmp(eap_type, L"EAPMsg"  ) == 0) return new config_method_eapmsg  (m_module, m_level + 1);
+    else if (_wcsicmp(eap_type, L"EapHost" ) == 0) return new config_method_eaphost (m_module, m_level + 1);
     else                                           throw invalid_argument(__FUNCTION__ " Unsupported inner authentication method.");
 }
 

@@ -35,7 +35,7 @@ class wxTTLSConfigWindow;
 #include "../../TLS_UI/include/TLS_UI.h"
 
 #include "../../TTLS/include/Config.h"
-#include "../../EAPMsg/include/Config.h"
+#include "../../EapHost/include/Config.h"
 #include "../../PAP/include/Config.h"
 #include "../../MSCHAPv2/include/Config.h"
 
@@ -104,5 +104,5 @@ protected:
     // Temporary inner method configurations to hold data until applied
     eap::config_method_pap      m_cfg_pap;       ///< PAP configuration
     eap::config_method_mschapv2 m_cfg_mschapv2;  ///< MSCHAPv2 configuration
-    eap::config_method_eapmsg   m_cfg_eapmsg;    ///< Inner EAP configuration
+    eap::config_method_eaphost  m_cfg_eaphost;   ///< Inner EAP configuration
 };

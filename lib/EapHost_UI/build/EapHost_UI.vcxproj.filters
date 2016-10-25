@@ -18,10 +18,10 @@
     <ClInclude Include="..\src\StdAfx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\EAPMsg_UI.h">
+    <ClInclude Include="..\include\EapHost_UI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\res\wxEAPMsg_UI.h">
+    <ClInclude Include="..\res\wxEapHost_UI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -29,15 +29,15 @@
     <ClCompile Include="..\src\StdAfx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\EAPMsg_UI.cpp">
+    <ClCompile Include="..\src\EapHost_UI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\res\wxEAPMsg_UI.cpp">
+    <ClCompile Include="..\res\wxEapHost_UI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\res\wxEAPMsg_UI.fbp">
+    <None Include="..\res\wxEapHost_UI.fbp">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

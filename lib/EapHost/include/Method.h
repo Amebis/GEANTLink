@@ -21,9 +21,9 @@
 namespace eap
 {
     ///
-    /// EAPMsg method
+    /// EapHost peer method
     ///
-    class method_eapmsg;
+    class method_eaphost;
 }
 
 
@@ -37,9 +37,9 @@ namespace eap
 
 namespace eap
 {
-    class method_eapmsg : public method_noneap
+    class method_eaphost : public method_noneap
     {
-        WINSTD_NONCOPYABLE(method_eapmsg)
+        WINSTD_NONCOPYABLE(method_eaphost)
 
     public:
         ///
@@ -49,14 +49,14 @@ namespace eap
         /// \param[in] cfg   Method configuration
         /// \param[in] cred  User credentials
         ///
-        method_eapmsg(_In_ module &module, _In_ config_method_eapmsg &cfg, _In_ credentials_eapmsg &cred);
+        method_eaphost(_In_ module &module, _In_ config_method_eaphost &cfg, _In_ credentials_eaphost &cred);
 
         ///
         /// Moves an EAP method
         ///
         /// \param[in] other  EAP method to move from
         ///
-        method_eapmsg(_Inout_ method_eapmsg &&other);
+        method_eaphost(_Inout_ method_eaphost &&other);
 
         ///
         /// Moves an EAP method
@@ -65,7 +65,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        method_eapmsg& operator=(_Inout_ method_eapmsg &&other);
+        method_eaphost& operator=(_Inout_ method_eaphost &&other);
 
         /// \name Packet processing
         /// @{

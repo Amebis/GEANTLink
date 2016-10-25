@@ -53,7 +53,7 @@ void eap::peer_ttls::initialize()
         MsiUseFeature(_T(PRODUCT_VERSION_GUID), _T("featEAPTTLS"));
 #endif
 
-    // Initialize EapHost for EAPMsg based inner authentication methods.
+    // Initialize EapHost based inner authentication methods.
     DWORD dwResult = EapHostPeerInitialize();
     if (dwResult != ERROR_SUCCESS)
         throw win_runtime_error(dwResult, __FUNCTION__ " EapHostPeerConfigBlob2Xml failed.");
@@ -62,7 +62,7 @@ void eap::peer_ttls::initialize()
 
 void eap::peer_ttls::shutdown()
 {
-    // Uninitialize EapHost. It was initialized for EAPMsg based inner authentication methods.
+    // Uninitialize EapHost. It was initialized for EapHost based inner authentication methods.
     EapHostPeerUninitialize();
 }
 

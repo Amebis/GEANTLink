@@ -278,8 +278,8 @@ void eap::peer_ttls_ui::invoke_identity_ui(
                         src_inner != eap::credentials::source_config && eap::config_method::status_cred_begin <= cfg_method->m_inner->m_last_status && cfg_method->m_inner->m_last_status < eap::config_method::status_cred_end)
                     {
                         // Prompt for inner credentials.
-                        auto cfg_inner_eapmsg = dynamic_cast<config_method_eapmsg*>(cfg_method->m_inner.get());
-                        if (!cfg_inner_eapmsg) {
+                        auto cfg_inner_eaphost = dynamic_cast<config_method_eaphost*>(cfg_method->m_inner.get());
+                        if (!cfg_inner_eaphost) {
                             // Native inner methods. Build dialog to prompt for inner credentials.
                             wxEAPCredentialsDialog dlg(*cfg_prov, &parent);
                             if (eap::config_method::status_cred_begin <= cfg_method->m_inner->m_last_status && cfg_method->m_inner->m_last_status < eap::config_method::status_cred_end)
@@ -316,17 +316,17 @@ void eap::peer_ttls_ui::invoke_identity_ui(
                             }
                         } else {
                             // EapHost inner method
-                            auto cred_inner = dynamic_cast<eap::credentials_eapmsg*>(cred->m_inner.get());
+                            auto cred_inner = dynamic_cast<eap::credentials_eaphost*>(cred->m_inner.get());
                             DWORD cred_data_size = 0;
                             winstd::eap_blob cred_data;
                             unique_ptr<WCHAR[], EapHostPeerFreeRuntimeMemory_delete> identity;
                             winstd::eap_error error;
                             DWORD dwResult = EapHostPeerInvokeIdentityUI(
                                 0,
-                                cfg_inner_eapmsg->m_type,
+                                cfg_inner_eaphost->m_type,
                                 dwFlags,
                                 hwndParent,
-                                (DWORD)cfg_inner_eapmsg->m_cfg_blob.size(), cfg_inner_eapmsg->m_cfg_blob.data(),
+                                (DWORD)cfg_inner_eaphost->m_cfg_blob.size(), cfg_inner_eaphost->m_cfg_blob.data(),
                                 (DWORD)cred_inner->m_cred_blob.size(), cred_inner->m_cred_blob.data(),
                                 &cred_data_size, &cred_data._Myptr,
                                 &identity._Myptr,

@@ -7,11 +7,11 @@
 
 #include <StdAfx.h>
 
-#include "wxEAPMsg_UI.h"
+#include "wxEapHost_UI.h"
 
 ///////////////////////////////////////////////////////////////////////////
 
-wxEAPMsgMethodConfigPanelBase::wxEAPMsgMethodConfigPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+wxEapHostMethodConfigPanelBase::wxEapHostMethodConfigPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
 	wxStaticBoxSizer* sb_method;
 	sb_method = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Inner EAP Method") ), wxVERTICAL );
@@ -54,14 +54,14 @@ wxEAPMsgMethodConfigPanelBase::wxEAPMsgMethodConfigPanelBase( wxWindow* parent, 
 	this->Layout();
 	
 	// Connect Events
-	this->Connect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( wxEAPMsgMethodConfigPanelBase::OnUpdateUI ) );
-	m_settings->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPMsgMethodConfigPanelBase::OnSettings ), NULL, this );
+	this->Connect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( wxEapHostMethodConfigPanelBase::OnUpdateUI ) );
+	m_settings->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEapHostMethodConfigPanelBase::OnSettings ), NULL, this );
 }
 
-wxEAPMsgMethodConfigPanelBase::~wxEAPMsgMethodConfigPanelBase()
+wxEapHostMethodConfigPanelBase::~wxEapHostMethodConfigPanelBase()
 {
 	// Disconnect Events
-	this->Disconnect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( wxEAPMsgMethodConfigPanelBase::OnUpdateUI ) );
-	m_settings->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEAPMsgMethodConfigPanelBase::OnSettings ), NULL, this );
+	this->Disconnect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( wxEapHostMethodConfigPanelBase::OnUpdateUI ) );
+	m_settings->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( wxEapHostMethodConfigPanelBase::OnSettings ), NULL, this );
 	
 }

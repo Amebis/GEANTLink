@@ -23,9 +23,9 @@
 namespace eap
 {
     ///
-    /// EAPMsg credentials
+    /// EapHost peer method credentials
     ///
-    class credentials_eapmsg;
+    class credentials_eaphost;
 }
 
 #pragma once
@@ -42,7 +42,7 @@ namespace eap
 
 namespace eap
 {
-    class credentials_eapmsg : public credentials
+    class credentials_eaphost : public credentials
     {
     public:
         ///
@@ -50,21 +50,21 @@ namespace eap
         ///
         /// \param[in] mod  EAP module to use for global services
         ///
-        credentials_eapmsg(_In_ module &mod);
+        credentials_eaphost(_In_ module &mod);
 
         ///
         /// Copies credentials
         ///
         /// \param[in] other  Credentials to copy from
         ///
-        credentials_eapmsg(_In_ const credentials_eapmsg &other);
+        credentials_eaphost(_In_ const credentials_eaphost &other);
 
         ///
         /// Moves credentials
         ///
         /// \param[in] other  Credentials to move from
         ///
-        credentials_eapmsg(_Inout_ credentials_eapmsg &&other);
+        credentials_eaphost(_Inout_ credentials_eaphost &&other);
 
         ///
         /// Copies credentials
@@ -73,7 +73,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        credentials_eapmsg& operator=(_In_ const credentials_eapmsg &other);
+        credentials_eaphost& operator=(_In_ const credentials_eaphost &other);
 
         ///
         /// Moves credentials
@@ -82,7 +82,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        credentials_eapmsg& operator=(_Inout_ credentials_eapmsg &&other);
+        credentials_eaphost& operator=(_Inout_ credentials_eaphost &&other);
 
         ///
         /// Clones credentials
@@ -191,8 +191,8 @@ namespace eap
         ///
         /// \param[in] dwFlags                A combination of [EAP flags](https://msdn.microsoft.com/en-us/library/windows/desktop/bb891975.aspx) that describe the EAP authentication session behavior
         /// \param[in] hTokenImpersonateUser  Impersonation token for a logged-on user to collect user-related information
-        /// \param[in] cred_cached            Cached credentials (optional, can be \c NULL, must be credentials_eapmsg* type)
-        /// \param[in] cfg                    Method configuration (unused, as must be as config_method_eapmsg is not derived from config_method_with_cred)
+        /// \param[in] cred_cached            Cached credentials (optional, can be \c NULL, must be credentials_eaphost* type)
+        /// \param[in] cfg                    Method configuration (unused, as must be as config_method_eaphost is not derived from config_method_with_cred)
         /// \param[in] pszTargetName          The name in Windows Credential Manager to retrieve credentials from (optional, can be \c NULL)
         ///
         /// \returns

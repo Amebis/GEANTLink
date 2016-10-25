@@ -33,8 +33,8 @@
 #include "../../MSCHAPv2/include/Method.h"
 #include "../../MSCHAPv2/include/MSCHAPv2.h"
 
-#include "../../EAPMsg/include/Config.h"
-#include "../../EAPMsg/include/Method.h"
+#include "../../EapHost/include/Config.h"
+#include "../../EapHost/include/Method.h"
 
 #include "../../EAPBase/include/EAPXML.h"
 

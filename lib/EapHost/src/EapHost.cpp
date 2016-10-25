@@ -22,27 +22,27 @@
 
 
 //////////////////////////////////////////////////////////////////////
-// eap::credentials_eapmsg
+// eap::credentials_eaphost
 //////////////////////////////////////////////////////////////////////
 
-eap::credentials_eapmsg::credentials_eapmsg(_In_ module &mod) : credentials_pass(mod)
+eap::credentials_eaphost::credentials_eaphost(_In_ module &mod) : credentials_pass(mod)
 {
 }
 
 
-eap::credentials_eapmsg::credentials_eapmsg(_In_ const credentials_eapmsg &other) :
+eap::credentials_eaphost::credentials_eaphost(_In_ const credentials_eaphost &other) :
     credentials_pass(other)
 {
 }
 
 
-eap::credentials_eapmsg::credentials_eapmsg(_Inout_ credentials_eapmsg &&other) :
+eap::credentials_eaphost::credentials_eaphost(_Inout_ credentials_eaphost &&other) :
     credentials_pass(std::move(other))
 {
 }
 
 
-eap::credentials_eapmsg& eap::credentials_eapmsg::operator=(_In_ const credentials_eapmsg &other)
+eap::credentials_eaphost& eap::credentials_eaphost::operator=(_In_ const credentials_eaphost &other)
 {
     if (this != &other)
         (credentials_pass&)*this = other;
@@ -51,7 +51,7 @@ eap::credentials_eapmsg& eap::credentials_eapmsg::operator=(_In_ const credentia
 }
 
 
-eap::credentials_eapmsg& eap::credentials_eapmsg::operator=(_Inout_ credentials_eapmsg &&other)
+eap::credentials_eaphost& eap::credentials_eaphost::operator=(_Inout_ credentials_eaphost &&other)
 {
     if (this != &other)
         (credentials_pass&&)*this = std::move(other);

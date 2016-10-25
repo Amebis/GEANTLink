@@ -97,7 +97,7 @@
     <ProjectReference Include="..\..\lib\EAPBase\build\EAPBase.vcxproj">
       <Project>{ad6816a0-9600-4e01-8c49-39d03d1e791f}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\lib\EAPMsg\build\EAPMsg.vcxproj">
+    <ProjectReference Include="..\..\lib\EapHost\build\EapHost.vcxproj">
       <Project>{b385ec2b-c3f4-48bb-9bac-8b996de7f754}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\lib\Events\build\Events.vcxproj">

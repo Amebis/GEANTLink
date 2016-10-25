@@ -22,7 +22,7 @@
 
 #define _CRT_SECURE_NO_WARNINGS // Prevent warnings from wxWidgets headers
 
-#include "../include/EAPMsg_UI.h"
+#include "../include/EapHost_UI.h"
 
 #include <WinStd/EAP.h>
 

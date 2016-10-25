@@ -19,7 +19,7 @@
 */
 
 #include "../../EAPBase_UI/include/EAP_UI.h"
-#include "../../EAPMsg/include/Config.h"
+#include "../../EapHost/include/Config.h"
 
 ///
 /// Helper class for auto-destroyable EAP_METHOD_TYPE used in wxWidget's item containers
@@ -29,21 +29,21 @@ class wxEAPMethodTypeClientData;
 ///
 /// Inner EAP method config panel
 ///
-class wxEAPMsgMethodConfigPanel;
+class wxEapHostMethodConfigPanel;
 
 ///
-/// EAPMsg credential configuration panel
+/// EapHost peer method credential configuration panel
 ///
-typedef wxEAPCredentialsConfigPanel<eap::credentials_pass, wxPasswordCredentialsPanel<eap::credentials_pass, wxPasswordCredentialsPanelBase> > wxEAPMsgCredentialsConfigPanel;
+typedef wxEAPCredentialsConfigPanel<eap::credentials_pass, wxPasswordCredentialsPanel<eap::credentials_pass, wxPasswordCredentialsPanelBase> > wxEapHostCredentialsConfigPanel;
 
 ///
-/// EAPMsg configuration panel
+/// EapHost peer method configuration panel
 ///
-class wxEAPMsgConfigPanel;
+class wxEapHostConfigPanel;
 
 #pragma once
 
-#include "../res/wxEAPMsg_UI.h"
+#include "../res/wxEapHost_UI.h"
 
 #include <wx/panel.h>
 #include <wx/stattext.h>
@@ -66,7 +66,7 @@ public:
 };
 
 
-class wxEAPMsgMethodConfigPanel : public wxEAPMsgMethodConfigPanelBase
+class wxEapHostMethodConfigPanel : public wxEapHostMethodConfigPanelBase
 {
 public:
     ///
@@ -76,7 +76,7 @@ public:
     /// \param[inout] cfg     Configuration data
     /// \param[in   ] parent  Parent window
     ///
-    wxEAPMsgMethodConfigPanel(const eap::config_provider &prov, eap::config_method_eapmsg &cfg, wxWindow *parent);
+    wxEapHostMethodConfigPanel(const eap::config_provider &prov, eap::config_method_eaphost &cfg, wxWindow *parent);
 
 protected:
     /// \cond internal
@@ -87,11 +87,11 @@ protected:
     /// \endcond
 
 protected:
-    eap::config_method_eapmsg &m_cfg;   ///< Method configuration
+    eap::config_method_eaphost &m_cfg;   ///< Method configuration
 };
 
 
-class wxEAPMsgConfigPanel : public wxPanel
+class wxEapHostConfigPanel : public wxPanel
 {
 public:
     ///
@@ -101,12 +101,12 @@ public:
     /// \param[inout] cfg     Configuration data
     /// \param[in   ] parent  Parent window
     ///
-    wxEAPMsgConfigPanel(const eap::config_provider &prov, eap::config_method_eapmsg &cfg, wxWindow* parent);
+    wxEapHostConfigPanel(const eap::config_provider &prov, eap::config_method_eaphost &cfg, wxWindow* parent);
 
     ///
     /// Destructs the configuration panel
     ///
-    virtual ~wxEAPMsgConfigPanel();
+    virtual ~wxEapHostConfigPanel();
 
 protected:
     /// \cond internal
@@ -114,5 +114,5 @@ protected:
     /// \endcond
 
 protected:
-    wxEAPMsgMethodConfigPanel *m_method; ///< Method configuration panel
+    wxEapHostMethodConfigPanel *m_method; ///< Method configuration panel
 };

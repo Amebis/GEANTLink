@@ -421,8 +421,8 @@ namespace eap
         ///
         /// \param[in] dwFlags                A combination of [EAP flags](https://msdn.microsoft.com/en-us/library/windows/desktop/bb891975.aspx) that describe the EAP authentication session behavior
         /// \param[in] hTokenImpersonateUser  Impersonation token for a logged-on user to collect user-related information
-        /// \param[in] cred_cached            Cached credentials (optional, can be \c NULL, must be credentials_eapmsg* type)
-        /// \param[in] cfg                    Method configuration (unused, as must be as config_method_eapmsg is not derived from config_method_with_cred)
+        /// \param[in] cred_cached            Cached credentials (optional, can be \c NULL, must be credentials_eaphost* type)
+        /// \param[in] cfg                    Method configuration (unused, as must be as config_method_eaphost is not derived from config_method_with_cred)
         /// \param[in] pszTargetName          The name in Windows Credential Manager to retrieve credentials from (optional, can be \c NULL)
         ///
         /// \returns

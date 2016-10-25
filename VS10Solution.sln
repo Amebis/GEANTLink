@@ -51,9 +51,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MSCHAPv2", "lib\MSCHAPv2\bu
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MSCHAPv2_UI", "lib\MSCHAPv2_UI\build\MSCHAPv2_UI.vcxproj", "{7AF5B922-7C17-428A-97E0-09E3B41A684D}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EAPMsg", "lib\EAPMsg\build\EAPMsg.vcxproj", "{B385EC2B-C3F4-48BB-9BAC-8B996DE7F754}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EapHost", "lib\EapHost\build\EapHost.vcxproj", "{B385EC2B-C3F4-48BB-9BAC-8B996DE7F754}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EAPMsg_UI", "lib\EAPMsg_UI\build\EAPMsg_UI.vcxproj", "{13D2D8B5-F6AA-459D-B5F7-29B95DD9D583}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EapHost_UI", "lib\EapHost_UI\build\EapHost_UI.vcxproj", "{13D2D8B5-F6AA-459D-B5F7-29B95DD9D583}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -64,10 +64,10 @@ void eap::method_ttls::begin_session(
     method_tls::begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
 
     // Initialize inner method.
-    auto  cfg_inner       = dynamic_cast<config_method_ttls  &>(m_cfg ).m_inner.get();
-    auto cred_inner       = dynamic_cast<credentials_ttls    &>(m_cred).m_inner.get();
-    auto cfg_inner_eapmsg = dynamic_cast<config_method_eapmsg*>(cfg_inner);
-    if (!cfg_inner_eapmsg) {
+    auto  cfg_inner        = dynamic_cast<config_method_ttls   &>(m_cfg ).m_inner.get();
+    auto cred_inner        = dynamic_cast<credentials_ttls     &>(m_cred).m_inner.get();
+    auto cfg_inner_eaphost = dynamic_cast<config_method_eaphost*>(cfg_inner);
+    if (!cfg_inner_eaphost) {
         // Native inner methods
         switch (cfg_inner->get_method_id()) {
         case eap_type_legacy_pap     : m_inner.reset(new method_pap     (m_module, dynamic_cast<config_method_pap     &>(*cfg_inner), dynamic_cast<credentials_pass&>(*cred_inner))); break;
@@ -76,7 +76,7 @@ void eap::method_ttls::begin_session(
         }
     } else {
         // EapHost inner method
-        m_inner.reset(new method_eapmsg(m_module, *cfg_inner_eapmsg, dynamic_cast<credentials_eapmsg&>(*cred_inner)));
+        m_inner.reset(new method_eaphost(m_module, *cfg_inner_eaphost, dynamic_cast<credentials_eaphost&>(*cred_inner)));
     }
     m_inner->begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, MAXDWORD);
 }

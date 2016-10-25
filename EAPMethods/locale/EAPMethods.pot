@@ -14,7 +14,7 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-KeywordsList: _\n"
 "X-Poedit-SearchPath-0: lib/EAPBase_UI\n"
-"X-Poedit-SearchPath-1: lib/EAPMsg_UI\n"
+"X-Poedit-SearchPath-1: lib/EapHost_UI\n"
 "X-Poedit-SearchPath-2: lib/MSCHAPv2_UI\n"
 "X-Poedit-SearchPath-3: lib/PAP_UI\n"
 "X-Poedit-SearchPath-4: lib/TLS_UI\n"
@@ -272,15 +272,15 @@ msgstr ""
 msgid "Please, make sure your credentials are correct, or try again later."
 msgstr ""
 
-#: lib/EAPMsg_UI/res/wxEAPMsg_UI.cpp:17
+#: lib/EapHost_UI/res/wxEapHost_UI.cpp:17
 msgid "Inner EAP Method"
 msgstr ""
 
-#: lib/EAPMsg_UI/res/wxEAPMsg_UI.cpp:28
+#: lib/EapHost_UI/res/wxEapHost_UI.cpp:28
 msgid "Select and configure inner EAP method"
 msgstr ""
 
-#: lib/EAPMsg_UI/res/wxEAPMsg_UI.cpp:40
+#: lib/EapHost_UI/res/wxEapHost_UI.cpp:40
 msgid "&Settings"
 msgstr ""
 

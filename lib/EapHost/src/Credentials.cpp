@@ -27,29 +27,29 @@ using namespace winstd;
 
 
 //////////////////////////////////////////////////////////////////////
-// eap::credentials_eapmsg
+// eap::credentials_eaphost
 //////////////////////////////////////////////////////////////////////
 
-eap::credentials_eapmsg::credentials_eapmsg(_In_ module &mod) : credentials(mod)
+eap::credentials_eaphost::credentials_eaphost(_In_ module &mod) : credentials(mod)
 {
 }
 
 
-eap::credentials_eapmsg::credentials_eapmsg(_In_ const credentials_eapmsg &other) :
+eap::credentials_eaphost::credentials_eaphost(_In_ const credentials_eaphost &other) :
     m_cred_blob(other.m_cred_blob),
     credentials(other            )
 {
 }
 
 
-eap::credentials_eapmsg::credentials_eapmsg(_Inout_ credentials_eapmsg &&other) :
+eap::credentials_eaphost::credentials_eaphost(_Inout_ credentials_eaphost &&other) :
     m_cred_blob(std::move(other.m_cred_blob)),
     credentials(std::move(other            ))
 {
 }
 
 
-eap::credentials_eapmsg& eap::credentials_eapmsg::operator=(_In_ const credentials_eapmsg &other)
+eap::credentials_eaphost& eap::credentials_eaphost::operator=(_In_ const credentials_eaphost &other)
 {
     if (this != &other) {
         (credentials&)*this = other;
@@ -60,7 +60,7 @@ eap::credentials_eapmsg& eap::credentials_eapmsg::operator=(_In_ const credentia
 }
 
 
-eap::credentials_eapmsg& eap::credentials_eapmsg::operator=(_Inout_ credentials_eapmsg &&other)
+eap::credentials_eaphost& eap::credentials_eaphost::operator=(_Inout_ credentials_eaphost &&other)
 {
     if (this != &other) {
         (credentials&)*this = std::move(other);
@@ -71,26 +71,26 @@ eap::credentials_eapmsg& eap::credentials_eapmsg::operator=(_Inout_ credentials_
 }
 
 
-eap::config* eap::credentials_eapmsg::clone() const
+eap::config* eap::credentials_eaphost::clone() const
 {
-    return new credentials_eapmsg(*this);
+    return new credentials_eaphost(*this);
 }
 
 
-void eap::credentials_eapmsg::clear()
+void eap::credentials_eaphost::clear()
 {
     credentials::clear();
     m_cred_blob.clear();
 }
 
 
-bool eap::credentials_eapmsg::empty() const
+bool eap::credentials_eaphost::empty() const
 {
     return m_cred_blob.empty();
 }
 
 
-void eap::credentials_eapmsg::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot) const
+void eap::credentials_eaphost::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot) const
 {
     assert(pDoc);
     assert(pConfigRoot);
@@ -105,7 +105,7 @@ void eap::credentials_eapmsg::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode 
 }
 
 
-void eap::credentials_eapmsg::load(_In_ IXMLDOMNode *pConfigRoot)
+void eap::credentials_eaphost::load(_In_ IXMLDOMNode *pConfigRoot)
 {
     assert(pConfigRoot);
     HRESULT hr;
@@ -123,14 +123,14 @@ void eap::credentials_eapmsg::load(_In_ IXMLDOMNode *pConfigRoot)
 }
 
 
-void eap::credentials_eapmsg::operator<<(_Inout_ cursor_out &cursor) const
+void eap::credentials_eaphost::operator<<(_Inout_ cursor_out &cursor) const
 {
     credentials::operator<<(cursor);
     cursor << m_cred_blob;
 }
 
 
-size_t eap::credentials_eapmsg::get_pk_size() const
+size_t eap::credentials_eaphost::get_pk_size() const
 {
     return
         credentials::get_pk_size() +
@@ -138,14 +138,14 @@ size_t eap::credentials_eapmsg::get_pk_size() const
 }
 
 
-void eap::credentials_eapmsg::operator>>(_Inout_ cursor_in &cursor)
+void eap::credentials_eaphost::operator>>(_Inout_ cursor_in &cursor)
 {
     credentials::operator>>(cursor);
     cursor >> m_cred_blob;
 }
 
 
-void eap::credentials_eapmsg::store(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int level) const
+void eap::credentials_eaphost::store(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int level) const
 {
     // TODO: Finish!
     UNREFERENCED_PARAMETER(pszTargetName);
@@ -186,7 +186,7 @@ void eap::credentials_eapmsg::store(_In_z_ LPCTSTR pszTargetName, _In_ unsigned 
 }
 
 
-void eap::credentials_eapmsg::retrieve(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int level)
+void eap::credentials_eaphost::retrieve(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int level)
 {
     // TODO: Finish!
     UNREFERENCED_PARAMETER(pszTargetName);
@@ -225,13 +225,13 @@ void eap::credentials_eapmsg::retrieve(_In_z_ LPCTSTR pszTargetName, _In_ unsign
 }
 
 
-LPCTSTR eap::credentials_eapmsg::target_suffix() const
+LPCTSTR eap::credentials_eaphost::target_suffix() const
 {
     return _T("BLOB");
 }
 
 
-std::wstring eap::credentials_eapmsg::get_identity() const
+std::wstring eap::credentials_eaphost::get_identity() const
 {
     if (!m_identity.empty()) {
         return m_identity;
@@ -244,7 +244,7 @@ std::wstring eap::credentials_eapmsg::get_identity() const
 }
 
 
-eap::credentials::source_t eap::credentials_eapmsg::combine(
+eap::credentials::source_t eap::credentials_eaphost::combine(
     _In_             DWORD         dwFlags,
     _In_             HANDLE        hTokenImpersonateUser,
     _In_opt_   const credentials   *cred_cached,
@@ -260,14 +260,14 @@ eap::credentials::source_t eap::credentials_eapmsg::combine(
 
     if (cred_cached) {
         // Using EAP service cached credentials.
-        *this = *(credentials_eapmsg*)cred_cached;
+        *this = *(credentials_eaphost*)cred_cached;
         m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CACHED2, event_data((unsigned int)cfg.get_method_id()), event_data(get_name()), event_data(pszTargetName), event_data::blank);
         src = source_cache;
     }
 
     //if (src == source_unknown && pszTargetName) {
     //    try {
-    //        credentials_eapmsg cred_loaded(m_module);
+    //        credentials_eaphost cred_loaded(m_module);
     //        cred_loaded.retrieve(pszTargetName, cfg.m_level);
 
     //        // Using stored credentials.
@@ -279,7 +279,7 @@ eap::credentials::source_t eap::credentials_eapmsg::combine(
     //    }
     //}
 
-    auto cfg_eapmsg = dynamic_cast<const config_method_eapmsg*>(&cfg);
+    auto cfg_eaphost = dynamic_cast<const config_method_eaphost*>(&cfg);
     BOOL fInvokeUI = FALSE;
     DWORD cred_data_size = 0;
     eap_blob_runtime cred_data;
@@ -288,8 +288,8 @@ eap::credentials::source_t eap::credentials_eapmsg::combine(
     DWORD dwResult = EapHostPeerGetIdentity(
         0,
         dwFlags,
-        cfg_eapmsg->m_type,
-        (DWORD)cfg_eapmsg->m_cfg_blob.size(), cfg_eapmsg->m_cfg_blob.data(),
+        cfg_eaphost->m_type,
+        (DWORD)cfg_eaphost->m_cfg_blob.size(), cfg_eaphost->m_cfg_blob.data(),
         src != source_unknown ? (DWORD)m_cred_blob.size() : 0, src != source_unknown ? m_cred_blob.data() : NULL,
         hTokenImpersonateUser,
         &fInvokeUI,
@@ -303,7 +303,7 @@ eap::credentials::source_t eap::credentials_eapmsg::combine(
             m_identity = identity.get();
             m_cred_blob.assign(cred_data.get(), cred_data.get() + cred_data_size);
             SecureZeroMemory(cred_data.get(), cred_data_size);
-            m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_EAPMSG, event_data((unsigned int)cfg.get_method_id()), event_data(get_name()), event_data(pszTargetName), event_data::blank);
+            m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_EAPHOST, event_data((unsigned int)cfg.get_method_id()), event_data(get_name()), event_data(pszTargetName), event_data::blank);
             return source_lower;
         } else
             SecureZeroMemory(cred_data.get(), cred_data_size);
@@ -319,7 +319,7 @@ eap::credentials::source_t eap::credentials_eapmsg::combine(
 }
 
 
-const unsigned char eap::credentials_eapmsg::s_entropy[1024] = {
+const unsigned char eap::credentials_eaphost::s_entropy[1024] = {
     0xe6, 0x01, 0x7b, 0x5f, 0xe5, 0x32, 0xee, 0x8c, 0x57, 0x41, 0x52, 0x95, 0xab, 0xe5, 0x65, 0xdd,
     0xb3, 0x12, 0x7c, 0xcb, 0xdb, 0x37, 0x03, 0x76, 0xfc, 0x53, 0x4a, 0xf9, 0x3f, 0xf1, 0xd8, 0x7e,
     0x60, 0x9a, 0x49, 0x93, 0xeb, 0x2e, 0x18, 0xd0, 0xfb, 0x40, 0xa9, 0x95, 0x66, 0x8a, 0xdd, 0x99,

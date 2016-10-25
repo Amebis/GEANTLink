@@ -98,7 +98,7 @@ void wxTTLSConfigPanel::OnUpdateUI(wxUpdateUIEvent& event)
 wxTTLSConfigWindow::wxTTLSConfigWindow(eap::config_provider &prov, eap::config_method &cfg, wxWindow* parent) :
     m_cfg_pap     (cfg.m_module, cfg.m_level + 1),
     m_cfg_mschapv2(cfg.m_module, cfg.m_level + 1),
-    m_cfg_eapmsg  (cfg.m_module, cfg.m_level + 1),
+    m_cfg_eaphost (cfg.m_module, cfg.m_level + 1),
     wxEAPConfigWindow(prov, cfg, parent)
 {
     wxBoxSizer* sb_content;
@@ -118,8 +118,8 @@ wxTTLSConfigWindow::wxTTLSConfigWindow(eap::config_provider &prov, eap::config_m
     m_inner_type->AddPage(panel_pap, _("PAP"));
     wxMSCHAPv2ConfigPanel *panel_mschapv2 = new wxMSCHAPv2ConfigPanel(m_prov, m_cfg_mschapv2, m_inner_type);
     m_inner_type->AddPage(panel_mschapv2, _("MSCHAPv2"));
-    wxEAPMsgConfigPanel *panel_eapmsg = new wxEAPMsgConfigPanel(m_prov, m_cfg_eapmsg, m_inner_type);
-    m_inner_type->AddPage(panel_eapmsg, _("EAP"));
+    wxEapHostConfigPanel *panel_eaphost = new wxEapHostConfigPanel(m_prov, m_cfg_eaphost, m_inner_type);
+    m_inner_type->AddPage(panel_eaphost, _("Other EAP methods..."));
     sb_content->Add(m_inner_type, 0, wxALL|wxEXPAND, 5);
 
     sb_content->Add(20, 20, 1, wxALL|wxEXPAND, 5);
@@ -163,8 +163,8 @@ bool wxTTLSConfigWindow::TransferDataToWindow()
 {
     auto &cfg_ttls = dynamic_cast<eap::config_method_ttls&>(m_cfg);
 
-    auto cfg_inner_eapmsg = dynamic_cast<eap::config_method_eapmsg*>(cfg_ttls.m_inner.get());
-    if (!cfg_inner_eapmsg) {
+    auto cfg_inner_eaphost = dynamic_cast<eap::config_method_eaphost*>(cfg_ttls.m_inner.get());
+    if (!cfg_inner_eaphost) {
         // Native inner methods
         switch (cfg_ttls.m_inner->get_method_id()) {
         case winstd::eap_type_legacy_pap:
@@ -182,8 +182,8 @@ bool wxTTLSConfigWindow::TransferDataToWindow()
         }
     } else {
         // EapHost inner method
-        m_cfg_eapmsg = *cfg_inner_eapmsg;
-        m_inner_type->SetSelection(2); // 2=EAP
+        m_cfg_eaphost = *cfg_inner_eaphost;
+        m_inner_type->SetSelection(2); // 2=EapHost
     }
 
     // Do not invoke inherited TransferDataToWindow(), as it will call others TransferDataToWindow().
@@ -209,8 +209,8 @@ bool wxTTLSConfigWindow::TransferDataFromWindow()
             cfg_ttls.m_inner.reset(new eap::config_method_mschapv2(m_cfg_mschapv2));
             break;
 
-        case 2: // 2=EAP
-            cfg_ttls.m_inner.reset(new eap::config_method_eapmsg(m_cfg_eapmsg));
+        case 2: // 2=EapHost
+            cfg_ttls.m_inner.reset(new eap::config_method_eaphost(m_cfg_eaphost));
             break;
 
         default:

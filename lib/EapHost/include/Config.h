@@ -23,9 +23,9 @@
 namespace eap
 {
     ///
-    /// EAPMsg configuration
+    /// EapHost peer method configuration
     ///
-    class config_method_eapmsg;
+    class config_method_eaphost;
 }
 
 #pragma once
@@ -39,7 +39,7 @@ namespace eap
 
 namespace eap
 {
-    class config_method_eapmsg : public config_method
+    class config_method_eaphost : public config_method
     {
     public:
         ///
@@ -48,21 +48,21 @@ namespace eap
         /// \param[in] mod    EAP module to use for global services
         /// \param[in] level  Config level (0=outer, 1=inner, 2=inner-inner...)
         ///
-        config_method_eapmsg(_In_ module &mod, _In_ unsigned int level);
+        config_method_eaphost(_In_ module &mod, _In_ unsigned int level);
 
         ///
         /// Copies configuration
         ///
         /// \param[in] other  Configuration to copy from
         ///
-        config_method_eapmsg(_In_ const config_method_eapmsg &other);
+        config_method_eaphost(_In_ const config_method_eaphost &other);
 
         ///
         /// Moves configuration
         ///
         /// \param[in] other  Configuration to move from
         ///
-        config_method_eapmsg(_Inout_ config_method_eapmsg &&other);
+        config_method_eaphost(_Inout_ config_method_eaphost &&other);
 
         ///
         /// Copies configuration
@@ -71,7 +71,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        config_method_eapmsg& operator=(_In_ const config_method_eapmsg &other);
+        config_method_eaphost& operator=(_In_ const config_method_eaphost &other);
 
         ///
         /// Moves configuration
@@ -80,7 +80,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        config_method_eapmsg& operator=(_Inout_ config_method_eapmsg &&other);
+        config_method_eaphost& operator=(_Inout_ config_method_eaphost &&other);
 
         ///
         /// Clones configuration

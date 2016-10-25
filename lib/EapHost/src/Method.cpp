@@ -25,24 +25,24 @@ using namespace winstd;
 
 
 //////////////////////////////////////////////////////////////////////
-// eap::method_eapmsg
+// eap::method_eaphost
 //////////////////////////////////////////////////////////////////////
 
-eap::method_eapmsg::method_eapmsg(_In_ module &module, _In_ config_method_eapmsg &cfg, _In_ credentials_eapmsg &cred) :
+eap::method_eaphost::method_eaphost(_In_ module &module, _In_ config_method_eaphost &cfg, _In_ credentials_eaphost &cred) :
     m_session_id(0),
     method_noneap(module, cfg, cred)
 {
 }
 
 
-eap::method_eapmsg::method_eapmsg(_Inout_ method_eapmsg &&other) :
+eap::method_eaphost::method_eaphost(_Inout_ method_eaphost &&other) :
     m_session_id (std::move(other.m_session_id)),
     method_noneap(std::move(other             ))
 {
 }
 
 
-eap::method_eapmsg& eap::method_eapmsg::operator=(_Inout_ method_eapmsg &&other)
+eap::method_eaphost& eap::method_eaphost::operator=(_Inout_ method_eaphost &&other)
 {
     if (this != std::addressof(other)) {
         (method_noneap&)*this = std::move(other             );
@@ -53,15 +53,15 @@ eap::method_eapmsg& eap::method_eapmsg::operator=(_Inout_ method_eapmsg &&other)
 }
 
 
-void eap::method_eapmsg::begin_session(
+void eap::method_eaphost::begin_session(
     _In_        DWORD         dwFlags,
     _In_  const EapAttributes *pAttributeArray,
     _In_        HANDLE        hTokenImpersonateUser,
     _In_opt_    DWORD         dwMaxSendPacketSize)
 {
     // Create EapHost peer session using available connection data (m_cfg) and user data (m_cred).
-    auto &cfg  = dynamic_cast<config_method_eapmsg&>(m_cfg);
-    auto &cred = dynamic_cast<credentials_eapmsg  &>(m_cred);
+    auto &cfg  = dynamic_cast<config_method_eaphost&>(m_cfg);
+    auto &cred = dynamic_cast<credentials_eaphost  &>(m_cred);
     eap_error_runtime error;
     DWORD dwResult = EapHostPeerBeginSession(
         dwFlags,
@@ -88,7 +88,7 @@ void eap::method_eapmsg::begin_session(
 }
 
 
-void eap::method_eapmsg::end_session()
+void eap::method_eaphost::end_session()
 {
     // End EapHost peer session.
     eap_error_runtime error;
@@ -102,7 +102,7 @@ void eap::method_eapmsg::end_session()
 }
 
 
-void eap::method_eapmsg::process_request_packet(
+void eap::method_eaphost::process_request_packet(
     _In_bytecount_(dwReceivedPacketSize) const void                *pReceivedPacket,
     _In_                                       DWORD               dwReceivedPacketSize,
     _Out_                                      EapPeerMethodOutput *pEapOutput)
@@ -131,7 +131,7 @@ void eap::method_eapmsg::process_request_packet(
 }
 
 
-void eap::method_eapmsg::get_response_packet(
+void eap::method_eaphost::get_response_packet(
     _Inout_bytecap_(*dwSendPacketSize) void  *pSendPacket,
     _Inout_                            DWORD *pdwSendPacketSize)
 {
@@ -157,7 +157,7 @@ void eap::method_eapmsg::get_response_packet(
 }
 
 
-void eap::method_eapmsg::get_result(
+void eap::method_eaphost::get_result(
     _In_    EapPeerMethodResultReason reason,
     _Inout_ EapPeerMethodResult       *pResult)
 {
@@ -180,10 +180,10 @@ void eap::method_eapmsg::get_result(
             pResult->pEapError           = result.pEapError;
 
             if (result.fSaveConnectionData)
-                dynamic_cast<config_method_eapmsg&>(m_cfg).m_cfg_blob.assign(result.pConnectionData, result.pConnectionData + result.dwSizeofConnectionData);
+                dynamic_cast<config_method_eaphost&>(m_cfg).m_cfg_blob.assign(result.pConnectionData, result.pConnectionData + result.dwSizeofConnectionData);
 
             if (result.fSaveUserData)
-                dynamic_cast<credentials_eapmsg  &>(m_cred).m_cred_blob.assign(result.pUserData, result.pUserData + result.dwSizeofUserData);
+                dynamic_cast<credentials_eaphost  &>(m_cred).m_cred_blob.assign(result.pUserData, result.pUserData + result.dwSizeofUserData);
         } else if (error)
             throw eap_runtime_error(*error  , __FUNCTION__ " EapHostPeerGetResult failed.");
         else
@@ -192,7 +192,7 @@ void eap::method_eapmsg::get_result(
 }
 
 
-void eap::method_eapmsg::get_ui_context(
+void eap::method_eaphost::get_ui_context(
     _Inout_ BYTE  **ppUIContextData,
     _Inout_ DWORD *pdwUIContextDataSize)
 {
@@ -212,7 +212,7 @@ void eap::method_eapmsg::get_ui_context(
 }
 
 
-void eap::method_eapmsg::set_ui_context(
+void eap::method_eaphost::set_ui_context(
     _In_count_(dwUIContextDataSize) const BYTE                *pUIContextData,
     _In_                                  DWORD               dwUIContextDataSize,
     _Out_                                 EapPeerMethodOutput *pEapOutput)
@@ -238,7 +238,7 @@ void eap::method_eapmsg::set_ui_context(
 }
 
 
-void eap::method_eapmsg::get_response_attributes(_Inout_ EapAttributes *pAttribs)
+void eap::method_eaphost::get_response_attributes(_Inout_ EapAttributes *pAttribs)
 {
     // Get response attributes from EapHost peer.
     eap_error_runtime error;
@@ -255,7 +255,7 @@ void eap::method_eapmsg::get_response_attributes(_Inout_ EapAttributes *pAttribs
 }
 
 
-void eap::method_eapmsg::set_response_attributes(
+void eap::method_eaphost::set_response_attributes(
     _In_ const EapAttributes       *pAttribs,
     _Out_      EapPeerMethodOutput *pEapOutput)
 {

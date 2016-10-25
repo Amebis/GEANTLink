@@ -25,11 +25,11 @@
 #include "../include/Module.h"
 #include "../include/TTLS_UI.h"
 
-#include "../../EAPMsg_UI/include/EAPMsg_UI.h"
+#include "../../EapHost_UI/include/EapHost_UI.h"
 #include "../../PAP_UI/include/PAP_UI.h"
 #include "../../MSCHAPv2_UI/include/MSCHAPv2_UI.h"
 
-#include "../../EAPMsg/include/Credentials.h"
+#include "../../EapHost/include/Credentials.h"
 
 #include <wxex/common.h>
 

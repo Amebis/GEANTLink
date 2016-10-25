@@ -24,7 +24,7 @@
 
 
 //////////////////////////////////////////////////////////////////////
-// wxEAPMsgMethodConfigPanel
+// wxEapHostMethodConfigPanel
 //////////////////////////////////////////////////////////////////////
 
 wxEAPMethodTypeClientData::wxEAPMethodTypeClientData(const EAP_METHOD_TYPE &type, DWORD properties) :
@@ -35,12 +35,12 @@ wxEAPMethodTypeClientData::wxEAPMethodTypeClientData(const EAP_METHOD_TYPE &type
 
 
 //////////////////////////////////////////////////////////////////////
-// wxEAPMsgMethodConfigPanel
+// wxEapHostMethodConfigPanel
 //////////////////////////////////////////////////////////////////////
 
-wxEAPMsgMethodConfigPanel::wxEAPMsgMethodConfigPanel(const eap::config_provider &prov, eap::config_method_eapmsg &cfg, wxWindow *parent) :
+wxEapHostMethodConfigPanel::wxEapHostMethodConfigPanel(const eap::config_provider &prov, eap::config_method_eaphost &cfg, wxWindow *parent) :
     m_cfg(cfg),
-    wxEAPMsgMethodConfigPanelBase(parent)
+    wxEapHostMethodConfigPanelBase(parent)
 {
     UNREFERENCED_PARAMETER(prov);
 
@@ -62,7 +62,7 @@ wxEAPMsgMethodConfigPanel::wxEAPMsgMethodConfigPanel(const eap::config_provider 
 }
 
 
-bool wxEAPMsgMethodConfigPanel::TransferDataToWindow()
+bool wxEapHostMethodConfigPanel::TransferDataToWindow()
 {
     if (m_method->HasClientObjectData()) {
         // Find configured method and set its selection and configuration BLOB.
@@ -75,13 +75,13 @@ bool wxEAPMsgMethodConfigPanel::TransferDataToWindow()
         }
     }
 
-    return wxEAPMsgMethodConfigPanelBase::TransferDataToWindow();
+    return wxEapHostMethodConfigPanelBase::TransferDataToWindow();
 }
 
 
-bool wxEAPMsgMethodConfigPanel::TransferDataFromWindow()
+bool wxEapHostMethodConfigPanel::TransferDataFromWindow()
 {
-    wxCHECK(wxEAPMsgMethodConfigPanelBase::TransferDataFromWindow(), false);
+    wxCHECK(wxEapHostMethodConfigPanelBase::TransferDataFromWindow(), false);
 
     int sel = m_method->GetSelection();
     const wxEAPMethodTypeClientData *data =
@@ -98,9 +98,9 @@ bool wxEAPMsgMethodConfigPanel::TransferDataFromWindow()
 }
 
 
-void wxEAPMsgMethodConfigPanel::OnUpdateUI(wxUpdateUIEvent& event)
+void wxEapHostMethodConfigPanel::OnUpdateUI(wxUpdateUIEvent& event)
 {
-    wxEAPMsgMethodConfigPanelBase::OnUpdateUI(event);
+    wxEapHostMethodConfigPanelBase::OnUpdateUI(event);
 
     int sel = m_method->GetSelection();
     const wxEAPMethodTypeClientData *data =
@@ -111,9 +111,9 @@ void wxEAPMsgMethodConfigPanel::OnUpdateUI(wxUpdateUIEvent& event)
 }
 
 
-void wxEAPMsgMethodConfigPanel::OnSettings(wxCommandEvent& event)
+void wxEapHostMethodConfigPanel::OnSettings(wxCommandEvent& event)
 {
-    wxEAPMsgMethodConfigPanelBase::OnSettings(event);
+    wxEapHostMethodConfigPanelBase::OnSettings(event);
 
     int sel = m_method->GetSelection();
     wxEAPMethodTypeClientData *data =
@@ -139,33 +139,33 @@ void wxEAPMsgMethodConfigPanel::OnSettings(wxCommandEvent& event)
 
 
 //////////////////////////////////////////////////////////////////////
-// wxEAPMsgConfigPanel
+// wxEapHostConfigPanel
 //////////////////////////////////////////////////////////////////////
 
-wxEAPMsgConfigPanel::wxEAPMsgConfigPanel(const eap::config_provider &prov, eap::config_method_eapmsg &cfg, wxWindow* parent) : wxPanel(parent)
+wxEapHostConfigPanel::wxEapHostConfigPanel(const eap::config_provider &prov, eap::config_method_eaphost &cfg, wxWindow* parent) : wxPanel(parent)
 {
     wxBoxSizer* sb_content;
     sb_content = new wxBoxSizer( wxVERTICAL );
 
-    m_method = new wxEAPMsgMethodConfigPanel(prov, cfg, this);
+    m_method = new wxEapHostMethodConfigPanel(prov, cfg, this);
     sb_content->Add(m_method, 0, wxEXPAND, 5);
 
     this->SetSizer(sb_content);
     this->Layout();
 
     // Connect Events
-    this->Connect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(wxEAPMsgConfigPanel::OnInitDialog));
+    this->Connect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(wxEapHostConfigPanel::OnInitDialog));
 }
 
 
-wxEAPMsgConfigPanel::~wxEAPMsgConfigPanel()
+wxEapHostConfigPanel::~wxEapHostConfigPanel()
 {
     // Disconnect Events
-    this->Disconnect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(wxEAPMsgConfigPanel::OnInitDialog));
+    this->Disconnect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(wxEapHostConfigPanel::OnInitDialog));
 }
 
 
-void wxEAPMsgConfigPanel::OnInitDialog(wxInitDialogEvent& event)
+void wxEapHostConfigPanel::OnInitDialog(wxInitDialogEvent& event)
 {
     // Forward the event to child panels.
     if (m_method)

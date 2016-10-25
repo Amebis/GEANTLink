@@ -5,8 +5,8 @@
 // PLEASE DO "NOT" EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
-#ifndef __WXEAPMSG_UI_H__
-#define __WXEAPMSG_UI_H__
+#ifndef __WXEAPHOST_UI_H__
+#define __WXEAPHOST_UI_H__
 
 #include <wx/artprov.h>
 #include <wx/xrc/xmlres.h>
@@ -30,9 +30,9 @@
 ///////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class wxEAPMsgMethodConfigPanelBase
+/// Class wxEapHostMethodConfigPanelBase
 ///////////////////////////////////////////////////////////////////////////////
-class wxEAPMsgMethodConfigPanelBase : public wxPanel 
+class wxEapHostMethodConfigPanelBase : public wxPanel 
 {
 	private:
 	
@@ -49,9 +49,9 @@ class wxEAPMsgMethodConfigPanelBase : public wxPanel
 	
 	public:
 		
-		wxEAPMsgMethodConfigPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL ); 
-		~wxEAPMsgMethodConfigPanelBase();
+		wxEapHostMethodConfigPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL ); 
+		~wxEapHostMethodConfigPanelBase();
 	
 };
 
-#endif //__WXEAPMSG_UI_H__
+#endif //__WXEAPHOST_UI_H__

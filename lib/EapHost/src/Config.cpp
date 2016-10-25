@@ -25,16 +25,16 @@ using namespace winstd;
 
 
 //////////////////////////////////////////////////////////////////////
-// eap::config_method_eapmsg
+// eap::config_method_eaphost
 //////////////////////////////////////////////////////////////////////
 
-eap::config_method_eapmsg::config_method_eapmsg(_In_ module &mod, _In_ unsigned int level) : config_method(mod, level)
+eap::config_method_eaphost::config_method_eaphost(_In_ module &mod, _In_ unsigned int level) : config_method(mod, level)
 {
     memset(&m_type, 0, sizeof(EAP_METHOD_TYPE));
 }
 
 
-eap::config_method_eapmsg::config_method_eapmsg(_In_ const config_method_eapmsg &other) :
+eap::config_method_eaphost::config_method_eaphost(_In_ const config_method_eaphost &other) :
     m_type       (other.m_type    ),
     m_cfg_blob   (other.m_cfg_blob),
     config_method(other           )
@@ -42,7 +42,7 @@ eap::config_method_eapmsg::config_method_eapmsg(_In_ const config_method_eapmsg 
 }
 
 
-eap::config_method_eapmsg::config_method_eapmsg(_Inout_ config_method_eapmsg &&other) :
+eap::config_method_eaphost::config_method_eaphost(_Inout_ config_method_eaphost &&other) :
     m_type       (std::move(other.m_type    )),
     m_cfg_blob   (std::move(other.m_cfg_blob)),
     config_method(std::move(other           ))
@@ -50,7 +50,7 @@ eap::config_method_eapmsg::config_method_eapmsg(_Inout_ config_method_eapmsg &&o
 }
 
 
-eap::config_method_eapmsg& eap::config_method_eapmsg::operator=(_In_ const config_method_eapmsg &other)
+eap::config_method_eaphost& eap::config_method_eaphost::operator=(_In_ const config_method_eaphost &other)
 {
     if (this != &other) {
         (config_method&)*this = other;
@@ -62,7 +62,7 @@ eap::config_method_eapmsg& eap::config_method_eapmsg::operator=(_In_ const confi
 }
 
 
-eap::config_method_eapmsg& eap::config_method_eapmsg::operator=(_Inout_ config_method_eapmsg &&other)
+eap::config_method_eaphost& eap::config_method_eaphost::operator=(_Inout_ config_method_eaphost &&other)
 {
     if (this != &other) {
         (config_method&&)*this = std::move(other           );
@@ -74,13 +74,13 @@ eap::config_method_eapmsg& eap::config_method_eapmsg::operator=(_Inout_ config_m
 }
 
 
-eap::config* eap::config_method_eapmsg::clone() const
+eap::config* eap::config_method_eaphost::clone() const
 {
-    return new config_method_eapmsg(*this);
+    return new config_method_eaphost(*this);
 }
 
 
-void eap::config_method_eapmsg::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot) const
+void eap::config_method_eaphost::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot) const
 {
     assert(pDoc);
     assert(pConfigRoot);
@@ -108,7 +108,7 @@ void eap::config_method_eapmsg::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNod
 }
 
 
-void eap::config_method_eapmsg::load(_In_ IXMLDOMNode *pConfigRoot)
+void eap::config_method_eaphost::load(_In_ IXMLDOMNode *pConfigRoot)
 {
     assert(pConfigRoot);
 
@@ -133,7 +133,7 @@ void eap::config_method_eapmsg::load(_In_ IXMLDOMNode *pConfigRoot)
 }
 
 
-void eap::config_method_eapmsg::operator<<(_Inout_ cursor_out &cursor) const
+void eap::config_method_eaphost::operator<<(_Inout_ cursor_out &cursor) const
 {
     config_method::operator<<(cursor);
     cursor << m_type    ;
@@ -141,7 +141,7 @@ void eap::config_method_eapmsg::operator<<(_Inout_ cursor_out &cursor) const
 }
 
 
-size_t eap::config_method_eapmsg::get_pk_size() const
+size_t eap::config_method_eaphost::get_pk_size() const
 {
     return
         config_method::get_pk_size() +
@@ -150,7 +150,7 @@ size_t eap::config_method_eapmsg::get_pk_size() const
 }
 
 
-void eap::config_method_eapmsg::operator>>(_Inout_ cursor_in &cursor)
+void eap::config_method_eaphost::operator>>(_Inout_ cursor_in &cursor)
 {
     config_method::operator>>(cursor);
     cursor >> m_type    ;
@@ -158,20 +158,20 @@ void eap::config_method_eapmsg::operator>>(_Inout_ cursor_in &cursor)
 }
 
 
-eap_type_t eap::config_method_eapmsg::get_method_id() const
+eap_type_t eap::config_method_eaphost::get_method_id() const
 {
     return (eap_type_t)m_type.eapType.type;
 }
 
 
-const wchar_t* eap::config_method_eapmsg::get_method_str() const
+const wchar_t* eap::config_method_eaphost::get_method_str() const
 {
     // TODO: Query registry for EAP method name (PeerFriendlyName using RegLoadMUIString()).
-    return L"EAPMsg";
+    return L"EapHost";
 }
 
 
-eap::credentials* eap::config_method_eapmsg::make_credentials() const
+eap::credentials* eap::config_method_eaphost::make_credentials() const
 {
-    return new credentials_eapmsg(m_module);
+    return new credentials_eaphost(m_module);
 }
