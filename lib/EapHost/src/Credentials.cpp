@@ -288,7 +288,7 @@ eap::credentials::source_t eap::credentials_eaphost::combine(
     DWORD dwResult = EapHostPeerGetIdentity(
         0,
         dwFlags,
-        cfg_eaphost->m_type,
+        cfg_eaphost->get_type(),
         (DWORD)cfg_eaphost->m_cfg_blob.size(), cfg_eaphost->m_cfg_blob.data(),
         src != source_unknown ? (DWORD)m_cred_blob.size() : 0, src != source_unknown ? m_cred_blob.data() : NULL,
         hTokenImpersonateUser,

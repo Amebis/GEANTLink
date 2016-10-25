@@ -28,7 +28,9 @@ using namespace winstd;
 // eap::config_method_eaphost
 //////////////////////////////////////////////////////////////////////
 
-eap::config_method_eaphost::config_method_eaphost(_In_ module &mod, _In_ unsigned int level) : config_method(mod, level)
+eap::config_method_eaphost::config_method_eaphost(_In_ module &mod, _In_ unsigned int level) :
+    config_method(mod, level),
+    m_type_str(L"EapHost")
 {
     memset(&m_type, 0, sizeof(EAP_METHOD_TYPE));
 }
@@ -36,6 +38,7 @@ eap::config_method_eaphost::config_method_eaphost(_In_ module &mod, _In_ unsigne
 
 eap::config_method_eaphost::config_method_eaphost(_In_ const config_method_eaphost &other) :
     m_type       (other.m_type    ),
+    m_type_str   (other.m_type_str),
     m_cfg_blob   (other.m_cfg_blob),
     config_method(other           )
 {
@@ -44,6 +47,7 @@ eap::config_method_eaphost::config_method_eaphost(_In_ const config_method_eapho
 
 eap::config_method_eaphost::config_method_eaphost(_Inout_ config_method_eaphost &&other) :
     m_type       (std::move(other.m_type    )),
+    m_type_str   (std::move(other.m_type_str)),
     m_cfg_blob   (std::move(other.m_cfg_blob)),
     config_method(std::move(other           ))
 {
@@ -55,6 +59,7 @@ eap::config_method_eaphost& eap::config_method_eaphost::operator=(_In_ const con
     if (this != &other) {
         (config_method&)*this = other;
         m_type                = other.m_type;
+        m_type_str            = other.m_type_str;
         m_cfg_blob            = other.m_cfg_blob;
     }
 
@@ -67,6 +72,7 @@ eap::config_method_eaphost& eap::config_method_eaphost::operator=(_Inout_ config
     if (this != &other) {
         (config_method&&)*this = std::move(other           );
         m_type                 = std::move(other.m_type    );
+        m_type_str             = std::move(other.m_type_str);
         m_cfg_blob             = std::move(other.m_cfg_blob);
     }
 
@@ -123,12 +129,13 @@ void eap::config_method_eaphost::load(_In_ IXMLDOMNode *pConfigRoot)
         eap_error error;
         DWORD dwResult = EapHostPeerConfigXml2Blob(0, pXmlElEapHostConfig, &cfg_data_size, &cfg_data._Myptr, &m_type, &error._Myptr);
         if (dwResult == ERROR_SUCCESS) {
+            update_type();
             const BYTE *_cfg_data = cfg_data.get();
             m_cfg_blob.assign(_cfg_data, _cfg_data + cfg_data_size);
         } else if (error)
-            throw eap_runtime_error(*error  , __FUNCTION__ " EapHostPeerConfigBlob2Xml failed.");
+            throw eap_runtime_error(*error  , __FUNCTION__ " EapHostPeerConfigXml2Blob failed.");
         else
-            throw win_runtime_error(dwResult, __FUNCTION__ " EapHostPeerConfigBlob2Xml failed.");
+            throw win_runtime_error(dwResult, __FUNCTION__ " EapHostPeerConfigXml2Blob failed.");
     }
 }
 
@@ -153,7 +160,7 @@ size_t eap::config_method_eaphost::get_pk_size() const
 void eap::config_method_eaphost::operator>>(_Inout_ cursor_in &cursor)
 {
     config_method::operator>>(cursor);
-    cursor >> m_type    ;
+    cursor >> m_type    ; update_type();
     cursor >> m_cfg_blob;
 }
 
@@ -166,12 +173,37 @@ eap_type_t eap::config_method_eaphost::get_method_id() const
 
 const wchar_t* eap::config_method_eaphost::get_method_str() const
 {
-    // TODO: Query registry for EAP method name (PeerFriendlyName using RegLoadMUIString()).
-    return L"EapHost";
+    return m_type_str.c_str();
 }
 
 
 eap::credentials* eap::config_method_eaphost::make_credentials() const
 {
     return new credentials_eaphost(m_module);
+}
+
+
+void eap::config_method_eaphost::update_type()
+{
+    // Query registry for EAP method name and save it to m_type_str.
+    // get_method_str() can return pointer to static string only, therefore we need to have the method name ready in advance.
+    reg_key key;
+    if (key.open(HKEY_LOCAL_MACHINE,
+            m_type.dwAuthorId   == 0   ? tstring_printf(_T("SYSTEM\\CurrentControlSet\\services\\RasMan\\PPP\\EAP\\%u"            ),                    m_type.eapType.type                                                        ).c_str() : // Legacy EAP method (RasMan)
+            m_type.eapType.type == 254 ? tstring_printf(_T("SYSTEM\\CurrentControlSet\\services\\EapHost\\Methods\\%u\\%u\\%u\\%u"), m_type.dwAuthorId, m_type.eapType.type, m_type.eapType.dwVendorId, m_type.eapType.dwVendorType).c_str() : // EapHost Expanded Type Peer
+                                         tstring_printf(_T("SYSTEM\\CurrentControlSet\\services\\EapHost\\Methods\\%u\\%u"        ), m_type.dwAuthorId, m_type.eapType.type                                                        ).c_str(),  // EapHost Peer
+            0,
+            KEY_READ) &&
+        RegLoadMUIStringW(key,
+            m_type.dwAuthorId == 0 ? L"FriendlyName" :
+                                     L"PeerFriendlyName",
+            m_type_str,
+            0,
+            NULL) == ERROR_SUCCESS)
+        return;
+
+    // Query failed. Provide generic name.
+         if (m_type.dwAuthorId   == 0  ) sprintf(m_type_str, L"RasMan-%u"          ,                    m_type.eapType.type                                                        );
+    else if (m_type.eapType.type == 254) sprintf(m_type_str, L"EapHost-%u-%u-%u-%u", m_type.dwAuthorId, m_type.eapType.type, m_type.eapType.dwVendorId, m_type.eapType.dwVendorType);
+    else                                 sprintf(m_type_str, L"EapHost-%u-%u"      , m_type.dwAuthorId, m_type.eapType.type                                                        );
 }

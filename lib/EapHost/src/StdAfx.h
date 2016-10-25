@@ -24,6 +24,8 @@
 #include "../include/Credentials.h"
 #include "../include/Method.h"
 
+#include <WinStd/Win.h>
+
 #include <Windows.h>
 #include <EapHostError.h> // include after Windows.h
 #include <EapHostPeerTypes.h>

@@ -323,7 +323,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
                             winstd::eap_error error;
                             DWORD dwResult = EapHostPeerInvokeIdentityUI(
                                 0,
-                                cfg_inner_eaphost->m_type,
+                                cfg_inner_eaphost->get_type(),
                                 dwFlags,
                                 hwndParent,
                                 (DWORD)cfg_inner_eaphost->m_cfg_blob.size(), cfg_inner_eaphost->m_cfg_blob.data(),

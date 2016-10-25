@@ -68,7 +68,7 @@ bool wxEapHostMethodConfigPanel::TransferDataToWindow()
         // Find configured method and set its selection and configuration BLOB.
         for (unsigned int i = 0, n = m_method->GetCount(); i < n; i++) {
             wxEAPMethodTypeClientData *data = dynamic_cast<wxEAPMethodTypeClientData*>(m_method->GetClientObject(i));
-            if (data->m_type == m_cfg.m_type) {
+            if (data->m_type == m_cfg.get_type()) {
                 m_method->SetSelection(i);
                 data->m_cfg_blob = m_cfg.m_cfg_blob;
             }
@@ -90,7 +90,7 @@ bool wxEapHostMethodConfigPanel::TransferDataFromWindow()
             NULL;
     if (data) {
         // Save method selection and configuration.
-        m_cfg.m_type     = data->m_type;
+        m_cfg.set_type(data->m_type);
         m_cfg.m_cfg_blob = data->m_cfg_blob;
     }
 

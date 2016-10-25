@@ -65,7 +65,7 @@ void eap::method_eaphost::begin_session(
     eap_error_runtime error;
     DWORD dwResult = EapHostPeerBeginSession(
         dwFlags,
-        cfg.m_type,
+        cfg.get_type(),
         pAttributeArray,
         hTokenImpersonateUser,
         (DWORD)cfg.m_cfg_blob.size(),
