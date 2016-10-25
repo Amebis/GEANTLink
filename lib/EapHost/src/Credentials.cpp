@@ -146,81 +146,69 @@ void eap::credentials_eaphost::operator>>(_Inout_ cursor_in &cursor)
 
 void eap::credentials_eaphost::store(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int level) const
 {
-    // TODO: Finish!
-    UNREFERENCED_PARAMETER(pszTargetName);
-    UNREFERENCED_PARAMETER(level);
+    assert(pszTargetName);
 
-    //assert(pszTargetName);
+    data_blob cred_enc;
+    if (!m_cred_blob.empty()) {
+        // Encrypt credentials BLOB using user's key.
+        DATA_BLOB cred_blob    = { (DWORD)m_cred_blob.size(), const_cast<LPBYTE>(m_cred_blob.data()) };
+        DATA_BLOB entropy_blob = {        sizeof(s_entropy) , const_cast<LPBYTE>(s_entropy)          };
+        if (!CryptProtectData(&cred_blob, NULL, &entropy_blob, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN, &cred_enc))
+            throw win_runtime_error(__FUNCTION__ " CryptProtectData failed.");
+    }
 
-    //data_blob cred_enc;
-    //if (m_cred_blob) {
-    //    // Encrypt the certificate using user's key.
-    //    DATA_BLOB cred_blob    = { m_cred_blob->cbCertEncoded,         m_cred_blob->pbCertEncoded };
-    //    DATA_BLOB entropy_blob = { sizeof(s_entropy)    , (LPBYTE)s_entropy             };
-    //    if (!CryptProtectData(&cred_blob, NULL, &entropy_blob, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN, &cred_enc))
-    //        throw win_runtime_error(__FUNCTION__ " CryptProtectData failed.");
-    //}
+    tstring target(target_name(pszTargetName, level));
 
-    //tstring target(target_name(pszTargetName, level));
-
-    //// Write credentials.
-    //assert(cred_enc.cbData     < CRED_MAX_CREDENTIAL_BLOB_SIZE);
-    //assert(m_identity.length() < CRED_MAX_USERNAME_LENGTH     );
-    //CREDENTIAL cred = {
-    //    0,                          // Flags
-    //    CRED_TYPE_GENERIC,          // Type
-    //    (LPTSTR)target.c_str(),     // TargetName
-    //    _T(""),                     // Comment
-    //    { 0, 0 },                   // LastWritten
-    //    cred_enc.cbData,            // CredentialBlobSize
-    //    cred_enc.pbData,            // CredentialBlob
-    //    CRED_PERSIST_ENTERPRISE,    // Persist
-    //    0,                          // AttributeCount
-    //    NULL,                       // Attributes
-    //    NULL,                       // TargetAlias
-    //    (LPTSTR)m_identity.c_str()  // UserName
-    //};
-    //if (!CredWrite(&cred, 0))
-    //    throw win_runtime_error(__FUNCTION__ " CredWrite failed.");
+    // Write credentials.
+    assert(cred_enc.cbData     < CRED_MAX_CREDENTIAL_BLOB_SIZE);
+    assert(m_identity.length() < CRED_MAX_USERNAME_LENGTH     );
+    CREDENTIAL cred = {
+        0,                                     // Flags
+        CRED_TYPE_GENERIC,                     // Type
+        const_cast<LPTSTR>(target.c_str()),    // TargetName
+        _T(""),                                // Comment
+        { 0, 0 },                              // LastWritten
+        cred_enc.cbData,                       // CredentialBlobSize
+        cred_enc.pbData,                       // CredentialBlob
+        CRED_PERSIST_ENTERPRISE,               // Persist
+        0,                                     // AttributeCount
+        NULL,                                  // Attributes
+        NULL,                                  // TargetAlias
+        const_cast<LPTSTR>(m_identity.c_str()) // UserName
+    };
+    if (!CredWrite(&cred, 0))
+        throw win_runtime_error(__FUNCTION__ " CredWrite failed.");
 }
 
 
 void eap::credentials_eaphost::retrieve(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int level)
 {
-    // TODO: Finish!
-    UNREFERENCED_PARAMETER(pszTargetName);
-    UNREFERENCED_PARAMETER(level);
+    // Read credentials.
+    unique_ptr<CREDENTIAL, CredFree_delete<CREDENTIAL> > cred;
+    if (!CredRead(target_name(pszTargetName, level).c_str(), CRED_TYPE_GENERIC, 0, (PCREDENTIAL*)&cred))
+        throw win_runtime_error(__FUNCTION__ " CredRead failed.");
 
-    //assert(pszTargetName);
+    if (cred->CredentialBlobSize) {
+        // Decrypt the credentials BLOB using user's key.
+        DATA_BLOB cred_enc     = { cred->CredentialBlobSize, cred->CredentialBlob          };
+        DATA_BLOB entropy_blob = { sizeof(s_entropy)       , const_cast<LPBYTE>(s_entropy) };
+        data_blob cred_int;
+        if (!CryptUnprotectData(&cred_enc, NULL, &entropy_blob, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN | CRYPTPROTECT_VERIFY_PROTECTION, &cred_int))
+            throw win_runtime_error(__FUNCTION__ " CryptUnprotectData failed.");
 
-    //// Read credentials.
-    //unique_ptr<CREDENTIAL, CredFree_delete<CREDENTIAL> > cred;
-    //if (!CredRead(target_name(pszTargetName, level).c_str(), CRED_TYPE_GENERIC, 0, (PCREDENTIAL*)&cred))
-    //    throw win_runtime_error(__FUNCTION__ " CredRead failed.");
+        m_cred_blob.assign(cred_int.pbData, cred_int.pbData + cred_int.cbData);
+        SecureZeroMemory(cred_int.pbData, cred_int.cbData);
+    } else
+        m_cred_blob.clear();
 
-    //if (cred->CredentialBlobSize) {
-    //    // Decrypt the certificate using user's key.
-    //    DATA_BLOB cred_enc     = { cred->CredentialBlobSize, cred->CredentialBlob };
-    //    DATA_BLOB entropy_blob = { sizeof(s_entropy)       , (LPBYTE)s_entropy    };
-    //    data_blob cred_int;
-    //    if (!CryptUnprotectData(&cred_enc, NULL, &entropy_blob, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN | CRYPTPROTECT_VERIFY_PROTECTION, &cred_int))
-    //        throw win_runtime_error(__FUNCTION__ " CryptUnprotectData failed.");
+    if (cred->UserName)
+        m_identity = cred->UserName;
+    else
+        m_identity.clear();
 
-    //    bool bResult = m_cred_blob.create(X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, cred_int.pbData, cred_int.cbData);
-    //    SecureZeroMemory(cred_int.pbData, cred_int.cbData);
-    //    if (!bResult)
-    //        throw win_runtime_error(__FUNCTION__ " Error loading certificate.");
-    //} else
-    //    m_cred_blob.free();
-
-    //if (cred->UserName)
-    //    m_identity = cred->UserName;
-    //else
-    //    m_identity.clear();
-
-    //wstring xpath(pszTargetName);
-    //m_module.log_config((xpath + L"/Identity").c_str(), m_identity.c_str());
-    //m_module.log_config((xpath + L"/Certificate").c_str(), get_name().c_str());
+    wstring xpath(pszTargetName);
+    m_module.log_config((xpath + L"/Identity").c_str(), m_identity.c_str());
+    m_module.log_config_discrete((xpath + L"/Credentials").c_str(), m_cred_blob.data(), (ULONG)m_cred_blob.size());
 }
 
 
