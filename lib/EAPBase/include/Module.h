@@ -147,7 +147,12 @@ namespace eap
         ///
         inline void log_config(_In_z_ LPCWSTR name, _In_z_ LPCWSTR value) const
         {
-            m_ep.write(&EAPMETHOD_TRACE_EVT_CFG_VALUE_UNICODE_STRING, winstd::event_data(name), winstd::event_data(value), winstd::event_data::blank);
+            EVENT_DATA_DESCRIPTOR desc[] = {
+                winstd::event_data(name ),
+                winstd::event_data(value)
+            };
+
+            m_ep.write(&EAPMETHOD_TRACE_EVT_CFG_VALUE_UNICODE_STRING, _countof(desc), desc);
         }
 
         ///
@@ -191,7 +196,12 @@ namespace eap
         ///
         inline void log_config(_In_z_ LPCWSTR name, _In_ bool value) const
         {
-            m_ep.write(&EAPMETHOD_TRACE_EVT_CFG_VALUE_BOOL, winstd::event_data(name), winstd::event_data((int)value), winstd::event_data::blank);
+            EVENT_DATA_DESCRIPTOR desc[] = {
+                winstd::event_data(     name ),
+                winstd::event_data((int)value)
+            };
+
+            m_ep.write(&EAPMETHOD_TRACE_EVT_CFG_VALUE_BOOL, _countof(desc), desc);
         }
 
         ///
