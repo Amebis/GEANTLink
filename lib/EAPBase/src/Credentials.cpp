@@ -319,13 +319,7 @@ void eap::credentials_pass::load(_In_ IXMLDOMNode *pConfigRoot)
         SecureZeroMemory((BSTR)password, sizeof(OLECHAR)*password.length());
     }
 
-    m_module.log_config((xpath + L"/Password").c_str(),
-#ifdef _DEBUG
-        m_password.c_str()
-#else
-        L"********"
-#endif
-        );
+    m_module.log_config_discrete((xpath + L"/Password").c_str(), m_password.c_str());
 }
 
 
@@ -420,13 +414,7 @@ void eap::credentials_pass::retrieve(_In_z_ LPCTSTR pszTargetName, _In_ unsigned
 
     wstring xpath(pszTargetName);
     m_module.log_config((xpath + L"/Identity").c_str(), m_identity.c_str());
-    m_module.log_config((xpath + L"/Password").c_str(),
-#ifdef _DEBUG
-        m_password.c_str()
-#else
-        L"********"
-#endif
-        );
+    m_module.log_config_discrete((xpath + L"/Password").c_str(), m_password.c_str());
 }
 
 

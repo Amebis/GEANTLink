@@ -24,6 +24,7 @@
 #include "../include/Credentials.h"
 #include "../include/Method.h"
 
+#include <WinStd/Cred.h>
 #include <WinStd/Win.h>
 
 #include <Windows.h>

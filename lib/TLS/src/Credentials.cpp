@@ -140,7 +140,11 @@ void eap::credentials_tls::load(_In_ IXMLDOMNode *pConfigRoot)
                 m_cert.create(X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, aData.data(), (DWORD)aData.size());
         }
     }
-    m_module.log_config((xpath + L"/ClientCertificate").c_str(), get_name().c_str());
+
+    if (m_cert)
+        m_module.log_config_discrete((xpath + L"/ClientCertificate").c_str(), m_cert->pbCertEncoded, m_cert->cbCertEncoded);
+    else
+        m_module.log_config_discrete((xpath + L"/ClientCertificate").c_str(), NULL, 0);
 }
 
 
@@ -234,7 +238,10 @@ void eap::credentials_tls::retrieve(_In_z_ LPCTSTR pszTargetName, _In_ unsigned 
 
     wstring xpath(pszTargetName);
     m_module.log_config((xpath + L"/Identity").c_str(), m_identity.c_str());
-    m_module.log_config((xpath + L"/Certificate").c_str(), get_name().c_str());
+    if (m_cert)
+        m_module.log_config_discrete((xpath + L"/Certificate").c_str(), m_cert->pbCertEncoded, m_cert->cbCertEncoded);
+    else
+        m_module.log_config_discrete((xpath + L"/Certificate").c_str(), NULL, 0);
 }
 
 

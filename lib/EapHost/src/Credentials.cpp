@@ -118,8 +118,7 @@ void eap::credentials_eaphost::load(_In_ IXMLDOMNode *pConfigRoot)
     if (FAILED(hr = eapxml::get_element_base64(pConfigRoot, bstr(L"eap-metadata:Credentials"), m_cred_blob)))
         throw com_runtime_error(hr, __FUNCTION__ " Error reading <Credentials> element.");
 
-    // TODO: Finish log output!
-    //m_module.log_config((xpath + L"/Credentials").c_str(), get_name().c_str());
+    m_module.log_config_discrete((xpath + L"/Credentials").c_str(), m_cred_blob.data(), (ULONG)m_cred_blob.size());
 }
 
 

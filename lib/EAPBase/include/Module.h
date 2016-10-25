@@ -159,7 +159,7 @@ namespace eap
         /// Logs string list config value
         ///
         template<class _Traits, class _Ax, class _Ax_list>
-        inline void log_config(_In_z_ LPCWSTR name, _In_z_ const std::list<std::basic_string<char, _Traits, _Ax>, _Ax_list> &value) const
+        inline void log_config(_In_z_ LPCWSTR name, _In_ const std::list<std::basic_string<char, _Traits, _Ax>, _Ax_list> &value) const
         {
             // Prepare a table of event data descriptors.
             std::vector<EVENT_DATA_DESCRIPTOR> desc;
@@ -177,7 +177,7 @@ namespace eap
         /// Logs Unicode string list config value
         ///
         template<class _Traits, class _Ax, class _Ax_list>
-        inline void log_config(_In_z_ LPCWSTR name, _In_z_ const std::list<std::basic_string<wchar_t, _Traits, _Ax>, _Ax_list> &value) const
+        inline void log_config(_In_z_ LPCWSTR name, _In_ const std::list<std::basic_string<wchar_t, _Traits, _Ax>, _Ax_list> &value) const
         {
             // Prepare a table of event data descriptors.
             std::vector<EVENT_DATA_DESCRIPTOR> desc;
@@ -202,6 +202,48 @@ namespace eap
             };
 
             m_ep.write(&EAPMETHOD_TRACE_EVT_CFG_VALUE_BOOL, _countof(desc), desc);
+        }
+
+        ///
+        /// Logs binary config value
+        ///
+        inline void log_config(_In_z_ LPCWSTR name, _In_bytecount_(size) const void *data, _In_ ULONG size) const
+        {
+            EVENT_DATA_DESCRIPTOR desc[] = {
+                winstd::event_data(      name),
+                winstd::event_data(      size),
+                winstd::event_data(data, size)
+            };
+
+            m_ep.write(&EAPMETHOD_TRACE_EVT_CFG_VALUE_BINARY, _countof(desc), desc);
+        }
+
+        ///
+        /// Discretely logs Unicode string config value
+        ///
+        /// If \c _DEBUG is set the value is masked.
+        ///
+        inline void log_config_discrete(_In_z_ LPCWSTR name, _In_z_ LPCWSTR value) const
+        {
+#ifdef _DEBUG
+            log_config(name, value);
+#else
+            log_config(name, value ? value[0] ? L"********" : L"" : NULL);
+#endif
+        }
+
+        ///
+        /// Discretely logs binary config value
+        ///
+        /// If \c _DEBUG is set the value is masked.
+        ///
+        inline void log_config_discrete(_In_z_ LPCWSTR name, _In_bytecount_(size) const void *data, _In_ ULONG size) const
+        {
+#ifdef _DEBUG
+            log_config(name, data, size);
+#else
+            log_config(name, data ? size ? L"********" : L"" : NULL);
+#endif
         }
 
         ///
