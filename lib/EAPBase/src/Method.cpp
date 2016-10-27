@@ -198,7 +198,11 @@ void eap::method_noneap::get_response_packet(
 }
 
 
-void eap::method_noneap::append_avp(_In_ unsigned int code, _In_ unsigned char flags, _In_bytecount_(size) const void *data, _In_ unsigned int size)
+void eap::method_noneap::append_avp(
+    _In_                       unsigned int  code,
+    _In_                       unsigned char flags,
+    _In_bytecount_(size) const void          *data,
+    _In_                       unsigned int  size)
 {
     unsigned int
         padding = (unsigned int)((4 - size) % 4),
@@ -224,7 +228,12 @@ void eap::method_noneap::append_avp(_In_ unsigned int code, _In_ unsigned char f
 }
 
 
-void eap::method_noneap::append_avp(_In_ unsigned int code, _In_ unsigned int vendor_id, _In_ unsigned char flags, _In_bytecount_(size) const void *data, _In_ unsigned int size)
+void eap::method_noneap::append_avp(
+    _In_                       unsigned int  code,
+    _In_                       unsigned int  vendor_id,
+    _In_                       unsigned char flags,
+    _In_bytecount_(size) const void          *data,
+    _In_                       unsigned int  size)
 {
     unsigned int
         padding = (unsigned int)((4 - size) % 4),

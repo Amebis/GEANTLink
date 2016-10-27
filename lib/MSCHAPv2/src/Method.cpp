@@ -101,13 +101,13 @@ EapPeerMethodResponseAction eap::method_mschapv2::process_request_packet(
         sanitizing_string identity_utf8;
         WideCharToMultiByte(CP_UTF8, 0, m_cred.m_identity.c_str(), (int)m_cred.m_identity.length(), identity_utf8, NULL, NULL);
 
-        // Randomize Peer-Challenge
+        // Randomize Peer-Challenge.
         m_challenge_client.randomize(m_cp);
 
-        // Calculate NT-Response
+        // Calculate NT-Response.
         m_nt_resp = nt_response(m_cp, m_challenge_server, m_challenge_client, identity_utf8.c_str(), m_cred.m_password.c_str());
 
-        // Prepare MS-CHAP2-Response
+        // Prepare MS-CHAP2-Response.
         sanitizing_blob response;
         response.reserve(
             1                          + // Ident

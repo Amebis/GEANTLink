@@ -189,7 +189,7 @@ namespace eap
 
     public:
         ///
-        /// Constructs an EAP method
+        /// Constructs a non-EAP method
         ///
         /// \param[in] mod   EAP module to use for global services
         /// \param[in] cfg   Method configuration
@@ -198,14 +198,14 @@ namespace eap
         method_noneap(_In_ module &module, _In_ config_method &cfg, _In_ credentials &cred);
 
         ///
-        /// Moves an EAP method
+        /// Moves a non-EAP method
         ///
         /// \param[in] other  EAP method to move from
         ///
         method_noneap(_Inout_ method_noneap &&other);
 
         ///
-        /// Moves an EAP method
+        /// Moves a non-EAP method
         ///
         /// \param[in] other  EAP method to move from
         ///
@@ -217,7 +217,7 @@ namespace eap
         /// @{
 
         ///
-        /// Obtains a response packet from the EAP method.
+        /// Obtains a response packet from the non-EAP method.
         ///
         /// \sa [EapPeerGetResponsePacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363610.aspx)
         ///
@@ -236,7 +236,11 @@ namespace eap
         /// \param[in] data     AVP data (<16777212B)
         /// \param[in] size     Size of \p data in bytes
         ///
-        void append_avp(_In_ unsigned int code, _In_ unsigned char flags, _In_bytecount_(size) const void *data, _In_ unsigned int size);
+        void append_avp(
+            _In_                       unsigned int  code,
+            _In_                       unsigned char flags,
+            _In_bytecount_(size) const void          *data,
+            _In_                       unsigned int  size);
 
         ///
         /// Appends Diameter AVP to response packet
@@ -247,7 +251,12 @@ namespace eap
         /// \param[in] data       AVP data (<16777212B)
         /// \param[in] size       Size of \p data in bytes
         ///
-        void append_avp(_In_ unsigned int code, _In_ unsigned int vendor_id, _In_ unsigned char flags, _In_bytecount_(size) const void *data, _In_ unsigned int size);
+        void append_avp(
+            _In_                       unsigned int  code,
+            _In_                       unsigned int  vendor_id,
+            _In_                       unsigned char flags,
+            _In_bytecount_(size) const void          *data,
+            _In_                       unsigned int  size);
 
     protected:
         sanitizing_blob m_packet_res;   ///< Response packet
