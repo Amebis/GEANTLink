@@ -246,13 +246,11 @@ void eap::method_tls::begin_session(
 }
 
 
-void eap::method_tls::process_request_packet(
-    _In_bytecount_(dwReceivedPacketSize) const void                *pReceivedPacket,
-    _In_                                       DWORD               dwReceivedPacketSize,
-    _Out_                                      EapPeerMethodOutput *pEapOutput)
+EapPeerMethodResponseAction eap::method_tls::process_request_packet(
+    _In_bytecount_(dwReceivedPacketSize) const void  *pReceivedPacket,
+    _In_                                       DWORD dwReceivedPacketSize)
 {
     assert(pReceivedPacket && dwReceivedPacketSize >= 4);
-    assert(pEapOutput);
 
     // Is this a valid EAP-TLS packet?
     if (dwReceivedPacketSize < 6)
@@ -265,9 +263,7 @@ void eap::method_tls::process_request_packet(
         m_packet_res.m_id    = ((const EapPacket*)pReceivedPacket)->Id;
         m_packet_res.m_flags = 0;
         m_packet_res.m_data.clear();
-        pEapOutput->fAllowNotifications = FALSE;
-        pEapOutput->action = EapPeerMethodResponseActionSend;
-        return;
+        return EapPeerMethodResponseActionSend;
     }
 
     if (m_packet_res.m_flags & packet_tls::flags_res_more_frag) {
@@ -275,9 +271,7 @@ void eap::method_tls::process_request_packet(
         if (m_packet_req.is_ack(m_packet_res.m_id)) {
             // This is the ACK of our fragmented message packet. Send the next fragment.
             m_packet_res.m_id++;
-            pEapOutput->fAllowNotifications = FALSE;
-            pEapOutput->action = EapPeerMethodResponseActionSend;
-            return;
+            return EapPeerMethodResponseActionSend;
         } else
             throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, string_printf(__FUNCTION__ " ACK expected, received %u-%u-%x.", m_packet_req.m_code, m_packet_req.m_id, m_packet_req.m_flags));
     }
@@ -286,6 +280,7 @@ void eap::method_tls::process_request_packet(
     m_packet_res.m_id    = m_packet_req.m_id;
     m_packet_res.m_flags = 0;
 
+    EapPeerMethodResponseAction action = EapPeerMethodResponseActionNone;
     user_impersonator impersonating(m_user_ctx);
 
 #if EAP_TLS < EAP_TLS_SCHANNEL
@@ -325,6 +320,7 @@ void eap::method_tls::process_request_packet(
         m_packet_res.m_data.insert(m_packet_res.m_data.end(), msg_client_hello.begin(), msg_client_hello.end());
 
         m_phase = phase_server_hello;
+        action = EapPeerMethodResponseActionSend;
         break;
     }
 
@@ -427,12 +423,14 @@ void eap::method_tls::process_request_packet(
             // Go to application data phase. And allow piggybacking of the first data message.
             m_phase = phase_application_data;
             m_session_resumed = true;
-            process_application_data(NULL, 0);
+            action = process_application_data(NULL, 0);
         } else {
             m_session_resumed = false;
             m_phase = phase_change_cipher_spec;
             m_cfg.m_last_status = config_method::status_cred_invalid; // Blame credentials if we fail beyond this point.
+            action = EapPeerMethodResponseActionSend;
         }
+
         break;
     }
 
@@ -440,13 +438,20 @@ void eap::method_tls::process_request_packet(
         // Wait in this phase until server sends change cipher spec and finish.
         if (m_state_server.m_alg_encrypt && m_handshake[tls_handshake_type_finished]) {
             m_phase = phase_application_data;
-            process_application_data(NULL, 0);
+            action = process_application_data(NULL, 0);
+        } else {
+            // Ignore content of the message and keep replying with ACK packet until change cipher spec is delivered.
+            action = EapPeerMethodResponseActionSend;
         }
         break;
 
     case phase_application_data:
         if (m_handshake[tls_handshake_type_hello_request])
             m_phase = phase_client_hello;
+        break;
+
+    default:
+        throw invalid_argument(string_printf(__FUNCTION__ " Unknown phase (phase %u).", m_phase).c_str());
     }
 #else
     if (((const EapPacket*)pReceivedPacket)->Code == EapCodeRequest && (m_packet_req.m_flags & packet_tls::flags_req_start)) {
@@ -462,20 +467,21 @@ void eap::method_tls::process_request_packet(
     switch (m_phase) {
     case phase_handshake_init:
     case phase_handshake_cont:
-        process_handshake();
+        action = process_handshake();
         break;
 
     case phase_application_data:
-        process_application_data();
+        action = process_application_data();
         break;
+
+    default:
+        throw invalid_argument(string_printf(__FUNCTION__ " Unknown phase (phase %u).", m_phase).c_str());
     }
 #endif
 
-    pEapOutput->fAllowNotifications = TRUE;
-    pEapOutput->action = EapPeerMethodResponseActionSend;
-
     // EAP-Request packet was processed. Clear its data since we use the absence of data to detect first of fragmented message packages.
     m_packet_req.m_data.clear();
+    return action;
 }
 
 
@@ -1105,7 +1111,7 @@ void eap::method_tls::process_handshake(_In_bytecount_(size_msg) const void *_ms
 
 #else
 
-void eap::method_tls::process_handshake()
+EapPeerMethodResponseAction eap::method_tls::process_handshake()
 {
     // Prepare input buffer(s).
     SecBuffer buf_in[] = {
@@ -1193,32 +1199,35 @@ void eap::method_tls::process_handshake()
             derive_challenge();
 
             m_phase = phase_application_data;
-            process_application_data(m_sc_queue.data(), m_sc_queue.size());
+            return process_application_data(m_sc_queue.data(), m_sc_queue.size());
         } else {
             m_phase = phase_handshake_cont;
             m_cfg.m_last_status = config_method::status_cred_invalid; // Blame credentials if we fail beyond this point.
+            return EapPeerMethodResponseActionSend;
         }
     } else if (status == SEC_E_INCOMPLETE_MESSAGE) {
         // Schannel neeeds more data. Send ACK packet to server to send more.
+        return EapPeerMethodResponseActionSend;
     } else if (FAILED(status)) {
         if (m_sc_ctx.m_attrib & ISC_RET_EXTENDED_ERROR) {
-            // Send alert via EAP. Not that EAP will transmit it once we throw this is an error...
+            // Send alert.
             assert(buf_out[1].BufferType == SECBUFFER_ALERT);
             assert(m_sc_ctx.m_attrib & ISC_RET_ALLOCATED_MEMORY);
             m_packet_res.m_data.assign(reinterpret_cast<const unsigned char*>(buf_out[1].pvBuffer), reinterpret_cast<const unsigned char*>(buf_out[1].pvBuffer) + buf_out[1].cbBuffer);
-        }
-
-        throw sec_runtime_error(status, __FUNCTION__ " Schannel error.");
+            return EapPeerMethodResponseActionSend;
+        } else
+            throw sec_runtime_error(status, __FUNCTION__ " Schannel error.");
     }
+
+    return EapPeerMethodResponseActionNone;
 }
 
 
-void eap::method_tls::process_application_data()
+EapPeerMethodResponseAction eap::method_tls::process_application_data()
 {
     if (m_sc_queue.empty()) {
         // An ACK packet received. Nothing to unencrypt.
-        process_application_data(NULL, 0);
-        return;
+        return process_application_data(NULL, 0);
     }
 
     if (!(m_sc_ctx.m_attrib & ISC_RET_CONFIDENTIALITY))
@@ -1244,10 +1253,18 @@ void eap::method_tls::process_application_data()
     // Decrypt the message.
     SECURITY_STATUS status = DecryptMessage(m_sc_ctx, &buf_desc, 0, NULL);
     if (status == SEC_E_OK) {
+        EapPeerMethodResponseAction action = EapPeerMethodResponseActionNone;
+
         // Find SECBUFFER_DATA buffer(s) and process data.
         for (size_t i = 0; i < _countof(buf); i++)
-            if (buf[i].BufferType == SECBUFFER_DATA)
-                process_application_data(buf[i].pvBuffer, buf[i].cbBuffer);
+            if (buf[i].BufferType == SECBUFFER_DATA) {
+                action = process_application_data(buf[i].pvBuffer, buf[i].cbBuffer);
+                if (action == EapPeerMethodResponseActionDiscard) {
+                    // Request is to be discarded as a whole.
+                    m_sc_queue.clear();
+                    return EapPeerMethodResponseActionDiscard;
+                }
+            }
 
         // Find SECBUFFER_EXTRA buffer(s) and queue data for the next time.
         std::vector<unsigned char> extra;
@@ -1255,28 +1272,37 @@ void eap::method_tls::process_application_data()
             if (buf[i].BufferType == SECBUFFER_EXTRA)
                 extra.insert(extra.end(), reinterpret_cast<const unsigned char*>(buf[i].pvBuffer), reinterpret_cast<const unsigned char*>(buf[i].pvBuffer) + buf[i].cbBuffer);
         m_sc_queue = std::move(extra);
+
+        return action;
     } else if (status == SEC_E_INCOMPLETE_MESSAGE) {
         // Schannel neeeds more data. Send ACK packet to server to send more.
+        return EapPeerMethodResponseActionSend;
     } else if (status == SEC_I_CONTEXT_EXPIRED) {
         // Server initiated connection shutdown.
         m_sc_queue.clear();
         m_phase = phase_shutdown;
+        return EapPeerMethodResponseActionNone;
     } else if (status == SEC_I_RENEGOTIATE) {
         // Re-negotiation required.
         m_sc_queue.clear();
         m_phase = phase_handshake_init;
         process_handshake();
+        return EapPeerMethodResponseActionSend;
     } else if (FAILED(status))
         throw sec_runtime_error(status, __FUNCTION__ " Schannel error.");
+
+    return EapPeerMethodResponseActionNone;
 }
 
 #endif
 
 
-void eap::method_tls::process_application_data(_In_bytecount_(size_msg) const void *msg, _In_ size_t size_msg)
+EapPeerMethodResponseAction eap::method_tls::process_application_data(_In_bytecount_(size_msg) const void *msg, _In_ size_t size_msg)
 {
     UNREFERENCED_PARAMETER(msg);
     UNREFERENCED_PARAMETER(size_msg);
+
+    return EapPeerMethodResponseActionNone;
 }
 
 

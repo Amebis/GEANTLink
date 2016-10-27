@@ -89,10 +89,9 @@ void eap::method_ttls::end_session()
 }
 
 
-void eap::method_ttls::process_request_packet(
-    _In_bytecount_(dwReceivedPacketSize) const void                *pReceivedPacket,
-    _In_                                       DWORD               dwReceivedPacketSize,
-    _Out_                                      EapPeerMethodOutput *pEapOutput)
+EapPeerMethodResponseAction eap::method_ttls::process_request_packet(
+    _In_bytecount_(dwReceivedPacketSize) const void  *pReceivedPacket,
+    _In_                                       DWORD dwReceivedPacketSize)
 {
     if (((const EapPacket*)pReceivedPacket)->Code == EapCodeRequest && (((const EapPacket*)pReceivedPacket)->Data[1] & packet_ttls::flags_start)) {
         // This is a start EAP-TTLS packet.
@@ -104,7 +103,7 @@ void eap::method_ttls::process_request_packet(
     }
 
     // Do the TLS.
-    method_tls::process_request_packet(pReceivedPacket, dwReceivedPacketSize, pEapOutput);
+    return method_tls::process_request_packet(pReceivedPacket, dwReceivedPacketSize);
 }
 
 
@@ -155,14 +154,12 @@ void eap::method_ttls::get_ui_context(
 }
 
 
-void eap::method_ttls::set_ui_context(
-    _In_count_(dwUIContextDataSize) const BYTE                *pUIContextData,
-    _In_                                  DWORD               dwUIContextDataSize,
-    _Out_                                 EapPeerMethodOutput *pEapOutput)
+EapPeerMethodResponseAction eap::method_ttls::set_ui_context(
+    _In_count_(dwUIContextDataSize) const BYTE  *pUIContextData,
+    _In_                                  DWORD dwUIContextDataSize)
 {
     UNREFERENCED_PARAMETER(pUIContextData);
     UNREFERENCED_PARAMETER(dwUIContextDataSize);
-    UNREFERENCED_PARAMETER(pEapOutput);
 
     throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Not supported.");
 }
@@ -176,12 +173,9 @@ void eap::method_ttls::get_response_attributes(_Inout_ EapAttributes *pAttribs)
 }
 
 
-void eap::method_ttls::set_response_attributes(
-    _In_ const EapAttributes       *pAttribs,
-    _Out_      EapPeerMethodOutput *pEapOutput)
+EapPeerMethodResponseAction eap::method_ttls::set_response_attributes(_In_ const EapAttributes *pAttribs)
 {
     UNREFERENCED_PARAMETER(pAttribs);
-    UNREFERENCED_PARAMETER(pEapOutput);
 
     throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Not supported.");
 }
@@ -273,7 +267,7 @@ void eap::method_ttls::derive_challenge()
 }
 
 
-void eap::method_ttls::process_application_data(_In_bytecount_(size_msg) const void *msg, _In_ size_t size_msg)
+EapPeerMethodResponseAction eap::method_ttls::process_application_data(_In_bytecount_(size_msg) const void *msg, _In_ size_t size_msg)
 {
     // Prepare inner authentication.
 #if EAP_TLS < EAP_TLS_SCHANNEL
@@ -282,7 +276,7 @@ void eap::method_ttls::process_application_data(_In_bytecount_(size_msg) const v
 
     if (m_session_resumed) {
         // On reconnect we do not need to do inner re-authentication.
-        return;
+        return EapPeerMethodResponseActionNone;
     }
 #else
     if (!(m_sc_ctx.m_attrib & ISC_RET_CONFIDENTIALITY))
@@ -292,13 +286,12 @@ void eap::method_ttls::process_application_data(_In_bytecount_(size_msg) const v
     if (SUCCEEDED(QueryContextAttributes(m_sc_ctx, SECPKG_ATTR_SESSION_INFO, &session_info)) && (session_info.dwFlags & SSL_SESSION_RECONNECT)) {
         // On reconnect we do not need to do inner re-authentication.
         // According to MSDN QueryContextAttributes(SECPKG_ATTR_SESSION_INFO) works from Windows 7 on. Therefore behaviour might vary.
-        return;
+        return EapPeerMethodResponseActionNone;
     }
 #endif
 
-    EapPeerMethodOutput eap_output = {};
-    m_inner->process_request_packet(msg, (DWORD)size_msg, &eap_output);
-    switch (eap_output.action) {
+    EapPeerMethodResponseAction action = m_inner->process_request_packet(msg, (DWORD)size_msg);
+    switch (action) {
     case EapPeerMethodResponseActionSend: {
         // Retrieve inner packet and send it.
 
@@ -356,6 +349,8 @@ void eap::method_ttls::process_application_data(_In_bytecount_(size_msg) const v
     }
 
     default:
-        throw invalid_argument(string_printf(__FUNCTION__ " Inner method returned an unsupported action (action %u).", eap_output.action).c_str());
+        throw invalid_argument(string_printf(__FUNCTION__ " Inner method returned an unsupported action (action %u).", action).c_str());
     }
+
+    return action;
 }

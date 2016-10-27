@@ -85,10 +85,9 @@ namespace eap
         ///
         /// \sa [EapPeerProcessRequestPacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363621.aspx)
         ///
-        virtual void process_request_packet(
-            _In_bytecount_(dwReceivedPacketSize) const void                *pReceivedPacket,
-            _In_                                       DWORD               dwReceivedPacketSize,
-            _Out_                                      EapPeerMethodOutput *pEapOutput);
+        virtual EapPeerMethodResponseAction process_request_packet(
+            _In_bytecount_(dwReceivedPacketSize) const void  *pReceivedPacket,
+            _In_                                       DWORD dwReceivedPacketSize);
 
         /// @}
 

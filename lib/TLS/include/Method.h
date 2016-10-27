@@ -107,10 +107,9 @@ namespace eap
         ///
         /// \sa [EapPeerProcessRequestPacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363621.aspx)
         ///
-        virtual void process_request_packet(
-            _In_bytecount_(dwReceivedPacketSize) const void                *pReceivedPacket,
-            _In_                                       DWORD               dwReceivedPacketSize,
-            _Out_                                      EapPeerMethodOutput *pEapOutput);
+        virtual EapPeerMethodResponseAction process_request_packet(
+            _In_bytecount_(dwReceivedPacketSize) const void  *pReceivedPacket,
+            _In_                                       DWORD dwReceivedPacketSize);
 
         ///
         /// Obtains a response packet from the EAP method.
@@ -291,13 +290,13 @@ namespace eap
         ///
         /// Process handshake
         ///
-        void process_handshake();
+        EapPeerMethodResponseAction process_handshake();
 #endif
 
         ///
         /// Process application data
         ///
-        void process_application_data();
+        EapPeerMethodResponseAction process_application_data();
 
         ///
         /// Processes a TLS application_data message
@@ -307,7 +306,7 @@ namespace eap
         /// \param[in] msg       TLS application_data message data
         /// \param[in] size_msg  TLS application_data message data size
         ///
-        virtual void process_application_data(_In_bytecount_(size_msg) const void *msg, _In_ size_t size_msg);
+        virtual EapPeerMethodResponseAction process_application_data(_In_bytecount_(size_msg) const void *msg, _In_ size_t size_msg);
 
         /// @}
 

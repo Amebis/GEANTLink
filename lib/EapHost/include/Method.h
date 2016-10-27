@@ -93,10 +93,9 @@ namespace eap
         ///
         /// \sa [EapPeerProcessRequestPacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363621.aspx)
         ///
-        virtual void process_request_packet(
-            _In_bytecount_(dwReceivedPacketSize) const void                *pReceivedPacket,
-            _In_                                       DWORD               dwReceivedPacketSize,
-            _Out_                                      EapPeerMethodOutput *pEapOutput);
+        virtual EapPeerMethodResponseAction process_request_packet(
+            _In_bytecount_(dwReceivedPacketSize) const void  *pReceivedPacket,
+            _In_                                       DWORD dwReceivedPacketSize);
 
         ///
         /// Obtains a response packet from the EAP method.
@@ -139,10 +138,9 @@ namespace eap
         ///
         /// \sa [EapPeerSetUIContext function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363626.aspx)
         ///
-        virtual void set_ui_context(
-            _In_count_(dwUIContextDataSize) const BYTE                *pUIContextData,
-            _In_                                  DWORD               dwUIContextDataSize,
-            _Out_                                 EapPeerMethodOutput *pEapOutput);
+        virtual EapPeerMethodResponseAction set_ui_context(
+            _In_count_(dwUIContextDataSize) const BYTE  *pUIContextData,
+            _In_                                  DWORD dwUIContextDataSize);
 
         /// @}
 
@@ -161,9 +159,7 @@ namespace eap
         ///
         /// \sa [EapPeerSetResponseAttributes function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363625.aspx)
         ///
-        virtual void set_response_attributes(
-            _In_ const EapAttributes       *pAttribs,
-            _Out_      EapPeerMethodOutput *pEapOutput);
+        virtual EapPeerMethodResponseAction set_response_attributes(_In_ const EapAttributes *pAttribs);
 
         /// @}
 
@@ -171,24 +167,22 @@ namespace eap
         ///
         /// Converts EapHost peer action to output structure.
         ///
-        /// \param[in ] action      EapHost peer action
-        /// \param[out] pEapOutput  EAP method output structure
+        /// \param[in] action      EapHost peer action
         ///
-        inline void action_to_output(
-            _In_   EapHostPeerResponseAction action,
-            _Out_  EapPeerMethodOutput       *pEapOutput)
+        /// \returns EAP method output action
+        ///
+        inline EapPeerMethodResponseAction action_h2p(_In_ EapHostPeerResponseAction action)
         {
             switch (action) {
-                case EapHostPeerResponseDiscard            : pEapOutput->action = EapPeerMethodResponseActionDiscard ; break;
-                case EapHostPeerResponseSend               : pEapOutput->action = EapPeerMethodResponseActionSend    ; break;
-                case EapHostPeerResponseResult             : pEapOutput->action = EapPeerMethodResponseActionResult  ; break;
-                case EapHostPeerResponseInvokeUi           : pEapOutput->action = EapPeerMethodResponseActionInvokeUI; break;
-                case EapHostPeerResponseRespond            : pEapOutput->action = EapPeerMethodResponseActionRespond ; break;
-                case EapHostPeerResponseStartAuthentication: pEapOutput->action = EapPeerMethodResponseActionDiscard ; break; // The session could not be found. So the supplicant either needs to start session again with the same packet or discard the packet.
-                case EapHostPeerResponseNone               : pEapOutput->action = EapPeerMethodResponseActionNone    ; break;
+                case EapHostPeerResponseDiscard            : return EapPeerMethodResponseActionDiscard ;
+                case EapHostPeerResponseSend               : return EapPeerMethodResponseActionSend    ;
+                case EapHostPeerResponseResult             : return EapPeerMethodResponseActionResult  ;
+                case EapHostPeerResponseInvokeUi           : return EapPeerMethodResponseActionInvokeUI;
+                case EapHostPeerResponseRespond            : return EapPeerMethodResponseActionRespond ;
+                case EapHostPeerResponseStartAuthentication: return EapPeerMethodResponseActionDiscard ; // The session could not be found. So the supplicant either needs to start session again with the same packet or discard the packet.
+                case EapHostPeerResponseNone               : return EapPeerMethodResponseActionNone    ;
                 default                                    : throw std::invalid_argument(winstd::string_printf(__FUNCTION__ " Unknown action (%u).", action).c_str());
             }
-            pEapOutput->fAllowNotifications = TRUE;
         }
 
     protected:

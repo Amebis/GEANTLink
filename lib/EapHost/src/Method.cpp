@@ -102,13 +102,11 @@ void eap::method_eaphost::end_session()
 }
 
 
-void eap::method_eaphost::process_request_packet(
-    _In_bytecount_(dwReceivedPacketSize) const void                *pReceivedPacket,
-    _In_                                       DWORD               dwReceivedPacketSize,
-    _Out_                                      EapPeerMethodOutput *pEapOutput)
+EapPeerMethodResponseAction eap::method_eaphost::process_request_packet(
+    _In_bytecount_(dwReceivedPacketSize) const void  *pReceivedPacket,
+    _In_                                       DWORD dwReceivedPacketSize)
 {
     assert(pReceivedPacket || dwReceivedPacketSize == 0);
-    assert(pEapOutput);
 
     m_module.log_event(&EAPMETHOD_PACKET_RECV, event_data((unsigned int)m_cfg.get_method_id()), event_data((unsigned int)dwReceivedPacketSize), event_data::blank);
 
@@ -123,7 +121,7 @@ void eap::method_eaphost::process_request_packet(
         &error._Myptr);
     if (dwResult == ERROR_SUCCESS) {
         // Packet successfuly processed.
-        action_to_output(action, pEapOutput);
+        return action_h2p(action);
     } else if (error)
         throw eap_runtime_error(*error  , __FUNCTION__ " EapHostPeerProcessReceivedPacket failed.");
     else
@@ -212,13 +210,10 @@ void eap::method_eaphost::get_ui_context(
 }
 
 
-void eap::method_eaphost::set_ui_context(
-    _In_count_(dwUIContextDataSize) const BYTE                *pUIContextData,
-    _In_                                  DWORD               dwUIContextDataSize,
-    _Out_                                 EapPeerMethodOutput *pEapOutput)
+EapPeerMethodResponseAction eap::method_eaphost::set_ui_context(
+    _In_count_(dwUIContextDataSize) const BYTE  *pUIContextData,
+    _In_                                  DWORD dwUIContextDataSize)
 {
-    assert(pEapOutput);
-
     // Set EapHost peer UI context data.
     EapHostPeerResponseAction action;
     eap_error_runtime error;
@@ -230,7 +225,7 @@ void eap::method_eaphost::set_ui_context(
         &error._Myptr);
     if (dwResult == ERROR_SUCCESS) {
         // UI context data successfuly returned.
-        action_to_output(action, pEapOutput);
+        return action_h2p(action);
     } else if (error)
         throw eap_runtime_error(*error  , __FUNCTION__ " EapHostPeerSetUIContext failed.");
     else
@@ -255,9 +250,7 @@ void eap::method_eaphost::get_response_attributes(_Inout_ EapAttributes *pAttrib
 }
 
 
-void eap::method_eaphost::set_response_attributes(
-    _In_ const EapAttributes       *pAttribs,
-    _Out_      EapPeerMethodOutput *pEapOutput)
+EapPeerMethodResponseAction eap::method_eaphost::set_response_attributes(_In_ const EapAttributes *pAttribs)
 {
     // Set response attributes for EapHost peer.
     EapHostPeerResponseAction action;
@@ -269,7 +262,7 @@ void eap::method_eaphost::set_response_attributes(
         &error._Myptr);
     if (dwResult == ERROR_SUCCESS) {
         // Response attributes successfuly set.
-        action_to_output(action, pEapOutput);
+        return action_h2p(action);
     } else if (error)
         throw eap_runtime_error(*error  , __FUNCTION__ " EapHostPeerGetResponseAttributes failed.");
     else

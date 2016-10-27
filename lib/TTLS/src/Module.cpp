@@ -254,7 +254,9 @@ void eap::peer_ttls::process_request_packet(
     _Out_                                      EapPeerMethodOutput *pEapOutput)
 {
     assert(dwReceivedPacketSize == ntohs(*(WORD*)pReceivedPacket->Length));
-    static_cast<session*>(hSession)->m_method->process_request_packet(pReceivedPacket, dwReceivedPacketSize, pEapOutput);
+    assert(pEapOutput);
+    pEapOutput->action              = static_cast<session*>(hSession)->m_method->process_request_packet(pReceivedPacket, dwReceivedPacketSize);
+    pEapOutput->fAllowNotifications = TRUE;
 }
 
 
@@ -318,7 +320,9 @@ void eap::peer_ttls::set_ui_context(
     _In_                                  DWORD               dwUIContextDataSize,
     _Out_                                 EapPeerMethodOutput *pEapOutput)
 {
-    static_cast<session*>(hSession)->m_method->set_ui_context(pUIContextData, dwUIContextDataSize, pEapOutput);
+    assert(pEapOutput);
+    pEapOutput->action              = static_cast<session*>(hSession)->m_method->set_ui_context(pUIContextData, dwUIContextDataSize);
+    pEapOutput->fAllowNotifications = TRUE;
 }
 
 
@@ -335,7 +339,9 @@ void eap::peer_ttls::set_response_attributes(
     _In_ const EapAttributes       *pAttribs,
     _Out_      EapPeerMethodOutput *pEapOutput)
 {
-    static_cast<session*>(hSession)->m_method->set_response_attributes(pAttribs, pEapOutput);
+    assert(pEapOutput);
+    pEapOutput->action              = static_cast<session*>(hSession)->m_method->set_response_attributes(pAttribs);
+    pEapOutput->fAllowNotifications = TRUE;
 }
 
 

@@ -69,14 +69,12 @@ void eap::method_pap::begin_session(
 }
 
 
-void eap::method_pap::process_request_packet(
-    _In_bytecount_(dwReceivedPacketSize) const void                *pReceivedPacket,
-    _In_                                       DWORD               dwReceivedPacketSize,
-    _Out_                                      EapPeerMethodOutput *pEapOutput)
+EapPeerMethodResponseAction eap::method_pap::process_request_packet(
+    _In_bytecount_(dwReceivedPacketSize) const void  *pReceivedPacket,
+    _In_                                       DWORD dwReceivedPacketSize)
 {
     UNREFERENCED_PARAMETER(pReceivedPacket);
     assert(pReceivedPacket || dwReceivedPacketSize == 0);
-    assert(pEapOutput);
 
     m_module.log_event(&EAPMETHOD_PACKET_RECV, event_data((unsigned int)eap_type_legacy_pap), event_data((unsigned int)dwReceivedPacketSize), event_data::blank);
 
@@ -99,13 +97,13 @@ void eap::method_pap::process_request_packet(
 
         m_phase = phase_finished;
         m_cfg.m_last_status = config_method::status_cred_invalid; // Blame credentials if we fail beyond this point.
-        break;
+        return EapPeerMethodResponseActionSend;
     }
 
     case phase_finished:
-        break;
-    }
+        return EapPeerMethodResponseActionNone;
 
-    pEapOutput->fAllowNotifications = TRUE;
-    pEapOutput->action = EapPeerMethodResponseActionSend;
+    default:
+        throw invalid_argument(string_printf(__FUNCTION__ " Unknown phase (phase %u).", m_phase).c_str());
+    }
 }

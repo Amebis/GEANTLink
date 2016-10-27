@@ -105,10 +105,9 @@ namespace eap
         ///
         /// \sa [EapPeerProcessRequestPacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363621.aspx)
         ///
-        virtual void process_request_packet(
-            _In_bytecount_(dwReceivedPacketSize) const void                *pReceivedPacket,
-            _In_                                       DWORD               dwReceivedPacketSize,
-            _Out_                                      EapPeerMethodOutput *pEapOutput) = 0;
+        virtual EapPeerMethodResponseAction process_request_packet(
+            _In_bytecount_(dwReceivedPacketSize) const void  *pReceivedPacket,
+            _In_                                       DWORD dwReceivedPacketSize) = 0;
 
         ///
         /// Obtains a response packet from the EAP method.
@@ -151,10 +150,9 @@ namespace eap
         ///
         /// \sa [EapPeerSetUIContext function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363626.aspx)
         ///
-        virtual void set_ui_context(
-            _In_count_(dwUIContextDataSize) const BYTE                *pUIContextData,
-            _In_                                  DWORD               dwUIContextDataSize,
-            _Out_                                 EapPeerMethodOutput *pEapOutput);
+        virtual EapPeerMethodResponseAction set_ui_context(
+            _In_count_(dwUIContextDataSize) const BYTE  *pUIContextData,
+            _In_                                  DWORD dwUIContextDataSize);
 
         /// @}
 
@@ -173,9 +171,7 @@ namespace eap
         ///
         /// \sa [EapPeerSetResponseAttributes function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363625.aspx)
         ///
-        virtual void set_response_attributes(
-            _In_ const EapAttributes       *pAttribs,
-            _Out_      EapPeerMethodOutput *pEapOutput);
+        virtual EapPeerMethodResponseAction set_response_attributes(_In_ const EapAttributes *pAttribs);
 
         /// @}
 
