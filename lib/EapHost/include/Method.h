@@ -37,7 +37,7 @@ namespace eap
 
 namespace eap
 {
-    class method_eaphost : public method_noneap
+    class method_eaphost : public method
     {
         WINSTD_NONCOPYABLE(method_eaphost)
 

@@ -30,14 +30,14 @@ using namespace winstd;
 
 eap::method_eaphost::method_eaphost(_In_ module &module, _In_ config_method_eaphost &cfg, _In_ credentials_eaphost &cred) :
     m_session_id(0),
-    method_noneap(module, cfg, cred)
+    method(module, cfg, cred)
 {
 }
 
 
 eap::method_eaphost::method_eaphost(_Inout_ method_eaphost &&other) :
     m_session_id (std::move(other.m_session_id)),
-    method_noneap(std::move(other             ))
+    method(std::move(other             ))
 {
 }
 
@@ -45,7 +45,7 @@ eap::method_eaphost::method_eaphost(_Inout_ method_eaphost &&other) :
 eap::method_eaphost& eap::method_eaphost::operator=(_Inout_ method_eaphost &&other)
 {
     if (this != std::addressof(other)) {
-        (method_noneap&)*this = std::move(other             );
+        (method&)*this = std::move(other             );
         m_session_id          = std::move(other.m_session_id);
     }
 
@@ -78,7 +78,7 @@ void eap::method_eaphost::begin_session(
         &error._Myptr);
     if (dwResult == ERROR_SUCCESS) {
         // Session succesfully created.
-        method_noneap::begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
+        method::begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
 
         m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)m_cfg.get_method_id()), event_data::blank);
     } else if (error)
@@ -90,6 +90,8 @@ void eap::method_eaphost::begin_session(
 
 void eap::method_eaphost::end_session()
 {
+    method::end_session();
+
     // End EapHost peer session.
     eap_error_runtime error;
     DWORD dwResult = EapHostPeerEndSession(m_session_id, &error._Myptr);
