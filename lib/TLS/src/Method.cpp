@@ -288,9 +288,6 @@ EapPeerMethodResponseAction eap::method_tls::process_request_packet(
         // This is the EAP-TLS start message: (re)initialize method.
         m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_tls), event_data::blank);
         m_phase = phase_client_hello;
-
-        m_key_mppe_client.clear();
-        m_key_mppe_server.clear();
     } else {
         // Process the packet.
         m_handshake.clear();
@@ -299,9 +296,19 @@ EapPeerMethodResponseAction eap::method_tls::process_request_packet(
     }
 
     switch (m_phase) {
+    case phase_application_data:
+        if (m_handshake[tls_handshake_type_hello_request]) {
+            // Re-handshake requested.
+            m_phase = phase_client_hello;
+            // Do not break out of this case to allow continuing with the following case.
+        } else
+            break;
+
     case phase_client_hello: {
         m_tls_version = tls_version_1_2;
 
+        m_key_mppe_client.clear();
+        m_key_mppe_server.clear();
         m_server_cert_chain.clear();
 
         // Create handshake hashing objects.
@@ -421,16 +428,16 @@ EapPeerMethodResponseAction eap::method_tls::process_request_packet(
 
         if (m_handshake[tls_handshake_type_finished]) {
             // Go to application data phase. And allow piggybacking of the first data message.
-            m_phase = phase_application_data;
             m_session_resumed = true;
-            action = process_application_data(NULL, 0);
+            m_phase = phase_application_data;
+            process_application_data(NULL, 0);
         } else {
             m_session_resumed = false;
             m_phase = phase_change_cipher_spec;
             m_cfg.m_last_status = config_method::status_cred_invalid; // Blame credentials if we fail beyond this point.
-            action = EapPeerMethodResponseActionSend;
         }
 
+        action = EapPeerMethodResponseActionSend;
         break;
     }
 
@@ -438,16 +445,11 @@ EapPeerMethodResponseAction eap::method_tls::process_request_packet(
         // Wait in this phase until server sends change cipher spec and finish.
         if (m_state_server.m_alg_encrypt && m_handshake[tls_handshake_type_finished]) {
             m_phase = phase_application_data;
-            action = process_application_data(NULL, 0);
-        } else {
-            // Ignore content of the message and keep replying with ACK packet until change cipher spec is delivered.
-            action = EapPeerMethodResponseActionSend;
+            process_application_data(NULL, 0);
         }
-        break;
 
-    case phase_application_data:
-        if (m_handshake[tls_handshake_type_hello_request])
-            m_phase = phase_client_hello;
+        // Keep replying (with application data or with ACK packet).
+        action = EapPeerMethodResponseActionSend;
         break;
 
     default:
@@ -458,14 +460,16 @@ EapPeerMethodResponseAction eap::method_tls::process_request_packet(
         // This is the EAP-TLS start message: (re)initialize method.
         m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_tls), event_data::blank);
         m_phase = phase_handshake_init;
-        m_key_mppe_client.clear();
-        m_key_mppe_server.clear();
-        m_sc_queue.assign(m_packet_req.m_data.begin(), m_packet_req.m_data.end());
     } else
         m_sc_queue.insert(m_sc_queue.end(), m_packet_req.m_data.begin(), m_packet_req.m_data.end());
 
     switch (m_phase) {
     case phase_handshake_init:
+        m_key_mppe_client.clear();
+        m_key_mppe_server.clear();
+        m_sc_queue.assign(m_packet_req.m_data.begin(), m_packet_req.m_data.end());
+        // Do not break out of this case to allow continuing with the following case.
+
     case phase_handshake_cont:
         action = process_handshake();
         break;
@@ -1199,12 +1203,12 @@ EapPeerMethodResponseAction eap::method_tls::process_handshake()
             derive_challenge();
 
             m_phase = phase_application_data;
-            return process_application_data(m_sc_queue.data(), m_sc_queue.size());
+            process_application_data(m_sc_queue.data(), m_sc_queue.size());
         } else {
             m_phase = phase_handshake_cont;
             m_cfg.m_last_status = config_method::status_cred_invalid; // Blame credentials if we fail beyond this point.
-            return EapPeerMethodResponseActionSend;
         }
+        return EapPeerMethodResponseActionSend;
     } else if (status == SEC_E_INCOMPLETE_MESSAGE) {
         // Schannel neeeds more data. Send ACK packet to server to send more.
         return EapPeerMethodResponseActionSend;
@@ -1255,22 +1259,25 @@ EapPeerMethodResponseAction eap::method_tls::process_application_data()
     if (status == SEC_E_OK) {
         EapPeerMethodResponseAction action = EapPeerMethodResponseActionNone;
 
-        // Find SECBUFFER_DATA buffer(s) and process data.
-        for (size_t i = 0; i < _countof(buf); i++)
-            if (buf[i].BufferType == SECBUFFER_DATA) {
+        std::vector<unsigned char> extra;
+        for (size_t i = 0; i < _countof(buf); i++) {
+            switch (buf[i].BufferType) {
+            case SECBUFFER_DATA:
+                // Process data.
                 action = process_application_data(buf[i].pvBuffer, buf[i].cbBuffer);
                 if (action == EapPeerMethodResponseActionDiscard) {
                     // Request is to be discarded as a whole.
                     m_sc_queue.clear();
                     return EapPeerMethodResponseActionDiscard;
                 }
-            }
+                break;
 
-        // Find SECBUFFER_EXTRA buffer(s) and queue data for the next time.
-        std::vector<unsigned char> extra;
-        for (size_t i = 0; i < _countof(buf); i++)
-            if (buf[i].BufferType == SECBUFFER_EXTRA)
+            case SECBUFFER_EXTRA:
+                // Queue data for the next time.
                 extra.insert(extra.end(), reinterpret_cast<const unsigned char*>(buf[i].pvBuffer), reinterpret_cast<const unsigned char*>(buf[i].pvBuffer) + buf[i].cbBuffer);
+                break;
+            }
+        }
         m_sc_queue = std::move(extra);
 
         return action;
@@ -1284,10 +1291,9 @@ EapPeerMethodResponseAction eap::method_tls::process_application_data()
         return EapPeerMethodResponseActionNone;
     } else if (status == SEC_I_RENEGOTIATE) {
         // Re-negotiation required.
-        m_sc_queue.clear();
         m_phase = phase_handshake_init;
-        process_handshake();
-        return EapPeerMethodResponseActionSend;
+        m_sc_queue.clear();
+        return process_handshake();
     } else if (FAILED(status))
         throw sec_runtime_error(status, __FUNCTION__ " Schannel error.");
 
