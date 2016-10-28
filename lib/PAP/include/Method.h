@@ -42,25 +42,25 @@ namespace eap
 
     public:
         ///
-        /// Constructs an EAP method
+        /// Constructs a PAP method
         ///
-        /// \param[in] mod   EAP module to use for global services
+        /// \param[in] mod   PAP module to use for global services
         /// \param[in] cfg   Method configuration
         /// \param[in] cred  User credentials
         ///
         method_pap(_In_ module &module, _In_ config_method_pap &cfg, _In_ credentials_pass &cred);
 
         ///
-        /// Moves an EAP method
+        /// Moves a PAP method
         ///
-        /// \param[in] other  EAP method to move from
+        /// \param[in] other  PAP method to move from
         ///
         method_pap(_Inout_ method_pap &&other);
 
         ///
-        /// Moves an EAP method
+        /// Moves a PAP method
         ///
-        /// \param[in] other  EAP method to move from
+        /// \param[in] other  PAP method to move from
         ///
         /// \returns Reference to this object
         ///

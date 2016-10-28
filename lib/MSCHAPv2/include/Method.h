@@ -44,25 +44,25 @@ namespace eap
 
     public:
         ///
-        /// Constructs an EAP method
+        /// Constructs a MSCHAPv2 method
         ///
-        /// \param[in] mod   EAP module to use for global services
+        /// \param[in] mod   MSCHAPv2 module to use for global services
         /// \param[in] cfg   Method configuration
         /// \param[in] cred  User credentials
         ///
         method_mschapv2(_In_ module &module, _In_ config_method_mschapv2 &cfg, _In_ credentials_pass &cred);
 
         ///
-        /// Moves an EAP method
+        /// Moves a MSCHAPv2 method
         ///
-        /// \param[in] other  EAP method to move from
+        /// \param[in] other  MSCHAPv2 method to move from
         ///
         method_mschapv2(_Inout_ method_mschapv2 &&other);
 
         ///
-        /// Moves an EAP method
+        /// Moves a MSCHAPv2 method
         ///
-        /// \param[in] other  EAP method to move from
+        /// \param[in] other  MSCHAPv2 method to move from
         ///
         /// \returns Reference to this object
         ///

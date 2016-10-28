@@ -64,7 +64,7 @@ namespace eap
 
     public:
         ///
-        /// Constructs an EAP method
+        /// Constructs an EAP-TLS method
         ///
         /// \param[in] mod   EAP module to use for global services
         /// \param[in] cfg   Method configuration
@@ -73,16 +73,16 @@ namespace eap
         method_tls(_In_ module &module, _In_ config_method_tls &cfg, _In_ credentials_tls &cred);
 
         ///
-        /// Moves an EAP method
+        /// Moves an EAP-TLS method
         ///
-        /// \param[in] other  EAP method to move from
+        /// \param[in] other  EAP-TLS method to move from
         ///
         method_tls(_Inout_ method_tls &&other);
 
         ///
-        /// Moves an EAP method
+        /// Moves an EAP-TLS method
         ///
-        /// \param[in] other  EAP method to move from
+        /// \param[in] other  EAP-TLS method to move from
         ///
         /// \returns Reference to this object
         ///
