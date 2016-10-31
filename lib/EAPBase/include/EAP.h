@@ -486,6 +486,9 @@ namespace eap
 {
     struct cursor_out
     {
+        ///
+        /// Pointer to output data type
+        ///
         typedef unsigned char *ptr_type;
 
         ptr_type ptr;       ///< Pointer to first data unwritten
@@ -495,6 +498,9 @@ namespace eap
 
     struct cursor_in
     {
+        ///
+        /// Pointer to input data type
+        ///
         typedef const unsigned char *ptr_type;
 
         ptr_type ptr;       ///< Pointer to first data unread

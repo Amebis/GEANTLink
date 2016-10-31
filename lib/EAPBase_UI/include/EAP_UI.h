@@ -33,7 +33,7 @@
 class wxEAPBannerPanel;
 
 ///
-/// EAP top-most configuration dialog
+/// EAP top-most configuration dialog template
 ///
 template <class _wxT> class wxEAPConfigDialog;
 
@@ -429,13 +429,13 @@ protected:
     /// \endcond
 
 protected:
-    wxStaticText *m_provider_notice;
-    wxStaticText *m_help_web_label;
-    wxHyperlinkCtrl *m_help_web_value;
-    wxStaticText *m_help_email_label;
-    wxHyperlinkCtrl *m_help_email_value;
-    wxStaticText *m_help_phone_label;
-    wxHyperlinkCtrl *m_help_phone_value;
+    wxStaticText *m_provider_notice;        ///< Identity provider notice
+    wxStaticText *m_help_web_label;         ///< Helpdesk URL label
+    wxHyperlinkCtrl *m_help_web_value;      ///< Helpdesk URL
+    wxStaticText *m_help_email_label;       ///< Helpdesk e-mail label
+    wxHyperlinkCtrl *m_help_email_value;    ///< Helpdesk e-mail
+    wxStaticText *m_help_phone_label;       ///< Helpdesk phone number label
+    wxHyperlinkCtrl *m_help_phone_value;    ///< Helpdesk phone number
 };
 
 
@@ -477,8 +477,21 @@ public:
     virtual ~wxEAPConfigWindow();
 
 public:
-    inline eap::config_provider& GetProvider() const { return m_prov; }
-    inline eap::config_method  & GetConfig  () const { return m_cfg ; }
+    ///
+    /// Returns reference to configuration provider
+    ///
+    inline eap::config_provider& GetProvider() const
+    {
+        return m_prov;
+    }
+
+    ///
+    /// Returns reference to method configuration
+    ///
+    inline eap::config_method& GetConfig() const
+    {
+        return m_cfg;
+    }
 
 protected:
     /// \cond internal
@@ -848,12 +861,20 @@ public:
             m_remember = NULL;
     }
 
+    ///
+    /// (Un)checks "Remember credentials" checkbox
+    ///
+    /// \param[in] val  If \c true, checkbox is checked; otherwise cleared
+    ///
     virtual void SetRemember(bool val)
     {
         if (m_remember)
             m_remember->SetValue(val);
     }
 
+    ///
+    /// Returns \c true if "Remember credentials" checkbox is checked
+    ///
     virtual bool GetRemember() const
     {
         return m_remember ?
@@ -1003,28 +1024,58 @@ namespace eap
     class monitor_ui
     {
     public:
+        ///
+        /// Constructs a UI monitor
+        ///
         monitor_ui(_In_ HINSTANCE module, _In_ const GUID &guid);
+
+        ///
+        /// Destructs the UI monitor
+        ///
         virtual ~monitor_ui();
 
+        ///
+        /// Sets pop-up window handle
+        ///
+        /// \param[in] hwnd  Handle of window to set as a new pop-up
+        ///
         void set_popup(_In_ HWND hwnd);
+
+        ///
+        /// Notifies all slaves waiting for this master and send them result data
+        ///
+        /// \param[in] data  Pointer to result data
+        /// \param[in] size  \p data size in bytes
+        ///
         void release_slaves(_In_bytecount_(size) const void *data, _In_ size_t size) const;
 
+        ///
+        /// Returns true if this is a master
+        ///
         inline bool is_master() const
         {
             return m_is_master;
         }
 
+        ///
+        /// Returns true if this is a slave
+        ///
         inline bool is_slave() const
         {
             return !is_master();
         }
 
+        ///
+        /// Returns the data master send
+        ///
         inline const std::vector<unsigned char>& master_data() const
         {
             return m_data;
         }
 
     protected:
+        /// \cond internal
+
         virtual LRESULT winproc(
             _In_ UINT   msg,
             _In_ WPARAM wparam,
@@ -1035,6 +1086,8 @@ namespace eap
             _In_ UINT   msg,
             _In_ WPARAM wparam,
             _In_ LPARAM lparam);
+
+        /// \endcond
 
     protected:
         bool m_is_master;                   ///< Is this monitor master?

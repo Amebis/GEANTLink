@@ -43,6 +43,15 @@ public:
     {
     }
 
+    ///
+    /// (Un)checks "Remember credentials" checkbox
+    ///
+    /// \param[in] val  If \c true, checkbox is checked; otherwise cleared
+    ///
     virtual void SetRemember(bool val) = 0;
+
+    ///
+    /// Returns \c true if "Remember credentials" checkbox is checked
+    ///
     virtual bool GetRemember() const = 0;
 };

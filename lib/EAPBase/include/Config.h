@@ -195,7 +195,7 @@ namespace eap
         module &m_module;   ///< EAP module
 
     protected:
-        static const winstd::bstr namespace_eapmetadata;
+        static const winstd::bstr namespace_eapmetadata;    ///< Reusable BSTR containing "urn:ietf:params:xml:ns:yang:ietf-eap-metadata"
     };
 
 
@@ -558,6 +558,9 @@ namespace eap
     class config_connection : public config
     {
     public:
+        ///
+        /// List of configuration providers
+        ///
         typedef std::list<eap::config_provider> provider_list;
 
     public:

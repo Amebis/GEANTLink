@@ -168,7 +168,9 @@ namespace eap
         }
 
     protected:
+        /// \cond internal
         void update_type();
+        /// \endcond
 
     protected:
         EAP_METHOD_TYPE m_type;     ///< EapHost method type: (EAP type, vendor ID, vendor type, author ID) tuple
