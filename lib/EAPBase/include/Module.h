@@ -89,6 +89,11 @@ namespace eap
         EAP_ERROR* make_error(_In_ std::exception &err) const;
 
         ///
+        /// Allocate a EAP_ERROR and fill it according to another EAP_ERROR
+        ///
+        EAP_ERROR* make_error(_In_ const EAP_ERROR *err) const;
+
+        ///
         /// Allocate BLOB
         ///
         BYTE* alloc_memory(_In_ size_t size);

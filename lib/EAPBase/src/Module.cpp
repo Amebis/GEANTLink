@@ -128,6 +128,19 @@ EAP_ERROR* eap::module::make_error(_In_ std::exception &err) const
 }
 
 
+EAP_ERROR* eap::module::make_error(_In_ const EAP_ERROR *err) const
+{
+    return make_error(
+        err->dwWinError,
+        err->pRootCauseString,
+        err->pRepairString,
+        err->dwReasonCode,
+        &(err->rootCauseGuid),
+        &(err->repairGuid),
+        &(err->helpLinkGuid));
+}
+
+
 BYTE* eap::module::alloc_memory(_In_ size_t size)
 {
     BYTE *p = (BYTE*)HeapAlloc(m_heap, 0, size);
