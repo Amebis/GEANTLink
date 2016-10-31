@@ -92,6 +92,40 @@ namespace eap
     struct diameter_avp_header_ven;
 
     ///
+    /// Appends Diameter AVP to response packet
+    ///
+    /// \param[in   ] code    AVP code
+    /// \param[in   ] flags   AVP flags
+    /// \param[in   ] data    AVP data (<16777212B)
+    /// \param[in   ] size    Size of \p data in bytes
+    /// \param[inout] packet  Response packet to append data to
+    ///
+    void diameter_avp_append(
+        _In_                       unsigned int    code,
+        _In_                       unsigned char   flags,
+        _In_bytecount_(size) const void            *data,
+        _In_                       unsigned int    size,
+        _Inout_                    sanitizing_blob &packet);
+
+    ///
+    /// Appends Diameter AVP to response packet
+    ///
+    /// \param[in   ] code       AVP code
+    /// \param[in   ] vendor_id  Vendor-ID
+    /// \param[in   ] flags      AVP flags
+    /// \param[in   ] data       AVP data (<16777212B)
+    /// \param[in   ] size       Size of \p data in bytes
+    /// \param[inout] packet     Response packet to append data to
+    ///
+    void diameter_avp_append(
+        _In_                       unsigned int    code,
+        _In_                       unsigned int    vendor_id,
+        _In_                       unsigned char   flags,
+        _In_bytecount_(size) const void            *data,
+        _In_                       unsigned int    size,
+        _Inout_                    sanitizing_blob &packet);
+
+    ///
     /// EAP packet
     ///
     class packet;
