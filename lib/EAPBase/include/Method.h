@@ -21,14 +21,23 @@
 namespace eap
 {
     ///
-    /// EAP and non-EAP method base class
+    /// Method base class
     ///
     class method;
 
     ///
-    /// Non-EAP method base class
+    /// Tunnel method base class
     ///
-    class method_noneap;
+    /// This is a base class for all the methods that encapsulate inner methods to provide stacking framework.
+    ///
+    class method_tunnel;
+
+    ///
+    /// EAP tunnel method
+    ///
+    /// This method encapsulates inner data in EAP packets.
+    ///
+    class method_eap;
 }
 
 #pragma once
@@ -55,25 +64,23 @@ namespace eap
 
     public:
         ///
-        /// Constructs an EAP method
+        /// Constructs a method
         ///
-        /// \param[in] mod   EAP module to use for global services
-        /// \param[in] cfg   Method configuration
-        /// \param[in] cred  User credentials
+        /// \param[in] mod  Module to use for global services
         ///
-        method(_In_ module &module, _In_ config_method &cfg, _In_ credentials &cred);
+        method(_In_ module &mod);
 
         ///
-        /// Moves an EAP method
+        /// Moves a method
         ///
-        /// \param[in] other  EAP method to move from
+        /// \param[in] other  Method to move from
         ///
         method(_Inout_ method &&other);
 
         ///
-        /// Moves an EAP method
+        /// Moves a method
         ///
-        /// \param[in] other  EAP method to move from
+        /// \param[in] other  Method to move from
         ///
         /// \returns Reference to this object
         ///
@@ -115,8 +122,8 @@ namespace eap
         /// \sa [EapPeerGetResponsePacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363610.aspx)
         ///
         virtual void get_response_packet(
-            _Inout_bytecap_(*dwSendPacketSize) void  *pSendPacket,
-            _Inout_                            DWORD *pdwSendPacketSize) = 0;
+            _Out_    sanitizing_blob &packet,
+            _In_opt_ DWORD           size_max = MAXDWORD) = 0;
 
         ///
         /// Obtains the result of an authentication session from the EAP method.
@@ -176,89 +183,193 @@ namespace eap
         /// @}
 
     public:
-        module &m_module;                           ///< EAP module
-        config_method &m_cfg;                       ///< Connection configuration
-        credentials &m_cred;                        ///< User credentials
-        std::vector<winstd::eap_attr> m_eap_attr;   ///< EAP attributes
+        module &m_module;   ///< Module for global services
     };
 
 
-    class method_noneap : public method
+    class method_tunnel : public method
     {
-        WINSTD_NONCOPYABLE(method_noneap)
+        WINSTD_NONCOPYABLE(method_tunnel)
 
     public:
         ///
-        /// Constructs a non-EAP method
+        /// Constructs a method
         ///
-        /// \param[in] mod   EAP module to use for global services
-        /// \param[in] cfg   Method configuration
-        /// \param[in] cred  User credentials
+        /// \param[in] mod    Module to use for global services
+        /// \param[in] inner  Inner method
         ///
-        method_noneap(_In_ module &module, _In_ config_method &cfg, _In_ credentials &cred);
+        method_tunnel(_In_ module &mod, _In_ method *inner);
 
         ///
-        /// Moves a non-EAP method
+        /// Moves a method
         ///
-        /// \param[in] other  EAP method to move from
+        /// \param[in] other  Method to move from
         ///
-        method_noneap(_Inout_ method_noneap &&other);
+        method_tunnel(_Inout_ method_tunnel &&other);
 
         ///
-        /// Moves a non-EAP method
+        /// Moves a method
         ///
-        /// \param[in] other  EAP method to move from
+        /// \param[in] other  Method to move from
         ///
         /// \returns Reference to this object
         ///
-        method_noneap& operator=(_Inout_ method_noneap &&other);
+        method_tunnel& operator=(_Inout_ method_tunnel &&other);
 
         /// \name Packet processing
         /// @{
 
         ///
-        /// Obtains a response packet from the non-EAP method.
+        /// Starts an EAP authentication session on the peer EapHost using the EAP method.
+        ///
+        /// \sa [EapPeerBeginSession function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363600.aspx)
+        ///
+        virtual void begin_session(
+            _In_        DWORD         dwFlags,
+            _In_  const EapAttributes *pAttributeArray,
+            _In_        HANDLE        hTokenImpersonateUser,
+            _In_opt_    DWORD         dwMaxSendPacketSize = MAXDWORD);
+
+        ///
+        /// Ends an EAP authentication session for the EAP method.
+        ///
+        /// \sa [EapPeerEndSession function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363604.aspx)
+        ///
+        virtual void end_session();
+
+        ///
+        /// Processes a packet received by EapHost from a supplicant.
+        ///
+        /// \sa [EapPeerProcessRequestPacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363621.aspx)
+        ///
+        virtual EapPeerMethodResponseAction process_request_packet(
+            _In_bytecount_(dwReceivedPacketSize) const void  *pReceivedPacket,
+            _In_                                       DWORD dwReceivedPacketSize);
+
+        ///
+        /// Obtains a response packet from the EAP method.
         ///
         /// \sa [EapPeerGetResponsePacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363610.aspx)
         ///
         virtual void get_response_packet(
-            _Inout_bytecap_(*dwSendPacketSize) void  *pSendPacket,
-            _Inout_                            DWORD *pdwSendPacketSize);
+            _Out_    sanitizing_blob &packet,
+            _In_opt_ DWORD           size_max = MAXDWORD);
+
+        ///
+        /// Obtains the result of an authentication session from the EAP method.
+        ///
+        /// \sa [EapPeerGetResult function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363611.aspx)
+        ///
+        virtual void get_result(
+            _In_    EapPeerMethodResultReason reason,
+            _Inout_ EapPeerMethodResult       *pResult);
+
+        /// @}
+
+        /// \name User Interaction
+        /// @{
+
+        ///
+        /// Obtains the user interface context from the EAP method.
+        ///
+        /// \note This function is always followed by the `EapPeerInvokeInteractiveUI()` function, which is followed by the `EapPeerSetUIContext()` function.
+        ///
+        /// \sa [EapPeerGetUIContext function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363612.aspx)
+        ///
+        virtual void get_ui_context(
+            _Inout_ BYTE  **ppUIContextData,
+            _Inout_ DWORD *pdwUIContextDataSize);
+
+        ///
+        /// Provides a user interface context to the EAP method.
+        ///
+        /// \note This function is called after the UI has been raised through the `EapPeerGetUIContext()` function.
+        ///
+        /// \sa [EapPeerSetUIContext function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363626.aspx)
+        ///
+        virtual EapPeerMethodResponseAction set_ui_context(
+            _In_count_(dwUIContextDataSize) const BYTE  *pUIContextData,
+            _In_                                  DWORD dwUIContextDataSize);
+
+        /// @}
+
+        /// \name EAP Response Attributes
+        /// @{
+
+        ///
+        /// Obtains an array of EAP response attributes from the EAP method.
+        ///
+        /// \sa [EapPeerGetResponseAttributes function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363609.aspx)
+        ///
+        virtual void get_response_attributes(_Inout_ EapAttributes *pAttribs);
+
+        ///
+        /// Provides an updated array of EAP response attributes to the EAP method.
+        ///
+        /// \sa [EapPeerSetResponseAttributes function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363625.aspx)
+        ///
+        virtual EapPeerMethodResponseAction set_response_attributes(_In_ const EapAttributes *pAttribs);
 
         /// @}
 
     protected:
+        std::unique_ptr<method> m_inner;    ///< Inner method
+    };
+
+
+    class method_eap : public method_tunnel
+    {
+        WINSTD_NONCOPYABLE(method_eap)
+
+    public:
         ///
-        /// Appends Diameter AVP to response packet
+        /// Constructs a method
         ///
-        /// \param[in] code     AVP code
-        /// \param[in] flags    AVP flags
-        /// \param[in] data     AVP data (<16777212B)
-        /// \param[in] size     Size of \p data in bytes
+        /// \param[in] mod         Module to use for global services
+        /// \param[in] eap_method  EAP method type
+        /// \param[in] inner       Inner method
         ///
-        void append_avp(
-            _In_                       unsigned int  code,
-            _In_                       unsigned char flags,
-            _In_bytecount_(size) const void          *data,
-            _In_                       unsigned int  size);
+        method_eap(_In_ module &mod, _In_ winstd::eap_type_t eap_method, _In_ method *inner);
 
         ///
-        /// Appends Diameter AVP to response packet
+        /// Moves a method
         ///
-        /// \param[in] code       AVP code
-        /// \param[in] vendor_id  Vendor-ID
-        /// \param[in] flags      AVP flags
-        /// \param[in] data       AVP data (<16777212B)
-        /// \param[in] size       Size of \p data in bytes
+        /// \param[in] other  Method to move from
         ///
-        void append_avp(
-            _In_                       unsigned int  code,
-            _In_                       unsigned int  vendor_id,
-            _In_                       unsigned char flags,
-            _In_bytecount_(size) const void          *data,
-            _In_                       unsigned int  size);
+        method_eap(_Inout_ method_eap &&other);
+
+        ///
+        /// Moves a method
+        ///
+        /// \param[in] other  Method to move from
+        ///
+        /// \returns Reference to this object
+        ///
+        method_eap& operator=(_Inout_ method_eap &&other);
+
+        /// \name Packet processing
+        /// @{
+
+        ///
+        /// Processes a packet received by EapHost from a supplicant.
+        ///
+        /// \sa [EapPeerProcessRequestPacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363621.aspx)
+        ///
+        virtual EapPeerMethodResponseAction process_request_packet(
+            _In_bytecount_(dwReceivedPacketSize) const void  *pReceivedPacket,
+            _In_                                       DWORD dwReceivedPacketSize);
+
+        ///
+        /// Obtains a response packet from the EAP method.
+        ///
+        /// \sa [EapPeerGetResponsePacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363610.aspx)
+        ///
+        virtual void get_response_packet(
+            _Out_    sanitizing_blob &packet,
+            _In_opt_ DWORD           size_max = MAXDWORD);
 
     protected:
-        sanitizing_blob m_packet_res;   ///< Response packet
+        const winstd::eap_type_t m_eap_method;  ///< EAP method type
+        unsigned char m_id;                     ///< Request packet ID
     };
 }

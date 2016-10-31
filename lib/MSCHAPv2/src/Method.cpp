@@ -28,17 +28,19 @@ using namespace winstd;
 // eap::method_mschapv2
 //////////////////////////////////////////////////////////////////////
 
-eap::method_mschapv2::method_mschapv2(_In_ module &module, _In_ config_method_mschapv2 &cfg, _In_ credentials_pass &cred) :
+eap::method_mschapv2::method_mschapv2(_In_ module &mod, _In_ config_method_mschapv2 &cfg, _In_ credentials_pass &cred) :
+    m_cfg(cfg),
     m_cred(cred),
     m_ident(0),
     m_success(false),
     m_phase(phase_unknown),
-    method_noneap(module, cfg, cred)
+    method(mod)
 {
 }
 
 
 eap::method_mschapv2::method_mschapv2(_Inout_ method_mschapv2 &&other) :
+    m_cfg             (          other.m_cfg              ),
     m_cred            (          other.m_cred             ),
     m_cp              (std::move(other.m_cp              )),
     m_challenge_server(std::move(other.m_challenge_server)),
@@ -47,7 +49,8 @@ eap::method_mschapv2::method_mschapv2(_Inout_ method_mschapv2 &&other) :
     m_nt_resp         (std::move(other.m_nt_resp         )),
     m_success         (std::move(other.m_success         )),
     m_phase           (std::move(other.m_phase           )),
-    method_noneap     (std::move(other                   ))
+    m_packet_res      (std::move(other.m_packet_res      )),
+    method            (std::move(other                   ))
 {
 }
 
@@ -55,15 +58,17 @@ eap::method_mschapv2::method_mschapv2(_Inout_ method_mschapv2 &&other) :
 eap::method_mschapv2& eap::method_mschapv2::operator=(_Inout_ method_mschapv2 &&other)
 {
     if (this != std::addressof(other)) {
-        assert(std::addressof(m_cred) == std::addressof(other.m_cred)); // Move method with same credentials only!
-        (method_noneap&)*this = std::move(other                   );
-        m_cp                  = std::move(other.m_cp              );
-        m_challenge_server    = std::move(other.m_challenge_server);
-        m_challenge_client    = std::move(other.m_challenge_client);
-        m_ident               = std::move(other.m_ident           );
-        m_nt_resp             = std::move(other.m_nt_resp         );
-        m_success             = std::move(other.m_success         );
-        m_phase               = std::move(other.m_phase           );
+        assert(std::addressof(m_cfg ) == std::addressof(other.m_cfg )); // Move method within same configuration only!
+        assert(std::addressof(m_cred) == std::addressof(other.m_cred)); // Move method within same credentials only!
+        (method&)*this     = std::move(other                   );
+        m_cp               = std::move(other.m_cp              );
+        m_challenge_server = std::move(other.m_challenge_server);
+        m_challenge_client = std::move(other.m_challenge_client);
+        m_ident            = std::move(other.m_ident           );
+        m_nt_resp          = std::move(other.m_nt_resp         );
+        m_success          = std::move(other.m_success         );
+        m_phase            = std::move(other.m_phase           );
+        m_packet_res       = std::move(other.m_packet_res      );
     }
 
     return *this;
@@ -76,13 +81,17 @@ void eap::method_mschapv2::begin_session(
     _In_        HANDLE        hTokenImpersonateUser,
     _In_opt_    DWORD         dwMaxSendPacketSize)
 {
-    method_noneap::begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
+    method::begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
+
+    // Presume authentication will fail with generic protocol failure. (Pesimist!!!)
+    // We will reset once we get get_result(Success) call.
+    m_cfg.m_last_status = config_method::status_auth_failed;
+    m_cfg.m_last_msg.clear();
 
     // Create cryptographics provider for support needs (client challenge ...).
     if (!m_cp.create(NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
         throw win_runtime_error(__FUNCTION__ " Error creating cryptographics provider.");
 
-    m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_legacy_mschapv2), event_data::blank);
     m_phase = phase_init;
 }
 
@@ -93,18 +102,16 @@ EapPeerMethodResponseAction eap::method_mschapv2::process_request_packet(
 {
     assert(pReceivedPacket || dwReceivedPacketSize == 0);
 
-    m_module.log_event(&EAPMETHOD_PACKET_RECV, event_data((unsigned int)eap_type_legacy_mschapv2), event_data((unsigned int)dwReceivedPacketSize), event_data::blank);
-
     switch (m_phase) {
     case phase_init: {
-        // Convert username to UTF-8.
-        sanitizing_string identity_utf8;
-        WideCharToMultiByte(CP_UTF8, 0, m_cred.m_identity.c_str(), (int)m_cred.m_identity.length(), identity_utf8, NULL, NULL);
+        m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_legacy_mschapv2), event_data::blank);
 
         // Randomize Peer-Challenge.
         m_challenge_client.randomize(m_cp);
 
         // Calculate NT-Response.
+        sanitizing_string identity_utf8;
+        WideCharToMultiByte(CP_UTF8, 0, m_cred.m_identity.c_str(), (int)m_cred.m_identity.length(), identity_utf8, NULL, NULL);
         m_nt_resp = nt_response(m_cp, m_challenge_server, m_challenge_client, identity_utf8.c_str(), m_cred.m_password.c_str());
 
         // Prepare MS-CHAP2-Response.
@@ -122,9 +129,10 @@ EapPeerMethodResponseAction eap::method_mschapv2::process_request_packet(
         response.insert(response.end(), reinterpret_cast<const unsigned char*>(&m_nt_resp), reinterpret_cast<const unsigned char*>(&m_nt_resp + 1)); // NT-Response
 
         // Diameter AVP (User-Name=1, MS-CHAP-Challenge=11/311, MS-CHAP2-Response=25/311)
-        append_avp( 1,      diameter_avp_flag_mandatory,                                         identity_utf8.data(), (unsigned int)identity_utf8.size()      );
-        append_avp(11, 311, diameter_avp_flag_mandatory, reinterpret_cast<const unsigned char*>(&m_challenge_server) , (unsigned int)sizeof(m_challenge_server));
-        append_avp(25, 311, diameter_avp_flag_mandatory,                                         response.data()     , (unsigned int)response.size()           );
+        m_packet_res.clear();
+        diameter_avp_append( 1,      diameter_avp_flag_mandatory,                                         identity_utf8.data(), (unsigned int)identity_utf8.size()      , m_packet_res);
+        diameter_avp_append(11, 311, diameter_avp_flag_mandatory, reinterpret_cast<const unsigned char*>(&m_challenge_server) , (unsigned int)sizeof(m_challenge_server), m_packet_res);
+        diameter_avp_append(25, 311, diameter_avp_flag_mandatory,                                         response.data()     , (unsigned int)response.size()           , m_packet_res);
 
         m_phase = phase_challenge_server;
         m_cfg.m_last_status = config_method::status_cred_invalid; // Blame credentials if we fail beyond this point.
@@ -133,9 +141,16 @@ EapPeerMethodResponseAction eap::method_mschapv2::process_request_packet(
 
     case phase_challenge_server: {
         process_packet(pReceivedPacket, dwReceivedPacketSize);
-        if (m_success)
+        if (m_success) {
+            m_module.log_event(&EAPMETHOD_METHOD_SUCCESS, event_data((unsigned int)eap_type_legacy_mschapv2), event_data::blank);
+
             m_phase = phase_finished;
-        return EapPeerMethodResponseActionNone;
+
+            // Acknowledge the authentication by sending an empty response packet.
+            m_packet_res.clear();
+            return EapPeerMethodResponseActionSend;
+        } else
+            return EapPeerMethodResponseActionDiscard;
     }
 
     case phase_finished:
@@ -144,6 +159,35 @@ EapPeerMethodResponseAction eap::method_mschapv2::process_request_packet(
     default:
         throw invalid_argument(string_printf(__FUNCTION__ " Unknown phase (phase %u).", m_phase).c_str());
     }
+}
+
+
+void eap::method_mschapv2::get_response_packet(
+    _Out_    sanitizing_blob &packet,
+    _In_opt_ DWORD           size_max)
+{
+    if (m_packet_res.size() > size_max)
+        throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %u, maximum: %u).", m_packet_res.size(), size_max).c_str());
+
+    packet.assign(m_packet_res.begin(), m_packet_res.end());
+}
+
+
+void eap::method_mschapv2::get_result(
+    _In_    EapPeerMethodResultReason reason,
+    _Inout_ EapPeerMethodResult       *pResult)
+{
+    assert(pResult);
+
+    method::get_result(reason, pResult);
+
+    if (reason == EapPeerMethodResultSuccess)
+        m_cfg.m_last_status = config_method::status_success;
+
+    // Always ask EAP host to save the connection data. And it will save it *only* when we report "success".
+    // Don't worry. EapHost is well aware of failed authentication condition.
+    pResult->fSaveConnectionData = TRUE;
+    pResult->fIsSuccess          = TRUE;
 }
 
 

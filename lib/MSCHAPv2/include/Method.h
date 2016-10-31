@@ -38,7 +38,7 @@ namespace eap
 
 namespace eap
 {
-    class method_mschapv2 : public method_noneap
+    class method_mschapv2 : public method
     {
         WINSTD_NONCOPYABLE(method_mschapv2)
 
@@ -50,7 +50,7 @@ namespace eap
         /// \param[in] cfg   Method configuration
         /// \param[in] cred  User credentials
         ///
-        method_mschapv2(_In_ module &module, _In_ config_method_mschapv2 &cfg, _In_ credentials_pass &cred);
+        method_mschapv2(_In_ module &mod, _In_ config_method_mschapv2 &cfg, _In_ credentials_pass &cred);
 
         ///
         /// Moves a MSCHAPv2 method
@@ -90,6 +90,24 @@ namespace eap
         virtual EapPeerMethodResponseAction process_request_packet(
             _In_bytecount_(dwReceivedPacketSize) const void  *pReceivedPacket,
             _In_                                       DWORD dwReceivedPacketSize);
+
+        ///
+        /// Obtains a response packet from the EAP method.
+        ///
+        /// \sa [EapPeerGetResponsePacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363610.aspx)
+        ///
+        virtual void get_response_packet(
+            _Out_    sanitizing_blob &packet,
+            _In_opt_ DWORD           size_max = MAXDWORD);
+
+        ///
+        /// Obtains the result of an authentication session from the EAP method.
+        ///
+        /// \sa [EapPeerGetResult function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363611.aspx)
+        ///
+        virtual void get_result(
+            _In_    EapPeerMethodResultReason reason,
+            _Inout_ EapPeerMethodResult       *pResult);
 
         /// @}
 
@@ -133,6 +151,7 @@ namespace eap
         static std::list<std::string> parse_response(_In_count_(count) const char *resp, _In_ size_t count);
 
     protected:
+        config_method_mschapv2 &m_cfg;          ///< Method configuration
         credentials_pass &m_cred;               ///< Method user credentials
         winstd::crypt_prov m_cp;                ///< Cryptography provider for general services
 
@@ -148,5 +167,7 @@ namespace eap
             phase_challenge_server,             ///< Verify server challenge
             phase_finished,                     ///< Connection shut down
         } m_phase;                              ///< What phase is our communication at?
+
+        sanitizing_blob m_packet_res;           ///< Response packet
     };
 }

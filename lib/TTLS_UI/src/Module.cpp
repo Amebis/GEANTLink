@@ -24,14 +24,20 @@ using namespace std;
 using namespace winstd;
 
 
-//////////////////////////////////////////////////////////////////////
-// wxInitializerPeer
-//////////////////////////////////////////////////////////////////////
-
+///
+/// Peer initializer
+///
 class wxInitializerPeer
 {
 public:
+    ///
+    /// Initialize peer
+    ///
     wxInitializerPeer(_In_ HINSTANCE instance);
+
+    ///
+    /// Uninitialize peer
+    ///
     virtual ~wxInitializerPeer();
 
 protected:

@@ -45,7 +45,6 @@ namespace eap
 #pragma once
 
 #include "Credentials.h"
-#include "Method.h"
 #include "TLS.h"
 
 #include "../../EAPBase/include/Config.h"
@@ -183,11 +182,5 @@ namespace eap
     public:
         std::list<winstd::cert_context> m_trusted_root_ca;  ///< Trusted root CAs
         std::list<std::wstring> m_server_names;             ///< Acceptable authenticating server names
-
-#if EAP_TLS < EAP_TLS_SCHANNEL
-        // Following members are used for session resumptions. They are not exported/imported to XML.
-        sanitizing_blob m_session_id;                       ///< TLS session ID
-        tls_master_secret m_master_secret;                  ///< TLS master secret
-#endif
     };
 }

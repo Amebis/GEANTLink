@@ -23,6 +23,8 @@ namespace eap
     ///
     /// EapHost peer method
     ///
+    /// A wrapper class to provide system installed 3rd party EAP methods integration.
+    ///
     class method_eaphost;
 }
 
@@ -49,7 +51,7 @@ namespace eap
         /// \param[in] cfg   Method configuration
         /// \param[in] cred  User credentials
         ///
-        method_eaphost(_In_ module &module, _In_ config_method_eaphost &cfg, _In_ credentials_eaphost &cred);
+        method_eaphost(_In_ module &mod, _In_ config_method_eaphost &cfg, _In_ credentials_eaphost &cred);
 
         ///
         /// Moves an EAP method
@@ -103,8 +105,8 @@ namespace eap
         /// \sa [EapPeerGetResponsePacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363610.aspx)
         ///
         virtual void get_response_packet(
-            _Inout_bytecap_(*dwSendPacketSize) void  *pSendPacket,
-            _Inout_                            DWORD *pdwSendPacketSize);
+            _Out_    sanitizing_blob &packet,
+            _In_opt_ DWORD           size_max = MAXDWORD);
 
         ///
         /// Obtains the result of an authentication session from the EAP method.
@@ -167,7 +169,7 @@ namespace eap
         ///
         /// Converts EapHost peer action to output structure.
         ///
-        /// \param[in] action      EapHost peer action
+        /// \param[in] action  EapHost peer action
         ///
         /// \returns EAP method output action
         ///
@@ -186,9 +188,9 @@ namespace eap
         }
 
     protected:
-        EAP_SESSIONID m_session_id;     ///< EAP session ID
+        config_method_eaphost &m_cfg;   ///< Method configuration
+        credentials_eaphost &m_cred;    ///< Method user credentials
 
-        sanitizing_blob m_ctx_req_blob; ///< Inner UI context request
-        sanitizing_blob m_ctx_res_blob; ///< Inner UI context response
+        EAP_SESSIONID m_session_id;     ///< EAP session ID
     };
 }

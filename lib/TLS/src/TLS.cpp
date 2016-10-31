@@ -428,7 +428,7 @@ void eap::tls_conn_state::set_cipher(_In_ const unsigned char cipher[2])
         m_size_mac_key   = 384/8; // SHA-384
         m_size_mac_hash  = 384/8; // SHA-384
     } else
-        throw win_runtime_error(ERROR_NOT_SUPPORTED, string_printf(__FUNCTION__ " Unknown cipher (received 0x%02x%02x).", cipher[0], cipher[1]));
+        throw win_runtime_error(ERROR_NOT_SUPPORTED, string_printf(__FUNCTION__ " Unknown cipher (received: 0x%02x%02x).", cipher[0], cipher[1]));
 }
 
 

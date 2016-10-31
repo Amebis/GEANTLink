@@ -75,10 +75,6 @@ eap::config_method_tls::config_method_tls(_In_ module &mod, _In_ unsigned int le
 eap::config_method_tls::config_method_tls(_In_ const config_method_tls &other) :
     m_trusted_root_ca(other.m_trusted_root_ca),
     m_server_names(other.m_server_names),
-#if EAP_TLS < EAP_TLS_SCHANNEL
-    m_session_id(other.m_session_id),
-    m_master_secret(other.m_master_secret),
-#endif
     config_method_with_cred(other)
 {
 }
@@ -87,10 +83,6 @@ eap::config_method_tls::config_method_tls(_In_ const config_method_tls &other) :
 eap::config_method_tls::config_method_tls(_Inout_ config_method_tls &&other) :
     m_trusted_root_ca(std::move(other.m_trusted_root_ca)),
     m_server_names(std::move(other.m_server_names)),
-#if EAP_TLS < EAP_TLS_SCHANNEL
-    m_session_id(std::move(other.m_session_id)),
-    m_master_secret(std::move(other.m_master_secret)),
-#endif
     config_method_with_cred(std::move(other))
 {
 }
@@ -102,10 +94,6 @@ eap::config_method_tls& eap::config_method_tls::operator=(_In_ const config_meth
         (config_method_with_cred&)*this = other;
         m_trusted_root_ca = other.m_trusted_root_ca;
         m_server_names    = other.m_server_names;
-#if EAP_TLS < EAP_TLS_SCHANNEL
-        m_session_id      = other.m_session_id;
-        m_master_secret   = other.m_master_secret;
-#endif
     }
 
     return *this;
@@ -118,10 +106,6 @@ eap::config_method_tls& eap::config_method_tls::operator=(_Inout_ config_method_
         (config_method_with_cred&&)*this = std::move(other);
         m_trusted_root_ca = std::move(other.m_trusted_root_ca);
         m_server_names    = std::move(other.m_server_names);
-#if EAP_TLS < EAP_TLS_SCHANNEL
-        m_session_id      = std::move(other.m_session_id);
-        m_master_secret   = std::move(other.m_master_secret);
-#endif
     }
 
     return *this;
@@ -250,10 +234,6 @@ void eap::config_method_tls::operator<<(_Inout_ cursor_out &cursor) const
     config_method_with_cred::operator<<(cursor);
     cursor << m_trusted_root_ca;
     cursor << m_server_names   ;
-#if EAP_TLS < EAP_TLS_SCHANNEL
-    cursor << m_session_id     ;
-    cursor << m_master_secret  ;
-#endif
 }
 
 
@@ -262,14 +242,7 @@ size_t eap::config_method_tls::get_pk_size() const
     return
         config_method_with_cred::get_pk_size() +
         pksizeof(m_trusted_root_ca) +
-        pksizeof(m_server_names   )
-#if EAP_TLS < EAP_TLS_SCHANNEL
-        +
-        pksizeof(m_session_id     ) +
-        pksizeof(m_master_secret  );
-#else
-        ;
-#endif
+        pksizeof(m_server_names   );
 }
 
 
@@ -278,10 +251,6 @@ void eap::config_method_tls::operator>>(_Inout_ cursor_in &cursor)
     config_method_with_cred::operator>>(cursor);
     cursor >> m_trusted_root_ca;
     cursor >> m_server_names   ;
-#if EAP_TLS < EAP_TLS_SCHANNEL
-    cursor >> m_session_id     ;
-    cursor >> m_master_secret  ;
-#endif
 }
 
 

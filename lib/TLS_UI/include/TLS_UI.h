@@ -172,9 +172,6 @@ public:
 protected:
     /// \cond internal
     virtual void OnInitDialog(wxInitDialogEvent& event);
-#if EAP_TLS < EAP_TLS_SCHANNEL
-    virtual bool TransferDataFromWindow();
-#endif
     /// \endcond
 
 protected:

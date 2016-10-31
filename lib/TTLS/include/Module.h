@@ -41,7 +41,7 @@ namespace eap
 
     public:
         ///
-        /// Constructs a EAP TTLS peer module
+        /// Constructs a EAP-TTLS peer module
         ///
         peer_ttls();
 
@@ -228,20 +228,26 @@ namespace eap
     protected:
         class session {
         public:
+            ///
+            /// Constructs a EAP-TTLS session
+            ///
             session(_In_ module &mod);
+
+            ///
+            /// Destructs EAP-TTLS session
+            ///
             virtual ~session();
 
         public:
-            module &m_module;                       ///< Module
-            config_connection m_cfg;                ///< Connection configuration
-            credentials_connection m_cred;          ///< Connection credentials
-            std::unique_ptr<method_ttls> m_method;  ///< EAP-TTLS method
+            module &m_module;                   ///< Module
+            config_connection m_cfg;            ///< Connection configuration
+            credentials_connection m_cred;      ///< Connection credentials
+            std::unique_ptr<method> m_method;   ///< EAP-TTLS method
 
             // The following members are required to avoid memory leakage in get_result()
-            EAP_ATTRIBUTES m_eap_attr_desc; ///< EAP attributes descriptor
-            BYTE *m_blob_cfg;               ///< Configuration BLOB
+            BYTE *m_blob_cfg;                   ///< Configuration BLOB
 #ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
-            BYTE *m_blob_cred;              ///< Credentials BLOB
+            BYTE *m_blob_cred;                  ///< Credentials BLOB
 #endif
         };
     };

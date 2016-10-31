@@ -39,7 +39,7 @@ namespace eap
     {
     public:
         ///
-        /// Constructs a EAP TTLS UI peer module
+        /// Constructs a EAP-TTLS UI peer module
         ///
         peer_ttls_ui();
 

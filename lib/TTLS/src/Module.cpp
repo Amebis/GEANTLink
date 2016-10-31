@@ -227,7 +227,27 @@ EAP_SESSION_HANDLE eap::peer_ttls::begin_session(
     }
 
     // We have configuration, we have credentials, create method.
-    s->m_method.reset(new method_ttls(*this, *cfg_method, *dynamic_cast<credentials_ttls*>(s->m_cred.m_cred.get())));
+    auto  cfg_inner        = cfg_method->m_inner.get();
+    auto cred_inner        = dynamic_cast<credentials_ttls*>(s->m_cred.m_cred.get())->m_inner.get();
+    auto cfg_inner_eaphost = dynamic_cast<config_method_eaphost*>(cfg_inner);
+    unique_ptr<method> meth_inner;
+    if (!cfg_inner_eaphost) {
+        // Native inner methods
+        switch (cfg_inner->get_method_id()) {
+        case eap_type_legacy_pap     : meth_inner.reset(new method_pap     (*this, dynamic_cast<config_method_pap     &>(*cfg_inner), dynamic_cast<credentials_pass&>(*cred_inner))); break;
+        case eap_type_legacy_mschapv2: meth_inner.reset(new method_mschapv2(*this, dynamic_cast<config_method_mschapv2&>(*cfg_inner), dynamic_cast<credentials_pass&>(*cred_inner))); break;
+        default: throw invalid_argument(__FUNCTION__ " Unsupported inner authentication method.");
+        }
+    } else {
+        // EapHost inner method
+        meth_inner.reset(
+            new method_eapmsg (*this, cred_inner->get_identity().c_str(),
+            new method_eaphost(*this, *cfg_inner_eaphost, dynamic_cast<credentials_eaphost&>(*cred_inner))));
+    }
+    s->m_method.reset(
+        new method_eap   (*this, eap_type_ttls,
+        new method_defrag(*this,
+        new method_ttls  (*this, *cfg_method, *dynamic_cast<credentials_ttls*>(s->m_cred.m_cred.get()), meth_inner.release()))));
 
     // Initialize method.
     s->m_method->begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
@@ -265,7 +285,14 @@ void eap::peer_ttls::get_response_packet(
     _Inout_bytecap_(*dwSendPacketSize) EapPacket          *pSendPacket,
     _Inout_                            DWORD              *pdwSendPacketSize)
 {
-    static_cast<session*>(hSession)->m_method->get_response_packet(pSendPacket, pdwSendPacketSize);
+    assert(pdwSendPacketSize);
+    assert(pSendPacket || !*pdwSendPacketSize);
+
+    sanitizing_blob packet;
+    static_cast<session*>(hSession)->m_method->get_response_packet(packet, *pdwSendPacketSize);
+    assert(packet.size() <= *pdwSendPacketSize);
+
+    memcpy(pSendPacket, packet.data(), *pdwSendPacketSize = (DWORD)packet.size());
 }
 
 
@@ -277,9 +304,6 @@ void eap::peer_ttls::get_result(
     auto s = static_cast<session*>(hSession);
 
     s->m_method->get_result(reason, pResult);
-    s->m_eap_attr_desc.dwNumberOfAttributes = (DWORD)s->m_method->m_eap_attr.size();
-    s->m_eap_attr_desc.pAttribs = s->m_method->m_eap_attr.data();
-    pResult->pAttribArray = &s->m_eap_attr_desc;
 
     // Do not report failure to EapHost, as it will not save updated configuration then. But we need it to save it, to alert user on next connection attempt.
     // EapHost is well aware of the failed condition.

@@ -28,18 +28,21 @@ using namespace winstd;
 // eap::method_pap
 //////////////////////////////////////////////////////////////////////
 
-eap::method_pap::method_pap(_In_ module &module, _In_ config_method_pap &cfg, _In_ credentials_pass &cred) :
+eap::method_pap::method_pap(_In_ module &mod, _In_ config_method_pap &cfg, _In_ credentials_pass &cred) :
+    m_cfg(cfg),
     m_cred(cred),
     m_phase(phase_unknown),
-    method_noneap(module, cfg, cred)
+    method(mod)
 {
 }
 
 
 eap::method_pap::method_pap(_Inout_ method_pap &&other) :
-    m_cred       (          other.m_cred       ),
-    m_phase      (std::move(other.m_phase     )),
-    method_noneap(std::move(other             ))
+    m_cfg       (          other.m_cfg        ),
+    m_cred      (          other.m_cred       ),
+    m_phase     (std::move(other.m_phase     )),
+    m_packet_res(std::move(other.m_packet_res)),
+    method      (std::move(other             ))
 {
 }
 
@@ -47,9 +50,11 @@ eap::method_pap::method_pap(_Inout_ method_pap &&other) :
 eap::method_pap& eap::method_pap::operator=(_Inout_ method_pap &&other)
 {
     if (this != std::addressof(other)) {
-        assert(std::addressof(m_cred) == std::addressof(other.m_cred)); // Move method with same credentials only!
-        (method_noneap&)*this = std::move(other             );
-        m_phase               = std::move(other.m_phase     );
+        assert(std::addressof(m_cfg ) == std::addressof(other.m_cfg )); // Move method within same configuration only!
+        assert(std::addressof(m_cred) == std::addressof(other.m_cred)); // Move method within same credentials only!
+        (method&)*this = std::move(other             );
+        m_phase        = std::move(other.m_phase     );
+        m_packet_res   = std::move(other.m_packet_res);
     }
 
     return *this;
@@ -62,9 +67,13 @@ void eap::method_pap::begin_session(
     _In_        HANDLE        hTokenImpersonateUser,
     _In_opt_    DWORD         dwMaxSendPacketSize)
 {
-    method_noneap::begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
+    method::begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
 
-    m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_legacy_pap), event_data::blank);
+    // Presume authentication will fail with generic protocol failure. (Pesimist!!!)
+    // We will reset once we get get_result(Success) call.
+    m_cfg.m_last_status = config_method::status_auth_failed;
+    m_cfg.m_last_msg.clear();
+
     m_phase = phase_init;
 }
 
@@ -74,12 +83,12 @@ EapPeerMethodResponseAction eap::method_pap::process_request_packet(
     _In_                                       DWORD dwReceivedPacketSize)
 {
     UNREFERENCED_PARAMETER(pReceivedPacket);
-    assert(pReceivedPacket || dwReceivedPacketSize == 0);
-
-    m_module.log_event(&EAPMETHOD_PACKET_RECV, event_data((unsigned int)eap_type_legacy_pap), event_data((unsigned int)dwReceivedPacketSize), event_data::blank);
+    UNREFERENCED_PARAMETER(dwReceivedPacketSize);
 
     switch (m_phase) {
     case phase_init: {
+        m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_legacy_pap), event_data::blank);
+
         // Convert username and password to UTF-8.
         sanitizing_string identity_utf8, password_utf8;
         WideCharToMultiByte(CP_UTF8, 0, m_cred.m_identity.c_str(), (int)m_cred.m_identity.length(), identity_utf8, NULL, NULL);
@@ -90,8 +99,9 @@ EapPeerMethodResponseAction eap::method_pap::process_request_packet(
         password_utf8.append(padding_password_ex, 0);
 
         // Diameter AVP (User-Name=1, User-Password=2)
-        append_avp(1, diameter_avp_flag_mandatory, identity_utf8.data(), (unsigned int)identity_utf8.size());
-        append_avp(2, diameter_avp_flag_mandatory, password_utf8.data(), (unsigned int)password_utf8.size());
+        m_packet_res.clear();
+        diameter_avp_append(1, diameter_avp_flag_mandatory, identity_utf8.data(), (unsigned int)identity_utf8.size(), m_packet_res);
+        diameter_avp_append(2, diameter_avp_flag_mandatory, password_utf8.data(), (unsigned int)password_utf8.size(), m_packet_res);
 
         m_phase = phase_finished;
         m_cfg.m_last_status = config_method::status_cred_invalid; // Blame credentials if we fail beyond this point.
@@ -104,4 +114,33 @@ EapPeerMethodResponseAction eap::method_pap::process_request_packet(
     default:
         throw invalid_argument(string_printf(__FUNCTION__ " Unknown phase (phase %u).", m_phase).c_str());
     }
+}
+
+
+void eap::method_pap::get_response_packet(
+    _Out_    sanitizing_blob &packet,
+    _In_opt_ DWORD           size_max)
+{
+    if (m_packet_res.size() > size_max)
+        throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %u, maximum: %u).", m_packet_res.size(), size_max).c_str());
+
+    packet.assign(m_packet_res.begin(), m_packet_res.end());
+}
+
+
+void eap::method_pap::get_result(
+    _In_    EapPeerMethodResultReason reason,
+    _Inout_ EapPeerMethodResult       *pResult)
+{
+    assert(pResult);
+
+    method::get_result(reason, pResult);
+
+    if (reason == EapPeerMethodResultSuccess)
+        m_cfg.m_last_status = config_method::status_success;
+
+    // Always ask EAP host to save the connection data. And it will save it *only* when we report "success".
+    // Don't worry. EapHost is well aware of failed authentication condition.
+    pResult->fSaveConnectionData = TRUE;
+    pResult->fIsSuccess          = TRUE;
 }

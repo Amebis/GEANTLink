@@ -28,19 +28,14 @@ using namespace winstd;
 // eap::method
 //////////////////////////////////////////////////////////////////////
 
-eap::method::method(_In_ module &module, _In_ config_method &cfg, _In_ credentials &cred) :
-    m_module(module),
-    m_cfg(cfg),
-    m_cred(cred)
+eap::method::method(_In_ module &mod) :
+    m_module(mod)
 {
 }
 
 
 eap::method::method(_Inout_ method &&other) :
-    m_module  (          other.m_module   ),
-    m_cfg     (          other.m_cfg      ),
-    m_cred    (          other.m_cred     ),
-    m_eap_attr(std::move(other.m_eap_attr))
+    m_module(other.m_module)
 {
 }
 
@@ -49,9 +44,6 @@ eap::method& eap::method::operator=(_Inout_ method &&other)
 {
     if (this != std::addressof(other)) {
         assert(std::addressof(m_module) == std::addressof(other.m_module)); // Move method within same module only!
-        assert(std::addressof(m_cfg   ) == std::addressof(other.m_cfg   )); // Move method with same configuration only!
-        assert(std::addressof(m_cred  ) == std::addressof(other.m_cred  )); // Move method with same credentials only!
-        m_eap_attr = std::move(other.m_eap_attr);
     }
 
     return *this;
@@ -68,11 +60,6 @@ void eap::method::begin_session(
     UNREFERENCED_PARAMETER(pAttributeArray);
     UNREFERENCED_PARAMETER(hTokenImpersonateUser);
     UNREFERENCED_PARAMETER(dwMaxSendPacketSize);
-
-    // Presume authentication will fail with generic protocol failure. (Pesimist!!!)
-    // We will reset once we get get_result(Success) call.
-    m_cfg.m_last_status = config_method::status_auth_failed;
-    m_cfg.m_last_msg.clear();
 }
 
 
@@ -85,27 +72,8 @@ void eap::method::get_result(
     _In_    EapPeerMethodResultReason reason,
     _Inout_ EapPeerMethodResult       *pResult)
 {
-    assert(pResult);
-
-    switch (reason) {
-    case EapPeerMethodResultSuccess: {
-        m_module.log_event(&EAPMETHOD_METHOD_SUCCESS, event_data((unsigned int)m_cfg.get_method_id()), event_data::blank);
-        m_cfg.m_last_status  = config_method::status_success;
-        break;
-    }
-
-    case EapPeerMethodResultFailure:
-        m_module.log_event(&EAPMETHOD_METHOD_FAILURE_ERROR2, event_data((unsigned int)m_cfg.get_method_id()), event_data((unsigned int)m_cfg.m_last_status), event_data::blank);
-        break;
-
-    default:
-        throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Not supported.");
-    }
-
-    // Always ask EAP host to save the connection data. And it will save it *only* when we report "success".
-    // Don't worry. EapHost is well aware of failed authentication condition.
-    pResult->fSaveConnectionData = TRUE;
-    pResult->fIsSuccess          = TRUE;
+    UNREFERENCED_PARAMETER(reason);
+    UNREFERENCED_PARAMETER(pResult);
 }
 
 
@@ -154,107 +122,192 @@ EapPeerMethodResponseAction eap::method::set_response_attributes(_In_ const EapA
 
 
 //////////////////////////////////////////////////////////////////////
-// eap::method_noneap
+// eap::method_tunnel
 //////////////////////////////////////////////////////////////////////
 
-eap::method_noneap::method_noneap(_In_ module &module, _In_ config_method &cfg, _In_ credentials &cred) : method(module, cfg, cred)
+eap::method_tunnel::method_tunnel(_In_ module &mod, _In_ method *inner) :
+    m_inner(inner),
+    method(mod)
 {
 }
 
 
-eap::method_noneap::method_noneap(_Inout_ method_noneap &&other) :
-    m_packet_res(std::move(other.m_packet_res)),
-    method      (std::move(other             ))
+eap::method_tunnel::method_tunnel(_Inout_ method_tunnel &&other) :
+    m_inner(std::move(other.m_inner)),
+    method (std::move(other        ))
 {
 }
 
 
-eap::method_noneap& eap::method_noneap::operator=(_Inout_ method_noneap &&other)
+eap::method_tunnel& eap::method_tunnel::operator=(_Inout_ method_tunnel &&other)
 {
     if (this != std::addressof(other)) {
-        assert(std::addressof(m_cred) == std::addressof(other.m_cred)); // Move method with same credentials only!
-        (method&)*this = std::move(other             );
-        m_packet_res   = std::move(other.m_packet_res);
+        (method&)*this = std::move(other        );
+        m_inner        = std::move(other.m_inner);
     }
 
     return *this;
 }
 
 
-void eap::method_noneap::get_response_packet(
-    _Inout_bytecap_(*dwSendPacketSize) void  *pSendPacket,
-    _Inout_                            DWORD *pdwSendPacketSize)
+void eap::method_tunnel::begin_session(
+    _In_        DWORD         dwFlags,
+    _In_  const EapAttributes *pAttributeArray,
+    _In_        HANDLE        hTokenImpersonateUser,
+    _In_opt_    DWORD         dwMaxSendPacketSize)
 {
-    assert(pdwSendPacketSize);
-    assert(pSendPacket);
+    method::begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
 
-    size_t size_packet = m_packet_res.size();
-    if (size_packet > *pdwSendPacketSize)
-        throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %u, maximum: %u).", size_packet, *pdwSendPacketSize).c_str());
-
-    memcpy(pSendPacket, m_packet_res.data(), size_packet);
-    *pdwSendPacketSize = (DWORD)size_packet;
-    m_packet_res.clear();
+    assert(m_inner);
+    m_inner->begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
 }
 
 
-void eap::method_noneap::append_avp(
-    _In_                       unsigned int  code,
-    _In_                       unsigned char flags,
-    _In_bytecount_(size) const void          *data,
-    _In_                       unsigned int  size)
+void eap::method_tunnel::end_session()
 {
-    unsigned int
-        padding = (unsigned int)((4 - size) % 4),
-        size_outer;
+    assert(m_inner);
+    m_inner->end_session();
 
-    m_packet_res.reserve(
-        m_packet_res.size() + 
-        (size_outer = 
-        sizeof(diameter_avp_header) + // Diameter header
-        size)                       + // Data
-        padding);                     // Data padding
-
-    // Diameter AVP header
-    diameter_avp_header hdr;
-    *reinterpret_cast<unsigned int*>(hdr.code) = htonl(code);
-    hdr.flags = flags;
-    hton24(size_outer, hdr.length);
-    m_packet_res.insert(m_packet_res.end(), reinterpret_cast<const unsigned char*>(&hdr), reinterpret_cast<const unsigned char*>(&hdr + 1));
-
-    // Data
-    m_packet_res.insert(m_packet_res.end(), reinterpret_cast<const unsigned char*>(data), reinterpret_cast<const unsigned char*>(data) + size);
-    m_packet_res.insert(m_packet_res.end(), padding, 0);
+    method::end_session();
 }
 
 
-void eap::method_noneap::append_avp(
-    _In_                       unsigned int  code,
-    _In_                       unsigned int  vendor_id,
-    _In_                       unsigned char flags,
-    _In_bytecount_(size) const void          *data,
-    _In_                       unsigned int  size)
+EapPeerMethodResponseAction eap::method_tunnel::process_request_packet(
+    _In_bytecount_(dwReceivedPacketSize) const void  *pReceivedPacket,
+    _In_                                       DWORD dwReceivedPacketSize)
 {
-    unsigned int
-        padding = (unsigned int)((4 - size) % 4),
-        size_outer;
+    assert(m_inner);
+    return m_inner->process_request_packet(pReceivedPacket, dwReceivedPacketSize);
+}
 
-    m_packet_res.reserve(
-        m_packet_res.size() + 
-        (size_outer = 
-        sizeof(diameter_avp_header_ven) + // Diameter header
-        size)                           + // Data
-        padding);                         // Data padding
 
-    // Diameter AVP header
-    diameter_avp_header_ven hdr;
-    *reinterpret_cast<unsigned int*>(hdr.code) = htonl(code);
-    hdr.flags = flags | diameter_avp_flag_vendor;
-    hton24(size_outer, hdr.length);
-    *reinterpret_cast<unsigned int*>(hdr.vendor) = htonl(vendor_id);
-    m_packet_res.insert(m_packet_res.end(), reinterpret_cast<const unsigned char*>(&hdr), reinterpret_cast<const unsigned char*>(&hdr + 1));
+void eap::method_tunnel::get_response_packet(
+    _Out_    sanitizing_blob &packet,
+    _In_opt_ DWORD           size_max)
+{
+    assert(m_inner);
+    m_inner->get_response_packet(packet, size_max);
+}
 
-    // Data
-    m_packet_res.insert(m_packet_res.end(), reinterpret_cast<const unsigned char*>(data), reinterpret_cast<const unsigned char*>(data) + size);
-    m_packet_res.insert(m_packet_res.end(), padding, 0);
+
+void eap::method_tunnel::get_result(
+    _In_    EapPeerMethodResultReason reason,
+    _Inout_ EapPeerMethodResult       *pResult)
+{
+    assert(m_inner);
+    m_inner->get_result(reason, pResult);
+}
+
+
+void eap::method_tunnel::get_ui_context(
+    _Inout_ BYTE  **ppUIContextData,
+    _Inout_ DWORD *pdwUIContextDataSize)
+{
+    assert(m_inner);
+    m_inner->get_ui_context(ppUIContextData, pdwUIContextDataSize);
+}
+
+
+EapPeerMethodResponseAction eap::method_tunnel::set_ui_context(
+    _In_count_(dwUIContextDataSize) const BYTE  *pUIContextData,
+    _In_                                  DWORD dwUIContextDataSize)
+{
+    assert(m_inner);
+    return m_inner->set_ui_context(pUIContextData, dwUIContextDataSize);
+}
+
+
+void eap::method_tunnel::get_response_attributes(_Inout_ EapAttributes *pAttribs)
+{
+    assert(m_inner);
+    m_inner->get_response_attributes(pAttribs);
+}
+
+
+EapPeerMethodResponseAction eap::method_tunnel::set_response_attributes(_In_ const EapAttributes *pAttribs)
+{
+    assert(m_inner);
+    return m_inner->set_response_attributes(pAttribs);
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// eap::method_eap
+//////////////////////////////////////////////////////////////////////
+
+eap::method_eap::method_eap(_In_ module &mod, _In_ eap_type_t eap_method, _In_ method *inner) :
+    m_eap_method(eap_method),
+    m_id(0),
+    method_tunnel(mod, inner)
+{
+}
+
+
+eap::method_eap::method_eap(_Inout_ method_eap &&other) :
+    m_eap_method (std::move(other.m_eap_method)),
+    m_id         (std::move(other.m_id        )),
+    method_tunnel(std::move(other             ))
+{
+}
+
+
+eap::method_eap& eap::method_eap::operator=(_Inout_ method_eap &&other)
+{
+    if (this != std::addressof(other)) {
+        assert(m_eap_method == other.m_eap_method); // Move method within same EAP method type only!
+        (method_tunnel&)*this = std::move(other     );
+        m_id                  = std::move(other.m_id);
+    }
+
+    return *this;
+}
+
+
+EapPeerMethodResponseAction eap::method_eap::process_request_packet(
+    _In_bytecount_(dwReceivedPacketSize) const void  *pReceivedPacket,
+    _In_                                       DWORD dwReceivedPacketSize)
+{
+    assert(dwReceivedPacketSize >= sizeof(EapPacket)); // Request packet should contain an EAP packet header at least.
+    auto hdr = reinterpret_cast<const EapPacket*>(pReceivedPacket);
+
+    // Parse EAP header.
+    if (hdr->Code != EapCodeRequest)
+        throw invalid_argument(string_printf(__FUNCTION__ " Unknown EAP packet received (expected: %u, received: %u).", EapCodeRequest, (int)hdr->Code));
+    DWORD size_packet = ntohs(*reinterpret_cast<const unsigned short*>(hdr->Length));
+    if (size_packet > dwReceivedPacketSize)
+        throw invalid_argument(string_printf(__FUNCTION__ " Incorrect EAP packet length (expected: %uB, received: %uB).", size_packet, dwReceivedPacketSize));
+    if (hdr->Data[0] != m_eap_method)
+        throw invalid_argument(string_printf(__FUNCTION__ " Unsupported EAP method (expected: %u, received: %u).", (int)m_eap_method, (int)hdr->Data[0]));
+
+    // Save request packet ID to make matching response packet in get_response_packet() later.
+    m_id = hdr->Id;
+
+    // Process the data with underlying method.
+    return method_tunnel::process_request_packet(hdr->Data + 1, size_packet - sizeof(EapPacket));
+}
+
+
+void eap::method_eap::get_response_packet(
+    _Out_    sanitizing_blob &packet,
+    _In_opt_ DWORD           size_max)
+{
+    assert(size_max >= sizeof(EapPacket)); // We should be able to respond with at least an EAP packet header.
+
+    if (size_max > MAXWORD) size_max = MAXWORD; // EAP packets maximum size is 64kB.
+    packet.reserve(size_max); // To avoid reallocation when inserting EAP packet header later.
+
+    // Get data from underlying method.
+    method_tunnel::get_response_packet(packet, size_max - sizeof(EapPacket));
+
+    // Prepare EAP packet header.
+    EapPacket hdr;
+    hdr.Code = (BYTE)EapCodeResponse;
+    hdr.Id = m_id;
+    size_t size_packet = packet.size() + sizeof(EapPacket);
+    assert(size_packet <= MAXWORD); // Packets spanning over 64kB are not supported.
+    *reinterpret_cast<unsigned short*>(hdr.Length) = htons((unsigned short)size_packet);
+    hdr.Data[0] = m_eap_method;
+
+    // Insert EAP packet header before data.
+    packet.insert(packet.begin(), reinterpret_cast<const unsigned char*>(&hdr), reinterpret_cast<const unsigned char*>(&hdr + 1));
 }
