@@ -325,7 +325,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
                             auto cred_inner = dynamic_cast<eap::credentials_eaphost*>(cred->m_inner.get());
                             DWORD cred_data_size = 0;
                             winstd::eap_blob cred_data;
-                            unique_ptr<WCHAR[], EapHostPeerFreeRuntimeMemory_delete> identity;
+                            unique_ptr<WCHAR[], EapHostPeerFreeMemory_delete> identity;
                             winstd::eap_error error;
                             DWORD dwResult = EapHostPeerInvokeIdentityUI(
                                 0,
