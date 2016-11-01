@@ -22,7 +22,6 @@
 
 #include "../include/Config.h"
 #include "../include/Credentials.h"
-#include "../include/TLS.h"
 
 #include "../../EAPBase/include/EAPXML.h"
 

@@ -83,7 +83,6 @@
     <ClInclude Include="..\include\Credentials.h" />
     <ClInclude Include="..\include\Method.h" />
     <ClInclude Include="..\include\Module.h" />
-    <ClInclude Include="..\include\TTLS.h" />
     <ClInclude Include="..\src\StdAfx.h" />
   </ItemGroup>
   <ItemGroup>

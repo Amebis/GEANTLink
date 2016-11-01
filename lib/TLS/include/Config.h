@@ -45,7 +45,6 @@ namespace eap
 #pragma once
 
 #include "Credentials.h"
-#include "TLS.h"
 
 #include "../../EAPBase/include/Config.h"
 

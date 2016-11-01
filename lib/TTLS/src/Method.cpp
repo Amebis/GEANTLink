@@ -781,14 +781,14 @@ void eap::method_ttls::get_result(
         const unsigned char *_key_block = key_block.rgbKeys;
 
         // MSK: MPPE-Recv-Key
-        a.create_ms_mppe_key(16, _key_block, sizeof(tls_random));
+        a.create_ms_mppe_key(16, _key_block, 32);
         m_eap_attr.push_back(std::move(a));
-        _key_block += sizeof(tls_random);
+        _key_block += 32;
 
         // MSK: MPPE-Send-Key
-        a.create_ms_mppe_key(17, _key_block, sizeof(tls_random));
+        a.create_ms_mppe_key(17, _key_block, 32);
         m_eap_attr.push_back(std::move(a));
-        _key_block += sizeof(tls_random);
+        _key_block += 32;
 
         SecureZeroMemory(&key_block, sizeof(key_block));
 
