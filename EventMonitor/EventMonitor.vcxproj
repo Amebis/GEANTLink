@@ -91,7 +91,7 @@
     <ClInclude Include="Frame.h" />
     <ClInclude Include="LogPanel.h" />
     <ClInclude Include="StdAfx.h" />
-    <ClInclude Include="wxEventMonitor_UI.h" />
+    <ClInclude Include="res\wxEventMonitor_UI.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
@@ -104,7 +104,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="wxEventMonitor_UI.cpp" />
+    <ClCompile Include="res\wxEventMonitor_UI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\lib\Events\build\Events.vcxproj">
@@ -120,7 +120,7 @@
   <ItemGroup>
     <None Include="locale\EventMonitor.pot" />
     <None Include="res\EventMonitor.ico" />
-    <None Include="wxEventMonitor_UI.fbp" />
+    <None Include="res\wxEventMonitor_UI.fbp" />
   </ItemGroup>
   <ItemGroup>
     <POCompile Include="locale\bg_BG.po" />
