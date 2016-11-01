@@ -7,7 +7,7 @@
 
 #include "StdAfx.h"
 
-#include "ETWLog.h"
+#include "../ETWLog.h"
 
 #include "wxEventMonitor_UI.h"
 

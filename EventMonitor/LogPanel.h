@@ -30,7 +30,7 @@ class wxPersistentEventMonitorLogPanel;
 
 #pragma once
 
-#include "wxEventMonitor_UI.h"
+#include "res/wxEventMonitor_UI.h"
 #include <wx/persist/window.h>
 
 

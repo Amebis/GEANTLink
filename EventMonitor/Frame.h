@@ -32,8 +32,6 @@ class wxPersistentEventMonitorFrame;
 
 #include "LogPanel.h"
 
-#include "wxEventMonitor_UI.h"
-
 #include <wx/frame.h>
 #include <wx/menu.h>
 #include <wx/statusbr.h>

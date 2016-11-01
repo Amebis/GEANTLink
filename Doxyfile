@@ -790,6 +790,7 @@ RECURSIVE              = YES
 # run.
 
 EXCLUDE                = \
+	EventMonitor\res \
 	lib\EAPBase_UI\res \
 	lib\TLS_UI\res \
 	lib\TTLS_UI\res \
