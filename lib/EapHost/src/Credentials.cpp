@@ -258,7 +258,7 @@ eap::credentials::source_t eap::credentials_eaphost::combine(
     DWORD cred_data_size = 0;
     eap_blob_runtime cred_data;
     unique_ptr<WCHAR[], EapHostPeerFreeRuntimeMemory_delete> identity;
-    eap_error error; // MSDN says to use EapHostPeerFreeErrorMemory()/eap_error, but given the context of execution, probably eap_error_runtime would be the right choice.
+    eap_error error; // MSDN says to use EapHostPeerFreeErrorMemory()/eap_error, but given the context of execution, eap_error_runtime might be the right choice.
     DWORD dwResult = EapHostPeerGetIdentity(
         0,
         dwFlags,

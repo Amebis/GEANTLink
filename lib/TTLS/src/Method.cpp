@@ -210,17 +210,17 @@ EapPeerMethodResponseAction eap::method_eapmsg::process_request_packet(
         WideCharToMultiByte(CP_UTF8, 0, m_identity.c_str(), -1, identity_utf8, NULL, NULL);
 
         // Build EAP-Response/Identity packet.
-        auto size_identity = identity_utf8.length();
-        assert(size_identity + 1 <= MAXWORD); // Packets spanning over 64kB are not supported.
+        auto size_identity = identity_utf8.length(), size_packet = size_identity + sizeof(EapPacket);
+        assert(size_packet <= MAXWORD); // Packets spanning over 64kB are not supported.
         eap_packet pck;
-        if (!pck.create(EapCodeResponse, 0, (WORD)size_identity + 1))
+        if (!pck.create(EapCodeResponse, 0, (WORD)size_packet))
             throw win_runtime_error(__FUNCTION__ " EapPacket creation failed.");
         pck->Data[0] = eap_type_identity;
         memcpy(pck->Data + 1, identity_utf8.data(), size_identity);
 
         // Diameter AVP (EAP-Message=79)
         m_packet_res.clear();
-        diameter_avp_append(79, diameter_avp_flag_mandatory, (const EapPacket*)pck, (unsigned int)size_identity + 5, m_packet_res);
+        diameter_avp_append(79, diameter_avp_flag_mandatory, (const EapPacket*)pck, (unsigned int)size_packet, m_packet_res);
 
         m_phase = phase_finished;
         return EapPeerMethodResponseActionSend;
@@ -239,8 +239,8 @@ EapPeerMethodResponseAction eap::method_eapmsg::process_request_packet(
             unsigned int size_msg = ntoh24(hdr->length);
             const unsigned char
                 *msg      = reinterpret_cast<const unsigned char*>(hdr + 1),
-                *msg_end  = pck +  size_msg,
-                *msg_next = pck + (size_msg + 3) / 4;
+                *msg_end  = pck + size_msg,
+                *msg_next = msg_end + (unsigned int)((4 - size_msg) % 4);
             if (msg_end > pck_end)
                 throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Incomplete message data.");
             unsigned int code = ntohl(*reinterpret_cast<const unsigned int*>(hdr->code));
@@ -298,7 +298,7 @@ void eap::method_eapmsg::get_response_packet(
         packet.insert(packet.begin(), reinterpret_cast<const unsigned char*>(&hdr), reinterpret_cast<const unsigned char*>(&hdr + 1));
 
         // Add padding.
-        packet.resize((size_packet + 3) / 4);
+        packet.insert(packet.end(), (unsigned int)((4 - size_packet) % 4), 0);
     } else {
         if (m_packet_res.size() > size_max)
             throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %u, maximum: %u).", m_packet_res.size(), size_max).c_str());
