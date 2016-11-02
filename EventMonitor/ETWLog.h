@@ -1,21 +1,21 @@
-/*
+ï»¿/*
     Copyright 2015-2016 Amebis
-    Copyright 2016 GÉANT
+    Copyright 2016 GÃ‰ANT
 
-    This file is part of GÉANTLink.
+    This file is part of GÃ‰ANTLink.
 
-    GÉANTLink is free software: you can redistribute it and/or modify it
+    GÃ‰ANTLink is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    GÉANTLink is distributed in the hope that it will be useful, but
+    GÃ‰ANTLink is distributed in the hope that it will be useful, but
     WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with GÉANTLink. If not, see <http://www.gnu.org/licenses/>.
+    along with GÃ‰ANTLink. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <wx/event.h>
@@ -25,27 +25,13 @@
 ///
 #define wxETWEVENT_RECORDS_MAX  1000000
 
-///
-/// ETW event
-///
 class wxETWEvent;
 wxDECLARE_EVENT(wxEVT_ETW_EVENT, wxETWEvent);
 #define wxETWEventHandler(func) wxEVENT_HANDLER_CAST(wxETWEventFunction, func)
 #define EVT_ETW_EVENT(func) wx__DECLARE_EVT0(wxEVT_ETW_EVENT, wxETWEventHandler(func))
 
-///
-/// Event trace processor
-///
 class wxEventTraceProcessorThread;
-
-///
-/// Event list control
-///
 class wxETWListCtrl;
-
-///
-/// Supports saving/restoring wxETWListCtrl state
-///
 class wxPersistentETWListCtrl;
 
 #pragma once
@@ -61,6 +47,9 @@ class wxPersistentETWListCtrl;
 #include <set>
 
 
+///
+/// ETW event
+///
 class wxETWEvent : public wxEvent
 {
 public:
@@ -89,6 +78,9 @@ protected:
 typedef void (wxEvtHandler::*wxETWEventFunction)(wxETWEvent&);
 
 
+///
+/// Event trace processor
+///
 class wxEventTraceProcessorThread : public wxThread
 {
 public:
@@ -109,6 +101,9 @@ protected:
 };
 
 
+///
+/// Event list control
+///
 class wxETWListCtrl : public wxListCtrl
 {
 protected:
@@ -209,6 +204,9 @@ protected:
 };
 
 
+///
+/// Supports saving/restoring wxETWListCtrl state
+///
 class wxPersistentETWListCtrl : public wxPersistentWindow<wxETWListCtrl>
 {
 public:

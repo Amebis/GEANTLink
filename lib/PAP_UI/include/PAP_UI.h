@@ -21,20 +21,22 @@
 #include "../../EAPBase_UI/include/EAP_UI.h"
 #include "../../PAP/include/Config.h"
 
+class wxPAPConfigPanel;
+
+/// \addtogroup EAPBaseGUI
+/// @{
+
 ///
 /// PAP credential configuration panel
 ///
 typedef wxEAPCredentialsConfigPanel<eap::credentials_pass, wxPasswordCredentialsPanel<eap::credentials_pass, wxPasswordCredentialsPanelBase> > wxPAPCredentialsConfigPanel;
 
 ///
-/// PAP configuration panel
-///
-class wxPAPConfigPanel;
-
-///
 /// PAP credential entry panel
 ///
 typedef wxPasswordCredentialsPanel<eap::credentials_pass, wxPasswordCredentialsPanelBase> wxPAPCredentialsPanel;
+
+/// @}
 
 #pragma once
 
@@ -44,6 +46,12 @@ typedef wxPasswordCredentialsPanel<eap::credentials_pass, wxPasswordCredentialsP
 #include <Windows.h>
 
 
+/// \addtogroup EAPBaseGUI
+/// @{
+
+///
+/// PAP configuration panel
+///
 class wxPAPConfigPanel : public wxPanel
 {
 public:
@@ -65,3 +73,5 @@ protected:
 protected:
     wxPAPCredentialsConfigPanel *m_credentials; ///< Credentials configuration panel
 };
+
+/// @}

@@ -1,28 +1,25 @@
-/*
+ï»¿/*
     Copyright 2015-2016 Amebis
-    Copyright 2016 GÉANT
+    Copyright 2016 GÃ‰ANT
 
-    This file is part of GÉANTLink.
+    This file is part of GÃ‰ANTLink.
 
-    GÉANTLink is free software: you can redistribute it and/or modify it
+    GÃ‰ANTLink is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    GÉANTLink is distributed in the hope that it will be useful, but
+    GÃ‰ANTLink is distributed in the hope that it will be useful, but
     WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with GÉANTLink. If not, see <http://www.gnu.org/licenses/>.
+    along with GÃ‰ANTLink. If not, see <http://www.gnu.org/licenses/>.
 */
 
 namespace eap
 {
-    ///
-    /// PAP method
-    ///
     class method_pap;
 }
 
@@ -36,6 +33,12 @@ namespace eap
 
 namespace eap
 {
+    /// \addtogroup EAPBaseMethod
+    /// @{
+
+    ///
+    /// PAP method
+    ///
     class method_pap : public method
     {
         WINSTD_NONCOPYABLE(method_pap)
@@ -66,53 +69,41 @@ namespace eap
         ///
         method_pap& operator=(_Inout_ method_pap &&other);
 
-        /// \name Packet processing
+        /// \name Session management
         /// @{
 
-        ///
-        /// Starts an EAP authentication session on the peer EapHost using the EAP method.
-        ///
-        /// \sa [EapPeerBeginSession function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363600.aspx)
-        ///
         virtual void begin_session(
             _In_        DWORD         dwFlags,
             _In_  const EapAttributes *pAttributeArray,
             _In_        HANDLE        hTokenImpersonateUser,
             _In_opt_    DWORD         dwMaxSendPacketSize = MAXDWORD);
 
-        ///
-        /// Processes a packet received by EapHost from a supplicant.
-        ///
-        /// \sa [EapPeerProcessRequestPacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363621.aspx)
-        ///
+        /// @}
+
+        /// \name Packet processing
+        /// @{
+
         virtual EapPeerMethodResponseAction process_request_packet(
             _In_bytecount_(dwReceivedPacketSize) const void  *pReceivedPacket,
             _In_                                       DWORD dwReceivedPacketSize);
 
-        ///
-        /// Obtains a response packet from the EAP method.
-        ///
-        /// \sa [EapPeerGetResponsePacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363610.aspx)
-        ///
         virtual void get_response_packet(
             _Out_    sanitizing_blob &packet,
             _In_opt_ DWORD           size_max = MAXDWORD);
 
-        ///
-        /// Obtains the result of an authentication session from the EAP method.
-        ///
-        /// \sa [EapPeerGetResult function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363611.aspx)
-        ///
-        virtual void get_result(
-            _In_    EapPeerMethodResultReason reason,
-            _Inout_ EapPeerMethodResult       *pResult);
-
         /// @}
+
+        virtual void get_result(
+            _In_  EapPeerMethodResultReason reason,
+            _Out_ EapPeerMethodResult       *pResult);
 
     protected:
         config_method_pap &m_cfg;       ///< Method configuration
         credentials_pass &m_cred;       ///< Method user credentials
 
+        ///
+        /// Communication phase
+        ///
         enum {
             phase_unknown = -1,         ///< Unknown phase
             phase_init = 0,             ///< Handshake initialize
@@ -121,4 +112,6 @@ namespace eap
 
         sanitizing_blob m_packet_res;   ///< Response packet
     };
+
+    /// @}
 }

@@ -22,9 +22,6 @@
 
 namespace eap
 {
-    ///
-    /// MSCHAPv2 configuration
-    ///
     class config_method_mschapv2;
 }
 
@@ -39,6 +36,12 @@ namespace eap
 
 namespace eap
 {
+    /// \addtogroup EAPBaseConfig
+    /// @{
+
+    ///
+    /// MSCHAPv2 configuration
+    ///
     class config_method_mschapv2 : public config_method_with_cred
     {
     public:
@@ -82,28 +85,26 @@ namespace eap
         ///
         config_method_mschapv2& operator=(_Inout_ config_method_mschapv2 &&other);
 
-        ///
-        /// Clones configuration
-        ///
-        /// \returns Pointer to cloned configuration
-        ///
         virtual config* clone() const;
 
         ///
-        /// Returns EAP method type of this configuration
-        ///
-        /// \returns `eap::type_mschapv2`
+        /// @copydoc eap::config_method::get_method_id()
+        /// \returns This implementation always returns `eap::type_mschapv2`
         ///
         virtual winstd::eap_type_t get_method_id() const;
 
         ///
-        /// Returns a string \c L"MSCHAPv2"
+        /// @copydoc eap::config_method::get_method_str()
+        /// \returns This implementation always returns `L"MSCHAPv2"`
         ///
         virtual const wchar_t* get_method_str() const;
 
         ///
-        /// Creates a blank set of credentials suitable for this method
+        /// @copydoc eap::config_method::make_credentials()
+        /// \returns This implementation always returns `eap::credentials_pass` type of credentials
         ///
         virtual credentials* make_credentials() const;
     };
+
+    /// @}
 }

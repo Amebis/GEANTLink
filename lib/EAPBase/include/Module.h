@@ -20,18 +20,7 @@
 
 namespace eap
 {
-    ///
-    /// EAP module base class
-    ///
-    /// Provides basic services to EAP methods.
-    ///
     class module;
-
-    ///
-    /// EAP peer base class
-    ///
-    /// A group of methods all EAP peers must or should implement.
-    ///
     class peer;
 }
 
@@ -58,6 +47,17 @@ extern "C" {
 
 namespace eap
 {
+    ///
+    /// \defgroup EAPBaseModule  Modules
+    /// Modules
+    ///
+    /// @{
+
+    ///
+    /// EAP module base class
+    ///
+    /// Provides basic services to EAP methods.
+    ///
     class module
     {
         WINSTD_NONCOPYABLE(module)
@@ -109,7 +109,9 @@ namespace eap
         void free_error_memory(_In_ EAP_ERROR *err);
 
         ///
-        /// Makes a new method config
+        /// Makes a new method configuration
+        ///
+        /// \returns New method configuration
         ///
         virtual config_method* make_config_method();
 
@@ -134,6 +136,7 @@ namespace eap
         /// Writes EAPMETHOD_TRACE_EVT_FN_CALL and returns auto event writer class
         ///
         /// \param[in] pszFnName  Function name
+        /// \param[in] result     Reference to function return variable
         ///
         /// \returns A new auto event writer that writes EAPMETHOD_TRACE_EVT_FN_RETURN_DWORD event on destruction
         ///
@@ -228,6 +231,9 @@ namespace eap
         ///
         /// If \c _DEBUG is set the value is masked.
         ///
+        /// \param[in] name   Variable name
+        /// \param[in] value  Variable value
+        ///
         inline void log_config_discrete(_In_z_ LPCWSTR name, _In_z_ LPCWSTR value) const
         {
 #ifdef _DEBUG
@@ -242,6 +248,10 @@ namespace eap
         ///
         /// If \c _DEBUG is set the value is masked.
         ///
+        /// \param[in] name  Variable name
+        /// \param[in] data  Variable data
+        /// \param[in] size  \p data size in bytes
+        ///
         inline void log_config_discrete(_In_z_ LPCWSTR name, _In_bytecount_(size) const void *data, _In_ ULONG size) const
         {
 #ifdef _DEBUG
@@ -253,6 +263,8 @@ namespace eap
 
         ///
         /// Logs event
+        ///
+        /// \param[in] EventDescriptor  Event descriptor
         ///
         inline void log_event(_In_ PCEVENT_DESCRIPTOR EventDescriptor, ...) const
         {
@@ -273,7 +285,6 @@ namespace eap
         /// \param[in ] hProv  Handle of cryptographics provider
         /// \param[in ] data   Pointer to data to encrypt
         /// \param[in ] size   Size of \p data in bytes
-        /// \param[out] enc    Encrypted data
         /// \param[out] hHash  Handle of hashing object
         ///
         /// \returns Encrypted data
@@ -522,11 +533,6 @@ namespace eap
         /// \param[inout] record        Object to unpack to
         /// \param[in   ] pDataIn       Pointer to encrypted BLOB
         /// \param[in   ] dwDataInSize  Size of \p pDataIn
-        /// \param[out  ] ppEapError    Pointer to error descriptor in case of failure. Free using `module::free_error_memory()`.
-        ///
-        /// \returns
-        /// - \c true if succeeded
-        /// - \c false otherwise. See \p ppEapError for details.
         ///
         template<class T>
         void unpack(
@@ -615,6 +621,11 @@ namespace eap
     };
 
 
+    ///
+    /// EAP peer base class
+    ///
+    /// A group of methods all EAP peers must or should implement.
+    ///
     class peer : public module
     {
         WINSTD_NONCOPYABLE(peer)
@@ -646,22 +657,42 @@ namespace eap
         ///
         /// \sa [EapPeerGetIdentity function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363607.aspx)
         ///
+        /// \param[in ] dwFlags                  A combination of EAP flags that describe the EAP authentication session behavior.
+        /// \param[in ] pConnectionData          Connection data used for the EAP method. If set to \c NULL, the static property of the method, as configured in the registry, is returned.
+        /// \param[in ] dwConnectionDataSize     The size, in bytes, of the connection data buffer provided in \p pConnectionData.
+        /// \param[in ] pUserData                A pointer to a byte buffer that contains the opaque user data BLOB. This parameter can be \c NULL.
+        /// \param[in ] dwUserDataSize           The size, in bytes, of the user data buffer provided in \p pUserData.
+        /// \param[out] ppUserDataOut            A pointer to a pointer to the returned user data. The data is passed to \p EapPeerBeginSession() as input \p pUserData.
+        /// \param[out] pdwUserDataOutSize       Specifies the size, in bytes, of the \p ppUserDataOut buffer.
+        /// \param[in ] hTokenImpersonateUser    A handle to the user impersonation token to use in this session.
+        /// \param[out] pfInvokeUI               Returns \c TRUE if the user identity and user data blob aren't returned successfully, and the method seeks to collect the information from the user through the user interface dialog.
+        /// \param[out] ppwszIdentity            A pointer to the returned user identity. The pointer will be included in the identity response packet and returned to the server.
+        ///
         virtual void get_identity(
             _In_                                   DWORD  dwFlags,
             _In_count_(dwConnectionDataSize) const BYTE   *pConnectionData,
             _In_                                   DWORD  dwConnectionDataSize,
             _In_count_(dwUserDataSize)       const BYTE   *pUserData,
             _In_                                   DWORD  dwUserDataSize,
-            _Inout_                                BYTE   **ppUserDataOut,
-            _Inout_                                DWORD  *pdwUserDataOutSize,
+            _Out_                                  BYTE   **ppUserDataOut,
+            _Out_                                  DWORD  *pdwUserDataOutSize,
             _In_                                   HANDLE hTokenImpersonateUser,
-            _Inout_                                BOOL   *pfInvokeUI,
-            _Inout_                                WCHAR  **ppwszIdentity) = 0;
+            _Out_                                  BOOL   *pfInvokeUI,
+            _Out_                                  WCHAR  **ppwszIdentity) = 0;
 
         ///
         /// Defines the implementation of an EAP method-specific function that retrieves the properties of an EAP method given the connection and user data.
         ///
         /// \sa [EapPeerGetMethodProperties function](https://msdn.microsoft.com/en-us/library/windows/desktop/hh706636.aspx)
+        ///
+        /// \param[in ] dwVersion                The version number of the API.
+        /// \param[in ] dwFlags                  A combination of EAP flags that describe the EAP authentication session behavior.
+        /// \param[in ] hUserImpersonationToken  A handle to the user impersonation token to use in this session.
+        /// \param[in ] pConnectionData          Connection data used for the EAP method. If set to \c NULL, the static property of the method, as configured in the registry, is returned.
+        /// \param[in ] dwConnectionDataSize     The size, in bytes, of the connection data buffer provided in \p pConnectionData.
+        /// \param[in ] pUserData                A pointer to a byte buffer that contains the opaque user data BLOB. This parameter can be \c NULL.
+        /// \param[in ] dwUserDataSize           The size, in bytes, of the user data buffer provided in \p pUserData.
+        /// \param[out] pMethodPropertyArray     A pointer to the method properties array. Caller should free the inner pointers using `EapHostPeerFreeMemory()` starting at the innermost pointer. The caller should free an \c empvtString value only when the type is \c empvtString.
         ///
         virtual void get_method_properties(
             _In_                                   DWORD                     dwVersion,
@@ -671,37 +702,58 @@ namespace eap
             _In_                                   DWORD                     dwConnectionDataSize,
             _In_count_(dwUserDataSize)       const BYTE                      *pUserData,
             _In_                                   DWORD                     dwUserDataSize,
-            _Inout_                                EAP_METHOD_PROPERTY_ARRAY *pMethodPropertyArray) = 0;
+            _Out_                                  EAP_METHOD_PROPERTY_ARRAY *pMethodPropertyArray) = 0;
 
         ///
         /// Converts XML into the configuration BLOB. The XML based credentials can come from group policy or from a system administrator.
         ///
         /// \sa [EapPeerCredentialsXml2Blob function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363603.aspx)
         ///
+        /// \param[in ] dwFlags                A combination of EAP flags that describe the EAP authentication session behavior.
+        /// \param[in ] pConfigRoot            A pointer to an XML node that contains credentials, which are either user or machine credentials depending on the configuration passed in. The XML document is created with the EapHostUserCredentials Schema.
+        /// \param[in ] dwConnectionDataSize   The size of the EAP SSO configuration data pointed to by \p pConnectionData, in bytes.
+        /// \param[in ] pConnectionData        A pointer to an opaque byte buffer that contains the EAP SSO configuration data BLOB.
+        /// \param[out] ppCredentialsOut       A pointer to the byte buffer that receives the credentials BLOB buffer generated by the input XML. The buffer can is of size \p pdwCredentialsOutSize. After consuming the data, this memory must be freed by calling `EapPeerFreeMemory()`.
+        /// \param[out] pdwCredentialsOutSize  The size, in bytes, of the buffer pointed to by \p ppCredentialsOut.
+        ///
         virtual void credentials_xml2blob(
             _In_                                   DWORD       dwFlags,
             _In_                                   IXMLDOMNode *pConfigRoot,
             _In_count_(dwConnectionDataSize) const BYTE        *pConnectionData,
             _In_                                   DWORD       dwConnectionDataSize,
-            _Inout_                                BYTE        **ppCredentialsOut,
-            _Inout_                                DWORD       *pdwCredentialsOutSize) = 0;
+            _Out_                                  BYTE        **ppCredentialsOut,
+            _Out_                                  DWORD       *pdwCredentialsOutSize) = 0;
 
         ///
         /// Defines the implementation of an EAP method-specific function that obtains the EAP Single-Sign-On (SSO) credential input fields for an EAP method.
         ///
         /// \sa [EapPeerQueryCredentialInputFields function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363622.aspx)
         ///
+        /// \param[in ] hUserImpersonationToken     An impersonation token for the user whose credentials are to be requested and obtained.
+        /// \param[in ] dwFlags                     A combination of EAP flags that describe the EAP authentication session behavior.
+        /// \param[in ] dwConnectionDataSize        The size of the EAP SSO configuration data pointed to by \p pConnectionData, in bytes.
+        /// \param[in ] pConnectionData             A pointer to an opaque byte buffer that contains the EAP SSO configuration data BLOB.
+        /// \param[out] pEapConfigInputFieldsArray  A Pointer to a structure that contains the input fields to display to the supplicant user. The `pwszData` fields in the individual `EAP_CONFIG_INPUT_FIELD_DATA` elements are initialized to \c NULL.
+        ///
         virtual void query_credential_input_fields(
             _In_                                   HANDLE                       hUserImpersonationToken,
             _In_                                   DWORD                        dwFlags,
             _In_                                   DWORD                        dwConnectionDataSize,
             _In_count_(dwConnectionDataSize) const BYTE                         *pConnectionData,
-            _Inout_                                EAP_CONFIG_INPUT_FIELD_ARRAY *pEapConfigInputFieldsArray) const;
+            _Out_                                  EAP_CONFIG_INPUT_FIELD_ARRAY *pEapConfigInputFieldsArray) const;
 
         ///
         /// Defines the implementation of an EAP method function that obtains the user BLOB data provided in an interactive Single-Sign-On (SSO) UI raised on the supplicant.
         ///
         /// \sa [EapPeerQueryUserBlobFromCredentialInputFields function](https://msdn.microsoft.com/en-us/library/windows/desktop/bb204697.aspx)
+        ///
+        /// \param[in ] hUserImpersonationToken    An impersonation token for the user whose credentials are to be requested and obtained.
+        /// \param[in ] dwFlags                    A combination of EAP flags that describe the EAP authentication session behavior.
+        /// \param[in ] dwConnectionDataSize       The size of the EAP SSO configuration data pointed to by \p pConnectionData, in bytes.
+        /// \param[in ] pConnectionData            A pointer to an opaque byte buffer that contains the EAP SSO configuration data BLOB.
+        /// \param[in ] pEapConfigInputFieldArray  A pointer to a structure that contains the input fields to display to the supplicant user. The `pwszData` fields in the individual `EAP_CONFIG_INPUT_FIELD_DATA` elements are initialized to \c NULL.
+        /// \param[out] pdwUsersBlobSize           A pointer to a buffer that contains the size, in bytes, of the opaque user configuration data BLOB in \p ppUserBlob.
+        /// \param[out] ppUserBlob                 A pointer that contains the opaque user data BLOB.
         ///
         virtual void query_user_blob_from_credential_input_fields(
             _In_                                   HANDLE                       hUserImpersonationToken,
@@ -709,25 +761,39 @@ namespace eap
             _In_                                   DWORD                        dwConnectionDataSize,
             _In_count_(dwConnectionDataSize) const BYTE                         *pConnectionData,
             _In_                             const EAP_CONFIG_INPUT_FIELD_ARRAY *pEapConfigInputFieldArray,
-            _Inout_                                DWORD                        *pdwUsersBlobSize,
-            _Inout_                                BYTE                         **ppUserBlob) const;
+            _Out_                                  DWORD                        *pdwUsersBlobSize,
+            _Out_                                  BYTE                         **ppUserBlob) const;
 
         ///
         /// Defines the implementation of an EAP method API that provides the input fields for interactive UI components to be raised on the supplicant.
         ///
         /// \sa [EapPeerQueryInteractiveUIInputFields function](https://msdn.microsoft.com/en-us/library/windows/desktop/bb204695.aspx)
         ///
+        /// \param[in ] dwVersion              The version number of the API.
+        /// \param[in ] dwFlags                A combination of EAP flags that describe the EAP authentication session behavior.
+        /// \param[in ] dwUIContextDataSize    The size of the context data in \p pUIContextData, in bytes.
+        /// \param[in ] pUIContextData         A pointer to a BLOB that contains UI context data, represented as inner pointers to field data. The supplicant obtained these inner pointers from EAPHost run-time APIs.
+        /// \param[out] pEapInteractiveUIData  Pointer that receives a structure that contains configuration information for interactive UI components raised on an EAP supplicant.
+        ///
         virtual void query_interactive_ui_input_fields(
             _In_                                  DWORD                   dwVersion,
             _In_                                  DWORD                   dwFlags,
             _In_                                  DWORD                   dwUIContextDataSize,
             _In_count_(dwUIContextDataSize) const BYTE                    *pUIContextData,
-            _Inout_                               EAP_INTERACTIVE_UI_DATA *pEapInteractiveUIData) const;
+            _Out_                                 EAP_INTERACTIVE_UI_DATA *pEapInteractiveUIData) const;
 
         ///
         /// Converts user information into a user BLOB that can be consumed by EapHost run-time functions.
         ///
         /// \sa [EapPeerQueryUIBlobFromInteractiveUIInputFields function](https://msdn.microsoft.com/en-us/library/windows/desktop/bb204696.aspx)
+        ///
+        /// \param[in ] dwVersion                     The version number of the API.
+        /// \param[in ] dwFlags                       A combination of EAP flags that describe the EAP authentication session behavior.
+        /// \param[in ] dwUIContextDataSize           The size of the context data in \p pUIContextData, in bytes.
+        /// \param[in ] pUIContextData                A pointer to a BLOB that contains UI context data, represented as inner pointers to field data. The supplicant obtained these inner pointers from EAPHost run-time APIs.
+        /// \param[in ] pEapInteractiveUIData         Pointer with a structure that contains configuration information for interactive user interface components raised on an EAP supplicant.
+        /// \param[out] pdwDataFromInteractiveUISize  A pointer to a `DWORD` that specifies the size of the buffer pointed to by the \p ppDataFromInteractiveUI parameter, in bytes. If this value is not set to \c 0, then a pointer to a buffer of the size specified in this parameter must be supplied in the \p ppDataFromInteractiveUI parameter.
+        /// \param[out] ppDataFromInteractiveUI       A pointer that receives a credentials BLOB that can be used in authentication. The caller should free the inner pointers using the function \p EapPeerFreeMemory(), starting at the innermost pointer. If a non-NULL value is supplied for this parameter, meaning that an existing data BLOB is passed to it, the supplied data BLOB will be updated and returned in this parameter.
         ///
         virtual void query_ui_blob_from_interactive_ui_input_fields(
             _In_                                  DWORD                   dwVersion,
@@ -735,8 +801,8 @@ namespace eap
             _In_                                  DWORD                   dwUIContextDataSize,
             _In_count_(dwUIContextDataSize) const BYTE                    *pUIContextData,
             _In_                            const EAP_INTERACTIVE_UI_DATA *pEapInteractiveUIData,
-            _Inout_                               DWORD                   *pdwDataFromInteractiveUISize,
-            _Inout_                               BYTE                    **ppDataFromInteractiveUI) const;
+            _Out_                                 DWORD                   *pdwDataFromInteractiveUISize,
+            _Out_                                 BYTE                    **ppDataFromInteractiveUI) const;
 
         /// \name Session management
         /// @{
@@ -745,6 +811,15 @@ namespace eap
         /// Starts an EAP authentication session on the peer EapHost using the EAP method.
         ///
         /// \sa [EapPeerBeginSession function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363600.aspx)
+        ///
+        /// \param[in] dwFlags                A combination of EAP flags that describe the new EAP authentication session behavior.
+        /// \param[in] pAttributeArray        A pointer to an array structure that specifies the EAP attributes of the entity to authenticate.
+        /// \param[in] hTokenImpersonateUser  Specifies a handle to the user impersonation token to use in this session.
+        /// \param[in] pConnectionData        Connection data specific to this method used to decide the user data returned from this API, where the user data depends on certain connection data configuration. When this parameter is NULL the method implementation should use default values for connection.
+        /// \param[in] dwConnectionDataSize   Specifies the size, in bytes, of the connection data buffer provided in \p pConnectionData.
+        /// \param[in] pUserData              A pointer to a byte buffer that contains the opaque user data BLOB.
+        /// \param[in] dwUserDataSize         Specifies the size in bytes of the user data buffer provided in \p pUserData.
+        /// \param[in] dwMaxSendPacketSize    Specifies the maximum size in bytes of an EAP packet sent during the session. If the method needs to send a packet larger than the maximum size, the method must accommodate fragmentation and reassembly.
         ///
         /// \returns Session handle
         ///
@@ -763,12 +838,24 @@ namespace eap
         ///
         /// \sa [EapPeerEndSession function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363604.aspx)
         ///
+        /// \param[in] hSession  A unique handle for this EAP authentication session on the EAPHost server. This handle is returned in the \p pSessionHandle parameter in a previous call to `EapPeerBeginSession()`.
+        ///
         virtual void end_session(_In_ EAP_SESSION_HANDLE hSession) = 0;
+
+        /// @}
+
+        /// \name Packet processing
+        /// @{
 
         ///
         /// Processes a packet received by EapHost from a supplicant.
         ///
         /// \sa [EapPeerProcessRequestPacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363621.aspx)
+        ///
+        /// \param[in] hSession              A unique handle for this EAP authentication session on the EAPHost server. This handle is returned in the \p pSessionHandle parameter in a previous call to `EapPeerBeginSession()`.
+        /// \param[in] pReceivedPacket       Received packet data
+        /// \param[in] dwReceivedPacketSize  \p pReceivedPacket size in bytes
+        /// \param[in] pEapOutput            A pointer to a structure that contains the output of the packet process operation.
         ///
         virtual void process_request_packet(
             _In_                                       EAP_SESSION_HANDLE  hSession,
@@ -781,20 +868,33 @@ namespace eap
         ///
         /// \sa [EapPeerGetResponsePacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363610.aspx)
         ///
+        /// \param[in   ] hSession           A unique handle for this EAP authentication session on the EAPHost server. This handle is returned in the \p pSessionHandle parameter in a previous call to `EapPeerBeginSession()`.
+        /// \param[inout] pSendPacket        A pointer to a structure that contains the response packet.
+        /// \param[inout] pdwSendPacketSize  A pointer to a value that contains the size in bytes of the buffer allocated for the response packet. On return, this parameter receives a pointer to the actual size in bytes of \p pSendPacket.
+        ///
         virtual void get_response_packet(
             _In_                               EAP_SESSION_HANDLE hSession,
             _Inout_bytecap_(*dwSendPacketSize) EapPacket          *pSendPacket,
             _Inout_                            DWORD              *pdwSendPacketSize) = 0;
+
+        /// @}
 
         ///
         /// Obtains the result of an authentication session from the EAP method.
         ///
         /// \sa [EapPeerGetResult function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363611.aspx)
         ///
+        /// \param[in ] hSession  A unique handle for this EAP authentication session on the EAPHost server. This handle is returned in the \p pSessionHandle parameter in a previous call to `EapPeerBeginSession()`.
+        /// \param[in ] reason    The reason code for the authentication result returned in \p pResult.
+        /// \param[out] pResult   A pointer to a structure that contains the authentication results.
+        ///
         virtual void get_result(
-            _In_    EAP_SESSION_HANDLE        hSession,
-            _In_    EapPeerMethodResultReason reason,
-            _Inout_ EapPeerMethodResult       *pResult) = 0;
+            _In_  EAP_SESSION_HANDLE        hSession,
+            _In_  EapPeerMethodResultReason reason,
+            _Out_ EapPeerMethodResult       *pResult) = 0;
+
+        /// \name User Interaction
+        /// @{
 
         ///
         /// Obtains the user interface context from the EAP method.
@@ -803,10 +903,14 @@ namespace eap
         ///
         /// \sa [EapPeerGetUIContext function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363612.aspx)
         ///
+        /// \param[in ] hSession              A unique handle for this EAP authentication session on the EAPHost server. This handle is returned in the \p pSessionHandle parameter in a previous call to `EapPeerBeginSession()`.
+        /// \param[out] ppUIContextData       A pointer to an address that contains a byte buffer with the supplicant user interface context data from EAPHost.
+        /// \param[out] pdwUIContextDataSize  A pointer to a value that specifies the size of the user interface context data byte buffer returned in \p ppUIContextData.
+        ///
         virtual void get_ui_context(
-            _In_    EAP_SESSION_HANDLE hSession,
-            _Inout_ BYTE               **ppUIContextData,
-            _Inout_ DWORD              *pdwUIContextDataSize) = 0;
+            _In_  EAP_SESSION_HANDLE hSession,
+            _Out_ BYTE               **ppUIContextData,
+            _Out_ DWORD              *pdwUIContextDataSize) = 0;
 
         ///
         /// Provides a user interface context to the EAP method.
@@ -815,25 +919,42 @@ namespace eap
         ///
         /// \sa [EapPeerSetUIContext function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363626.aspx)
         ///
+        /// \param[in] hSession             A unique handle for this EAP authentication session on the EAPHost server. This handle is returned in the \p pSessionHandle parameter in a previous call to `EapPeerBeginSession()`.
+        /// \param[in] pUIContextData       A pointer to an address that contains a byte buffer with the new supplicant UI context data to set on EAPHost.
+        /// \param[in] dwUIContextDataSize  \p pUIContextData size in bytes
+        /// \param[in] pEapOutput           A pointer to a structure that contains the output of the packet process operation.
+        ///
         virtual void set_ui_context(
             _In_                                  EAP_SESSION_HANDLE  hSession,
             _In_count_(dwUIContextDataSize) const BYTE                *pUIContextData,
             _In_                                  DWORD               dwUIContextDataSize,
             _Out_                                 EapPeerMethodOutput *pEapOutput) = 0;
 
+        /// @}
+
+        /// \name EAP Response Attributes
+        /// @{
+
         ///
         /// Obtains an array of EAP response attributes from the EAP method.
         ///
         /// \sa [EapPeerGetResponseAttributes function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363609.aspx)
         ///
+        /// \param[in ] hSession  A unique handle for this EAP authentication session on the EAPHost server. This handle is returned in the \p pSessionHandle parameter in a previous call to `EapPeerBeginSession()`.
+        /// \param[out] pAttribs  A pointer to a structure that contains an array of EAP authentication response attributes for the supplicant.
+        ///
         virtual void get_response_attributes(
-            _In_    EAP_SESSION_HANDLE hSession,
-            _Inout_ EapAttributes      *pAttribs) = 0;
+            _In_  EAP_SESSION_HANDLE hSession,
+            _Out_ EapAttributes      *pAttribs) = 0;
 
         ///
         /// Provides an updated array of EAP response attributes to the EAP method.
         ///
         /// \sa [EapPeerSetResponseAttributes function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363625.aspx)
+        ///
+        /// \param[in] hSession    A unique handle for this EAP authentication session on the EAPHost server. This handle is returned in the \p pSessionHandle parameter in a previous call to `EapPeerBeginSession()`.
+        /// \param[in] pAttribs    A pointer to a structure that contains an array of new EAP authentication response attributes to set for the supplicant on EAPHost.
+        /// \param[in] pEapOutput  A pointer to a structure that contains the output of the packet process operation.
         ///
         virtual void set_response_attributes(
             _In_       EAP_SESSION_HANDLE  hSession,
@@ -842,4 +963,6 @@ namespace eap
 
         /// @}
     };
+
+    /// @}
 }

@@ -1,21 +1,21 @@
-/*
+ï»¿/*
     Copyright 2015-2016 Amebis
-    Copyright 2016 GÉANT
+    Copyright 2016 GÃ‰ANT
 
-    This file is part of GÉANTLink.
+    This file is part of GÃ‰ANTLink.
 
-    GÉANTLink is free software: you can redistribute it and/or modify it
+    GÃ‰ANTLink is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    GÉANTLink is distributed in the hope that it will be useful, but
+    GÃ‰ANTLink is distributed in the hope that it will be useful, but
     WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with GÉANTLink. If not, see <http://www.gnu.org/licenses/>.
+    along with GÃ‰ANTLink. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <WinStd/Crypt.h>
@@ -23,30 +23,17 @@
 
 namespace eap
 {
-    ///
-    /// MSCHAPv2 Challenge
-    ///
-    struct challenge_mschapv2;
+    struct WINSTD_NOVTABLE challenge_mschapv2;
+    struct WINSTD_NOVTABLE challenge_hash;
+    struct WINSTD_NOVTABLE nt_password_hash;
+    struct WINSTD_NOVTABLE nt_response;
+    struct WINSTD_NOVTABLE authenticator_response;
 
     ///
-    /// MSCHAPv2 Challenge Hash
+    /// \defgroup MSCHAPv2  MSCHAPv2
+    /// Microsoft Challenge-Handshake Authentication Protocol (version 2)
     ///
-    struct challenge_hash;
-
-    ///
-    /// NT-Password Hash
-    ///
-    struct nt_password_hash;
-
-    ///
-    /// NT-Response
-    ///
-    struct nt_response;
-
-    ///
-    /// Authenticator Response
-    ///
-    struct authenticator_response;
+    /// @{
 
     ///
     /// Creates DES encryption key with given plaintext key
@@ -55,7 +42,11 @@ namespace eap
     /// \param[in] key   The key (without parity bits)
     /// \param[in] size  Size of \p key (maximum 7B)
     ///
+    /// \returns DES encryption key
+    ///
     winstd::crypt_key create_des_key(_In_ HCRYPTPROV cp, _In_count_(size) const unsigned char *key, _In_ size_t size);
+
+    /// @}
 }
 
 #pragma once
@@ -65,10 +56,16 @@ namespace eap
 
 namespace eap
 {
+    /// \addtogroup MSCHAPv2
+    /// @{
+
 #pragma pack(push)
 #pragma pack(1)
 
-    struct __declspec(novtable) challenge_mschapv2 : public sanitizing_blob_xf<16>
+    ///
+    /// MSCHAPv2 Challenge
+    ///
+    struct WINSTD_NOVTABLE challenge_mschapv2 : public sanitizing_blob_xf<16>
     {
         ///
         /// Generates random challenge
@@ -79,7 +76,10 @@ namespace eap
     };
 
 
-    struct __declspec(novtable) challenge_hash : public sanitizing_blob_xf<8>
+    ///
+    /// MSCHAPv2 Challenge Hash
+    ///
+    struct WINSTD_NOVTABLE challenge_hash : public sanitizing_blob_xf<8>
     {
         ///
         /// Constructor
@@ -120,7 +120,10 @@ namespace eap
     };
 
 
-    struct __declspec(novtable) nt_password_hash : public sanitizing_blob_xf<16>
+    ///
+    /// NT-Password Hash
+    ///
+    struct WINSTD_NOVTABLE nt_password_hash : public sanitizing_blob_xf<16>
     {
         ///
         /// Constructor
@@ -169,7 +172,10 @@ namespace eap
     };
 
 
-    struct __declspec(novtable) nt_response : public sanitizing_blob_xf<24>
+    ///
+    /// NT-Response
+    ///
+    struct WINSTD_NOVTABLE nt_response : public sanitizing_blob_xf<24>
     {
         ///
         /// Constructor
@@ -212,7 +218,10 @@ namespace eap
     };
 
 
-    struct __declspec(novtable) authenticator_response : public sanitizing_blob_xf<20>
+    ///
+    /// Authenticator Response
+    ///
+    struct WINSTD_NOVTABLE authenticator_response : public sanitizing_blob_xf<20>
     {
         ///
         /// Constructor
@@ -257,4 +266,6 @@ namespace eap
     };
 
 #pragma pack(pop)
+
+    /// @}
 }

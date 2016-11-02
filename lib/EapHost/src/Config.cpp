@@ -183,6 +183,7 @@ eap::credentials* eap::config_method_eaphost::make_credentials() const
 }
 
 
+/// \cond internal
 void eap::config_method_eaphost::update_type()
 {
     // Query registry for EAP method name and save it to m_type_str.
@@ -207,3 +208,4 @@ void eap::config_method_eaphost::update_type()
     else if (m_type.eapType.type == 254) sprintf(m_type_str, L"EapHost-%u-%u-%u-%u", m_type.dwAuthorId, m_type.eapType.type, m_type.eapType.dwVendorId, m_type.eapType.dwVendorType);
     else                                 sprintf(m_type_str, L"EapHost-%u-%u"      , m_type.dwAuthorId, m_type.eapType.type                                                        );
 }
+/// \endcond

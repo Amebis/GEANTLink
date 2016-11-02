@@ -63,10 +63,10 @@ eap::config_method* eap::peer_ttls_ui::make_config_method()
 
 
 void eap::peer_ttls_ui::config_xml2blob(
-    _In_    DWORD       dwFlags,
-    _In_    IXMLDOMNode *pConfigRoot,
-    _Inout_ BYTE        **pConnectionDataOut,
-    _Inout_ DWORD       *pdwConnectionDataOutSize)
+    _In_  DWORD       dwFlags,
+    _In_  IXMLDOMNode *pConfigRoot,
+    _Out_ BYTE        **pConnectionDataOut,
+    _Out_ DWORD       *pdwConnectionDataOutSize)
 {
     UNREFERENCED_PARAMETER(dwFlags);
 
@@ -101,8 +101,8 @@ void eap::peer_ttls_ui::invoke_config_ui(
     _In_                                     HWND  hwndParent,
     _In_count_(dwConnectionDataInSize) const BYTE  *pConnectionDataIn,
     _In_                                     DWORD dwConnectionDataInSize,
-    _Inout_                                  BYTE  **ppConnectionDataOut,
-    _Inout_                                  DWORD *pdwConnectionDataOutSize)
+    _Out_                                    BYTE  **ppConnectionDataOut,
+    _Out_                                    DWORD *pdwConnectionDataOutSize)
 {
     // Unpack configuration.
     config_connection cfg(*this);
@@ -149,9 +149,9 @@ void eap::peer_ttls_ui::invoke_identity_ui(
     _In_                                   DWORD  dwConnectionDataSize,
     _In_count_(dwUserDataSize)       const BYTE   *pUserData,
     _In_                                   DWORD  dwUserDataSize,
-    _Inout_                                BYTE   **ppUserDataOut,
-    _Inout_                                DWORD  *pdwUserDataOutSize,
-    _Inout_                                LPWSTR *ppwszIdentity)
+    _Out_                                  BYTE   **ppUserDataOut,
+    _Out_                                  DWORD  *pdwUserDataOutSize,
+    _Out_                                  LPWSTR *ppwszIdentity)
 {
     assert(ppwszIdentity);
 

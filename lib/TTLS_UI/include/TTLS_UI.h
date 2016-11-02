@@ -18,14 +18,7 @@
     along with GÉANTLink. If not, see <http://www.gnu.org/licenses/>.
 */
 
-///
-/// TTLS configuration panel
-///
 class wxTTLSConfigPanel;
-
-///
-/// TTLS configuration scrollable window
-///
 class wxTTLSConfigWindow;
 
 #pragma once
@@ -48,6 +41,12 @@ class wxTTLSConfigWindow;
 #include <Windows.h>
 
 
+/// \addtogroup EAPBaseGUI
+/// @{
+
+///
+/// TTLS configuration panel
+///
 class wxTTLSConfigPanel : public wxTTLSConfigPanelBase
 {
 public:
@@ -69,6 +68,9 @@ protected:
 };
 
 
+///
+/// TTLS configuration scrollable window
+///
 class wxTTLSConfigWindow : public wxEAPConfigWindow
 {
 public:
@@ -106,3 +108,5 @@ protected:
     eap::config_method_mschapv2 m_cfg_mschapv2;  ///< MSCHAPv2 configuration
     eap::config_method_eaphost  m_cfg_eaphost;   ///< Inner EAP configuration
 };
+
+/// @}

@@ -20,23 +20,8 @@
 
 namespace eap
 {
-    ///
-    /// Method base class
-    ///
     class method;
-
-    ///
-    /// Tunnel method base class
-    ///
-    /// This is a base class for all the methods that encapsulate inner methods to provide stacking framework.
-    ///
     class method_tunnel;
-
-    ///
-    /// EAP tunnel method
-    ///
-    /// This method encapsulates inner data in EAP packets.
-    ///
     class method_eap;
 }
 
@@ -58,6 +43,15 @@ extern "C" {
 
 namespace eap
 {
+    ///
+    /// \defgroup EAPBaseMethod  Methods
+    /// Methods
+    ///
+    /// @{
+
+    ///
+    /// Method base class
+    ///
     class method
     {
         WINSTD_NONCOPYABLE(method)
@@ -86,13 +80,18 @@ namespace eap
         ///
         method& operator=(_Inout_ method &&other);
 
-        /// \name Packet processing
+        /// \name Session management
         /// @{
 
         ///
         /// Starts an EAP authentication session on the peer EapHost using the EAP method.
         ///
         /// \sa [EapPeerBeginSession function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363600.aspx)
+        ///
+        /// \param[in] dwFlags                A combination of EAP flags that describe the new EAP authentication session behavior.
+        /// \param[in] pAttributeArray        A pointer to an array structure that specifies the EAP attributes of the entity to authenticate.
+        /// \param[in] hTokenImpersonateUser  Specifies a handle to the user impersonation token to use in this session.
+        /// \param[in] dwMaxSendPacketSize    Specifies the maximum size in bytes of an EAP packet sent during the session. If the method needs to send a packet larger than the maximum size, the method must accommodate fragmentation and reassembly.
         ///
         virtual void begin_session(
             _In_        DWORD         dwFlags,
@@ -107,10 +106,20 @@ namespace eap
         ///
         virtual void end_session();
 
+        /// @}
+
+        /// \name Packet processing
+        /// @{
+
         ///
         /// Processes a packet received by EapHost from a supplicant.
         ///
         /// \sa [EapPeerProcessRequestPacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363621.aspx)
+        ///
+        /// \param[in] pReceivedPacket       Received packet data
+        /// \param[in] dwReceivedPacketSize  \p pReceivedPacket size in bytes
+        ///
+        /// \returns Action peer wants EapHost to do next.
         ///
         virtual EapPeerMethodResponseAction process_request_packet(
             _In_bytecount_(dwReceivedPacketSize) const void  *pReceivedPacket,
@@ -121,20 +130,26 @@ namespace eap
         ///
         /// \sa [EapPeerGetResponsePacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363610.aspx)
         ///
+        /// \param[out] packet    Response packet
+        /// \param[in]  size_max  The maximum size in bytes \p packet must not exceed. If the method needs to send a packet larger than the maximum size, the method must accommodate fragmentation and reassembly.
+        ///
         virtual void get_response_packet(
             _Out_    sanitizing_blob &packet,
             _In_opt_ DWORD           size_max = MAXDWORD) = 0;
+
+        /// @}
 
         ///
         /// Obtains the result of an authentication session from the EAP method.
         ///
         /// \sa [EapPeerGetResult function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363611.aspx)
         ///
+        /// \param[in ] reason   The reason code for the authentication result returned in \p pResult.
+        /// \param[out] pResult  A pointer to a structure that contains the authentication results.
+        ///
         virtual void get_result(
-            _In_    EapPeerMethodResultReason reason,
-            _Inout_ EapPeerMethodResult       *pResult);
-
-        /// @}
+            _In_  EapPeerMethodResultReason reason,
+            _Out_ EapPeerMethodResult       *pResult);
 
         /// \name User Interaction
         /// @{
@@ -146,9 +161,12 @@ namespace eap
         ///
         /// \sa [EapPeerGetUIContext function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363612.aspx)
         ///
+        /// \param[out] ppUIContextData       A pointer to an address that contains a byte buffer with the supplicant user interface context data from EAPHost.
+        /// \param[out] pdwUIContextDataSize  A pointer to a value that specifies the size of the user interface context data byte buffer returned in \p ppUIContextData.
+        ///
         virtual void get_ui_context(
-            _Inout_ BYTE  **ppUIContextData,
-            _Inout_ DWORD *pdwUIContextDataSize);
+            _Out_ BYTE  **ppUIContextData,
+            _Out_ DWORD *pdwUIContextDataSize);
 
         ///
         /// Provides a user interface context to the EAP method.
@@ -156,6 +174,11 @@ namespace eap
         /// \note This function is called after the UI has been raised through the `EapPeerGetUIContext()` function.
         ///
         /// \sa [EapPeerSetUIContext function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363626.aspx)
+        ///
+        /// \param[in] pUIContextData       A pointer to an address that contains a byte buffer with the new supplicant UI context data to set on EAPHost.
+        /// \param[in] dwUIContextDataSize  \p pUIContextData size in bytes
+        ///
+        /// \returns Action peer wants EapHost to do next.
         ///
         virtual EapPeerMethodResponseAction set_ui_context(
             _In_count_(dwUIContextDataSize) const BYTE  *pUIContextData,
@@ -171,12 +194,18 @@ namespace eap
         ///
         /// \sa [EapPeerGetResponseAttributes function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363609.aspx)
         ///
-        virtual void get_response_attributes(_Inout_ EapAttributes *pAttribs);
+        /// \param[out] pAttribs  A pointer to a structure that contains an array of EAP authentication response attributes for the supplicant.
+        ///
+        virtual void get_response_attributes(_Out_ EapAttributes *pAttribs);
 
         ///
         /// Provides an updated array of EAP response attributes to the EAP method.
         ///
         /// \sa [EapPeerSetResponseAttributes function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363625.aspx)
+        ///
+        /// \param[in] pAttribs  A pointer to a structure that contains an array of new EAP authentication response attributes to set for the supplicant on EAPHost.
+        ///
+        /// \returns Action peer wants EapHost to do next.
         ///
         virtual EapPeerMethodResponseAction set_response_attributes(_In_ const EapAttributes *pAttribs);
 
@@ -187,6 +216,11 @@ namespace eap
     };
 
 
+    ///
+    /// Tunnel method base class
+    ///
+    /// This is a base class for all the methods that encapsulate inner methods to provide stacking framework.
+    ///
     class method_tunnel : public method
     {
         WINSTD_NONCOPYABLE(method_tunnel)
@@ -216,77 +250,43 @@ namespace eap
         ///
         method_tunnel& operator=(_Inout_ method_tunnel &&other);
 
-        /// \name Packet processing
+        /// \name Session management
         /// @{
 
-        ///
-        /// Starts an EAP authentication session on the peer EapHost using the EAP method.
-        ///
-        /// \sa [EapPeerBeginSession function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363600.aspx)
-        ///
         virtual void begin_session(
             _In_        DWORD         dwFlags,
             _In_  const EapAttributes *pAttributeArray,
             _In_        HANDLE        hTokenImpersonateUser,
             _In_opt_    DWORD         dwMaxSendPacketSize = MAXDWORD);
 
-        ///
-        /// Ends an EAP authentication session for the EAP method.
-        ///
-        /// \sa [EapPeerEndSession function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363604.aspx)
-        ///
         virtual void end_session();
 
-        ///
-        /// Processes a packet received by EapHost from a supplicant.
-        ///
-        /// \sa [EapPeerProcessRequestPacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363621.aspx)
-        ///
+        /// @}
+
+        /// \name Packet processing
+        /// @{
+
         virtual EapPeerMethodResponseAction process_request_packet(
             _In_bytecount_(dwReceivedPacketSize) const void  *pReceivedPacket,
             _In_                                       DWORD dwReceivedPacketSize);
 
-        ///
-        /// Obtains a response packet from the EAP method.
-        ///
-        /// \sa [EapPeerGetResponsePacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363610.aspx)
-        ///
         virtual void get_response_packet(
             _Out_    sanitizing_blob &packet,
             _In_opt_ DWORD           size_max = MAXDWORD);
 
-        ///
-        /// Obtains the result of an authentication session from the EAP method.
-        ///
-        /// \sa [EapPeerGetResult function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363611.aspx)
-        ///
-        virtual void get_result(
-            _In_    EapPeerMethodResultReason reason,
-            _Inout_ EapPeerMethodResult       *pResult);
-
         /// @}
+
+        virtual void get_result(
+            _In_  EapPeerMethodResultReason reason,
+            _Out_ EapPeerMethodResult       *pResult);
 
         /// \name User Interaction
         /// @{
 
-        ///
-        /// Obtains the user interface context from the EAP method.
-        ///
-        /// \note This function is always followed by the `EapPeerInvokeInteractiveUI()` function, which is followed by the `EapPeerSetUIContext()` function.
-        ///
-        /// \sa [EapPeerGetUIContext function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363612.aspx)
-        ///
         virtual void get_ui_context(
-            _Inout_ BYTE  **ppUIContextData,
-            _Inout_ DWORD *pdwUIContextDataSize);
+            _Out_ BYTE  **ppUIContextData,
+            _Out_ DWORD *pdwUIContextDataSize);
 
-        ///
-        /// Provides a user interface context to the EAP method.
-        ///
-        /// \note This function is called after the UI has been raised through the `EapPeerGetUIContext()` function.
-        ///
-        /// \sa [EapPeerSetUIContext function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363626.aspx)
-        ///
         virtual EapPeerMethodResponseAction set_ui_context(
             _In_count_(dwUIContextDataSize) const BYTE  *pUIContextData,
             _In_                                  DWORD dwUIContextDataSize);
@@ -296,18 +296,8 @@ namespace eap
         /// \name EAP Response Attributes
         /// @{
 
-        ///
-        /// Obtains an array of EAP response attributes from the EAP method.
-        ///
-        /// \sa [EapPeerGetResponseAttributes function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363609.aspx)
-        ///
-        virtual void get_response_attributes(_Inout_ EapAttributes *pAttribs);
+        virtual void get_response_attributes(_Out_ EapAttributes *pAttribs);
 
-        ///
-        /// Provides an updated array of EAP response attributes to the EAP method.
-        ///
-        /// \sa [EapPeerSetResponseAttributes function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363625.aspx)
-        ///
         virtual EapPeerMethodResponseAction set_response_attributes(_In_ const EapAttributes *pAttribs);
 
         /// @}
@@ -317,6 +307,11 @@ namespace eap
     };
 
 
+    ///
+    /// EAP tunnel method
+    ///
+    /// This method encapsulates inner data in EAP packets.
+    ///
     class method_eap : public method_tunnel
     {
         WINSTD_NONCOPYABLE(method_eap)
@@ -350,26 +345,20 @@ namespace eap
         /// \name Packet processing
         /// @{
 
-        ///
-        /// Processes a packet received by EapHost from a supplicant.
-        ///
-        /// \sa [EapPeerProcessRequestPacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363621.aspx)
-        ///
         virtual EapPeerMethodResponseAction process_request_packet(
             _In_bytecount_(dwReceivedPacketSize) const void  *pReceivedPacket,
             _In_                                       DWORD dwReceivedPacketSize);
 
-        ///
-        /// Obtains a response packet from the EAP method.
-        ///
-        /// \sa [EapPeerGetResponsePacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363610.aspx)
-        ///
         virtual void get_response_packet(
             _Out_    sanitizing_blob &packet,
             _In_opt_ DWORD           size_max = MAXDWORD);
+
+        /// @}
 
     protected:
         const winstd::eap_type_t m_eap_method;  ///< EAP method type
         unsigned char m_id;                     ///< Request packet ID
     };
+
+    /// @}
 }

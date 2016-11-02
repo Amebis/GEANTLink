@@ -30,10 +30,12 @@ wxEAPBannerPanel::wxEAPBannerPanel(wxWindow* parent) : wxEAPBannerPanelBase(pare
 }
 
 
+/// \cond internal
 bool wxEAPBannerPanel::AcceptsFocusFromKeyboard() const
 {
     return false;
 }
+/// \endcond
 
 
 //////////////////////////////////////////////////////////////////////
@@ -79,6 +81,7 @@ void wxEAPGeneralDialog::AddContent(wxPanel *content)
 }
 
 
+/// \cond internal
 void wxEAPGeneralDialog::OnInitDialog(wxInitDialogEvent& event)
 {
     wxEAPGeneralDialogBase::OnInitDialog(event);
@@ -86,6 +89,7 @@ void wxEAPGeneralDialog::OnInitDialog(wxInitDialogEvent& event)
     for (wxSizerItemList::compatibility_iterator panel = m_panels->GetChildren().GetFirst(); panel; panel = panel->GetNext())
         panel->GetData()->GetWindow()->GetEventHandler()->ProcessEvent(event);
 }
+/// \endcond
 
 
 //////////////////////////////////////////////////////////////////////
@@ -116,6 +120,8 @@ wxEAPNotePanel::wxEAPNotePanel(wxWindow* parent) :
 {
 }
 
+
+/// \cond internal
 
 bool wxEAPNotePanel::AcceptsFocusFromKeyboard() const
 {
@@ -175,6 +181,8 @@ void wxEAPNotePanel::CreateContactFields(const eap::config_provider &prov)
         m_note_vert->Add(sb_contact_tbl, 0, wxLEFT|wxRIGHT|wxDOWN|wxEXPAND, 5);
     }
 }
+
+/// \endcond
 
 
 //////////////////////////////////////////////////////////////////////
@@ -246,6 +254,7 @@ wxEAPConfigWindow::~wxEAPConfigWindow()
 }
 
 
+/// \cond internal
 void wxEAPConfigWindow::OnInitDialog(wxInitDialogEvent& event)
 {
     // Call TransferDataToWindow() manually, as wxScrolledWindow somehow skips that.
@@ -253,6 +262,7 @@ void wxEAPConfigWindow::OnInitDialog(wxInitDialogEvent& event)
 
     event.Skip();
 }
+/// \endcond
 
 
 //////////////////////////////////////////////////////////////////////
@@ -269,6 +279,8 @@ wxEAPProviderContactInfoPanel::wxEAPProviderContactInfoPanel(eap::config_provide
         m_provider_contact_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(259)));
 }
 
+
+/// \cond internal
 
 bool wxEAPProviderContactInfoPanel::TransferDataToWindow()
 {
@@ -293,6 +305,8 @@ bool wxEAPProviderContactInfoPanel::TransferDataFromWindow()
     return true;
 }
 
+/// \endcond
+
 
 //////////////////////////////////////////////////////////////////////
 // wxEAPProviderIDPanel
@@ -308,6 +322,8 @@ wxEAPProviderIDPanel::wxEAPProviderIDPanel(eap::config_provider &prov, wxWindow*
         m_provider_id_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(29)));
 }
 
+
+/// \cond internal
 
 bool wxEAPProviderIDPanel::TransferDataToWindow()
 {
@@ -328,6 +344,8 @@ bool wxEAPProviderIDPanel::TransferDataFromWindow()
     return true;
 }
 
+/// \endcond
+
 
 //////////////////////////////////////////////////////////////////////
 // wxEAPProviderLockPanel
@@ -343,6 +361,8 @@ wxEAPProviderLockPanel::wxEAPProviderLockPanel(eap::config_provider &prov, wxWin
         m_provider_lock_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(1003)));
 }
 
+
+/// \cond internal
 
 bool wxEAPProviderLockPanel::TransferDataToWindow()
 {
@@ -360,6 +380,8 @@ bool wxEAPProviderLockPanel::TransferDataFromWindow()
 
     return true;
 }
+
+/// \endcond
 
 
 //////////////////////////////////////////////////////////////////////
@@ -410,6 +432,7 @@ wxEAPProviderSelectDialog::wxEAPProviderSelectDialog(eap::config_connection &cfg
 }
 
 
+/// \cond internal
 void wxEAPProviderSelectDialog::OnProvSelect(wxCommandEvent& event)
 {
     // Set selected provider and dismiss dialog.
@@ -417,6 +440,7 @@ void wxEAPProviderSelectDialog::OnProvSelect(wxCommandEvent& event)
     this->EndModal(wxID_OK);
     event.Skip();
 }
+/// \endcond
 
 
 using namespace std;
@@ -544,6 +568,8 @@ void eap::monitor_ui::release_slaves(_In_bytecount_(size) const void *data, _In_
 }
 
 
+/// \cond internal
+
 LRESULT eap::monitor_ui::winproc(
     _In_ UINT   msg,
     _In_ WPARAM wparam,
@@ -606,6 +632,8 @@ LRESULT CALLBACK eap::monitor_ui::winproc(
             return DefWindowProc(hwnd, msg, wparam, lparam);
     }
 }
+
+/// \endcond
 
 
 const UINT eap::monitor_ui::s_msg_attach  = RegisterWindowMessage(_T(PRODUCT_NAME_STR) _T("-Attach"));

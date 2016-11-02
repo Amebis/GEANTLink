@@ -53,6 +53,8 @@ wxTLSCredentialsPanel::wxTLSCredentialsPanel(const eap::config_provider &prov, c
 }
 
 
+/// \cond internal
+
 bool wxTLSCredentialsPanel::TransferDataToWindow()
 {
     // Populate certificate list.
@@ -129,6 +131,8 @@ void wxTLSCredentialsPanel::OnUpdateUI(wxUpdateUIEvent& event)
     }
 }
 
+/// \endcond
+
 
 //////////////////////////////////////////////////////////////////////
 // wxTLSServerTrustPanel
@@ -149,6 +153,8 @@ wxTLSServerTrustPanel::wxTLSServerTrustPanel(const eap::config_provider &prov, e
     m_server_names->SetValidator(wxFQDNListValidator(&m_server_names_val));
 }
 
+
+/// \cond internal
 
 bool wxTLSServerTrustPanel::TransferDataToWindow()
 {
@@ -275,6 +281,8 @@ void wxTLSServerTrustPanel::OnRootCARemove(wxCommandEvent& event)
         m_root_ca->Delete(selections[i]);
 }
 
+/// \endcond
+
 
 bool wxTLSServerTrustPanel::AddRootCA(PCCERT_CONTEXT cert)
 {
@@ -332,6 +340,7 @@ wxTLSConfigPanel::~wxTLSConfigPanel()
 }
 
 
+/// \cond internal
 void wxTLSConfigPanel::OnInitDialog(wxInitDialogEvent& event)
 {
     // Forward the event to child panels.
@@ -339,3 +348,4 @@ void wxTLSConfigPanel::OnInitDialog(wxInitDialogEvent& event)
     if (m_credentials)
         m_credentials->GetEventHandler()->ProcessEvent(event);
 }
+/// \endcond

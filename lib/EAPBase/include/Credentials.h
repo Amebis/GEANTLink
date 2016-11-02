@@ -22,19 +22,8 @@
 
 namespace eap
 {
-    ///
-    /// Base class for method credential storage
-    ///
     class credentials;
-
-    ///
-    /// Password based method credentials
-    ///
     class credentials_pass;
-
-    ///
-    /// Connection credentials
-    ///
     class credentials_connection;
 }
 
@@ -58,6 +47,15 @@ namespace eap
 
 namespace eap
 {
+    ///
+    /// \defgroup EAPBaseCred  Credentials
+    /// Credential management
+    ///
+    /// @{
+
+    ///
+    /// Base class for method credential storage
+    ///
     class credentials : public config
     {
     public:
@@ -127,50 +125,17 @@ namespace eap
         ///
         virtual bool empty() const;
 
-        /// \name XML configuration management
+        /// \name XML management
         /// @{
-
-        ///
-        /// Save to XML document
-        ///
-        /// \param[in]  pDoc         XML document
-        /// \param[in]  pConfigRoot  Suggested root element for saving
-        ///
         virtual void save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot) const;
-
-        ///
-        /// Load from XML document
-        ///
-        /// \param[in]  pConfigRoot  Root element for loading
-        ///
         virtual void load(_In_ IXMLDOMNode *pConfigRoot);
-
         /// @}
 
         /// \name BLOB management
         /// @{
-
-        ///
-        /// Packs a configuration
-        ///
-        /// \param[inout] cursor  Memory cursor
-        ///
         virtual void operator<<(_Inout_ cursor_out &cursor) const;
-
-        ///
-        /// Returns packed size of a configuration
-        ///
-        /// \returns Size of data when packed (in bytes)
-        ///
         virtual size_t get_pk_size() const;
-
-        ///
-        /// Unpacks a configuration
-        ///
-        /// \param[inout] cursor  Memory cursor
-        ///
         virtual void operator>>(_Inout_ cursor_in &cursor);
-
         /// @}
 
         /// \name Storage
@@ -240,7 +205,7 @@ namespace eap
         /// Combine credentials in the following order:
         ///
         /// 1. Cached credentials
-        /// 2. Configured credentials (if \p cfg is derived from config_method_with_cred)
+        /// 2. Configured credentials (if \p cfg is derived from `config_method_with_cred`)
         /// 3. Stored credentials
         ///
         /// \param[in] dwFlags                A combination of [EAP flags](https://msdn.microsoft.com/en-us/library/windows/desktop/bb891975.aspx) that describe the EAP authentication session behavior
@@ -266,6 +231,9 @@ namespace eap
     };
 
 
+    ///
+    /// Password based method credentials
+    ///
     class credentials_pass : public credentials
     {
     public:
@@ -319,110 +287,46 @@ namespace eap
         ///
         credentials_pass& operator=(_Inout_ credentials_pass &&other);
 
-        ///
-        /// Clones credentials
-        ///
-        /// \returns Pointer to cloned credentials
-        ///
         virtual config* clone() const;
-
-        ///
-        /// Resets credentials
-        ///
         virtual void clear();
-
-        ///
-        /// Test credentials if blank
-        ///
-        /// \returns
-        /// - \c true if blank
-        /// - \c false otherwise
-        ///
         virtual bool empty() const;
 
-        /// \name XML configuration management
+        /// \name XML management
         /// @{
-
-        ///
-        /// Save to XML document
-        ///
-        /// \param[in]  pDoc         XML document
-        /// \param[in]  pConfigRoot  Suggested root element for saving
-        ///
         virtual void save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot) const;
-
-        ///
-        /// Load from XML document
-        ///
-        /// \param[in]  pConfigRoot  Root element for loading
-        ///
         virtual void load(_In_ IXMLDOMNode *pConfigRoot);
-
         /// @}
 
         /// \name BLOB management
         /// @{
-
-        ///
-        /// Packs a configuration
-        ///
-        /// \param[inout] cursor  Memory cursor
-        ///
         virtual void operator<<(_Inout_ cursor_out &cursor) const;
-
-        ///
-        /// Returns packed size of a configuration
-        ///
-        /// \returns Size of data when packed (in bytes)
-        ///
         virtual size_t get_pk_size() const;
-
-        ///
-        /// Unpacks a configuration
-        ///
-        /// \param[inout] cursor  Memory cursor
-        ///
         virtual void operator>>(_Inout_ cursor_in &cursor);
-
         /// @}
 
         /// \name Storage
         /// @{
-
-        ///
-        /// Save credentials to Windows Credential Manager
-        ///
-        /// \param[in]  pszTargetName  The name in Windows Credential Manager to store credentials as
-        /// \param[in]  level          Credential level (0=outer, 1=inner, 2=inner-inner...)
-        ///
         virtual void store(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int level) const;
-
-        ///
-        /// Retrieve credentials from Windows Credential Manager
-        ///
-        /// \param[in]  pszTargetName  The name in Windows Credential Manager to retrieve credentials from
-        /// \param[in]  level          Credential level (0=outer, 1=inner, 2=inner-inner...)
-        ///
         virtual void retrieve(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int level);
 
         ///
-        /// Return target suffix for Windows Credential Manager credential name
+        /// @copydoc eap::credentials::target_suffix()
+        /// \returns This implementation always returns `_T("pass")`
         ///
         virtual LPCTSTR target_suffix() const;
-
         /// @}
 
         ///
         /// Combine credentials in the following order:
         ///
         /// 1. Cached credentials
-        /// 2. Configured credentials (if \p cfg is derived from config_method_with_cred)
+        /// 2. Configured credentials (if \p cfg is derived from `config_method_with_cred`)
         /// 3. Stored credentials
         ///
         /// \param[in] dwFlags                A combination of [EAP flags](https://msdn.microsoft.com/en-us/library/windows/desktop/bb891975.aspx) that describe the EAP authentication session behavior
         /// \param[in] hTokenImpersonateUser  Impersonation token for a logged-on user to collect user-related information
-        /// \param[in] cred_cached            Cached credentials (optional, can be \c NULL, must be credentials_eaphost* type)
-        /// \param[in] cfg                    Method configuration (unused, as must be as config_method_eaphost is not derived from config_method_with_cred)
+        /// \param[in] cred_cached            Cached credentials (optional, can be \c NULL, must be `credentials_eaphost*` type)
+        /// \param[in] cfg                    Method configuration (unused, as must be as config_method_eaphost is not derived from `config_method_with_cred`)
         /// \param[in] pszTargetName          The name in Windows Credential Manager to retrieve credentials from (optional, can be \c NULL)
         ///
         /// \returns
@@ -438,8 +342,8 @@ namespace eap
             _In_opt_z_       LPCTSTR       pszTargetName);
 
     public:
-        winstd::sanitizing_wstring m_password;  ///< Password
-        enc_alg_t m_enc_alg;                    ///< Encryption algorithm used for XML password keeping
+        winstd::sanitizing_wstring m_password;      ///< Password
+        enc_alg_t m_enc_alg;                        ///< Encryption algorithm used for XML password keeping
 
     private:
         /// \cond internal
@@ -448,6 +352,9 @@ namespace eap
     };
 
 
+    ///
+    /// Connection credentials
+    ///
     class credentials_connection : public config
     {
     public:
@@ -491,57 +398,19 @@ namespace eap
         ///
         credentials_connection& operator=(_Inout_ credentials_connection &&other);
 
-        ///
-        /// Clones configuration
-        ///
-        /// \returns Pointer to cloned configuration
-        ///
         virtual config* clone() const;
 
-        /// \name XML configuration management
+        /// \name XML management
         /// @{
-
-        ///
-        /// Save to XML document
-        ///
-        /// \param[in]  pDoc         XML document
-        /// \param[in]  pConfigRoot  Suggested root element for saving
-        ///
         virtual void save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot) const;
-
-        ///
-        /// Load from XML document
-        ///
-        /// \param[in]  pConfigRoot  Root element for loading
-        ///
         virtual void load(_In_ IXMLDOMNode *pConfigRoot);
-
         /// @}
 
         /// \name BLOB management
         /// @{
-
-        ///
-        /// Packs a configuration
-        ///
-        /// \param[inout] cursor  Memory cursor
-        ///
         virtual void operator<<(_Inout_ cursor_out &cursor) const;
-
-        ///
-        /// Returns packed size of a configuration
-        ///
-        /// \returns Size of data when packed (in bytes)
-        ///
         virtual size_t get_pk_size() const;
-
-        ///
-        /// Unpacks a configuration
-        ///
-        /// \param[inout] cursor  Memory cursor
-        ///
         virtual void operator>>(_Inout_ cursor_in &cursor);
-
         /// @}
 
         ///
@@ -575,22 +444,47 @@ namespace eap
         std::wstring m_id;                      ///< Provider ID
         std::unique_ptr<credentials> m_cred;    ///< Credentials
     };
+
+    /// @}
 }
 
+/// \addtogroup EAPBaseStream
+/// @{
 
+///
+/// Packs a credential encryption algorithm ID
+///
+/// \param[inout] cursor  Memory cursor
+/// \param[in]    val     Credential encryption algorithm ID to pack
+///
 inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const eap::credentials_pass::enc_alg_t &val)
 {
     cursor << (unsigned char)val;
 }
 
 
+///
+/// Returns packed size of a credential encryption algorithm ID
+///
+/// \param[in] val  Credential encryption algorithm ID to pack
+///
+/// \returns Size of data when packed (in bytes)
+///
 inline size_t pksizeof(_In_ const eap::credentials_pass::enc_alg_t &val)
 {
     return pksizeof((unsigned char)val);
 }
 
 
+///
+/// Unpacks a credential encryption algorithm ID
+///
+/// \param[inout] cursor  Memory cursor
+/// \param[out]   val     Credential encryption algorithm ID to unpack to
+///
 inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ eap::credentials_pass::enc_alg_t &val)
 {
     cursor >> (unsigned char&)val;
 }
+
+/// @}

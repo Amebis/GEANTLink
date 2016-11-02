@@ -1,21 +1,21 @@
-/*
+ï»¿/*
     Copyright 2015-2016 Amebis
-    Copyright 2016 GÉANT
+    Copyright 2016 GÃ‰ANT
 
-    This file is part of GÉANTLink.
+    This file is part of GÃ‰ANTLink.
 
-    GÉANTLink is free software: you can redistribute it and/or modify it
+    GÃ‰ANTLink is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    GÉANTLink is distributed in the hope that it will be useful, but
+    GÃ‰ANTLink is distributed in the hope that it will be useful, but
     WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with GÉANTLink. If not, see <http://www.gnu.org/licenses/>.
+    along with GÃ‰ANTLink. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "StdAfx.h"
@@ -36,6 +36,8 @@ wxTTLSConfigPanel::wxTTLSConfigPanel(const eap::config_provider &prov, eap::conf
         m_outer_identity_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(265)));
 }
 
+
+/// \cond internal
 
 bool wxTTLSConfigPanel::TransferDataToWindow()
 {
@@ -89,6 +91,8 @@ void wxTTLSConfigPanel::OnUpdateUI(wxUpdateUIEvent& event)
         m_outer_identity_custom_val->Enable(m_outer_identity_custom->GetValue());
     }
 }
+
+/// \endcond
 
 
 //////////////////////////////////////////////////////////////////////
@@ -158,6 +162,8 @@ wxTTLSConfigWindow::~wxTTLSConfigWindow()
     this->Disconnect(wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxTTLSConfigWindow::OnUpdateUI));
 }
 
+
+/// \cond internal
 
 bool wxTTLSConfigWindow::TransferDataToWindow()
 {
@@ -240,3 +246,5 @@ void wxTTLSConfigWindow::OnUpdateUI(wxUpdateUIEvent& event)
 
     event.Skip();
 }
+
+/// \endcond

@@ -21,20 +21,22 @@
 #include "../../EAPBase_UI/include/EAP_UI.h"
 #include "../../MSCHAPv2/include/Config.h"
 
+class wxMSCHAPv2ConfigPanel;
+
+/// \addtogroup EAPBaseGUI
+/// @{
+
 ///
 /// MSCHAPv2 credential configuration panel
 ///
 typedef wxEAPCredentialsConfigPanel<eap::credentials_pass, wxPasswordCredentialsPanel<eap::credentials_pass, wxPasswordCredentialsPanelBase> > wxMSCHAPv2CredentialsConfigPanel;
 
 ///
-/// MSCHAPv2 configuration panel
-///
-class wxMSCHAPv2ConfigPanel;
-
-///
 /// MSCHAPv2 credential entry panel
 ///
 typedef wxPasswordCredentialsPanel<eap::credentials_pass, wxPasswordCredentialsPanelBase> wxMSCHAPv2CredentialsPanel;
+
+/// @}
 
 #pragma once
 
@@ -44,6 +46,12 @@ typedef wxPasswordCredentialsPanel<eap::credentials_pass, wxPasswordCredentialsP
 #include <Windows.h>
 
 
+/// \addtogroup EAPBaseGUI
+/// @{
+
+///
+/// MSCHAPv2 configuration panel
+///
 class wxMSCHAPv2ConfigPanel : public wxPanel
 {
 public:
@@ -65,3 +73,5 @@ protected:
 protected:
     wxMSCHAPv2CredentialsConfigPanel *m_credentials; ///< Credentials configuration panel
 };
+
+/// @}

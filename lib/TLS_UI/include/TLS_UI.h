@@ -35,31 +35,20 @@
 #include <list>
 #include <string>
 
-
-///
-/// Helper class for auto-destroyable certificates used in wxWidget's item containers
-///
 class wxCertificateClientData;
-
-///
-/// TLS credential panel
-///
 class wxTLSCredentialsPanel;
-
-///
-/// TLS server trust configuration panel
-///
 class wxTLSServerTrustPanel;
+class wxTLSConfigPanel;
+
+/// \addtogroup EAPBaseGUI
+/// @{
 
 ///
 /// TLS credentials configuration panel
 ///
 typedef wxEAPCredentialsConfigPanel<eap::credentials_tls, wxTLSCredentialsPanel> wxTLSCredentialsConfigPanel;
 
-///
-/// TLS configuration panel
-///
-class wxTLSConfigPanel;
+/// @}
 
 #pragma once
 
@@ -78,11 +67,19 @@ class wxTLSConfigPanel;
 #include <vector>
 
 
+/// \addtogroup EAPBaseGUI
+/// @{
+
+///
+/// Helper class for auto-destroyable certificates used in wxWidget's item containers
+///
 class wxCertificateClientData : public wxClientData
 {
 public:
     ///
     /// Constructs client data object with existing handle
+    ///
+    /// \param[in] cert  Certificate handle
     ///
     wxCertificateClientData(PCCERT_CONTEXT cert);
 
@@ -96,6 +93,9 @@ public:
 };
 
 
+///
+/// TLS credential panel
+///
 class wxTLSCredentialsPanel : public wxEAPCredentialsPanel<eap::credentials_tls, wxTLSCredentialsPanelBase>
 {
 public:
@@ -119,11 +119,18 @@ protected:
 };
 
 
+///
+/// TLS server trust configuration panel
+///
 class wxTLSServerTrustPanel : public wxTLSServerTrustPanelBase
 {
 public:
     ///
     /// Constructs a configuration panel
+    ///
+    /// \param[in   ] prov    Provider configuration data
+    /// \param[inout] cfg     Configuration data
+    /// \param[in   ] parent  Parent window
     ///
     wxTLSServerTrustPanel(const eap::config_provider &prov, eap::config_method_tls &cfg, wxWindow* parent);
 
@@ -156,11 +163,18 @@ protected:
 };
 
 
+///
+/// TLS configuration panel
+///
 class wxTLSConfigPanel : public wxPanel
 {
 public:
     ///
     /// Constructs a configuration panel
+    ///
+    /// \param[in   ] prov    Provider configuration data
+    /// \param[inout] cfg     Configuration data
+    /// \param[in   ] parent  Parent window
     ///
     wxTLSConfigPanel(const eap::config_provider &prov, eap::config_method_tls &cfg, wxWindow* parent);
 
@@ -180,3 +194,5 @@ protected:
     wxTLSServerTrustPanel *m_server_trust;      ///< Server trust configuration panel
     wxTLSCredentialsConfigPanel *m_credentials; ///< Credentials configuration panel
 };
+
+/// @}

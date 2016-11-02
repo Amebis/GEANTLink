@@ -29,39 +29,531 @@
 
 namespace eapxml
 {
+    ///
+    /// \defgroup EAPBaseXML  XML DOM
+    /// Easy interaction with MSXML
+    ///
+    /// @{
+
+    ///
+    /// Returns owner document object for a given node
+    ///
+    /// \param[in ] pXmlNode  XML node
+    /// \param[out] ppXmlDoc  XML document
+    ///
+    /// \returns
+    /// - >0 if succeeded with warnings;
+    /// - =0 (\c S_OK) if successful;
+    /// - <0 if failed.
+    /// Use `SUCCEEDED()` macro to test for first two cases (>=0) or `FAILED()` to test for failure.
+    ///
     inline HRESULT get_document(_In_ IXMLDOMNode *pXmlNode, _Out_ winstd::com_obj<IXMLDOMDocument2> &ppXmlDoc);
+
+    ///
+    /// Selects single child node by name
+    ///
+    /// \param[in ] pXmlParent    Parent XML node
+    /// \param[in ] bstrNodeName  XML node selection name
+    /// \param[out] ppXmlNode     Child XML node found
+    ///
+    /// \returns
+    /// - >0 if succeeded with warnings;
+    /// - =0 (\c S_OK) if successful;
+    /// - <0 if failed.
+    /// Use `SUCCEEDED()` macro to test for first two cases (>=0) or `FAILED()` to test for failure.
+    ///
     inline HRESULT select_node(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrNodeName, _Out_ winstd::com_obj<IXMLDOMNode> &ppXmlNode);
+
+    ///
+    /// Selects child nodes by name
+    ///
+    /// \param[in ] pXmlParent    Parent XML node
+    /// \param[in ] bstrNodeName  XML node selection name
+    /// \param[out] ppXmlNodes    List of child XML nodes found
+    ///
+    /// \returns
+    /// - >0 if succeeded with warnings;
+    /// - =0 (\c S_OK) if successful;
+    /// - <0 if failed.
+    /// Use `SUCCEEDED()` macro to test for first two cases (>=0) or `FAILED()` to test for failure.
+    ///
     inline HRESULT select_nodes(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrNodeName, _Out_ winstd::com_obj<IXMLDOMNodeList> &ppXmlNodes);
+
+    ///
+    /// Selects single child element by name
+    ///
+    /// \param[in ] pXmlParent       Parent XML node
+    /// \param[in ] bstrElementName  XML element selection name
+    /// \param[out] ppXmlElement     Child XML element found
+    ///
+    /// \returns
+    /// - >0 if succeeded with warnings;
+    /// - =0 (\c S_OK) if successful;
+    /// - <0 if failed.
+    /// Use `SUCCEEDED()` macro to test for first two cases (>=0) or `FAILED()` to test for failure.
+    ///
     inline HRESULT select_element(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _Out_ winstd::com_obj<IXMLDOMElement> &ppXmlElement);
+
+    ///
+    /// Creates a new element
+    ///
+    /// \param[in ] pDoc             Owner XML document
+    /// \param[in ] bstrElementName  XML element name
+    /// \param[in ] bstrNamespace    XML element namespace
+    /// \param[out] ppXmlElement     XML element created
+    ///
+    /// \returns
+    /// - >0 if succeeded with warnings;
+    /// - =0 (\c S_OK) if successful;
+    /// - <0 if failed.
+    /// Use `SUCCEEDED()` macro to test for first two cases (>=0) or `FAILED()` to test for failure.
+    ///
     inline HRESULT create_element(_In_ IXMLDOMDocument *pDoc, _In_z_ const BSTR bstrElementName, _In_z_ const BSTR bstrNamespace, _Out_ winstd::com_obj<IXMLDOMElement> &ppXmlElement);
+
+    ///
+    /// Creates a new child element if not already present
+    ///
+    /// \param[in ] pDoc                   Owner XML document
+    /// \param[in ] pXmlParent             Parent XML node
+    /// \param[in ] bstrElementNameSelect  XML element selection name
+    /// \param[in ] bstrElementNameCreate  XML element name
+    /// \param[in ] bstrNamespace          XML element namespace
+    /// \param[out] ppXmlElement           XML element found or created
+    ///
+    /// \returns
+    /// - >0 if succeeded with warnings;
+    /// - =0 (\c S_OK) if successful;
+    /// - <0 if failed.
+    /// Use `SUCCEEDED()` macro to test for first two cases (>=0) or `FAILED()` to test for failure.
+    ///
     inline HRESULT create_element(_In_ IXMLDOMDocument *pDoc, IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementNameSelect, _In_z_ const BSTR bstrElementNameCreate, _In_z_ const BSTR bstrNamespace, _Out_ winstd::com_obj<IXMLDOMElement> &ppXmlElement);
+
+    ///
+    /// Tests if node has a parent set
+    ///
+    /// \param[in] pXmlNode  XML node
+    ///
+    /// \returns
+    /// - Non zero when \p pXmlNode has a parent set;
+    /// - Zero otherwise.
+    ///
     inline bool has_parent(_In_ IXMLDOMNode *pXmlNode);
+
+    ///
+    /// Returns child element text
+    ///
+    /// \param[in ] pXmlParent       Parent XML node
+    /// \param[in ] bstrElementName  XML element selection name
+    /// \param[out] pbstrValue       XML element text
+    /// \param[out] ppXmlElement     Child XML element found
+    ///
+    /// \returns
+    /// - >0 if succeeded with warnings;
+    /// - =0 (\c S_OK) if successful;
+    /// - <0 if failed.
+    /// Use `SUCCEEDED()` macro to test for first two cases (>=0) or `FAILED()` to test for failure.
+    ///
     inline HRESULT get_element_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _Out_ winstd::bstr &pbstrValue, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement = NULL);
+
+    ///
+    /// Returns child element text
+    ///
+    /// \param[in ] pXmlParent       Parent XML node
+    /// \param[in ] bstrElementName  XML element selection name
+    /// \param[out] sValue           XML element text
+    /// \param[out] ppXmlElement     Child XML element found
+    ///
+    /// \returns
+    /// - >0 if succeeded with warnings;
+    /// - =0 (\c S_OK) if successful;
+    /// - <0 if failed.
+    /// Use `SUCCEEDED()` macro to test for first two cases (>=0) or `FAILED()` to test for failure.
+    ///
     template<class _Traits, class _Ax> inline HRESULT get_element_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _Out_ std::basic_string<wchar_t, _Traits, _Ax> &sValue, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement = NULL);
+
+    ///
+    /// Returns child element text converted to number
+    ///
+    /// \param[in ] pXmlParent       Parent XML node
+    /// \param[in ] bstrElementName  XML element selection name
+    /// \param[out] pdwValue         XML element text converted to number
+    /// \param[out] ppXmlElement     Child XML element found
+    ///
+    /// \returns
+    /// - >0 if succeeded with warnings;
+    /// - =0 (\c S_OK) if successful;
+    /// - <0 if failed.
+    /// Use `SUCCEEDED()` macro to test for first two cases (>=0) or `FAILED()` to test for failure.
+    ///
     inline HRESULT get_element_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _Out_ DWORD &pdwValue, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement = NULL);
+
+    ///
+    /// Returns child element text converted to boolean
+    ///
+    /// \param[in ] pXmlParent       Parent XML node
+    /// \param[in ] bstrElementName  XML element selection name
+    /// \param[out] pbValue          XML element text converted to boolean
+    /// \param[out] ppXmlElement     Child XML element found
+    ///
+    /// \returns
+    /// - >0 if succeeded with warnings;
+    /// - =0 (\c S_OK) if successful;
+    /// - <0 if failed.
+    /// Use `SUCCEEDED()` macro to test for first two cases (>=0) or `FAILED()` to test for failure.
+    ///
     inline HRESULT get_element_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _Out_ bool &pbValue, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement = NULL);
+
+    ///
+    /// Returns child element BLOB encoded as Base64 text
+    ///
+    /// \param[in ] pXmlParent       Parent XML node
+    /// \param[in ] bstrElementName  XML element selection name
+    /// \param[out] aValue           XML element BLOB
+    /// \param[out] ppXmlElement     Child XML element found
+    ///
+    /// \returns
+    /// - >0 if succeeded with warnings;
+    /// - =0 (\c S_OK) if successful;
+    /// - <0 if failed.
+    /// Use `SUCCEEDED()` macro to test for first two cases (>=0) or `FAILED()` to test for failure.
+    ///
     template<class _Ty, class _Ax> inline HRESULT get_element_base64(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _Out_ std::vector<_Ty, _Ax> &aValue, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement = NULL);
+
+    ///
+    /// Returns child element BLOB encoded as hexadecimal text
+    ///
+    /// \param[in ] pXmlParent       Parent XML node
+    /// \param[in ] bstrElementName  XML element selection name
+    /// \param[out] aValue           XML element BLOB
+    /// \param[out] ppXmlElement     Child XML element found
+    ///
+    /// \returns
+    /// - >0 if succeeded with warnings;
+    /// - =0 (\c S_OK) if successful;
+    /// - <0 if failed.
+    /// Use `SUCCEEDED()` macro to test for first two cases (>=0) or `FAILED()` to test for failure.
+    ///
     template<class _Ty, class _Ax> inline HRESULT get_element_hex(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _Out_ std::vector<_Ty, _Ax> &aValue, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement = NULL);
+
+    ///
+    /// Returns child element localizable text
+    ///
+    /// \param[in ] pXmlParent       Parent XML node
+    /// \param[in ] bstrElementName  XML element selection name
+    /// \param[in ] pszLang          Desired localization
+    /// \param[out] pbstrValue       XML element text
+    /// \param[out] ppXmlElement     Child XML element found
+    ///
+    /// \returns
+    /// - >0 if succeeded with warnings;
+    /// - =0 (\c S_OK) if successful;
+    /// - <0 if failed.
+    /// Use `SUCCEEDED()` macro to test for first two cases (>=0) or `FAILED()` to test for failure.
+    ///
     inline HRESULT get_element_localized(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _In_z_ LPCWSTR pszLang, _Out_ winstd::bstr &pbstrValue, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement = NULL);
+
+    ///
+    /// Returns child element localizable text
+    ///
+    /// \param[in ] pXmlParent       Parent XML node
+    /// \param[in ] bstrElementName  XML element selection name
+    /// \param[in ] pszLang          Desired localization
+    /// \param[out] sValue           XML element text
+    /// \param[out] ppXmlElement     Child XML element found
+    ///
+    /// \returns
+    /// - >0 if succeeded with warnings;
+    /// - =0 (\c S_OK) if successful;
+    /// - <0 if failed.
+    /// Use `SUCCEEDED()` macro to test for first two cases (>=0) or `FAILED()` to test for failure.
+    ///
     template<class _Traits, class _Ax> inline HRESULT get_element_localized(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrElementName, _In_z_ LPCWSTR pszLang, _Out_ std::basic_string<wchar_t, _Traits, _Ax> &sValue, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement = NULL);
+
+    ///
+    /// Creates a new child element
+    ///
+    /// \param[in ] pDoc             Owner XML document
+    /// \param[in ] pCurrentDOMNode  Parent XML node
+    /// \param[in ] bstrElementName  XML element name
+    /// \param[in ] bstrNamespace    XML element namespace
+    /// \param[out] ppXmlElement     XML element created
+    ///
+    /// \returns
+    /// - >0 if succeeded with warnings;
+    /// - =0 (\c S_OK) if successful;
+    /// - <0 if failed.
+    /// Use `SUCCEEDED()` macro to test for first two cases (>=0) or `FAILED()` to test for failure.
+    ///
     inline HRESULT put_element(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _Out_ winstd::com_obj<IXMLDOMElement> &ppXmlElement);
+
+    ///
+    /// Creates a new child element with text
+    ///
+    /// \param[in ] pDoc             Owner XML document
+    /// \param[in ] pCurrentDOMNode  Parent XML node
+    /// \param[in ] bstrElementName  XML element name
+    /// \param[in ] bstrNamespace    XML element namespace
+    /// \param[in ] bstrValue        XML element text
+    /// \param[out] ppXmlElement     XML element created
+    ///
+    /// \returns
+    /// - >0 if succeeded with warnings;
+    /// - =0 (\c S_OK) if successful;
+    /// - <0 if failed.
+    /// Use `SUCCEEDED()` macro to test for first two cases (>=0) or `FAILED()` to test for failure.
+    ///
     inline HRESULT put_element_value(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _In_z_ const BSTR bstrValue, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement = NULL);
+
+    ///
+    /// Creates a new child element with text converted from number
+    ///
+    /// \param[in ] pDoc             Owner XML document
+    /// \param[in ] pCurrentDOMNode  Parent XML node
+    /// \param[in ] bstrElementName  XML element name
+    /// \param[in ] bstrNamespace    XML element namespace
+    /// \param[in ] dwValue          XML element number
+    /// \param[out] ppXmlElement     XML element created
+    ///
+    /// \returns
+    /// - >0 if succeeded with warnings;
+    /// - =0 (\c S_OK) if successful;
+    /// - <0 if failed.
+    /// Use `SUCCEEDED()` macro to test for first two cases (>=0) or `FAILED()` to test for failure.
+    ///
     inline HRESULT put_element_value(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _In_ DWORD dwValue, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement = NULL);
+
+    ///
+    /// Creates a new child element with text converted from boolean
+    ///
+    /// \param[in ] pDoc             Owner XML document
+    /// \param[in ] pCurrentDOMNode  Parent XML node
+    /// \param[in ] bstrElementName  XML element name
+    /// \param[in ] bstrNamespace    XML element namespace
+    /// \param[in ] bValue           XML element boolean
+    /// \param[out] ppXmlElement     XML element created
+    ///
+    /// \returns
+    /// - >0 if succeeded with warnings;
+    /// - =0 (\c S_OK) if successful;
+    /// - <0 if failed.
+    /// Use `SUCCEEDED()` macro to test for first two cases (>=0) or `FAILED()` to test for failure.
+    ///
     inline HRESULT put_element_value(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _In_ bool bValue, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement = NULL);
+
+    ///
+    /// Creates a new child element with Base64 encoded text from BLOB
+    ///
+    /// \param[in ] pDoc             Owner XML document
+    /// \param[in ] pCurrentDOMNode  Parent XML node
+    /// \param[in ] bstrElementName  XML element name
+    /// \param[in ] bstrNamespace    XML element namespace
+    /// \param[in ] pValue           Pointer to BLOB data
+    /// \param[in ] nValueLen        Size of \p pValue in bytes
+    /// \param[out] ppXmlElement     XML element created
+    ///
+    /// \returns
+    /// - >0 if succeeded with warnings;
+    /// - =0 (\c S_OK) if successful;
+    /// - <0 if failed.
+    /// Use `SUCCEEDED()` macro to test for first two cases (>=0) or `FAILED()` to test for failure.
+    ///
     inline HRESULT put_element_base64(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _In_count_(nValueLen) LPCVOID pValue, _In_ SIZE_T nValueLen, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement = NULL);
+
+    ///
+    /// Creates a new child element with hexadecimal encoded text from BLOB
+    ///
+    /// \param[in ] pDoc             Owner XML document
+    /// \param[in ] pCurrentDOMNode  Parent XML node
+    /// \param[in ] bstrElementName  XML element name
+    /// \param[in ] bstrNamespace    XML element namespace
+    /// \param[in ] pValue           Pointer to BLOB data
+    /// \param[in ] nValueLen        Size of \p pValue in bytes
+    /// \param[out] ppXmlElement     XML element created
+    ///
+    /// \returns
+    /// - >0 if succeeded with warnings;
+    /// - =0 (\c S_OK) if successful;
+    /// - <0 if failed.
+    /// Use `SUCCEEDED()` macro to test for first two cases (>=0) or `FAILED()` to test for failure.
+    ///
     inline HRESULT put_element_hex(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _In_count_(nValueLen) LPCVOID pValue, _In_ SIZE_T nValueLen, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement = NULL);
+
+    ///
+    /// Returns attribute text
+    ///
+    /// \param[in ] pXmlParent         Parent XML node
+    /// \param[in ] bstrAttributeName  XML attribute selection name
+    /// \param[out] pbstrValue         XML atribute value
+    ///
+    /// \returns
+    /// - >0 if succeeded with warnings;
+    /// - =0 (\c S_OK) if successful;
+    /// - <0 if failed.
+    /// Use `SUCCEEDED()` macro to test for first two cases (>=0) or `FAILED()` to test for failure.
+    ///
     inline HRESULT get_attrib_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrAttributeName, _Out_ winstd::bstr &pbstrValue);
+
+    ///
+    /// Returns attribute text
+    ///
+    /// \param[in ] pXmlParent         Parent XML node
+    /// \param[in ] bstrAttributeName  XML attribute selection name
+    /// \param[out] sValue             XML atribute value
+    ///
+    /// \returns
+    /// - >0 if succeeded with warnings;
+    /// - =0 (\c S_OK) if successful;
+    /// - <0 if failed.
+    /// Use `SUCCEEDED()` macro to test for first two cases (>=0) or `FAILED()` to test for failure.
+    ///
     template<class _Traits, class _Ax> inline HRESULT get_attrib_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrAttributeName, _Out_ std::basic_string<wchar_t, _Traits, _Ax> &sValue);
+
+    ///
+    /// Returns attribute text converted to number
+    ///
+    /// \param[in ] pXmlParent         Parent XML node
+    /// \param[in ] bstrAttributeName  XML attribute selection name
+    /// \param[out] pdwValue           XML atribute value
+    ///
+    /// \returns
+    /// - >0 if succeeded with warnings;
+    /// - =0 (\c S_OK) if successful;
+    /// - <0 if failed.
+    /// Use `SUCCEEDED()` macro to test for first two cases (>=0) or `FAILED()` to test for failure.
+    ///
     inline HRESULT get_attrib_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrAttributeName, _Out_ DWORD &pdwValue);
+
+    ///
+    /// Returns attribute text converted to boolean
+    ///
+    /// \param[in ] pXmlParent         Parent XML node
+    /// \param[in ] bstrAttributeName  XML attribute selection name
+    /// \param[out] pbValue            XML atribute value
+    ///
+    /// \returns
+    /// - >0 if succeeded with warnings;
+    /// - =0 (\c S_OK) if successful;
+    /// - <0 if failed.
+    /// Use `SUCCEEDED()` macro to test for first two cases (>=0) or `FAILED()` to test for failure.
+    ///
     inline HRESULT get_attrib_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrAttributeName, _Out_ bool &pbValue);
+
+    ///
+    /// Returns attribute BLOB converted from Base64 encoded text
+    ///
+    /// \param[in ] pXmlParent         Parent XML node
+    /// \param[in ] bstrAttributeName  XML attribute selection name
+    /// \param[out] aValue             XML atribute value
+    ///
+    /// \returns
+    /// - >0 if succeeded with warnings;
+    /// - =0 (\c S_OK) if successful;
+    /// - <0 if failed.
+    /// Use `SUCCEEDED()` macro to test for first two cases (>=0) or `FAILED()` to test for failure.
+    ///
     template<class _Ty, class _Ax> inline HRESULT get_attrib_base64(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrAttributeName, _Out_ std::vector<_Ty, _Ax> &aValue);
+
+    ///
+    /// Returns attribute BLOB converted from hexadecimal encoded text
+    ///
+    /// \param[in ] pXmlParent         Parent XML node
+    /// \param[in ] bstrAttributeName  XML attribute selection name
+    /// \param[out] aValue             XML atribute value
+    ///
+    /// \returns
+    /// - >0 if succeeded with warnings;
+    /// - =0 (\c S_OK) if successful;
+    /// - <0 if failed.
+    /// Use `SUCCEEDED()` macro to test for first two cases (>=0) or `FAILED()` to test for failure.
+    ///
     template<class _Ty, class _Ax> inline HRESULT get_attrib_hex(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrAttributeName, _Out_ std::vector<_Ty, _Ax> &aValue);
+
+    ///
+    /// Sets node attribute
+    ///
+    /// \param[in ] pCurrentDOMNode    Parent XML node
+    /// \param[in ] bstrAttributeName  XML attribute name
+    /// \param[out] bstrValue          XML atribute value
+    ///
+    /// \returns
+    /// - >0 if succeeded with warnings;
+    /// - =0 (\c S_OK) if successful;
+    /// - <0 if failed.
+    /// Use `SUCCEEDED()` macro to test for first two cases (>=0) or `FAILED()` to test for failure.
+    ///
     inline HRESULT put_attrib_value(_In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrAttributeName, _In_opt_z_ _In_z_ const BSTR bstrValue);
+
+    ///
+    /// Sets node attribute converted from number
+    ///
+    /// \param[in ] pCurrentDOMNode    Parent XML node
+    /// \param[in ] bstrAttributeName  XML attribute name
+    /// \param[out] dwValue            XML atribute value
+    ///
+    /// \returns
+    /// - >0 if succeeded with warnings;
+    /// - =0 (\c S_OK) if successful;
+    /// - <0 if failed.
+    /// Use `SUCCEEDED()` macro to test for first two cases (>=0) or `FAILED()` to test for failure.
+    ///
     inline HRESULT put_attrib_value(_In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrAttributeName, _In_opt_z_ _In_ DWORD dwValue);
+
+    ///
+    /// Sets node attribute converted from boolean
+    ///
+    /// \param[in ] pCurrentDOMNode    Parent XML node
+    /// \param[in ] bstrAttributeName  XML attribute name
+    /// \param[out] bValue             XML atribute value
+    ///
+    /// \returns
+    /// - >0 if succeeded with warnings;
+    /// - =0 (\c S_OK) if successful;
+    /// - <0 if failed.
+    /// Use `SUCCEEDED()` macro to test for first two cases (>=0) or `FAILED()` to test for failure.
+    ///
     inline HRESULT put_attrib_value(_In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrAttributeName, _In_opt_z_ _In_ bool bValue);
+
+    ///
+    /// Sets node attribute to Base64 encoded text from BLOB
+    ///
+    /// \param[in ] pCurrentDOMNode    Parent XML node
+    /// \param[in ] bstrAttributeName  XML attribute name
+    /// \param[in ] pValue             Pointer to BLOB data
+    /// \param[in ] nValueLen          Size of \p pValue in bytes
+    ///
+    /// \returns
+    /// - >0 if succeeded with warnings;
+    /// - =0 (\c S_OK) if successful;
+    /// - <0 if failed.
+    /// Use `SUCCEEDED()` macro to test for first two cases (>=0) or `FAILED()` to test for failure.
+    ///
     inline HRESULT put_attrib_base64(_In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrAttributeName, _In_opt_z_ _In_count_(nValueLen) LPCVOID pValue, _In_ SIZE_T nValueLen);
+    ///
+    /// Sets node attribute to hexadecimal encoded text from BLOB
+    ///
+    /// \param[in ] pCurrentDOMNode    Parent XML node
+    /// \param[in ] bstrAttributeName  XML attribute name
+    /// \param[in ] pValue             Pointer to BLOB data
+    /// \param[in ] nValueLen          Size of \p pValue in bytes
+    ///
+    /// \returns
+    /// - >0 if succeeded with warnings;
+    /// - =0 (\c S_OK) if successful;
+    /// - <0 if failed.
+    /// Use `SUCCEEDED()` macro to test for first two cases (>=0) or `FAILED()` to test for failure.
+    ///
     inline HRESULT put_attrib_hex(_In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrAttributeName, _In_count_(nValueLen) LPCVOID pValue, _In_ SIZE_T nValueLen);
+
+    ///
+    /// Builds XPath for a given node
+    ///
+    /// \param[in] pXmlNode  XML node
+    ///
+    /// \returns String with XPath for a given node up to node terminal parent
+    ///
     inline std::wstring get_xpath(_In_ IXMLDOMNode *pXmlNode);
+
+    /// @}
 }
 
 #pragma once

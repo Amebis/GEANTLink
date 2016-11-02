@@ -20,19 +20,8 @@
 
 namespace eap
 {
-    ///
-    /// EAP-(T)TLS class defragging method tunnel
-    ///
     class method_defrag;
-
-    ///
-    /// Diameter EAP-Message tunnel method
-    ///
     class method_eapmsg;
-
-    ///
-    /// TTLS method
-    ///
     class method_ttls;
 }
 
@@ -48,6 +37,12 @@ namespace eap
 
 namespace eap
 {
+    /// \addtogroup EAPBaseMethod
+    /// @{
+
+    ///
+    /// EAP-(T)TLS class defragging method tunnel
+    ///
     class method_defrag : public method_tunnel
     {
         WINSTD_NONCOPYABLE(method_defrag)
@@ -111,23 +106,15 @@ namespace eap
         /// \name Packet processing
         /// @{
 
-        ///
-        /// Processes a packet received by EapHost from a supplicant.
-        ///
-        /// \sa [EapPeerProcessRequestPacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363621.aspx)
-        ///
         virtual EapPeerMethodResponseAction process_request_packet(
             _In_bytecount_(dwReceivedPacketSize) const void  *pReceivedPacket,
             _In_                                       DWORD dwReceivedPacketSize);
 
-        ///
-        /// Obtains a response packet from the EAP method.
-        ///
-        /// \sa [EapPeerGetResponsePacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363610.aspx)
-        ///
         virtual void get_response_packet(
             _Out_    sanitizing_blob &packet,
             _In_opt_ DWORD           size_max = MAXDWORD);
+
+        /// @}
 
     protected:
         DWORD m_size_frag_max;      ///< Maximum size of a fragment
@@ -137,6 +124,9 @@ namespace eap
     };
 
 
+    ///
+    /// Diameter EAP-Message tunnel method
+    ///
     class method_eapmsg : public method_tunnel
     {
     public:
@@ -165,34 +155,24 @@ namespace eap
         ///
         method_eapmsg& operator=(_Inout_ method_eapmsg &&other);
 
-        /// \name Packet processing
+        /// \name Session management
         /// @{
 
-        ///
-        /// Starts an EAP authentication session on the peer EapHost using the EAP method.
-        ///
-        /// \sa [EapPeerBeginSession function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363600.aspx)
-        ///
         virtual void begin_session(
             _In_        DWORD         dwFlags,
             _In_  const EapAttributes *pAttributeArray,
             _In_        HANDLE        hTokenImpersonateUser,
             _In_opt_    DWORD         dwMaxSendPacketSize = MAXDWORD);
 
-        ///
-        /// Processes a packet received by EapHost from a supplicant.
-        ///
-        /// \sa [EapPeerProcessRequestPacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363621.aspx)
-        ///
+        /// @}
+
+        /// \name Packet processing
+        /// @{
+
         virtual EapPeerMethodResponseAction process_request_packet(
             _In_bytecount_(dwReceivedPacketSize) const void  *pReceivedPacket,
             _In_                                       DWORD dwReceivedPacketSize);
 
-        ///
-        /// Obtains a response packet from the EAP method.
-        ///
-        /// \sa [EapPeerGetResponsePacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363610.aspx)
-        ///
         virtual void get_response_packet(
             _Out_    sanitizing_blob &packet,
             _In_opt_ DWORD           size_max = MAXDWORD);
@@ -202,6 +182,9 @@ namespace eap
     protected:
         std::wstring m_identity;        ///< User identity
 
+        ///
+        /// Communication phase
+        ///
         enum {
             phase_unknown = -1,         ///< Unknown phase
             phase_identity = 0,         ///< Send identity
@@ -212,6 +195,9 @@ namespace eap
     };
 
 
+    ///
+    /// TTLS method
+    ///
     class method_ttls : public method_tunnel
     {
         WINSTD_NONCOPYABLE(method_ttls)
@@ -243,48 +229,33 @@ namespace eap
         ///
         method_ttls& operator=(_Inout_ method_ttls &&other);
 
-        /// \name Packet processing
+        /// \name Session management
         /// @{
 
-        ///
-        /// Starts an EAP authentication session on the peer EapHost using the EAP method.
-        ///
-        /// \sa [EapPeerBeginSession function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363600.aspx)
-        ///
         virtual void begin_session(
             _In_        DWORD         dwFlags,
             _In_  const EapAttributes *pAttributeArray,
             _In_        HANDLE        hTokenImpersonateUser,
             _In_opt_    DWORD         dwMaxSendPacketSize = MAXDWORD);
 
-        ///
-        /// Processes a packet received by EapHost from a supplicant.
-        ///
-        /// \sa [EapPeerProcessRequestPacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363621.aspx)
-        ///
+        /// @}
+
+        /// \name Packet processing
+        /// @{
+
         virtual EapPeerMethodResponseAction process_request_packet(
             _In_bytecount_(dwReceivedPacketSize) const void  *pReceivedPacket,
             _In_                                       DWORD dwReceivedPacketSize);
 
-        ///
-        /// Obtains a response packet from the EAP method.
-        ///
-        /// \sa [EapPeerGetResponsePacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363610.aspx)
-        ///
         virtual void get_response_packet(
             _Out_    sanitizing_blob &packet,
             _In_opt_ DWORD           size_max = MAXDWORD);
 
-        ///
-        /// Obtains the result of an authentication session from the EAP method.
-        ///
-        /// \sa [EapPeerGetResult function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363611.aspx)
-        ///
-        virtual void get_result(
-            _In_    EapPeerMethodResultReason reason,
-            _Inout_ EapPeerMethodResult       *pResult);
-
         /// @}
+
+        virtual void get_result(
+            _In_  EapPeerMethodResultReason reason,
+            _Out_ EapPeerMethodResult       *pResult);
 
     protected:
 #if EAP_TLS < EAP_TLS_SCHANNEL_FULL
@@ -303,6 +274,9 @@ namespace eap
         std::vector<unsigned char> m_sc_queue;      ///< TLS data queue
         winstd::sec_context m_sc_ctx;               ///< Schannel context
 
+        ///
+        /// Communication phase
+        ///
         enum {
             phase_unknown = -1,                     ///< Unknown phase
             phase_handshake_init = 0,               ///< Handshake initialize
@@ -316,4 +290,6 @@ namespace eap
         std::vector<winstd::eap_attr> m_eap_attr;   ///< EAP attributes returned by get_result() method
         EAP_ATTRIBUTES m_eap_attr_desc;             ///< EAP attributes descriptor (required to avoid memory leakage in get_result())
     };
+
+    /// @}
 }

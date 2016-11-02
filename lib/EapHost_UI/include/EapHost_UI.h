@@ -21,25 +21,19 @@
 #include "../../EAPBase_UI/include/EAP_UI.h"
 #include "../../EapHost/include/Config.h"
 
-///
-/// Helper class for auto-destroyable EAP_METHOD_TYPE used in wxWidget's item containers
-///
 class wxEAPMethodTypeClientData;
-
-///
-/// Inner EAP method config panel
-///
 class wxEapHostMethodConfigPanel;
+class wxEapHostConfigPanel;
+
+/// \addtogroup EAPBaseGUI
+/// @{
 
 ///
 /// EapHost peer method credential configuration panel
 ///
 typedef wxEAPCredentialsConfigPanel<eap::credentials_pass, wxPasswordCredentialsPanel<eap::credentials_pass, wxPasswordCredentialsPanelBase> > wxEapHostCredentialsConfigPanel;
 
-///
-/// EapHost peer method configuration panel
-///
-class wxEapHostConfigPanel;
+/// @}
 
 #pragma once
 
@@ -51,6 +45,12 @@ class wxEapHostConfigPanel;
 #include <Windows.h>
 
 
+/// \addtogroup EAPBaseGUI
+/// @{
+
+///
+/// Helper class for auto-destroyable EAP_METHOD_TYPE used in wxWidget's item containers
+///
 class wxEAPMethodTypeClientData : public wxClientData
 {
 public:
@@ -66,6 +66,9 @@ public:
 };
 
 
+///
+/// Inner EAP method config panel
+///
 class wxEapHostMethodConfigPanel : public wxEapHostMethodConfigPanelBase
 {
 public:
@@ -91,6 +94,9 @@ protected:
 };
 
 
+///
+/// EapHost peer method configuration panel
+///
 class wxEapHostConfigPanel : public wxPanel
 {
 public:
@@ -116,3 +122,5 @@ protected:
 protected:
     wxEapHostMethodConfigPanel *m_method; ///< Method configuration panel
 };
+
+/// @}

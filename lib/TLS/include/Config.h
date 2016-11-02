@@ -31,15 +31,17 @@
 
 namespace eap
 {
-    ///
-    /// TLS configuration
-    ///
     class config_method_tls;
+
+    /// \addtogroup EAPBaseMethod
+    /// @{
 
     ///
     /// Helper function to compile human-readable certificate name for UI display
     ///
     winstd::tstring get_cert_title(PCCERT_CONTEXT cert);
+
+    /// @}
 }
 
 #pragma once
@@ -58,6 +60,12 @@ namespace eap
 
 namespace eap
 {
+    /// \addtogroup EAPBaseMethod
+    /// @{
+
+    ///
+    /// TLS configuration
+    ///
     class config_method_tls : public config_method_with_cred
     {
     public:
@@ -101,80 +109,51 @@ namespace eap
         ///
         config_method_tls& operator=(_Inout_ config_method_tls &&other);
 
-        ///
-        /// Clones configuration
-        ///
-        /// \returns Pointer to cloned configuration
-        ///
         virtual config* clone() const;
 
-        /// \name XML configuration management
+        /// \name XML management
         /// @{
-
-        ///
-        /// Save to XML document
-        ///
-        /// \param[in]  pDoc         XML document
-        /// \param[in]  pConfigRoot  Suggested root element for saving
-        ///
         virtual void save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot) const;
-
-        ///
-        /// Load from XML document
-        ///
-        /// \param[in]  pConfigRoot  Root element for loading
-        ///
         virtual void load(_In_ IXMLDOMNode *pConfigRoot);
-
         /// @}
 
         /// \name BLOB management
         /// @{
-
-        ///
-        /// Packs a configuration
-        ///
-        /// \param[inout] cursor  Memory cursor
-        ///
         virtual void operator<<(_Inout_ cursor_out &cursor) const;
-
-        ///
-        /// Returns packed size of a configuration
-        ///
-        /// \returns Size of data when packed (in bytes)
-        ///
         virtual size_t get_pk_size() const;
-
-        ///
-        /// Unpacks a configuration
-        ///
-        /// \param[inout] cursor  Memory cursor
-        ///
         virtual void operator>>(_Inout_ cursor_in &cursor);
-
         /// @}
 
         ///
-        /// Returns EAP method type of this configuration
-        ///
-        /// \returns `eap::type_tls`
+        /// @copydoc eap::config_method::get_method_id()
+        /// \returns This implementation always returns `eap::type_tls`
         ///
         virtual winstd::eap_type_t get_method_id() const;
 
         ///
-        /// Returns a string \c L"EAP-TLS"
+        /// @copydoc eap::config_method::get_method_str()
+        /// \returns This implementation always returns `L"EAP-TLS"`
         ///
         virtual const wchar_t* get_method_str() const;
 
         ///
-        /// Creates a blank set of credentials suitable for this method
+        /// @copydoc eap::config_method::make_credentials()
+        /// \returns This implementation always returns `eap::credentials_tls` type of credentials
         ///
         virtual credentials* make_credentials() const;
 
         ///
         /// Adds CA to the list of trusted root CA's
         ///
-        /// \sa [CertCreateCertificateContext function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa376033.aspx)
+        /// \note If the CA is already on the list, function fails returning \c false.
+        ///
+        /// \param[in] dwCertEncodingType  Any bitwise OR combination of \c X509_ASN_ENCODING and \c PKCS_7_ASN_ENCODING flags
+        /// \param[in] pbCertEncoded       Certificate data
+        /// \param[in] cbCertEncoded       Size of \p pbCertEncoded in bytes
+        ///
+        /// \returns
+        /// - \c true when adding succeeds;
+        /// - \c false otherwise.
         ///
         bool add_trusted_ca(_In_ DWORD dwCertEncodingType, _In_ const BYTE *pbCertEncoded, _In_ DWORD cbCertEncoded);
 
@@ -182,4 +161,6 @@ namespace eap
         std::list<winstd::cert_context> m_trusted_root_ca;  ///< Trusted root CAs
         std::list<std::wstring> m_server_names;             ///< Acceptable authenticating server names
     };
+
+    /// @}
 }

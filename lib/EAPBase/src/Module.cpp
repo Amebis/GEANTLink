@@ -270,7 +270,7 @@ void eap::peer::query_credential_input_fields(
     _In_                                   DWORD                        dwFlags,
     _In_                                   DWORD                        dwConnectionDataSize,
     _In_count_(dwConnectionDataSize) const BYTE                         *pConnectionData,
-    _Inout_                                EAP_CONFIG_INPUT_FIELD_ARRAY *pEapConfigInputFieldsArray) const
+    _Out_                                  EAP_CONFIG_INPUT_FIELD_ARRAY *pEapConfigInputFieldsArray) const
 {
     UNREFERENCED_PARAMETER(hUserImpersonationToken);
     UNREFERENCED_PARAMETER(dwFlags);
@@ -288,8 +288,8 @@ void eap::peer::query_user_blob_from_credential_input_fields(
     _In_                                   DWORD                        dwConnectionDataSize,
     _In_count_(dwConnectionDataSize) const BYTE                         *pConnectionData,
     _In_                             const EAP_CONFIG_INPUT_FIELD_ARRAY *pEapConfigInputFieldArray,
-    _Inout_                                DWORD                        *pdwUsersBlobSize,
-    _Inout_                                BYTE                         **ppUserBlob) const
+    _Out_                                  DWORD                        *pdwUsersBlobSize,
+    _Out_                                  BYTE                         **ppUserBlob) const
 {
     UNREFERENCED_PARAMETER(hUserImpersonationToken);
     UNREFERENCED_PARAMETER(dwFlags);
@@ -308,7 +308,7 @@ void eap::peer::query_interactive_ui_input_fields(
     _In_                                  DWORD                   dwFlags,
     _In_                                  DWORD                   dwUIContextDataSize,
     _In_count_(dwUIContextDataSize) const BYTE                    *pUIContextData,
-    _Inout_                               EAP_INTERACTIVE_UI_DATA *pEapInteractiveUIData) const
+    _Out_                                 EAP_INTERACTIVE_UI_DATA *pEapInteractiveUIData) const
 {
     UNREFERENCED_PARAMETER(dwVersion);
     UNREFERENCED_PARAMETER(dwFlags);
@@ -326,8 +326,8 @@ void eap::peer::query_ui_blob_from_interactive_ui_input_fields(
     _In_                                  DWORD                   dwUIContextDataSize,
     _In_count_(dwUIContextDataSize) const BYTE                    *pUIContextData,
     _In_                            const EAP_INTERACTIVE_UI_DATA *pEapInteractiveUIData,
-    _Inout_                               DWORD                   *pdwDataFromInteractiveUISize,
-    _Inout_                               BYTE                    **ppDataFromInteractiveUI) const
+    _Out_                                 DWORD                   *pdwDataFromInteractiveUISize,
+    _Out_                                 BYTE                    **ppDataFromInteractiveUI) const
 {
     UNREFERENCED_PARAMETER(dwVersion);
     UNREFERENCED_PARAMETER(dwFlags);

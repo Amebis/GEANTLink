@@ -24,31 +24,15 @@
 
 namespace eap
 {
-    ///
-    /// Base class for configuration storage
-    ///
     class config;
-
-    ///
-    /// Base class for method configuration storage
-    ///
     class config_method;
-
-    ///
-    /// Base class for method with credentials
-    ///
     class config_method_with_cred;
-
-    ///
-    /// Provider configuration storage
-    ///
     class config_provider;
-
-    ///
-    /// Connection configuration storage
-    ///
     class config_connection;
 }
+
+/// \addtogroup EAPBaseStream
+/// @{
 
 ///
 /// Packs a configuration
@@ -65,7 +49,7 @@ inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const eap::config &
 ///
 /// \returns Size of data when packed (in bytes)
 ///
-inline size_t pksizeof(const eap::config &val);
+inline size_t pksizeof(_In_ const eap::config &val);
 
 ///
 /// Unpacks a configuration
@@ -74,6 +58,8 @@ inline size_t pksizeof(const eap::config &val);
 /// \param[out]   val     Configuration to unpack to
 ///
 inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ eap::config &val);
+
+/// @}
 
 #pragma once
 
@@ -96,6 +82,15 @@ inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ eap::config &val);
 
 namespace eap
 {
+    ///
+    /// \defgroup EAPBaseConfig  Configuration
+    /// Configuration management
+    ///
+    /// @{
+
+    ///
+    /// Base class for configuration storage
+    ///
     class config
     {
     public:
@@ -139,17 +134,17 @@ namespace eap
         config& operator=(_Inout_ config &&other);
 
         ///
-        /// Clones this configuration
+        /// Clones this object
         ///
-        /// \returns Pointer to cloned configuration
+        /// \returns Pointer to cloned object with identical data
         ///
         virtual config* clone() const = 0;
 
-        /// \name XML configuration management
+        /// \name XML management
         /// @{
 
         ///
-        /// Save to XML document
+        /// Save data to XML document
         ///
         /// \param[in]  pDoc         XML document
         /// \param[in]  pConfigRoot  Suggested root element for saving
@@ -169,21 +164,21 @@ namespace eap
         /// @{
 
         ///
-        /// Packs a configuration
+        /// Packs this object
         ///
         /// \param[inout] cursor  Memory cursor
         ///
         virtual void operator<<(_Inout_ cursor_out &cursor) const;
 
         ///
-        /// Returns packed size of a configuration
+        /// Returns packed size of this object
         ///
         /// \returns Size of data when packed (in bytes)
         ///
         virtual size_t get_pk_size() const;
 
         ///
-        /// Unpacks a configuration
+        /// Unpacks this object
         ///
         /// \param[inout] cursor  Memory cursor
         ///
@@ -192,7 +187,7 @@ namespace eap
         /// @}
 
     public:
-        module &m_module;   ///< EAP module
+        module &m_module;                                   ///< EAP module
 
     protected:
         static const winstd::bstr namespace_eapmetadata;    ///< Reusable BSTR containing "urn:ietf:params:xml:ns:yang:ietf-eap-metadata"
@@ -202,6 +197,9 @@ namespace eap
     class credentials;
 
 
+    ///
+    /// Base class for method configuration storage
+    ///
     class config_method : public config
     {
     public:
@@ -264,50 +262,17 @@ namespace eap
         ///
         config_method& operator=(_Inout_ config_method &&other);
 
-        /// \name XML configuration management
+        /// \name XML management
         /// @{
-
-        ///
-        /// Save to XML document
-        ///
-        /// \param[in]  pDoc         XML document
-        /// \param[in]  pConfigRoot  Suggested root element for saving
-        ///
         virtual void save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot) const;
-
-        ///
-        /// Load from XML document
-        ///
-        /// \param[in]  pConfigRoot  Root element for loading
-        ///
         virtual void load(_In_ IXMLDOMNode *pConfigRoot);
-
         /// @}
 
         /// \name BLOB management
         /// @{
-
-        ///
-        /// Packs a configuration
-        ///
-        /// \param[inout] cursor  Memory cursor
-        ///
         virtual void operator<<(_Inout_ cursor_out &cursor) const;
-
-        ///
-        /// Returns packed size of a configuration
-        ///
-        /// \returns Size of data when packed (in bytes)
-        ///
         virtual size_t get_pk_size() const;
-
-        ///
-        /// Unpacks a configuration
-        ///
-        /// \param[inout] cursor  Memory cursor
-        ///
         virtual void operator>>(_Inout_ cursor_in &cursor);
-
         /// @}
 
         ///
@@ -335,6 +300,9 @@ namespace eap
     };
 
 
+    ///
+    /// Base class for method with credentials
+    ///
     class config_method_with_cred : public config_method
     {
     public:
@@ -378,50 +346,17 @@ namespace eap
         ///
         config_method_with_cred& operator=(_Inout_ config_method_with_cred &&other);
 
-        /// \name XML configuration management
+        /// \name XML management
         /// @{
-
-        ///
-        /// Save to XML document
-        ///
-        /// \param[in]  pDoc         XML document
-        /// \param[in]  pConfigRoot  Suggested root element for saving
-        ///
         virtual void save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot) const;
-
-        ///
-        /// Load from XML document
-        ///
-        /// \param[in]  pConfigRoot  Root element for loading
-        ///
         virtual void load(_In_ IXMLDOMNode *pConfigRoot);
-
         /// @}
 
         /// \name BLOB management
         /// @{
-
-        ///
-        /// Packs a configuration
-        ///
-        /// \param[inout] cursor  Memory cursor
-        ///
         virtual void operator<<(_Inout_ cursor_out &cursor) const;
-
-        ///
-        /// Returns packed size of a configuration
-        ///
-        /// \returns Size of data when packed (in bytes)
-        ///
         virtual size_t get_pk_size() const;
-
-        ///
-        /// Unpacks a configuration
-        ///
-        /// \param[inout] cursor  Memory cursor
-        ///
         virtual void operator>>(_Inout_ cursor_in &cursor);
-
         /// @}
 
     public:
@@ -430,6 +365,9 @@ namespace eap
     };
 
 
+    ///
+    /// Provider configuration storage
+    ///
     class config_provider : public config
     {
     public:
@@ -472,57 +410,19 @@ namespace eap
         ///
         config_provider& operator=(_Inout_ config_provider &&other);
 
-        ///
-        /// Clones configuration
-        ///
-        /// \returns Pointer to cloned configuration
-        ///
         virtual config* clone() const;
 
-        /// \name XML configuration management
+        /// \name XML management
         /// @{
-
-        ///
-        /// Save to XML document
-        ///
-        /// \param[in]  pDoc         XML document
-        /// \param[in]  pConfigRoot  Suggested root element for saving
-        ///
         virtual void save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot) const;
-
-        ///
-        /// Load from XML document
-        ///
-        /// \param[in]  pConfigRoot  Root element for loading
-        ///
         virtual void load(_In_ IXMLDOMNode *pConfigRoot);
-
         /// @}
 
         /// \name BLOB management
         /// @{
-
-        ///
-        /// Packs a configuration
-        ///
-        /// \param[inout] cursor  Memory cursor
-        ///
         virtual void operator<<(_Inout_ cursor_out &cursor) const;
-
-        ///
-        /// Returns packed size of a configuration
-        ///
-        /// \returns Size of data when packed (in bytes)
-        ///
         virtual size_t get_pk_size() const;
-
-        ///
-        /// Unpacks a configuration
-        ///
-        /// \param[inout] cursor  Memory cursor
-        ///
         virtual void operator>>(_Inout_ cursor_in &cursor);
-
         /// @}
 
         ///
@@ -555,6 +455,9 @@ namespace eap
     };
 
 
+    ///
+    /// Connection configuration storage
+    ///
     class config_connection : public config
     {
     public:
@@ -603,62 +506,26 @@ namespace eap
         ///
         config_connection& operator=(_Inout_ config_connection &&other);
 
-        ///
-        /// Clones configuration
-        ///
-        /// \returns Pointer to cloned configuration
-        ///
         virtual config* clone() const;
 
-        /// \name XML configuration management
+        /// \name XML management
         /// @{
-
-        ///
-        /// Save to XML document
-        ///
-        /// \param[in]  pDoc         XML document
-        /// \param[in]  pConfigRoot  Suggested root element for saving
-        ///
         virtual void save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot) const;
-
-        ///
-        /// Load from XML document
-        ///
-        /// \param[in]  pConfigRoot  Root element for loading
-        ///
         virtual void load(_In_ IXMLDOMNode *pConfigRoot);
-
         /// @}
 
         /// \name BLOB management
         /// @{
-
-        ///
-        /// Packs a configuration
-        ///
-        /// \param[inout] cursor  Memory cursor
-        ///
         virtual void operator<<(_Inout_ cursor_out &cursor) const;
-
-        ///
-        /// Returns packed size of a configuration
-        ///
-        /// \returns Size of data when packed (in bytes)
-        ///
         virtual size_t get_pk_size() const;
-
-        ///
-        /// Unpacks a configuration
-        ///
-        /// \param[inout] cursor  Memory cursor
-        ///
         virtual void operator>>(_Inout_ cursor_in &cursor);
-
         /// @}
 
     public:
         std::list<eap::config_provider> m_providers;    ///< Provider configurations
     };
+
+    /// @}
 }
 
 
@@ -668,7 +535,7 @@ inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const eap::config &
 }
 
 
-inline size_t pksizeof(const eap::config &val)
+inline size_t pksizeof(_In_ const eap::config &val)
 {
     return val.get_pk_size();
 }
@@ -680,19 +547,43 @@ inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ eap::config &val)
 }
 
 
+/// \addtogroup EAPBaseStream
+/// @{
+
+///
+/// Packs a method status
+///
+/// \param[inout] cursor  Memory cursor
+/// \param[in]    val     Method status to pack
+///
 inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const eap::config_method::status_t &val)
 {
     cursor << (unsigned char)val;
 }
 
 
+///
+/// Returns packed size of a method status
+///
+/// \param[in] val  Method status to pack
+///
+/// \returns Size of data when packed (in bytes)
+///
 inline size_t pksizeof(_In_ const eap::config_method::status_t &val)
 {
     return pksizeof((unsigned char)val);
 }
 
 
+///
+/// Unpacks a method status
+///
+/// \param[inout] cursor  Memory cursor
+/// \param[out]   val     Method status to unpack to
+///
 inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ eap::config_method::status_t &val)
 {
     cursor >> (unsigned char&)val;
 }
+
+/// @}

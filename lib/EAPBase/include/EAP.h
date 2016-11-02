@@ -21,9 +21,18 @@
 #define IDR_EAP_KEY_PUBLIC  1
 #define IDR_EAP_KEY_PRIVATE 2
 
+///
+/// \defgroup EAPBaseStream  Memory Packaging
+/// Simple serialization/deserialization of data to/from memory opaque BLOBs
+///
+/// @{
 #ifndef EAP_ENCRYPT_BLOBS
+///
+/// Compiler variable to control whether BLOBs leaving our module get encrypted
+///
 #define EAP_ENCRYPT_BLOBS 1
 #endif
+/// @}
 
 #define _HOST_LOW_ENDIAN
 
@@ -42,15 +51,17 @@
 
 namespace eap
 {
-    ///
-    /// Output BLOB cursor
-    ///
     struct cursor_out;
+    struct cursor_in;
+
+    template<size_t N> struct WINSTD_NOVTABLE sanitizing_blob_f;
+    template<size_t N> struct WINSTD_NOVTABLE sanitizing_blob_zf;
 
     ///
-    /// Input BLOB cursor
+    /// \defgroup EAPBaseSanitizing  Sanitizing memory
+    /// Secure memory erasing after use
     ///
-    struct cursor_in;
+    /// @{
 
     ///
     /// Sanitizing dynamically allocated BLOB
@@ -58,17 +69,7 @@ namespace eap
     typedef std::vector<unsigned char, winstd::sanitizing_allocator<unsigned char> > sanitizing_blob;
 
     ///
-    /// Sanitizing BLOB of fixed size
-    ///
-    template<size_t N> struct sanitizing_blob_f;
-
-    ///
-    /// Sanitizing BLOB of fixed size (zero initialized)
-    ///
-    template<size_t N> struct sanitizing_blob_zf;
-
-    ///
-    /// Sanitizing BLOB of fixed size (zero initialized in _DEBUG version)
+    /// Sanitizing BLOB of fixed size (zero initialized in _DEBUG version, non-initialized in release version)
     ///
 #ifdef _DEBUG
     #define sanitizing_blob_xf sanitizing_blob_zf
@@ -76,19 +77,13 @@ namespace eap
     #define sanitizing_blob_xf sanitizing_blob_f
 #endif
 
-    ///
-    /// Diameter AVP flags
-    ///
+    /// @}
+
+    /// \addtogroup EAPBaseDiameter
+    /// @{
+
     enum diameter_avp_flags_t;
-
-    ///
-    /// Diameter AVP header
-    ///
     struct diameter_avp_header;
-
-    ///
-    /// Diameter AVP header with Vendor-ID
-    ///
     struct diameter_avp_header_ven;
 
     ///
@@ -124,7 +119,12 @@ namespace eap
         _In_bytecount_(size) const void            *data,
         _In_                       unsigned int    size,
         _Inout_                    sanitizing_blob &packet);
+
+    /// @}
 }
+
+/// \addtogroup EAPBaseStream
+/// @{
 
 ///
 /// Packs a boolean
@@ -243,7 +243,7 @@ template<class _Elem, class _Traits, class _Ax> inline void operator<<(_Inout_ e
 ///
 /// \returns Size of data when packed (in bytes)
 ///
-template<class _Elem, class _Traits, class _Ax> inline size_t pksizeof(const std::basic_string<_Elem, _Traits, _Ax> &val);
+template<class _Elem, class _Traits, class _Ax> inline size_t pksizeof(_In_ const std::basic_string<_Elem, _Traits, _Ax> &val);
 
 ///
 /// Unpacks a string
@@ -268,7 +268,7 @@ template<class _Traits, class _Ax> inline void operator<<(_Inout_ eap::cursor_ou
 ///
 /// \returns Size of data when packed (in bytes)
 ///
-template<class _Traits, class _Ax> inline size_t pksizeof(const std::basic_string<wchar_t, _Traits, _Ax> &val);
+template<class _Traits, class _Ax> inline size_t pksizeof(_In_ const std::basic_string<wchar_t, _Traits, _Ax> &val);
 
 ///
 /// Unpacks a wide string
@@ -293,7 +293,7 @@ template<class _Ty, class _Ax> inline void operator<<(_Inout_ eap::cursor_out &c
 ///
 /// \returns Size of data when packed (in bytes)
 ///
-template<class _Ty, class _Ax> inline size_t pksizeof(const std::vector<_Ty, _Ax> &val);
+template<class _Ty, class _Ax> inline size_t pksizeof(_In_ const std::vector<_Ty, _Ax> &val);
 
 ///
 /// Unpacks a vector
@@ -318,7 +318,7 @@ template<class _Ty, class _Ax> inline void operator<<(_Inout_ eap::cursor_out &c
 ///
 /// \returns Size of data when packed (in bytes)
 ///
-template<class _Ty, class _Ax> inline size_t pksizeof(const std::list<_Ty, _Ax> &val);
+template<class _Ty, class _Ax> inline size_t pksizeof(_In_ const std::list<_Ty, _Ax> &val);
 
 ///
 /// Unpacks a list
@@ -343,16 +343,9 @@ template<class _Ty, class _Dx> inline void operator<<(_Inout_ eap::cursor_out &c
 ///
 /// \returns Size of data when packed (in bytes)
 ///
-template<class _Ty, class _Dx> inline size_t pksizeof(const std::unique_ptr<_Ty, _Dx> &val);
+template<class _Ty, class _Dx> inline size_t pksizeof(_In_ const std::unique_ptr<_Ty, _Dx> &val);
 
-/////
-///// Unpacks a std::unique_ptr
-/////
-///// \note Not generally unpackable, since we do not know, how to create a new instance of unique_ptr.
-/////
-///// \param[inout] cursor  Memory cursor
-///// \param[out]   val     std::unique_ptr to unpack to
-/////
+// std::unique_ptr<> is generally not unpackable, since we do not know, how to create a new instance of unique_ptr.
 //template<class _Ty, class _Dx> inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ std::unique_ptr<_Ty, _Dx> &val);
 
 ///
@@ -370,7 +363,7 @@ inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const winstd::cert_
 ///
 /// \returns Size of data when packed (in bytes)
 ///
-inline size_t pksizeof(const winstd::cert_context &val);
+inline size_t pksizeof(_In_ const winstd::cert_context &val);
 
 ///
 /// Unpacks a certificate context
@@ -395,7 +388,7 @@ inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const winstd::eap_t
 ///
 /// \returns Size of data when packed (in bytes)
 ///
-inline size_t pksizeof(const winstd::eap_type_t &val);
+inline size_t pksizeof(_In_ const winstd::eap_type_t &val);
 
 ///
 /// Unpacks an EAP method type
@@ -480,6 +473,14 @@ inline size_t pksizeof(_In_ const EAP_METHOD_TYPE &val);
 ///
 inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ EAP_METHOD_TYPE &val);
 
+/// @}
+
+///
+/// \defgroup EAPBaseConversion  Data conversion
+/// Data conversion
+///
+/// @{
+
 #ifndef htonll
 ///
 /// Converts an unsigned __int64 from host to TCP/IP network byte order.
@@ -492,7 +493,7 @@ inline unsigned __int64 htonll(unsigned __int64 val);
 #endif
 
 ///
-/// Converts an 24-bit integer from host to TCP/IP network byte order.
+/// Converts a 24-bit integer from host to TCP/IP network byte order.
 ///
 /// \param[in ] val  A 24-bit unsigned number in host byte order
 /// \param[out] out  A 24-bit unsigned number in network byte order
@@ -500,7 +501,7 @@ inline unsigned __int64 htonll(unsigned __int64 val);
 inline void hton24(_In_ unsigned int val, _Out_ unsigned char out[3]);
 
 ///
-/// Converts an 24-bit integer from TCP/IP network to host byte order.
+/// Converts a 24-bit integer from TCP/IP network to host byte order.
 ///
 /// \param[in] val  A 24-bit unsigned number in network byte order
 ///
@@ -508,11 +509,19 @@ inline void hton24(_In_ unsigned int val, _Out_ unsigned char out[3]);
 ///
 inline unsigned int ntoh24(_In_ const unsigned char val[3]);
 
+/// @}
+
 #pragma once
 
 
 namespace eap
 {
+    /// \addtogroup EAPBaseStream
+    /// @{
+
+    ///
+    /// Output BLOB cursor
+    ///
     struct cursor_out
     {
         ///
@@ -525,6 +534,9 @@ namespace eap
     };
 
 
+    ///
+    /// Input BLOB cursor
+    ///
     struct cursor_in
     {
         ///
@@ -536,12 +548,18 @@ namespace eap
         ptr_type ptr_end;   ///< Pointer to the end of BLOB
     };
 
+    /// @}
+
+    /// \addtogroup EAPBaseSanitizing
+    /// @{
 
 #pragma pack(push)
 #pragma pack(1)
 
-    template<size_t N>
-    struct __declspec(novtable) sanitizing_blob_f<N>
+    ///
+    /// Sanitizing BLOB of fixed size
+    ///
+    template<size_t N> struct WINSTD_NOVTABLE sanitizing_blob_f<N>
     {
         unsigned char data[N]; ///< BLOB data
 
@@ -664,8 +682,11 @@ namespace eap
         }
     };
 
-    template<size_t N>
-    struct __declspec(novtable) sanitizing_blob_zf<N> : sanitizing_blob_f<N>
+
+    ///
+    /// Sanitizing BLOB of fixed size (zero initialized)
+    ///
+    template<size_t N> struct WINSTD_NOVTABLE sanitizing_blob_zf<N> : sanitizing_blob_f<N>
     {
         ///
         /// Constructor
@@ -697,7 +718,17 @@ namespace eap
     };
 #pragma pack(pop)
 
+    /// @}
 
+    ///
+    /// \defgroup EAPBaseDiameter  Diameter
+    /// Diameter authentication protocol
+    ///
+    /// @{
+
+    ///
+    /// Diameter AVP flags
+    ///
     #pragma warning(suppress: 4480)
     enum diameter_avp_flags_t : unsigned char {
         diameter_avp_flag_vendor    = 0x80, ///< Vendor-ID present
@@ -709,6 +740,9 @@ namespace eap
 #pragma pack(push)
 #pragma pack(1)
 
+    ///
+    /// Diameter AVP header
+    ///
     struct diameter_avp_header
     {
         unsigned char code[4];      ///< AVP Code
@@ -717,12 +751,17 @@ namespace eap
     };
 
 
+    ///
+    /// Diameter AVP header with Vendor-ID
+    ///
     struct diameter_avp_header_ven : public diameter_avp_header
     {
         unsigned char vendor[4];    ///< Vendor-ID
     };
 
 #pragma pack(pop)
+
+    /// @}
 }
 
 
@@ -842,7 +881,7 @@ inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const std::basic_st
 
 
 template<class _Elem, class _Traits, class _Ax>
-inline size_t pksizeof(const std::basic_string<_Elem, _Traits, _Ax> &val)
+inline size_t pksizeof(_In_ const std::basic_string<_Elem, _Traits, _Ax> &val)
 {
     return sizeof(_Elem)*(val.length() + 1);
 }
@@ -869,7 +908,7 @@ inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const std::basic_st
 
 
 template<class _Traits, class _Ax>
-inline size_t pksizeof(const std::basic_string<wchar_t, _Traits, _Ax> &val)
+inline size_t pksizeof(_In_ const std::basic_string<wchar_t, _Traits, _Ax> &val)
 {
     return sizeof(char)*(WideCharToMultiByte(CP_UTF8, 0, val.c_str(), (int)val.length(), NULL, 0, NULL, NULL) + 1);
 }
@@ -898,7 +937,7 @@ inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const std::vector<_
 
 
 template<class _Ty, class _Ax>
-inline size_t pksizeof(const std::vector<_Ty, _Ax> &val)
+inline size_t pksizeof(_In_ const std::vector<_Ty, _Ax> &val)
 {
     // Since we do not know wheter vector elements are primitives or objects, iterate instead of sizeof().
     // For performance critical vectors of flat opaque data types write specialized template instantiation.
@@ -942,7 +981,7 @@ inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const std::list<_Ty
 
 
 template<class _Ty, class _Ax>
-inline size_t pksizeof(const std::list<_Ty, _Ax> &val)
+inline size_t pksizeof(_In_ const std::list<_Ty, _Ax> &val)
 {
     // Since we do not know wheter list elements are primitives or objects, iterate instead of sizeof().
     // For performance critical vectors of flat opaque data types write specialized template instantiation.
@@ -981,7 +1020,7 @@ inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const std::unique_p
 
 
 template<class _Ty, class _Dx>
-inline size_t pksizeof(const std::unique_ptr<_Ty, _Dx> &val)
+inline size_t pksizeof(_In_ const std::unique_ptr<_Ty, _Dx> &val)
 {
     return
         val ?
@@ -1007,7 +1046,7 @@ inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const winstd::cert_
 }
 
 
-inline size_t pksizeof(const winstd::cert_context &val)
+inline size_t pksizeof(_In_ const winstd::cert_context &val)
 {
     return
         val ?

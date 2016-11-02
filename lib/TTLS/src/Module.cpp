@@ -73,11 +73,11 @@ void eap::peer_ttls::get_identity(
     _In_                                   DWORD  dwConnectionDataSize,
     _In_count_(dwUserDataSize)       const BYTE   *pUserData,
     _In_                                   DWORD  dwUserDataSize,
-    _Inout_                                BYTE   **ppUserDataOut,
-    _Inout_                                DWORD  *pdwUserDataOutSize,
+    _Out_                                  BYTE   **ppUserDataOut,
+    _Out_                                  DWORD  *pdwUserDataOutSize,
     _In_                                   HANDLE hTokenImpersonateUser,
-    _Inout_                                BOOL   *pfInvokeUI,
-    _Inout_                                WCHAR  **ppwszIdentity)
+    _Out_                                  BOOL   *pfInvokeUI,
+    _Out_                                  WCHAR  **ppwszIdentity)
 {
     assert(pfInvokeUI);
     assert(ppwszIdentity);
@@ -126,7 +126,7 @@ void eap::peer_ttls::get_method_properties(
     _In_                                   DWORD                     dwConnectionDataSize,
     _In_count_(dwUserDataSize)       const BYTE                      *pUserData,
     _In_                                   DWORD                     dwUserDataSize,
-    _Inout_                                EAP_METHOD_PROPERTY_ARRAY *pMethodPropertyArray)
+    _Out_                                  EAP_METHOD_PROPERTY_ARRAY *pMethodPropertyArray)
 {
     UNREFERENCED_PARAMETER(dwVersion);
     UNREFERENCED_PARAMETER(dwFlags);
@@ -176,8 +176,8 @@ void eap::peer_ttls::credentials_xml2blob(
     _In_                                   IXMLDOMNode *pConfigRoot,
     _In_count_(dwConnectionDataSize) const BYTE        *pConnectionData,
     _In_                                   DWORD       dwConnectionDataSize,
-    _Inout_                                BYTE        **ppCredentialsOut,
-    _Inout_                                DWORD       *pdwCredentialsOutSize)
+    _Out_                                  BYTE        **ppCredentialsOut,
+    _Out_                                  DWORD       *pdwCredentialsOutSize)
 {
     UNREFERENCED_PARAMETER(dwFlags);
     UNREFERENCED_PARAMETER(pConnectionData);
@@ -330,9 +330,9 @@ void eap::peer_ttls::get_result(
 
 
 void eap::peer_ttls::get_ui_context(
-    _In_    EAP_SESSION_HANDLE hSession,
-    _Inout_ BYTE               **ppUIContextData,
-    _Inout_ DWORD              *pdwUIContextDataSize)
+    _In_  EAP_SESSION_HANDLE hSession,
+    _Out_ BYTE               **ppUIContextData,
+    _Out_ DWORD              *pdwUIContextDataSize)
 {
     static_cast<session*>(hSession)->m_method->get_ui_context(ppUIContextData, pdwUIContextDataSize);
 }

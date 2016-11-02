@@ -22,9 +22,6 @@
 
 namespace eap
 {
-    ///
-    /// EapHost peer method configuration
-    ///
     class config_method_eaphost;
 }
 
@@ -39,6 +36,12 @@ namespace eap
 
 namespace eap
 {
+    /// \addtogroup EAPBaseConfig
+    /// @{
+
+    ///
+    /// EapHost peer method configuration
+    ///
     class config_method_eaphost : public config_method
     {
     public:
@@ -82,71 +85,27 @@ namespace eap
         ///
         config_method_eaphost& operator=(_Inout_ config_method_eaphost &&other);
 
-        ///
-        /// Clones configuration
-        ///
-        /// \returns Pointer to cloned configuration
-        ///
         virtual config* clone() const;
 
-        /// \name XML configuration management
+        /// \name XML management
         /// @{
-
-        ///
-        /// Save to XML document
-        ///
-        /// \param[in]  pDoc         XML document
-        /// \param[in]  pConfigRoot  Suggested root element for saving
-        ///
         virtual void save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot) const;
-
-        ///
-        /// Load from XML document
-        ///
-        /// \param[in]  pConfigRoot  Root element for loading
-        ///
         virtual void load(_In_ IXMLDOMNode *pConfigRoot);
-
         /// @}
 
         /// \name BLOB management
         /// @{
-
-        ///
-        /// Packs a configuration
-        ///
-        /// \param[inout] cursor  Memory cursor
-        ///
         virtual void operator<<(_Inout_ cursor_out &cursor) const;
-
-        ///
-        /// Returns packed size of a configuration
-        ///
-        /// \returns Size of data when packed (in bytes)
-        ///
         virtual size_t get_pk_size() const;
-
-        ///
-        /// Unpacks a configuration
-        ///
-        /// \param[inout] cursor  Memory cursor
-        ///
         virtual void operator>>(_Inout_ cursor_in &cursor);
-
         /// @}
 
-        ///
-        /// Returns EAP method type of this configuration
-        ///
         virtual winstd::eap_type_t get_method_id() const;
-
-        ///
-        /// Returns EAP method type as a string
-        ///
         virtual const wchar_t* get_method_str() const;
 
         ///
-        /// Creates a blank set of credentials suitable for this method
+        /// @copydoc eap::config_method::make_credentials()
+        /// \returns This implementation always returns `eap::credentials_eaphost` type of credentials
         ///
         virtual credentials* make_credentials() const;
 
@@ -179,4 +138,6 @@ namespace eap
     public:
         sanitizing_blob m_cfg_blob; ///< Method configuration BLOB
     };
+
+    /// @}
 }

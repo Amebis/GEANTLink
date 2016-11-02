@@ -22,9 +22,6 @@
 
 namespace eap
 {
-    ///
-    /// EapHost peer method credentials
-    ///
     class credentials_eaphost;
 }
 
@@ -42,6 +39,12 @@ namespace eap
 
 namespace eap
 {
+    /// \addtogroup EAPBaseCred
+    /// @{
+
+    ///
+    /// EapHost peer method credentials
+    ///
     class credentials_eaphost : public credentials
     {
     public:
@@ -84,110 +87,46 @@ namespace eap
         ///
         credentials_eaphost& operator=(_Inout_ credentials_eaphost &&other);
 
-        ///
-        /// Clones credentials
-        ///
-        /// \returns Pointer to cloned credentials
-        ///
         virtual config* clone() const;
-
-        ///
-        /// Resets credentials
-        ///
         virtual void clear();
-
-        ///
-        /// Test credentials if blank
-        ///
-        /// \returns
-        /// - \c true if blank
-        /// - \c false otherwise
-        ///
         virtual bool empty() const;
 
-        /// \name XML credentials management
+        /// \name XML management
         /// @{
-
-        ///
-        /// Save to XML document
-        ///
-        /// \param[in]  pDoc         XML document
-        /// \param[in]  pConfigRoot  Suggested root element for saving
-        ///
         virtual void save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot) const;
-
-        ///
-        /// Load from XML document
-        ///
-        /// \param[in]  pConfigRoot  Root element for loading
-        ///
         virtual void load(_In_ IXMLDOMNode *pConfigRoot);
-
         /// @}
 
         /// \name BLOB management
         /// @{
-
-        ///
-        /// Packs a configuration
-        ///
-        /// \param[inout] cursor  Memory cursor
-        ///
         virtual void operator<<(_Inout_ cursor_out &cursor) const;
-
-        ///
-        /// Returns packed size of a configuration
-        ///
-        /// \returns Size of data when packed (in bytes)
-        ///
         virtual size_t get_pk_size() const;
-
-        ///
-        /// Unpacks a configuration
-        ///
-        /// \param[inout] cursor  Memory cursor
-        ///
         virtual void operator>>(_Inout_ cursor_in &cursor);
-
         /// @}
 
         /// \name Storage
         /// @{
-
-        ///
-        /// Save credentials to Windows Credential Manager
-        ///
-        /// \param[in]  pszTargetName  The name in Windows Credential Manager to store credentials as
-        /// \param[in]  level          Credential level (0=outer, 1=inner, 2=inner-inner...)
-        ///
         virtual void store(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int level) const;
-
-        ///
-        /// Retrieve credentials from Windows Credential Manager
-        ///
-        /// \param[in]  pszTargetName  The name in Windows Credential Manager to retrieve credentials from
-        /// \param[in]  level          Credential level (0=outer, 1=inner, 2=inner-inner...)
-        ///
         virtual void retrieve(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int level);
 
         ///
-        /// Return target suffix for Windows Credential Manager credential name
+        /// @copydoc eap::credentials::target_suffix()
+        /// \returns This implementation always returns `_T("BLOB")`
         ///
         virtual LPCTSTR target_suffix() const;
-
         /// @}
 
         ///
         /// Combine credentials in the following order:
         ///
         /// 1. Cached credentials
-        /// 2. Configured credentials (if \p cfg is derived from config_method_with_cred)
+        /// 2. Configured credentials (if \p cfg is derived from `config_method_with_cred`)
         /// 3. Stored credentials
         ///
         /// \param[in] dwFlags                A combination of [EAP flags](https://msdn.microsoft.com/en-us/library/windows/desktop/bb891975.aspx) that describe the EAP authentication session behavior
         /// \param[in] hTokenImpersonateUser  Impersonation token for a logged-on user to collect user-related information
-        /// \param[in] cred_cached            Cached credentials (optional, can be \c NULL, must be credentials_eaphost* type)
-        /// \param[in] cfg                    Method configuration (unused, as must be as config_method_eaphost is not derived from config_method_with_cred)
+        /// \param[in] cred_cached            Cached credentials (optional, can be \c NULL, must be `credentials_eaphost*` type)
+        /// \param[in] cfg                    Method configuration (unused, as must be as config_method_eaphost is not derived from `config_method_with_cred`)
         /// \param[in] pszTargetName          The name in Windows Credential Manager to retrieve credentials from (optional, can be \c NULL)
         ///
         /// \returns
@@ -203,11 +142,13 @@ namespace eap
             _In_opt_z_       LPCTSTR       pszTargetName);
 
     public:
-        sanitizing_blob m_cred_blob;    ///< Credentials BLOB
+        sanitizing_blob m_cred_blob;                ///< Credentials BLOB
 
     private:
         /// \cond internal
         static const unsigned char s_entropy[1024];
         /// \endcond
     };
+
+    /// @}
 }

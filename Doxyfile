@@ -51,7 +51,7 @@ PROJECT_BRIEF          = "EAP Supplicant for Windows"
 # and the maximum width should not exceed 200 pixels. Doxygen will copy the logo
 # to the output directory.
 
-PROJECT_LOGO           =
+PROJECT_LOGO           = include\icon_ui.ico
 
 # The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute) path
 # into which the generated documentation will be written. If a relative path is
@@ -694,7 +694,7 @@ CITE_BIB_FILES         =
 # messages are off.
 # The default value is: NO.
 
-QUIET                  = NO
+QUIET                  = YES
 
 # The WARNINGS tag can be used to turn on/off the warning messages that are
 # generated to standard error ( stderr) by doxygen. If WARNINGS is set to YES
@@ -718,7 +718,7 @@ WARN_IF_UNDOCUMENTED   = YES
 # markup commands wrongly.
 # The default value is: YES.
 
-WARN_IF_DOC_ERROR      = NO
+WARN_IF_DOC_ERROR      = YES
 
 # This WARN_NO_PARAMDOC option can be enabled to get warnings for functions that
 # are documented, but have no documentation for their parameters or return
@@ -790,13 +790,16 @@ RECURSIVE              = YES
 # run.
 
 EXCLUDE                = \
+	CredWrite\README.md \
 	EventMonitor\res \
 	lib\EAPBase_UI\res \
 	lib\EapHost_UI\res \
 	lib\TLS_UI\res \
 	lib\TTLS_UI\res \
 	lib\WinStd \
-	lib\wxExtend
+	lib\wxExtend \
+	MsiUseFeature\README.md \
+	WLANManager\README.md
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
 # directories that are symbolic links (a Unix file system feature) are excluded

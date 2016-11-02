@@ -1,30 +1,25 @@
-/*
+ï»¿/*
     Copyright 2015-2016 Amebis
-    Copyright 2016 GÉANT
+    Copyright 2016 GÃ‰ANT
 
-    This file is part of GÉANTLink.
+    This file is part of GÃ‰ANTLink.
 
-    GÉANTLink is free software: you can redistribute it and/or modify it
+    GÃ‰ANTLink is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    GÉANTLink is distributed in the hope that it will be useful, but
+    GÃ‰ANTLink is distributed in the hope that it will be useful, but
     WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with GÉANTLink. If not, see <http://www.gnu.org/licenses/>.
+    along with GÃ‰ANTLink. If not, see <http://www.gnu.org/licenses/>.
 */
 
 namespace eap
 {
-    ///
-    /// EapHost peer method
-    ///
-    /// A wrapper class to provide system installed 3rd party EAP methods integration.
-    ///
     class method_eaphost;
 }
 
@@ -39,6 +34,14 @@ namespace eap
 
 namespace eap
 {
+    /// \addtogroup EAPBaseMethod
+    /// @{
+
+    ///
+    /// EapHost peer method
+    ///
+    /// A wrapper class to provide system installed 3rd party EAP methods integration.
+    ///
     class method_eaphost : public method
     {
         WINSTD_NONCOPYABLE(method_eaphost)
@@ -69,77 +72,43 @@ namespace eap
         ///
         method_eaphost& operator=(_Inout_ method_eaphost &&other);
 
-        /// \name Packet processing
+        /// \name Session management
         /// @{
 
-        ///
-        /// Starts an EAP authentication session on the peer EapHost using the EAP method.
-        ///
-        /// \sa [EapPeerBeginSession function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363600.aspx)
-        ///
         virtual void begin_session(
             _In_        DWORD         dwFlags,
             _In_  const EapAttributes *pAttributeArray,
             _In_        HANDLE        hTokenImpersonateUser,
             _In_opt_    DWORD         dwMaxSendPacketSize = MAXDWORD);
 
-        ///
-        /// Ends an EAP authentication session for the EAP method.
-        ///
-        /// \sa [EapPeerEndSession function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363604.aspx)
-        ///
         virtual void end_session();
 
-        ///
-        /// Processes a packet received by EapHost from a supplicant.
-        ///
-        /// \sa [EapPeerProcessRequestPacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363621.aspx)
-        ///
+        /// @}
+
+        /// \name Packet processing
+        /// @{
+
         virtual EapPeerMethodResponseAction process_request_packet(
             _In_bytecount_(dwReceivedPacketSize) const void  *pReceivedPacket,
             _In_                                       DWORD dwReceivedPacketSize);
 
-        ///
-        /// Obtains a response packet from the EAP method.
-        ///
-        /// \sa [EapPeerGetResponsePacket function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363610.aspx)
-        ///
         virtual void get_response_packet(
             _Out_    sanitizing_blob &packet,
             _In_opt_ DWORD           size_max = MAXDWORD);
 
-        ///
-        /// Obtains the result of an authentication session from the EAP method.
-        ///
-        /// \sa [EapPeerGetResult function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363611.aspx)
-        ///
-        virtual void get_result(
-            _In_    EapPeerMethodResultReason reason,
-            _Inout_ EapPeerMethodResult       *pResult);
-
         /// @}
+
+        virtual void get_result(
+            _In_   EapPeerMethodResultReason reason,
+            _Out_ EapPeerMethodResult       *pResult);
 
         /// \name User Interaction
         /// @{
 
-        ///
-        /// Obtains the user interface context from the EAP method.
-        ///
-        /// \note This function is always followed by the `EapPeerInvokeInteractiveUI()` function, which is followed by the `EapPeerSetUIContext()` function.
-        ///
-        /// \sa [EapPeerGetUIContext function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363612.aspx)
-        ///
         virtual void get_ui_context(
-            _Inout_ BYTE  **ppUIContextData,
-            _Inout_ DWORD *pdwUIContextDataSize);
+            _Out_ BYTE  **ppUIContextData,
+            _Out_ DWORD *pdwUIContextDataSize);
 
-        ///
-        /// Provides a user interface context to the EAP method.
-        ///
-        /// \note This function is called after the UI has been raised through the `EapPeerGetUIContext()` function.
-        ///
-        /// \sa [EapPeerSetUIContext function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363626.aspx)
-        ///
         virtual EapPeerMethodResponseAction set_ui_context(
             _In_count_(dwUIContextDataSize) const BYTE  *pUIContextData,
             _In_                                  DWORD dwUIContextDataSize);
@@ -149,18 +118,8 @@ namespace eap
         /// \name EAP Response Attributes
         /// @{
 
-        ///
-        /// Obtains an array of EAP response attributes from the EAP method.
-        ///
-        /// \sa [EapPeerGetResponseAttributes function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363609.aspx)
-        ///
-        virtual void get_response_attributes(_Inout_ EapAttributes *pAttribs);
+        virtual void get_response_attributes(_Out_ EapAttributes *pAttribs);
 
-        ///
-        /// Provides an updated array of EAP response attributes to the EAP method.
-        ///
-        /// \sa [EapPeerSetResponseAttributes function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363625.aspx)
-        ///
         virtual EapPeerMethodResponseAction set_response_attributes(_In_ const EapAttributes *pAttribs);
 
         /// @}
@@ -193,4 +152,6 @@ namespace eap
 
         EAP_SESSIONID m_session_id;     ///< EAP session ID
     };
+
+    /// @}
 }

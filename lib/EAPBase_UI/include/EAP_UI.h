@@ -27,93 +27,71 @@
 #include <Windows.h>
 
 
-///
-/// Reusable EAP dialog banner for `wxEAPConfigDialog` and `wxEAPCredentialsDialog`
-///
 class wxEAPBannerPanel;
-
-///
-/// EAP top-most configuration dialog template
-///
 template <class _wxT> class wxEAPConfigDialog;
-
-///
-/// EAP general-use dialog
-///
 class wxEAPGeneralDialog;
-
-///
-/// EAP method credential dialog
-///
 class wxEAPCredentialsDialog;
-
-///
-/// EAP general note
-///
 class wxEAPNotePanel;
-
-///
-/// EAP provider-locked congifuration note
-///
 class wxEAPProviderLockedPanel;
-
-///
-/// EAP credential warning note
-///
 class wxEAPCredentialWarningPanel;
-
-///
-/// EAP Configuration window
-///
 class wxEAPConfigWindow;
-
-///
-/// EAP provider contact info config panel
-///
 class wxEAPProviderContactInfoPanel;
-
-///
-/// EAP provider identity config panel
-///
 class wxEAPProviderIDPanel;
-
-///
-/// EAP provider configuration dialog
-///
 class wxEAPConfigProvider;
-
-///
-/// Base template for credential configuration panel
-///
 template <class _Tcred, class _wxT> class wxEAPCredentialsConfigPanel;
-
-///
-/// Helper template for all credential entry panels
-///
 template <class _Tcred, class _Tbase> class wxEAPCredentialsPanel;
-
-///
-/// Generic password credential entry panel
-///
 template <class _Tcred, class _Tbase> class wxPasswordCredentialsPanel;
-
-///
-/// EAP provider select dialog
-///
 class wxEAPProviderSelectDialog;
 
 ///
+/// \defgroup EAPBaseGUI  GUI
+/// Graphical User Interface
+///
+/// @{
+
+///
 /// Loads icon from resource
+///
+/// When icon of desired \p cx × \p cy dimensions is not found, the most appropriate variant (larger if available) is loaded and scaled to \p cx × \p cy.
+///
+/// \sa [LoadIconWithScaleDown function](https://msdn.microsoft.com/en-us/library/windows/desktop/bb775703.aspx)
+///
+/// \param[in] hinst    Resource module instance handle
+/// \param[in] pszName  Resource name (`MAKEINTRESOURCE()` macro can be used for numerical resources)
+/// \param[in] cx       Desired width of the icon
+/// \param[in] cy       Desired height of the icon
+///
+/// \returns
+/// - Loaded icon when successful;
+/// - \c wxNullIcon otherwise.
 ///
 inline wxIcon wxLoadIconFromResource(HINSTANCE hinst, PCWSTR pszName, int cx = GetSystemMetrics(SM_CXICON), int cy = GetSystemMetrics(SM_CYICON));
 
 ///
 /// Loads icon from resource
 ///
+/// When icon of desired \p size dimensions is not found, the most appropriate variant (larger if available) is loaded and scaled to \p size.
+///
+/// \sa [LoadIconWithScaleDown function](https://msdn.microsoft.com/en-us/library/windows/desktop/bb775703.aspx)
+///
+/// \param[in] hinst    Resource module instance handle
+/// \param[in] pszName  Resource name (`MAKEINTRESOURCE()` macro can be used for numerical resources)
+/// \param[in] size     Desired width and height of the icon
+///
+/// \returns
+/// - Loaded icon when successful;
+/// - \c wxNullIcon otherwise.
+///
 inline wxIcon wxLoadIconFromResource(HINSTANCE hinst, PCWSTR pszName, const wxSize &size);
 
 ///
 /// Returns GUI displayable provider name
+///
+/// \param[in] id  Provider name
+///
+/// \returns
+/// - \p id when \p id is not blank;
+/// - localized "<Your Organization>" otherwise.
 ///
 inline wxString wxEAPGetProviderName(const std::wstring &id);
 
@@ -122,12 +100,10 @@ inline wxString wxEAPGetProviderName(const std::wstring &id);
 ///
 inline void wxInitializeConfig();
 
+/// @}
 
 namespace eap
 {
-    ///
-    /// Base class to prevent multiple instances of the same dialog
-    ///
     class monitor_ui;
 }
 
@@ -151,12 +127,19 @@ namespace eap
 #include <list>
 #include <memory>
 
+/// \addtogroup EAPBaseGUI
+/// @{
 
+///
+/// Reusable EAP dialog banner for `wxEAPConfigDialog` and `wxEAPCredentialsDialog`
+///
 class wxEAPBannerPanel : public wxEAPBannerPanelBase
 {
 public:
     ///
     /// Constructs a banner pannel and set the title text to product name
+    ///
+    /// \param[in] parent  Parent window
     ///
     wxEAPBannerPanel(wxWindow* parent);
 
@@ -167,6 +150,9 @@ protected:
 };
 
 
+///
+/// EAP top-most configuration dialog template
+///
 template <class _wxT>
 class wxEAPConfigDialog : public wxEAPConfigDialogBase
 {
@@ -326,11 +312,21 @@ protected:
 };
 
 
+///
+/// EAP general-use dialog
+///
 class wxEAPGeneralDialog : public wxEAPGeneralDialogBase
 {
 public:
     ///
     /// Constructs a dialog
+    ///
+    /// \param[in] parent  Parent window
+    /// \param[in] id      An identifier for the dialog. A value of \c wxID_ANY is taken to mean a default.
+    /// \param[in] title   The title of the dialog
+    /// \param[in] pos     The dialog position. The value \c wxDefaultPosition indicates a default position, chosen by either the windowing system or wxWidgets, depending on platform.
+    /// \param[in] size    The dialog size. The value \c wxDefaultSize indicates a default size, chosen by either the windowing system or wxWidgets, depending on platform.
+    /// \param[in] style   The window style.
     ///
     wxEAPGeneralDialog(wxWindow *parent, wxWindowID id = wxID_ANY, const wxString &title = wxEmptyString, const wxPoint &pos = wxDefaultPosition, const wxSize &size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE);
 
@@ -351,6 +347,9 @@ protected:
 };
 
 
+///
+/// EAP method credential dialog
+///
 class wxEAPCredentialsDialog : public wxEAPGeneralDialog
 {
 public:
@@ -361,6 +360,9 @@ public:
 };
 
 
+///
+/// EAP provider select dialog
+///
 class wxEAPProviderSelectDialog : public wxEAPProviderSelectDialogBase
 {
 public:
@@ -390,6 +392,9 @@ protected:
 };
 
 
+///
+/// EAP general note
+///
 class wxEAPNotePanel : public wxEAPNotePanelBase
 {
 public:
@@ -439,6 +444,9 @@ protected:
 };
 
 
+///
+/// EAP provider-locked congifuration note
+///
 class wxEAPProviderLockedPanel : public wxEAPNotePanel
 {
 public:
@@ -449,6 +457,9 @@ public:
 };
 
 
+///
+/// EAP credential warning note
+///
 class wxEAPCredentialWarningPanel : public wxEAPNotePanel
 {
 public:
@@ -459,6 +470,9 @@ public:
 };
 
 
+///
+/// EAP Configuration window
+///
 class wxEAPConfigWindow : public wxScrolledWindow
 {
 public:
@@ -504,6 +518,9 @@ protected:
 };
 
 
+///
+/// EAP provider contact info config panel
+///
 class wxEAPProviderContactInfoPanel : public wxEAPProviderContactInfoPanelBase
 {
 public:
@@ -528,6 +545,9 @@ protected:
 };
 
 
+///
+/// EAP provider identity config panel
+///
 class wxEAPProviderIDPanel : public wxEAPProviderIDPanelBase
 {
 public:
@@ -550,6 +570,9 @@ protected:
 };
 
 
+///
+/// EAP provider lock config panel
+///
 class wxEAPProviderLockPanel : public wxEAPProviderLockPanelBase
 {
 public:
@@ -572,6 +595,9 @@ protected:
 };
 
 
+///
+/// EAP provider configuration dialog
+///
 class wxEAPConfigProvider : public wxEAPGeneralDialog
 {
 public:
@@ -580,6 +606,11 @@ public:
     ///
     /// \param[inout] prov    Provider configuration data
     /// \param[in]    parent  Parent window
+    /// \param[in]    id      An identifier for the dialog. A value of \c wxID_ANY is taken to mean a default.
+    /// \param[in]    title   The title of the dialog
+    /// \param[in]    pos     The dialog position. The value \c wxDefaultPosition indicates a default position, chosen by either the windowing system or wxWidgets, depending on platform.
+    /// \param[in]    size    The dialog size. The value \c wxDefaultSize indicates a default size, chosen by either the windowing system or wxWidgets, depending on platform.
+    /// \param[in]    style   The window style.
     ///
     wxEAPConfigProvider(eap::config_provider &prov, wxWindow *parent, wxWindowID id = wxID_ANY, const wxString &title = _("Provider Settings"), const wxPoint &pos = wxDefaultPosition, const wxSize &size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE);
 
@@ -591,6 +622,9 @@ protected:
 };
 
 
+///
+/// Base template for credential configuration panel
+///
 template <class _Tcred, class _wxT>
 class wxEAPCredentialsConfigPanel : public wxEAPCredentialsConfigPanelBase
 {
@@ -601,6 +635,7 @@ public:
     /// \param[in]    prov    Provider configuration data
     /// \param[inout] cfg     Configuration data
     /// \param[in]    parent  Parent window
+    /// \param[in]    method  Method name to display
     ///
     wxEAPCredentialsConfigPanel(const eap::config_provider &prov, eap::config_method_with_cred &cfg, wxWindow *parent, const wxString &method = wxEmptyString) :
         m_prov(prov),
@@ -833,6 +868,9 @@ private:
 };
 
 
+///
+/// Helper template for all credential entry panels
+///
 template <class _Tcred, class _Tbase>
 class wxEAPCredentialsPanel : public _Tbase
 {
@@ -891,6 +929,9 @@ protected:
 };
 
 
+///
+/// Generic password credential entry panel
+///
 template <class _Tcred, class _Tbase>
 class wxPasswordCredentialsPanel : public wxEAPCredentialsPanel<_Tcred, _Tbase>
 {
@@ -980,6 +1021,8 @@ private:
     bool m_password_set;
 };
 
+/// @}
+
 
 inline wxIcon wxLoadIconFromResource(HINSTANCE hinst, PCWSTR pszName, int cx, int cy)
 {
@@ -1021,6 +1064,12 @@ inline void wxInitializeConfig()
 
 namespace eap
 {
+    /// \addtogroup EAPBaseGUI
+    /// @{
+
+    ///
+    /// Base class to enable single instance of the same dialog (master) return result to multiple threads (slaves)
+    ///
     class monitor_ui
     {
     public:
@@ -1100,4 +1149,6 @@ namespace eap
         static const UINT s_msg_attach;     ///< Slave sends this message to attach to master
         static const UINT s_msg_finish;     ///< Master sends this message to slaves to notify them it has finished (wparam has size, lparam has data)
     };
+
+    /// @}
 }

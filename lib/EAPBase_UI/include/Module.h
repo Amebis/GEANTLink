@@ -20,11 +20,6 @@
 
 namespace eap
 {
-    ///
-    /// EAP UI peer base abstract class
-    ///
-    /// A group of methods all EAP UI peers must or should implement.
-    ///
     class peer_ui;
 }
 
@@ -35,6 +30,14 @@ namespace eap
 
 namespace eap
 {
+    /// \addtogroup EAPBaseModule
+    /// @{
+
+    ///
+    /// EAP UI peer base abstract class
+    ///
+    /// A group of methods all EAP UI peers must or should implement.
+    ///
     class peer_ui : public module
     {
     public:
@@ -50,11 +53,16 @@ namespace eap
         ///
         /// \sa [EapPeerConfigXml2Blob function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363602.aspx)
         ///
+        /// \param[in ] dwFlags                   A combination of EAP flags that describe the EAP authentication session behavior.
+        /// \param[in ] pConfigRoot               Pointer to the XML configuration to be converted.
+        /// \param[out] pConnectionDataOut        A pointer to a pointer to a byte buffer that contains the configuration data converted from XML. The configuration data is created inside the EapHostConfig Schema element. The buffer is of size \p pdwConnectionDataOutSize. After consuming the data, this memory must be freed by calling \p EapPeerFreeMemory().
+        /// \param[out] pdwConnectionDataOutSize  A pointer to the size, in bytes, of the configuration BLOB in \p pConnectionDataOut.
+        ///
         virtual void config_xml2blob(
-            _In_    DWORD       dwFlags,
-            _In_    IXMLDOMNode *pConfigRoot,
-            _Inout_ BYTE        **pConnectionDataOut,
-            _Inout_ DWORD       *pdwConnectionDataOutSize) = 0;
+            _In_  DWORD       dwFlags,
+            _In_  IXMLDOMNode *pConfigRoot,
+            _Out_ BYTE        **pConnectionDataOut,
+            _Out_ DWORD       *pdwConnectionDataOutSize) = 0;
 
         ///
         /// Converts the configuration BLOB to XML.
@@ -62,6 +70,12 @@ namespace eap
         /// The configuration BLOB is returned in the `ppConnectionDataOut` parameter of the `EapPeerInvokeConfigUI` function.
         ///
         /// \sa [EapPeerConfigBlob2Xml function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363601.aspx)
+        ///
+        /// \param[in] dwFlags               A combination of EAP flags that describe the EAP authentication session behavior.
+        /// \param[in] pConnectionData       A pointer to a buffer that contains the configuration BLOB to convert. The buffer is of size \p dwConnectionDataSize.
+        /// \param[in] dwConnectionDataSize  The size, in bytes, of the configuration BLOB in \p pConnectionData.
+        /// \param[in] pDoc                  A pointer to a pointer to an XML document that contains the converted configuration. If the EAP method does not support the \p EapPeerConfigBlob2Xml() function, the XML document will contain the \p ConfigBlob node with the BLOB in string form. The EAP method should create configuration inside the EapHostConfig Schema configuration element.
+        /// \param[in] pConfigRoot           Configuration root XML node
         ///
         virtual void config_blob2xml(
             _In_                                   DWORD           dwFlags,
@@ -75,17 +89,33 @@ namespace eap
         ///
         /// \sa [EapPeerInvokeConfigUI function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363614.aspx)
         ///
+        /// \param[in ] hwndParent                A handle to the parent window which will spawn the connection configuration user interface dialog.
+        /// \param[in ] pConnectionDataIn         A pointer to a buffer that contains the configuration BLOB to convert. The buffer is of size \p dwConnectionDataInSize.
+        /// \param[in ] dwConnectionDataInSize    The size, in bytes, of the configuration BLOB in \p pConnectionDataIn.
+        /// \param[out] ppConnectionDataOut       Receives a pointer to a pointer that contains a byte buffer with the user-configured connection data.
+        /// \param[out] pdwConnectionDataOutSize  Receives a pointer to the size, in bytes, of the \p ppConnectionDataOut parameter.
+        ///
         virtual void invoke_config_ui(
             _In_                                     HWND  hwndParent,
             _In_count_(dwConnectionDataInSize) const BYTE  *pConnectionDataIn,
             _In_                                     DWORD dwConnectionDataInSize,
-            _Inout_                                  BYTE  **ppConnectionDataOut,
-            _Inout_                                  DWORD *pdwConnectionDataOutSize) = 0;
+            _Out_                                    BYTE  **ppConnectionDataOut,
+            _Out_                                    DWORD *pdwConnectionDataOutSize) = 0;
 
         ///
         /// Raises a custom interactive user interface dialog to obtain user identity information for the EAP method on the client.
         ///
         /// \sa [EapPeerInvokeIdentityUI function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363615.aspx)
+        ///
+        /// \param[in ] hwndParent            A handle to the parent window which will spawn the interactive user interface dialog to obtain the identity data. Can be \c NULL.
+        /// \param[in ] dwFlags               A combination of EAP flags that describe the EAP authentication session behavior.
+        /// \param[in ] pConnectionData       A pointer to a buffer that contains the configuration BLOB to convert. The buffer is of size \p dwConnectionDataSize.
+        /// \param[in ] dwConnectionDataSize  The size, in bytes, of the configuration BLOB in \p pConnectionData.
+        /// \param[in ] pUserData             A pointer to the user data specific to this authentication used to pre-populate the user data. When this API is called for the first time, or when a new authentication session starts, this parameter is \c NULL. Otherwise, set this parameter to the `pUserData` member of the structure pointed to by the \p pResult parameter received by `EapPeerGetResult()`.
+        /// \param[in ] dwUserDataSize        Specifies the size, in bytes, of the user identity data returned in \p pUserData.
+        /// \param[out] ppUserDataOut         A pointer to the pointer of the returned user data. The data is passed to `EapPeerBeginSession()` as input \p pUserData.
+        /// \param[out] pdwUserDataOutSize    Specifies the size, in bytes, of the \p ppUserDataOut buffer.
+        /// \param[out] ppwszIdentity         A pointer to the returned user identity. The pointer will be included in the identity response packet and returned to the server.
         ///
         virtual void invoke_identity_ui(
             _In_                                   HWND   hwndParent,
@@ -94,14 +124,20 @@ namespace eap
             _In_                                   DWORD  dwConnectionDataSize,
             _In_count_(dwUserDataSize)       const BYTE   *pUserData,
             _In_                                   DWORD  dwUserDataSize,
-            _Inout_                                BYTE   **ppUserDataOut,
-            _Inout_                                DWORD  *pdwUserDataOutSize,
-            _Inout_                                LPWSTR *ppwszIdentity) = 0;
+            _Out_                                  BYTE   **ppUserDataOut,
+            _Out_                                  DWORD  *pdwUserDataOutSize,
+            _Out_                                  LPWSTR *ppwszIdentity) = 0;
 
         ///
         /// Raises a custom interactive user interface dialog for the EAP method on the client.
         ///
         /// \sa [EapPeerInvokeInteractiveUI function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363616.aspx)
+        ///
+        /// \param[in ] hwndParent                    A handle to the parent window which will spawn the interactive user interface dialog.
+        /// \param[in ] pUIContextData                A pointer to an opaque byte buffer that contains the context data used to create the user interface dialog.
+        /// \param[in ] dwUIContextDataSize           The size, in bytes, of the user interface context data specified by \p pUIContextData.
+        /// \param[out] ppDataFromInteractiveUI       A pointer to the address of an opaque byte buffer that contains data obtained from the interactive user interface dialog.
+        /// \param[out] pdwDataFromInteractiveUISize  A pointer to the size, in bytes, of the data returned in \p ppDataFromInteractiveUI.
         ///
         virtual void invoke_interactive_ui(
             _In_                                  HWND  hwndParent,
@@ -110,4 +146,6 @@ namespace eap
             _Inout_                               BYTE  **ppDataFromInteractiveUI,
             _Inout_                               DWORD *pdwDataFromInteractiveUISize) = 0;
     };
+
+    /// @}
 }

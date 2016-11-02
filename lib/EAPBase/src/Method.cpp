@@ -1,21 +1,21 @@
-/*
+ï»¿/*
     Copyright 2015-2016 Amebis
-    Copyright 2016 GÉANT
+    Copyright 2016 GÃ‰ANT
 
-    This file is part of GÉANTLink.
+    This file is part of GÃ‰ANTLink.
 
-    GÉANTLink is free software: you can redistribute it and/or modify it
+    GÃ‰ANTLink is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    GÉANTLink is distributed in the hope that it will be useful, but
+    GÃ‰ANTLink is distributed in the hope that it will be useful, but
     WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with GÉANTLink. If not, see <http://www.gnu.org/licenses/>.
+    along with GÃ‰ANTLink. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "StdAfx.h"
@@ -78,8 +78,8 @@ void eap::method::get_result(
 
 
 void eap::method::get_ui_context(
-    _Inout_ BYTE  **ppUIContextData,
-    _Inout_ DWORD *pdwUIContextDataSize)
+    _Out_ BYTE  **ppUIContextData,
+    _Out_ DWORD *pdwUIContextDataSize)
 {
     assert(ppUIContextData);
     assert(pdwUIContextDataSize);
@@ -200,8 +200,8 @@ void eap::method_tunnel::get_result(
 
 
 void eap::method_tunnel::get_ui_context(
-    _Inout_ BYTE  **ppUIContextData,
-    _Inout_ DWORD *pdwUIContextDataSize)
+    _Out_ BYTE  **ppUIContextData,
+    _Out_ DWORD *pdwUIContextDataSize)
 {
     assert(m_inner);
     m_inner->get_ui_context(ppUIContextData, pdwUIContextDataSize);
@@ -235,7 +235,7 @@ EapPeerMethodResponseAction eap::method_tunnel::set_response_attributes(_In_ con
 // eap::method_eap
 //////////////////////////////////////////////////////////////////////
 
-eap::method_eap::method_eap(_In_ module &mod, _In_ eap_type_t eap_method, _In_ method *inner) :
+eap::method_eap::method_eap(_In_ module &mod, _In_ winstd::eap_type_t eap_method, _In_ method *inner) :
     m_eap_method(eap_method),
     m_id(0),
     method_tunnel(mod, inner)

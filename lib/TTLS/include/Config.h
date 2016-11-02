@@ -22,9 +22,6 @@
 
 namespace eap
 {
-    ///
-    /// TTLS configuration
-    ///
     class config_method_ttls;
 }
 
@@ -40,7 +37,14 @@ namespace eap
 #include <memory>
 
 
-namespace eap {
+namespace eap
+{
+    /// \addtogroup EAPBaseMethod
+    /// @{
+
+    ///
+    /// TTLS configuration
+    ///
     class config_method_ttls : public config_method_tls
     {
     public:
@@ -84,71 +88,36 @@ namespace eap {
         ///
         config_method_ttls& operator=(_Inout_ config_method_ttls &&other);
 
-        ///
-        /// Clones configuration
-        ///
-        /// \returns Pointer to cloned configuration
-        ///
         virtual config* clone() const;
 
-        /// \name XML configuration management
+        /// \name XML management
         /// @{
-
-        ///
-        /// Save to XML document
-        ///
-        /// \param[in]  pDoc         XML document
-        /// \param[in]  pConfigRoot  Suggested root element for saving
-        ///
         virtual void save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot) const;
-
-        ///
-        /// Load from XML document
-        ///
-        /// \param[in]  pConfigRoot  Root element for loading
-        ///
         virtual void load(_In_ IXMLDOMNode *pConfigRoot);
-
         /// @}
 
         /// \name BLOB management
         /// @{
-
-        ///
-        /// Packs a configuration
-        ///
-        /// \param[inout] cursor  Memory cursor
-        ///
         virtual void operator<<(_Inout_ cursor_out &cursor) const;
-
-        ///
-        /// Returns packed size of a configuration
-        ///
-        /// \returns Size of data when packed (in bytes)
-        ///
         virtual size_t get_pk_size() const;
-
-        ///
-        /// Unpacks a configuration
-        ///
-        /// \param[inout] cursor  Memory cursor
-        ///
         virtual void operator>>(_Inout_ cursor_in &cursor);
+        /// @}
 
         ///
-        /// Returns EAP method type of this configuration
-        ///
-        /// \returns `eap::type_ttls`
+        /// @copydoc eap::config_method::get_method_id()
+        /// \returns This implementation always returns `eap::type_ttls`
         ///
         virtual winstd::eap_type_t get_method_id() const;
 
         ///
-        /// Returns a string \c L"EAP-TTLS"
+        /// @copydoc eap::config_method::get_method_str()
+        /// \returns This implementation always returns `L"EAP-TTLS"`
         ///
         virtual const wchar_t* get_method_str() const;
 
         ///
-        /// Creates a blank set of credentials suitable for this method
+        /// @copydoc eap::config_method::make_credentials()
+        /// \returns This implementation always returns `eap::credentials_ttls` type of credentials
         ///
         virtual credentials* make_credentials() const;
 
@@ -157,12 +126,16 @@ namespace eap {
         ///
         /// \param[in] eap_type  EAP type
         ///
+        /// \returns A new inner method config of given type
+        ///
         config_method* make_config_method(_In_ winstd::eap_type_t eap_type) const;
 
         ///
         /// Makes a new inner method config
         ///
         /// \param[in] eap_type  EAP type
+        ///
+        /// \returns A new inner method config of given type
         ///
         config_method* make_config_method(_In_ const wchar_t *eap_type) const;
 
@@ -175,4 +148,6 @@ namespace eap {
         std::unique_ptr<config_method> m_inner; ///< Inner authentication configuration
         std::wstring m_anonymous_identity;      ///< Anonymous identity
     };
+
+    /// @}
 }
