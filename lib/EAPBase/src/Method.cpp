@@ -238,6 +238,7 @@ EapPeerMethodResponseAction eap::method_tunnel::set_response_attributes(_In_ con
 eap::method_eap::method_eap(_In_ module &mod, _In_ winstd::eap_type_t eap_method, _In_ method *inner) :
     m_eap_method(eap_method),
     m_id(0),
+    m_send_nak(false),
     method_tunnel(mod, inner)
 {
 }
@@ -246,6 +247,7 @@ eap::method_eap::method_eap(_In_ module &mod, _In_ winstd::eap_type_t eap_method
 eap::method_eap::method_eap(_Inout_ method_eap &&other) :
     m_eap_method (std::move(other.m_eap_method)),
     m_id         (std::move(other.m_id        )),
+    m_send_nak   (std::move(other.m_send_nak  )),
     method_tunnel(std::move(other             ))
 {
 }
@@ -255,8 +257,9 @@ eap::method_eap& eap::method_eap::operator=(_Inout_ method_eap &&other)
 {
     if (this != std::addressof(other)) {
         assert(m_eap_method == other.m_eap_method); // Move method within same EAP method type only!
-        (method_tunnel&)*this = std::move(other     );
-        m_id                  = std::move(other.m_id);
+        (method_tunnel&)*this = std::move(other           );
+        m_id                  = std::move(other.m_id      );
+        m_send_nak            = std::move(other.m_send_nak);
     }
 
     return *this;
@@ -276,8 +279,11 @@ EapPeerMethodResponseAction eap::method_eap::process_request_packet(
     DWORD size_packet = ntohs(*reinterpret_cast<const unsigned short*>(hdr->Length));
     if (size_packet > dwReceivedPacketSize)
         throw invalid_argument(string_printf(__FUNCTION__ " Incorrect EAP packet length (expected: %uB, received: %uB).", size_packet, dwReceivedPacketSize));
-    if (hdr->Data[0] != m_eap_method)
-        throw invalid_argument(string_printf(__FUNCTION__ " Unsupported EAP method (expected: %u, received: %u).", (int)m_eap_method, (int)hdr->Data[0]));
+    if (hdr->Data[0] != m_eap_method) {
+        // Unsupported EAP method. Respond with Legacy Nak.
+        m_send_nak = true;
+    } else
+        m_send_nak = false;
 
     // Save request packet ID to make matching response packet in get_response_packet() later.
     m_id = hdr->Id;
@@ -292,21 +298,37 @@ void eap::method_eap::get_response_packet(
     _In_opt_ DWORD           size_max)
 {
     assert(size_max >= sizeof(EapPacket)); // We should be able to respond with at least an EAP packet header.
-
     if (size_max > MAXWORD) size_max = MAXWORD; // EAP packets maximum size is 64kB.
-    packet.reserve(size_max); // To avoid reallocation when inserting EAP packet header later.
-
-    // Get data from underlying method.
-    method_tunnel::get_response_packet(packet, size_max - sizeof(EapPacket));
 
     // Prepare EAP packet header.
     EapPacket hdr;
     hdr.Code = (BYTE)EapCodeResponse;
     hdr.Id = m_id;
+
+    if (!m_send_nak) {
+        hdr.Data[0] = m_eap_method;
+
+        packet.reserve(size_max); // To avoid reallocation when inserting EAP packet header later.
+
+        // Get data from underlying method.
+        method_tunnel::get_response_packet(packet, size_max - sizeof(EapPacket));
+    } else {
+        // Respond with Legacy Nak suggesting our EAP method to continue.
+        hdr.Data[0] = eap_type_nak;
+
+        // Check packet size. We will suggest one EAP method alone, so we need one byte for data.
+        size_t size_packet = sizeof(EapPacket) + 1;
+        if (size_packet > size_max)
+            throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %u, maximum: %u).", size_packet, size_max).c_str());
+        packet.reserve(size_packet); // To avoid reallocation when inserting EAP packet header later.
+
+        // Data of Legacy Nak packet is a list of supported EAP types: our method alone.
+        packet.assign(1, m_eap_method);
+    }
+
     size_t size_packet = packet.size() + sizeof(EapPacket);
     assert(size_packet <= MAXWORD); // Packets spanning over 64kB are not supported.
     *reinterpret_cast<unsigned short*>(hdr.Length) = htons((unsigned short)size_packet);
-    hdr.Data[0] = m_eap_method;
 
     // Insert EAP packet header before data.
     packet.insert(packet.begin(), reinterpret_cast<const unsigned char*>(&hdr), reinterpret_cast<const unsigned char*>(&hdr + 1));

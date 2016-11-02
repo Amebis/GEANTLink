@@ -358,6 +358,7 @@ namespace eap
     protected:
         const winstd::eap_type_t m_eap_method;  ///< EAP method type
         unsigned char m_id;                     ///< Request packet ID
+        bool m_send_nak;                        ///< Are we sending Legacy Nak response?
     };
 
     /// @}
