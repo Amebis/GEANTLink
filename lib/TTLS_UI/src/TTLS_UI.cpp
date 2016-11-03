@@ -102,7 +102,9 @@ void wxTTLSConfigPanel::OnUpdateUI(wxUpdateUIEvent& event)
 wxTTLSConfigWindow::wxTTLSConfigWindow(eap::config_provider &prov, eap::config_method &cfg, wxWindow* parent) :
     m_cfg_pap     (cfg.m_module, cfg.m_level + 1),
     m_cfg_mschapv2(cfg.m_module, cfg.m_level + 1),
+#ifdef EAP_INNER_EAPHOST
     m_cfg_eaphost (cfg.m_module, cfg.m_level + 1),
+#endif
     wxEAPConfigWindow(prov, cfg, parent)
 {
     wxBoxSizer* sb_content;
@@ -122,8 +124,10 @@ wxTTLSConfigWindow::wxTTLSConfigWindow(eap::config_provider &prov, eap::config_m
     m_inner_type->AddPage(panel_pap, _("PAP"));
     wxMSCHAPv2ConfigPanel *panel_mschapv2 = new wxMSCHAPv2ConfigPanel(m_prov, m_cfg_mschapv2, m_inner_type);
     m_inner_type->AddPage(panel_mschapv2, _("MSCHAPv2"));
+#ifdef EAP_INNER_EAPHOST
     wxEapHostConfigPanel *panel_eaphost = new wxEapHostConfigPanel(m_prov, m_cfg_eaphost, m_inner_type);
     m_inner_type->AddPage(panel_eaphost, _("Other EAP methods..."));
+#endif
     sb_content->Add(m_inner_type, 0, wxALL|wxEXPAND, 5);
 
     sb_content->Add(20, 20, 1, wxALL|wxEXPAND, 5);
@@ -169,8 +173,11 @@ bool wxTTLSConfigWindow::TransferDataToWindow()
 {
     auto &cfg_ttls = dynamic_cast<eap::config_method_ttls&>(m_cfg);
 
+#ifdef EAP_INNER_EAPHOST
     auto cfg_inner_eaphost = dynamic_cast<eap::config_method_eaphost*>(cfg_ttls.m_inner.get());
-    if (!cfg_inner_eaphost) {
+    if (!cfg_inner_eaphost)
+#endif
+    {
         // Native inner methods
         switch (cfg_ttls.m_inner->get_method_id()) {
         case winstd::eap_type_legacy_pap:
@@ -186,11 +193,14 @@ bool wxTTLSConfigWindow::TransferDataToWindow()
         default:
             wxFAIL_MSG(wxT("Unsupported inner authentication method type."));
         }
-    } else {
+    }
+#ifdef EAP_INNER_EAPHOST
+    else {
         // EapHost inner method
         m_cfg_eaphost = *cfg_inner_eaphost;
         m_inner_type->SetSelection(2); // 2=EapHost
     }
+#endif
 
     // Do not invoke inherited TransferDataToWindow(), as it will call others TransferDataToWindow().
     // This will handle wxTTLSConfigWindow::OnInitDialog() via wxEVT_INIT_DIALOG forwarding.
@@ -215,9 +225,11 @@ bool wxTTLSConfigWindow::TransferDataFromWindow()
             cfg_ttls.m_inner.reset(new eap::config_method_mschapv2(m_cfg_mschapv2));
             break;
 
+#ifdef EAP_INNER_EAPHOST
         case 2: // 2=EapHost
             cfg_ttls.m_inner.reset(new eap::config_method_eaphost(m_cfg_eaphost));
             break;
+#endif
 
         default:
             wxFAIL_MSG(wxT("Unsupported inner authentication method type."));

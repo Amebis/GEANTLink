@@ -284,8 +284,11 @@ void eap::peer_ttls_ui::invoke_identity_ui(
                         src_inner != eap::credentials::source_config && eap::config_method::status_cred_begin <= cfg_method->m_inner->m_last_status && cfg_method->m_inner->m_last_status < eap::config_method::status_cred_end)
                     {
                         // Prompt for inner credentials.
+#ifdef EAP_INNER_EAPHOST
                         auto cfg_inner_eaphost = dynamic_cast<config_method_eaphost*>(cfg_method->m_inner.get());
-                        if (!cfg_inner_eaphost) {
+                        if (!cfg_inner_eaphost)
+#endif
+                        {
                             // Native inner methods. Build dialog to prompt for inner credentials.
                             wxEAPCredentialsDialog dlg(*cfg_prov, &parent);
                             if (eap::config_method::status_cred_begin <= cfg_method->m_inner->m_last_status && cfg_method->m_inner->m_last_status < eap::config_method::status_cred_end)
@@ -320,7 +323,9 @@ void eap::peer_ttls_ui::invoke_identity_ui(
                                     }
                                 }
                             }
-                        } else {
+                        }
+#ifdef EAP_INNER_EAPHOST
+                        else {
                             // EapHost inner method
                             auto cred_inner = dynamic_cast<eap::credentials_eaphost*>(cred->m_inner.get());
                             DWORD cred_data_size = 0;
@@ -353,6 +358,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
                             else
                                 wxLogError(_("Invoking EAP identity UI failed (error %u)."), dwResult);
                         }
+#endif
                     } else
                         result = wxID_OK;
                 }

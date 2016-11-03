@@ -106,7 +106,9 @@ protected:
     // Temporary inner method configurations to hold data until applied
     eap::config_method_pap      m_cfg_pap;       ///< PAP configuration
     eap::config_method_mschapv2 m_cfg_mschapv2;  ///< MSCHAPv2 configuration
+#ifdef EAP_INNER_EAPHOST
     eap::config_method_eaphost  m_cfg_eaphost;   ///< Inner EAP configuration
+#endif
 };
 
 /// @}

@@ -227,23 +227,29 @@ EAP_SESSION_HANDLE eap::peer_ttls::begin_session(
     }
 
     // We have configuration, we have credentials, create method.
+    unique_ptr<method> meth_inner;
     auto  cfg_inner        = cfg_method->m_inner.get();
     auto cred_inner        = dynamic_cast<credentials_ttls*>(s->m_cred.m_cred.get())->m_inner.get();
+#ifdef EAP_INNER_EAPHOST
     auto cfg_inner_eaphost = dynamic_cast<config_method_eaphost*>(cfg_inner);
-    unique_ptr<method> meth_inner;
-    if (!cfg_inner_eaphost) {
+    if (!cfg_inner_eaphost)
+#endif
+    {
         // Native inner methods
         switch (cfg_inner->get_method_id()) {
         case eap_type_legacy_pap     : meth_inner.reset(new method_pap     (*this, dynamic_cast<config_method_pap     &>(*cfg_inner), dynamic_cast<credentials_pass&>(*cred_inner))); break;
         case eap_type_legacy_mschapv2: meth_inner.reset(new method_mschapv2(*this, dynamic_cast<config_method_mschapv2&>(*cfg_inner), dynamic_cast<credentials_pass&>(*cred_inner))); break;
         default: throw invalid_argument(__FUNCTION__ " Unsupported inner authentication method.");
         }
-    } else {
+    }
+#ifdef EAP_INNER_EAPHOST
+    else {
         // EapHost inner method
         meth_inner.reset(
             new method_eapmsg (*this, cred_inner->get_identity().c_str(),
             new method_eaphost(*this, *cfg_inner_eaphost, dynamic_cast<credentials_eaphost&>(*cred_inner))));
     }
+#endif
     s->m_method.reset(
         new method_eap   (*this, eap_type_ttls,
         new method_defrag(*this,
