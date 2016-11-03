@@ -89,7 +89,7 @@ namespace eap
 
         ///
         /// @copydoc eap::config_method::get_method_id()
-        /// \returns This implementation always returns `eap::type_pap`
+        /// \returns This implementation always returns `winstd::eap_type_legacy_pap`
         ///
         virtual winstd::eap_type_t get_method_id() const;
 
