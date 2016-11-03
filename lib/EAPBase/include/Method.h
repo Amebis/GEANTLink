@@ -342,6 +342,17 @@ namespace eap
         ///
         method_eap& operator=(_Inout_ method_eap &&other);
 
+        /// \name Session management
+        /// @{
+
+        virtual void begin_session(
+            _In_        DWORD         dwFlags,
+            _In_  const EapAttributes *pAttributeArray,
+            _In_        HANDLE        hTokenImpersonateUser,
+            _In_opt_    DWORD         dwMaxSendPacketSize = MAXDWORD);
+
+        /// @}
+
         /// \name Packet processing
         /// @{
 

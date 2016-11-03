@@ -266,6 +266,24 @@ eap::method_eap& eap::method_eap::operator=(_Inout_ method_eap &&other)
 }
 
 
+void eap::method_eap::begin_session(
+    _In_        DWORD         dwFlags,
+    _In_  const EapAttributes *pAttributeArray,
+    _In_        HANDLE        hTokenImpersonateUser,
+    _In_opt_    DWORD         dwMaxSendPacketSize)
+{
+    // Initialize tunnel method session only.
+    method::begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
+
+    // Inner method can generate packets of up to 64kB (less the EAP packet header).
+    // Initialize inner method with appropriately less packet size maximum.
+    if (dwMaxSendPacketSize < sizeof(EapPacket))
+        throw invalid_argument(string_printf(__FUNCTION__ " Maximum packet size too small (minimum: %u, available: %u).", sizeof(EapPacket) + 1, dwMaxSendPacketSize));
+    assert(m_inner);
+    m_inner->begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, std::min<DWORD>(dwMaxSendPacketSize, MAXWORD) - sizeof(EapPacket));
+}
+
+
 EapPeerMethodResponseAction eap::method_eap::process_request_packet(
     _In_bytecount_(dwReceivedPacketSize) const void  *pReceivedPacket,
     _In_                                       DWORD dwReceivedPacketSize)

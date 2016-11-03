@@ -59,6 +59,21 @@ eap::method_defrag& eap::method_defrag::operator=(_Inout_ method_defrag &&other)
 }
 
 
+void eap::method_defrag::begin_session(
+    _In_        DWORD         dwFlags,
+    _In_  const EapAttributes *pAttributeArray,
+    _In_        HANDLE        hTokenImpersonateUser,
+    _In_opt_    DWORD         dwMaxSendPacketSize)
+{
+    // Initialize tunnel method session only.
+    method::begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
+
+    // Inner method can generate packets of up to 4GB.
+    assert(m_inner);
+    m_inner->begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, MAXDWORD);
+}
+
+
 EapPeerMethodResponseAction eap::method_defrag::process_request_packet(
     _In_bytecount_(dwReceivedPacketSize) const void  *pReceivedPacket,
     _In_                                       DWORD dwReceivedPacketSize)
@@ -194,7 +209,16 @@ void eap::method_eapmsg::begin_session(
     _In_        HANDLE        hTokenImpersonateUser,
     _In_opt_    DWORD         dwMaxSendPacketSize)
 {
-    method_tunnel::begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
+    // Initialize tunnel method session only.
+    method::begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
+
+    // Inner method can generate packets of up to 16MB (less the Diameter AVP header).
+    // Initialize inner method with appropriately less packet size maximum.
+    if (dwMaxSendPacketSize < sizeof(diameter_avp_header))
+        throw invalid_argument(string_printf(__FUNCTION__ " Maximum packet size too small (minimum: %u, available: %u).", sizeof(diameter_avp_header) + 1, dwMaxSendPacketSize));
+    assert(m_inner);
+    m_inner->begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, std::min<DWORD>(dwMaxSendPacketSize, 0xffffff) - sizeof(diameter_avp_header));
+
     m_phase = phase_identity;
 }
 
@@ -367,6 +391,9 @@ void eap::method_ttls::begin_session(
     _In_        HANDLE        hTokenImpersonateUser,
     _In_opt_    DWORD         dwMaxSendPacketSize)
 {
+    // In TLS, maximum packet length can precisely be calculated only after handshake is complete.
+    // Therefore, we allow inner method same maximum packet size as this method.
+    // Initialize tunnel and inner method session with same parameters.
     method_tunnel::begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
 
     // Presume authentication will fail with generic protocol failure. (Pesimist!!!)
