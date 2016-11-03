@@ -315,7 +315,7 @@ eap::credentials::source_t eap::credentials_tls::combine(
     }
 
     auto cfg_with_cred = dynamic_cast<const config_method_with_cred*>(&cfg);
-    if (cfg_with_cred->m_use_cred) {
+    if (cfg_with_cred && cfg_with_cred->m_use_cred) {
         // Using configured credentials.
         *this = *dynamic_cast<const credentials_tls*>(cfg_with_cred->m_cred.get());
         m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CONFIG2, event_data((unsigned int)eap_type_tls), event_data(credentials_tls::get_name()), event_data(pszTargetName), event_data::blank);

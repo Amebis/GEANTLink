@@ -343,6 +343,8 @@ void eap::peer_ttls_ui::invoke_identity_ui(
                                 cred_inner->m_identity = identity.get();
                                 cred_inner->m_cred_blob.assign(cred_data.get(), cred_data.get() + cred_data_size);
                                 SecureZeroMemory(cred_data.get(), cred_data_size);
+
+                                // TODO: If we ever choose to store EapHost credentials to Windows Credential Manager, add a "Save credentials? Yes/No" prompt here and write them to Credential Manager.
                             } else if (dwResult == ERROR_CANCELLED) {
                                 // Not really an error.
                                 result = wxID_CANCEL;

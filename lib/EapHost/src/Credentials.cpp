@@ -228,30 +228,46 @@ eap::credentials::source_t eap::credentials_eaphost::combine(
     // When cached credentials are available, EapHost calls EapPeerGetIdentity() anyway.
     // This allows each peer to decide to reuse or drop cached credentials itself.
     // To mimic that behaviour, we do the same:
-    // 1. Retrieve credentials from cache (or store)
+    // 1. Retrieve credentials from cache, store, or configuration
     // 2. Call EapHostPeerGetIdentity()
     source_t src = source_unknown;
 
     if (cred_cached) {
         // Using EAP service cached credentials.
-        *this = *(credentials_eaphost*)cred_cached;
+        *this = *dynamic_cast<const credentials_eaphost*>(cred_cached);
         m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CACHED2, event_data((unsigned int)cfg.get_method_id()), event_data(get_name()), event_data(pszTargetName), event_data::blank);
         src = source_cache;
     }
 
-    //if (src == source_unknown && pszTargetName) {
-    //    try {
-    //        credentials_eaphost cred_loaded(m_module);
-    //        cred_loaded.retrieve(pszTargetName, cfg.m_level);
+    // Note: Currently we do not provide credential storage for EapHost methods within configuration.
+    // EapHost credentials will never get loaded from configuration, since config_method_eaphost is config_method based, not config_method_with_cred.
+    // The code is kept (and maintained) for consistency with another methods, if we choose to provide that feature at a later time.
+    if (src == source_unknown) {
+        auto cfg_with_cred = dynamic_cast<const config_method_with_cred*>(&cfg);
+        if (cfg_with_cred && cfg_with_cred->m_use_cred) {
+            // Using configured credentials.
+            *this = *dynamic_cast<const credentials_eaphost*>(cfg_with_cred->m_cred.get());
+            m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CONFIG2, event_data((unsigned int)cfg.get_method_id()), event_data(credentials_eaphost::get_name()), event_data(pszTargetName), event_data::blank);
+            src = source_config;
+        }
+    }
 
-    //        // Using stored credentials.
-    //        *this = std::move(cred_loaded);
-    //        m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_STORED2, event_data((unsigned int)cfg.get_method_id()), event_data(get_name()), event_data(pszTargetName), event_data::blank);
-    //        src = source_storage;
-    //    } catch (...) {
-    //        // Not actually an error.
-    //    }
-    //}
+    if (src == source_unknown && pszTargetName) {
+        // Switch user context.
+        user_impersonator impersonating(hTokenImpersonateUser);
+
+        try {
+            credentials_eaphost cred_loaded(m_module);
+            cred_loaded.retrieve(pszTargetName, cfg.m_level);
+
+            // Using stored credentials.
+            *this = std::move(cred_loaded);
+            m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_STORED2, event_data((unsigned int)cfg.get_method_id()), event_data(get_name()), event_data(pszTargetName), event_data::blank);
+            src = source_storage;
+        } catch (...) {
+            // Not actually an error.
+        }
+    }
 
     auto cfg_eaphost = dynamic_cast<const config_method_eaphost*>(&cfg);
     BOOL fInvokeUI = FALSE;
