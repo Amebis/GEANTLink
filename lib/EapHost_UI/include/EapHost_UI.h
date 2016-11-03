@@ -76,7 +76,7 @@ public:
     /// Constructs an inner EAP method config panel
     ///
     /// \param[in   ] prov    Provider configuration data
-    /// \param[inout] cfg     Configuration data
+    /// \param[inout] cfg     Method configuration data
     /// \param[in   ] parent  Parent window
     ///
     wxEapHostMethodConfigPanel(const eap::config_provider &prov, eap::config_method_eaphost &cfg, wxWindow *parent);
@@ -104,7 +104,7 @@ public:
     /// Constructs a configuration panel
     ///
     /// \param[in   ] prov    Provider configuration data
-    /// \param[inout] cfg     Configuration data
+    /// \param[inout] cfg     Method configuration data
     /// \param[in   ] parent  Parent window
     ///
     wxEapHostConfigPanel(const eap::config_provider &prov, eap::config_method_eaphost &cfg, wxWindow* parent);

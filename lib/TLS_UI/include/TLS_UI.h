@@ -103,7 +103,7 @@ public:
     /// Constructs a TLS credentials panel
     ///
     /// \param[in]    prov       Provider configuration data
-    /// \param[in]    cfg        Configuration data
+    /// \param[in]    cfg        Method configuration data
     /// \param[inout] cred       Credentials data
     /// \param[in]    parent     Parent window
     /// \param[in]    is_config  Is this panel used to config credentials?
@@ -129,7 +129,7 @@ public:
     /// Constructs a configuration panel
     ///
     /// \param[in   ] prov    Provider configuration data
-    /// \param[inout] cfg     Configuration data
+    /// \param[inout] cfg     Method configuration data
     /// \param[in   ] parent  Parent window
     ///
     wxTLSServerTrustPanel(const eap::config_provider &prov, eap::config_method_tls &cfg, wxWindow* parent);
@@ -173,7 +173,7 @@ public:
     /// Constructs a configuration panel
     ///
     /// \param[in   ] prov    Provider configuration data
-    /// \param[inout] cfg     Configuration data
+    /// \param[inout] cfg     Method configuration data
     /// \param[in   ] parent  Parent window
     ///
     wxTLSConfigPanel(const eap::config_provider &prov, eap::config_method_tls &cfg, wxWindow* parent);

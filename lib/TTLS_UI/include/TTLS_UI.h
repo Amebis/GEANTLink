@@ -78,7 +78,7 @@ public:
     /// Constructs a configuration window
     ///
     /// \param[in]    prov    Provider configuration data
-    /// \param[inout] cfg     Configuration data
+    /// \param[inout] cfg     Method configuration data
     /// \param[in]    parent  Parent window
     ///
     wxTTLSConfigWindow(eap::config_provider &prov, eap::config_method &cfg, wxWindow* parent);

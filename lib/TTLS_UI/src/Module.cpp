@@ -347,9 +347,9 @@ void eap::peer_ttls_ui::invoke_identity_ui(
                                 // Not really an error.
                                 result = wxID_CANCEL;
                             } else if (error)
-                                wxLogError(_("Invoking EAP identity failed (error %u, %s, %s)."), error->dwWinError, error->pRootCauseString, error->pRepairString);
+                                wxLogError(_("Invoking EAP identity UI failed (error %u, %s, %s)."), error->dwWinError, error->pRootCauseString, error->pRepairString);
                             else
-                                wxLogError(_("Invoking EAP identity failed (error %u)."), dwResult);
+                                wxLogError(_("Invoking EAP identity UI failed (error %u)."), dwResult);
                         }
                     } else
                         result = wxID_OK;

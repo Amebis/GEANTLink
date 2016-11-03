@@ -480,7 +480,7 @@ public:
     /// Constructs a configuration window
     ///
     /// \param[in]    prov    Provider configuration data
-    /// \param[inout] cfg     Configuration data
+    /// \param[inout] cfg     Method configuration data
     /// \param[in]    parent  Parent window
     ///
     wxEAPConfigWindow(eap::config_provider &prov, eap::config_method &cfg, wxWindow* parent);
@@ -633,7 +633,7 @@ public:
     /// Constructs a credential configuration panel
     ///
     /// \param[in]    prov    Provider configuration data
-    /// \param[inout] cfg     Configuration data
+    /// \param[inout] cfg     Method configuration data
     /// \param[in]    parent  Parent window
     /// \param[in]    method  Method name to display
     ///
@@ -798,9 +798,7 @@ protected:
         wxEAPCredentialsConfigPanelBase::OnSetConfig(event);
 
         wxEAPCredentialsDialog dlg(m_prov, this);
-
         _wxT *panel = new _wxT(m_prov, m_cfg, m_cred_config, &dlg, true);
-
         dlg.AddContent(panel);
         if (dlg.ShowModal() == wxID_OK)
             UpdateConfigIdentity();
@@ -879,7 +877,7 @@ public:
     /// Constructs a credentials panel
     ///
     /// \param[in]    prov       Provider configuration data
-    /// \param[in]    cfg        Configuration data
+    /// \param[in]    cfg        Method configuration data
     /// \param[inout] cred       Credentials data
     /// \param[in]    parent     Parent window
     /// \param[in]    is_config  Is this panel used to config credentials?
@@ -940,7 +938,7 @@ public:
     /// Constructs a password credentials panel
     ///
     /// \param[in]    prov       Provider configuration data
-    /// \param[in]    cfg        Configuration data
+    /// \param[in]    cfg        Method configuration data
     /// \param[inout] cred       Credentials data
     /// \param[in]    parent     Parent window
     /// \param[in]    is_config  Is this panel used to config credentials?
