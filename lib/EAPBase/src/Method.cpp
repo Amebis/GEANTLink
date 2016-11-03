@@ -291,23 +291,27 @@ EapPeerMethodResponseAction eap::method_eap::process_request_packet(
     assert(dwReceivedPacketSize >= sizeof(EapPacket)); // Request packet should contain an EAP packet header at least.
     auto hdr = reinterpret_cast<const EapPacket*>(pReceivedPacket);
 
-    // Parse EAP header.
+    // This must be an EAP-Request packet.
     if (hdr->Code != EapCodeRequest)
         throw invalid_argument(string_printf(__FUNCTION__ " Unknown EAP packet received (expected: %u, received: %u).", EapCodeRequest, (int)hdr->Code));
+
+    // Check packet size.
     DWORD size_packet = ntohs(*reinterpret_cast<const unsigned short*>(hdr->Length));
     if (size_packet > dwReceivedPacketSize)
         throw invalid_argument(string_printf(__FUNCTION__ " Incorrect EAP packet length (expected: %uB, received: %uB).", size_packet, dwReceivedPacketSize));
-    if (hdr->Data[0] != m_eap_method) {
-        // Unsupported EAP method. Respond with Legacy Nak.
-        m_send_nak = true;
-    } else
-        m_send_nak = false;
 
     // Save request packet ID to make matching response packet in get_response_packet() later.
     m_id = hdr->Id;
 
-    // Process the data with underlying method.
-    return method_tunnel::process_request_packet(hdr->Data + 1, size_packet - sizeof(EapPacket));
+    if (hdr->Data[0] != m_eap_method) {
+        // Unsupported EAP method. Respond with Legacy Nak.
+        m_send_nak = true;
+        return EapPeerMethodResponseActionSend;
+    } else {
+        // Process the data with underlying method.
+        m_send_nak = false;
+        return method_tunnel::process_request_packet(hdr->Data + 1, size_packet - sizeof(EapPacket));
+    }
 }
 
 
