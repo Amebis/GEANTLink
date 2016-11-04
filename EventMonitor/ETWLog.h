@@ -20,10 +20,15 @@
 
 #include <wx/event.h>
 
+/// \addtogroup EventMonitor
+/// @{
+
 ///
 /// Maximum number of event records kept
 ///
 #define wxETWEVENT_RECORDS_MAX  1000000
+
+/// @}
 
 class wxETWEvent;
 wxDECLARE_EVENT(wxEVT_ETW_EVENT, wxETWEvent);
@@ -47,53 +52,106 @@ class wxPersistentETWListCtrl;
 #include <set>
 
 
+/// \addtogroup EventMonitor
+/// @{
+
 ///
 /// ETW event
 ///
 class wxETWEvent : public wxEvent
 {
 public:
+    ///
+    /// Creates ETW event
+    ///
+    /// \param[in] type    The unique type of event
+    /// \param[in] record  ETW event record
+    ///
     wxETWEvent(wxEventType type = wxEVT_NULL, const EVENT_RECORD &record = s_record_null);
+
+    ///
+    /// Copies an ETW event
+    ///
+    /// \param[in] event  ETW event to copy from
+    ///
     wxETWEvent(const wxETWEvent& event);
-    virtual wxEvent *Clone() const { return new wxETWEvent(*this); }
 
-    inline const winstd::event_rec&  GetRecord() const { return m_record; }
-    inline       winstd::event_rec&  GetRecord()       { return m_record; }
+    ///
+    /// Clones the ETW event
+    ///
+    /// \returns Event copy
+    ///
+    virtual wxEvent *Clone() const
+    {
+        return new wxETWEvent(*this);
+    }
 
-protected:
-    bool DoSetExtendedData(size_t extended_data_count, const EVENT_HEADER_EXTENDED_DATA_ITEM *extended_data);
-    bool DoSetUserData(size_t user_data_length, const void *user_data);
+    ///
+    /// Returns ETW event record assosiated with event
+    ///
+    inline const winstd::event_rec& GetRecord() const
+    {
+        return m_record;
+    }
+
+    ///
+    /// Returns ETW event record assosiated with event
+    ///
+    inline winstd::event_rec& GetRecord()
+    {
+        return m_record;
+    }
 
 private:
     DECLARE_DYNAMIC_CLASS_NO_ASSIGN(wxETWEvent)
 
 public:
-    static const EVENT_RECORD s_record_null;
+    static const EVENT_RECORD s_record_null; ///< Blank ETW event record
 
 protected:
     winstd::event_rec m_record; ///< ETW event record
 };
 
 
+///
+/// Prototype of the function consuming `wxETWEvent` events
+///
 typedef void (wxEvtHandler::*wxETWEventFunction)(wxETWEvent&);
 
 
 ///
-/// Event trace processor
+/// Monitors ETW events and forwards them as `wxETWEvent` event
 ///
 class wxEventTraceProcessorThread : public wxThread
 {
 public:
+    ///
+    /// A thread to process ETW events
+    ///
+    /// \param[in] parent    Event handler this thread will send record notifications
+    /// \param[in] sessions  An array of sessions to monitor
+    ///
     wxEventTraceProcessorThread(wxEvtHandler *parent, const wxArrayString &sessions);
+
+    ///
+    /// Destructor
+    ///
     virtual ~wxEventTraceProcessorThread();
 
+    ///
+    /// Closes all session handles to allow graceful thread termination
+    ///
     void Abort();
 
 protected:
+    /// \cond internal
     virtual ExitCode Entry();
+    /// \endcond
 
 private:
+    /// \cond internal
     static VOID WINAPI EventRecordCallback(PEVENT_RECORD pEvent);
+    /// \endcond
 
 protected:
     std::vector<TRACEHANDLE> m_traces;  ///< An array of tracing sessions this thread is monitoring
@@ -112,6 +170,9 @@ protected:
     ///
     struct less_guid : public std::binary_function<GUID, GUID, bool>
     {
+        ///
+        /// Compares two GUIDs
+        ///
         bool operator()(const GUID &a, const GUID &b) const
         {
             if (a.Data1 < b.Data1) return true;
@@ -131,6 +192,17 @@ protected:
     typedef std::set<GUID, less_guid> guidset;
 
 public:
+    ///
+    /// Creates a list control for ETW log display
+    ///
+    /// \param[in] parent     Parent window. Must not be \c NULL.
+    /// \param[in] id         Window identifier. The value \c wxID_ANY indicates a default value.
+    /// \param[in] pos        Window position. If \c wxDefaultPosition is specified then a default position is chosen.
+    /// \param[in] size       Window size. If \c wxDefaultSize is specified then the window is sized appropriately.
+    /// \param[in] style      Window style. See \c wxListCtrl.
+    /// \param[in] validator  Window validator
+    /// \param[in] name       Window name
+    ///
     wxETWListCtrl(
               wxWindow    *parent,
               wxWindowID  id         = wxID_ANY,
@@ -139,21 +211,70 @@ public:
               long        style      = wxLC_NO_SORT_HEADER|wxLC_REPORT|wxLC_VIRTUAL|wxNO_BORDER,
         const wxValidator &validator = wxDefaultValidator,
         const wxString    &name      = wxListCtrlNameStr);
+
+    ///
+    /// Destructor
+    ///
     virtual ~wxETWListCtrl();
 
-    inline bool IsEmpty() const { return m_rec_db.empty(); }
+    ///
+    /// Returns true if the list is empty
+    ///
+    inline bool IsEmpty() const
+    {
+        return m_rec_db.empty();
+    }
+
+    ///
+    /// Copies selected rows to clipboard
+    ///
     void CopySelected() const;
+
+    ///
+    /// Copies all rows (including hidden ones) to clipboard
+    ///
     void CopyAll() const;
+
+    ///
+    /// Empties the list
+    ///
     void ClearAll();
+
+    ///
+    /// Selects all rows
+    ///
     void SelectAll();
+
+    ///
+    /// Clears row selection
+    ///
     void SelectNone();
+
+    ///
+    /// Rebuilds the list
+    ///
     void RebuildItems();
 
+    ///
+    /// Checks if given ETW source is enabled
+    ///
+    /// \param[in] guid  GUID of ETW source
+    ///
+    /// \returns
+    /// - \c true if ETW source with \p guid GUID is enabled;
+    /// - \c false otherwise.
+    ///
     inline bool IsSourceEnabled(const GUID &guid) const
     {
         return m_sources.find(guid) != m_sources.end();
     }
 
+    ///
+    /// Enables/Disables ETW source
+    ///
+    /// \param[in] guid    GUID of ETW source
+    /// \param[in] enable  \c true to enable, \c false to disable
+    ///
     inline void EnableSource(const GUID &guid, bool enable = true)
     {
         auto s = m_sources.find(guid);
@@ -173,6 +294,7 @@ public:
     friend class wxPersistentETWListCtrl;   // Allow saving/restoring window state.
 
 protected:
+    /// \cond internal
     bool IsVisible(const EVENT_RECORD &rec) const;
     void FormatRow(const winstd::event_rec &rec, std::string &rowA, std::wstring &rowW) const;
     bool CopyToClipboard(const std::string &dataA, const std::wstring &dataW) const;
@@ -181,6 +303,8 @@ protected:
     virtual wxString OnGetItemText(long item, long column) const;
     virtual wxString OnGetItemText(const winstd::event_rec &rec, long column) const;
     void OnETWEvent(wxETWEvent& event);
+    /// \endcond
+
     DECLARE_EVENT_TABLE()
 
 public:
@@ -205,20 +329,47 @@ protected:
 
 
 ///
-/// Supports saving/restoring wxETWListCtrl state
+/// Supports saving/restoring `wxETWListCtrl` state
 ///
 class wxPersistentETWListCtrl : public wxPersistentWindow<wxETWListCtrl>
 {
 public:
+    ///
+    /// Constructor for a persistent window object
+    ///
+    /// \param[in] wnd  Window this object will save/restore
+    ///
     wxPersistentETWListCtrl(wxETWListCtrl *wnd);
 
+    ///
+    /// Returns the string uniquely identifying the objects supported by this adapter.
+    ///
+    /// \returns This implementation always returns `wxT(wxPERSIST_TLW_KIND)`
+    ///
     virtual wxString GetKind() const;
+
+    ///
+    /// Saves the object properties
+    ///
     virtual void Save() const;
+
+    ///
+    /// Restores the object properties
+    ///
+    /// \returns
+    /// - \c true if the properties were successfully restored;
+    /// - \c false otherwise.
+    ///
     virtual bool Restore();
 };
 
 
+///
+/// Creates persistent window object for `wxETWListCtrl` class window
+///
 inline wxPersistentObject *wxCreatePersistentObject(wxETWListCtrl *wnd)
 {
     return new wxPersistentETWListCtrl(wnd);
 }
+
+/// @}

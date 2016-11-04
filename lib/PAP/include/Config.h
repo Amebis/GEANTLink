@@ -36,7 +36,7 @@ namespace eap
 
 namespace eap
 {
-    /// \\addtogroup EAPBaseConfig
+    /// \addtogroup EAPBaseConfig
     /// @{
 
     ///
