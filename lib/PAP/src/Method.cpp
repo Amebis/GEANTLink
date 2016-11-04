@@ -25,10 +25,10 @@ using namespace winstd;
 
 
 //////////////////////////////////////////////////////////////////////
-// eap::method_pap
+// eap::method_pap_diameter
 //////////////////////////////////////////////////////////////////////
 
-eap::method_pap::method_pap(_In_ module &mod, _In_ config_method_pap &cfg, _In_ credentials_pass &cred) :
+eap::method_pap_diameter::method_pap_diameter(_In_ module &mod, _In_ config_method_pap &cfg, _In_ credentials_pass &cred) :
     m_cfg(cfg),
     m_cred(cred),
     m_phase(phase_unknown),
@@ -37,7 +37,7 @@ eap::method_pap::method_pap(_In_ module &mod, _In_ config_method_pap &cfg, _In_ 
 }
 
 
-eap::method_pap::method_pap(_Inout_ method_pap &&other) :
+eap::method_pap_diameter::method_pap_diameter(_Inout_ method_pap_diameter &&other) :
     m_cfg       (          other.m_cfg        ),
     m_cred      (          other.m_cred       ),
     m_phase     (std::move(other.m_phase     )),
@@ -47,7 +47,7 @@ eap::method_pap::method_pap(_Inout_ method_pap &&other) :
 }
 
 
-eap::method_pap& eap::method_pap::operator=(_Inout_ method_pap &&other)
+eap::method_pap_diameter& eap::method_pap_diameter::operator=(_Inout_ method_pap_diameter &&other)
 {
     if (this != std::addressof(other)) {
         assert(std::addressof(m_cfg ) == std::addressof(other.m_cfg )); // Move method within same configuration only!
@@ -61,7 +61,7 @@ eap::method_pap& eap::method_pap::operator=(_Inout_ method_pap &&other)
 }
 
 
-void eap::method_pap::begin_session(
+void eap::method_pap_diameter::begin_session(
     _In_        DWORD         dwFlags,
     _In_  const EapAttributes *pAttributeArray,
     _In_        HANDLE        hTokenImpersonateUser,
@@ -78,7 +78,7 @@ void eap::method_pap::begin_session(
 }
 
 
-EapPeerMethodResponseAction eap::method_pap::process_request_packet(
+EapPeerMethodResponseAction eap::method_pap_diameter::process_request_packet(
     _In_bytecount_(dwReceivedPacketSize) const void  *pReceivedPacket,
     _In_                                       DWORD dwReceivedPacketSize)
 {
@@ -117,7 +117,7 @@ EapPeerMethodResponseAction eap::method_pap::process_request_packet(
 }
 
 
-void eap::method_pap::get_response_packet(
+void eap::method_pap_diameter::get_response_packet(
     _Out_    sanitizing_blob &packet,
     _In_opt_ DWORD           size_max)
 {
@@ -128,7 +128,7 @@ void eap::method_pap::get_response_packet(
 }
 
 
-void eap::method_pap::get_result(
+void eap::method_pap_diameter::get_result(
     _In_    EapPeerMethodResultReason reason,
     _Inout_ EapPeerMethodResult       *pResult)
 {

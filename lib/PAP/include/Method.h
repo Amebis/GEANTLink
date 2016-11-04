@@ -20,7 +20,7 @@
 
 namespace eap
 {
-    class method_pap;
+    class method_pap_diameter;
 }
 
 
@@ -37,11 +37,11 @@ namespace eap
     /// @{
 
     ///
-    /// PAP method
+    /// PAP method over Diameter AVP (for use as inner EAP-TTLS)
     ///
-    class method_pap : public method
+    class method_pap_diameter : public method
     {
-        WINSTD_NONCOPYABLE(method_pap)
+        WINSTD_NONCOPYABLE(method_pap_diameter)
 
     public:
         ///
@@ -51,14 +51,14 @@ namespace eap
         /// \param[in] cfg   Method configuration
         /// \param[in] cred  User credentials
         ///
-        method_pap(_In_ module &mod, _In_ config_method_pap &cfg, _In_ credentials_pass &cred);
+        method_pap_diameter(_In_ module &mod, _In_ config_method_pap &cfg, _In_ credentials_pass &cred);
 
         ///
         /// Moves a PAP method
         ///
         /// \param[in] other  PAP method to move from
         ///
-        method_pap(_Inout_ method_pap &&other);
+        method_pap_diameter(_Inout_ method_pap_diameter &&other);
 
         ///
         /// Moves a PAP method
@@ -67,7 +67,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        method_pap& operator=(_Inout_ method_pap &&other);
+        method_pap_diameter& operator=(_Inout_ method_pap_diameter &&other);
 
         /// \name Session management
         /// @{
