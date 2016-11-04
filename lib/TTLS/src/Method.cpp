@@ -606,7 +606,7 @@ EapPeerMethodResponseAction eap::method_ttls::process_request_packet(
                     if (FAILED(status))
                         throw sec_runtime_error(status, __FUNCTION__ " Error generating PRF in Schannel.");
 
-                    memcpy(&inner_mschapv2->m_challenge_server, key_block.rgbKeys, sizeof(challenge_mschapv2));
+                    inner_mschapv2->m_challenge_server.assign(key_block.rgbKeys, key_block.rgbKeys + sizeof(challenge_mschapv2));
                     inner_mschapv2->m_ident = key_block.rgbKeys[sizeof(challenge_mschapv2) + 0];
 
                     SecureZeroMemory(&key_block, sizeof(key_block));

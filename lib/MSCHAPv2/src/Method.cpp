@@ -169,12 +169,8 @@ void eap::method_mschapv2_base::process_error(_In_ const list<string> &argv)
             }
         } else if ((val[0] == 'C' || val[0] == 'c') && val[1] == '=') {
             hex_dec dec;
-            sanitizing_blob resp;
             bool is_last;
-            dec.decode(resp, is_last, val.data() + 2, (size_t)-1);
-            if (resp.size() != sizeof(m_challenge_server))
-                throw invalid_argument(string_printf(__FUNCTION__ " Incorrect MSCHAPv2 challenge length (expected: %uB, received: %uB).", sizeof(m_challenge_server), resp.size()));
-            memcpy(&m_challenge_server, resp.data(), sizeof(m_challenge_server));
+            dec.decode(m_challenge_server, is_last, val.data() + 2, (size_t)-1);
         } else if ((val[0] == 'M' || val[0] == 'm') && val[1] == '=') {
             MultiByteToWideChar(CP_UTF8, 0, val.data() + 2, -1, m_cfg.m_last_msg);
             m_module.log_event(&EAPMETHOD_METHOD_FAILURE_ERROR1, event_data((unsigned int)m_cfg.get_method_id()), event_data(m_cfg.m_last_msg), event_data::blank);
@@ -276,9 +272,9 @@ EapPeerMethodResponseAction eap::method_mschapv2::process_request_packet(
             // Prepare CHAP response value.
             sanitizing_blob value;
             value.reserve(
-                sizeof(challenge_mschapv2) + // Peer-Challenge
+                sizeof(m_challenge_client) + // Peer-Challenge
                 8                          + // Reserved
-                sizeof(nt_response)        + // NT-Response
+                sizeof(m_nt_resp)          + // NT-Response
                 1);                          // Flags
             value.insert(value.end(), reinterpret_cast<const unsigned char*>(&m_challenge_client), reinterpret_cast<const unsigned char*>(&m_challenge_client + 1)); // Peer-Challenge
             value.insert(value.end(), 8, 0); // Reserved (must be zero)
@@ -387,9 +383,9 @@ EapPeerMethodResponseAction eap::method_mschapv2_diameter::process_request_packe
         response.reserve(
             1                          + // Ident
             1                          + // Flags
-            sizeof(challenge_mschapv2) + // Peer-Challenge
+            sizeof(m_challenge_client) + // Peer-Challenge
             8                          + // Reserved
-            sizeof(nt_response));        // NT-Response
+            sizeof(m_nt_resp));          // NT-Response
         response.push_back(m_ident);
         response.push_back(0); // Flags
         response.insert(response.end(), reinterpret_cast<const unsigned char*>(&m_challenge_client), reinterpret_cast<const unsigned char*>(&m_challenge_client + 1)); // Peer-Challenge
@@ -398,9 +394,9 @@ EapPeerMethodResponseAction eap::method_mschapv2_diameter::process_request_packe
 
         // Diameter AVP (User-Name=1, MS-CHAP-Challenge=11/311, MS-CHAP2-Response=25/311)
         m_packet_res.clear();
-        diameter_avp_append( 1,      diameter_avp_flag_mandatory,                                         identity_utf8.data(), (unsigned int)identity_utf8.size()      , m_packet_res);
-        diameter_avp_append(11, 311, diameter_avp_flag_mandatory, reinterpret_cast<const unsigned char*>(&m_challenge_server) , (unsigned int)sizeof(m_challenge_server), m_packet_res);
-        diameter_avp_append(25, 311, diameter_avp_flag_mandatory,                                         response.data()     , (unsigned int)response.size()           , m_packet_res);
+        diameter_avp_append( 1,      diameter_avp_flag_mandatory, identity_utf8     .data(), (unsigned int)identity_utf8     .size(), m_packet_res);
+        diameter_avp_append(11, 311, diameter_avp_flag_mandatory, m_challenge_server.data(), (unsigned int)m_challenge_server.size(), m_packet_res);
+        diameter_avp_append(25, 311, diameter_avp_flag_mandatory, response          .data(), (unsigned int)response          .size(), m_packet_res);
 
         m_phase = phase_challenge_server;
         m_cfg.m_last_status = config_method::status_cred_invalid; // Blame credentials if we fail beyond this point.
