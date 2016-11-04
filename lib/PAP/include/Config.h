@@ -39,6 +39,12 @@ namespace eap
 
 namespace eap
 {
+    /// \addtogroup EAPBaseConfig
+    /// @{
+
+    ///
+    /// PAP configuration
+    ///
     class config_method_pap : public config_method_with_cred
     {
     public:

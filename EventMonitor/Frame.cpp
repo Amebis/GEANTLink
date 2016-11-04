@@ -261,6 +261,8 @@ wxEventMonitorFrame::~wxEventMonitorFrame()
 }
 
 
+/// \cond internal
+
 void wxEventMonitorFrame::OnExit(wxCommandEvent& event)
 {
     Close();
@@ -407,6 +409,8 @@ void wxEventMonitorFrame::OnViewToolbar(wxCommandEvent& event)
         m_mgr.Update();
     }
 }
+
+/// \endcond
 
 
 //////////////////////////////////////////////////////////////////////////

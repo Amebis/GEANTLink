@@ -18,14 +18,7 @@
     along with GÉANTLink. If not, see <http://www.gnu.org/licenses/>.
 */
 
-///
-/// EventMonitor main frame
-///
 class wxEventMonitorFrame;
-
-///
-/// Supports saving/restoring wxEventMonitorFrame GUI state
-///
 class wxPersistentEventMonitorFrame;
 
 #pragma once;
@@ -42,6 +35,12 @@ class wxPersistentEventMonitorFrame;
 #include <WinStd/Win.h>
 
 
+/// \addtogroup EventMonitor
+/// @{
+
+///
+/// EventMonitor main frame
+///
 class wxEventMonitorFrame : public wxFrame
 {
 protected:
@@ -62,12 +61,28 @@ protected:
     };
 
 public:
+    ///
+    /// Creates an EventMonitor frame window
+    ///
+    /// \param[in] parent  The window parent. This may be \c NULL. If it is non-NULL, the frame will always be displayed on top of the parent window on Windows.
+    /// \param[in] id      The window identifier. It may take a value of \c wxID_ANY to indicate a default value.
+    /// \param[in] title   The caption to be displayed on the frame's title bar.
+    /// \param[in] pos     The window position. The value \c wxDefaultPosition indicates a default position, chosen by either the windowing system or wxWidgets, depending on platform.
+    /// \param[in] size    The window size. The value \c wxDefaultSize indicates a default size, chosen by either the windowing system or wxWidgets, depending on platform.
+    /// \param[in] style   The window style. See `wxFrame` class description.
+    /// \param[in] name    The name of the window. This parameter is used to associate a name with the item, allowing the application user to set Motif resource values for individual windows.
+    ///
     wxEventMonitorFrame(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Event Monitor"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(600,400), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL, const wxString& name = wxT("EventMonitor"));
+
+    ///
+    /// Destructor
+    ///
     ~wxEventMonitorFrame();
 
     friend class wxPersistentEventMonitorFrame;
 
 protected:
+    /// \cond internal
     void OnExit(wxCommandEvent& event);
     void OnEditCopyUpdate(wxUpdateUIEvent& event);
     void OnEditCopy(wxCommandEvent& event);
@@ -87,8 +102,10 @@ protected:
     void OnViewLevel(wxCommandEvent& event);
     void OnViewToolbarUpdate(wxUpdateUIEvent& event);
     void OnViewToolbar(wxCommandEvent& event);
+    /// \endcond
 
 protected:
+    /// \cond internal
     wxMenuBar* m_menubar;
     wxMenu* m_menuProgram;
     wxMenu* m_menuEdit;
@@ -114,20 +131,45 @@ protected:
     wxStatusBar* m_statusBar;
     wxEventMonitorLogPanel* m_panel;
     wxAuiManager m_mgr;
+    /// \endcond
 };
 
 
+///
+/// Supports saving/restoring `wxEventMonitorFrame` GUI state
+///
 class wxPersistentEventMonitorFrame : public wxPersistentTLW
 {
 public:
+    ///
+    /// Constructor for a persistent window object
+    ///
+    /// \param[in] wnd  Window this object will save/restore
+    ///
     wxPersistentEventMonitorFrame(wxEventMonitorFrame *wnd);
 
+    ///
+    /// Saves the object properties
+    ///
     virtual void Save() const;
+
+    ///
+    /// Restores the object properties
+    ///
+    /// \returns
+    /// - \c true if the properties were successfully restored;
+    /// - \c false otherwise.
+    ///
     virtual bool Restore();
 };
 
 
+///
+/// Creates persistent window object for `wxETWListCtrl` class window
+///
 inline wxPersistentObject *wxCreatePersistentObject(wxEventMonitorFrame *wnd)
 {
     return new wxPersistentEventMonitorFrame(wnd);
 }
+
+/// @}

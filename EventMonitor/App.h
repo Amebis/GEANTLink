@@ -19,8 +19,10 @@
 */
 
 ///
-/// EventMonitor application
+/// \defgroup EventMonitor  Event Monitor
+/// Real-time log of application events
 ///
+
 class wxEventMonitorApp;
 
 #pragma once
@@ -32,6 +34,12 @@ class wxEventMonitorApp;
 #include <wx/intl.h>
 
 
+/// \addtogroup EventMonitor
+/// @{
+
+///
+/// EventMonitor application
+///
 class wxEventMonitorApp : public wxApp
 {
 public:
@@ -56,5 +64,7 @@ public:
 public:
     wxLocale             m_locale;  ///< Current locale
 };
+
+/// @}
 
 wxDECLARE_APP(wxEventMonitorApp);

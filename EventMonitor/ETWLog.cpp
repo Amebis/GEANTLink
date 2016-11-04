@@ -115,6 +115,8 @@ void wxEventTraceProcessorThread::Abort()
 }
 
 
+/// \cond internal
+
 wxThread::ExitCode wxEventTraceProcessorThread::Entry()
 {
     // Process events.
@@ -138,6 +140,8 @@ VOID WINAPI wxEventTraceProcessorThread::EventRecordCallback(_In_ PEVENT_RECORD 
 
     _this->m_parent->QueueEvent(new wxETWEvent(wxEVT_ETW_EVENT, *pEvent));
 }
+
+/// \endcond
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -460,6 +464,8 @@ void wxETWListCtrl::RebuildItems()
 }
 
 
+/// \cond internal
+
 bool wxETWListCtrl::IsVisible(const EVENT_RECORD &rec) const
 {
     return
@@ -561,7 +567,7 @@ wxString wxETWListCtrl::OnGetItemText(long item, long column) const
 }
 
 
-wxString wxETWListCtrl::OnGetItemText(const event_rec &rec, long column) const
+wxString wxETWListCtrl::OnGetItemText(const winstd::event_rec &rec, long column) const
 {
     switch (column) {
     case 0: {
@@ -677,6 +683,8 @@ void wxETWListCtrl::OnETWEvent(wxETWEvent& event)
         }
     }
 }
+
+/// \endcond
 
 
 //////////////////////////////////////////////////////////////////////////
