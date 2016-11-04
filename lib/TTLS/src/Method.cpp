@@ -591,6 +591,7 @@ EapPeerMethodResponseAction eap::method_ttls::process_request_packet(
                     m_module.log_event(&EAPMETHOD_TLS_QUERY_FAILED, event_data((unsigned int)SECPKG_ATTR_CONNECTION_INFO), event_data(status), event_data::blank);
 
                 m_phase = phase_finished;
+                m_cfg.m_last_status = config_method::status_success;
 
                 method_mschapv2_diameter *inner_mschapv2 = dynamic_cast<method_mschapv2_diameter*>(m_inner.get());
                 if (inner_mschapv2) {
@@ -833,20 +834,6 @@ void eap::method_ttls::get_result(
     // Don't worry. EapHost is well aware of failed authentication condition.
     pResult->fSaveConnectionData = TRUE;
     pResult->fIsSuccess          = TRUE;
-
-    //if (m_phase == phase_finished) {
-    //    // Get inner method result.
-    //    EapPeerMethodResult result = {};
-    //    m_inner->get_result(reason, &result);
-    //    if (result.fSaveConnectionData)
-    //        pResult->fSaveConnectionData = TRUE;
-
-    //    if (m_inner->m_cfg.m_last_status != config_method::status_success) {
-    //        // Inner method admitted problems, so autentication must have proceeded to inner authentication already.
-    //        // Therefore, outer authentication must have been OK.
-    //        m_cfg.m_last_status = config_method::status_success;
-    //    }
-    //}
 }
 
 

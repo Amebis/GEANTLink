@@ -135,7 +135,6 @@ namespace eap
         challenge_mschapv2 m_challenge_client;  ///< MSCHAP client challenge
         unsigned char m_ident;                  ///< Ident
         nt_response m_nt_resp;                  ///< NT-Response
-        bool m_success;                         ///< Did we receive MS-CHAP2-Success?
 
         sanitizing_blob m_packet_res;           ///< Response packet
     };
