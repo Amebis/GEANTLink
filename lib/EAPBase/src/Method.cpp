@@ -146,7 +146,7 @@ void eap::method_noneap::get_response_packet(
 
     size_t size_packet = m_packet_res.size();
     if (size_packet > *pdwSendPacketSize)
-        throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %u, maximum: %u).", size_packet, *pdwSendPacketSize).c_str());
+        throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %u, maximum: %u).", size_packet, *pdwSendPacketSize));
 
     memcpy(pSendPacket, m_packet_res.data(), size_packet);
     *pdwSendPacketSize = (DWORD)size_packet;

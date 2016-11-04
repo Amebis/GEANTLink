@@ -209,12 +209,12 @@ EAP_SESSION_HANDLE eap::peer_ttls::begin_session(
             if (s->m_cred.match(*cfg_prov)) {
                 // Matching provider found.
                 if (cfg_prov->m_methods.empty())
-                    throw invalid_argument(string_printf(__FUNCTION__ " %ls provider has no methods.", cfg_prov->get_id().c_str()).c_str());
+                    throw invalid_argument(string_printf(__FUNCTION__ " %ls provider has no methods.", cfg_prov->get_id().c_str()));
                 cfg_method = dynamic_cast<config_method_ttls*>(cfg_prov->m_methods.front().get());
                 break;
             }
         } else
-            throw invalid_argument(string_printf(__FUNCTION__ " Credentials do not match to any provider within this connection configuration (provider: %ls).", s->m_cred.get_id().c_str()).c_str());
+            throw invalid_argument(string_printf(__FUNCTION__ " Credentials do not match to any provider within this connection configuration (provider: %ls).", s->m_cred.get_id().c_str()));
     }
 
     // We have configuration, we have credentials, create method.

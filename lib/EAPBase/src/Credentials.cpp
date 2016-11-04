@@ -650,14 +650,14 @@ void eap::credentials_connection::load(_In_ IXMLDOMNode *pConfigRoot)
             if (match(*cfg_prov)) {
                 // Matching provider found. Create matching blank credential set, then load.
                 if (cfg_prov->m_methods.empty())
-                    throw invalid_argument(string_printf(__FUNCTION__ " %ls provider has no methods.", cfg_prov->get_id().c_str()).c_str());
+                    throw invalid_argument(string_printf(__FUNCTION__ " %ls provider has no methods.", cfg_prov->get_id().c_str()));
                 const config_method_with_cred *cfg_method = dynamic_cast<const config_method_with_cred*>(cfg_prov->m_methods.front().get());
                 m_cred.reset(cfg_method->make_credentials());
                 m_cred->load(pXmlElClientSideCredential);
                 break;
             }
         } else
-            throw invalid_argument(string_printf(__FUNCTION__ " Credentials do not match to any provider within this connection configuration (provider: %ls).", get_id().c_str()).c_str());
+            throw invalid_argument(string_printf(__FUNCTION__ " Credentials do not match to any provider within this connection configuration (provider: %ls).", get_id().c_str()));
     }
 }
 
@@ -693,14 +693,14 @@ void eap::credentials_connection::operator>>(_Inout_ cursor_in &cursor)
             if (match(*cfg_prov)) {
                 // Matching provider found. Create matching blank credential set, then read.
                 if (cfg_prov->m_methods.empty())
-                    throw invalid_argument(string_printf(__FUNCTION__ " %ls provider has no methods.", cfg_prov->get_id().c_str()).c_str());
+                    throw invalid_argument(string_printf(__FUNCTION__ " %ls provider has no methods.", cfg_prov->get_id().c_str()));
                 const config_method_with_cred *cfg_method = dynamic_cast<const config_method_with_cred*>(cfg_prov->m_methods.front().get());
                 m_cred.reset(cfg_method->make_credentials());
                 cursor >> *m_cred;
                 break;
             }
         } else
-            throw invalid_argument(string_printf(__FUNCTION__ " Credentials do not match to any provider within this connection configuration (provider: %ls).", get_id().c_str()).c_str());
+            throw invalid_argument(string_printf(__FUNCTION__ " Credentials do not match to any provider within this connection configuration (provider: %ls).", get_id().c_str()));
     }
 }
 

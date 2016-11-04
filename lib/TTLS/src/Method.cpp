@@ -306,6 +306,6 @@ void eap::method_ttls::process_application_data(_In_bytecount_(size_msg) const v
     }
 
     default:
-        throw invalid_argument(string_printf(__FUNCTION__ " Inner method returned an unsupported action (action %u).", eap_output.action).c_str());
+        throw invalid_argument(string_printf(__FUNCTION__ " Inner method returned an unsupported action (action %u).", eap_output.action));
     }
 }

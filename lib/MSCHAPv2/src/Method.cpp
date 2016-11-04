@@ -178,7 +178,7 @@ void eap::method_mschapv2::process_packet(_In_bytecount_(size_pck) const void *_
         if (code == 26 && vendor == 311) {
             // MS-CHAP2-Success
             if (msg[0] != m_ident)
-                throw invalid_argument(string_printf(__FUNCTION__ " Wrong MSCHAPv2 ident (expected: %u, received: %u).", m_ident, msg[0]).c_str());
+                throw invalid_argument(string_printf(__FUNCTION__ " Wrong MSCHAPv2 ident (expected: %u, received: %u).", m_ident, msg[0]));
             const char *str = reinterpret_cast<const char*>(msg + 1);
             process_success(parse_response(str, (reinterpret_cast<const char*>(msg_end) - str)));
         } else if (code == 2 && vendor == 311) {
@@ -187,7 +187,7 @@ void eap::method_mschapv2::process_packet(_In_bytecount_(size_pck) const void *_
             const char *str = reinterpret_cast<const char*>(msg + 1);
             process_error(parse_response(str, (reinterpret_cast<const char*>(msg_end) - str)));
         } else if (hdr->flags & diameter_avp_flag_mandatory)
-            throw win_runtime_error(ERROR_NOT_SUPPORTED, string_printf(__FUNCTION__ " Server sent mandatory Diameter AVP we do not support (code: %u, vendor: %u).", code, vendor).c_str());
+            throw win_runtime_error(ERROR_NOT_SUPPORTED, string_printf(__FUNCTION__ " Server sent mandatory Diameter AVP we do not support (code: %u, vendor: %u).", code, vendor));
 
         pck = msg_next;
     }
@@ -246,7 +246,7 @@ void eap::method_mschapv2::process_error(_In_ const list<string> &argv)
             bool is_last;
             dec.decode(resp, is_last, val.data() + 2, (size_t)-1);
             if (resp.size() != sizeof(m_challenge_server))
-                throw invalid_argument(string_printf(__FUNCTION__ " Incorrect MSCHAPv2 challenge length (expected: %uB, received: %uB).", sizeof(m_challenge_server), resp.size()).c_str());
+                throw invalid_argument(string_printf(__FUNCTION__ " Incorrect MSCHAPv2 challenge length (expected: %uB, received: %uB).", sizeof(m_challenge_server), resp.size()));
             memcpy(&m_challenge_server, resp.data(), sizeof(m_challenge_server));
         } else if ((val[0] == 'M' || val[0] == 'm') && val[1] == '=') {
             MultiByteToWideChar(CP_UTF8, 0, val.data() + 2, -1, m_cfg.m_last_msg);
