@@ -341,7 +341,7 @@ void eap::method_eap::get_response_packet(
         // Check packet size. We will suggest one EAP method alone, so we need one byte for data.
         size_t size_packet = sizeof(EapPacket) + 1;
         if (size_packet > size_max)
-            throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %u, maximum: %u).", size_packet, size_max).c_str());
+            throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %u, maximum: %u).", size_packet, size_max));
         packet.reserve(size_packet); // To avoid reallocation when inserting EAP packet header later.
 
         // Data of Legacy Nak packet is a list of supported EAP types: our method alone.

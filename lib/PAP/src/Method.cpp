@@ -112,7 +112,7 @@ EapPeerMethodResponseAction eap::method_pap_diameter::process_request_packet(
         return EapPeerMethodResponseActionNone;
 
     default:
-        throw invalid_argument(string_printf(__FUNCTION__ " Unknown phase (phase %u).", m_phase).c_str());
+        throw invalid_argument(string_printf(__FUNCTION__ " Unknown phase (phase %u).", m_phase));
     }
 }
 
@@ -122,7 +122,7 @@ void eap::method_pap_diameter::get_response_packet(
     _In_opt_ DWORD           size_max)
 {
     if (m_packet_res.size() > size_max)
-        throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %u, maximum: %u).", m_packet_res.size(), size_max).c_str());
+        throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %u, maximum: %u).", m_packet_res.size(), size_max));
 
     packet.assign(m_packet_res.begin(), m_packet_res.end());
 }

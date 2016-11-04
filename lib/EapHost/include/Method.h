@@ -142,7 +142,7 @@ namespace eap
                 case EapHostPeerResponseRespond            : return EapPeerMethodResponseActionRespond ;
                 case EapHostPeerResponseStartAuthentication: return EapPeerMethodResponseActionDiscard ; // The session could not be found. So the supplicant either needs to start session again with the same packet or discard the packet.
                 case EapHostPeerResponseNone               : return EapPeerMethodResponseActionNone    ;
-                default                                    : throw std::invalid_argument(winstd::string_printf(__FUNCTION__ " Unknown action (%u).", action).c_str());
+                default                                    : throw std::invalid_argument(winstd::string_printf(__FUNCTION__ " Unknown action (%u).", action));
             }
         }
 

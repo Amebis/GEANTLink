@@ -293,7 +293,7 @@ EapPeerMethodResponseAction eap::method_eapmsg::process_request_packet(
     }
 
     default:
-        throw invalid_argument(string_printf(__FUNCTION__ " Unknown phase (phase %u).", m_phase).c_str());
+        throw invalid_argument(string_printf(__FUNCTION__ " Unknown phase (phase %u).", m_phase));
     }
 }
 
@@ -325,7 +325,7 @@ void eap::method_eapmsg::get_response_packet(
         packet.insert(packet.end(), (unsigned int)((4 - size_packet) % 4), 0);
     } else {
         if (m_packet_res.size() > size_max)
-            throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %u, maximum: %u).", m_packet_res.size(), size_max).c_str());
+            throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %u, maximum: %u).", m_packet_res.size(), size_max));
 
         packet.assign(m_packet_res.begin(), m_packet_res.end());
     }
@@ -653,7 +653,7 @@ EapPeerMethodResponseAction eap::method_ttls::process_request_packet(
                 switch (action) {
                 case EapPeerMethodResponseActionSend: m_packet_res_inner = true ; break;
                 case EapPeerMethodResponseActionNone: m_packet_res_inner = false; break;
-                default                             : throw invalid_argument(string_printf(__FUNCTION__ " Inner method returned an unsupported action (action %u).", action).c_str());
+                default                             : throw invalid_argument(string_printf(__FUNCTION__ " Inner method returned an unsupported action (action %u).", action));
                 }
             }
             return EapPeerMethodResponseActionSend;
@@ -717,7 +717,7 @@ EapPeerMethodResponseAction eap::method_ttls::process_request_packet(
     }
 
     default:
-        throw invalid_argument(string_printf(__FUNCTION__ " Unknown phase (phase %u).", m_phase).c_str());
+        throw invalid_argument(string_printf(__FUNCTION__ " Unknown phase (phase %u).", m_phase));
     }
 }
 
@@ -733,7 +733,7 @@ void eap::method_ttls::get_response_packet(
         if (FAILED(status))
             throw sec_runtime_error(status, __FUNCTION__ " Error getting Schannel required encryption sizes.");
         if (m_packet_res.size() + sizes.cbHeader + sizes.cbTrailer > size_max)
-            throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %u, maximum: %u).", m_packet_res.size(), size_max).c_str());
+            throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %u, maximum: %u).", m_packet_res.size(), size_max));
         sizes.cbMaximumMessage = std::min<unsigned long>(sizes.cbMaximumMessage, size_max - (unsigned long)(m_packet_res.size() + sizes.cbHeader + sizes.cbTrailer));
 
         // Get inner response packet.
@@ -762,7 +762,7 @@ void eap::method_ttls::get_response_packet(
             m_packet_res.insert(m_packet_res.end(), reinterpret_cast<const unsigned char*>(buf[0].pvBuffer), reinterpret_cast<const unsigned char*>(buf[0].pvBuffer) + buf[0].cbBuffer + buf[1].cbBuffer + buf[2].cbBuffer);
         }
     } else if (m_packet_res.size() > size_max)
-        throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %u, maximum: %u).", m_packet_res.size(), size_max).c_str());
+        throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %u, maximum: %u).", m_packet_res.size(), size_max));
 
     packet.assign(m_packet_res.begin(), m_packet_res.end());
 }

@@ -96,7 +96,7 @@ void eap::method_mschapv2_base::get_response_packet(
     _In_opt_ DWORD           size_max)
 {
     if (m_packet_res.size() > size_max)
-        throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %u, maximum: %u).", m_packet_res.size(), size_max).c_str());
+        throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %u, maximum: %u).", m_packet_res.size(), size_max));
 
     packet.assign(m_packet_res.begin(), m_packet_res.end());
 }
@@ -173,7 +173,7 @@ void eap::method_mschapv2_base::process_error(_In_ const list<string> &argv)
             bool is_last;
             dec.decode(resp, is_last, val.data() + 2, (size_t)-1);
             if (resp.size() != sizeof(m_challenge_server))
-                throw invalid_argument(string_printf(__FUNCTION__ " Incorrect MSCHAPv2 challenge length (expected: %uB, received: %uB).", sizeof(m_challenge_server), resp.size()).c_str());
+                throw invalid_argument(string_printf(__FUNCTION__ " Incorrect MSCHAPv2 challenge length (expected: %uB, received: %uB).", sizeof(m_challenge_server), resp.size()));
             memcpy(&m_challenge_server, resp.data(), sizeof(m_challenge_server));
         } else if ((val[0] == 'M' || val[0] == 'm') && val[1] == '=') {
             MultiByteToWideChar(CP_UTF8, 0, val.data() + 2, -1, m_cfg.m_last_msg);
@@ -423,7 +423,7 @@ EapPeerMethodResponseAction eap::method_mschapv2_diameter::process_request_packe
         return EapPeerMethodResponseActionNone;
 
     default:
-        throw invalid_argument(string_printf(__FUNCTION__ " Unknown phase (phase %u).", m_phase).c_str());
+        throw invalid_argument(string_printf(__FUNCTION__ " Unknown phase (phase %u).", m_phase));
     }
 }
 
@@ -457,7 +457,7 @@ void eap::method_mschapv2_diameter::process_packet(_In_bytecount_(size_pck) cons
         if (code == 26 && vendor == 311) {
             // MS-CHAP2-Success
             if (msg[0] != m_ident)
-                throw invalid_argument(string_printf(__FUNCTION__ " Wrong MSCHAPv2 ident (expected: %u, received: %u).", m_ident, msg[0]).c_str());
+                throw invalid_argument(string_printf(__FUNCTION__ " Wrong MSCHAPv2 ident (expected: %u, received: %u).", m_ident, msg[0]));
             const char *str = reinterpret_cast<const char*>(msg + 1);
             process_success(parse_response(str, (reinterpret_cast<const char*>(msg_end) - str)));
         } else if (code == 2 && vendor == 311) {
@@ -466,7 +466,7 @@ void eap::method_mschapv2_diameter::process_packet(_In_bytecount_(size_pck) cons
             const char *str = reinterpret_cast<const char*>(msg + 1);
             process_error(parse_response(str, (reinterpret_cast<const char*>(msg_end) - str)));
         } else if (hdr->flags & diameter_avp_flag_mandatory)
-            throw win_runtime_error(ERROR_NOT_SUPPORTED, string_printf(__FUNCTION__ " Server sent mandatory Diameter AVP we do not support (code: %u, vendor: %u).", code, vendor).c_str());
+            throw win_runtime_error(ERROR_NOT_SUPPORTED, string_printf(__FUNCTION__ " Server sent mandatory Diameter AVP we do not support (code: %u, vendor: %u).", code, vendor));
 
         pck = msg_next;
     }
