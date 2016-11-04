@@ -464,6 +464,8 @@ EapPeerMethodResponseAction eap::method_ttls::process_request_packet(
 
     switch (m_phase) {
     case phase_handshake_init: {
+        m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_ttls), event_data::blank);
+
         // Prepare input buffer(s).
         SecBuffer buf_in[] = {
             { (unsigned long)dwReceivedPacketSize, SECBUFFER_TOKEN, const_cast<void*>(pReceivedPacket) },
@@ -577,7 +579,7 @@ EapPeerMethodResponseAction eap::method_ttls::process_request_packet(
                 SecPkgContext_ConnectionInfo info;
                 if (SUCCEEDED(status = QueryContextAttributes(m_sc_ctx, SECPKG_ATTR_CONNECTION_INFO, &info)))
                     m_module.log_event(&EAPMETHOD_TLS_HANDSHAKE_FINISHED,
-                        event_data((unsigned int)eap_type_tls),
+                        event_data((unsigned int)eap_type_ttls),
                         event_data(auth.sAuthorityName),
                         event_data(info.dwProtocol),
                         event_data(info.aiCipher),
@@ -851,7 +853,7 @@ void eap::method_ttls::verify_server_trust() const
             memcmp(cert->pbCertEncoded, (*c)->pbCertEncoded, cert->cbCertEncoded) == 0)
         {
             // Server certificate found directly on the trusted root CA list.
-            m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_TRUSTED_EX, event_data::blank);
+            m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_TRUSTED_EX1, event_data((unsigned int)eap_type_ttls), event_data::blank);
             return;
         }
     }
@@ -900,7 +902,7 @@ void eap::method_ttls::verify_server_trust() const
                     if (san_info->rgAltEntry[idx_entry].dwAltNameChoice == CERT_ALT_NAME_DNS_NAME &&
                         _wcsicmp(s->c_str(), san_info->rgAltEntry[idx_entry].pwszDNSName) == 0)
                     {
-                        m_module.log_event(&EAPMETHOD_TLS_SERVER_NAME_TRUSTED1, event_data(san_info->rgAltEntry[idx_entry].pwszDNSName), event_data::blank);
+                        m_module.log_event(&EAPMETHOD_TLS_SERVER_NAME_TRUSTED2, event_data((unsigned int)eap_type_ttls), event_data(san_info->rgAltEntry[idx_entry].pwszDNSName), event_data::blank);
                         found = true;
                     }
                 }
@@ -915,7 +917,7 @@ void eap::method_ttls::verify_server_trust() const
 
             for (auto s = m_cfg.m_server_names.cbegin(), s_end = m_cfg.m_server_names.cend(); !found && s != s_end; ++s) {
                 if (_wcsicmp(s->c_str(), subj.c_str()) == 0) {
-                    m_module.log_event(&EAPMETHOD_TLS_SERVER_NAME_TRUSTED1, event_data(subj), event_data::blank);
+                    m_module.log_event(&EAPMETHOD_TLS_SERVER_NAME_TRUSTED2, event_data((unsigned int)eap_type_ttls), event_data(subj), event_data::blank);
                     found = true;
                 }
             }
@@ -1005,7 +1007,7 @@ void eap::method_ttls::verify_server_trust() const
         }
     }
 
-    m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_TRUSTED, event_data::blank);
+    m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_TRUSTED1, event_data((unsigned int)eap_type_ttls), event_data::blank);
 }
 
 #endif
