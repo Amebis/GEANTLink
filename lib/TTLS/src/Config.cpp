@@ -265,10 +265,11 @@ eap::credentials* eap::config_method_ttls::make_credentials() const
 eap::config_method* eap::config_method_ttls::make_config_method(_In_ winstd::eap_type_t eap_type) const
 {
     switch (eap_type) {
-    case eap_type_legacy_pap     : return new config_method_pap     (m_module, m_level + 1);
-    case eap_type_legacy_mschapv2: return new config_method_mschapv2(m_module, m_level + 1);
+    case eap_type_legacy_pap     : return new config_method_pap        (m_module, m_level + 1);
+    case eap_type_legacy_mschapv2: return new config_method_mschapv2   (m_module, m_level + 1);
+    case eap_type_mschapv2       : return new config_method_eapmschapv2(m_module, m_level + 1);
 #ifdef EAP_INNER_EAPHOST
-    default                      : return new config_method_eaphost (m_module, m_level + 1); // EapHost peer method handles all other method types
+    default                      : return new config_method_eaphost    (m_module, m_level + 1); // EapHost peer method handles all other method types
 #endif
     default                      : throw invalid_argument(__FUNCTION__ " Unsupported inner authentication method.");
     }
@@ -277,12 +278,13 @@ eap::config_method* eap::config_method_ttls::make_config_method(_In_ winstd::eap
 
 eap::config_method* eap::config_method_ttls::make_config_method(_In_ const wchar_t *eap_type) const
 {
-         if (_wcsicmp(eap_type, L"PAP"     ) == 0) return new config_method_pap     (m_module, m_level + 1);
-    else if (_wcsicmp(eap_type, L"MSCHAPv2") == 0) return new config_method_mschapv2(m_module, m_level + 1);
+         if (_wcsicmp(eap_type, L"PAP"         ) == 0) return new config_method_pap        (m_module, m_level + 1);
+    else if (_wcsicmp(eap_type, L"MSCHAPv2"    ) == 0) return new config_method_mschapv2   (m_module, m_level + 1);
+    else if (_wcsicmp(eap_type, L"EAP-MSCHAPv2") == 0) return new config_method_eapmschapv2(m_module, m_level + 1);
 #ifdef EAP_INNER_EAPHOST
-    else if (_wcsicmp(eap_type, L"EapHost" ) == 0) return new config_method_eaphost (m_module, m_level + 1);
+    else if (_wcsicmp(eap_type, L"EapHost"     ) == 0) return new config_method_eaphost    (m_module, m_level + 1);
 #endif
-    else                                           throw invalid_argument(__FUNCTION__ " Unsupported inner authentication method.");
+    else                                               throw invalid_argument(__FUNCTION__ " Unsupported inner authentication method.");
 }
 
 

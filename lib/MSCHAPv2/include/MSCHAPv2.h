@@ -23,6 +23,8 @@
 
 namespace eap
 {
+    enum chap_packet_code_t;
+    struct WINSTD_NOVTABLE chap_header;
     struct WINSTD_NOVTABLE challenge_mschapv2;
     struct WINSTD_NOVTABLE challenge_hash;
     struct WINSTD_NOVTABLE nt_password_hash;
@@ -59,8 +61,33 @@ namespace eap
     /// \addtogroup MSCHAPv2
     /// @{
 
+    ///
+    /// CHAP packet codes
+    ///
+    #pragma warning(suppress: 4480)
+    enum chap_packet_code_t : unsigned char {
+        chap_packet_code_challenge            = 1, ///< Challenge
+        chap_packet_code_response             = 2, ///< Response
+        chap_packet_code_success              = 3, ///< Success
+        chap_packet_code_failure              = 4, ///< Failure
+
+        mschapv2_packet_code_change_password  = 7, ///< Change password
+    };
+
+
 #pragma pack(push)
 #pragma pack(1)
+
+    ///
+    /// CHAP packet header base class
+    ///
+    struct WINSTD_NOVTABLE chap_header
+    {
+        chap_packet_code_t code;    ///< CHAP packet code
+        unsigned char ident;        ///< CHAP identifier
+        unsigned char length[2];    ///< CHAP packet length
+    };
+
 
     ///
     /// MSCHAPv2 Challenge
@@ -98,7 +125,7 @@ namespace eap
         ///
         challenge_hash(
             _In_         HCRYPTPROV         cp,
-            _In_   const challenge_mschapv2 &challenge_server,
+            _In_   const sanitizing_blob    &challenge_server,
             _In_   const challenge_mschapv2 &challenge_client,
             _In_z_ const char               *username);
 
@@ -195,7 +222,7 @@ namespace eap
         ///
         nt_response(
             _In_         HCRYPTPROV         cp,
-            _In_   const challenge_mschapv2 &challenge_server,
+            _In_   const sanitizing_blob    &challenge_server,
             _In_   const challenge_mschapv2 &challenge_client,
             _In_z_ const char               *username,
             _In_z_ const wchar_t            *password);
@@ -242,7 +269,7 @@ namespace eap
         ///
         authenticator_response(
             _In_         HCRYPTPROV         cp,
-            _In_   const challenge_mschapv2 &challenge_server,
+            _In_   const sanitizing_blob    &challenge_server,
             _In_   const challenge_mschapv2 &challenge_client,
             _In_z_ const char               *username,
             _In_z_ const wchar_t            *password,

@@ -294,14 +294,12 @@ void eap::peer_ttls_ui::invoke_identity_ui(
                             if (eap::config_method::status_cred_begin <= cfg_method->m_inner->m_last_status && cfg_method->m_inner->m_last_status < eap::config_method::status_cred_end)
                                 dlg.AddContent(new wxEAPCredentialWarningPanel(*cfg_prov, cfg_method->m_inner->m_last_status, &dlg));
                             wxEAPCredentialsPanelBase *panel = NULL;
-                            const eap::config_method_pap      *cfg_inner_pap;
-                            const eap::config_method_mschapv2 *cfg_inner_mschapv2;
-                            if ((cfg_inner_pap = dynamic_cast<const eap::config_method_pap*>(cfg_method->m_inner.get())) != NULL)
-                                panel = new wxPAPCredentialsPanel(*cfg_prov, *cfg_inner_pap, *dynamic_cast<eap::credentials_pass*>(cred->m_inner.get()), &dlg, false);
-                            else if ((cfg_inner_mschapv2 = dynamic_cast<const eap::config_method_mschapv2*>(cfg_method->m_inner.get())) != NULL)
-                                panel = new wxMSCHAPv2CredentialsPanel(*cfg_prov, *cfg_inner_mschapv2, *dynamic_cast<eap::credentials_pass*>(cred->m_inner.get()), &dlg, false);
-                            else
-                                assert(0); // Unsupported inner authentication method type.
+                            switch (cfg_method->m_inner->get_method_id()) {
+                                case eap_type_legacy_pap     : panel = new wxPAPCredentialsPanel     (*cfg_prov, *dynamic_cast<const eap::config_method_pap        *>(cfg_method->m_inner.get()), *dynamic_cast<eap::credentials_pass*>(cred->m_inner.get()), &dlg, false); break;
+                                case eap_type_legacy_mschapv2: panel = new wxMSCHAPv2CredentialsPanel(*cfg_prov, *dynamic_cast<const eap::config_method_mschapv2   *>(cfg_method->m_inner.get()), *dynamic_cast<eap::credentials_pass*>(cred->m_inner.get()), &dlg, false); break;
+                                case eap_type_mschapv2       : panel = new wxMSCHAPv2CredentialsPanel(*cfg_prov, *dynamic_cast<const eap::config_method_eapmschapv2*>(cfg_method->m_inner.get()), *dynamic_cast<eap::credentials_pass*>(cred->m_inner.get()), &dlg, false); break;
+                                default                      : wxLogError("Unsupported inner authentication method.");
+                            }
                             panel->SetRemember(src_inner == eap::credentials::source_storage);
                             dlg.AddContent(panel);
 

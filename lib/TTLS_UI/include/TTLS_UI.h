@@ -104,10 +104,11 @@ protected:
     wxChoicebook *m_inner_type;             ///< Inner authentication type
 
     // Temporary inner method configurations to hold data until applied
-    eap::config_method_pap      m_cfg_pap;       ///< PAP configuration
-    eap::config_method_mschapv2 m_cfg_mschapv2;  ///< MSCHAPv2 configuration
+    eap::config_method_pap         m_cfg_pap;           ///< PAP configuration
+    eap::config_method_mschapv2    m_cfg_mschapv2;      ///< MSCHAPv2 configuration
+    eap::config_method_eapmschapv2 m_cfg_eapmschapv2;   ///< EAP-MSCHAPv2 configuration
 #ifdef EAP_INNER_EAPHOST
-    eap::config_method_eaphost  m_cfg_eaphost;   ///< Inner EAP configuration
+    eap::config_method_eaphost     m_cfg_eaphost;       ///< Inner EAP configuration
 #endif
 };
 

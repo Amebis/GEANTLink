@@ -237,8 +237,12 @@ EAP_SESSION_HANDLE eap::peer_ttls::begin_session(
     {
         // Native inner methods
         switch (cfg_inner->get_method_id()) {
-        case eap_type_legacy_pap     : meth_inner.reset(new method_pap     (*this, dynamic_cast<config_method_pap     &>(*cfg_inner), dynamic_cast<credentials_pass&>(*cred_inner))); break;
-        case eap_type_legacy_mschapv2: meth_inner.reset(new method_mschapv2(*this, dynamic_cast<config_method_mschapv2&>(*cfg_inner), dynamic_cast<credentials_pass&>(*cred_inner))); break;
+        case eap_type_legacy_pap     : meth_inner.reset(new method_pap              (*this, dynamic_cast<config_method_pap     &>(*cfg_inner), dynamic_cast<credentials_pass&>(*cred_inner))); break;
+        case eap_type_legacy_mschapv2: meth_inner.reset(new method_mschapv2_diameter(*this, dynamic_cast<config_method_mschapv2&>(*cfg_inner), dynamic_cast<credentials_pass&>(*cred_inner))); break;
+        case eap_type_mschapv2       : meth_inner.reset(
+                                           new method_eapmsg  (*this, cred_inner->get_identity().c_str(),
+                                           new method_eap     (*this, eap_type_mschapv2,
+                                           new method_mschapv2(*this, dynamic_cast<config_method_mschapv2&>(*cfg_inner), dynamic_cast<credentials_pass&>(*cred_inner))))); break;
         default: throw invalid_argument(__FUNCTION__ " Unsupported inner authentication method.");
         }
     }

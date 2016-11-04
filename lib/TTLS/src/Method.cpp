@@ -592,7 +592,7 @@ EapPeerMethodResponseAction eap::method_ttls::process_request_packet(
 
                 m_phase = phase_finished;
 
-                method_mschapv2 *inner_mschapv2 = dynamic_cast<method_mschapv2*>(m_inner.get());
+                method_mschapv2_diameter *inner_mschapv2 = dynamic_cast<method_mschapv2_diameter*>(m_inner.get());
                 if (inner_mschapv2) {
                     // Push keying material to inner MSCHAPv2 method.
                     static const DWORD s_key_id = 0x02; // EAP-TTLSv0 Challenge Data
