@@ -232,7 +232,7 @@ wxETWListCtrl::wxETWListCtrl(wxWindow *parent, wxWindowID id, const wxPoint& pos
             wxLogError(_("Access denied creating event session: you need administrative privileges (Run As Administrator) or be a member of Performance Log Users group to start event tracing session."));
             return;
         } else if (ulResult == ERROR_ALREADY_EXISTS) {
-            wxLogDebug(_("The %s event session already exists."), name.c_str());
+            wxLogDebug(_("The %s event session already exists."), name);
             // Do not despair... Retry with a new session name and ID.
             continue;
         } else {
@@ -711,7 +711,7 @@ void wxPersistentETWListCtrl::Save() const
     col.SetMask(wxLIST_MASK_TEXT | wxLIST_MASK_WIDTH);
     for (int i = 0, n = wnd->GetColumnCount(); i < n; i++) {
         wnd->GetColumn(i, col);
-        SaveValue(wxString::Format(wxT("Column%sWidth"), col.GetText().c_str()), col.GetWidth());
+        SaveValue(wxString::Format(wxT("Column%sWidth"), col.GetText()), col.GetWidth());
     }
 
     SaveValue(wxT("ScrollAuto"), wnd->m_scroll_auto);
@@ -736,7 +736,7 @@ bool wxPersistentETWListCtrl::Restore()
         wnd->GetColumn(i, col);
 
         int width;
-        if (RestoreValue(wxString::Format(wxT("Column%sWidth"), col.GetText().c_str()), &width))
+        if (RestoreValue(wxString::Format(wxT("Column%sWidth"), col.GetText()), &width))
             wnd->SetColumnWidth(i, width);
     }
 
