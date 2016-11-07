@@ -101,6 +101,10 @@ wxEAPCredentialsDialog::wxEAPCredentialsDialog(const eap::config_provider &prov,
 {
     // Set banner title.
     m_banner->m_title->SetLabel(wxString::Format(_("%s Credentials"), wxEAPGetProviderName(prov.m_name)));
+
+#ifdef __DANGEROUS__LOG_CONFIDENTIAL_DATA
+    AddContent(new wxEAPCredentialLogWarningPanel(this));
+#endif
 }
 
 
@@ -229,6 +233,27 @@ wxEAPCredentialWarningPanel::wxEAPCredentialWarningPanel(const eap::config_provi
 
     this->Layout();
 }
+
+
+//////////////////////////////////////////////////////////////////////
+// wxEAPCredentialWarningPanel
+//////////////////////////////////////////////////////////////////////
+
+#ifdef __DANGEROUS__LOG_CONFIDENTIAL_DATA
+wxEAPCredentialLogWarningPanel::wxEAPCredentialLogWarningPanel(wxWindow* parent) : wxEAPNotePanel(parent)
+{
+    // Load and set icon.
+    winstd::library lib_shell32;
+    if (lib_shell32.load(_T("imageres.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
+        m_note_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(105)));
+
+    m_note_label->SetLabel(wxString::Format(_("The %s version installed on this computer logs credentials in easy to read visible way."), wxT(PRODUCT_NAME_STR)) + " " +
+        _("Please, reconsider necessity to enter your credentials."));
+    m_note_label->Wrap(449);
+
+    this->Layout();
+}
+#endif
 
 
 //////////////////////////////////////////////////////////////////////

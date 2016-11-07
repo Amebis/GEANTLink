@@ -34,6 +34,9 @@ class wxEAPCredentialsDialog;
 class wxEAPNotePanel;
 class wxEAPProviderLockedPanel;
 class wxEAPCredentialWarningPanel;
+#ifdef __DANGEROUS__LOG_CONFIDENTIAL_DATA
+class wxEAPCredentialLogWarningPanel;
+#endif
 class wxEAPConfigWindow;
 class wxEAPProviderContactInfoPanel;
 class wxEAPProviderIDPanel;
@@ -469,6 +472,20 @@ public:
     wxEAPCredentialWarningPanel(const eap::config_provider &prov, eap::config_method::status_t status, wxWindow* parent);
 };
 
+
+///
+/// EAP credential logging enabled warning note
+///
+#ifdef __DANGEROUS__LOG_CONFIDENTIAL_DATA
+class wxEAPCredentialLogWarningPanel : public wxEAPNotePanel
+{
+public:
+    ///
+    /// Constructs a notice pannel and set the title text
+    ///
+    wxEAPCredentialLogWarningPanel(wxWindow* parent);
+};
+#endif
 
 ///
 /// EAP Configuration window
