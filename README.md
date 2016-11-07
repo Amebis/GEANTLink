@@ -8,22 +8,22 @@ Suite of EAP supplicants for Windows - IEEE 802.1X plug-ins for enterprise netwo
 - Microsoft Windows Vista or later
 - Microsoft Visual Studio 2010 SP1
 - _msgfmt.exe_ from [gettext](https://www.gnu.org/software/gettext/);
-  Hint: [Poedit](https://poedit.net/) contains up-to-date binary Win32 compiled gettext-utilities. Install it and add _GettextTools\bin_ folder to path.
+  Hint: [Poedit](https://poedit.net/) contains up-to-date binary Win32 compiled gettext-utilities. Install it and add `GettextTools\bin` folder to path.
 - _sed.exe_ and _grep.exe_
-- _MsiDb.Exe_ and other command line utilities for MSI packaging distributed as a part of Microsoft Windows SDK (installed with Visual Studio). Add SDK's _Bin_ folder to path.
+- _MsiDb.Exe_ and other command line utilities for MSI packaging distributed as a part of Microsoft Windows SDK (installed with Visual Studio). Add SDK's `Bin` folder to path.
 
 ### wxWidgets
 GÉANTLink is using wxWidgets v3.0.2 static libraries. Unfortunately, only dynamic libraries (DLL) variant is available as a binary download. Therefore static libraries needs to be compiled from [source](https://github.com/wxWidgets/wxWidgets).
 
 #### Compiling wxWidgets Win32 static libraries
 1. Start _Visual Studio Command Prompt (2010)_
-2. Change working directory to _build\msw_
+2. Change working folder to `build\msw`
 3. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0`
 4. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 BUILD=release`
 
 #### Compiling wxWidgets x64 static libraries
 1. Start _Visual Studio x64 Cross Tools Command Prompt (2010)_
-2. Change working directory to _build\msw_
+2. Change working folder to `build\msw`
 3. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 TARGET_CPU=X64`
 4. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 TARGET_CPU=X64 BUILD=release`
 
@@ -75,7 +75,7 @@ Command            | Explanation
 `nmake Clean`      | Deletes all intermediate and output files.
 `nmake Register`   | Builds a debug version of project, registers DLLs, and adds Start Menu shortcuts. For testing and development purposes only! Requires elevated command prompt.
 `nmake Unregister` | Removes Start Menu shortcuts, unregisters DLLs. For testing development purposes only! Requires elevated command prompt.
-`nmake Setup`      | Builds a release version of project and release MSI setup files. The resulting files can be found in _output\Setup_ folder.
-`nmake SetupDebug` | Builds a debug version of project and debug MSI setup files. The resulting files can be found in _output\Setup_ folder.
+`nmake Setup`      | Builds a release version of project and release MSI setup files. The resulting files can be found in `output\Setup` folder.
+`nmake SetupDebug` | Builds a debug version of project and debug MSI setup files. The resulting files can be found in `output\Setup` folder.
 
 The `/ls` flag can be appended to the commands above to reduce NMAKE’s verbosity. You can combine multiple targets (i.e. nmake Unregister Clean). Please, see NMAKE reference for further reading.
