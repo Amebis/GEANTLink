@@ -307,7 +307,7 @@ namespace eap
         std::vector<unsigned char> encrypt(_In_ HCRYPTPROV hProv, _In_ const std::basic_string<wchar_t, _Traits, _Ax> &val, _Out_opt_ HCRYPTHASH hHash = NULL) const
         {
             winstd::sanitizing_string val_utf8;
-            WideCharToMultiByte(CP_UTF8, 0, val.c_str(), (int)val.length(), val_utf8, NULL, NULL);
+            WideCharToMultiByte(CP_UTF8, 0, val, val_utf8, NULL, NULL);
             return encrypt(hProv, val_utf8, hHash);
         }
 
@@ -351,7 +351,7 @@ namespace eap
         std::vector<unsigned char> encrypt_md5(_In_ HCRYPTPROV hProv, _In_ const std::basic_string<wchar_t, _Traits, _Ax> &val) const
         {
             winstd::sanitizing_string val_utf8;
-            WideCharToMultiByte(CP_UTF8, 0, val.c_str(), (int)val.length(), val_utf8, NULL, NULL);
+            WideCharToMultiByte(CP_UTF8, 0, val, val_utf8, NULL, NULL);
             return encrypt_md5(hProv, val_utf8);
         }
 
@@ -432,7 +432,7 @@ namespace eap
         {
             winstd::sanitizing_string buf(std::move(decrypt_str(hProv, data, size, hHash)));
             std::basic_string<wchar_t, _Traits, _Ax> dec;
-            MultiByteToWideChar(CP_UTF8, 0, buf.data(), (int)buf.size(), dec);
+            MultiByteToWideChar(CP_UTF8, 0, buf, dec);
             return dec;
         }
 
@@ -504,7 +504,7 @@ namespace eap
         {
             winstd::sanitizing_string buf(std::move(decrypt_str_md5<char, std::char_traits<char>, sanitizing_allocator<char> >(hProv, data, size)));
             std::basic_string<wchar_t, _Traits, _Ax> dec;
-            MultiByteToWideChar(CP_UTF8, 0, buf.data(), (int)buf.size(), dec);
+            MultiByteToWideChar(CP_UTF8, 0, buf, dec);
             return dec;
         }
 

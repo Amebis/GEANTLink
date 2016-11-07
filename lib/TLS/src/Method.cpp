@@ -206,7 +206,7 @@ void eap::method_tls::begin_session(
         m_sc_target_name.insert(m_sc_target_name.end(), name->begin(), name->end());
 #else
         string buf;
-        WideCharToMultiByte(CP_ACP, 0, name->c_str(), -1, buf, NULL, NULL);
+        WideCharToMultiByte(CP_ACP, 0, name, buf, NULL, NULL);
         m_sc_target_name.insert(m_sc_target_name.end(), buf.begin(), buf.end());
 #endif
     }

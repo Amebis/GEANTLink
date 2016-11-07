@@ -101,7 +101,7 @@ void eap::method_mschapv2::process_request_packet(
     case phase_init: {
         // Convert username to UTF-8.
         sanitizing_string identity_utf8;
-        WideCharToMultiByte(CP_UTF8, 0, m_cred.m_identity.c_str(), (int)m_cred.m_identity.length(), identity_utf8, NULL, NULL);
+        WideCharToMultiByte(CP_UTF8, 0, m_cred.m_identity, identity_utf8, NULL, NULL);
 
         // Randomize Peer-Challenge
         m_challenge_client.randomize(m_cp);
@@ -209,7 +209,7 @@ void eap::method_mschapv2::process_success(_In_ const list<string> &argv)
 
             // Calculate expected authenticator response.
             sanitizing_string identity_utf8;
-            WideCharToMultiByte(CP_UTF8, 0, m_cred.m_identity.c_str(), (int)m_cred.m_identity.length(), identity_utf8, NULL, NULL);
+            WideCharToMultiByte(CP_UTF8, 0, m_cred.m_identity, identity_utf8, NULL, NULL);
             authenticator_response resp_exp(m_cp, m_challenge_server, m_challenge_client, identity_utf8.c_str(), m_cred.m_password.c_str(), m_nt_resp);
 
             // Compare against provided authemticator response.
@@ -249,7 +249,7 @@ void eap::method_mschapv2::process_error(_In_ const list<string> &argv)
                 throw invalid_argument(string_printf(__FUNCTION__ " Incorrect MSCHAPv2 challenge length (expected: %uB, received: %uB).", sizeof(m_challenge_server), resp.size()));
             memcpy(&m_challenge_server, resp.data(), sizeof(m_challenge_server));
         } else if ((val[0] == 'M' || val[0] == 'm') && val[1] == '=') {
-            MultiByteToWideChar(CP_UTF8, 0, val.data() + 2, -1, m_cfg.m_last_msg);
+            MultiByteToWideChar(CP_UTF8, 0, val.data() + 2, (int)val.length() - 2, m_cfg.m_last_msg);
             m_module.log_event(&EAPMETHOD_METHOD_FAILURE_ERROR1, event_data((unsigned int)eap_type_legacy_mschapv2), event_data(m_cfg.m_last_msg), event_data::blank);
         }
     }

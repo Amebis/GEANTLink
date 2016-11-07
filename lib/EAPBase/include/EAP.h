@@ -855,7 +855,7 @@ template<class _Traits, class _Ax>
 inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const std::basic_string<wchar_t, _Traits, _Ax> &val)
 {
     std::string val_utf8;
-    WideCharToMultiByte(CP_UTF8, 0, val.c_str(), (int)val.length(), val_utf8, NULL, NULL);
+    WideCharToMultiByte(CP_UTF8, 0, val, val_utf8, NULL, NULL);
     cursor << val_utf8;
 }
 
@@ -872,7 +872,7 @@ inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ std::basic_string<w
 {
     std::string val_utf8;
     cursor >> val_utf8;
-    MultiByteToWideChar(CP_UTF8, 0, val_utf8.c_str(), (int)val_utf8.length(), val);
+    MultiByteToWideChar(CP_UTF8, 0, val_utf8, val);
 }
 
 
