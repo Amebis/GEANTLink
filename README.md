@@ -10,7 +10,7 @@ Suite of EAP supplicants for Windows - IEEE 802.1X plug-ins for enterprise netwo
 - _msgfmt.exe_ from [gettext](https://www.gnu.org/software/gettext/);
   Hint: [Poedit](https://poedit.net/) contains up-to-date binary Win32 compiled gettext-utilities. Install it and add `GettextTools\bin` folder to the system path.
 - _sed.exe_ and _grep.exe_
-- _MsiDb.Exe_ and other command line utilities for MSI packaging distributed as a part of Microsoft Windows SDK (installed with Visual Studio). Add SDK's `Bin` folder to path.
+- _MsiDb.Exe_ and other command line utilities for MSI packaging distributed as a part of Microsoft Windows SDK (installed with Visual Studio). Add SDK's `Bin` folder to the system path.
 
 ### wxWidgets
 GÉANTLink is using wxWidgets v3.0.2 static libraries. Unfortunately, only dynamic libraries (DLL) variant is available as a binary download. Therefore static libraries needs to be compiled from [source](https://github.com/wxWidgets/wxWidgets).
@@ -69,7 +69,7 @@ A few seconds after desired function call has finished, _DllHost.exe_ terminates
 To debug early life of our GUI DLL, uncomment `Sleep(10000)` in `DllMain()` of the module, and set breakpoints. This should give you plenty of time to attach the debugger to _DllHost.exe_ process before our DLL starts.
 
 #### Building in command line
-Use of standard command prompt is recommended, providing that Microsoft Visual Studio 2010 folders containing _nmake.exe_ and _devenv.com_ are added to the path.
+Use of standard command prompt is recommended, providing that Microsoft Visual Studio 2010 folders containing _nmake.exe_ and _devenv.com_ are added to the system path.
 
 Use Microsoft NMAKE to build the project.
 
