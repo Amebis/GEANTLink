@@ -279,7 +279,7 @@ wxEAPCredentialLogWarningPanel::wxEAPCredentialLogWarningPanel(wxWindow* parent)
     if (lib_shell32.load(_T("imageres.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
         m_note_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(105)));
 
-    m_note_label->SetLabel(wxString::Format(_("The %s version installed on this computer logs credentials in easy to read visible way."), wxT(PRODUCT_NAME_STR)) + " " +
+    m_note_label->SetLabel(wxString::Format(_("The %s version installed on this computer logs credentials in visible and easy to read way."), wxT(PRODUCT_NAME_STR)) + " " +
         _("Please, reconsider necessity to enter your credentials."));
     m_note_label->Wrap(449);
 
