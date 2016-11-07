@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: EAPMethods\n"
-"POT-Creation-Date: 2016-11-04 14:10+0100\n"
+"POT-Creation-Date: 2016-11-07 12:40+0100\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
 "Last-Translator: Simon Rozman <simon.rozman@amebis.si>\n"
 "Language-Team: Amebis, d. o. o., Kamnik <info@amebis.si>\n"
@@ -45,7 +45,7 @@ msgstr ""
 msgid "Opens dialog with provider settings"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:229 lib/EAPBase_UI/include/EAP_UI.h:648
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:229 lib/EAPBase_UI/include/EAP_UI.h:665
 #, c-format
 msgid "%s User Credentials"
 msgstr ""
@@ -217,54 +217,63 @@ msgstr ""
 msgid "%s Credentials"
 msgstr ""
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:135
+#: lib/EAPBase_UI/src/EAP_UI.cpp:139
 #, c-format
 msgid "For additional help and instructions, please contact %s at:"
 msgstr ""
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:136
+#: lib/EAPBase_UI/src/EAP_UI.cpp:140
 msgid "your provider"
 msgstr ""
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:155
+#: lib/EAPBase_UI/src/EAP_UI.cpp:159
 msgid "Open the default web browser"
 msgstr ""
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:166
+#: lib/EAPBase_UI/src/EAP_UI.cpp:170
 msgid "Open your e-mail program"
 msgstr ""
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:177
+#: lib/EAPBase_UI/src/EAP_UI.cpp:181
 msgid "Dial the phone number"
 msgstr ""
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:199
+#: lib/EAPBase_UI/src/EAP_UI.cpp:203
 #, c-format
 msgid "%s has pre-set parts of this configuration. Those parts are locked to prevent accidental modification."
 msgstr ""
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:200
+#: lib/EAPBase_UI/src/EAP_UI.cpp:204
 msgid "Your provider"
 msgstr ""
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:221
+#: lib/EAPBase_UI/src/EAP_UI.cpp:225
 msgid "Previous attempt to connect reported invalid credentials."
 msgstr ""
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:222
+#: lib/EAPBase_UI/src/EAP_UI.cpp:226
 msgid "Previous attempt to connect reported your credentials expired."
 msgstr ""
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:223
+#: lib/EAPBase_UI/src/EAP_UI.cpp:227
 msgid "Previous attempt to connect reported your credentials are being changed."
 msgstr ""
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:224
+#: lib/EAPBase_UI/src/EAP_UI.cpp:228
 msgid "Previous attempt to connect failed."
 msgstr ""
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:225
+#: lib/EAPBase_UI/src/EAP_UI.cpp:229
 msgid "Please, make sure your credentials are correct, or try again later."
+msgstr ""
+
+#: lib/EAPBase_UI/src/EAP_UI.cpp:250
+#, c-format
+msgid "The %s version installed on this computer logs credentials in visible and easy to read way."
+msgstr ""
+
+#: lib/EAPBase_UI/src/EAP_UI.cpp:251
+msgid "Please, reconsider necessity to enter your credentials."
 msgstr ""
 
 #: lib/EapHost_UI/res/wxEapHost_UI.cpp:17
@@ -379,8 +388,8 @@ msgstr ""
 msgid "Your identity (username@domain) to override one from certificate; or blank to use one provided in certificate"
 msgstr ""
 
-#: lib/TLS_UI/src/TLS_UI.cpp:61 lib/EAPBase_UI/include/EAP_UI.h:844
-#: lib/EAPBase_UI/include/EAP_UI.h:853
+#: lib/TLS_UI/src/TLS_UI.cpp:61 lib/EAPBase_UI/include/EAP_UI.h:861
+#: lib/EAPBase_UI/include/EAP_UI.h:870
 msgid "<empty>"
 msgstr ""
 
@@ -450,13 +459,13 @@ msgid "Custom outer identity to use"
 msgstr ""
 
 #: lib/TTLS_UI/src/Module.cpp:262 lib/TTLS_UI/src/Module.cpp:318
-#: lib/EAPBase_UI/include/EAP_UI.h:767
+#: lib/EAPBase_UI/include/EAP_UI.h:784
 #, c-format
 msgid "Error writing credentials to Credential Manager: %hs (error %u)"
 msgstr ""
 
 #: lib/TTLS_UI/src/Module.cpp:264 lib/TTLS_UI/src/Module.cpp:320
-#: lib/EAPBase_UI/include/EAP_UI.h:770
+#: lib/EAPBase_UI/include/EAP_UI.h:787
 msgid "Writing credentials failed."
 msgstr ""
 
@@ -498,50 +507,50 @@ msgstr ""
 msgid "Outer Authentication"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:281
+#: lib/EAPBase_UI/include/EAP_UI.h:284
 #, c-format
 msgid "Are you sure you want to permanently remove %s provider from configuration?"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:281
+#: lib/EAPBase_UI/include/EAP_UI.h:284
 msgid "Warning"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:359 lib/EAPBase_UI/res/wxEAP_UI.h:119
+#: lib/EAPBase_UI/include/EAP_UI.h:362 lib/EAPBase_UI/res/wxEAP_UI.h:119
 msgid "EAP Credentials"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:615
+#: lib/EAPBase_UI/include/EAP_UI.h:632
 msgid "Provider Settings"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:790
+#: lib/EAPBase_UI/include/EAP_UI.h:807
 #, c-format
 msgid "Deleting credentials failed (error %u)."
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:829
+#: lib/EAPBase_UI/include/EAP_UI.h:846
 #, c-format
 msgid "<error %u>"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:833
+#: lib/EAPBase_UI/include/EAP_UI.h:850
 msgid "<error>"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:844 lib/EAPBase_UI/include/EAP_UI.h:853
+#: lib/EAPBase_UI/include/EAP_UI.h:861 lib/EAPBase_UI/include/EAP_UI.h:870
 msgid "<blank ID>"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:893
+#: lib/EAPBase_UI/include/EAP_UI.h:910
 msgid "&Remember"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:894
+#: lib/EAPBase_UI/include/EAP_UI.h:911
 msgid "Check if you would like to save credentials"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:1052
+#: lib/EAPBase_UI/include/EAP_UI.h:1069
 msgid "<Your Organization>"
 msgstr ""
 
