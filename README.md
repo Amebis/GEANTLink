@@ -8,7 +8,7 @@ Suite of EAP supplicants for Windows - IEEE 802.1X plug-ins for enterprise netwo
 - Microsoft Windows Vista or later
 - Microsoft Visual Studio 2010 SP1
 - _msgfmt.exe_ from [gettext](https://www.gnu.org/software/gettext/);
-  Hint: [Poedit](https://poedit.net/) contains up-to-date binary Win32 compiled gettext-utilities. Install it and add `GettextTools\bin` folder to path.
+  Hint: [Poedit](https://poedit.net/) contains up-to-date binary Win32 compiled gettext-utilities. Install it and add `GettextTools\bin` folder to the system path.
 - _sed.exe_ and _grep.exe_
 - _MsiDb.Exe_ and other command line utilities for MSI packaging distributed as a part of Microsoft Windows SDK (installed with Visual Studio). Add SDK's `Bin` folder to path.
 
@@ -43,6 +43,9 @@ Please note that only Release builds are configured for timestamp signing. Debug
 ### Building
 
 #### Building in Visual Studio IDE
+GÉANTLink has some submodules. When cloning Git repository, make sure to use `--recursive` Git switch to clone submodules too. Example:
+`git clone --recursive "https://github.com/Amebis/GEANTLink.git" "C:\Projects\GEANTLink"`
+
 GÉANTLink can be build and debugged opening _VS10Solution.sln_ in Visual C++ 2010 IDE.
 
 Before one can attempt to debug EAP DLLs, you should run `nmake register` from an elevated command prompt. See _Building in command line_ chapter below.
