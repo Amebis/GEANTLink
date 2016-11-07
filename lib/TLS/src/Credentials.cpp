@@ -179,7 +179,7 @@ void eap::credentials_tls::store(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int
         // Encrypt the certificate using user's key.
         DATA_BLOB cred_blob    = { m_cert->cbCertEncoded, m_cert->pbCertEncoded         };
         DATA_BLOB entropy_blob = { sizeof(s_entropy)    , const_cast<LPBYTE>(s_entropy) };
-        if (!CryptProtectData(&cred_blob, NULL, &entropy_blob, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN, &cred_enc))
+        if (!CryptProtectData(&cred_blob, NULL, &entropy_blob, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN | CRYPTPROTECT_AUDIT, &cred_enc))
             throw win_runtime_error(__FUNCTION__ " CryptProtectData failed.");
     }
 
