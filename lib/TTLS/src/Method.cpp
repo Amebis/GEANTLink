@@ -231,7 +231,7 @@ EapPeerMethodResponseAction eap::method_eapmsg::process_request_packet(
     case phase_identity: {
         // Convert identity to UTF-8.
         sanitizing_string identity_utf8;
-        WideCharToMultiByte(CP_UTF8, 0, m_identity.c_str(), -1, identity_utf8, NULL, NULL);
+        WideCharToMultiByte(CP_UTF8, 0, m_identity, identity_utf8, NULL, NULL);
 
         // Build EAP-Response/Identity packet.
         auto size_identity = identity_utf8.length(), size_packet = size_identity + sizeof(EapPacket);
@@ -413,7 +413,7 @@ void eap::method_ttls::begin_session(
         m_sc_target_name.insert(m_sc_target_name.end(), name->begin(), name->end());
 #else
         string buf;
-        WideCharToMultiByte(CP_ACP, 0, name->c_str(), -1, buf, NULL, NULL);
+        WideCharToMultiByte(CP_ACP, 0, name, buf, NULL, NULL);
         m_sc_target_name.insert(m_sc_target_name.end(), buf.begin(), buf.end());
 #endif
     }

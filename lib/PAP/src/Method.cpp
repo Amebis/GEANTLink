@@ -91,8 +91,8 @@ EapPeerMethodResponseAction eap::method_pap_diameter::process_request_packet(
 
         // Convert username and password to UTF-8.
         sanitizing_string identity_utf8, password_utf8;
-        WideCharToMultiByte(CP_UTF8, 0, m_cred.m_identity.c_str(), (int)m_cred.m_identity.length(), identity_utf8, NULL, NULL);
-        WideCharToMultiByte(CP_UTF8, 0, m_cred.m_password.c_str(), (int)m_cred.m_password.length(), password_utf8, NULL, NULL);
+        WideCharToMultiByte(CP_UTF8, 0, m_cred.m_identity, identity_utf8, NULL, NULL);
+        WideCharToMultiByte(CP_UTF8, 0, m_cred.m_password, password_utf8, NULL, NULL);
 
         // PAP passwords must be padded to 16B boundary according to RFC 5281. Will not add random extra padding here, as length obfuscation should be done by outer transport layers.
         size_t padding_password_ex = (16 - password_utf8.length()) % 16;

@@ -132,7 +132,7 @@ void eap::method_mschapv2_base::process_success(_In_ const list<string> &argv)
 
             // Calculate expected authenticator response.
             sanitizing_string identity_utf8;
-            WideCharToMultiByte(CP_UTF8, 0, m_cred.m_identity.c_str(), (int)m_cred.m_identity.length(), identity_utf8, NULL, NULL);
+            WideCharToMultiByte(CP_UTF8, 0, m_cred.m_identity, identity_utf8, NULL, NULL);
             authenticator_response resp_exp(m_cp, m_challenge_server, m_challenge_client, identity_utf8.c_str(), m_cred.m_password.c_str(), m_nt_resp);
 
             // Compare against provided authemticator response.
@@ -169,7 +169,7 @@ void eap::method_mschapv2_base::process_error(_In_ const list<string> &argv)
             bool is_last;
             dec.decode(m_challenge_server, is_last, val.data() + 2, (size_t)-1);
         } else if ((val[0] == 'M' || val[0] == 'm') && val[1] == '=') {
-            MultiByteToWideChar(CP_UTF8, 0, val.data() + 2, -1, m_cfg.m_last_msg);
+            MultiByteToWideChar(CP_UTF8, 0, val.data() + 2, (int)val.length() - 2, m_cfg.m_last_msg);
             m_module.log_event(&EAPMETHOD_METHOD_FAILURE_ERROR1, event_data((unsigned int)m_cfg.get_method_id()), event_data(m_cfg.m_last_msg), event_data::blank);
         }
     }
@@ -263,7 +263,7 @@ EapPeerMethodResponseAction eap::method_mschapv2::process_request_packet(
 
             // Calculate NT-Response.
             sanitizing_string identity_utf8;
-            WideCharToMultiByte(CP_UTF8, 0, m_cred.m_identity.c_str(), (int)m_cred.m_identity.length(), identity_utf8, NULL, NULL);
+            WideCharToMultiByte(CP_UTF8, 0, m_cred.m_identity, identity_utf8, NULL, NULL);
             m_nt_resp = nt_response(m_cp, m_challenge_server, m_challenge_client, identity_utf8.c_str(), m_cred.m_password.c_str());
 
             // Prepare CHAP response value.
@@ -373,7 +373,7 @@ EapPeerMethodResponseAction eap::method_mschapv2_diameter::process_request_packe
 
         // Calculate NT-Response.
         sanitizing_string identity_utf8;
-        WideCharToMultiByte(CP_UTF8, 0, m_cred.m_identity.c_str(), (int)m_cred.m_identity.length(), identity_utf8, NULL, NULL);
+        WideCharToMultiByte(CP_UTF8, 0, m_cred.m_identity, identity_utf8, NULL, NULL);
         m_nt_resp = nt_response(m_cp, m_challenge_server, m_challenge_client, identity_utf8.c_str(), m_cred.m_password.c_str());
 
         // Prepare MS-CHAP2-Response.

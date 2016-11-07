@@ -251,7 +251,7 @@ void eap::credentials_pass::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *p
     switch (m_enc_alg) {
     case enc_alg_kph: {
         sanitizing_string password_utf8;
-        WideCharToMultiByte(CP_UTF8, 0, m_password.c_str(), -1, password_utf8, NULL, NULL);
+        WideCharToMultiByte(CP_UTF8, 0, m_password, password_utf8, NULL, NULL);
         wstring password_enc(std::move(kph_encrypt<wchar_t, char_traits<wchar_t>, allocator<wchar_t> >(cp, password_utf8.c_str())));
         com_obj<IXMLDOMElement> pXmlElPassword;
         if (FAILED(hr = eapxml::put_element_value(pDoc, pConfigRoot, bstr(L"Password"), namespace_eapmetadata, bstr(password_enc), std::addressof(pXmlElPassword))))
@@ -308,7 +308,7 @@ void eap::credentials_pass::load(_In_ IXMLDOMNode *pConfigRoot)
     } else if (encryption && CompareStringEx(LOCALE_NAME_INVARIANT, NORM_IGNORECASE, encryption, encryption.length(), _L("KPH"), -1, NULL, NULL, 0) == CSTR_EQUAL) {
         // Decrypt password.
         sanitizing_string password_utf8(std::move(kph_decrypt<OLECHAR>(password)));
-        MultiByteToWideChar(CP_UTF8, 0, password_utf8.c_str(), -1, m_password);
+        MultiByteToWideChar(CP_UTF8, 0, password_utf8, m_password);
         m_enc_alg = enc_alg_kph;
     } else if (encryption && encryption[0]) {
         // Encryption is defined but unrecognized.
@@ -354,7 +354,7 @@ void eap::credentials_pass::store(_In_z_ LPCTSTR pszTargetName, _In_ unsigned in
 
     // Convert password to UTF-8.
     sanitizing_string cred_utf8;
-    WideCharToMultiByte(CP_UTF8, 0, m_password.c_str(), (int)m_password.length(), cred_utf8, NULL, NULL);
+    WideCharToMultiByte(CP_UTF8, 0, m_password, cred_utf8, NULL, NULL);
 
     // Encrypt the password using user's key.
     DATA_BLOB cred_blob    = { (DWORD)cred_utf8.size() , const_cast<LPBYTE>(reinterpret_cast<LPCBYTE>(cred_utf8.data())) };
