@@ -360,7 +360,7 @@ void eap::credentials_pass::store(_In_z_ LPCTSTR pszTargetName, _In_ unsigned in
     DATA_BLOB cred_blob    = { (DWORD)cred_utf8.size() , const_cast<LPBYTE>(reinterpret_cast<LPCBYTE>(cred_utf8.data())) };
     DATA_BLOB entropy_blob = {        sizeof(s_entropy), const_cast<LPBYTE>(                          s_entropy        ) };
     data_blob cred_enc;
-    if (!CryptProtectData(&cred_blob, NULL, &entropy_blob, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN, &cred_enc))
+    if (!CryptProtectData(&cred_blob, NULL, &entropy_blob, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN | CRYPTPROTECT_AUDIT, &cred_enc))
         throw win_runtime_error(__FUNCTION__ " CryptProtectData failed.");
 
     tstring target(target_name(pszTargetName, level));

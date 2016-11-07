@@ -153,7 +153,7 @@ void eap::credentials_eaphost::store(_In_z_ LPCTSTR pszTargetName, _In_ unsigned
         // Encrypt credentials BLOB using user's key.
         DATA_BLOB cred_blob    = { (DWORD)m_cred_blob.size(), const_cast<LPBYTE>(m_cred_blob.data()) };
         DATA_BLOB entropy_blob = {        sizeof(s_entropy) , const_cast<LPBYTE>(s_entropy)          };
-        if (!CryptProtectData(&cred_blob, NULL, &entropy_blob, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN, &cred_enc))
+        if (!CryptProtectData(&cred_blob, NULL, &entropy_blob, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN | CRYPTPROTECT_AUDIT, &cred_enc))
             throw win_runtime_error(__FUNCTION__ " CryptProtectData failed.");
     }
 
