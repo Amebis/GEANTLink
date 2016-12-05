@@ -233,7 +233,7 @@ void eap::peer_ttls::end_session(_In_ EAP_SESSION_HANDLE hSession)
 
     // End the session.
     session *s = static_cast<session*>(hSession);
-    //s->end(ppEapError);
+    s->m_method->end_session();
     delete s;
 }
 
