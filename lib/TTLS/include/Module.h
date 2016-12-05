@@ -155,6 +155,13 @@ namespace eap
 
         /// @}
 
+        ///
+        /// Spawns a new certificate revocation check thread
+        ///
+        /// \param[inout] cert  Certificate context to check for revocation. `hCertStore` member should contain all certificates in chain up to and including root CA to test them for revocation too.
+        ///
+        void spawn_crl_check(_Inout_ winstd::cert_context &&cert);
+
     protected:
         ///
         /// Checks all configured providers and tries to combine credentials.
@@ -195,6 +202,53 @@ namespace eap
             BYTE *m_blob_cred;                  ///< Credentials BLOB
 #endif
         };
+
+        ///
+        ///< Post-festum server certificate revocation verify thread
+        ///
+        class crl_checker {
+        public:
+            ///
+            /// Constructs a thread
+            ///
+            /// \param[in   ] mod   EAP module to use for global services
+            /// \param[inout] cert  Certificate context to check for revocation. `hCertStore` member should contain all certificates in chain up to and including root CA to test them for revocation too.
+            ///
+            crl_checker(_In_ module &mod, _Inout_ winstd::cert_context &&cert);
+
+            ///
+            /// Moves a thread
+            ///
+            /// \param[in] other  Thread to move from
+            ///
+            crl_checker(_Inout_ crl_checker &&other);
+
+            ///
+            /// Moves a thread
+            ///
+            /// \param[in] other  Thread to move from
+            ///
+            /// \returns Reference to this object
+            ///
+            crl_checker& operator=(_Inout_ crl_checker &&other);
+
+            ///
+            /// Verifies server's certificate if it has been revoked
+            ///
+            /// \param[in] obj  Pointer to the instance of this object
+            ///
+            /// \returns Thread exit code
+            ///
+            static DWORD WINAPI verify(_In_ crl_checker *obj);
+
+        public:
+            module &m_module;               ///< Module
+            winstd::win_handle m_thread;    ///< Thread
+            winstd::win_handle m_abort;     ///< Thread abort event
+            winstd::cert_context m_cert;    ///< Server certificate
+        };
+
+        std::list<crl_checker> m_crl_checkers;  ///< List of certificate revocation check threads
     };
 
     /// @}

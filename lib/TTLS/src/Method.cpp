@@ -355,6 +355,7 @@ eap::method_ttls::method_ttls(_Inout_ method_ttls &&other) :
     m_sc_cred         (std::move(other.m_sc_cred         )),
     m_sc_queue        (std::move(other.m_sc_queue        )),
     m_sc_ctx          (std::move(other.m_sc_ctx          )),
+    m_sc_cert         (std::move(other.m_sc_cert         )),
     m_phase           (std::move(other.m_phase           )),
     m_packet_res      (std::move(other.m_packet_res      )),
     m_packet_res_inner(std::move(other.m_packet_res_inner)),
@@ -375,6 +376,7 @@ eap::method_ttls& eap::method_ttls::operator=(_Inout_ method_ttls &&other)
         m_sc_cred             = std::move(other.m_sc_cred         );
         m_sc_queue            = std::move(other.m_sc_queue        );
         m_sc_ctx              = std::move(other.m_sc_ctx          );
+        m_sc_cert             = std::move(other.m_sc_cert         );
         m_phase               = std::move(other.m_phase           );
         m_packet_res          = std::move(other.m_packet_res      );
         m_packet_res_inner    = std::move(other.m_packet_res_inner);
@@ -549,10 +551,45 @@ EapPeerMethodResponseAction eap::method_ttls::process_request_packet(
             &buf_in_desc,
             &buf_out_desc);
 
+        if (status == SEC_E_OK) {
+            // Get server certificate.
+            SECURITY_STATUS status = QueryContextAttributes(m_sc_ctx, SECPKG_ATTR_REMOTE_CERT_CONTEXT, (PVOID)&m_sc_cert);
+            if (FAILED(status))
+                throw sec_runtime_error(status, __FUNCTION__ " Error retrieving server certificate from Schannel.");
+
+            // Add all trusted root CAs to server certificate's store. This allows CertGetIssuerCertificateFromStore() in the following CRL check to test the root CA for revocation too.
+            // verify_server_trust(), ignores all self-signed certificates from the server certificate's store, and rebuilds its own trusted root store, so we are safe to do this.
+            for (auto c = m_cfg.m_trusted_root_ca.cbegin(), c_end = m_cfg.m_trusted_root_ca.cend(); c != c_end; ++c)
+                CertAddCertificateContextToStore(m_sc_cert->hCertStore, *c, CERT_STORE_ADD_REPLACE_EXISTING, NULL);
+
+            // Verify cached CRL (entire chain).
+            reg_key key;
+            if (key.open(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\") _T(VENDOR_NAME_STR) _T("\\") _T(PRODUCT_NAME_STR) _T("\\TLSCRL"), 0, KEY_READ)) {
+                wstring hash_unicode;
+                vector<unsigned char> hash, subj;
+                for (cert_context c(m_sc_cert); c;) {
+                    if (CertGetCertificateContextProperty(c, CERT_HASH_PROP_ID, hash)) {
+                        hash_unicode.clear();
+                        hex_enc enc;
+                        enc.encode(hash_unicode, hash.data(), hash.size());
+                        if (RegQueryValueExW(key, hash_unicode.c_str(), NULL, NULL, subj) == ERROR_SUCCESS) {
+                            // A certificate in the chain is found to be revoked as compromised.
+                            m_cfg.m_last_status = config_method::status_server_compromised;
+                            throw com_runtime_error(CRYPT_E_REVOKED, __FUNCTION__ " Server certificate or one of its issuer's certificate has been found revoked as compromised. Your credentials were probably sent to this server during previous connection attempts, thus changing your credentials (in a safe manner) is strongly advised. Please, contact your helpdesk immediately.");
+                        }
+                    }
+
+                    DWORD flags = 0;
+                    c = CertGetIssuerCertificateFromStore(m_sc_cert->hCertStore, c, NULL, &flags);
+                    if (!c) break;
+                }
+            }
+
 #if EAP_TLS < EAP_TLS_SCHANNEL_FULL
-        if (status == SEC_E_OK)
+            // Verify server certificate chain.
             verify_server_trust();
 #endif
+        }
 
         if (status == SEC_E_OK || status == SEC_I_CONTINUE_NEEDED) {
             // Send Schannel's token.
@@ -830,6 +867,9 @@ void eap::method_ttls::get_result(
         pResult->pAttribArray = &m_eap_attr_desc;
 
         m_cfg.m_last_status = config_method::status_success;
+
+        // Spawn certificate revocation verify thread.
+        dynamic_cast<peer_ttls&>(m_module).spawn_crl_check(std::move(m_sc_cert));
     }
 
     // Always ask EAP host to save the connection data. And it will save it *only* when we report "success".
@@ -843,14 +883,9 @@ void eap::method_ttls::get_result(
 
 void eap::method_ttls::verify_server_trust() const
 {
-    cert_context cert;
-    SECURITY_STATUS status = QueryContextAttributes(m_sc_ctx, SECPKG_ATTR_REMOTE_CERT_CONTEXT, (PVOID)&cert);
-    if (FAILED(status))
-        throw sec_runtime_error(status, __FUNCTION__ " Error retrieving server certificate from Schannel.");
-
     for (auto c = m_cfg.m_trusted_root_ca.cbegin(), c_end = m_cfg.m_trusted_root_ca.cend(); c != c_end; ++c) {
-        if (cert->cbCertEncoded == (*c)->cbCertEncoded &&
-            memcmp(cert->pbCertEncoded, (*c)->pbCertEncoded, cert->cbCertEncoded) == 0)
+        if (m_sc_cert->cbCertEncoded == (*c)->cbCertEncoded &&
+            memcmp(m_sc_cert->pbCertEncoded, (*c)->pbCertEncoded, m_sc_cert->cbCertEncoded) == 0)
         {
             // Server certificate found directly on the trusted root CA list.
             m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_TRUSTED_EX1, event_data((unsigned int)eap_type_ttls), event_data::blank);
@@ -865,27 +900,27 @@ void eap::method_ttls::verify_server_trust() const
             found   = false;
 
         // Search subjectAltName2 and subjectAltName.
-        for (DWORD idx_ext = 0; !found && idx_ext < cert->pCertInfo->cExtension; idx_ext++) {
+        for (DWORD idx_ext = 0; !found && idx_ext < m_sc_cert->pCertInfo->cExtension; idx_ext++) {
             unique_ptr<CERT_ALT_NAME_INFO, LocalFree_delete<CERT_ALT_NAME_INFO> > san_info;
-            if (strcmp(cert->pCertInfo->rgExtension[idx_ext].pszObjId, szOID_SUBJECT_ALT_NAME2) == 0) {
+            if (strcmp(m_sc_cert->pCertInfo->rgExtension[idx_ext].pszObjId, szOID_SUBJECT_ALT_NAME2) == 0) {
                 unsigned char *output = NULL;
                 DWORD size_output;
                 if (!CryptDecodeObjectEx(
                         X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
                         szOID_SUBJECT_ALT_NAME2,
-                        cert->pCertInfo->rgExtension[idx_ext].Value.pbData, cert->pCertInfo->rgExtension[idx_ext].Value.cbData,
+                        m_sc_cert->pCertInfo->rgExtension[idx_ext].Value.pbData, m_sc_cert->pCertInfo->rgExtension[idx_ext].Value.cbData,
                         CRYPT_DECODE_ALLOC_FLAG | CRYPT_DECODE_ENABLE_PUNYCODE_FLAG,
                         NULL,
                         &output, &size_output))
                     throw win_runtime_error(__FUNCTION__ " Error decoding subjectAltName2 certificate extension.");
                 san_info.reset((CERT_ALT_NAME_INFO*)output);
-            } else if (strcmp(cert->pCertInfo->rgExtension[idx_ext].pszObjId, szOID_SUBJECT_ALT_NAME) == 0) {
+            } else if (strcmp(m_sc_cert->pCertInfo->rgExtension[idx_ext].pszObjId, szOID_SUBJECT_ALT_NAME) == 0) {
                 unsigned char *output = NULL;
                 DWORD size_output;
                 if (!CryptDecodeObjectEx(
                         X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
                         szOID_SUBJECT_ALT_NAME,
-                        cert->pCertInfo->rgExtension[idx_ext].Value.pbData, cert->pCertInfo->rgExtension[idx_ext].Value.cbData,
+                        m_sc_cert->pCertInfo->rgExtension[idx_ext].Value.pbData, m_sc_cert->pCertInfo->rgExtension[idx_ext].Value.cbData,
                         CRYPT_DECODE_ALLOC_FLAG | CRYPT_DECODE_ENABLE_PUNYCODE_FLAG,
                         NULL,
                         &output, &size_output))
@@ -912,7 +947,7 @@ void eap::method_ttls::verify_server_trust() const
         if (!has_san) {
             // Certificate has no subjectAltName. Compare against Common Name.
             wstring subj;
-            if (!CertGetNameStringW(cert, CERT_NAME_DNS_TYPE, CERT_NAME_STR_ENABLE_PUNYCODE_FLAG, NULL, subj))
+            if (!CertGetNameStringW(m_sc_cert, CERT_NAME_DNS_TYPE, CERT_NAME_STR_ENABLE_PUNYCODE_FLAG, NULL, subj))
                 throw win_runtime_error(__FUNCTION__ " Error retrieving server's certificate subject name.");
 
             for (auto s = m_cfg.m_server_names.cbegin(), s_end = m_cfg.m_server_names.cend(); !found && s != s_end; ++s) {
@@ -927,8 +962,8 @@ void eap::method_ttls::verify_server_trust() const
             throw sec_runtime_error(SEC_E_WRONG_PRINCIPAL, __FUNCTION__ " Name provided in server certificate is not on the list of trusted server names.");
     }
 
-    if (cert->pCertInfo->Issuer.cbData == cert->pCertInfo->Subject.cbData &&
-        memcmp(cert->pCertInfo->Issuer.pbData, cert->pCertInfo->Subject.pbData, cert->pCertInfo->Issuer.cbData) == 0)
+    if (m_sc_cert->pCertInfo->Issuer.cbData == m_sc_cert->pCertInfo->Subject.cbData &&
+        memcmp(m_sc_cert->pCertInfo->Issuer.pbData, m_sc_cert->pCertInfo->Subject.pbData, m_sc_cert->pCertInfo->Issuer.cbData) == 0)
         throw sec_runtime_error(SEC_E_CERT_UNKNOWN, __FUNCTION__ " Server is using a self-signed certificate. Cannot trust it.");
 
     // Create temporary certificate store of our trusted root CAs.
@@ -939,9 +974,9 @@ void eap::method_ttls::verify_server_trust() const
         CertAddCertificateContextToStore(store, *c, CERT_STORE_ADD_REPLACE_EXISTING, NULL);
 
     // Add all intermediate certificates from the server's certificate chain.
-    for (cert_context c(cert); c;) {
+    for (cert_context c(m_sc_cert); c;) {
         DWORD flags = 0;
-        c.attach(CertGetIssuerCertificateFromStore(cert->hCertStore, c, NULL, &flags));
+        c.attach(CertGetIssuerCertificateFromStore(m_sc_cert->hCertStore, c, NULL, &flags));
         if (!c) break;
 
         if (c->pCertInfo->Issuer.cbData == c->pCertInfo->Subject.cbData &&
@@ -971,7 +1006,7 @@ void eap::method_ttls::verify_server_trust() const
 #endif
     };
     cert_chain_context context;
-    if (!context.create(NULL, cert, NULL, store, &chain_params, 0))
+    if (!context.create(NULL, m_sc_cert, NULL, store, &chain_params, 0))
         throw win_runtime_error(__FUNCTION__ " Error creating certificate chain context.");
 
     // Check chain validation error flags. Ignore CERT_TRUST_IS_UNTRUSTED_ROOT flag since we check root CA explicitly.

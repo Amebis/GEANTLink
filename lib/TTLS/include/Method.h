@@ -225,14 +225,14 @@ namespace eap
         method_ttls(_In_ module &mod, _In_ config_method_ttls &cfg, _In_ credentials_ttls &cred, _In_ method *inner);
 
         ///
-        /// Moves an TTLS method
+        /// Moves a TTLS method
         ///
         /// \param[in] other  TTLS method to move from
         ///
         method_ttls(_Inout_ method_ttls &&other);
 
         ///
-        /// Moves an TTLS method
+        /// Moves a TTLS method
         ///
         /// \param[in] other  TTLS method to move from
         ///
@@ -271,7 +271,7 @@ namespace eap
     protected:
 #if EAP_TLS < EAP_TLS_SCHANNEL_FULL
         ///
-        /// Verifies server's certificate if trusted by configuration
+        /// Verifies server certificate if trusted by configuration
         ///
         void verify_server_trust() const;
 #endif
@@ -284,6 +284,7 @@ namespace eap
         winstd::sec_credentials m_sc_cred;          ///< Schannel client credentials
         std::vector<unsigned char> m_sc_queue;      ///< TLS data queue
         winstd::sec_context m_sc_ctx;               ///< Schannel context
+        winstd::cert_context m_sc_cert;             ///< Server certificate
 
         ///
         /// Communication phase
