@@ -214,6 +214,7 @@ namespace eap
             status_account_disabled,                        ///< Account is disabled
             status_account_logon_hours,                     ///< Restricted account logon hours
             status_account_denied,                          ///< Account access is denied
+            status_server_compromised,                      ///< Authentication server might have been compromised (CRL)
 
             // Meta statuses
             status_cred_begin = status_cred_invalid,        ///< First credential related problem
