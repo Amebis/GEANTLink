@@ -76,8 +76,8 @@ msgstr ""
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:244
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:244
-msgid "Use credentials from Credential &Manager:"
-msgstr "Usa credenciales del &Administrador de Credenciales:"
+msgid "Use credentials from Credential &Manager"
+msgstr "Usa credenciales del &Administrador de Credenciales"
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:245
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:245
@@ -125,8 +125,8 @@ msgstr "Haga clic aquí para establecer o modificar sus credenciales"
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:276
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:276
-msgid "Use credentials from &profile configuration:"
-msgstr "Usa las credenciales de la configuración del &perfil:"
+msgid "Use credentials from &profile configuration"
+msgstr "Usa las credenciales de la configuración del &perfil"
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:277
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:277

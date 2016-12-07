@@ -75,8 +75,8 @@ msgstr "Izberite vir, kjer so shranjene vaše poverilnice za povezovanje."
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:244
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:244
-msgid "Use credentials from Credential &Manager:"
-msgstr "Uporabi poverilnice iz &Upravitelja poverilnic:"
+msgid "Use credentials from Credential &Manager"
+msgstr "Uporabi poverilnice iz &Upravitelja poverilnic"
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:245
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:245
@@ -122,8 +122,8 @@ msgstr "Kliknite tukaj, da nastavite ali spremenite svoje poverilnice"
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:276
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:276
-msgid "Use credentials from &profile configuration:"
-msgstr "Uporabi poverilnice iz nastavitev &profila:"
+msgid "Use credentials from &profile configuration"
+msgstr "Uporabi poverilnice iz nastavitev &profila"
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:277
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:277

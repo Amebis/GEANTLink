@@ -75,7 +75,7 @@ msgstr "Wählen sie die Datei in der ihre Anmeldedateien gespeichert sind"
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:244
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:244
-msgid "Use credentials from Credential &Manager:"
+msgid "Use credentials from Credential &Manager"
 msgstr "Benutze die Daten aus dem Schlüsselbund"
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:245
@@ -123,7 +123,7 @@ msgstr "Klicken Sie hier um Ihre Anmeldedaten einzugeben oder zu ändern"
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:276
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:276
-msgid "Use credentials from &profile configuration:"
+msgid "Use credentials from &profile configuration"
 msgstr "Verwende die Anmeldedaten aus der &Profilkonfiguration"
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:277

@@ -75,8 +75,8 @@ msgstr "Velg kilden for din påloggingsinformasjon"
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:244
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:244
-msgid "Use credentials from Credential &Manager:"
-msgstr "Bruk brukerdetaljer fra Credential &Manager:"
+msgid "Use credentials from Credential &Manager"
+msgstr "Bruk brukerdetaljer fra Credential &Manager"
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:245
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:245
@@ -122,8 +122,8 @@ msgstr "Klikk her for å sette eller endre påloggingsinformasjon"
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:276
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:276
-msgid "Use credentials from &profile configuration:"
-msgstr "Bruk brukerinformasjon fra &profil konfigurasjon:"
+msgid "Use credentials from &profile configuration"
+msgstr "Bruk brukerinformasjon fra &profil konfigurasjon"
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:277
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:277
