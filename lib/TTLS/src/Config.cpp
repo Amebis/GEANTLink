@@ -271,7 +271,7 @@ eap::config_method* eap::config_method_ttls::make_config_method(_In_ winstd::eap
 #ifdef EAP_INNER_EAPHOST
     default                      : return new config_method_eaphost    (m_module, m_level + 1); // EapHost peer method handles all other method types
 #endif
-    default                      : throw invalid_argument(__FUNCTION__ " Unsupported inner authentication method.");
+    default                      : throw invalid_argument(string_printf(__FUNCTION__ " Unsupported inner authentication method (%d).", eap_type));
     }
 }
 
@@ -284,7 +284,7 @@ eap::config_method* eap::config_method_ttls::make_config_method(_In_ const wchar
 #ifdef EAP_INNER_EAPHOST
     else if (_wcsicmp(eap_type, L"EapHost"     ) == 0) return new config_method_eaphost    (m_module, m_level + 1);
 #endif
-    else                                               throw invalid_argument(__FUNCTION__ " Unsupported inner authentication method.");
+    else                                               throw invalid_argument(string_printf(__FUNCTION__ " Unsupported inner authentication method (%ls).", eap_type));
 }
 
 
