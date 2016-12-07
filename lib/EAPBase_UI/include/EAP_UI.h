@@ -740,7 +740,7 @@ protected:
         m_timer_storage.Stop();
 
         if (CredDelete(m_cred_storage.target_name(m_prov.get_id().c_str(), m_cfg.m_level).c_str(), CRED_TYPE_GENERIC, 0)) {
-            m_storage_identity->Clear();
+            m_storage_identity->SetLabel(wxEmptyString);
             m_cred_storage.clear();
             m_has_storage = false;
         } else
@@ -781,15 +781,15 @@ protected:
             UpdateStorageIdentity();
         } catch (winstd::win_runtime_error &err) {
             if (err.number() == ERROR_NOT_FOUND) {
-                m_storage_identity->Clear();
+                m_storage_identity->SetLabel(wxEmptyString);
                 m_cred_storage.clear();
                 m_has_storage = false;
             } else {
-                m_storage_identity->SetValue(wxString::Format(_("<error %u>"), err.number()));
+                m_storage_identity->SetLabel(wxString::Format(_("<error %u>"), err.number()));
                 m_has_storage = true;
             }
         } catch (...) {
-            m_storage_identity->SetValue(_("<error>"));
+            m_storage_identity->SetLabel(_("<error>"));
             m_has_storage = true;
         }
     }
@@ -798,7 +798,7 @@ protected:
     inline void UpdateStorageIdentity()
     {
         wxString identity(m_cred_storage.get_identity());
-        m_storage_identity->SetValue(
+        m_storage_identity->SetLabel(
             !identity.empty() ? identity :
             m_cred_storage.empty() ? _("<empty>") : _("<blank ID>"));
     }
@@ -807,7 +807,7 @@ protected:
     inline void UpdateConfigIdentity()
     {
         wxString identity(m_cred_config.get_identity());
-        m_config_identity->SetValue(
+        m_config_identity->SetLabel(
             !identity.empty() ? identity :
             m_cred_config.empty() ? _("<empty>") : _("<blank ID>"));
     }

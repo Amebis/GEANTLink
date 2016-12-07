@@ -31,9 +31,9 @@ class wxEAPBannerPanel;
 #include <wx/icon.h>
 #include <wx/statbmp.h>
 #include <wx/radiobut.h>
-#include <wx/textctrl.h>
 #include <wx/statbox.h>
 #include <wx/timer.h>
+#include <wx/textctrl.h>
 #include <wx/choice.h>
 #include <wx/checkbox.h>
 
@@ -169,11 +169,13 @@ class wxEAPCredentialsConfigPanelBase : public wxPanel
 		wxStaticBitmap* m_credentials_icon;
 		wxStaticText* m_credentials_label;
 		wxRadioButton* m_storage;
-		wxTextCtrl* m_storage_identity;
+		wxStaticText* m_storage_identity_label;
+		wxStaticText* m_storage_identity;
 		wxButton* m_storage_clear;
 		wxButton* m_storage_set;
 		wxRadioButton* m_config;
-		wxTextCtrl* m_config_identity;
+		wxStaticText* m_config_identity_label;
+		wxStaticText* m_config_identity;
 		wxButton* m_config_set;
 		wxTimer m_timer_storage;
 		
