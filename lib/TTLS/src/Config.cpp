@@ -269,7 +269,7 @@ eap::config_method_with_cred* eap::config_method_ttls::make_config_method(_In_ w
     case eap_type_ttls           : return new config_method_ttls    (m_module, m_level + 1);
     case eap_type_legacy_pap     : return new config_method_pap     (m_module, m_level + 1);
     case eap_type_legacy_mschapv2: return new config_method_mschapv2(m_module, m_level + 1);
-    default                      : throw invalid_argument(__FUNCTION__ " Unsupported inner authentication method.");
+    default                      : throw invalid_argument(string_printf(__FUNCTION__ " Unsupported inner authentication method (%d).", eap_type));
     }
 }
 
@@ -280,7 +280,7 @@ eap::config_method_with_cred* eap::config_method_ttls::make_config_method(_In_ c
     else if (_wcsicmp(eap_type, L"EAP-TTLS") == 0) return new config_method_ttls    (m_module, m_level + 1);
     else if (_wcsicmp(eap_type, L"PAP"     ) == 0) return new config_method_pap     (m_module, m_level + 1);
     else if (_wcsicmp(eap_type, L"MSCHAPv2") == 0) return new config_method_mschapv2(m_module, m_level + 1);
-    else                                           throw invalid_argument(__FUNCTION__ " Unsupported inner authentication method.");
+    else                                           throw invalid_argument(string_printf(__FUNCTION__ " Unsupported inner authentication method (%ls).", eap_type));
 }
 
 
