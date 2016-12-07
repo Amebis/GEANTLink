@@ -259,6 +259,7 @@ wxEAPCredentialsConfigPanelBase::wxEAPCredentialsConfigPanelBase( wxWindow* pare
 	m_storage_identity = new wxStaticText( m_sb_credentials->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	m_storage_identity->Wrap( -1 );
 	m_storage_identity->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
+	m_storage_identity->SetToolTip( _("Your present credentials stored in Windows Credential Manager") );
 	
 	sb_storage_identity->Add( m_storage_identity, 1, wxEXPAND|wxLEFT, 5 );
 	
@@ -302,6 +303,7 @@ wxEAPCredentialsConfigPanelBase::wxEAPCredentialsConfigPanelBase( wxWindow* pare
 	m_config_identity = new wxStaticText( m_sb_credentials->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	m_config_identity->Wrap( -1 );
 	m_config_identity->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
+	m_config_identity->SetToolTip( _("Profile configuration credentials") );
 	
 	sb_config_identity->Add( m_config_identity, 1, wxEXPAND|wxLEFT, 5 );
 	
