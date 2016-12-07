@@ -3,7 +3,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: EAPMethods\n"
-"POT-Creation-Date: 2016-11-08 11:55+0100\n"
+"POT-Creation-Date: 2016-12-07 13:55+0100\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
 "Last-Translator: Simon Rozman <simon@rozman.si>, 2016\n"
 "Language-Team: Vietnamese (https://www.transifex.com/eduroam_devel/teams/11799/vi/)\n"
@@ -75,7 +75,7 @@ msgstr ""
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:244
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:244
-msgid "Use credentials from Credential &Manager:"
+msgid "Use credentials from Credential &Manager"
 msgstr ""
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:245
@@ -85,205 +85,212 @@ msgid ""
 "Credential Manager"
 msgstr ""
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:253
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:253
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:255
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:299
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:255
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:299
+msgid "Identity:"
+msgstr ""
+
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:262
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:262
 msgid "Your present credentials stored in Windows Credential Manager"
 msgstr ""
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:260
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:260
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:272
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:272
 msgid "&Clear Credentials"
 msgstr ""
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:261
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:261
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:273
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:273
 msgid ""
 "Click to clear your credentials from Credential Manager.\n"
 "Note: You will be prompted to enter credentials when connecting."
 msgstr ""
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:265
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:292
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:265
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:292
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:277
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:316
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:277
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:316
 msgid "&Set Credentials..."
 msgstr ""
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:266
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:293
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:266
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:293
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:278
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:317
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:278
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:317
 msgid "Click here to set or modify your credentials"
 msgstr ""
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:276
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:276
-msgid "Use credentials from &profile configuration:"
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:288
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:288
+msgid "Use credentials from &profile configuration"
 msgstr ""
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:277
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:277
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:289
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:289
 msgid ""
 "Select this option if you would like to store credentials as a part of  "
 "profile configuration"
 msgstr ""
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:285
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:285
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:306
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:306
 msgid "Profile configuration credentials"
 msgstr ""
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:335
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:335
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:359
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:359
 msgid "User ID and Password"
-msgstr ""
-
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:345
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:345
-msgid "Please provide your user ID and password."
-msgstr ""
-
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:355
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:355
-msgid "User ID:"
-msgstr ""
-
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:360
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:360
-msgid "Enter your user name here (user@domain.org, DOMAIN\\User, etc.)"
-msgstr ""
-
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:364
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:364
-msgid "Password:"
 msgstr ""
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:369
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:369
+msgid "Please provide your user ID and password."
+msgstr ""
+
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:379
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:379
+msgid "User ID:"
+msgstr ""
+
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:384
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:384
+msgid "Enter your user name here (user@domain.org, DOMAIN\\User, etc.)"
+msgstr ""
+
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:388
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:388
+msgid "Password:"
+msgstr ""
+
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:393
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:393
 msgid "Enter your password here"
 msgstr ""
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:400
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:400
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:424
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:424
 msgid "Your Organization"
 msgstr ""
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:411
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:411
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:435
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:435
 msgid ""
 "Describe your organization to customize user prompts.  When organization is "
 "introduced, end-users find program messages easier to understand and act."
 msgstr ""
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:418
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:418
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:442
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:442
 msgid "Your organization &name:"
-msgstr ""
-
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:423
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:423
-msgid ""
-"Your organization name as it will appear on helpdesk contact notifications"
-msgstr ""
-
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:427
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:427
-msgid "(Keep it short, please)"
-msgstr ""
-
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:437
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:437
-msgid "Helpdesk contact &information:"
 msgstr ""
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:447
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:447
+msgid ""
+"Your organization name as it will appear on helpdesk contact notifications"
+msgstr ""
+
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:451
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:451
+msgid "(Keep it short, please)"
+msgstr ""
+
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:461
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:461
+msgid "Helpdesk contact &information:"
+msgstr ""
+
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:471
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:471
 msgid "¶"
 msgstr "¶"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:454
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:454
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:478
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:478
 msgid "Your helpdesk website address"
 msgstr ""
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:458
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:458
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:482
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:482
 msgid "*"
 msgstr "*"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:465
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:465
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:489
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:489
 msgid "Your helpdesk e-mail address"
 msgstr ""
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:469
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:469
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:493
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:493
 msgid ")"
 msgstr ")"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:476
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:476
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:500
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:500
 msgid "Your helpdesk phone number"
 msgstr ""
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:504
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:504
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:528
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:528
 msgid "Provider Unique Identifier"
 msgstr ""
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:515
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:515
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:539
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:539
 msgid ""
 "Assign your organization a unique ID to allow sharing the same credential "
 "set across different network profiles."
 msgstr ""
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:522
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:522
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:546
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:546
 msgid "&Namespace:"
 msgstr ""
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:526
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:526
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:550
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:550
 msgid "urn:RFC4282:realm"
 msgstr "urn:RFC4282:realm"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:526
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:526
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:550
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:550
 msgid "urn:uuid"
 msgstr "urn:uuid"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:538
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:538
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:562
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:562
 msgid "Provider unique &identifier:"
 msgstr ""
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:543
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:543
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:567
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:567
 msgid "Your organization ID to assign same credentials from other profiles"
 msgstr ""
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:568
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:568
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:592
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:592
 msgid "Configuration Lock"
 msgstr ""
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:579
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:579
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:603
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:603
 msgid ""
 "Your configuration can be locked to prevent accidental modification by end-"
 "users. Users will only be allowed to enter credentials."
 msgstr ""
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:586
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:586
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:610
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:610
 msgid ""
 "&Lock this configuration and prevent any further modification via user "
 "interface."
 msgstr ""
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:589
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:589
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:613
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:613
 msgid "(Warning: Once locked, you can not revert using this dialog!)"
 msgstr ""
 
@@ -710,7 +717,7 @@ msgstr ""
 msgid "EAP Connection Configuration"
 msgstr ""
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.h:312
+#: master/lib/EAPBase_UI/res/wxEAP_UI.h:314
 msgid "EAP Identity Provider"
 msgstr ""
 
