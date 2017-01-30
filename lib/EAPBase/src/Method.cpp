@@ -204,6 +204,8 @@ void eap::method_tunnel::get_ui_context(
     _Out_ DWORD *pdwUIContextDataSize)
 {
     assert(m_inner);
+
+    // Default implementation forwards UI context handling to the inner method.
     m_inner->get_ui_context(ppUIContextData, pdwUIContextDataSize);
 }
 
@@ -213,6 +215,8 @@ EapPeerMethodResponseAction eap::method_tunnel::set_ui_context(
     _In_                                  DWORD dwUIContextDataSize)
 {
     assert(m_inner);
+
+    // Default implementation forwards UI context handling to the inner method.
     return m_inner->set_ui_context(pUIContextData, dwUIContextDataSize);
 }
 
