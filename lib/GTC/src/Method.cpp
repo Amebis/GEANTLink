@@ -36,9 +36,10 @@ eap::method_gtc::method_gtc(_In_ module &mod, _In_ config_method_eapgtc &cfg) :
 
 
 eap::method_gtc::method_gtc(_Inout_ method_gtc &&other) :
-    m_cfg       (          other.m_cfg        ),
-    m_packet_res(std::move(other.m_packet_res)),
-    method      (std::move(other             ))
+    m_cfg    (          other.m_cfg    ),
+    m_message(std::move(other.m_message)),
+    m_reply  (std::move(other.m_reply  )),
+    method   (std::move(other          ))
 {
 }
 
@@ -46,9 +47,10 @@ eap::method_gtc::method_gtc(_Inout_ method_gtc &&other) :
 eap::method_gtc& eap::method_gtc::operator=(_Inout_ method_gtc &&other)
 {
     if (this != std::addressof(other)) {
-        assert(std::addressof(m_cfg ) == std::addressof(other.m_cfg )); // Move method within same configuration only!
-        (method&)*this = std::move(other             );
-        m_packet_res   = std::move(other.m_packet_res);
+        assert(std::addressof(m_cfg) == std::addressof(other.m_cfg)); // Move method within same configuration only!
+        (method&)*this = std::move(other          );
+        m_message      = std::move(other.m_message);
+        m_reply        = std::move(other.m_reply  );
     }
 
     return *this;
@@ -76,88 +78,11 @@ EapPeerMethodResponseAction eap::method_gtc::process_request_packet(
 {
     assert(pReceivedPacket || dwReceivedPacketSize == 0);
 
-    //for (const unsigned char *pck = reinterpret_cast<const unsigned char*>(pReceivedPacket), *pck_end = pck + dwReceivedPacketSize; pck < pck_end; ) {
-    //    if (pck + sizeof(chap_header) > pck_end)
-    //        throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Incomplete CHAP header.");
-    //    auto hdr = reinterpret_cast<const chap_header*>(pck);
-    //    unsigned short length = ntohs(*reinterpret_cast<const unsigned short*>(hdr->length));
-    //    const unsigned char
-    //        *msg     = reinterpret_cast<const unsigned char*>(hdr + 1),
-    //        *msg_end = pck + length;
-    //    if (msg_end > pck_end)
-    //        throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Incomplete CHAP data.");
+    // Read authenticator message as UTF-8 encoded string.
+    MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)pReceivedPacket, dwReceivedPacketSize, m_message);
 
-    //    // Save packet ident.
-    //    m_ident = hdr->ident;
-
-    //    switch (hdr->code) {
-    //    case chap_packet_code_challenge: {
-    //        m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_gtc), event_data::blank);
-
-    //        if (msg + 1 > msg_end)
-    //            throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Incomplete CHAP challenge packet.");
-
-    //        // Read server challenge.
-    //        if (msg + 1 + msg[0] > msg_end)
-    //            throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Incomplete CHAP server challenge.");
-    //        m_challenge_server.assign(msg + 1, msg + 1 + msg[0]);
-
-    //        // Randomize Peer-Challenge.
-    //        m_challenge_client.randomize(m_cp);
-
-    //        // Calculate NT-Response.
-    //        sanitizing_string identity_utf8;
-    //        WideCharToMultiByte(CP_UTF8, 0, m_cred.m_identity, identity_utf8, NULL, NULL);
-    //        m_nt_resp = nt_response(m_cp, m_challenge_server, m_challenge_client, identity_utf8.c_str(), m_cred.m_password.c_str());
-
-    //        // Prepare CHAP response value.
-    //        sanitizing_blob value;
-    //        value.reserve(
-    //            sizeof(m_challenge_client) + // Peer-Challenge
-    //            8                          + // Reserved
-    //            sizeof(m_nt_resp)          + // NT-Response
-    //            1);                          // Flags
-    //        value.insert(value.end(), reinterpret_cast<const unsigned char*>(&m_challenge_client), reinterpret_cast<const unsigned char*>(&m_challenge_client + 1)); // Peer-Challenge
-    //        value.insert(value.end(), 8, 0); // Reserved (must be zero)
-    //        value.insert(value.end(), reinterpret_cast<const unsigned char*>(&m_nt_resp), reinterpret_cast<const unsigned char*>(&m_nt_resp + 1)); // NT-Response
-    //        value.push_back(0); // Flags
-
-    //        chap_header hdr_resp;
-    //        hdr_resp.code = chap_packet_code_response;
-    //        hdr_resp.ident = m_ident;
-    //        size_t size_value = value.size();
-    //        *reinterpret_cast<unsigned short*>(hdr_resp.length) = htons((unsigned short)(sizeof(chap_header) + 1 + size_value + identity_utf8.length()));
-    //        assert(size_value <= 0xff); // CHAP value can be 255B max
-
-    //        // Append response.
-    //        m_packet_res.assign(reinterpret_cast<const unsigned char*>(&hdr_resp), reinterpret_cast<const unsigned char*>(&hdr_resp + 1));
-    //        m_packet_res.insert(m_packet_res.end(), 1, (unsigned char)size_value);
-    //        m_packet_res.insert(m_packet_res.end(), value.begin(), value.end());
-    //        m_packet_res.insert(m_packet_res.end(), identity_utf8.begin(), identity_utf8.end());
-
-    //        m_cfg.m_last_status = config_method::status_cred_invalid; // Blame credentials if we fail beyond this point.
-    //        return EapPeerMethodResponseActionSend;
-    //    }
-
-    //    case chap_packet_code_success:
-    //        process_success(parse_response(reinterpret_cast<const char*>(msg), reinterpret_cast<const char*>(msg_end) - reinterpret_cast<const char*>(msg)));
-    //        if (m_cfg.m_last_status == config_method::status_success) {
-    //            // Acknowledge the authentication by sending a "3" (chap_packet_code_success).
-    //            m_packet_res.assign(1, chap_packet_code_success);
-    //            m_cfg.m_last_status = config_method::status_auth_failed; // Blame protocol if we fail beyond this point.
-    //            return EapPeerMethodResponseActionSend;
-    //        } else
-    //            return EapPeerMethodResponseActionDiscard;
-
-    //    case chap_packet_code_failure:
-    //        process_error(parse_response(reinterpret_cast<const char*>(msg), reinterpret_cast<const char*>(msg_end) - reinterpret_cast<const char*>(msg)));
-    //        return EapPeerMethodResponseActionDiscard;
-    //    }
-
-    //    pck = msg_end;
-    //}
-
-    return EapPeerMethodResponseActionNone;
+    // User must reply to the message.
+    return EapPeerMethodResponseActionInvokeUI;
 }
 
 
@@ -165,10 +90,14 @@ void eap::method_gtc::get_response_packet(
     _Out_    sanitizing_blob &packet,
     _In_opt_ DWORD           size_max)
 {
-    if (m_packet_res.size() > size_max)
-        throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %u, maximum: %u).", m_packet_res.size(), size_max));
+    // Encode GTC reply as UTF-8.
+    sanitizing_string reply_utf8;
+    WideCharToMultiByte(CP_UTF8, 0, m_reply, reply_utf8, NULL, NULL);
 
-    packet.assign(m_packet_res.begin(), m_packet_res.end());
+    if (sizeof(sanitizing_string::value_type)*reply_utf8.length() > size_max)
+        throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %u, maximum: %u).", sizeof(sanitizing_string::value_type)*reply_utf8.length(), size_max));
+
+    packet.assign(reply_utf8.begin(), reply_utf8.end());
 }
 
 
@@ -187,4 +116,32 @@ void eap::method_gtc::get_result(
     // Don't worry. EapHost is well aware of failed authentication condition.
     pResult->fSaveConnectionData = TRUE;
     pResult->fIsSuccess          = TRUE;
+}
+
+
+void eap::method_gtc::get_ui_context(
+    _Out_ BYTE  **ppUIContextData,
+    _Out_ DWORD *pdwUIContextDataSize)
+{
+    assert(ppUIContextData);
+    assert(pdwUIContextDataSize);
+
+    // Return a direct pointer to authenticator string.
+    *pdwUIContextDataSize = (DWORD)(sizeof(sanitizing_wstring::value_type)*m_message.length());
+    *ppUIContextData      = const_cast<LPBYTE>(reinterpret_cast<LPCBYTE>(m_message.data()));
+}
+
+
+EapPeerMethodResponseAction eap::method_gtc::set_ui_context(
+    _In_count_(dwUIContextDataSize) const BYTE  *pUIContextData,
+    _In_                                  DWORD dwUIContextDataSize)
+{
+    // Save GTC reply.
+    m_reply.assign(
+        reinterpret_cast<sanitizing_wstring::const_pointer>(pUIContextData),
+        reinterpret_cast<sanitizing_wstring::const_pointer>(pUIContextData + dwUIContextDataSize));
+
+    // Send the reply.
+    m_cfg.m_last_status = config_method::status_cred_invalid; // Blame "credentials" if we fail beyond this point.
+    return EapPeerMethodResponseActionSend;
 }

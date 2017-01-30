@@ -93,13 +93,27 @@ namespace eap
 
         /// @}
 
+        /// \name User Interaction
+        /// @{
+
+        virtual void get_ui_context(
+            _Out_ BYTE  **ppUIContextData,
+            _Out_ DWORD *pdwUIContextDataSize);
+
+        virtual EapPeerMethodResponseAction set_ui_context(
+            _In_count_(dwUIContextDataSize) const BYTE  *pUIContextData,
+            _In_                                  DWORD dwUIContextDataSize);
+
+        /// @}
+
         virtual void get_result(
             _In_  EapPeerMethodResultReason reason,
             _Out_ EapPeerMethodResult       *pResult);
 
     protected:
-        config_method_eapgtc &m_cfg;    ///< Method configuration
-        sanitizing_blob m_packet_res;   ///< Response packet
+        config_method_eapgtc &m_cfg;            ///< Method configuration
+        winstd::sanitizing_wstring m_message;   ///< Authenticator message
+        winstd::sanitizing_wstring m_reply;     ///< GTC reply
     };
 
     /// @}
