@@ -31,6 +31,7 @@ class wxTTLSConfigWindow;
 #include "../../EapHost/include/Config.h"
 #include "../../PAP/include/Config.h"
 #include "../../MSCHAPv2/include/Config.h"
+#include "../../GTC/include/Config.h"
 
 #include <WinStd/Win.h>
 
@@ -107,6 +108,7 @@ protected:
     eap::config_method_pap         m_cfg_pap;           ///< PAP configuration
     eap::config_method_mschapv2    m_cfg_mschapv2;      ///< MSCHAPv2 configuration
     eap::config_method_eapmschapv2 m_cfg_eapmschapv2;   ///< EAP-MSCHAPv2 configuration
+    eap::config_method_eapgtc      m_cfg_eapgtc;        ///< EAP-GTC configuration
 #ifdef EAP_INNER_EAPHOST
     eap::config_method_eaphost     m_cfg_eaphost;       ///< Inner EAP configuration
 #endif

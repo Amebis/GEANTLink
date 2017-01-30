@@ -103,6 +103,7 @@ wxTTLSConfigWindow::wxTTLSConfigWindow(eap::config_provider &prov, eap::config_m
     m_cfg_pap        (cfg.m_module, cfg.m_level + 1),
     m_cfg_mschapv2   (cfg.m_module, cfg.m_level + 1),
     m_cfg_eapmschapv2(cfg.m_module, cfg.m_level + 1),
+    m_cfg_eapgtc     (cfg.m_module, cfg.m_level + 1),
 #ifdef EAP_INNER_EAPHOST
     m_cfg_eaphost    (cfg.m_module, cfg.m_level + 1),
 #endif
@@ -127,6 +128,8 @@ wxTTLSConfigWindow::wxTTLSConfigWindow(eap::config_provider &prov, eap::config_m
     m_inner_type->AddPage(panel_mschapv2, _("MSCHAPv2"));
     wxMSCHAPv2ConfigPanel *panel_eapmschapv2 = new wxMSCHAPv2ConfigPanel(m_prov, m_cfg_eapmschapv2, m_inner_type);
     m_inner_type->AddPage(panel_eapmschapv2, _("EAP-MSCHAPv2"));
+    wxGTCConfigPanel *panel_eapgtc = new wxGTCConfigPanel(m_prov, m_cfg_eapgtc, m_inner_type);
+    m_inner_type->AddPage(panel_eapgtc, _("EAP-GTC"));
 #ifdef EAP_INNER_EAPHOST
     wxEapHostConfigPanel *panel_eaphost = new wxEapHostConfigPanel(m_prov, m_cfg_eaphost, m_inner_type);
     m_inner_type->AddPage(panel_eaphost, _("Other EAP methods..."));
@@ -198,6 +201,11 @@ bool wxTTLSConfigWindow::TransferDataToWindow()
             m_inner_type->SetSelection(2); // 2=EAP-MSCHAPv2
             break;
 
+        case winstd::eap_type_gtc:
+            m_cfg_eapgtc = dynamic_cast<eap::config_method_eapgtc&>(*cfg_ttls.m_inner);
+            m_inner_type->SetSelection(3); // 3=EAP-GTC
+            break;
+
         default:
             wxFAIL_MSG(wxT("Unsupported inner authentication method type."));
         }
@@ -206,7 +214,7 @@ bool wxTTLSConfigWindow::TransferDataToWindow()
     else {
         // EapHost inner method
         m_cfg_eaphost = *cfg_inner_eaphost;
-        m_inner_type->SetSelection(3); // 3=EapHost
+        m_inner_type->SetSelection(4); // 4=EapHost
     }
 #endif
 
@@ -237,8 +245,12 @@ bool wxTTLSConfigWindow::TransferDataFromWindow()
             cfg_ttls.m_inner.reset(new eap::config_method_eapmschapv2(m_cfg_eapmschapv2));
             break;
 
+        case 3: // 3=EAP-GTC
+            cfg_ttls.m_inner.reset(new eap::config_method_eapgtc(m_cfg_eapgtc));
+            break;
+
 #ifdef EAP_INNER_EAPHOST
-        case 3: // 3=EapHost
+        case 4: // 4=EapHost
             cfg_ttls.m_inner.reset(new eap::config_method_eaphost(m_cfg_eaphost));
             break;
 #endif

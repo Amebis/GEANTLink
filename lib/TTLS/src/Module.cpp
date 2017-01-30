@@ -252,6 +252,10 @@ EAP_SESSION_HANDLE eap::peer_ttls::begin_session(
                                            new method_eapmsg  (*this, cred_inner->get_identity().c_str(),
                                            new method_eap     (*this, eap_type_mschapv2,
                                            new method_mschapv2(*this, dynamic_cast<config_method_mschapv2&>(*cfg_inner), dynamic_cast<credentials_pass&>(*cred_inner))))); break;
+        case eap_type_gtc            : meth_inner.reset(
+                                           new method_eapmsg  (*this, cred_inner->get_identity().c_str(),
+                                           new method_eap     (*this, eap_type_gtc,
+                                           new method_gtc     (*this, dynamic_cast<config_method_eapgtc&>(*cfg_inner))))); break;
         default: throw invalid_argument(__FUNCTION__ " Unsupported inner authentication method.");
         }
     }

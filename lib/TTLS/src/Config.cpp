@@ -268,6 +268,7 @@ eap::config_method* eap::config_method_ttls::make_config_method(_In_ winstd::eap
     case eap_type_legacy_pap     : return new config_method_pap        (m_module, m_level + 1);
     case eap_type_legacy_mschapv2: return new config_method_mschapv2   (m_module, m_level + 1);
     case eap_type_mschapv2       : return new config_method_eapmschapv2(m_module, m_level + 1);
+    case eap_type_gtc            : return new config_method_eapgtc     (m_module, m_level + 1);
 #ifdef EAP_INNER_EAPHOST
     default                      : return new config_method_eaphost    (m_module, m_level + 1); // EapHost peer method handles all other method types
 #endif
@@ -281,6 +282,7 @@ eap::config_method* eap::config_method_ttls::make_config_method(_In_ const wchar
          if (_wcsicmp(eap_type, L"PAP"         ) == 0) return new config_method_pap        (m_module, m_level + 1);
     else if (_wcsicmp(eap_type, L"MSCHAPv2"    ) == 0) return new config_method_mschapv2   (m_module, m_level + 1);
     else if (_wcsicmp(eap_type, L"EAP-MSCHAPv2") == 0) return new config_method_eapmschapv2(m_module, m_level + 1);
+    else if (_wcsicmp(eap_type, L"EAP-GTC"     ) == 0) return new config_method_eapgtc     (m_module, m_level + 1);
 #ifdef EAP_INNER_EAPHOST
     else if (_wcsicmp(eap_type, L"EapHost"     ) == 0) return new config_method_eaphost    (m_module, m_level + 1);
 #endif

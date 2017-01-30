@@ -28,6 +28,7 @@
 #include "../../EapHost_UI/include/EapHost_UI.h"
 #include "../../PAP_UI/include/PAP_UI.h"
 #include "../../MSCHAPv2_UI/include/MSCHAPv2_UI.h"
+#include "../../GTC_UI/include/GTC_UI.h"
 
 #include "../../EapHost/include/Credentials.h"
 
