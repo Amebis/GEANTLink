@@ -22,6 +22,7 @@
 #include "../../GTC/include/Config.h"
 
 class wxGTCConfigPanel;
+class wxGTCResponsePanel;
 
 /// \addtogroup EAPBaseGUI
 /// @{
@@ -39,6 +40,8 @@ typedef wxEAPCredentialsConfigPanel<eap::credentials_identity, wxGTCCredentialsP
 /// @}
 
 #pragma once
+
+#include "../res/wxGTC_UI.h"
 
 #include <wx/panel.h>
 #include <wx/stattext.h>
@@ -72,6 +75,19 @@ protected:
 
 protected:
     wxGTCCredentialsConfigPanel *m_credentials; ///< Credentials configuration panel
+};
+
+
+///
+/// GTC challenge/response panel
+///
+class wxGTCResponsePanel : public wxGTCResponsePanelBase
+{
+public:
+    ///
+    /// Constructs a panel
+    ///
+    wxGTCResponsePanel(const eap::config_provider &prov, eap::config_method_eapgtc &cfg, wxWindow* parent);
 };
 
 /// @}

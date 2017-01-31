@@ -56,3 +56,19 @@ void wxGTCConfigPanel::OnInitDialog(wxInitDialogEvent& event)
         m_credentials->GetEventHandler()->ProcessEvent(event);
 }
 /// \endcond
+
+
+//////////////////////////////////////////////////////////////////////
+// wxGTCResponsePanel
+//////////////////////////////////////////////////////////////////////
+
+wxGTCResponsePanel::wxGTCResponsePanel(const eap::config_provider &prov, eap::config_method_eapgtc &cfg, wxWindow* parent) : wxGTCResponsePanelBase(parent)
+{
+    UNREFERENCED_PARAMETER(prov);
+    UNREFERENCED_PARAMETER(cfg);
+
+    // Load and set icon.
+    winstd::library lib_shell32;
+    if (lib_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
+        m_response_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(24)));
+}

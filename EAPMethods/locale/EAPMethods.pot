@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: EAPMethods\n"
-"POT-Creation-Date: 2017-01-31 11:11+0100\n"
+"POT-Creation-Date: 2017-01-31 14:57+0100\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
 "Last-Translator: Simon Rozman <simon.rozman@amebis.si>\n"
 "Language-Team: Amebis, d. o. o., Kamnik <info@amebis.si>\n"
@@ -481,6 +481,22 @@ msgstr ""
 msgid "Configuring EAP method failed (error %u)."
 msgstr ""
 
+#: master/lib/GTC_UI/res/wxGTC_UI.cpp:16
+msgid "GTC Challenge"
+msgstr ""
+
+#: master/lib/GTC_UI/res/wxGTC_UI.cpp:26
+msgid "Please provide your response."
+msgstr ""
+
+#: master/lib/GTC_UI/res/wxGTC_UI.cpp:38
+msgid "Server challenge"
+msgstr ""
+
+#: master/lib/GTC_UI/res/wxGTC_UI.cpp:43
+msgid "Enter your response here"
+msgstr ""
+
 #: master/lib/GTC_UI/src/GTC_UI.cpp:33
 msgid "GTC User ID"
 msgstr ""
@@ -836,7 +852,7 @@ msgstr ""
 msgid "Check if you would like to save credentials"
 msgstr ""
 
-#: master/lib/EAPBase_UI/include/EAP_UI.h:1118
+#: master/lib/EAPBase_UI/include/EAP_UI.h:1123
 #: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:1000
 #: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:1069
 msgid "<Your Organization>"
