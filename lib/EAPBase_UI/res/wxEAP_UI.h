@@ -223,6 +223,28 @@ class wxPasswordCredentialsPanelBase : public wxEAPCredentialsPanelBase
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+/// Class wxIdentityCredentialsPanelBase
+///////////////////////////////////////////////////////////////////////////////
+class wxIdentityCredentialsPanelBase : public wxEAPCredentialsPanelBase
+{
+	private:
+	
+	protected:
+		wxStaticBoxSizer* m_sb_credentials;
+		wxStaticBitmap* m_credentials_icon;
+		wxBoxSizer* m_sb_credentials_vert;
+		wxStaticText* m_credentials_label;
+		wxStaticText* m_identity_label;
+		wxTextCtrl* m_identity;
+	
+	public:
+		
+		wxIdentityCredentialsPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL ); 
+		~wxIdentityCredentialsPanelBase();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
 /// Class wxEAPProviderContactInfoPanelBase
 ///////////////////////////////////////////////////////////////////////////////
 class wxEAPProviderContactInfoPanelBase : public wxPanel 

@@ -418,6 +418,55 @@ wxPasswordCredentialsPanelBase::~wxPasswordCredentialsPanelBase()
 	
 }
 
+wxIdentityCredentialsPanelBase::wxIdentityCredentialsPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxEAPCredentialsPanelBase( parent, id, pos, size, style )
+{
+	m_sb_credentials = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("User ID") ), wxVERTICAL );
+	
+	wxBoxSizer* sb_credentials_horiz;
+	sb_credentials_horiz = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_credentials_icon = new wxStaticBitmap( m_sb_credentials->GetStaticBox(), wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
+	sb_credentials_horiz->Add( m_credentials_icon, 0, wxALL, 5 );
+	
+	m_sb_credentials_vert = new wxBoxSizer( wxVERTICAL );
+	
+	m_credentials_label = new wxStaticText( m_sb_credentials->GetStaticBox(), wxID_ANY, _("Please provide your user ID."), wxDefaultPosition, wxDefaultSize, 0 );
+	m_credentials_label->Wrap( 440 );
+	m_sb_credentials_vert->Add( m_credentials_label, 0, wxALL|wxEXPAND, 5 );
+	
+	wxFlexGridSizer* sb_credentials_tbl;
+	sb_credentials_tbl = new wxFlexGridSizer( 0, 2, 5, 5 );
+	sb_credentials_tbl->AddGrowableCol( 1 );
+	sb_credentials_tbl->SetFlexibleDirection( wxBOTH );
+	sb_credentials_tbl->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_identity_label = new wxStaticText( m_sb_credentials->GetStaticBox(), wxID_ANY, _("User ID:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_identity_label->Wrap( -1 );
+	sb_credentials_tbl->Add( m_identity_label, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_identity = new wxTextCtrl( m_sb_credentials->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_identity->SetToolTip( _("Enter your user name here (user@domain.org, DOMAIN\\User, etc.)") );
+	
+	sb_credentials_tbl->Add( m_identity, 2, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	
+	m_sb_credentials_vert->Add( sb_credentials_tbl, 0, wxEXPAND|wxALL, 5 );
+	
+	
+	sb_credentials_horiz->Add( m_sb_credentials_vert, 1, wxEXPAND, 5 );
+	
+	
+	m_sb_credentials->Add( sb_credentials_horiz, 0, wxEXPAND, 5 );
+	
+	
+	this->SetSizer( m_sb_credentials );
+	this->Layout();
+}
+
+wxIdentityCredentialsPanelBase::~wxIdentityCredentialsPanelBase()
+{
+}
+
 wxEAPProviderContactInfoPanelBase::wxEAPProviderContactInfoPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
 	wxStaticBoxSizer* sb_provider_contact;

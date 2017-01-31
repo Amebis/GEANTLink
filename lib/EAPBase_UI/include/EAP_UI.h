@@ -43,6 +43,7 @@ class wxEAPProviderIDPanel;
 class wxEAPConfigProvider;
 template <class _Tcred, class _wxT> class wxEAPCredentialsConfigPanel;
 template <class _Tcred, class _Tbase> class wxEAPCredentialsPanel;
+template <class _Tcred, class _Tbase> class wxIdentityCredentialsPanel;
 template <class _Tcred, class _Tbase> class wxPasswordCredentialsPanel;
 class wxEAPProviderSelectDialog;
 
@@ -945,14 +946,14 @@ protected:
 
 
 ///
-/// Generic password credential entry panel
+/// Generic identity credential entry panel
 ///
 template <class _Tcred, class _Tbase>
-class wxPasswordCredentialsPanel : public wxEAPCredentialsPanel<_Tcred, _Tbase>
+class wxIdentityCredentialsPanel : public wxEAPCredentialsPanel<_Tcred, _Tbase>
 {
 public:
     ///
-    /// Constructs a password credentials panel
+    /// Constructs a identity credentials panel
     ///
     /// \param[in]    prov       Provider configuration data
     /// \param[in]    cfg        Method configuration data
@@ -960,8 +961,7 @@ public:
     /// \param[in]    parent     Parent window
     /// \param[in]    is_config  Is this panel used to config credentials?
     ///
-    wxPasswordCredentialsPanel(const eap::config_provider &prov, const eap::config_method_with_cred &cfg, _Tcred &cred, wxWindow* parent, bool is_config = false) :
-        m_password_set(false),
+    wxIdentityCredentialsPanel(const eap::config_provider &prov, const eap::config_method_with_cred &cfg, _Tcred &cred, wxWindow* parent, bool is_config = false) :
         wxEAPCredentialsPanel<_Tcred, _Tbase>(prov, cfg, cred, parent, is_config)
     {
         // Load and set icon.
@@ -981,11 +981,6 @@ public:
             layout = true;
         }
 
-        if (!m_prov.m_lbl_alt_password.empty()) {
-            m_password_label->SetLabel(m_prov.m_lbl_alt_password);
-            layout = true;
-        }
-
         if (layout)
             this->Layout();
     }
@@ -997,26 +992,80 @@ protected:
     {
         m_identity->SetValue(m_cred.m_identity);
         m_identity->SetSelection(0, -1);
-        m_password->SetValue(m_cred.m_password.empty() ? wxEmptyString : wxT("dummypass"));
-        m_password_set = false;
 
         if (!m_is_config && m_cfg.m_use_cred) {
             // Credential prompt mode & Using configured credentials
             m_identity_label->Enable(false);
             m_identity      ->Enable(false);
-            m_password_label->Enable(false);
-            m_password      ->Enable(false);
         }
 
-        return wxEAPCredentialsPanel<_Tcred, wxPasswordCredentialsPanelBase>::TransferDataToWindow();
+        return wxEAPCredentialsPanel<_Tcred, _Tbase>::TransferDataToWindow();
     }
 
     virtual bool TransferDataFromWindow()
     {
-        if (!wxEAPCredentialsPanel<_Tcred, wxPasswordCredentialsPanelBase>::TransferDataFromWindow())
+        if (!wxEAPCredentialsPanel<_Tcred, _Tbase>::TransferDataFromWindow())
             return false;
 
         m_cred.m_identity = m_identity->GetValue();
+
+        return true;
+    }
+
+    /// \endcond
+};
+
+/// @}
+
+
+///
+/// Generic password credential entry panel
+///
+template <class _Tcred, class _Tbase>
+class wxPasswordCredentialsPanel : public wxIdentityCredentialsPanel<_Tcred, _Tbase>
+{
+public:
+    ///
+    /// Constructs a password credentials panel
+    ///
+    /// \param[in]    prov       Provider configuration data
+    /// \param[in]    cfg        Method configuration data
+    /// \param[inout] cred       Credentials data
+    /// \param[in]    parent     Parent window
+    /// \param[in]    is_config  Is this panel used to config credentials?
+    ///
+    wxPasswordCredentialsPanel(const eap::config_provider &prov, const eap::config_method_with_cred &cfg, _Tcred &cred, wxWindow* parent, bool is_config = false) :
+        m_password_set(false),
+        wxIdentityCredentialsPanel<_Tcred, _Tbase>(prov, cfg, cred, parent, is_config)
+    {
+        if (!m_prov.m_lbl_alt_password.empty()) {
+            m_password_label->SetLabel(m_prov.m_lbl_alt_password);
+            this->Layout();
+        }
+    }
+
+protected:
+    /// \cond internal
+
+    virtual bool TransferDataToWindow()
+    {
+        m_password->SetValue(m_cred.m_password.empty() ? wxEmptyString : wxT("dummypass"));
+        m_password_set = false;
+
+        if (!m_is_config && m_cfg.m_use_cred) {
+            // Credential prompt mode & Using configured credentials
+            m_password_label->Enable(false);
+            m_password      ->Enable(false);
+        }
+
+        return wxIdentityCredentialsPanel<_Tcred, _Tbase>::TransferDataToWindow();
+    }
+
+    virtual bool TransferDataFromWindow()
+    {
+        if (!wxIdentityCredentialsPanel<_Tcred, _Tbase>::TransferDataFromWindow())
+            return false;
+
         if (m_password_set)
             m_cred.m_password = m_password->GetValue();
 
@@ -1025,7 +1074,7 @@ protected:
 
     virtual void OnPasswordText(wxCommandEvent& event)
     {
-        wxEAPCredentialsPanel<_Tcred, _Tbase>::OnPasswordText(event);
+        wxIdentityCredentialsPanel<_Tcred, _Tbase>::OnPasswordText(event);
 
         m_password_set = true;
     }
