@@ -296,7 +296,7 @@ wstring eap::config_method_ttls::get_public_identity(const credentials_ttls &cre
         // Use the true identity.
         return cred.get_identity();
     } else if (m_anonymous_identity.compare(L"@") == 0) {
-        // Strip username part from identity (RFC 4822).
+        // Strip username part from identity.
         wstring identity(std::move(cred.get_identity()));
         auto offset = identity.find(L'@');
         if (offset != wstring::npos) identity.erase(0, offset);
