@@ -30,7 +30,7 @@ using namespace winstd;
 
 eap::config_method_eapgtc::config_method_eapgtc(_In_ module &mod, _In_ unsigned int level) : config_method_with_cred(mod, level)
 {
-    m_cred.reset(new credentials(mod));
+    m_cred.reset(new credentials_identity(mod));
 }
 
 
@@ -84,5 +84,5 @@ const wchar_t* eap::config_method_eapgtc::get_method_str() const
 
 eap::credentials* eap::config_method_eapgtc::make_credentials() const
 {
-    return new eap::credentials(m_module);
+    return new eap::credentials_identity(m_module);
 }

@@ -101,7 +101,7 @@ namespace eap
 
         ///
         /// @copydoc eap::config_method::make_credentials()
-        /// \returns This implementation always returns `eap::credentials` type of credentials
+        /// \returns This implementation always returns `eap::credentials_identity` type of credentials
         ///
         virtual credentials* make_credentials() const;
     };

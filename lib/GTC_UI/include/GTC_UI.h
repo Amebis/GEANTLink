@@ -27,14 +27,14 @@ class wxGTCConfigPanel;
 /// @{
 
 ///
-/// GTC credential configuration panel
-///
-typedef wxEAPCredentialsConfigPanel<eap::credentials, wxIdentityCredentialsPanel<eap::credentials, wxIdentityCredentialsPanelBase> > wxGTCCredentialsConfigPanel;
-
-///
 /// GTC credential entry panel
 ///
-typedef wxIdentityCredentialsPanel<eap::credentials, wxIdentityCredentialsPanelBase> wxGTCCredentialsPanel;
+typedef wxIdentityCredentialsPanel<eap::credentials_identity, wxIdentityCredentialsPanelBase> wxGTCCredentialsPanel;
+
+///
+/// GTC credential configuration panel
+///
+typedef wxEAPCredentialsConfigPanel<eap::credentials_identity, wxGTCCredentialsPanel> wxGTCCredentialsConfigPanel;
 
 /// @}
 

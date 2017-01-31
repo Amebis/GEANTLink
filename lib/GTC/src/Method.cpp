@@ -28,7 +28,7 @@ using namespace winstd;
 // eap::method_gtc
 //////////////////////////////////////////////////////////////////////
 
-eap::method_gtc::method_gtc(_In_ module &mod, _In_ config_method_eapgtc &cfg, _In_ credentials &cred) :
+eap::method_gtc::method_gtc(_In_ module &mod, _In_ config_method_eapgtc &cfg, _In_ credentials_identity &cred) :
     m_cfg(cfg),
     m_cred(cred),
     method(mod)

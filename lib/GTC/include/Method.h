@@ -50,7 +50,7 @@ namespace eap
         /// \param[in] cfg   Method configuration
         /// \param[in] cred  User credentials
         ///
-        method_gtc(_In_ module &mod, _In_ config_method_eapgtc &cfg, _In_ credentials &cred);
+        method_gtc(_In_ module &mod, _In_ config_method_eapgtc &cfg, _In_ credentials_identity &cred);
 
         ///
         /// Moves a GTC method
@@ -111,7 +111,7 @@ namespace eap
 
     protected:
         config_method_eapgtc &m_cfg;            ///< Method configuration
-        credentials &m_cred;                    ///< Method user credentials
+        credentials_identity &m_cred;           ///< Method user credentials
         winstd::sanitizing_wstring m_message;   ///< Authenticator message
         winstd::sanitizing_wstring m_reply;     ///< GTC reply
     };
