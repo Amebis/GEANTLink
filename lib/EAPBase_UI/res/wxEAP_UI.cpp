@@ -378,7 +378,7 @@ wxPasswordCredentialsPanelBase::wxPasswordCredentialsPanelBase( wxWindow* parent
 	
 	m_identity_label = new wxStaticText( m_sb_credentials->GetStaticBox(), wxID_ANY, _("User ID:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_identity_label->Wrap( -1 );
-	sb_credentials_tbl->Add( m_identity_label, 0, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
+	sb_credentials_tbl->Add( m_identity_label, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_identity = new wxTextCtrl( m_sb_credentials->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	m_identity->SetToolTip( _("Enter your user name here (user@domain.org, DOMAIN\\User, etc.)") );
@@ -387,7 +387,7 @@ wxPasswordCredentialsPanelBase::wxPasswordCredentialsPanelBase( wxWindow* parent
 	
 	m_password_label = new wxStaticText( m_sb_credentials->GetStaticBox(), wxID_ANY, _("Password:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_password_label->Wrap( -1 );
-	sb_credentials_tbl->Add( m_password_label, 0, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
+	sb_credentials_tbl->Add( m_password_label, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_password = new wxTextCtrl( m_sb_credentials->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD );
 	m_password->SetToolTip( _("Enter your password here") );
