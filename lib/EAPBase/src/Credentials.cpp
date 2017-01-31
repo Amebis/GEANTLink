@@ -82,12 +82,6 @@ eap::credentials& eap::credentials::operator=(_Inout_ credentials &&other)
 }
 
 
-eap::config* eap::credentials::clone() const
-{
-    return new credentials(*this);
-}
-
-
 void eap::credentials::clear()
 {
     m_identity.clear();
@@ -154,14 +148,109 @@ void eap::credentials::operator>>(_Inout_ cursor_in &cursor)
 }
 
 
-void eap::credentials::store(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int level) const
+wstring eap::credentials::get_identity() const
+{
+    return m_identity;
+}
+
+
+tstring eap::credentials::get_name() const
+{
+    tstring identity(std::move(get_identity()));
+    return
+        !identity.empty() ? identity :
+        empty()           ? _T("<empty>") : _T("<blank ID>");
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// eap::credentials_identity
+//////////////////////////////////////////////////////////////////////
+
+eap::credentials_identity::credentials_identity(_In_ module &mod) : credentials(mod)
+{
+}
+
+
+eap::credentials_identity::credentials_identity(_In_ const credentials_identity &other) : credentials(other)
+{
+}
+
+
+eap::credentials_identity::credentials_identity(_Inout_ credentials_identity &&other) : credentials(std::move(other))
+{
+}
+
+
+eap::credentials_identity& eap::credentials_identity::operator=(_In_ const credentials_identity &other)
+{
+    if (this != &other)
+        (credentials&)*this = other;
+
+    return *this;
+}
+
+
+eap::credentials_identity& eap::credentials_identity::operator=(_Inout_ credentials_identity &&other)
+{
+    if (this != &other)
+        (credentials&)*this = std::move(other);
+
+    return *this;
+}
+
+
+eap::config* eap::credentials_identity::clone() const
+{
+    return new credentials_identity(*this);
+}
+
+
+void eap::credentials_identity::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot) const
+{
+    assert(pDoc);
+    assert(pConfigRoot);
+
+    // We could have used credentials::save() to save identity,
+    // but that method tolerates absence of <UserName> element,
+    // whereas for this class the absence of <UserName> is fatal.
+    config::save(pDoc, pConfigRoot);
+
+    HRESULT hr;
+
+    // <UserName>
+    if (FAILED(hr = eapxml::put_element_value(pDoc, pConfigRoot, bstr(L"UserName"), namespace_eapmetadata, bstr(m_identity))))
+        throw com_runtime_error(hr, __FUNCTION__ " Error creating <UserName> element.");
+}
+
+
+void eap::credentials_identity::load(_In_ IXMLDOMNode *pConfigRoot)
+{
+    assert(pConfigRoot);
+    HRESULT hr;
+
+    // We could have used credentials::load() to load identity,
+    // but that method tolerates absence of <UserName> element,
+    // whereas for this class the absence of <UserName> is fatal.
+    config::load(pConfigRoot);
+
+    wstring xpath(eapxml::get_xpath(pConfigRoot));
+
+    if (FAILED(hr = eapxml::get_element_value(pConfigRoot, bstr(L"eap-metadata:UserName"), m_identity)))
+        throw com_runtime_error(hr, __FUNCTION__ " Error reading <UserName> element.");
+
+    m_module.log_config((xpath + L"/UserName").c_str(), m_identity.c_str());
+}
+
+
+void eap::credentials_identity::store(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int level) const
 {
     assert(pszTargetName);
 
     tstring target(target_name(pszTargetName, level));
 
     // Write credentials.
-    assert(m_identity.length() < CRED_MAX_USERNAME_LENGTH     );
+    assert(m_identity.length() < CRED_MAX_USERNAME_LENGTH);
     CREDENTIAL cred = {
         0,                                     // Flags
         CRED_TYPE_GENERIC,                     // Type
@@ -181,7 +270,7 @@ void eap::credentials::store(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int lev
 }
 
 
-void eap::credentials::retrieve(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int level)
+void eap::credentials_identity::retrieve(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int level)
 {
     assert(pszTargetName);
 
@@ -200,28 +289,13 @@ void eap::credentials::retrieve(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int 
 }
 
 
-LPCTSTR eap::credentials::target_suffix() const
+LPCTSTR eap::credentials_identity::target_suffix() const
 {
     return _T("id");
 }
 
 
-wstring eap::credentials::get_identity() const
-{
-    return m_identity;
-}
-
-
-tstring eap::credentials::get_name() const
-{
-    tstring identity(std::move(get_identity()));
-    return
-        !identity.empty() ? identity :
-        empty()           ? _T("<empty>") : _T("<blank ID>");
-}
-
-
-eap::credentials::source_t eap::credentials::combine(
+eap::credentials::source_t eap::credentials_identity::combine(
     _In_             DWORD         dwFlags,
     _In_             HANDLE        hTokenImpersonateUser,
     _In_opt_   const credentials   *cred_cached,
@@ -232,16 +306,16 @@ eap::credentials::source_t eap::credentials::combine(
 
     if (cred_cached) {
         // Using EAP service cached credentials.
-        *this = *cred_cached;
-        m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CACHED2, event_data((unsigned int)cfg.get_method_id()), event_data(credentials::get_name()), event_data(pszTargetName), event_data::blank);
+        *this = *dynamic_cast<const credentials_identity*>(cred_cached);
+        m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CACHED2, event_data((unsigned int)cfg.get_method_id()), event_data(credentials_identity::get_name()), event_data(pszTargetName), event_data::blank);
         return source_cache;
     }
 
     auto cfg_with_cred = dynamic_cast<const config_method_with_cred*>(&cfg);
     if (cfg_with_cred && cfg_with_cred->m_use_cred) {
         // Using configured credentials.
-        *this = *cfg_with_cred->m_cred.get();
-        m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CONFIG2, event_data((unsigned int)cfg.get_method_id()), event_data(credentials::get_name()), event_data(pszTargetName), event_data::blank);
+        *this = *dynamic_cast<const credentials_identity*>(cfg_with_cred->m_cred.get());
+        m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CONFIG2, event_data((unsigned int)cfg.get_method_id()), event_data(credentials_identity::get_name()), event_data(pszTargetName), event_data::blank);
         return source_config;
     }
 
@@ -250,12 +324,12 @@ eap::credentials::source_t eap::credentials::combine(
         user_impersonator impersonating(hTokenImpersonateUser);
 
         try {
-            credentials cred_loaded(m_module);
+            credentials_identity cred_loaded(m_module);
             cred_loaded.retrieve(pszTargetName, cfg.m_level);
 
             // Using stored credentials.
             *this = std::move(cred_loaded);
-            m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_STORED2, event_data((unsigned int)cfg.get_method_id()), event_data(credentials::get_name()), event_data(pszTargetName), event_data::blank);
+            m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_STORED2, event_data((unsigned int)cfg.get_method_id()), event_data(credentials_identity::get_name()), event_data(pszTargetName), event_data::blank);
             return source_storage;
         } catch (...) {
             // Not actually an error.

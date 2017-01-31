@@ -111,8 +111,6 @@ namespace eap
         ///
         credentials& operator=(_Inout_ credentials &&other);
 
-        virtual config* clone() const;
-
         ///
         /// Resets credentials
         ///
@@ -149,7 +147,7 @@ namespace eap
         /// \param[in]  pszTargetName  The name in Windows Credential Manager to store credentials as
         /// \param[in]  level          Credential level (0=outer, 1=inner, 2=inner-inner...)
         ///
-        virtual void store(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int level) const;
+        virtual void store(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int level) const = 0;
 
         ///
         /// Retrieve credentials from Windows Credential Manager
@@ -157,7 +155,7 @@ namespace eap
         /// \param[in]  pszTargetName  The name in Windows Credential Manager to retrieve credentials from
         /// \param[in]  level          Credential level (0=outer, 1=inner, 2=inner-inner...)
         ///
-        virtual void retrieve(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int level);
+        virtual void retrieve(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int level) = 0;
 
         ///
         /// Returns target name for Windows Credential Manager credential name
@@ -189,7 +187,7 @@ namespace eap
         ///
         /// Return target suffix for Windows Credential Manager credential name
         ///
-        virtual LPCTSTR target_suffix() const;
+        virtual LPCTSTR target_suffix() const = 0;
 
         /// @}
 
@@ -226,10 +224,102 @@ namespace eap
             _In_             HANDLE        hTokenImpersonateUser,
             _In_opt_   const credentials   *cred_cached,
             _In_       const config_method &cfg,
-            _In_opt_z_       LPCTSTR       pszTargetName);
+            _In_opt_z_       LPCTSTR       pszTargetName) = 0;
 
     public:
         std::wstring m_identity;    ///< Identity (username\@domain, certificate name etc.)
+    };
+
+
+    ///
+    /// Identity-only based method credentials
+    ///
+    class credentials_identity : public credentials
+    {
+    public:
+        ///
+        /// Constructs credentials
+        ///
+        /// \param[in] mod  EAP module to use for global services
+        ///
+        credentials_identity(_In_ module &mod);
+
+        ///
+        /// Copies credentials
+        ///
+        /// \param[in] other  Credentials to copy from
+        ///
+        credentials_identity(_In_ const credentials_identity &other);
+
+        ///
+        /// Moves credentials
+        ///
+        /// \param[in] other  Credentials to move from
+        ///
+        credentials_identity(_Inout_ credentials_identity &&other);
+
+        ///
+        /// Copies credentials
+        ///
+        /// \param[in] other  Credentials to copy from
+        ///
+        /// \returns Reference to this object
+        ///
+        credentials_identity& operator=(_In_ const credentials_identity &other);
+
+        ///
+        /// Moves credentials
+        ///
+        /// \param[in] other  Credentials to move from
+        ///
+        /// \returns Reference to this object
+        ///
+        credentials_identity& operator=(_Inout_ credentials_identity &&other);
+
+        virtual config* clone() const;
+
+        /// \name XML management
+        /// @{
+        virtual void save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot) const;
+        virtual void load(_In_ IXMLDOMNode *pConfigRoot);
+        /// @}
+
+        /// \name Storage
+        /// @{
+        virtual void store(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int level) const;
+        virtual void retrieve(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int level);
+
+        ///
+        /// @copydoc eap::credentials::target_suffix()
+        /// \returns This implementation always returns `_T("pass")`
+        ///
+        virtual LPCTSTR target_suffix() const;
+        /// @}
+
+        ///
+        /// Combine credentials in the following order:
+        ///
+        /// 1. Cached credentials
+        /// 2. Configured credentials (if \p cfg is derived from `config_method_with_cred`)
+        /// 3. Stored credentials
+        ///
+        /// \param[in] dwFlags                A combination of [EAP flags](https://msdn.microsoft.com/en-us/library/windows/desktop/bb891975.aspx) that describe the EAP authentication session behavior
+        /// \param[in] hTokenImpersonateUser  Impersonation token for a logged-on user to collect user-related information
+        /// \param[in] cred_cached            Cached credentials (optional, can be \c NULL)
+        /// \param[in] cfg                    Method configuration (when derived from `config_method_with_cred`, metod attempt to load credentials from \p cfg)
+        /// \param[in] pszTargetName          The name in Windows Credential Manager to retrieve credentials from (optional, can be \c NULL)
+        ///
+        /// \returns
+        /// - \c source_cache   Credentials were obtained from EapHost cache
+        /// - \c source_config  Credentials were set by method configuration
+        /// - \c source_storage Credentials were loaded from Windows Credential Manager
+        ///
+        virtual source_t combine(
+            _In_             DWORD         dwFlags,
+            _In_             HANDLE        hTokenImpersonateUser,
+            _In_opt_   const credentials   *cred_cached,
+            _In_       const config_method &cfg,
+            _In_opt_z_       LPCTSTR       pszTargetName);
     };
 
 
