@@ -114,7 +114,7 @@ void eap::config_method_ttls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode 
             throw com_runtime_error(hr, __FUNCTION__ " Error creating <NonEAPAuthMethod> element.");
     } else {
         // <InnerAuthenticationMethod>/<EAPMethod>
-        if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElInnerAuthenticationMethod, bstr(L"EAPMethod"), namespace_eapmetadata, (DWORD)m_inner->get_method_id())))
+        if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElInnerAuthenticationMethod, bstr(L"EAPMethod"), namespace_eapmetadata, (DWORD)eap_type)))
             throw com_runtime_error(hr, __FUNCTION__ " Error creating <EAPMethod> element.");
     }
 

@@ -27,14 +27,14 @@ class wxMSCHAPv2ConfigPanel;
 /// @{
 
 ///
-/// MSCHAPv2 credential configuration panel
-///
-typedef wxEAPCredentialsConfigPanel<eap::credentials_pass, wxPasswordCredentialsPanel<eap::credentials_pass, wxPasswordCredentialsPanelBase> > wxMSCHAPv2CredentialsConfigPanel;
-
-///
 /// MSCHAPv2 credential entry panel
 ///
 typedef wxPasswordCredentialsPanel<eap::credentials_pass, wxPasswordCredentialsPanelBase> wxMSCHAPv2CredentialsPanel;
+
+///
+/// MSCHAPv2 credential configuration panel
+///
+typedef wxEAPCredentialsConfigPanel<eap::credentials_pass, wxMSCHAPv2CredentialsPanel> wxMSCHAPv2CredentialsConfigPanel;
 
 /// @}
 
