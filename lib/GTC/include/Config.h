@@ -42,7 +42,7 @@ namespace eap
     ///
     /// EAP-GTC configuration
     ///
-    class config_method_eapgtc : public config_method
+    class config_method_eapgtc : public config_method_with_cred
     {
     public:
         ///
@@ -101,7 +101,7 @@ namespace eap
 
         ///
         /// @copydoc eap::config_method::make_credentials()
-        /// \returns This implementation always returns `NULL`
+        /// \returns This implementation always returns `eap::credentials` type of credentials
         ///
         virtual credentials* make_credentials() const;
     };

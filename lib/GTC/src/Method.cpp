@@ -28,15 +28,17 @@ using namespace winstd;
 // eap::method_gtc
 //////////////////////////////////////////////////////////////////////
 
-eap::method_gtc::method_gtc(_In_ module &mod, _In_ config_method_eapgtc &cfg) :
+eap::method_gtc::method_gtc(_In_ module &mod, _In_ config_method_eapgtc &cfg, _In_ credentials &cred) :
     m_cfg(cfg),
+    m_cred(cred),
     method(mod)
 {
 }
 
 
 eap::method_gtc::method_gtc(_Inout_ method_gtc &&other) :
-    m_cfg    (          other.m_cfg    ),
+    m_cfg    (          other.m_cfg     ),
+    m_cred   (          other.m_cred    ),
     m_message(std::move(other.m_message)),
     m_reply  (std::move(other.m_reply  )),
     method   (std::move(other          ))
@@ -47,7 +49,8 @@ eap::method_gtc::method_gtc(_Inout_ method_gtc &&other) :
 eap::method_gtc& eap::method_gtc::operator=(_Inout_ method_gtc &&other)
 {
     if (this != std::addressof(other)) {
-        assert(std::addressof(m_cfg) == std::addressof(other.m_cfg)); // Move method within same configuration only!
+        assert(std::addressof(m_cfg ) == std::addressof(other.m_cfg )); // Move method within same configuration only!
+        assert(std::addressof(m_cred) == std::addressof(other.m_cred)); // Move method within same credentials only!
         (method&)*this = std::move(other          );
         m_message      = std::move(other.m_message);
         m_reply        = std::move(other.m_reply  );

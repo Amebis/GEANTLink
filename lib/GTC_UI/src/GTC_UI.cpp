@@ -22,23 +22,6 @@
 
 
 //////////////////////////////////////////////////////////////////////
-// wxGTCMethodConfigPanel
-//////////////////////////////////////////////////////////////////////
-
-wxGTCMethodConfigPanel::wxGTCMethodConfigPanel(const eap::config_provider &prov, eap::config_method_eapgtc &cfg, wxWindow *parent) :
-    m_cfg(cfg),
-    wxGTCMethodConfigPanelBase(parent)
-{
-    UNREFERENCED_PARAMETER(prov);
-
-    // Load and set icon.
-    winstd::library lib_shell32;
-    if (lib_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
-        m_method_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(153)));
-}
-
-
-//////////////////////////////////////////////////////////////////////
 // wxGTCConfigPanel
 //////////////////////////////////////////////////////////////////////
 
@@ -47,8 +30,8 @@ wxGTCConfigPanel::wxGTCConfigPanel(const eap::config_provider &prov, eap::config
     wxBoxSizer* sb_content;
     sb_content = new wxBoxSizer( wxVERTICAL );
 
-    m_method = new wxGTCMethodConfigPanel(prov, cfg, this);
-    sb_content->Add(m_method, 0, wxEXPAND, 5);
+    m_credentials = new wxGTCCredentialsConfigPanel(prov, cfg, this, _("GTC User ID"));
+    sb_content->Add(m_credentials, 0, wxEXPAND, 5);
 
     this->SetSizer(sb_content);
     this->Layout();
@@ -69,7 +52,7 @@ wxGTCConfigPanel::~wxGTCConfigPanel()
 void wxGTCConfigPanel::OnInitDialog(wxInitDialogEvent& event)
 {
     // Forward the event to child panels.
-    if (m_method)
-        m_method->GetEventHandler()->ProcessEvent(event);
+    if (m_credentials)
+        m_credentials->GetEventHandler()->ProcessEvent(event);
 }
 /// \endcond

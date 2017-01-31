@@ -28,19 +28,20 @@ using namespace winstd;
 // eap::config_method_eapgtc
 //////////////////////////////////////////////////////////////////////
 
-eap::config_method_eapgtc::config_method_eapgtc(_In_ module &mod, _In_ unsigned int level) : config_method(mod, level)
+eap::config_method_eapgtc::config_method_eapgtc(_In_ module &mod, _In_ unsigned int level) : config_method_with_cred(mod, level)
 {
+    m_cred.reset(new credentials(mod));
 }
 
 
 eap::config_method_eapgtc::config_method_eapgtc(_In_ const config_method_eapgtc &other) :
-    config_method(other)
+    config_method_with_cred(other)
 {
 }
 
 
 eap::config_method_eapgtc::config_method_eapgtc(_Inout_ config_method_eapgtc &&other) :
-    config_method(std::move(other))
+    config_method_with_cred(std::move(other))
 {
 }
 
@@ -48,7 +49,7 @@ eap::config_method_eapgtc::config_method_eapgtc(_Inout_ config_method_eapgtc &&o
 eap::config_method_eapgtc& eap::config_method_eapgtc::operator=(_In_ const config_method_eapgtc &other)
 {
     if (this != &other)
-        (config_method&)*this = other;
+        (config_method_with_cred&)*this = other;
 
     return *this;
 }
@@ -57,7 +58,7 @@ eap::config_method_eapgtc& eap::config_method_eapgtc::operator=(_In_ const confi
 eap::config_method_eapgtc& eap::config_method_eapgtc::operator=(_Inout_ config_method_eapgtc &&other)
 {
     if (this != &other)
-        (config_method&&)*this = std::move(other);
+        (config_method_with_cred&&)*this = std::move(other);
 
     return *this;
 }
@@ -83,5 +84,5 @@ const wchar_t* eap::config_method_eapgtc::get_method_str() const
 
 eap::credentials* eap::config_method_eapgtc::make_credentials() const
 {
-    return NULL;
+    return new eap::credentials(m_module);
 }

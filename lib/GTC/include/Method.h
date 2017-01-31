@@ -29,8 +29,6 @@ namespace eap
 
 #include "../../EAPBase/include/Method.h"
 
-#include <list>
-
 
 namespace eap
 {
@@ -50,8 +48,9 @@ namespace eap
         ///
         /// \param[in] mod   GTC module to use for global services
         /// \param[in] cfg   Method configuration
+        /// \param[in] cred  User credentials
         ///
-        method_gtc(_In_ module &mod, _In_ config_method_eapgtc &cfg);
+        method_gtc(_In_ module &mod, _In_ config_method_eapgtc &cfg, _In_ credentials &cred);
 
         ///
         /// Moves a GTC method
@@ -93,6 +92,10 @@ namespace eap
 
         /// @}
 
+        virtual void get_result(
+            _In_  EapPeerMethodResultReason reason,
+            _Out_ EapPeerMethodResult       *pResult);
+
         /// \name User Interaction
         /// @{
 
@@ -106,12 +109,9 @@ namespace eap
 
         /// @}
 
-        virtual void get_result(
-            _In_  EapPeerMethodResultReason reason,
-            _Out_ EapPeerMethodResult       *pResult);
-
     protected:
         config_method_eapgtc &m_cfg;            ///< Method configuration
+        credentials &m_cred;                    ///< Method user credentials
         winstd::sanitizing_wstring m_message;   ///< Authenticator message
         winstd::sanitizing_wstring m_reply;     ///< GTC reply
     };

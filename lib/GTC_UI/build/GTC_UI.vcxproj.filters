@@ -21,9 +21,6 @@
     <ClInclude Include="..\include\GTC_UI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\res\wxGTC_UI.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\StdAfx.cpp">
@@ -32,13 +29,5 @@
     <ClCompile Include="..\src\GTC_UI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\res\wxGTC_UI.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\res\wxGTC_UI.fbp">
-      <Filter>Resource Files</Filter>
-    </None>
   </ItemGroup>
 </Project>

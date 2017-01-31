@@ -21,12 +21,24 @@
 #include "../../EAPBase_UI/include/EAP_UI.h"
 #include "../../GTC/include/Config.h"
 
-class wxGTCMethodConfigPanel;
 class wxGTCConfigPanel;
 
-#pragma once
+/// \addtogroup EAPBaseGUI
+/// @{
 
-#include "../res/wxGTC_UI.h"
+///
+/// GTC credential configuration panel
+///
+typedef wxEAPCredentialsConfigPanel<eap::credentials, wxIdentityCredentialsPanel<eap::credentials, wxIdentityCredentialsPanelBase> > wxGTCCredentialsConfigPanel;
+
+///
+/// GTC credential entry panel
+///
+typedef wxIdentityCredentialsPanel<eap::credentials, wxIdentityCredentialsPanelBase> wxGTCCredentialsPanel;
+
+/// @}
+
+#pragma once
 
 #include <wx/panel.h>
 #include <wx/stattext.h>
@@ -36,26 +48,6 @@ class wxGTCConfigPanel;
 
 /// \addtogroup EAPBaseGUI
 /// @{
-
-///
-/// Inner EAP method config panel
-///
-class wxGTCMethodConfigPanel : public wxGTCMethodConfigPanelBase
-{
-public:
-    ///
-    /// Constructs an inner EAP method config panel
-    ///
-    /// \param[in   ] prov    Provider configuration data
-    /// \param[inout] cfg     Method configuration data
-    /// \param[in   ] parent  Parent window
-    ///
-    wxGTCMethodConfigPanel(const eap::config_provider &prov, eap::config_method_eapgtc &cfg, wxWindow *parent);
-
-protected:
-    eap::config_method_eapgtc &m_cfg;   ///< Method configuration
-};
-
 
 ///
 /// GTC configuration panel
@@ -79,7 +71,7 @@ protected:
     /// \endcond
 
 protected:
-    wxGTCMethodConfigPanel *m_method; ///< Method configuration panel
+    wxGTCCredentialsConfigPanel *m_credentials; ///< Credentials configuration panel
 };
 
 /// @}
