@@ -174,15 +174,15 @@ void eap::module::log_error(_In_ const EAP_ERROR *err) const
     // Write trace event.
     vector<EVENT_DATA_DESCRIPTOR> evt_desc;
     evt_desc.reserve(8);
-    evt_desc.push_back(event_data(err->dwWinError));
+    evt_desc.push_back(event_data(err->dwWinError      ));
     DWORD dwType = err->type.eapType.type;
-    evt_desc.push_back(event_data(dwType));
-    evt_desc.push_back(event_data(err->dwReasonCode));
-    evt_desc.push_back(event_data(&(err->rootCauseGuid), sizeof(GUID)));
-    evt_desc.push_back(event_data(&(err->repairGuid), sizeof(GUID)));
-    evt_desc.push_back(event_data(&(err->helpLinkGuid), sizeof(GUID)));
+    evt_desc.push_back(event_data(dwType               ));
+    evt_desc.push_back(event_data(err->dwReasonCode    ));
+    evt_desc.push_back(event_data(err->rootCauseGuid   ));
+    evt_desc.push_back(event_data(err->repairGuid      ));
+    evt_desc.push_back(event_data(err->helpLinkGuid    ));
     evt_desc.push_back(event_data(err->pRootCauseString));
-    evt_desc.push_back(event_data(err->pRepairString));
+    evt_desc.push_back(event_data(err->pRepairString   ));
     m_ep.write(&EAPMETHOD_TRACE_EVT_EAP_ERROR, (ULONG)evt_desc.size(), evt_desc.data());
 }
 
