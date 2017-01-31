@@ -82,6 +82,12 @@ eap::credentials& eap::credentials::operator=(_Inout_ credentials &&other)
 }
 
 
+eap::config* eap::credentials::clone() const
+{
+    return new credentials(*this);
+}
+
+
 void eap::credentials::clear()
 {
     m_identity.clear();
@@ -148,6 +154,58 @@ void eap::credentials::operator>>(_Inout_ cursor_in &cursor)
 }
 
 
+void eap::credentials::store(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int level) const
+{
+    assert(pszTargetName);
+
+    tstring target(target_name(pszTargetName, level));
+
+    // Write credentials.
+    assert(m_identity.length() < CRED_MAX_USERNAME_LENGTH     );
+    CREDENTIAL cred = {
+        0,                                     // Flags
+        CRED_TYPE_GENERIC,                     // Type
+        const_cast<LPTSTR>(target.c_str()),    // TargetName
+        _T(""),                                // Comment
+        { 0, 0 },                              // LastWritten
+        0,                                     // CredentialBlobSize
+        NULL,                                  // CredentialBlob
+        CRED_PERSIST_ENTERPRISE,               // Persist
+        0,                                     // AttributeCount
+        NULL,                                  // Attributes
+        NULL,                                  // TargetAlias
+        const_cast<LPTSTR>(m_identity.c_str()) // UserName
+    };
+    if (!CredWrite(&cred, 0))
+        throw win_runtime_error(__FUNCTION__ " CredWrite failed.");
+}
+
+
+void eap::credentials::retrieve(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int level)
+{
+    assert(pszTargetName);
+
+    // Read credentials.
+    unique_ptr<CREDENTIAL, CredFree_delete<CREDENTIAL> > cred;
+    if (!CredRead(target_name(pszTargetName, level).c_str(), CRED_TYPE_GENERIC, 0, (PCREDENTIAL*)&cred))
+        throw win_runtime_error(__FUNCTION__ " CredRead failed.");
+
+    if (cred->UserName)
+        m_identity = cred->UserName;
+    else
+        m_identity.clear();
+
+    wstring xpath(pszTargetName);
+    m_module.log_config((xpath + L"/Identity").c_str(), m_identity.c_str());
+}
+
+
+LPCTSTR eap::credentials::target_suffix() const
+{
+    return _T("id");
+}
+
+
 wstring eap::credentials::get_identity() const
 {
     return m_identity;
@@ -160,6 +218,51 @@ tstring eap::credentials::get_name() const
     return
         !identity.empty() ? identity :
         empty()           ? _T("<empty>") : _T("<blank ID>");
+}
+
+
+eap::credentials::source_t eap::credentials::combine(
+    _In_             DWORD         dwFlags,
+    _In_             HANDLE        hTokenImpersonateUser,
+    _In_opt_   const credentials   *cred_cached,
+    _In_       const config_method &cfg,
+    _In_opt_z_       LPCTSTR       pszTargetName)
+{
+    UNREFERENCED_PARAMETER(dwFlags);
+
+    if (cred_cached) {
+        // Using EAP service cached credentials.
+        *this = *cred_cached;
+        m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CACHED2, event_data((unsigned int)cfg.get_method_id()), event_data(credentials::get_name()), event_data(pszTargetName), event_data::blank);
+        return source_cache;
+    }
+
+    auto cfg_with_cred = dynamic_cast<const config_method_with_cred*>(&cfg);
+    if (cfg_with_cred && cfg_with_cred->m_use_cred) {
+        // Using configured credentials.
+        *this = *cfg_with_cred->m_cred.get();
+        m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CONFIG2, event_data((unsigned int)cfg.get_method_id()), event_data(credentials::get_name()), event_data(pszTargetName), event_data::blank);
+        return source_config;
+    }
+
+    if (pszTargetName) {
+        // Switch user context.
+        user_impersonator impersonating(hTokenImpersonateUser);
+
+        try {
+            credentials cred_loaded(m_module);
+            cred_loaded.retrieve(pszTargetName, cfg.m_level);
+
+            // Using stored credentials.
+            *this = std::move(cred_loaded);
+            m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_STORED2, event_data((unsigned int)cfg.get_method_id()), event_data(credentials::get_name()), event_data(pszTargetName), event_data::blank);
+            return source_storage;
+        } catch (...) {
+            // Not actually an error.
+        }
+    }
+
+    return source_unknown;
 }
 
 

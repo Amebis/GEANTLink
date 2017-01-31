@@ -111,6 +111,8 @@ namespace eap
         ///
         credentials& operator=(_Inout_ credentials &&other);
 
+        virtual config* clone() const;
+
         ///
         /// Resets credentials
         ///
@@ -147,7 +149,7 @@ namespace eap
         /// \param[in]  pszTargetName  The name in Windows Credential Manager to store credentials as
         /// \param[in]  level          Credential level (0=outer, 1=inner, 2=inner-inner...)
         ///
-        virtual void store(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int level) const = 0;
+        virtual void store(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int level) const;
 
         ///
         /// Retrieve credentials from Windows Credential Manager
@@ -155,7 +157,7 @@ namespace eap
         /// \param[in]  pszTargetName  The name in Windows Credential Manager to retrieve credentials from
         /// \param[in]  level          Credential level (0=outer, 1=inner, 2=inner-inner...)
         ///
-        virtual void retrieve(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int level) = 0;
+        virtual void retrieve(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int level);
 
         ///
         /// Returns target name for Windows Credential Manager credential name
@@ -187,7 +189,7 @@ namespace eap
         ///
         /// Return target suffix for Windows Credential Manager credential name
         ///
-        virtual LPCTSTR target_suffix() const = 0;
+        virtual LPCTSTR target_suffix() const;
 
         /// @}
 
@@ -224,7 +226,7 @@ namespace eap
             _In_             HANDLE        hTokenImpersonateUser,
             _In_opt_   const credentials   *cred_cached,
             _In_       const config_method &cfg,
-            _In_opt_z_       LPCTSTR       pszTargetName) = 0;
+            _In_opt_z_       LPCTSTR       pszTargetName);
 
     public:
         std::wstring m_identity;    ///< Identity (username\@domain, certificate name etc.)
