@@ -604,8 +604,8 @@ msgstr "Im unverschlüsselten Teil der Anmeldung den echten Nutzernamen senden"
 
 #: master/lib/TTLS_UI/res/wxTTLS_UI.cpp:40
 #: ver1.0/lib/TTLS_UI/res/wxTTLS_UI.cpp:40
-msgid "Use &empty outer identity (RFC 4822)"
-msgstr "Leeren N&utzernamen verwenden (gemäß RFC 4822)"
+msgid "Use &empty outer identity"
+msgstr "Leeren N&utzernamen verwenden"
 
 #: master/lib/TTLS_UI/res/wxTTLS_UI.cpp:41
 #: ver1.0/lib/TTLS_UI/res/wxTTLS_UI.cpp:41

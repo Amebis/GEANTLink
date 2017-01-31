@@ -595,8 +595,8 @@ msgstr "Utitlitza el meu usuari real"
 
 #: master/lib/TTLS_UI/res/wxTTLS_UI.cpp:40
 #: ver1.0/lib/TTLS_UI/res/wxTTLS_UI.cpp:40
-msgid "Use &empty outer identity (RFC 4822)"
-msgstr "Utilitza una identitat externa &buida (RFC 4822)"
+msgid "Use &empty outer identity"
+msgstr "Utilitza una identitat externa &buida"
 
 #: master/lib/TTLS_UI/res/wxTTLS_UI.cpp:41
 #: ver1.0/lib/TTLS_UI/res/wxTTLS_UI.cpp:41

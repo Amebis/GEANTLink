@@ -612,8 +612,8 @@ msgstr "Χρησιμοποιήσε το αληθινό όνομα χρήστη �
 
 #: master/lib/TTLS_UI/res/wxTTLS_UI.cpp:40
 #: ver1.0/lib/TTLS_UI/res/wxTTLS_UI.cpp:40
-msgid "Use &empty outer identity (RFC 4822)"
-msgstr "Χρησιμοποιήστε &κενή εξωτερική ταυτότητα (RFC 4822)"
+msgid "Use &empty outer identity"
+msgstr "Χρησιμοποιήστε &κενή εξωτερική ταυτότητα"
 
 #: master/lib/TTLS_UI/res/wxTTLS_UI.cpp:41
 #: ver1.0/lib/TTLS_UI/res/wxTTLS_UI.cpp:41

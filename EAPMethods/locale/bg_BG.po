@@ -609,8 +609,8 @@ msgstr "Използвай моето истинско потребителск�
 
 #: master/lib/TTLS_UI/res/wxTTLS_UI.cpp:40
 #: ver1.0/lib/TTLS_UI/res/wxTTLS_UI.cpp:40
-msgid "Use &empty outer identity (RFC 4822)"
-msgstr "Използвай &празна външна самоличност (RFC 4822)"
+msgid "Use &empty outer identity"
+msgstr "Използвай &празна външна самоличност"
 
 #: master/lib/TTLS_UI/res/wxTTLS_UI.cpp:41
 #: ver1.0/lib/TTLS_UI/res/wxTTLS_UI.cpp:41

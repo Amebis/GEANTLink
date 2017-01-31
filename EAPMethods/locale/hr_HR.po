@@ -580,9 +580,9 @@ msgstr "Koristi moju stvarnu korisničku oznaku"
 
 #: master/lib/TTLS_UI/res/wxTTLS_UI.cpp:40
 #: ver1.0/lib/TTLS_UI/res/wxTTLS_UI.cpp:40
-msgid "Use &empty outer identity (RFC 4822)"
+msgid "Use &empty outer identity"
 msgstr ""
-"Koristi &prazan vanjski identitet (RFC 4822) (ovo nije podržano za korisnike"
+"Koristi &prazan vanjski identitet (ovo nije podržano za korisnike"
 " iz sustava AAI@EduHr)"
 
 #: master/lib/TTLS_UI/res/wxTTLS_UI.cpp:41

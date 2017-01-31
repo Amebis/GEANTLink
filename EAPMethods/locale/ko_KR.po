@@ -439,7 +439,7 @@ msgid "Use my true user name"
 msgstr ""
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:40
-msgid "Use &empty outer identity (RFC 4822)"
+msgid "Use &empty outer identity"
 msgstr ""
 
 #: lib/TTLS_UI/res/wxTTLS_UI.cpp:41

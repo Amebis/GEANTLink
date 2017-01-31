@@ -604,8 +604,8 @@ msgstr "Korzystaj z mojego rzeczywistego identyfikatora"
 
 #: master/lib/TTLS_UI/res/wxTTLS_UI.cpp:40
 #: ver1.0/lib/TTLS_UI/res/wxTTLS_UI.cpp:40
-msgid "Use &empty outer identity (RFC 4822)"
-msgstr "Użyj &pustego identyfikatora zewnętrznego (RFC 4822)"
+msgid "Use &empty outer identity"
+msgstr "Użyj &pustego identyfikatora zewnętrznego"
 
 #: master/lib/TTLS_UI/res/wxTTLS_UI.cpp:41
 #: ver1.0/lib/TTLS_UI/res/wxTTLS_UI.cpp:41

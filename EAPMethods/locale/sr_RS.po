@@ -603,8 +603,8 @@ msgstr "Koristi moje pravo korisničko ime"
 
 #: master/lib/TTLS_UI/res/wxTTLS_UI.cpp:40
 #: ver1.0/lib/TTLS_UI/res/wxTTLS_UI.cpp:40
-msgid "Use &empty outer identity (RFC 4822)"
-msgstr "Koristi &empty spoljni identitet (RFC 4822)"
+msgid "Use &empty outer identity"
+msgstr "Koristi &empty spoljni identitet"
 
 #: master/lib/TTLS_UI/res/wxTTLS_UI.cpp:41
 #: ver1.0/lib/TTLS_UI/res/wxTTLS_UI.cpp:41
