@@ -161,12 +161,9 @@ namespace eap
         ///
         /// \sa [EapPeerGetUIContext function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363612.aspx)
         ///
-        /// \param[out] ppUIContextData       A pointer to an address that contains a byte buffer with the supplicant user interface context data from EAPHost.
-        /// \param[out] pdwUIContextDataSize  A pointer to a value that specifies the size of the user interface context data byte buffer returned in \p ppUIContextData.
+        /// \param[out] context_data  Supplicant user interface context data from EAPHost.
         ///
-        virtual void get_ui_context(
-            _Out_ BYTE  **ppUIContextData,
-            _Out_ DWORD *pdwUIContextDataSize);
+        virtual void get_ui_context(_Out_ sanitizing_blob &context_data);
 
         ///
         /// Provides a user interface context to the EAP method.
@@ -283,9 +280,7 @@ namespace eap
         /// \name User Interaction
         /// @{
 
-        virtual void get_ui_context(
-            _Out_ BYTE  **ppUIContextData,
-            _Out_ DWORD *pdwUIContextDataSize);
+        virtual void get_ui_context(_Out_ sanitizing_blob &context_data);
 
         virtual EapPeerMethodResponseAction set_ui_context(
             _In_count_(dwUIContextDataSize) const BYTE  *pUIContextData,

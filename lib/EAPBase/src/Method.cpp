@@ -77,16 +77,10 @@ void eap::method::get_result(
 }
 
 
-void eap::method::get_ui_context(
-    _Out_ BYTE  **ppUIContextData,
-    _Out_ DWORD *pdwUIContextDataSize)
+void eap::method::get_ui_context(_Out_ sanitizing_blob &context_data)
 {
-    assert(ppUIContextData);
-    assert(pdwUIContextDataSize);
-
     // Default implementation returns blank context data.
-    *ppUIContextData      = NULL;
-    *pdwUIContextDataSize = 0;
+    context_data.clear();
 }
 
 
@@ -199,14 +193,12 @@ void eap::method_tunnel::get_result(
 }
 
 
-void eap::method_tunnel::get_ui_context(
-    _Out_ BYTE  **ppUIContextData,
-    _Out_ DWORD *pdwUIContextDataSize)
+void eap::method_tunnel::get_ui_context(_Out_ sanitizing_blob &context_data)
 {
     assert(m_inner);
 
     // Default implementation forwards UI context handling to the inner method.
-    m_inner->get_ui_context(ppUIContextData, pdwUIContextDataSize);
+    m_inner->get_ui_context(context_data);
 }
 
 
