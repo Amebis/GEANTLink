@@ -196,13 +196,11 @@ namespace eap
             credentials_connection m_cred;      ///< Connection credentials
             std::unique_ptr<method> m_method;   ///< EAP-TTLS method
 
-            // The following members are required to avoid memory leakage in get_result()
+            // The following members are required to avoid memory leakage in get_result() and get_ui_context().
             BYTE *m_blob_cfg;                   ///< Configuration BLOB
 #ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
             BYTE *m_blob_cred;                  ///< Credentials BLOB
 #endif
-
-            // The following members are required to avoid memory leakage in get_ui_context()
             BYTE *m_blob_ui_ctx;                ///< User Interface context data
         };
 

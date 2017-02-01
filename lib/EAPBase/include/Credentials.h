@@ -18,8 +18,6 @@
     along with GÉANTLink. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <sal.h>
-
 namespace eap
 {
     class credentials;
