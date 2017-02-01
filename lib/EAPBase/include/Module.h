@@ -530,15 +530,45 @@ namespace eap
         /// @{
 
         ///
-        /// Unencrypts and unpacks the BLOB
+        /// Decrypts a BLOB
         ///
-        /// \param[inout] record        Object to unpack to
+        /// \note When EAP_ENCRYPT_BLOBS is defined non-zero, the BLOB is decrypted; otherwise, it is copied only.
+        ///
         /// \param[in   ] pDataIn       Pointer to encrypted BLOB
         /// \param[in   ] dwDataInSize  Size of \p pDataIn
         ///
+        /// \returns Encrypted BLOB
+        ///
+        sanitizing_blob unpack(
+            _In_count_(dwDataInSize) const BYTE  *pDataIn,
+            _In_                           DWORD dwDataInSize)
+        {
+#if EAP_ENCRYPT_BLOBS
+            // Prepare cryptographics provider.
+            winstd::crypt_prov cp;
+            if (!cp.create(NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
+                throw winstd::win_runtime_error(__FUNCTION__ " CryptAcquireContext failed.");
+
+            // Decrypt data.
+            return std::move(decrypt_md5<unsigned char, winstd::sanitizing_allocator<unsigned char> >(cp, pDataIn, dwDataInSize));
+#else
+            return sanitizing_blob(pDataIn, pDataIn + dwDataInSize);
+#endif
+        }
+
+
+        ///
+        /// Decrypts and unpacks the BLOB
+        ///
+        /// \note When EAP_ENCRYPT_BLOBS is defined non-zero, the BLOB is decrypted and unpacked to the \p record; otherwise, it is unpacked to the \p record only.
+        ///
+        /// \param[out] record        Object to unpack to
+        /// \param[in ] pDataIn       Pointer to encrypted BLOB
+        /// \param[in ] dwDataInSize  Size of \p pDataIn
+        ///
         template<class T>
         void unpack(
-            _Inout_                        T     &record,
+            _Out_                          T     &record,
             _In_count_(dwDataInSize) const BYTE  *pDataIn,
             _In_                           DWORD dwDataInSize)
         {
@@ -561,7 +591,47 @@ namespace eap
 
 
         ///
+        /// Encrypts a BLOB
+        ///
+        /// \note When EAP_ENCRYPT_BLOBS is defined non-zero, the BLOB is encrypted; otherwise, it is copied only.
+        ///
+        /// \param[in ] data            BLOB to encrypt
+        /// \param[out] ppDataOut       Pointer to pointer to receive encrypted BLOB. Pointer must be freed using `module::free_memory()`.
+        /// \param[out] pdwDataOutSize  Pointer to \p ppDataOut size
+        ///
+        void pack(
+            _In_  const sanitizing_blob &data,
+            _Out_       BYTE            **ppDataOut,
+            _Out_       DWORD           *pdwDataOutSize)
+        {
+            assert(ppDataOut);
+            assert(pdwDataOutSize);
+
+#if EAP_ENCRYPT_BLOBS
+            // Prepare cryptographics provider.
+            winstd::crypt_prov cp;
+            if (!cp.create(NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
+                throw winstd::win_runtime_error(__FUNCTION__ " CryptAcquireContext failed.");
+
+            // Encrypt BLOB.
+            std::vector<unsigned char> data_enc(std::move(encrypt_md5(cp, data.data(), data.size())));
+
+            // Copy encrypted BLOB to output.
+            *pdwDataOutSize = (DWORD)data_enc.size();
+            *ppDataOut = alloc_memory(*pdwDataOutSize);
+            memcpy(*ppDataOut, data_enc.data(), *pdwDataOutSize);
+#else
+            // Allocate and copy BLOB.
+            *pdwDataOutSize = (DWORD)data.size();
+            memcpy(*ppDataOut = alloc_memory(*pdwDataOutSize), data.data(), *pdwDataOutSize);
+#endif
+        }
+
+
+        ///
         /// Packs and encrypts to the BLOB
+        ///
+        /// \note When EAP_ENCRYPT_BLOBS is defined non-zero, the \p record is packed and encrypted; otherwise, it is packed to an unencrypted BLOB only.
         ///
         /// \param[in ] record          Object to pack
         /// \param[out] ppDataOut       Pointer to pointer to receive encrypted BLOB. Pointer must be freed using `module::free_memory()`.
