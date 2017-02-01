@@ -445,11 +445,12 @@ wxEAPProviderSelectDialog::wxEAPProviderSelectDialog(eap::config_connection &cfg
     std::unique_ptr<eap::config_method> cfg_dummy(cfg.m_module.make_config_method());
     m_banner->m_title->SetLabel(wxString::Format("%s %s", wxT(PRODUCT_NAME_STR), cfg_dummy->get_method_str()));
 
-    for (auto prov = cfg.m_providers.cbegin(), prov_end = cfg.m_providers.cend(); prov != prov_end; ++prov) {
-        wxCommandLinkButton *btn = new wxCommandLinkButton(this, wxID_ANY, wxEAPGetProviderName(prov->m_name));
+    // Iterate over providers.
+    for (auto cfg_prov = cfg.m_providers.cbegin(), cfg_prov_end = cfg.m_providers.cend(); cfg_prov != cfg_prov_end; ++cfg_prov) {
+        wxCommandLinkButton *btn = new wxCommandLinkButton(this, wxID_ANY, wxEAPGetProviderName(cfg_prov->m_name));
         m_providers->Add(btn, 0, wxALL|wxEXPAND, 5);
 
-        btn->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(wxEAPProviderSelectDialog::OnProvSelect), new wxVariant((void*)&*prov), this);
+        btn->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(wxEAPProviderSelectDialog::OnProvSelect), new wxVariant((void*)&*cfg_prov), this);
     }
 
     this->Layout();
