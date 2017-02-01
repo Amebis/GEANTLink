@@ -357,7 +357,20 @@ void eap::peer_ttls::get_ui_context(
     _Out_ BYTE               **ppUIContextData,
     _Out_ DWORD              *pdwUIContextDataSize)
 {
-    static_cast<session*>(hSession)->m_method->get_ui_context(ppUIContextData, pdwUIContextDataSize);
+    assert(ppUIContextData);
+    assert(pdwUIContextDataSize);
+
+    auto s = static_cast<session*>(hSession);
+
+    // Get context data from method.
+    sanitizing_blob context_data;
+    s->m_method->get_ui_context(context_data);
+
+    // Pack data.
+    pack(context_data, ppUIContextData, pdwUIContextDataSize);
+    if (s->m_blob_ui_ctx)
+        free_memory(s->m_blob_ui_ctx);
+    s->m_blob_ui_ctx = *ppUIContextData;
 }
 
 
@@ -368,7 +381,9 @@ void eap::peer_ttls::set_ui_context(
     _Out_                                 EapPeerMethodOutput *pEapOutput)
 {
     assert(pEapOutput);
-    pEapOutput->action              = static_cast<session*>(hSession)->m_method->set_ui_context(pUIContextData, dwUIContextDataSize);
+
+    sanitizing_blob data(std::move(unpack(pUIContextData, dwUIContextDataSize)));
+    pEapOutput->action              = static_cast<session*>(hSession)->m_method->set_ui_context(data.data(), (DWORD)data.size());
     pEapOutput->fAllowNotifications = TRUE;
 }
 
@@ -505,10 +520,11 @@ eap::peer_ttls::session::session(_In_ module &mod) :
     m_module(mod),
     m_cfg(mod),
     m_cred(mod, m_cfg),
-    m_blob_cfg(NULL)
+    m_blob_cfg(NULL),
 #ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
-    , m_blob_cred(NULL)
+    m_blob_cred(NULL),
 #endif
+    m_blob_ui_ctx(NULL)
 {}
 
 
@@ -521,6 +537,9 @@ eap::peer_ttls::session::~session()
     if (m_blob_cred)
         m_module.free_memory(m_blob_cred);
 #endif
+
+    if (m_blob_ui_ctx)
+        m_module.free_memory(m_blob_ui_ctx);
 }
 
 

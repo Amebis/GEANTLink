@@ -122,16 +122,12 @@ void eap::method_gtc::get_result(
 }
 
 
-void eap::method_gtc::get_ui_context(
-    _Out_ BYTE  **ppUIContextData,
-    _Out_ DWORD *pdwUIContextDataSize)
+void eap::method_gtc::get_ui_context(_Out_ sanitizing_blob &context_data)
 {
-    assert(ppUIContextData);
-    assert(pdwUIContextDataSize);
-
-    // Return a direct pointer to authenticator string.
-    *pdwUIContextDataSize = (DWORD)(sizeof(sanitizing_wstring::value_type)*m_message.length());
-    *ppUIContextData      = const_cast<LPBYTE>(reinterpret_cast<LPCBYTE>(m_message.data()));
+    // Return authenticator string.
+    context_data.assign(
+        reinterpret_cast<sanitizing_blob::const_pointer>(m_message.data()                     ),
+        reinterpret_cast<sanitizing_blob::const_pointer>(m_message.data() + m_message.length()));
 }
 
 
@@ -141,7 +137,7 @@ EapPeerMethodResponseAction eap::method_gtc::set_ui_context(
 {
     // Save GTC reply.
     m_reply.assign(
-        reinterpret_cast<sanitizing_wstring::const_pointer>(pUIContextData),
+        reinterpret_cast<sanitizing_wstring::const_pointer>(pUIContextData                      ),
         reinterpret_cast<sanitizing_wstring::const_pointer>(pUIContextData + dwUIContextDataSize));
 
     // Send the reply.

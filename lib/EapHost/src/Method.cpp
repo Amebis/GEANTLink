@@ -209,19 +209,23 @@ void eap::method_eaphost::get_result(
 }
 
 
-void eap::method_eaphost::get_ui_context(
-    _Out_ BYTE  **ppUIContextData,
-    _Out_ DWORD *pdwUIContextDataSize)
+void eap::method_eaphost::get_ui_context(_Out_ sanitizing_blob &context_data)
 {
     // Get EapHost peer UI context data.
+    DWORD dwUIContextDataSize;
+    LPBYTE pUIContextData;
     eap_error_runtime error;
     DWORD dwResult = EapHostPeerGetUIContext(
         m_session_id,
-        pdwUIContextDataSize,
-        ppUIContextData,
+        &dwUIContextDataSize,
+        &pUIContextData,
         &error._Myptr);
     if (dwResult == ERROR_SUCCESS) {
         // UI context data successfuly returned.
+        context_data.assign(pUIContextData, pUIContextData + dwUIContextDataSize);
+
+        // TODO: Test if EapHostPeerGetUIContext() requires us to free the buffer.
+        //EapHostPeerFreeMemory(pUIContextData);
     } else if (error)
         throw eap_runtime_error(*error  , __FUNCTION__ " EapHostPeerGetUIContext failed.");
     else

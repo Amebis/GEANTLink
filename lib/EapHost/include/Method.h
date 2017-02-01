@@ -105,9 +105,7 @@ namespace eap
         /// \name User Interaction
         /// @{
 
-        virtual void get_ui_context(
-            _Out_ BYTE  **ppUIContextData,
-            _Out_ DWORD *pdwUIContextDataSize);
+        virtual void get_ui_context(_Out_ sanitizing_blob &context_data);
 
         virtual EapPeerMethodResponseAction set_ui_context(
             _In_count_(dwUIContextDataSize) const BYTE  *pUIContextData,
