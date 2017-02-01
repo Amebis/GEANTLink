@@ -394,20 +394,20 @@ namespace eap
             std::unique_ptr<unsigned char[], winstd::LocalFree_delete<unsigned char[]> > keyinfo_data;
             DWORD keyinfo_size = 0;
             if (!CryptDecodeObjectEx(X509_ASN_ENCODING, PKCS_RSA_PRIVATE_KEY, (const BYTE*)::LockResource(res_handle), ::SizeofResource(m_instance, res), CRYPT_DECODE_ALLOC_FLAG, NULL, &keyinfo_data, &keyinfo_size))
-                throw win_runtime_error(__FUNCTION__ " CryptDecodeObjectEx failed.");
+                throw winstd::win_runtime_error(__FUNCTION__ " CryptDecodeObjectEx failed.");
             if (!key_rsa.import(hProv, keyinfo_data.get(), keyinfo_size, NULL, 0))
-                throw win_runtime_error(__FUNCTION__ " Private key import failed.");
+                throw winstd::win_runtime_error(__FUNCTION__ " Private key import failed.");
 
             // Import the 256-bit AES session key.
             winstd::crypt_key key_aes;
             if (!CryptImportKey(hProv, reinterpret_cast<LPCBYTE>(data), 268, key_rsa, 0, &key_aes))
-                throw win_runtime_error(__FUNCTION__ " CryptImportKey failed.");
+                throw winstd::win_runtime_error(__FUNCTION__ " CryptImportKey failed.");
 
             // Decrypt the data using AES session key.
             std::vector<unsigned char, winstd::sanitizing_allocator<unsigned char> > buf;
             buf.assign(reinterpret_cast<const unsigned char*>(data) + 268, reinterpret_cast<const unsigned char*>(data) + size);
             if (!CryptDecrypt(key_aes, hHash, TRUE, 0, buf))
-                throw win_runtime_error(__FUNCTION__ " CryptDecrypt failed.");
+                throw winstd::win_runtime_error(__FUNCTION__ " CryptDecrypt failed.");
 
             std::vector<_Ty, _Ax> buf_res;
             buf_res.assign(buf.cbegin(), buf.cend());
@@ -468,11 +468,11 @@ namespace eap
             // Create hash.
             winstd::crypt_hash hash;
             if (!hash.create(hProv, CALG_MD5))
-                throw win_runtime_error(__FUNCTION__ " Creating MD5 hash failed.");
+                throw winstd::win_runtime_error(__FUNCTION__ " Creating MD5 hash failed.");
             DWORD dwHashSize;
             CryptGetHashParam(hash, HP_HASHSIZE, dwHashSize, 0);
             if (size < dwHashSize)
-                throw invalid_argument(__FUNCTION__ " Encrypted data too short.");
+                throw std::invalid_argument(__FUNCTION__ " Encrypted data too short.");
             size_t enc_size = size - dwHashSize;
 
             // Decrypt data.
@@ -481,9 +481,9 @@ namespace eap
             // Calculate MD5 hash and verify it.
             std::vector<unsigned char> hash_bin;
             if (!CryptGetHashParam(hash, HP_HASHVAL, hash_bin, 0))
-                throw win_runtime_error(__FUNCTION__ " Calculating MD5 hash failed.");
+                throw winstd::win_runtime_error(__FUNCTION__ " Calculating MD5 hash failed.");
             if (memcmp(reinterpret_cast<const unsigned char*>(data) + enc_size, hash_bin.data(), dwHashSize) != 0)
-                throw invalid_argument(__FUNCTION__ " Invalid encrypted data.");
+                throw std::invalid_argument(__FUNCTION__ " Invalid encrypted data.");
 
             return dec;
         }
@@ -546,7 +546,7 @@ namespace eap
             // Prepare cryptographics provider.
             winstd::crypt_prov cp;
             if (!cp.create(NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
-                throw win_runtime_error(__FUNCTION__ " CryptAcquireContext failed.");
+                throw winstd::win_runtime_error(__FUNCTION__ " CryptAcquireContext failed.");
 
             // Decrypt data.
             std::vector<unsigned char, winstd::sanitizing_allocator<unsigned char> > data(std::move(decrypt_md5<unsigned char, winstd::sanitizing_allocator<unsigned char> >(cp, pDataIn, dwDataInSize)));
@@ -589,7 +589,7 @@ namespace eap
             // Prepare cryptographics provider.
             winstd::crypt_prov cp;
             if (!cp.create(NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
-                throw win_runtime_error(__FUNCTION__ " CryptAcquireContext failed.");
+                throw winstd::win_runtime_error(__FUNCTION__ " CryptAcquireContext failed.");
 
             // Encrypt BLOB.
             std::vector<unsigned char> data_enc(std::move(encrypt_md5(cp, data.data(), data.size())));
