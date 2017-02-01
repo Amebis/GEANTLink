@@ -59,16 +59,55 @@ void wxGTCConfigPanel::OnInitDialog(wxInitDialogEvent& event)
 
 
 //////////////////////////////////////////////////////////////////////
+// wxGTCResponseDialog
+//////////////////////////////////////////////////////////////////////
+
+wxGTCResponseDialog::wxGTCResponseDialog(const eap::config_provider &prov, wxWindow *parent, wxWindowID id, const wxString &title, const wxPoint &pos, const wxSize &size, long style) :
+    wxEAPGeneralDialog(parent, id, title, pos, size, style)
+{
+    // Set banner title.
+    m_banner->m_title->SetLabel(wxString::Format(_("%s Challenge"), wxEAPGetProviderName(prov.m_name)));
+}
+
+
+//////////////////////////////////////////////////////////////////////
 // wxGTCResponsePanel
 //////////////////////////////////////////////////////////////////////
 
-wxGTCResponsePanel::wxGTCResponsePanel(const eap::config_provider &prov, eap::config_method_eapgtc &cfg, wxWindow* parent) : wxGTCResponsePanelBase(parent)
+wxGTCResponsePanel::wxGTCResponsePanel(winstd::sanitizing_wstring &response, const wchar_t *challenge, wxWindow* parent) :
+    wxGTCResponsePanelBase(parent),
+    m_response_value(response)
 {
-    UNREFERENCED_PARAMETER(prov);
-    UNREFERENCED_PARAMETER(cfg);
-
     // Load and set icon.
     winstd::library lib_shell32;
     if (lib_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
         m_response_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(24)));
+
+    // Set challenge label.
+    m_challenge->SetLabelText(challenge);
+    m_challenge->Wrap(200);
+
+    this->Layout();
 }
+
+
+/// \cond internal
+
+bool wxGTCResponsePanel::TransferDataToWindow()
+{
+    m_response->SetValue(m_response_value.c_str());
+
+    return wxGTCResponsePanelBase::TransferDataToWindow();
+}
+
+
+bool wxGTCResponsePanel::TransferDataFromWindow()
+{
+    wxCHECK(wxGTCResponsePanelBase::TransferDataFromWindow(), false);
+
+    m_response_value = m_response->GetValue();
+
+    return true;
+}
+
+/// \endcond

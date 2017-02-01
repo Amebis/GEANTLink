@@ -22,6 +22,7 @@
 #include "../../GTC/include/Config.h"
 
 class wxGTCConfigPanel;
+class wxGTCResponseDialog;
 class wxGTCResponsePanel;
 
 /// \addtogroup EAPBaseGUI
@@ -45,6 +46,8 @@ typedef wxEAPCredentialsConfigPanel<eap::credentials_identity, wxGTCCredentialsP
 
 #include <wx/panel.h>
 #include <wx/stattext.h>
+
+#include <string>
 
 #include <Windows.h>
 
@@ -79,6 +82,19 @@ protected:
 
 
 ///
+/// GTC challenge/response dialog
+///
+class wxGTCResponseDialog : public wxEAPGeneralDialog
+{
+public:
+    ///
+    /// Constructs a credential dialog
+    ///
+    wxGTCResponseDialog(const eap::config_provider &prov, wxWindow *parent, wxWindowID id = wxID_ANY, const wxString &title = _("GTC Challenge"), const wxPoint &pos = wxDefaultPosition, const wxSize &size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE);
+};
+
+
+///
 /// GTC challenge/response panel
 ///
 class wxGTCResponsePanel : public wxGTCResponsePanelBase
@@ -87,7 +103,20 @@ public:
     ///
     /// Constructs a panel
     ///
-    wxGTCResponsePanel(const eap::config_provider &prov, eap::config_method_eapgtc &cfg, wxWindow* parent);
+    /// \param[inout] response   GTC response
+    /// \param[in   ] challenge  GTC challenge
+    /// \param[in   ] parent     Parent window
+    ///
+    wxGTCResponsePanel(winstd::sanitizing_wstring &response, const wchar_t *challenge, wxWindow* parent);
+
+protected:
+    /// \cond internal
+    virtual bool TransferDataToWindow();
+    virtual bool TransferDataFromWindow();
+    /// \endcond
+
+protected:
+    winstd::sanitizing_wstring &m_response_value;   ///< GTC response
 };
 
 /// @}
