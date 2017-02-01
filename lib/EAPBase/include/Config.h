@@ -465,7 +465,7 @@ namespace eap
         ///
         /// List of configuration providers
         ///
-        typedef std::list<eap::config_provider> provider_list;
+        typedef std::list<config_provider> provider_list;
 
     public:
         ///
@@ -523,7 +523,7 @@ namespace eap
         /// @}
 
     public:
-        std::list<eap::config_provider> m_providers;    ///< Provider configurations
+        std::list<config_provider> m_providers;    ///< Provider configurations
     };
 
     /// @}
