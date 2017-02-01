@@ -53,10 +53,12 @@ void eap::peer_ttls::initialize()
         MsiUseFeature(_T(PRODUCT_VERSION_GUID), _T("featEAPTTLS"));
 #endif
 
+#ifdef EAP_INNER_EAPHOST
     // Initialize EapHost based inner authentication methods.
     DWORD dwResult = EapHostPeerInitialize();
     if (dwResult != ERROR_SUCCESS)
         throw win_runtime_error(dwResult, __FUNCTION__ " EapHostPeerConfigBlob2Xml failed.");
+#endif
 }
 
 
@@ -71,8 +73,10 @@ void eap::peer_ttls::shutdown()
     }
     WaitForMultipleObjects((DWORD)chks.size(), chks.data(), TRUE, 10000);
 
+#ifdef EAP_INNER_EAPHOST
     // Uninitialize EapHost. It was initialized for EapHost based inner authentication methods.
     EapHostPeerUninitialize();
+#endif
 }
 
 
