@@ -661,7 +661,7 @@ EapPeerMethodResponseAction eap::method_ttls::process_request_packet(
                     // No extra initial data for inner authentication avaliable.
                     action = method_tunnel::process_request_packet(NULL, 0);
                 } else {
-                    // Authenticator sent some data for inner authentication. Unencrypt it.
+                    // Authenticator sent some data for inner authentication. Decrypt it.
 
                     // Decrypt the message.
                     SecBuffer buf[] = {
@@ -722,7 +722,7 @@ EapPeerMethodResponseAction eap::method_ttls::process_request_packet(
             // No extra data for inner authentication.
             return method_tunnel::process_request_packet(NULL, 0);
         } else {
-            // Authenticator sent data for inner authentication. Unencrypt it.
+            // Authenticator sent data for inner authentication. Decrypt it.
 
             // Decrypt the message.
             SecBuffer buf[] = {
