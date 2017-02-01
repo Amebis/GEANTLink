@@ -224,8 +224,8 @@ EAP_SESSION_HANDLE eap::peer_ttls::begin_session(
     // Unpack credentials.
     unpack(s->m_cred, pUserData, dwUserDataSize);
 
+    // Look-up the provider.
     config_method_ttls *cfg_method;
-
     for (auto cfg_prov = s->m_cfg.m_providers.begin(), cfg_prov_end = s->m_cfg.m_providers.end();; ++cfg_prov) {
         if (cfg_prov != cfg_prov_end) {
             if (s->m_cred.match(*cfg_prov)) {
@@ -436,6 +436,7 @@ const eap::config_method_ttls* eap::peer_ttls::combine_credentials(
     UNREFERENCED_PARAMETER(dwUserDataSize);
 #endif
 
+    // Iterate over providers.
     for (auto cfg_prov = cfg.m_providers.cbegin(), cfg_prov_end = cfg.m_providers.cend(); cfg_prov != cfg_prov_end; ++cfg_prov) {
         wstring target_name(std::move(cfg_prov->get_id()));
 
