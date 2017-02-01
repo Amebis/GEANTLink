@@ -1216,7 +1216,7 @@ void eap::method_tls::process_handshake()
 void eap::method_tls::process_application_data()
 {
     if (m_sc_queue.empty()) {
-        // An ACK packet received. Nothing to unencrypt.
+        // An ACK packet received. Nothing to decrypt.
         process_application_data(NULL, 0);
         return;
     }
