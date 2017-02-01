@@ -85,6 +85,7 @@
     <ClInclude Include="..\include\EAPXML.h" />
     <ClInclude Include="..\include\Method.h" />
     <ClInclude Include="..\include\Module.h" />
+    <ClInclude Include="..\include\UIContext.h" />
     <ClInclude Include="..\src\StdAfx.h" />
   </ItemGroup>
   <ItemGroup>
@@ -99,6 +100,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\src\UIContext.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Events\build\Events.vcxproj">
