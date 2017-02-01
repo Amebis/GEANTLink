@@ -389,13 +389,75 @@ void eap::peer_ttls_ui::invoke_interactive_ui(
     _Inout_                               BYTE  **ppDataFromInteractiveUI,
     _Inout_                               DWORD *pdwDataFromInteractiveUISize)
 {
-    UNREFERENCED_PARAMETER(pUIContextData);
-    UNREFERENCED_PARAMETER(dwUIContextDataSize);
-    UNREFERENCED_PARAMETER(ppDataFromInteractiveUI);
-    UNREFERENCED_PARAMETER(pdwDataFromInteractiveUISize);
+    // Unpack context data.
+    config_connection cfg(*this);
+    credentials_connection cred(*this, cfg);
+    ui_context_ttls ctx(*this, cfg, cred);
+    unpack(ctx, pUIContextData, dwUIContextDataSize);
 
-    InitCommonControls();
-    MessageBox(hwndParent, _T(PRODUCT_NAME_STR) _T(" interactive UI goes here!"), _T(PRODUCT_NAME_STR) _T(" Prompt"), MB_OK);
+    // Look-up the provider.
+    config_provider *cfg_prov;
+    config_method_ttls *cfg_method;
+    for (auto _cfg_prov = cfg.m_providers.begin(), cfg_prov_end = cfg.m_providers.end();; ++_cfg_prov) {
+        if (_cfg_prov != cfg_prov_end) {
+            if (cred.match(*_cfg_prov)) {
+                // Matching provider found.
+                if (_cfg_prov->m_methods.empty())
+                    throw invalid_argument(string_printf(__FUNCTION__ " %ls provider has no methods.", _cfg_prov->get_id().c_str()));
+                cfg_prov   = &*_cfg_prov;
+                cfg_method = dynamic_cast<config_method_ttls*>(_cfg_prov->m_methods.front().get());
+                break;
+            }
+        } else
+            throw invalid_argument(string_printf(__FUNCTION__ " Credentials do not match to any provider within this connection configuration (provider: %ls).", cred.get_id().c_str()));
+    }
+
+    int result;
+    {
+        // Initialize application.
+        wxInitializerPeer init(m_instance);
+
+        {
+            // Create wxWidget-approved parent window.
+            wxWindow parent;
+            parent.SetHWND((WXHWND)(hwndParent ? hwndParent : GetForegroundWindow()));
+            parent.AdoptAttributesFromHWND();
+            wxTopLevelWindows.Append(&parent);
+
+            {
+                sanitizing_wstring
+                    challenge(reinterpret_cast<sanitizing_wstring::const_pointer>(ctx.m_data.data()), ctx.m_data.size()/sizeof(sanitizing_wstring::value_type)),
+                    response;
+
+                // Build dialog to prompt for response.
+                wxGTCResponseDialog dlg(*cfg_prov, &parent);
+                auto panel = new wxGTCResponsePanel(response, challenge.c_str(), &dlg);
+                dlg.AddContent(panel);
+
+                // Update dialog layout.
+                dlg.Layout();
+                dlg.GetSizer()->Fit(&dlg);
+
+                // Centre and display dialog.
+                dlg.Centre(wxBOTH);
+                if ((result = dlg.ShowModal()) == wxID_OK) {
+                    // Save response.
+                    ctx.m_data.assign(
+                        reinterpret_cast<sanitizing_blob::const_pointer>(response.data()                    ),
+                        reinterpret_cast<sanitizing_blob::const_pointer>(response.data() + response.length()));
+                }
+            }
+
+            wxTopLevelWindows.DeleteObject(&parent);
+            parent.SetHWND((WXHWND)NULL);
+        }
+    }
+
+    if (result != wxID_OK)
+        throw win_runtime_error(ERROR_CANCELLED, __FUNCTION__ " Cancelled.");
+
+    // Pack output data.
+    pack(ctx.m_data, ppDataFromInteractiveUI, pdwDataFromInteractiveUISize);
 }
 
 

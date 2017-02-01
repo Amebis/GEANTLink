@@ -367,11 +367,11 @@ void eap::peer_ttls::get_ui_context(
     auto s = static_cast<session*>(hSession);
 
     // Get context data from method.
-    sanitizing_blob context_data;
-    s->m_method->get_ui_context(context_data);
+    ui_context_ttls ctx(*this, s->m_cfg, s->m_cred);
+    s->m_method->get_ui_context(ctx.m_data);
 
-    // Pack data.
-    pack(context_data, ppUIContextData, pdwUIContextDataSize);
+    // Pack context data.
+    pack(ctx, ppUIContextData, pdwUIContextDataSize);
     if (s->m_blob_ui_ctx)
         free_memory(s->m_blob_ui_ctx);
     s->m_blob_ui_ctx = *ppUIContextData;
