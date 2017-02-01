@@ -24,6 +24,7 @@
 #include "../include/Credentials.h"
 #include "../include/Method.h"
 #include "../include/Module.h"
+#include "../include/UIContext.h"
 
 #include "../../PAP/include/Config.h"
 #include "../../PAP/include/Method.h"
