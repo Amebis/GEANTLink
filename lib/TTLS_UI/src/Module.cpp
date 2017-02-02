@@ -284,7 +284,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
                         src_inner != eap::credentials::source_config && eap::config_method::status_cred_begin <= cfg_method->m_inner->m_last_status && cfg_method->m_inner->m_last_status < eap::config_method::status_cred_end)
                     {
                         // Prompt for inner credentials.
-#ifdef EAP_INNER_EAPHOST
+#if EAP_INNER_EAPHOST
                         auto cfg_inner_eaphost = dynamic_cast<config_method_eaphost*>(cfg_method->m_inner.get());
                         if (!cfg_inner_eaphost)
 #endif
@@ -322,7 +322,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
                                 }
                             }
                         }
-#ifdef EAP_INNER_EAPHOST
+#if EAP_INNER_EAPHOST
                         else {
                             // EapHost inner method
                             auto cred_inner = dynamic_cast<eap::credentials_eaphost*>(cred->m_inner.get());

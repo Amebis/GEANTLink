@@ -53,7 +53,7 @@ void eap::peer_ttls::initialize()
         MsiUseFeature(_T(PRODUCT_VERSION_GUID), _T("featEAPTTLS"));
 #endif
 
-#ifdef EAP_INNER_EAPHOST
+#if EAP_INNER_EAPHOST
     // Initialize EapHost based inner authentication methods.
     DWORD dwResult = EapHostPeerInitialize();
     if (dwResult != ERROR_SUCCESS)
@@ -73,7 +73,7 @@ void eap::peer_ttls::shutdown()
     }
     WaitForMultipleObjects((DWORD)chks.size(), chks.data(), TRUE, 10000);
 
-#ifdef EAP_INNER_EAPHOST
+#if EAP_INNER_EAPHOST
     // Uninitialize EapHost. It was initialized for EapHost based inner authentication methods.
     EapHostPeerUninitialize();
 #endif
@@ -243,7 +243,7 @@ EAP_SESSION_HANDLE eap::peer_ttls::begin_session(
     unique_ptr<method> meth_inner;
     auto  cfg_inner        = cfg_method->m_inner.get();
     auto cred_inner        = dynamic_cast<credentials_ttls*>(s->m_cred.m_cred.get())->m_inner.get();
-#ifdef EAP_INNER_EAPHOST
+#if EAP_INNER_EAPHOST
     auto cfg_inner_eaphost = dynamic_cast<config_method_eaphost*>(cfg_inner);
     if (!cfg_inner_eaphost)
 #endif
@@ -259,7 +259,7 @@ EAP_SESSION_HANDLE eap::peer_ttls::begin_session(
         default: throw invalid_argument(__FUNCTION__ " Unsupported inner authentication method.");
         }
     }
-#ifdef EAP_INNER_EAPHOST
+#if EAP_INNER_EAPHOST
     else {
         // EapHost inner method
         meth_inner.reset(

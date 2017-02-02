@@ -1,6 +1,6 @@
 ﻿/*
-    Copyright 2015-2016 Amebis
-    Copyright 2016 GÉANT
+    Copyright 2015-2017 Amebis
+    Copyright 2016-2017 GÉANT
 
     This file is part of GÉANTLink.
 
@@ -20,28 +20,12 @@
 
 #pragma once
 
-#include "../include/TTLS.h"
-
-#include "../include/Config.h"
-#include "../include/Credentials.h"
-#include "../include/Method.h"
-#include "../include/Module.h"
-
-#include "../../PAP/include/Config.h"
-#include "../../PAP/include/Method.h"
-
-#include "../../MSCHAPv2/include/Config.h"
-#include "../../MSCHAPv2/include/Method.h"
-#include "../../MSCHAPv2/include/MSCHAPv2.h"
-
-#include "../../EapHost/include/Config.h"
-#include "../../EapHost/include/Method.h"
-
-#include "../../EAPBase/include/EAPXML.h"
-
-#include <WinStd/EAP.h>
-
-#include <EapHostError.h>
-#include <EapHostPeerTypes.h>
-#include <eappapis.h>
-#include <schannel.h>
+/// \addtogroup EAPBaseMethod
+/// @{
+#ifndef EAP_INNER_EAPHOST
+///
+/// EapHost inner method support
+///
+#define EAP_INNER_EAPHOST 0
+#endif
+/// @}

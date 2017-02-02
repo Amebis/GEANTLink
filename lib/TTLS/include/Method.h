@@ -29,6 +29,7 @@ namespace eap
 
 #include "Config.h"
 #include "Credentials.h"
+#include "TTLS.h"
 
 #include "../../EAPBase/include/Method.h"
 
