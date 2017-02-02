@@ -270,8 +270,9 @@ eap::config_method* eap::config_method_ttls::make_config_method(_In_ winstd::eap
     case eap_type_mschapv2       : return new config_method_eapmschapv2(m_module, m_level + 1);
 #ifdef EAP_INNER_EAPHOST
     default                      : return new config_method_eaphost    (m_module, m_level + 1); // EapHost peer method handles all other method types
-#endif
+#else
     default                      : throw invalid_argument(string_printf(__FUNCTION__ " Unsupported inner authentication method (%d).", eap_type));
+#endif
     }
 }
 
