@@ -45,10 +45,7 @@ namespace eap
 
 namespace eap
 {
-    ///
-    /// \defgroup EAPBaseCred  Credentials
-    /// Credential management
-    ///
+    /// \addtogroup EAPBaseCred
     /// @{
 
     ///

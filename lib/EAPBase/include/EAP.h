@@ -28,9 +28,22 @@
 /// @{
 #ifndef EAP_ENCRYPT_BLOBS
 ///
-/// Compiler variable to control whether BLOBs leaving our module get encrypted
+/// BLOBs leaving our module are encrypted
 ///
 #define EAP_ENCRYPT_BLOBS 1
+#endif
+/// @}
+
+///
+/// \defgroup EAPBaseCred  Credentials
+/// Credential management
+///
+/// @{
+#ifndef EAP_USE_NATIVE_CREDENTIAL_CACHE
+///
+/// Using EapHost credential cache
+///
+#define EAP_USE_NATIVE_CREDENTIAL_CACHE 0
 #endif
 /// @}
 
