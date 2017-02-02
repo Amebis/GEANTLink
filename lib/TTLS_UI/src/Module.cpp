@@ -413,49 +413,83 @@ void eap::peer_ttls_ui::invoke_interactive_ui(
             throw invalid_argument(string_printf(__FUNCTION__ " Credentials do not match to any provider within this connection configuration (provider: %ls).", cred.get_id().c_str()));
     }
 
-    int result;
+#ifdef EAP_INNER_EAPHOST
+    auto cfg_inner_eaphost = dynamic_cast<config_method_eaphost*>(cfg_method->m_inner.get());
+    if (!cfg_inner_eaphost)
+#endif
     {
-        // Initialize application.
-        wxInitializerPeer init(m_instance);
-
+        int result;
         {
-            // Create wxWidget-approved parent window.
-            wxWindow parent;
-            parent.SetHWND((WXHWND)(hwndParent ? hwndParent : GetForegroundWindow()));
-            parent.AdoptAttributesFromHWND();
-            wxTopLevelWindows.Append(&parent);
+            // Initialize application.
+            wxInitializerPeer init(m_instance);
 
             {
-                sanitizing_wstring
-                    challenge(reinterpret_cast<sanitizing_wstring::const_pointer>(ctx.m_data.data()), ctx.m_data.size()/sizeof(sanitizing_wstring::value_type)),
-                    response;
+                // Create wxWidget-approved parent window.
+                wxWindow parent;
+                parent.SetHWND((WXHWND)(hwndParent ? hwndParent : GetForegroundWindow()));
+                parent.AdoptAttributesFromHWND();
+                wxTopLevelWindows.Append(&parent);
 
-                // Build dialog to prompt for response.
-                wxGTCResponseDialog dlg(*cfg_prov, &parent);
-                auto panel = new wxGTCResponsePanel(response, challenge.c_str(), &dlg);
-                dlg.AddContent(panel);
+                {
+                    sanitizing_wstring
+                        challenge(reinterpret_cast<sanitizing_wstring::const_pointer>(ctx.m_data.data()), ctx.m_data.size()/sizeof(sanitizing_wstring::value_type)),
+                        response;
 
-                // Update dialog layout.
-                dlg.Layout();
-                dlg.GetSizer()->Fit(&dlg);
+                    // Build dialog to prompt for response.
+                    wxGTCResponseDialog dlg(*cfg_prov, &parent);
+                    auto panel = new wxGTCResponsePanel(response, challenge.c_str(), &dlg);
+                    dlg.AddContent(panel);
 
-                // Centre and display dialog.
-                dlg.Centre(wxBOTH);
-                if ((result = dlg.ShowModal()) == wxID_OK) {
-                    // Save response.
-                    ctx.m_data.assign(
-                        reinterpret_cast<sanitizing_blob::const_pointer>(response.data()                    ),
-                        reinterpret_cast<sanitizing_blob::const_pointer>(response.data() + response.length()));
+                    // Update dialog layout.
+                    dlg.Layout();
+                    dlg.GetSizer()->Fit(&dlg);
+
+                    // Centre and display dialog.
+                    dlg.Centre(wxBOTH);
+                    if ((result = dlg.ShowModal()) == wxID_OK) {
+                        // Save response.
+                        ctx.m_data.assign(
+                            reinterpret_cast<sanitizing_blob::const_pointer>(response.data()                    ),
+                            reinterpret_cast<sanitizing_blob::const_pointer>(response.data() + response.length()));
+                    }
                 }
-            }
 
-            wxTopLevelWindows.DeleteObject(&parent);
-            parent.SetHWND((WXHWND)NULL);
+                wxTopLevelWindows.DeleteObject(&parent);
+                parent.SetHWND((WXHWND)NULL);
+            }
+        }
+
+        if (result != wxID_OK)
+            throw win_runtime_error(ERROR_CANCELLED, __FUNCTION__ " Cancelled.");
+    }
+#ifdef EAP_INNER_EAPHOST
+    else {
+        // EapHost inner method
+        DWORD dwSizeofDataFromInteractiveUI;
+        BYTE *pDataFromInteractiveUI;
+        winstd::eap_error error;
+        DWORD dwResult = EapHostPeerInvokeInteractiveUI(
+            hwndParent,
+            (DWORD)ctx.m_data.size(),
+            ctx.m_data.data(),
+            &dwSizeofDataFromInteractiveUI,
+            &pDataFromInteractiveUI,
+            &error._Myptr);
+        if (dwResult == ERROR_SUCCESS) {
+            // Inner EAP method provided response.
+            ctx.m_data.assign(pDataFromInteractiveUI, pDataFromInteractiveUI + dwSizeofDataFromInteractiveUI);
+        } else if (dwResult == ERROR_CANCELLED) {
+            // Not really an error.
+            throw win_runtime_error(ERROR_CANCELLED, __FUNCTION__ " Cancelled.");
+        } else if (error) {
+            wxLogError(_("Invoking EAP interactive UI failed (error %u, %s, %s)."), error->dwWinError, error->pRootCauseString, error->pRepairString);
+            throw eap_runtime_error(*error  , __FUNCTION__ " EapHostPeerInvokeInteractiveUI failed.");
+        } else {
+            wxLogError(_("Invoking EAP interactive UI failed (error %u)."), dwResult);
+            throw win_runtime_error(dwResult, __FUNCTION__ " EapHostPeerInvokeInteractiveUI failed.");
         }
     }
-
-    if (result != wxID_OK)
-        throw win_runtime_error(ERROR_CANCELLED, __FUNCTION__ " Cancelled.");
+#endif
 
     // Pack output data.
     pack(ctx.m_data, ppDataFromInteractiveUI, pdwDataFromInteractiveUISize);
