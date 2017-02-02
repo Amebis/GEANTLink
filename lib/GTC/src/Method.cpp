@@ -37,11 +37,11 @@ eap::method_gtc::method_gtc(_In_ module &mod, _In_ config_method_eapgtc &cfg, _I
 
 
 eap::method_gtc::method_gtc(_Inout_ method_gtc &&other) :
-    m_cfg    (          other.m_cfg     ),
-    m_cred   (          other.m_cred    ),
-    m_message(std::move(other.m_message)),
-    m_reply  (std::move(other.m_reply  )),
-    method   (std::move(other          ))
+    m_cfg      (          other.m_cfg       ),
+    m_cred     (          other.m_cred      ),
+    m_challenge(std::move(other.m_challenge)),
+    m_response (std::move(other.m_response )),
+    method     (std::move(other            ))
 {
 }
 
@@ -51,9 +51,9 @@ eap::method_gtc& eap::method_gtc::operator=(_Inout_ method_gtc &&other)
     if (this != std::addressof(other)) {
         assert(std::addressof(m_cfg ) == std::addressof(other.m_cfg )); // Move method within same configuration only!
         assert(std::addressof(m_cred) == std::addressof(other.m_cred)); // Move method within same credentials only!
-        (method&)*this = std::move(other          );
-        m_message      = std::move(other.m_message);
-        m_reply        = std::move(other.m_reply  );
+        (method&)*this = std::move(other            );
+        m_challenge    = std::move(other.m_challenge);
+        m_response     = std::move(other.m_response );
     }
 
     return *this;
@@ -81,10 +81,14 @@ EapPeerMethodResponseAction eap::method_gtc::process_request_packet(
 {
     assert(pReceivedPacket || dwReceivedPacketSize == 0);
 
-    // Read authenticator message as UTF-8 encoded string.
-    MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)pReceivedPacket, dwReceivedPacketSize, m_message);
+    m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_gtc), event_data::blank);
 
-    // User must reply to the message.
+    // Read authenticator challenge as UTF-8 encoded string.
+    MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)pReceivedPacket, dwReceivedPacketSize, m_challenge);
+
+    m_module.log_event(&EAPMETHOD_GTC_RESPONSE_REQ, event_data((unsigned int)eap_type_gtc), event_data::blank);
+
+    // User must respond to the challenge.
     return EapPeerMethodResponseActionInvokeUI;
 }
 
@@ -93,9 +97,9 @@ void eap::method_gtc::get_response_packet(
     _Out_    sanitizing_blob &packet,
     _In_opt_ DWORD           size_max)
 {
-    // Encode GTC reply as UTF-8.
+    // Encode GTC response as UTF-8.
     sanitizing_string reply_utf8;
-    WideCharToMultiByte(CP_UTF8, 0, m_reply, reply_utf8, NULL, NULL);
+    WideCharToMultiByte(CP_UTF8, 0, m_response, reply_utf8, NULL, NULL);
 
     if (sizeof(sanitizing_string::value_type)*reply_utf8.length() > size_max)
         throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %u, maximum: %u).", sizeof(sanitizing_string::value_type)*reply_utf8.length(), size_max));
@@ -126,8 +130,8 @@ void eap::method_gtc::get_ui_context(_Out_ sanitizing_blob &context_data)
 {
     // Return authenticator string.
     context_data.assign(
-        reinterpret_cast<sanitizing_blob::const_pointer>(m_message.data()                     ),
-        reinterpret_cast<sanitizing_blob::const_pointer>(m_message.data() + m_message.length()));
+        reinterpret_cast<sanitizing_blob::const_pointer>(m_challenge.data()                       ),
+        reinterpret_cast<sanitizing_blob::const_pointer>(m_challenge.data() + m_challenge.length()));
 }
 
 
@@ -135,12 +139,14 @@ EapPeerMethodResponseAction eap::method_gtc::set_ui_context(
     _In_count_(dwUIContextDataSize) const BYTE  *pUIContextData,
     _In_                                  DWORD dwUIContextDataSize)
 {
-    // Save GTC reply.
-    m_reply.assign(
+    m_module.log_event(&EAPMETHOD_GTC_RESPONSE, event_data((unsigned int)eap_type_gtc), event_data::blank);
+
+    // Save GTC response.
+    m_response.assign(
         reinterpret_cast<sanitizing_wstring::const_pointer>(pUIContextData                      ),
         reinterpret_cast<sanitizing_wstring::const_pointer>(pUIContextData + dwUIContextDataSize));
 
-    // Send the reply.
+    // Send the response.
     m_cfg.m_last_status = config_method::status_cred_invalid; // Blame "credentials" if we fail beyond this point.
     return EapPeerMethodResponseActionSend;
 }

@@ -110,8 +110,8 @@ namespace eap
     protected:
         config_method_eapgtc &m_cfg;            ///< Method configuration
         credentials_identity &m_cred;           ///< Method user credentials
-        winstd::sanitizing_wstring m_message;   ///< Authenticator message
-        winstd::sanitizing_wstring m_reply;     ///< GTC reply
+        winstd::sanitizing_wstring m_challenge; ///< GTC challenge
+        winstd::sanitizing_wstring m_response;  ///< GTC response
     };
 
     /// @}
