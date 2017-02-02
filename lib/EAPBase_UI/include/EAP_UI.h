@@ -67,7 +67,7 @@ class wxEAPProviderLockedPanel;
 ///
 class wxEAPCredentialWarningPanel;
 
-#ifdef __DANGEROUS__LOG_CONFIDENTIAL_DATA
+#if __DANGEROUS__LOG_CONFIDENTIAL_DATA
 ///
 /// EAP credential logging enabled warning note
 ///
@@ -452,7 +452,7 @@ public:
 };
 
 
-#ifdef __DANGEROUS__LOG_CONFIDENTIAL_DATA
+#if __DANGEROUS__LOG_CONFIDENTIAL_DATA
 class wxEAPCredentialLogWarningPanel : public wxEAPNotePanel
 {
 public:
