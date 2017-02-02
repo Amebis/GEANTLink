@@ -1,6 +1,38 @@
 # GÉANTLink
 
-Suite of EAP supplicants for Windows - IEEE 802.1X plug-ins for enterprise network authentication
+Suite of EAP supplicants for Microsoft Windows - IEEE 802.1X plug-ins for enterprise network authentication
+
+## Features
+
+### Authentication methods
+- EAP-TTLS with the following inner methods:
+    - PAP
+    - MSCHAPv2
+    - EAP-MSCHAPv2
+    - System-installed EAP method chaining (experimental)
+
+### Security
+- Microsoft Windows Credential Manager stored user credentials
+- User credentials can be shared between different network profiles
+- Encrypted EapHost inter-process communication
+- TLS:
+   - Separate trusted root CA list
+   - Configurable list of accepted server names
+   - Post-authentication CRL check
+
+### Diagnostics
+- Reporting to Event Log channels: Operational and Analytic verbosity
+- Real-time event monitoring utility
+
+### User interface
+- Customizable helpdesk contact information
+- Lockable network profile configuration
+
+### Deployment
+- Released as multi-lingual 32 and 64-bit MSI packages
+- [MsiUseFeature utility](https://github.com/Amebis/GEANTLink/tree/ver1.1/MsiUseFeature) for GÉANTLink install state testing (for embedding GÉANTLink into other setup packages)
+- [CredWrite utility](https://github.com/Amebis/GEANTLink/tree/ver1.1/CredWrite) for automated user credential import to Credential Manager
+- [WLANManager utility](https://github.com/Amebis/GEANTLink/tree/ver1.1/WLANManager) to allow network profile configuration dialog shortcuts
 
 ## Building
 
