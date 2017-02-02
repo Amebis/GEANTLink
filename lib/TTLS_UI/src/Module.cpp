@@ -342,6 +342,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
                                 &identity._Myptr,
                                 &error._Myptr,
                                 NULL);
+                            result = dwResult == ERROR_SUCCESS ? wxID_OK : wxID_CANCEL;
                             if (dwResult == ERROR_SUCCESS) {
                                 // Inner EAP method provided credentials.
                                 cred_inner->m_identity = identity.get();
@@ -351,7 +352,6 @@ void eap::peer_ttls_ui::invoke_identity_ui(
                                 // TODO: If we ever choose to store EapHost credentials to Windows Credential Manager, add a "Save credentials? Yes/No" prompt here and write them to Credential Manager.
                             } else if (dwResult == ERROR_CANCELLED) {
                                 // Not really an error.
-                                result = wxID_CANCEL;
                             } else if (error)
                                 wxLogError(_("Invoking EAP identity UI failed (error %u, %s, %s)."), error->dwWinError, error->pRootCauseString, error->pRepairString);
                             else
