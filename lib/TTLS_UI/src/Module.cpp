@@ -159,7 +159,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
     config_connection cfg(*this);
     unpack(cfg, pConnectionData, dwConnectionDataSize);
 
-#ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
+#if EAP_USE_NATIVE_CREDENTIAL_CACHE
     // Unpack cached credentials.
     credentials_connection cred_in(*this, cfg);
     if (dwUserDataSize)
@@ -214,7 +214,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
                 cred_out.m_id        = cfg_prov->m_id;
                 auto cred = dynamic_cast<credentials_ttls*>(cfg_method->make_credentials());
                 cred_out.m_cred.reset(cred);
-#ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
+#if EAP_USE_NATIVE_CREDENTIAL_CACHE
                 bool has_cached = cred_in.m_cred && cred_in.match(*cfg_prov);
 #endif
 
@@ -229,7 +229,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
                 eap::credentials::source_t src_outer = cred->credentials_tls::combine(
                     dwFlags,
                     NULL,
-#ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
+#if EAP_USE_NATIVE_CREDENTIAL_CACHE
                     has_cached ? cred_in.m_cred.get() : NULL,
 #else
                     NULL,
@@ -273,7 +273,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
                     eap::credentials::source_t src_inner = cred->m_inner->combine(
                         dwFlags,
                         NULL,
-#ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
+#if EAP_USE_NATIVE_CREDENTIAL_CACHE
                         has_cached ? dynamic_cast<credentials_ttls*>(cred_in.m_cred.get())->m_inner.get() : NULL,
 #else
                         NULL,

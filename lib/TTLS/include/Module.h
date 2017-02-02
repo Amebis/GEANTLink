@@ -198,7 +198,7 @@ namespace eap
 
             // The following members are required to avoid memory leakage in get_result() and get_ui_context().
             BYTE *m_blob_cfg;                   ///< Configuration BLOB
-#ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
+#if EAP_USE_NATIVE_CREDENTIAL_CACHE
             BYTE *m_blob_cred;                  ///< Credentials BLOB
 #endif
             BYTE *m_blob_ui_ctx;                ///< User Interface context data
