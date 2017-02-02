@@ -794,6 +794,7 @@ EXCLUDE                = \
 	EventMonitor\res \
 	lib\EAPBase_UI\res \
 	lib\EapHost_UI\res \
+	lib\GTC_UI\res \
 	lib\TLS_UI\res \
 	lib\TTLS_UI\res \
 	lib\WinStd \
