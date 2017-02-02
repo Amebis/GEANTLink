@@ -240,7 +240,7 @@ namespace eap
             // The following members are required to avoid memory leakage in get_result()
             EAP_ATTRIBUTES m_eap_attr_desc; ///< EAP attributes descriptor
             BYTE *m_blob_cfg;               ///< Configuration BLOB
-#ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
+#if EAP_USE_NATIVE_CREDENTIAL_CACHE
             BYTE *m_blob_cred;              ///< Credentials BLOB
 #endif
         };

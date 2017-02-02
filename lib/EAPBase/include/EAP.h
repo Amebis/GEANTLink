@@ -25,6 +25,10 @@
 #define EAP_ENCRYPT_BLOBS 1
 #endif
 
+#ifndef EAP_USE_NATIVE_CREDENTIAL_CACHE
+#define EAP_USE_NATIVE_CREDENTIAL_CACHE 0
+#endif
+
 #define _HOST_LOW_ENDIAN
 
 #if !defined(RC_INVOKED) && !defined(MIDL_PASS)

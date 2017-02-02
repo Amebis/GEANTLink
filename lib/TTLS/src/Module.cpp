@@ -284,7 +284,7 @@ void eap::peer_ttls::get_result(
         s->m_blob_cfg = pResult->pConnectionData;
     }
 
-#ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
+#if EAP_USE_NATIVE_CREDENTIAL_CACHE
     pResult->fSaveUserData = TRUE;
     pack(s->m_cred, &pResult->pUserData, &pResult->dwSizeofUserData);
     if (s->m_blob_cred)
@@ -354,7 +354,7 @@ const eap::config_method_ttls* eap::peer_ttls::combine_credentials(
     _Out_                            credentials_connection& cred_out,
     _In_                             HANDLE                  hTokenImpersonateUser)
 {
-#ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
+#if EAP_USE_NATIVE_CREDENTIAL_CACHE
     // Unpack cached credentials.
     credentials_connection cred_in(*this, cfg);
     if (dwUserDataSize)
@@ -380,14 +380,14 @@ const eap::config_method_ttls* eap::peer_ttls::combine_credentials(
         // Combine credentials. We could use eap::credentials_ttls() to do all the work, but we would not know which credentials is missing then.
         credentials_ttls *cred = dynamic_cast<credentials_ttls*>(cfg_method->make_credentials());
         cred_out.m_cred.reset(cred);
-#ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
+#if EAP_USE_NATIVE_CREDENTIAL_CACHE
         bool has_cached = cred_in.m_cred && cred_in.match(*cfg_prov);
 #endif
 
         // Combine outer credentials.
         LPCTSTR _target_name = (dwFlags & EAP_FLAG_GUEST_ACCESS) == 0 ? target_name.c_str() : NULL;
         eap::credentials::source_t src_outer = cred->credentials_tls::combine(
-#ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
+#if EAP_USE_NATIVE_CREDENTIAL_CACHE
             has_cached ? cred_in.m_cred.get() : NULL,
 #else
             NULL,
@@ -401,7 +401,7 @@ const eap::config_method_ttls* eap::peer_ttls::combine_credentials(
 
         // Combine inner credentials.
         eap::credentials::source_t src_inner = cred->m_inner->combine(
-#ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
+#if EAP_USE_NATIVE_CREDENTIAL_CACHE
             has_cached ? dynamic_cast<credentials_ttls*>(cred_in.m_cred.get())->m_inner.get() : NULL,
 #else
             NULL,
@@ -447,7 +447,7 @@ eap::peer_ttls::session::session(_In_ module &mod) :
     m_cfg(mod),
     m_cred(mod, m_cfg),
     m_blob_cfg(NULL)
-#ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
+#if EAP_USE_NATIVE_CREDENTIAL_CACHE
     , m_blob_cred(NULL)
 #endif
 {}
@@ -458,7 +458,7 @@ eap::peer_ttls::session::~session()
     if (m_blob_cfg)
         m_module.free_memory(m_blob_cfg);
 
-#ifdef EAP_USE_NATIVE_CREDENTIAL_CACHE
+#if EAP_USE_NATIVE_CREDENTIAL_CACHE
     if (m_blob_cred)
         m_module.free_memory(m_blob_cred);
 #endif
