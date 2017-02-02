@@ -25,6 +25,8 @@ namespace eap
 
 #pragma once
 
+#include "TTLS.h"
+
 #include "../../EAPBase/include/UIContext.h"
 
 

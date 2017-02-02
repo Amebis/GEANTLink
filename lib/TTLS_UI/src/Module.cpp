@@ -284,7 +284,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
                         src_inner != eap::credentials::source_config && eap::config_method::status_cred_begin <= cfg_method->m_inner->m_last_status && cfg_method->m_inner->m_last_status < eap::config_method::status_cred_end)
                     {
                         // Prompt for inner credentials.
-#ifdef EAP_INNER_EAPHOST
+#if EAP_INNER_EAPHOST
                         auto cfg_inner_eaphost = dynamic_cast<config_method_eaphost*>(cfg_method->m_inner.get());
                         if (!cfg_inner_eaphost)
 #endif
@@ -323,7 +323,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
                                 }
                             }
                         }
-#ifdef EAP_INNER_EAPHOST
+#if EAP_INNER_EAPHOST
                         else {
                             // EapHost inner method
                             auto cred_inner = dynamic_cast<eap::credentials_eaphost*>(cred->m_inner.get());
@@ -413,7 +413,7 @@ void eap::peer_ttls_ui::invoke_interactive_ui(
             throw invalid_argument(string_printf(__FUNCTION__ " Credentials do not match to any provider within this connection configuration (provider: %ls).", cred.get_id().c_str()));
     }
 
-#ifdef EAP_INNER_EAPHOST
+#if EAP_INNER_EAPHOST
     auto cfg_inner_eaphost = dynamic_cast<config_method_eaphost*>(cfg_method->m_inner.get());
     if (!cfg_inner_eaphost)
 #endif
@@ -462,7 +462,7 @@ void eap::peer_ttls_ui::invoke_interactive_ui(
         if (result != wxID_OK)
             throw win_runtime_error(ERROR_CANCELLED, __FUNCTION__ " Cancelled.");
     }
-#ifdef EAP_INNER_EAPHOST
+#if EAP_INNER_EAPHOST
     else {
         // EapHost inner method
         DWORD dwSizeofDataFromInteractiveUI;

@@ -29,6 +29,9 @@
     <ClInclude Include="..\include\UIContext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\TTLS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\StdAfx.cpp">

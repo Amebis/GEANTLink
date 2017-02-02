@@ -109,7 +109,7 @@ protected:
     eap::config_method_mschapv2    m_cfg_mschapv2;      ///< MSCHAPv2 configuration
     eap::config_method_eapmschapv2 m_cfg_eapmschapv2;   ///< EAP-MSCHAPv2 configuration
     eap::config_method_eapgtc      m_cfg_eapgtc;        ///< EAP-GTC configuration
-#ifdef EAP_INNER_EAPHOST
+#if EAP_INNER_EAPHOST
     eap::config_method_eaphost     m_cfg_eaphost;       ///< Inner EAP configuration
 #endif
 };

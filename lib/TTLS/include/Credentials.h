@@ -25,6 +25,8 @@ namespace eap
 
 #pragma once
 
+#include "TTLS.h"
+
 #include "../../TLS/include/Credentials.h"
 
 #include <memory>

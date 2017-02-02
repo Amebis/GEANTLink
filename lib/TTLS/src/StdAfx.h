@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include "../include/TTLS.h"
+
 #include "../include/Config.h"
 #include "../include/Credentials.h"
 #include "../include/Method.h"
