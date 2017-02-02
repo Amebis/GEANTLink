@@ -28,9 +28,22 @@
 /// @{
 #ifndef EAP_ENCRYPT_BLOBS
 ///
-/// BLOBs leaving our module are encrypted
+/// Encrypt BLOBs leaving our module
 ///
 #define EAP_ENCRYPT_BLOBS 1
+#endif
+/// @}
+
+///
+/// \defgroup EAPBaseModule  Modules
+/// Modules
+///
+/// @{
+#ifndef __DANGEROUS__LOG_CONFIDENTIAL_DATA
+///
+/// Output passwords and other confidential information to event log
+///
+#define __DANGEROUS__LOG_CONFIDENTIAL_DATA 0
 #endif
 /// @}
 
@@ -41,7 +54,7 @@
 /// @{
 #ifndef EAP_USE_NATIVE_CREDENTIAL_CACHE
 ///
-/// Using EapHost credential cache
+/// Use EapHost credential cache
 ///
 #define EAP_USE_NATIVE_CREDENTIAL_CACHE 0
 #endif

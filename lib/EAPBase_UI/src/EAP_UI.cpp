@@ -102,7 +102,7 @@ wxEAPCredentialsDialog::wxEAPCredentialsDialog(const eap::config_provider &prov,
     // Set banner title.
     m_banner->m_title->SetLabel(wxString::Format(_("%s Credentials"), wxEAPGetProviderName(prov.m_name)));
 
-#ifdef __DANGEROUS__LOG_CONFIDENTIAL_DATA
+#if __DANGEROUS__LOG_CONFIDENTIAL_DATA
     AddContent(new wxEAPCredentialLogWarningPanel(this));
 #endif
 }
@@ -239,7 +239,7 @@ wxEAPCredentialWarningPanel::wxEAPCredentialWarningPanel(const eap::config_provi
 // wxEAPCredentialWarningPanel
 //////////////////////////////////////////////////////////////////////
 
-#ifdef __DANGEROUS__LOG_CONFIDENTIAL_DATA
+#if __DANGEROUS__LOG_CONFIDENTIAL_DATA
 wxEAPCredentialLogWarningPanel::wxEAPCredentialLogWarningPanel(wxWindow* parent) : wxEAPNotePanel(parent)
 {
     // Load and set icon.

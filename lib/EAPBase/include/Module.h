@@ -47,10 +47,7 @@ extern "C" {
 
 namespace eap
 {
-    ///
-    /// \defgroup EAPBaseModule  Modules
-    /// Modules
-    ///
+    /// \addtogroup EAPBaseModule
     /// @{
 
     ///
@@ -236,8 +233,8 @@ namespace eap
         ///
         inline void log_config_discrete(_In_z_ LPCWSTR name, _In_z_ LPCWSTR value) const
         {
-#ifdef __DANGEROUS__LOG_CONFIDENTIAL_DATA
-#pragma message (__FILE__ "(" STRING(__LINE__) "): Warning: !!! DANGER !!!  Passwords and certificates will be logged as a clear-text. Please, consider undefining __DANGEROUS__LOG_CONFIDENTIAL_DATA.")
+#if __DANGEROUS__LOG_CONFIDENTIAL_DATA
+#pragma message (__FILE__ "(" STRING(__LINE__) "): Warning: !!! DANGER !!!  Passwords and certificates will be logged as a clear-text. Please, consider setting __DANGEROUS__LOG_CONFIDENTIAL_DATA to 0.")
             log_config(name, value);
 #else
             log_config(name, value ? value[0] ? L"********" : L"" : NULL);
@@ -255,8 +252,8 @@ namespace eap
         ///
         inline void log_config_discrete(_In_z_ LPCWSTR name, _In_bytecount_(size) const void *data, _In_ ULONG size) const
         {
-#ifdef __DANGEROUS__LOG_CONFIDENTIAL_DATA
-#pragma message (__FILE__ "(" STRING(__LINE__) "): Warning: !!! DANGER !!!  Passwords and certificates will be logged as a clear-text. Please, consider undefining __DANGEROUS__LOG_CONFIDENTIAL_DATA.")
+#if __DANGEROUS__LOG_CONFIDENTIAL_DATA
+#pragma message (__FILE__ "(" STRING(__LINE__) "): Warning: !!! DANGER !!!  Passwords and certificates will be logged as a clear-text. Please, consider setting __DANGEROUS__LOG_CONFIDENTIAL_DATA to 0.")
             log_config(name, data, size);
 #else
             log_config(name, data ? size ? L"********" : L"" : NULL);
