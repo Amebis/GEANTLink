@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: EAPMethods\n"
-"POT-Creation-Date: 2017-01-31 14:57+0100\n"
+"POT-Creation-Date: 2017-02-02 18:14+0100\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
 "Last-Translator: Simon Rozman <simon.rozman@amebis.si>\n"
 "Language-Team: Amebis, d. o. o., Kamnik <info@amebis.si>\n"
@@ -481,7 +481,7 @@ msgstr ""
 msgid "Configuring EAP method failed (error %u)."
 msgstr ""
 
-#: master/lib/GTC_UI/res/wxGTC_UI.cpp:16
+#: master/lib/GTC_UI/res/wxGTC_UI.cpp:16 master/lib/GTC_UI/include/GTC_UI.h:93
 msgid "GTC Challenge"
 msgstr ""
 
@@ -499,6 +499,11 @@ msgstr ""
 
 #: master/lib/GTC_UI/src/GTC_UI.cpp:33
 msgid "GTC User ID"
+msgstr ""
+
+#: master/lib/GTC_UI/src/GTC_UI.cpp:69
+#, c-format
+msgid "%s Challenge"
 msgstr ""
 
 #: master/lib/MSCHAPv2_UI/src/MSCHAPv2_UI.cpp:33
@@ -708,7 +713,7 @@ msgstr ""
 msgid "Custom outer identity to use"
 msgstr ""
 
-#: master/lib/TTLS_UI/src/Module.cpp:262 master/lib/TTLS_UI/src/Module.cpp:318
+#: master/lib/TTLS_UI/src/Module.cpp:262 master/lib/TTLS_UI/src/Module.cpp:319
 #: ver1.0/lib/TTLS_UI/src/Module.cpp:274 ver1.0/lib/TTLS_UI/src/Module.cpp:284
 #: ver1.1/lib/TTLS_UI/src/Module.cpp:262 ver1.1/lib/TTLS_UI/src/Module.cpp:318
 #: master/lib/EAPBase_UI/include/EAP_UI.h:785
@@ -718,7 +723,7 @@ msgstr ""
 msgid "Error writing credentials to Credential Manager: %hs (error %u)"
 msgstr ""
 
-#: master/lib/TTLS_UI/src/Module.cpp:264 master/lib/TTLS_UI/src/Module.cpp:320
+#: master/lib/TTLS_UI/src/Module.cpp:264 master/lib/TTLS_UI/src/Module.cpp:321
 #: ver1.0/lib/TTLS_UI/src/Module.cpp:276 ver1.0/lib/TTLS_UI/src/Module.cpp:286
 #: ver1.1/lib/TTLS_UI/src/Module.cpp:264 ver1.1/lib/TTLS_UI/src/Module.cpp:320
 #: master/lib/EAPBase_UI/include/EAP_UI.h:788
@@ -727,14 +732,24 @@ msgstr ""
 msgid "Writing credentials failed."
 msgstr ""
 
-#: master/lib/TTLS_UI/src/Module.cpp:355 ver1.1/lib/TTLS_UI/src/Module.cpp:355
+#: master/lib/TTLS_UI/src/Module.cpp:356 ver1.1/lib/TTLS_UI/src/Module.cpp:355
 #, c-format
 msgid "Invoking EAP identity UI failed (error %u, %s, %s)."
 msgstr ""
 
-#: master/lib/TTLS_UI/src/Module.cpp:357 ver1.1/lib/TTLS_UI/src/Module.cpp:357
+#: master/lib/TTLS_UI/src/Module.cpp:358 ver1.1/lib/TTLS_UI/src/Module.cpp:357
 #, c-format
 msgid "Invoking EAP identity UI failed (error %u)."
+msgstr ""
+
+#: master/lib/TTLS_UI/src/Module.cpp:485
+#, c-format
+msgid "Invoking EAP interactive UI failed (error %u, %s, %s)."
+msgstr ""
+
+#: master/lib/TTLS_UI/src/Module.cpp:488
+#, c-format
+msgid "Invoking EAP interactive UI failed (error %u)."
 msgstr ""
 
 #: master/lib/TTLS_UI/src/TTLS_UI.cpp:118 ver1.0/lib/TTLS_UI/src/TTLS_UI.cpp:36
