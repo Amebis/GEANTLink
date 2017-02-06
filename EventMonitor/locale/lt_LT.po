@@ -3,7 +3,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: EventMonitor\n"
-"POT-Creation-Date: 2016-11-08 11:55+0100\n"
+"POT-Creation-Date: 2017-02-02 18:14+0100\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
 "Last-Translator: Rimas Kudelis <rq@akl.lt>, 2016\n"
 "Language-Team: Lithuanian (https://www.transifex.com/eduroam_devel/teams/11799/lt/)\n"
@@ -16,11 +16,13 @@ msgstr ""
 "X-Poedit-Basepath: ../../..\n"
 "X-Poedit-KeywordsList: _\n"
 "X-Poedit-SearchPath-0: master/EventMonitor\n"
-"X-Poedit-SearchPath-1: ver1.0/EventMonitor\n"
+"X-Poedit-SearchPath-1: ver1.1/EventMonitor\n"
+"X-Poedit-SearchPath-2: ver1.0/EventMonitor\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 
 #: master/EventMonitor/App.cpp:61 ver1.0/EventMonitor/App.cpp:61
-#: master/EventMonitor/Frame.h:75 ver1.0/EventMonitor/Frame.h:75
+#: ver1.1/EventMonitor/App.cpp:61 master/EventMonitor/Frame.h:75
+#: ver1.0/EventMonitor/Frame.h:75 ver1.1/EventMonitor/Frame.h:75
 #: master/EventMonitor/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
 #: master/EventMonitor/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
 #: master/EventMonitor/MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
@@ -29,35 +31,46 @@ msgstr ""
 #: ver1.0/EventMonitor/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
 #: ver1.0/EventMonitor/MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
 #: ver1.0/EventMonitor/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
 msgid "Event Monitor"
 msgstr "Įvykių stebėjimo programa"
 
 #: master/EventMonitor/ETWLog.cpp:83 ver1.0/EventMonitor/ETWLog.cpp:83
+#: ver1.1/EventMonitor/ETWLog.cpp:83
 #, c-format
 msgid "Error opening event trace (error %u)."
 msgstr "Klaida atveriant įvykio sekimo failą (klaida %u)."
 
 #: master/EventMonitor/ETWLog.cpp:171 ver1.0/EventMonitor/ETWLog.cpp:171
+#: ver1.1/EventMonitor/ETWLog.cpp:171
 msgid "Time"
 msgstr "Laikas"
 
 #: master/EventMonitor/ETWLog.cpp:172 ver1.0/EventMonitor/ETWLog.cpp:172
+#: ver1.1/EventMonitor/ETWLog.cpp:172
 msgid "PID"
 msgstr "PID"
 
 #: master/EventMonitor/ETWLog.cpp:173 ver1.0/EventMonitor/ETWLog.cpp:173
+#: ver1.1/EventMonitor/ETWLog.cpp:173
 msgid "TID"
 msgstr "Gijos ID"
 
 #: master/EventMonitor/ETWLog.cpp:174 ver1.0/EventMonitor/ETWLog.cpp:174
+#: ver1.1/EventMonitor/ETWLog.cpp:174
 msgid "Source"
 msgstr "Šaltinis"
 
 #: master/EventMonitor/ETWLog.cpp:175 ver1.0/EventMonitor/ETWLog.cpp:175
+#: ver1.1/EventMonitor/ETWLog.cpp:175
 msgid "Event"
 msgstr "Įvykis"
 
 #: master/EventMonitor/ETWLog.cpp:232 ver1.0/EventMonitor/ETWLog.cpp:232
+#: ver1.1/EventMonitor/ETWLog.cpp:232
 msgid ""
 "Access denied creating event session: you need administrative privileges "
 "(Run As Administrator) or be a member of Performance Log Users group to "
@@ -67,11 +80,13 @@ msgstr ""
 "administratoriaus teisėmis arba būti „Performance Log Users“ grupės nariu."
 
 #: master/EventMonitor/ETWLog.cpp:235 ver1.0/EventMonitor/ETWLog.cpp:235
+#: ver1.1/EventMonitor/ETWLog.cpp:235
 #, c-format
 msgid "The %s event session already exists."
 msgstr "„%s“ įvykių sesija jau egzistuoja."
 
 #: master/EventMonitor/ETWLog.cpp:239 ver1.0/EventMonitor/ETWLog.cpp:239
+#: ver1.1/EventMonitor/ETWLog.cpp:239
 #, c-format
 msgid "Error creating event session (error %u)."
 msgstr "Klaida kuriant įvykių sesiją (klaida %u)."
@@ -79,6 +94,8 @@ msgstr "Klaida kuriant įvykių sesiją (klaida %u)."
 #: master/EventMonitor/ETWLog.cpp:255 master/EventMonitor/ETWLog.cpp:271
 #: master/EventMonitor/ETWLog.cpp:285 ver1.0/EventMonitor/ETWLog.cpp:255
 #: ver1.0/EventMonitor/ETWLog.cpp:271 ver1.0/EventMonitor/ETWLog.cpp:285
+#: ver1.1/EventMonitor/ETWLog.cpp:255 ver1.1/EventMonitor/ETWLog.cpp:271
+#: ver1.1/EventMonitor/ETWLog.cpp:285
 #, c-format
 msgid "Error enabling %s event provider (error %u)."
 msgstr "Klaida įgalinant „%s“ įvykių teiktuvą (klaida %u)."
@@ -88,128 +105,157 @@ msgstr "Klaida įgalinant „%s“ įvykių teiktuvą (klaida %u)."
 #: master/EventMonitor/Frame.cpp:170 ver1.0/EventMonitor/Frame.cpp:48
 #: ver1.0/EventMonitor/Frame.cpp:108 ver1.0/EventMonitor/Frame.cpp:113
 #: ver1.0/EventMonitor/Frame.cpp:168 ver1.0/EventMonitor/Frame.cpp:170
+#: ver1.1/EventMonitor/Frame.cpp:48 ver1.1/EventMonitor/Frame.cpp:108
+#: ver1.1/EventMonitor/Frame.cpp:113 ver1.1/EventMonitor/Frame.cpp:168
+#: ver1.1/EventMonitor/Frame.cpp:170
 #, c-format
 msgid "Toggles display of %s records"
 msgstr "Perjungia „%s“ klaidų matomumą"
 
 #: master/EventMonitor/Frame.cpp:65 ver1.0/EventMonitor/Frame.cpp:65
+#: ver1.1/EventMonitor/Frame.cpp:65
 msgid "E&xit"
 msgstr "&Išeiti"
 
 #: master/EventMonitor/Frame.cpp:65 ver1.0/EventMonitor/Frame.cpp:65
+#: ver1.1/EventMonitor/Frame.cpp:65
 msgid "Quits this program"
 msgstr "Baigti šios programos darbą"
 
 #: master/EventMonitor/Frame.cpp:69 ver1.0/EventMonitor/Frame.cpp:69
+#: ver1.1/EventMonitor/Frame.cpp:69
 msgid "&Program"
 msgstr "&Programa"
 
 #: master/EventMonitor/Frame.cpp:73 ver1.0/EventMonitor/Frame.cpp:73
+#: ver1.1/EventMonitor/Frame.cpp:73
 msgid "&Copy"
 msgstr "&Kopijuoti"
 
 #: master/EventMonitor/Frame.cpp:73 master/EventMonitor/Frame.cpp:154
 #: ver1.0/EventMonitor/Frame.cpp:73 ver1.0/EventMonitor/Frame.cpp:154
+#: ver1.1/EventMonitor/Frame.cpp:73 ver1.1/EventMonitor/Frame.cpp:154
 msgid "Copies selected records to clipboard"
 msgstr "Kopijuoti pažymėtus įrašus į iškarpinę"
 
 #: master/EventMonitor/Frame.cpp:78 ver1.0/EventMonitor/Frame.cpp:78
+#: ver1.1/EventMonitor/Frame.cpp:78
 msgid "Copy A&ll"
 msgstr "Kopijuoti vi&sus"
 
 #: master/EventMonitor/Frame.cpp:78 master/EventMonitor/Frame.cpp:156
 #: ver1.0/EventMonitor/Frame.cpp:78 ver1.0/EventMonitor/Frame.cpp:156
+#: ver1.1/EventMonitor/Frame.cpp:78 ver1.1/EventMonitor/Frame.cpp:156
 msgid "Copies all records to clipboard (including hidden)"
 msgstr "Kopijuoti visus įrašus (taip pat ir nematomus) į iškarpinę"
 
 #: master/EventMonitor/Frame.cpp:83 master/EventMonitor/Frame.cpp:158
 #: ver1.0/EventMonitor/Frame.cpp:83 ver1.0/EventMonitor/Frame.cpp:158
+#: ver1.1/EventMonitor/Frame.cpp:83 ver1.1/EventMonitor/Frame.cpp:158
 msgid "Clear"
 msgstr "Valyti"
 
 #: master/EventMonitor/Frame.cpp:83 master/EventMonitor/Frame.cpp:158
 #: ver1.0/EventMonitor/Frame.cpp:83 ver1.0/EventMonitor/Frame.cpp:158
+#: ver1.1/EventMonitor/Frame.cpp:83 ver1.1/EventMonitor/Frame.cpp:158
 msgid "Clears all records from the log"
 msgstr "Pašalinti visus žurnalo įrašus"
 
 #: master/EventMonitor/Frame.cpp:90 ver1.0/EventMonitor/Frame.cpp:90
+#: ver1.1/EventMonitor/Frame.cpp:90
 msgid "Select &All"
 msgstr "Žymėti &visus"
 
 #: master/EventMonitor/Frame.cpp:90 ver1.0/EventMonitor/Frame.cpp:90
+#: ver1.1/EventMonitor/Frame.cpp:90
 msgid "Selects all visible records"
 msgstr "Pažymėti visus matomus įrašus"
 
 #: master/EventMonitor/Frame.cpp:94 ver1.0/EventMonitor/Frame.cpp:94
+#: ver1.1/EventMonitor/Frame.cpp:94
 msgid "Select &None"
 msgstr "Nežymėti &nieko"
 
 #: master/EventMonitor/Frame.cpp:94 ver1.0/EventMonitor/Frame.cpp:94
+#: ver1.1/EventMonitor/Frame.cpp:94
 msgid "Clears record selection"
 msgstr "Nužymėti pažymėtus įrašus"
 
 #: master/EventMonitor/Frame.cpp:97 master/EventMonitor/Frame.cpp:142
 #: ver1.0/EventMonitor/Frame.cpp:97 ver1.0/EventMonitor/Frame.cpp:142
+#: ver1.1/EventMonitor/Frame.cpp:97 ver1.1/EventMonitor/Frame.cpp:142
 msgid "&Edit"
 msgstr "R&edagavimas"
 
 #: master/EventMonitor/Frame.cpp:101 ver1.0/EventMonitor/Frame.cpp:101
+#: ver1.1/EventMonitor/Frame.cpp:101
 msgid "Auto &Scroll"
 msgstr "&Automatinė slinktis"
 
 #: master/EventMonitor/Frame.cpp:101 master/EventMonitor/Frame.cpp:164
 #: ver1.0/EventMonitor/Frame.cpp:101 ver1.0/EventMonitor/Frame.cpp:164
+#: ver1.1/EventMonitor/Frame.cpp:101 ver1.1/EventMonitor/Frame.cpp:164
 msgid "Automatically scrolls to the most recent records as they come-in"
 msgstr "Automatiškai slinkti vaizdą, kad visuomet būtų matomi vėliausi įrašai"
 
 #: master/EventMonitor/Frame.cpp:123 master/EventMonitor/Frame.cpp:176
 #: ver1.0/EventMonitor/Frame.cpp:123 ver1.0/EventMonitor/Frame.cpp:176
+#: ver1.1/EventMonitor/Frame.cpp:123 ver1.1/EventMonitor/Frame.cpp:176
 msgid "Verbose"
 msgstr "Išsamūs"
 
 #: master/EventMonitor/Frame.cpp:123 master/EventMonitor/Frame.cpp:176
 #: ver1.0/EventMonitor/Frame.cpp:123 ver1.0/EventMonitor/Frame.cpp:176
+#: ver1.1/EventMonitor/Frame.cpp:123 ver1.1/EventMonitor/Frame.cpp:176
 msgid "Displays all levels of records"
 msgstr "Rodyti visų lygių įrašus"
 
 #: master/EventMonitor/Frame.cpp:127 master/EventMonitor/Frame.cpp:178
 #: ver1.0/EventMonitor/Frame.cpp:127 ver1.0/EventMonitor/Frame.cpp:178
+#: ver1.1/EventMonitor/Frame.cpp:127 ver1.1/EventMonitor/Frame.cpp:178
 msgid "Informational"
 msgstr "Informaciniai"
 
 #: master/EventMonitor/Frame.cpp:127 master/EventMonitor/Frame.cpp:178
 #: ver1.0/EventMonitor/Frame.cpp:127 ver1.0/EventMonitor/Frame.cpp:178
+#: ver1.1/EventMonitor/Frame.cpp:127 ver1.1/EventMonitor/Frame.cpp:178
 msgid "Displays all records up to informational level"
 msgstr "Rodyti informacinio ir svarbesnių lygių įrašus"
 
 #: master/EventMonitor/Frame.cpp:131 master/EventMonitor/Frame.cpp:180
 #: ver1.0/EventMonitor/Frame.cpp:131 ver1.0/EventMonitor/Frame.cpp:180
+#: ver1.1/EventMonitor/Frame.cpp:131 ver1.1/EventMonitor/Frame.cpp:180
 msgid "Warning"
 msgstr "Įspėjimai"
 
 #: master/EventMonitor/Frame.cpp:131 master/EventMonitor/Frame.cpp:180
 #: ver1.0/EventMonitor/Frame.cpp:131 ver1.0/EventMonitor/Frame.cpp:180
+#: ver1.1/EventMonitor/Frame.cpp:131 ver1.1/EventMonitor/Frame.cpp:180
 msgid "Displays all records up to warning level"
 msgstr "Rodyti įspėjimo ir svarbesnių lygių įrašus"
 
 #: master/EventMonitor/Frame.cpp:135 master/EventMonitor/Frame.cpp:182
 #: ver1.0/EventMonitor/Frame.cpp:135 ver1.0/EventMonitor/Frame.cpp:182
+#: ver1.1/EventMonitor/Frame.cpp:135 ver1.1/EventMonitor/Frame.cpp:182
 msgid "Error"
 msgstr "Klaidos"
 
 #: master/EventMonitor/Frame.cpp:135 master/EventMonitor/Frame.cpp:182
 #: ver1.0/EventMonitor/Frame.cpp:135 ver1.0/EventMonitor/Frame.cpp:182
+#: ver1.1/EventMonitor/Frame.cpp:135 ver1.1/EventMonitor/Frame.cpp:182
 msgid "Displays error level records only"
 msgstr "Rodyti tik klaidų įrašus"
 
 #: master/EventMonitor/Frame.cpp:142 master/EventMonitor/Frame.cpp:146
 #: ver1.0/EventMonitor/Frame.cpp:142 ver1.0/EventMonitor/Frame.cpp:146
+#: ver1.1/EventMonitor/Frame.cpp:142 ver1.1/EventMonitor/Frame.cpp:146
 #, c-format
 msgid "%s toolbar"
 msgstr "Įrankių juosta „%s“"
 
 #: master/EventMonitor/Frame.cpp:142 master/EventMonitor/Frame.cpp:146
 #: ver1.0/EventMonitor/Frame.cpp:142 ver1.0/EventMonitor/Frame.cpp:146
+#: ver1.1/EventMonitor/Frame.cpp:142 ver1.1/EventMonitor/Frame.cpp:146
 #, c-format
 msgid "Toggles display of %s toolbar"
 msgstr "Perjungti įrankių juostos „%s“ matomumą"
@@ -217,31 +263,39 @@ msgstr "Perjungti įrankių juostos „%s“ matomumą"
 #: master/EventMonitor/Frame.cpp:142 master/EventMonitor/Frame.cpp:146
 #: master/EventMonitor/Frame.cpp:185 ver1.0/EventMonitor/Frame.cpp:142
 #: ver1.0/EventMonitor/Frame.cpp:146 ver1.0/EventMonitor/Frame.cpp:185
+#: ver1.1/EventMonitor/Frame.cpp:142 ver1.1/EventMonitor/Frame.cpp:146
+#: ver1.1/EventMonitor/Frame.cpp:185
 msgid "View"
 msgstr "Rodymas"
 
 #: master/EventMonitor/Frame.cpp:146 master/EventMonitor/Frame.cpp:149
 #: ver1.0/EventMonitor/Frame.cpp:146 ver1.0/EventMonitor/Frame.cpp:149
+#: ver1.1/EventMonitor/Frame.cpp:146 ver1.1/EventMonitor/Frame.cpp:149
 msgid "&View"
 msgstr "&Rodymas"
 
 #: master/EventMonitor/Frame.cpp:154 ver1.0/EventMonitor/Frame.cpp:154
+#: ver1.1/EventMonitor/Frame.cpp:154
 msgid "Copy"
 msgstr "Kopijuoti"
 
 #: master/EventMonitor/Frame.cpp:156 ver1.0/EventMonitor/Frame.cpp:156
+#: ver1.1/EventMonitor/Frame.cpp:156
 msgid "Copy All"
 msgstr "Kopijuoti visus"
 
 #: master/EventMonitor/Frame.cpp:161 ver1.0/EventMonitor/Frame.cpp:161
+#: ver1.1/EventMonitor/Frame.cpp:161
 msgid "Edit"
 msgstr "Redagavimas"
 
 #: master/EventMonitor/Frame.cpp:164 ver1.0/EventMonitor/Frame.cpp:164
+#: ver1.1/EventMonitor/Frame.cpp:164
 msgid "Auto Scroll"
 msgstr "Automatinė slinktis"
 
 #: master/EventMonitor/Frame.cpp:189 ver1.0/EventMonitor/Frame.cpp:189
+#: ver1.1/EventMonitor/Frame.cpp:189
 msgid "Trace Log"
 msgstr "Sekimo žurnalas"
 
@@ -261,6 +315,14 @@ msgstr "Sekimo žurnalas"
 #: ver1.0/EventMonitor/MSIBuild/en_US.x64.Debug.Shortcut-2.idtx:4
 #: ver1.0/EventMonitor/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
 #: ver1.0/EventMonitor/MSIBuild/en_US.x64.Release.Shortcut-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.Win32.Debug.Shortcut-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.Win32.Release.Shortcut-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.x64.Debug.Shortcut-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.x64.Release.Shortcut-2.idtx:4
 msgid "Real-time display of internal events"
 msgstr "Vidinių įvykių stebėjimas tikruoju laiku"
 
@@ -272,5 +334,9 @@ msgstr "Vidinių įvykių stebėjimas tikruoju laiku"
 #: ver1.0/EventMonitor/MSIBuild/en_US.Win32.Release.Shortcut-2.idtx:4
 #: ver1.0/EventMonitor/MSIBuild/en_US.x64.Debug.Shortcut-2.idtx:4
 #: ver1.0/EventMonitor/MSIBuild/en_US.x64.Release.Shortcut-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.Win32.Debug.Shortcut-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.Win32.Release.Shortcut-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.x64.Debug.Shortcut-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.x64.Release.Shortcut-2.idtx:4
 msgid "EVENTM~1|GÉANTLink Event Monitor"
 msgstr "EVENTM~1|„GÉANTLink“ įvykių stebėjimo programa"

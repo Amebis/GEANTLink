@@ -3,7 +3,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: EventMonitor\n"
-"POT-Creation-Date: 2016-11-08 11:55+0100\n"
+"POT-Creation-Date: 2017-02-02 18:14+0100\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
 "Last-Translator: University of Ruse <support@uni-ruse.bg>, 2016\n"
 "Language-Team: Bulgarian (Bulgaria) (https://www.transifex.com/eduroam_devel/teams/11799/bg_BG/)\n"
@@ -16,11 +16,13 @@ msgstr ""
 "X-Poedit-Basepath: ../../..\n"
 "X-Poedit-KeywordsList: _\n"
 "X-Poedit-SearchPath-0: master/EventMonitor\n"
-"X-Poedit-SearchPath-1: ver1.0/EventMonitor\n"
+"X-Poedit-SearchPath-1: ver1.1/EventMonitor\n"
+"X-Poedit-SearchPath-2: ver1.0/EventMonitor\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 
 #: master/EventMonitor/App.cpp:61 ver1.0/EventMonitor/App.cpp:61
-#: master/EventMonitor/Frame.h:75 ver1.0/EventMonitor/Frame.h:75
+#: ver1.1/EventMonitor/App.cpp:61 master/EventMonitor/Frame.h:75
+#: ver1.0/EventMonitor/Frame.h:75 ver1.1/EventMonitor/Frame.h:75
 #: master/EventMonitor/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
 #: master/EventMonitor/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
 #: master/EventMonitor/MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
@@ -29,35 +31,46 @@ msgstr ""
 #: ver1.0/EventMonitor/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
 #: ver1.0/EventMonitor/MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
 #: ver1.0/EventMonitor/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
 msgid "Event Monitor"
 msgstr "Следене на събития"
 
 #: master/EventMonitor/ETWLog.cpp:83 ver1.0/EventMonitor/ETWLog.cpp:83
+#: ver1.1/EventMonitor/ETWLog.cpp:83
 #, c-format
 msgid "Error opening event trace (error %u)."
 msgstr "Грешка при отваряне проследяването на събитие (error %u)."
 
 #: master/EventMonitor/ETWLog.cpp:171 ver1.0/EventMonitor/ETWLog.cpp:171
+#: ver1.1/EventMonitor/ETWLog.cpp:171
 msgid "Time"
 msgstr "Време"
 
 #: master/EventMonitor/ETWLog.cpp:172 ver1.0/EventMonitor/ETWLog.cpp:172
+#: ver1.1/EventMonitor/ETWLog.cpp:172
 msgid "PID"
 msgstr "PID"
 
 #: master/EventMonitor/ETWLog.cpp:173 ver1.0/EventMonitor/ETWLog.cpp:173
+#: ver1.1/EventMonitor/ETWLog.cpp:173
 msgid "TID"
 msgstr "TID"
 
 #: master/EventMonitor/ETWLog.cpp:174 ver1.0/EventMonitor/ETWLog.cpp:174
+#: ver1.1/EventMonitor/ETWLog.cpp:174
 msgid "Source"
 msgstr "Източник"
 
 #: master/EventMonitor/ETWLog.cpp:175 ver1.0/EventMonitor/ETWLog.cpp:175
+#: ver1.1/EventMonitor/ETWLog.cpp:175
 msgid "Event"
 msgstr "Събитие"
 
 #: master/EventMonitor/ETWLog.cpp:232 ver1.0/EventMonitor/ETWLog.cpp:232
+#: ver1.1/EventMonitor/ETWLog.cpp:232
 msgid ""
 "Access denied creating event session: you need administrative privileges "
 "(Run As Administrator) or be a member of Performance Log Users group to "
@@ -68,11 +81,13 @@ msgstr ""
 "Performance Log Users, за да стартирате сесия за проследяване на събитие."
 
 #: master/EventMonitor/ETWLog.cpp:235 ver1.0/EventMonitor/ETWLog.cpp:235
+#: ver1.1/EventMonitor/ETWLog.cpp:235
 #, c-format
 msgid "The %s event session already exists."
 msgstr "Сесията на събитие %s вече съществува."
 
 #: master/EventMonitor/ETWLog.cpp:239 ver1.0/EventMonitor/ETWLog.cpp:239
+#: ver1.1/EventMonitor/ETWLog.cpp:239
 #, c-format
 msgid "Error creating event session (error %u)."
 msgstr "Грешка при създаване сесията на събитие (error %u)."
@@ -80,6 +95,8 @@ msgstr "Грешка при създаване сесията на събити�
 #: master/EventMonitor/ETWLog.cpp:255 master/EventMonitor/ETWLog.cpp:271
 #: master/EventMonitor/ETWLog.cpp:285 ver1.0/EventMonitor/ETWLog.cpp:255
 #: ver1.0/EventMonitor/ETWLog.cpp:271 ver1.0/EventMonitor/ETWLog.cpp:285
+#: ver1.1/EventMonitor/ETWLog.cpp:255 ver1.1/EventMonitor/ETWLog.cpp:271
+#: ver1.1/EventMonitor/ETWLog.cpp:285
 #, c-format
 msgid "Error enabling %s event provider (error %u)."
 msgstr "Грешка при разрешаване %s събитие на доставчик (error %u)."
@@ -89,128 +106,157 @@ msgstr "Грешка при разрешаване %s събитие на дос
 #: master/EventMonitor/Frame.cpp:170 ver1.0/EventMonitor/Frame.cpp:48
 #: ver1.0/EventMonitor/Frame.cpp:108 ver1.0/EventMonitor/Frame.cpp:113
 #: ver1.0/EventMonitor/Frame.cpp:168 ver1.0/EventMonitor/Frame.cpp:170
+#: ver1.1/EventMonitor/Frame.cpp:48 ver1.1/EventMonitor/Frame.cpp:108
+#: ver1.1/EventMonitor/Frame.cpp:113 ver1.1/EventMonitor/Frame.cpp:168
+#: ver1.1/EventMonitor/Frame.cpp:170
 #, c-format
 msgid "Toggles display of %s records"
 msgstr "Сборно изобразяване на записи %s"
 
 #: master/EventMonitor/Frame.cpp:65 ver1.0/EventMonitor/Frame.cpp:65
+#: ver1.1/EventMonitor/Frame.cpp:65
 msgid "E&xit"
 msgstr "Из&ход"
 
 #: master/EventMonitor/Frame.cpp:65 ver1.0/EventMonitor/Frame.cpp:65
+#: ver1.1/EventMonitor/Frame.cpp:65
 msgid "Quits this program"
 msgstr "Излизане от тази програма"
 
 #: master/EventMonitor/Frame.cpp:69 ver1.0/EventMonitor/Frame.cpp:69
+#: ver1.1/EventMonitor/Frame.cpp:69
 msgid "&Program"
 msgstr "&Програма"
 
 #: master/EventMonitor/Frame.cpp:73 ver1.0/EventMonitor/Frame.cpp:73
+#: ver1.1/EventMonitor/Frame.cpp:73
 msgid "&Copy"
 msgstr "&Копиране"
 
 #: master/EventMonitor/Frame.cpp:73 master/EventMonitor/Frame.cpp:154
 #: ver1.0/EventMonitor/Frame.cpp:73 ver1.0/EventMonitor/Frame.cpp:154
+#: ver1.1/EventMonitor/Frame.cpp:73 ver1.1/EventMonitor/Frame.cpp:154
 msgid "Copies selected records to clipboard"
 msgstr "Копиране на избраните записи в клипборда"
 
 #: master/EventMonitor/Frame.cpp:78 ver1.0/EventMonitor/Frame.cpp:78
+#: ver1.1/EventMonitor/Frame.cpp:78
 msgid "Copy A&ll"
 msgstr "Копиране на Всич&ко"
 
 #: master/EventMonitor/Frame.cpp:78 master/EventMonitor/Frame.cpp:156
 #: ver1.0/EventMonitor/Frame.cpp:78 ver1.0/EventMonitor/Frame.cpp:156
+#: ver1.1/EventMonitor/Frame.cpp:78 ver1.1/EventMonitor/Frame.cpp:156
 msgid "Copies all records to clipboard (including hidden)"
 msgstr "Копиране на всички записи в клипборда (включително скритите)"
 
 #: master/EventMonitor/Frame.cpp:83 master/EventMonitor/Frame.cpp:158
 #: ver1.0/EventMonitor/Frame.cpp:83 ver1.0/EventMonitor/Frame.cpp:158
+#: ver1.1/EventMonitor/Frame.cpp:83 ver1.1/EventMonitor/Frame.cpp:158
 msgid "Clear"
 msgstr "Изчистване"
 
 #: master/EventMonitor/Frame.cpp:83 master/EventMonitor/Frame.cpp:158
 #: ver1.0/EventMonitor/Frame.cpp:83 ver1.0/EventMonitor/Frame.cpp:158
+#: ver1.1/EventMonitor/Frame.cpp:83 ver1.1/EventMonitor/Frame.cpp:158
 msgid "Clears all records from the log"
 msgstr "Изчистване на всички записи от лога"
 
 #: master/EventMonitor/Frame.cpp:90 ver1.0/EventMonitor/Frame.cpp:90
+#: ver1.1/EventMonitor/Frame.cpp:90
 msgid "Select &All"
 msgstr "Изберете &всичко"
 
 #: master/EventMonitor/Frame.cpp:90 ver1.0/EventMonitor/Frame.cpp:90
+#: ver1.1/EventMonitor/Frame.cpp:90
 msgid "Selects all visible records"
 msgstr "Изберете всички видими записи"
 
 #: master/EventMonitor/Frame.cpp:94 ver1.0/EventMonitor/Frame.cpp:94
+#: ver1.1/EventMonitor/Frame.cpp:94
 msgid "Select &None"
 msgstr "Изберете &Нищо"
 
 #: master/EventMonitor/Frame.cpp:94 ver1.0/EventMonitor/Frame.cpp:94
+#: ver1.1/EventMonitor/Frame.cpp:94
 msgid "Clears record selection"
 msgstr "Изчистете избраните записи"
 
 #: master/EventMonitor/Frame.cpp:97 master/EventMonitor/Frame.cpp:142
 #: ver1.0/EventMonitor/Frame.cpp:97 ver1.0/EventMonitor/Frame.cpp:142
+#: ver1.1/EventMonitor/Frame.cpp:97 ver1.1/EventMonitor/Frame.cpp:142
 msgid "&Edit"
 msgstr "&Редактиране"
 
 #: master/EventMonitor/Frame.cpp:101 ver1.0/EventMonitor/Frame.cpp:101
+#: ver1.1/EventMonitor/Frame.cpp:101
 msgid "Auto &Scroll"
 msgstr "Автоматичен &скрол"
 
 #: master/EventMonitor/Frame.cpp:101 master/EventMonitor/Frame.cpp:164
 #: ver1.0/EventMonitor/Frame.cpp:101 ver1.0/EventMonitor/Frame.cpp:164
+#: ver1.1/EventMonitor/Frame.cpp:101 ver1.1/EventMonitor/Frame.cpp:164
 msgid "Automatically scrolls to the most recent records as they come-in"
 msgstr "Автоматичен скрол на най-последните записи, така както са влезли"
 
 #: master/EventMonitor/Frame.cpp:123 master/EventMonitor/Frame.cpp:176
 #: ver1.0/EventMonitor/Frame.cpp:123 ver1.0/EventMonitor/Frame.cpp:176
+#: ver1.1/EventMonitor/Frame.cpp:123 ver1.1/EventMonitor/Frame.cpp:176
 msgid "Verbose"
 msgstr "Подробно"
 
 #: master/EventMonitor/Frame.cpp:123 master/EventMonitor/Frame.cpp:176
 #: ver1.0/EventMonitor/Frame.cpp:123 ver1.0/EventMonitor/Frame.cpp:176
+#: ver1.1/EventMonitor/Frame.cpp:123 ver1.1/EventMonitor/Frame.cpp:176
 msgid "Displays all levels of records"
 msgstr "Показва всички нива на записите"
 
 #: master/EventMonitor/Frame.cpp:127 master/EventMonitor/Frame.cpp:178
 #: ver1.0/EventMonitor/Frame.cpp:127 ver1.0/EventMonitor/Frame.cpp:178
+#: ver1.1/EventMonitor/Frame.cpp:127 ver1.1/EventMonitor/Frame.cpp:178
 msgid "Informational"
 msgstr "Информационен"
 
 #: master/EventMonitor/Frame.cpp:127 master/EventMonitor/Frame.cpp:178
 #: ver1.0/EventMonitor/Frame.cpp:127 ver1.0/EventMonitor/Frame.cpp:178
+#: ver1.1/EventMonitor/Frame.cpp:127 ver1.1/EventMonitor/Frame.cpp:178
 msgid "Displays all records up to informational level"
 msgstr "Показва всички записи, по-високи от информационното ниво"
 
 #: master/EventMonitor/Frame.cpp:131 master/EventMonitor/Frame.cpp:180
 #: ver1.0/EventMonitor/Frame.cpp:131 ver1.0/EventMonitor/Frame.cpp:180
+#: ver1.1/EventMonitor/Frame.cpp:131 ver1.1/EventMonitor/Frame.cpp:180
 msgid "Warning"
 msgstr "Предупреждение"
 
 #: master/EventMonitor/Frame.cpp:131 master/EventMonitor/Frame.cpp:180
 #: ver1.0/EventMonitor/Frame.cpp:131 ver1.0/EventMonitor/Frame.cpp:180
+#: ver1.1/EventMonitor/Frame.cpp:131 ver1.1/EventMonitor/Frame.cpp:180
 msgid "Displays all records up to warning level"
 msgstr "Показва всички записи, по-високи от ниво предупреждение"
 
 #: master/EventMonitor/Frame.cpp:135 master/EventMonitor/Frame.cpp:182
 #: ver1.0/EventMonitor/Frame.cpp:135 ver1.0/EventMonitor/Frame.cpp:182
+#: ver1.1/EventMonitor/Frame.cpp:135 ver1.1/EventMonitor/Frame.cpp:182
 msgid "Error"
 msgstr "Грешка"
 
 #: master/EventMonitor/Frame.cpp:135 master/EventMonitor/Frame.cpp:182
 #: ver1.0/EventMonitor/Frame.cpp:135 ver1.0/EventMonitor/Frame.cpp:182
+#: ver1.1/EventMonitor/Frame.cpp:135 ver1.1/EventMonitor/Frame.cpp:182
 msgid "Displays error level records only"
 msgstr "Показва само записи с ниво грешка"
 
 #: master/EventMonitor/Frame.cpp:142 master/EventMonitor/Frame.cpp:146
 #: ver1.0/EventMonitor/Frame.cpp:142 ver1.0/EventMonitor/Frame.cpp:146
+#: ver1.1/EventMonitor/Frame.cpp:142 ver1.1/EventMonitor/Frame.cpp:146
 #, c-format
 msgid "%s toolbar"
 msgstr "%s лента с инструменти"
 
 #: master/EventMonitor/Frame.cpp:142 master/EventMonitor/Frame.cpp:146
 #: ver1.0/EventMonitor/Frame.cpp:142 ver1.0/EventMonitor/Frame.cpp:146
+#: ver1.1/EventMonitor/Frame.cpp:142 ver1.1/EventMonitor/Frame.cpp:146
 #, c-format
 msgid "Toggles display of %s toolbar"
 msgstr "Сборно изобразяване на лентата с инструменти %s"
@@ -218,31 +264,39 @@ msgstr "Сборно изобразяване на лентата с инстр�
 #: master/EventMonitor/Frame.cpp:142 master/EventMonitor/Frame.cpp:146
 #: master/EventMonitor/Frame.cpp:185 ver1.0/EventMonitor/Frame.cpp:142
 #: ver1.0/EventMonitor/Frame.cpp:146 ver1.0/EventMonitor/Frame.cpp:185
+#: ver1.1/EventMonitor/Frame.cpp:142 ver1.1/EventMonitor/Frame.cpp:146
+#: ver1.1/EventMonitor/Frame.cpp:185
 msgid "View"
 msgstr "Изглед"
 
 #: master/EventMonitor/Frame.cpp:146 master/EventMonitor/Frame.cpp:149
 #: ver1.0/EventMonitor/Frame.cpp:146 ver1.0/EventMonitor/Frame.cpp:149
+#: ver1.1/EventMonitor/Frame.cpp:146 ver1.1/EventMonitor/Frame.cpp:149
 msgid "&View"
 msgstr "&Изглед"
 
 #: master/EventMonitor/Frame.cpp:154 ver1.0/EventMonitor/Frame.cpp:154
+#: ver1.1/EventMonitor/Frame.cpp:154
 msgid "Copy"
 msgstr "Копиране"
 
 #: master/EventMonitor/Frame.cpp:156 ver1.0/EventMonitor/Frame.cpp:156
+#: ver1.1/EventMonitor/Frame.cpp:156
 msgid "Copy All"
 msgstr "Копиране на всичко"
 
 #: master/EventMonitor/Frame.cpp:161 ver1.0/EventMonitor/Frame.cpp:161
+#: ver1.1/EventMonitor/Frame.cpp:161
 msgid "Edit"
 msgstr "Редактиране"
 
 #: master/EventMonitor/Frame.cpp:164 ver1.0/EventMonitor/Frame.cpp:164
+#: ver1.1/EventMonitor/Frame.cpp:164
 msgid "Auto Scroll"
 msgstr "Автоматичен скрол"
 
 #: master/EventMonitor/Frame.cpp:189 ver1.0/EventMonitor/Frame.cpp:189
+#: ver1.1/EventMonitor/Frame.cpp:189
 msgid "Trace Log"
 msgstr "Лог с проследяване"
 
@@ -262,6 +316,14 @@ msgstr "Лог с проследяване"
 #: ver1.0/EventMonitor/MSIBuild/en_US.x64.Debug.Shortcut-2.idtx:4
 #: ver1.0/EventMonitor/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
 #: ver1.0/EventMonitor/MSIBuild/en_US.x64.Release.Shortcut-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.Win32.Debug.Shortcut-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.Win32.Release.Shortcut-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.x64.Debug.Shortcut-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.x64.Release.Shortcut-2.idtx:4
 msgid "Real-time display of internal events"
 msgstr "Покзва в реално време вътрешни събития"
 
@@ -273,5 +335,9 @@ msgstr "Покзва в реално време вътрешни събития"
 #: ver1.0/EventMonitor/MSIBuild/en_US.Win32.Release.Shortcut-2.idtx:4
 #: ver1.0/EventMonitor/MSIBuild/en_US.x64.Debug.Shortcut-2.idtx:4
 #: ver1.0/EventMonitor/MSIBuild/en_US.x64.Release.Shortcut-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.Win32.Debug.Shortcut-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.Win32.Release.Shortcut-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.x64.Debug.Shortcut-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.x64.Release.Shortcut-2.idtx:4
 msgid "EVENTM~1|GÉANTLink Event Monitor"
 msgstr "EVENTM~1|GÉANTLink следене на събитие"
