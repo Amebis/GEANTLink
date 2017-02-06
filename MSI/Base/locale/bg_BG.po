@@ -3,7 +3,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: GÉANTLink MSI\n"
-"POT-Creation-Date: 2016-11-08 11:55+0100\n"
+"POT-Creation-Date: 2017-02-02 18:14+0100\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
 "Last-Translator: University of Ruse <support@uni-ruse.bg>, 2016\n"
 "Language-Team: Bulgarian (Bulgaria) (https://www.transifex.com/eduroam_devel/teams/11799/bg_BG/)\n"
@@ -16,7 +16,8 @@ msgstr ""
 "X-Poedit-Basepath: ../../../..\n"
 "X-Poedit-KeywordsList: _\n"
 "X-Poedit-SearchPath-0: master/MSI/Base/Main\n"
-"X-Poedit-SearchPath-1: ver1.0/MSI/Base/Main\n"
+"X-Poedit-SearchPath-1: ver1.1/MSI/Base/Main\n"
+"X-Poedit-SearchPath-2: ver1.0/MSI/Base/Main\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 
 #: master/MSI/Base/Main/en_US.Win32.Debug.LaunchCondition-2.idtx:4
@@ -27,6 +28,10 @@ msgstr ""
 #: ver1.0/MSI/Base/Main/en_US.Win32.Release.LaunchCondition-2.idtx:4
 #: ver1.0/MSI/Base/Main/en_US.x64.Debug.LaunchCondition-2.idtx:4
 #: ver1.0/MSI/Base/Main/en_US.x64.Release.LaunchCondition-2.idtx:4
+#: ver1.1/MSI/Base/Main/en_US.Win32.Debug.LaunchCondition-2.idtx:4
+#: ver1.1/MSI/Base/Main/en_US.Win32.Release.LaunchCondition-2.idtx:4
+#: ver1.1/MSI/Base/Main/en_US.x64.Debug.LaunchCondition-2.idtx:4
+#: ver1.1/MSI/Base/Main/en_US.x64.Release.LaunchCondition-2.idtx:4
 msgid "[ProductName] requires Windows Vista or later version of Windows."
 msgstr "[ProductName] изисква Windows Vista или по-висока версия на Windows."
 
@@ -46,6 +51,14 @@ msgstr "[ProductName] изисква Windows Vista или по-висока ве
 #: ver1.0/MSI/Base/Main/en_US.x64.Debug.Property-2.idtx:5
 #: ver1.0/MSI/Base/Main/en_US.x64.Release.Property-2.idtx:4
 #: ver1.0/MSI/Base/Main/en_US.x64.Release.Property-2.idtx:5
+#: ver1.1/MSI/Base/Main/en_US.Win32.Debug.Property-2.idtx:4
+#: ver1.1/MSI/Base/Main/en_US.Win32.Debug.Property-2.idtx:5
+#: ver1.1/MSI/Base/Main/en_US.Win32.Release.Property-2.idtx:4
+#: ver1.1/MSI/Base/Main/en_US.Win32.Release.Property-2.idtx:5
+#: ver1.1/MSI/Base/Main/en_US.x64.Debug.Property-2.idtx:4
+#: ver1.1/MSI/Base/Main/en_US.x64.Debug.Property-2.idtx:5
+#: ver1.1/MSI/Base/Main/en_US.x64.Release.Property-2.idtx:4
+#: ver1.1/MSI/Base/Main/en_US.x64.Release.Property-2.idtx:5
 msgid "http://www.geant.org/"
 msgstr "http://www.geant.org/"
 
@@ -57,5 +70,9 @@ msgstr "http://www.geant.org/"
 #: ver1.0/MSI/Base/Main/en_US.Win32.Release.Property-2.idtx:6
 #: ver1.0/MSI/Base/Main/en_US.x64.Debug.Property-2.idtx:6
 #: ver1.0/MSI/Base/Main/en_US.x64.Release.Property-2.idtx:6
+#: ver1.1/MSI/Base/Main/en_US.Win32.Debug.Property-2.idtx:6
+#: ver1.1/MSI/Base/Main/en_US.Win32.Release.Property-2.idtx:6
+#: ver1.1/MSI/Base/Main/en_US.x64.Debug.Property-2.idtx:6
+#: ver1.1/MSI/Base/Main/en_US.x64.Release.Property-2.idtx:6
 msgid "https://github.com/Amebis/GEANTLink/releases"
 msgstr "https://github.com/Amebis/GEANTLink/releases"

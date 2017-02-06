@@ -3,7 +3,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: EventMonitor\n"
-"POT-Creation-Date: 2016-11-08 11:55+0100\n"
+"POT-Creation-Date: 2017-02-02 18:14+0100\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
 "Last-Translator: Dubravko Penezic <dpenezic@gmail.com>, 2016\n"
 "Language-Team: Croatian (Croatia) (https://www.transifex.com/eduroam_devel/teams/11799/hr_HR/)\n"
@@ -16,11 +16,13 @@ msgstr ""
 "X-Poedit-Basepath: ../../..\n"
 "X-Poedit-KeywordsList: _\n"
 "X-Poedit-SearchPath-0: master/EventMonitor\n"
-"X-Poedit-SearchPath-1: ver1.0/EventMonitor\n"
+"X-Poedit-SearchPath-1: ver1.1/EventMonitor\n"
+"X-Poedit-SearchPath-2: ver1.0/EventMonitor\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 
 #: master/EventMonitor/App.cpp:61 ver1.0/EventMonitor/App.cpp:61
-#: master/EventMonitor/Frame.h:75 ver1.0/EventMonitor/Frame.h:75
+#: ver1.1/EventMonitor/App.cpp:61 master/EventMonitor/Frame.h:75
+#: ver1.0/EventMonitor/Frame.h:75 ver1.1/EventMonitor/Frame.h:75
 #: master/EventMonitor/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
 #: master/EventMonitor/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
 #: master/EventMonitor/MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
@@ -29,35 +31,46 @@ msgstr ""
 #: ver1.0/EventMonitor/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
 #: ver1.0/EventMonitor/MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
 #: ver1.0/EventMonitor/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
 msgid "Event Monitor"
 msgstr "Preglednik Događaja"
 
 #: master/EventMonitor/ETWLog.cpp:83 ver1.0/EventMonitor/ETWLog.cpp:83
+#: ver1.1/EventMonitor/ETWLog.cpp:83
 #, c-format
 msgid "Error opening event trace (error %u)."
 msgstr "Greška pri otvraranju slijeda događaja (error %u)."
 
 #: master/EventMonitor/ETWLog.cpp:171 ver1.0/EventMonitor/ETWLog.cpp:171
+#: ver1.1/EventMonitor/ETWLog.cpp:171
 msgid "Time"
 msgstr "Vrijeme"
 
 #: master/EventMonitor/ETWLog.cpp:172 ver1.0/EventMonitor/ETWLog.cpp:172
+#: ver1.1/EventMonitor/ETWLog.cpp:172
 msgid "PID"
 msgstr "PID"
 
 #: master/EventMonitor/ETWLog.cpp:173 ver1.0/EventMonitor/ETWLog.cpp:173
+#: ver1.1/EventMonitor/ETWLog.cpp:173
 msgid "TID"
 msgstr "TID"
 
 #: master/EventMonitor/ETWLog.cpp:174 ver1.0/EventMonitor/ETWLog.cpp:174
+#: ver1.1/EventMonitor/ETWLog.cpp:174
 msgid "Source"
 msgstr "Source"
 
 #: master/EventMonitor/ETWLog.cpp:175 ver1.0/EventMonitor/ETWLog.cpp:175
+#: ver1.1/EventMonitor/ETWLog.cpp:175
 msgid "Event"
 msgstr "Event"
 
 #: master/EventMonitor/ETWLog.cpp:232 ver1.0/EventMonitor/ETWLog.cpp:232
+#: ver1.1/EventMonitor/ETWLog.cpp:232
 msgid ""
 "Access denied creating event session: you need administrative privileges "
 "(Run As Administrator) or be a member of Performance Log Users group to "
@@ -68,11 +81,13 @@ msgstr ""
 "Log Users da bi ste pokrenuli stvaranje zapisa događaja."
 
 #: master/EventMonitor/ETWLog.cpp:235 ver1.0/EventMonitor/ETWLog.cpp:235
+#: ver1.1/EventMonitor/ETWLog.cpp:235
 #, c-format
 msgid "The %s event session already exists."
 msgstr "Zapis događaja  %s već postoji."
 
 #: master/EventMonitor/ETWLog.cpp:239 ver1.0/EventMonitor/ETWLog.cpp:239
+#: ver1.1/EventMonitor/ETWLog.cpp:239
 #, c-format
 msgid "Error creating event session (error %u)."
 msgstr "Greška pri stvaranju slijeda događaja (error %u)."
@@ -80,6 +95,8 @@ msgstr "Greška pri stvaranju slijeda događaja (error %u)."
 #: master/EventMonitor/ETWLog.cpp:255 master/EventMonitor/ETWLog.cpp:271
 #: master/EventMonitor/ETWLog.cpp:285 ver1.0/EventMonitor/ETWLog.cpp:255
 #: ver1.0/EventMonitor/ETWLog.cpp:271 ver1.0/EventMonitor/ETWLog.cpp:285
+#: ver1.1/EventMonitor/ETWLog.cpp:255 ver1.1/EventMonitor/ETWLog.cpp:271
+#: ver1.1/EventMonitor/ETWLog.cpp:285
 #, c-format
 msgid "Error enabling %s event provider (error %u)."
 msgstr "Greška pri omogučavanje sustava događaja %s (error %u)."
@@ -89,128 +106,157 @@ msgstr "Greška pri omogučavanje sustava događaja %s (error %u)."
 #: master/EventMonitor/Frame.cpp:170 ver1.0/EventMonitor/Frame.cpp:48
 #: ver1.0/EventMonitor/Frame.cpp:108 ver1.0/EventMonitor/Frame.cpp:113
 #: ver1.0/EventMonitor/Frame.cpp:168 ver1.0/EventMonitor/Frame.cpp:170
+#: ver1.1/EventMonitor/Frame.cpp:48 ver1.1/EventMonitor/Frame.cpp:108
+#: ver1.1/EventMonitor/Frame.cpp:113 ver1.1/EventMonitor/Frame.cpp:168
+#: ver1.1/EventMonitor/Frame.cpp:170
 #, c-format
 msgid "Toggles display of %s records"
 msgstr "Zamjeni prikaz od %s zapisa"
 
 #: master/EventMonitor/Frame.cpp:65 ver1.0/EventMonitor/Frame.cpp:65
+#: ver1.1/EventMonitor/Frame.cpp:65
 msgid "E&xit"
 msgstr "I&zlaz"
 
 #: master/EventMonitor/Frame.cpp:65 ver1.0/EventMonitor/Frame.cpp:65
+#: ver1.1/EventMonitor/Frame.cpp:65
 msgid "Quits this program"
 msgstr "Završi"
 
 #: master/EventMonitor/Frame.cpp:69 ver1.0/EventMonitor/Frame.cpp:69
+#: ver1.1/EventMonitor/Frame.cpp:69
 msgid "&Program"
 msgstr "&Program"
 
 #: master/EventMonitor/Frame.cpp:73 ver1.0/EventMonitor/Frame.cpp:73
+#: ver1.1/EventMonitor/Frame.cpp:73
 msgid "&Copy"
 msgstr "&Kopiraj"
 
 #: master/EventMonitor/Frame.cpp:73 master/EventMonitor/Frame.cpp:154
 #: ver1.0/EventMonitor/Frame.cpp:73 ver1.0/EventMonitor/Frame.cpp:154
+#: ver1.1/EventMonitor/Frame.cpp:73 ver1.1/EventMonitor/Frame.cpp:154
 msgid "Copies selected records to clipboard"
 msgstr "Kopiraj odabrane zapise u prijenosnik"
 
 #: master/EventMonitor/Frame.cpp:78 ver1.0/EventMonitor/Frame.cpp:78
+#: ver1.1/EventMonitor/Frame.cpp:78
 msgid "Copy A&ll"
 msgstr "Kopiraj S&ve"
 
 #: master/EventMonitor/Frame.cpp:78 master/EventMonitor/Frame.cpp:156
 #: ver1.0/EventMonitor/Frame.cpp:78 ver1.0/EventMonitor/Frame.cpp:156
+#: ver1.1/EventMonitor/Frame.cpp:78 ver1.1/EventMonitor/Frame.cpp:156
 msgid "Copies all records to clipboard (including hidden)"
 msgstr "Kopiraj sve zapise u prenosnik (uključujući i skrivene)"
 
 #: master/EventMonitor/Frame.cpp:83 master/EventMonitor/Frame.cpp:158
 #: ver1.0/EventMonitor/Frame.cpp:83 ver1.0/EventMonitor/Frame.cpp:158
+#: ver1.1/EventMonitor/Frame.cpp:83 ver1.1/EventMonitor/Frame.cpp:158
 msgid "Clear"
 msgstr "Obriši"
 
 #: master/EventMonitor/Frame.cpp:83 master/EventMonitor/Frame.cpp:158
 #: ver1.0/EventMonitor/Frame.cpp:83 ver1.0/EventMonitor/Frame.cpp:158
+#: ver1.1/EventMonitor/Frame.cpp:83 ver1.1/EventMonitor/Frame.cpp:158
 msgid "Clears all records from the log"
 msgstr "Obriši sve zapise iz log-a"
 
 #: master/EventMonitor/Frame.cpp:90 ver1.0/EventMonitor/Frame.cpp:90
+#: ver1.1/EventMonitor/Frame.cpp:90
 msgid "Select &All"
 msgstr "Označi &Sve"
 
 #: master/EventMonitor/Frame.cpp:90 ver1.0/EventMonitor/Frame.cpp:90
+#: ver1.1/EventMonitor/Frame.cpp:90
 msgid "Selects all visible records"
 msgstr "Odaberi sve vidljive zapise"
 
 #: master/EventMonitor/Frame.cpp:94 ver1.0/EventMonitor/Frame.cpp:94
+#: ver1.1/EventMonitor/Frame.cpp:94
 msgid "Select &None"
 msgstr "Odaberi &Ništa"
 
 #: master/EventMonitor/Frame.cpp:94 ver1.0/EventMonitor/Frame.cpp:94
+#: ver1.1/EventMonitor/Frame.cpp:94
 msgid "Clears record selection"
 msgstr "Obriši odabir zapisa"
 
 #: master/EventMonitor/Frame.cpp:97 master/EventMonitor/Frame.cpp:142
 #: ver1.0/EventMonitor/Frame.cpp:97 ver1.0/EventMonitor/Frame.cpp:142
+#: ver1.1/EventMonitor/Frame.cpp:97 ver1.1/EventMonitor/Frame.cpp:142
 msgid "&Edit"
 msgstr "&Uredi"
 
 #: master/EventMonitor/Frame.cpp:101 ver1.0/EventMonitor/Frame.cpp:101
+#: ver1.1/EventMonitor/Frame.cpp:101
 msgid "Auto &Scroll"
 msgstr "Auto &Pomicanje"
 
 #: master/EventMonitor/Frame.cpp:101 master/EventMonitor/Frame.cpp:164
 #: ver1.0/EventMonitor/Frame.cpp:101 ver1.0/EventMonitor/Frame.cpp:164
+#: ver1.1/EventMonitor/Frame.cpp:101 ver1.1/EventMonitor/Frame.cpp:164
 msgid "Automatically scrolls to the most recent records as they come-in"
 msgstr "Automatski pomići naj relevantnije zapise po redu dolaska"
 
 #: master/EventMonitor/Frame.cpp:123 master/EventMonitor/Frame.cpp:176
 #: ver1.0/EventMonitor/Frame.cpp:123 ver1.0/EventMonitor/Frame.cpp:176
+#: ver1.1/EventMonitor/Frame.cpp:123 ver1.1/EventMonitor/Frame.cpp:176
 msgid "Verbose"
 msgstr "Verbose"
 
 #: master/EventMonitor/Frame.cpp:123 master/EventMonitor/Frame.cpp:176
 #: ver1.0/EventMonitor/Frame.cpp:123 ver1.0/EventMonitor/Frame.cpp:176
+#: ver1.1/EventMonitor/Frame.cpp:123 ver1.1/EventMonitor/Frame.cpp:176
 msgid "Displays all levels of records"
 msgstr "Prikaži sve nivoe zapisa"
 
 #: master/EventMonitor/Frame.cpp:127 master/EventMonitor/Frame.cpp:178
 #: ver1.0/EventMonitor/Frame.cpp:127 ver1.0/EventMonitor/Frame.cpp:178
+#: ver1.1/EventMonitor/Frame.cpp:127 ver1.1/EventMonitor/Frame.cpp:178
 msgid "Informational"
 msgstr "Informativno"
 
 #: master/EventMonitor/Frame.cpp:127 master/EventMonitor/Frame.cpp:178
 #: ver1.0/EventMonitor/Frame.cpp:127 ver1.0/EventMonitor/Frame.cpp:178
+#: ver1.1/EventMonitor/Frame.cpp:127 ver1.1/EventMonitor/Frame.cpp:178
 msgid "Displays all records up to informational level"
 msgstr "Prikaži sve zapise na informativnom nivou"
 
 #: master/EventMonitor/Frame.cpp:131 master/EventMonitor/Frame.cpp:180
 #: ver1.0/EventMonitor/Frame.cpp:131 ver1.0/EventMonitor/Frame.cpp:180
+#: ver1.1/EventMonitor/Frame.cpp:131 ver1.1/EventMonitor/Frame.cpp:180
 msgid "Warning"
 msgstr "Upozorenje"
 
 #: master/EventMonitor/Frame.cpp:131 master/EventMonitor/Frame.cpp:180
 #: ver1.0/EventMonitor/Frame.cpp:131 ver1.0/EventMonitor/Frame.cpp:180
+#: ver1.1/EventMonitor/Frame.cpp:131 ver1.1/EventMonitor/Frame.cpp:180
 msgid "Displays all records up to warning level"
 msgstr "Prikaži sve zapise na nivou upozorenja"
 
 #: master/EventMonitor/Frame.cpp:135 master/EventMonitor/Frame.cpp:182
 #: ver1.0/EventMonitor/Frame.cpp:135 ver1.0/EventMonitor/Frame.cpp:182
+#: ver1.1/EventMonitor/Frame.cpp:135 ver1.1/EventMonitor/Frame.cpp:182
 msgid "Error"
 msgstr "Greška"
 
 #: master/EventMonitor/Frame.cpp:135 master/EventMonitor/Frame.cpp:182
 #: ver1.0/EventMonitor/Frame.cpp:135 ver1.0/EventMonitor/Frame.cpp:182
+#: ver1.1/EventMonitor/Frame.cpp:135 ver1.1/EventMonitor/Frame.cpp:182
 msgid "Displays error level records only"
 msgstr "Prikaži sve zapise na nivou greške"
 
 #: master/EventMonitor/Frame.cpp:142 master/EventMonitor/Frame.cpp:146
 #: ver1.0/EventMonitor/Frame.cpp:142 ver1.0/EventMonitor/Frame.cpp:146
+#: ver1.1/EventMonitor/Frame.cpp:142 ver1.1/EventMonitor/Frame.cpp:146
 #, c-format
 msgid "%s toolbar"
 msgstr "%s toolbar"
 
 #: master/EventMonitor/Frame.cpp:142 master/EventMonitor/Frame.cpp:146
 #: ver1.0/EventMonitor/Frame.cpp:142 ver1.0/EventMonitor/Frame.cpp:146
+#: ver1.1/EventMonitor/Frame.cpp:142 ver1.1/EventMonitor/Frame.cpp:146
 #, c-format
 msgid "Toggles display of %s toolbar"
 msgstr "Zamjeni prikaz od %s toolbar"
@@ -218,31 +264,39 @@ msgstr "Zamjeni prikaz od %s toolbar"
 #: master/EventMonitor/Frame.cpp:142 master/EventMonitor/Frame.cpp:146
 #: master/EventMonitor/Frame.cpp:185 ver1.0/EventMonitor/Frame.cpp:142
 #: ver1.0/EventMonitor/Frame.cpp:146 ver1.0/EventMonitor/Frame.cpp:185
+#: ver1.1/EventMonitor/Frame.cpp:142 ver1.1/EventMonitor/Frame.cpp:146
+#: ver1.1/EventMonitor/Frame.cpp:185
 msgid "View"
 msgstr "Pogled"
 
 #: master/EventMonitor/Frame.cpp:146 master/EventMonitor/Frame.cpp:149
 #: ver1.0/EventMonitor/Frame.cpp:146 ver1.0/EventMonitor/Frame.cpp:149
+#: ver1.1/EventMonitor/Frame.cpp:146 ver1.1/EventMonitor/Frame.cpp:149
 msgid "&View"
 msgstr "&Pogled"
 
 #: master/EventMonitor/Frame.cpp:154 ver1.0/EventMonitor/Frame.cpp:154
+#: ver1.1/EventMonitor/Frame.cpp:154
 msgid "Copy"
 msgstr "Kopiraj"
 
 #: master/EventMonitor/Frame.cpp:156 ver1.0/EventMonitor/Frame.cpp:156
+#: ver1.1/EventMonitor/Frame.cpp:156
 msgid "Copy All"
 msgstr "Kopiraj sve"
 
 #: master/EventMonitor/Frame.cpp:161 ver1.0/EventMonitor/Frame.cpp:161
+#: ver1.1/EventMonitor/Frame.cpp:161
 msgid "Edit"
 msgstr "Uredi"
 
 #: master/EventMonitor/Frame.cpp:164 ver1.0/EventMonitor/Frame.cpp:164
+#: ver1.1/EventMonitor/Frame.cpp:164
 msgid "Auto Scroll"
 msgstr "Automatsko pomicanje"
 
 #: master/EventMonitor/Frame.cpp:189 ver1.0/EventMonitor/Frame.cpp:189
+#: ver1.1/EventMonitor/Frame.cpp:189
 msgid "Trace Log"
 msgstr "Pregledaj Log"
 
@@ -262,6 +316,14 @@ msgstr "Pregledaj Log"
 #: ver1.0/EventMonitor/MSIBuild/en_US.x64.Debug.Shortcut-2.idtx:4
 #: ver1.0/EventMonitor/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
 #: ver1.0/EventMonitor/MSIBuild/en_US.x64.Release.Shortcut-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.Win32.Debug.Shortcut-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.Win32.Release.Shortcut-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.x64.Debug.Shortcut-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.x64.Release.Shortcut-2.idtx:4
 msgid "Real-time display of internal events"
 msgstr "Prikaz događaja u realnom vremenu "
 
@@ -273,5 +335,9 @@ msgstr "Prikaz događaja u realnom vremenu "
 #: ver1.0/EventMonitor/MSIBuild/en_US.Win32.Release.Shortcut-2.idtx:4
 #: ver1.0/EventMonitor/MSIBuild/en_US.x64.Debug.Shortcut-2.idtx:4
 #: ver1.0/EventMonitor/MSIBuild/en_US.x64.Release.Shortcut-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.Win32.Debug.Shortcut-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.Win32.Release.Shortcut-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.x64.Debug.Shortcut-2.idtx:4
+#: ver1.1/EventMonitor/MSIBuild/en_US.x64.Release.Shortcut-2.idtx:4
 msgid "EVENTM~1|GÉANTLink Event Monitor"
 msgstr "EVENTM~1|GÉANTLink Preglednik događaja"
