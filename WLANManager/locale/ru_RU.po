@@ -15,7 +15,8 @@ msgstr ""
 "X-Poedit-Basepath: ../../..\n"
 "X-Poedit-KeywordsList: _\n"
 "X-Poedit-SearchPath-0: master/WLANManager\n"
-"X-Poedit-SearchPath-1: ver1.0/WLANManager\n"
+"X-Poedit-SearchPath-1: ver1.1/WLANManager\n"
+"X-Poedit-SearchPath-2: ver1.0/WLANManager\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 
 #: MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
