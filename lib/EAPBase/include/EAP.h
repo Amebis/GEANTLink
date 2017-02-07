@@ -80,6 +80,8 @@ namespace eap
     struct cursor_out;
     struct cursor_in;
 
+    class packable;
+
     template<size_t N> struct WINSTD_NOVTABLE sanitizing_blob_f;
     template<size_t N> struct WINSTD_NOVTABLE sanitizing_blob_zf;
 
@@ -499,6 +501,31 @@ inline size_t pksizeof(_In_ const EAP_METHOD_TYPE &val);
 ///
 inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ EAP_METHOD_TYPE &val);
 
+///
+/// Packs a packable object
+///
+/// \param[inout] cursor  Memory cursor
+/// \param[in]    val     Object to pack
+///
+inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const eap::packable &val);
+
+///
+/// Returns packed size of a packable object
+///
+/// \param[in] val  Object to pack
+///
+/// \returns Size of data when packed (in bytes)
+///
+inline size_t pksizeof(_In_ const eap::packable &val);
+
+///
+/// Unpacks a packable object
+///
+/// \param[inout] cursor  Memory cursor
+/// \param[out]   val     Object to unpack to
+///
+inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ eap::packable &val);
+
 /// @}
 
 ///
@@ -572,6 +599,45 @@ namespace eap
 
         ptr_type ptr;       ///< Pointer to first data unread
         ptr_type ptr_end;   ///< Pointer to the end of BLOB
+    };
+
+
+    ///
+    /// Base class for all packable data classes
+    ///
+    class packable
+    {
+    public:
+        ///
+        /// Constructs configuration
+        ///
+        packable();
+
+        /// \name BLOB management
+        /// @{
+
+        ///
+        /// Packs this object
+        ///
+        /// \param[inout] cursor  Memory cursor
+        ///
+        virtual void operator<<(_Inout_ cursor_out &cursor) const;
+
+        ///
+        /// Returns packed size of this object
+        ///
+        /// \returns Size of data when packed (in bytes)
+        ///
+        virtual size_t get_pk_size() const;
+
+        ///
+        /// Unpacks this object
+        ///
+        /// \param[inout] cursor  Memory cursor
+        ///
+        virtual void operator>>(_Inout_ cursor_in &cursor);
+
+        /// @}
     };
 
     /// @}
@@ -1195,6 +1261,24 @@ inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ EAP_METHOD_TYPE &va
     assert(ptr_end <= cursor.ptr_end);
     memcpy(&val, cursor.ptr, sizeof(EAP_METHOD_TYPE));
     cursor.ptr = ptr_end;
+}
+
+
+inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const eap::packable &val)
+{
+    val.operator<<(cursor);
+}
+
+
+inline size_t pksizeof(_In_ const eap::packable &val)
+{
+    return val.get_pk_size();
+}
+
+
+inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ eap::packable &val)
+{
+    val.operator>>(cursor);
 }
 
 
