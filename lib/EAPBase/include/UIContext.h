@@ -43,17 +43,16 @@ namespace eap
     ///
     /// UI context
     ///
-    class ui_context : public config
+    class ui_context : public packable
     {
     public:
         ///
         /// Constructs context
         ///
-        /// \param[in] mod   EAP module to use for global services
         /// \param[in] cfg   Connection configuration
         /// \param[in] cred  Connection credentials
         ///
-        ui_context(_In_ module &mod, _In_ config_connection &cfg, _In_ credentials_connection &cred);
+        ui_context(_In_ config_connection &cfg, _In_ credentials_connection &cred);
 
         ///
         /// Copies context

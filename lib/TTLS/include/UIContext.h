@@ -44,11 +44,10 @@ namespace eap
         ///
         /// Constructs context
         ///
-        /// \param[in] mod   EAP module to use for global services
         /// \param[in] cfg   Connection configuration
         /// \param[in] cred  Connection credentials
         ///
-        ui_context_ttls(_In_ module &mod, _In_ config_connection &cfg, _In_ credentials_connection &cred);
+        ui_context_ttls(_In_ config_connection &cfg, _In_ credentials_connection &cred);
 
         ///
         /// Copies context
@@ -81,13 +80,6 @@ namespace eap
         /// \returns Reference to this object
         ///
         ui_context_ttls& operator=(_Inout_ ui_context_ttls &&other);
-
-        ///
-        /// Clones this object
-        ///
-        /// \returns Pointer to cloned object with identical data
-        ///
-        virtual config* clone() const;
 
         /// \name BLOB management
         /// @{

@@ -28,14 +28,15 @@ using namespace winstd;
 // eap::ui_context_ttls
 //////////////////////////////////////////////////////////////////////
 
-eap::ui_context_ttls::ui_context_ttls(_In_ module &mod, _In_ config_connection &cfg, _In_ credentials_connection &cred) :
-    ui_context(mod, cfg, cred)
+eap::ui_context_ttls::ui_context_ttls(_In_ config_connection &cfg, _In_ credentials_connection &cred) :
+    ui_context(cfg, cred)
 {
 }
 
 
 eap::ui_context_ttls::ui_context_ttls(_In_ const ui_context_ttls &other) :
-    ui_context(other)
+    m_data    (other.m_data),
+    ui_context(other       )
 {
 }
 
@@ -66,12 +67,6 @@ eap::ui_context_ttls& eap::ui_context_ttls::operator=(_Inout_ ui_context_ttls &&
     }
 
     return *this;
-}
-
-
-eap::config* eap::ui_context_ttls::clone() const
-{
-    return new ui_context_ttls(*this);
 }
 
 

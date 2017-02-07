@@ -367,7 +367,7 @@ void eap::peer_ttls::get_ui_context(
     auto s = static_cast<session*>(hSession);
 
     // Get context data from method.
-    ui_context_ttls ctx(*this, s->m_cfg, s->m_cred);
+    ui_context_ttls ctx(s->m_cfg, s->m_cred);
     s->m_method->get_ui_context(ctx.m_data);
 
     // Pack context data.

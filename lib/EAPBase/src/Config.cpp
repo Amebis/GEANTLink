@@ -77,24 +77,6 @@ void eap::config::load(_In_ IXMLDOMNode *pConfigRoot)
 }
 
 
-void eap::config::operator<<(_Inout_ cursor_out &cursor) const
-{
-    UNREFERENCED_PARAMETER(cursor);
-}
-
-
-size_t eap::config::get_pk_size() const
-{
-    return 0;
-}
-
-
-void eap::config::operator>>(_Inout_ cursor_in &cursor)
-{
-    UNREFERENCED_PARAMETER(cursor);
-}
-
-
 const bstr eap::config::namespace_eapmetadata(L"urn:ietf:params:xml:ns:yang:ietf-eap-metadata");
 
 

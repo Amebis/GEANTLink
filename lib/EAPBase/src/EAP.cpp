@@ -20,8 +20,37 @@
 
 #include "StdAfx.h"
 
+#pragma comment(lib, "Ws2_32.lib")
+
 using namespace std;
 using namespace winstd;
+
+
+//////////////////////////////////////////////////////////////////////
+// eap::packable
+//////////////////////////////////////////////////////////////////////
+
+eap::packable::packable()
+{
+}
+
+
+void eap::packable::operator<<(_Inout_ cursor_out &cursor) const
+{
+    UNREFERENCED_PARAMETER(cursor);
+}
+
+
+size_t eap::packable::get_pk_size() const
+{
+    return 0;
+}
+
+
+void eap::packable::operator>>(_Inout_ cursor_in &cursor)
+{
+    UNREFERENCED_PARAMETER(cursor);
+}
 
 
 //////////////////////////////////////////////////////////////////////
