@@ -61,3 +61,32 @@ wxGTCResponsePanelBase::wxGTCResponsePanelBase( wxWindow* parent, wxWindowID id,
 wxGTCResponsePanelBase::~wxGTCResponsePanelBase()
 {
 }
+
+wxGTCConfigPanelBase::wxGTCConfigPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+{
+	wxBoxSizer* sb_vertical;
+	sb_vertical = new wxBoxSizer( wxVERTICAL );
+	
+	m_auth_mode_label = new wxStaticText( this, wxID_ANY, _("EAP-GTC authentication &mode:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_auth_mode_label->Wrap( -1 );
+	sb_vertical->Add( m_auth_mode_label, 0, wxBOTTOM, 5 );
+	
+	m_auth_mode = new wxChoicebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxCHB_DEFAULT );
+	m_auth_mode->SetToolTip( _("Select EAP-GTC authentication mode from the list") );
+	
+	sb_vertical->Add( m_auth_mode, 1, wxEXPAND, 5 );
+	
+	
+	this->SetSizer( sb_vertical );
+	this->Layout();
+	
+	// Connect Events
+	this->Connect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( wxGTCConfigPanelBase::OnUpdateUI ) );
+}
+
+wxGTCConfigPanelBase::~wxGTCConfigPanelBase()
+{
+	// Disconnect Events
+	this->Disconnect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( wxGTCConfigPanelBase::OnUpdateUI ) );
+	
+}

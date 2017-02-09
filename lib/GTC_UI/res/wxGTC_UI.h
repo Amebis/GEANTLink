@@ -25,6 +25,7 @@
 #include <wx/sizer.h>
 #include <wx/statbox.h>
 #include <wx/panel.h>
+#include <wx/choicebk.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -47,6 +48,28 @@ class wxGTCResponsePanelBase : public wxPanel
 		
 		wxGTCResponsePanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL ); 
 		~wxGTCResponsePanelBase();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class wxGTCConfigPanelBase
+///////////////////////////////////////////////////////////////////////////////
+class wxGTCConfigPanelBase : public wxPanel 
+{
+	private:
+	
+	protected:
+		wxStaticText* m_auth_mode_label;
+		wxChoicebook* m_auth_mode;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnUpdateUI( wxUpdateUIEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		wxGTCConfigPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL ); 
+		~wxGTCConfigPanelBase();
 	
 };
 

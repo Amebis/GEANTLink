@@ -28,7 +28,7 @@ using namespace winstd;
 // eap::method_gtc
 //////////////////////////////////////////////////////////////////////
 
-eap::method_gtc::method_gtc(_In_ module &mod, _In_ config_method_eapgtc &cfg, _In_ credentials_identity &cred) :
+eap::method_gtc::method_gtc(_In_ module &mod, _In_ config_method_eapgtc &cfg, _In_ credentials &cred) :
     m_cfg(cfg),
     m_cred(cred),
     method(mod)
@@ -83,13 +83,24 @@ EapPeerMethodResponseAction eap::method_gtc::process_request_packet(
 
     m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_gtc), event_data::blank);
 
-    // Read authenticator challenge as UTF-8 encoded string.
-    MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)pReceivedPacket, dwReceivedPacketSize, m_challenge);
+    credentials_pass *cred_pass;
+    if (dynamic_cast<credentials_identity*>(&m_cred)) {
+        // Read authenticator challenge as UTF-8 encoded string.
+        MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)pReceivedPacket, dwReceivedPacketSize, m_challenge);
 
-    m_module.log_event(&EAPMETHOD_GTC_RESPONSE_REQ, event_data((unsigned int)eap_type_gtc), event_data::blank);
+        m_module.log_event(&EAPMETHOD_GTC_RESPONSE_REQ, event_data((unsigned int)eap_type_gtc), event_data::blank);
 
-    // User must respond to the challenge.
-    return EapPeerMethodResponseActionInvokeUI;
+        // User must respond to the challenge.
+        return EapPeerMethodResponseActionInvokeUI;
+    } else if ((cred_pass = dynamic_cast<credentials_pass*>(&m_cred)) != NULL) {
+        // Ignore authenticator challenge and save password as GTC response.
+        m_response = cred_pass->m_password;
+
+        // Send the response.
+        m_cfg.m_last_status = config_method::status_cred_invalid; // Blame "credentials" if we fail beyond this point.
+        return EapPeerMethodResponseActionSend;
+    } else
+        throw invalid_argument(__FUNCTION__ " Unsupported authentication mode.");
 }
 
 
@@ -98,13 +109,13 @@ void eap::method_gtc::get_response_packet(
     _In_opt_ DWORD           size_max)
 {
     // Encode GTC response as UTF-8.
-    sanitizing_string reply_utf8;
-    WideCharToMultiByte(CP_UTF8, 0, m_response, reply_utf8, NULL, NULL);
+    sanitizing_string response_utf8;
+    WideCharToMultiByte(CP_UTF8, 0, m_response, response_utf8, NULL, NULL);
 
-    if (sizeof(sanitizing_string::value_type)*reply_utf8.length() > size_max)
-        throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %u, maximum: %u).", sizeof(sanitizing_string::value_type)*reply_utf8.length(), size_max));
+    if (sizeof(sanitizing_string::value_type)*response_utf8.length() > size_max)
+        throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %u, maximum: %u).", sizeof(sanitizing_string::value_type)*response_utf8.length(), size_max));
 
-    packet.assign(reply_utf8.begin(), reply_utf8.end());
+    packet.assign(response_utf8.begin(), response_utf8.end());
 }
 
 

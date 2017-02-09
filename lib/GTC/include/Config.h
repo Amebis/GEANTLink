@@ -46,6 +46,15 @@ namespace eap
     {
     public:
         ///
+        /// Authentication mode
+        ///
+        enum auth_mode_t {
+            auth_mode_response = 0, ///< Challenge/Response
+            auth_mode_password,     ///< Password
+        };
+
+    public:
+        ///
         /// Constructs configuration
         ///
         /// \param[in] mod    EAP module to use for global services
@@ -87,6 +96,19 @@ namespace eap
 
         virtual config* clone() const;
 
+        /// \name XML management
+        /// @{
+        virtual void save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot) const;
+        virtual void load(_In_ IXMLDOMNode *pConfigRoot);
+        /// @}
+
+        /// \name BLOB management
+        /// @{
+        virtual void operator<<(_Inout_ cursor_out &cursor) const;
+        virtual size_t get_pk_size() const;
+        virtual void operator>>(_Inout_ cursor_in &cursor);
+        /// @}
+
         ///
         /// @copydoc eap::config_method::get_method_id()
         /// \returns This implementation always returns `winstd::eap_type_gtc`
@@ -101,10 +123,53 @@ namespace eap
 
         ///
         /// @copydoc eap::config_method::make_credentials()
-        /// \returns This implementation always returns `eap::credentials_identity` type of credentials
+        /// \returns This implementation returns `eap::credentials_identity` or `eap::credentials_pass` type of credentials, depending on authentication mode.
         ///
         virtual credentials* make_credentials() const;
     };
 
     /// @}
 }
+
+
+/// \addtogroup EAPBaseStream
+/// @{
+
+///
+/// Packs an EAP-GTC method authentication mode
+///
+/// \param[inout] cursor  Memory cursor
+/// \param[in]    val     Authentication mode to pack
+///
+inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const eap::config_method_eapgtc::auth_mode_t &val)
+{
+    cursor << (unsigned char)val;
+}
+
+
+///
+/// Returns packed size of an EAP-GTC method authentication mode
+///
+/// \param[in] val  Authentication mode to pack
+///
+/// \returns Size of data when packed (in bytes)
+///
+inline size_t pksizeof(_In_ const eap::config_method_eapgtc::auth_mode_t &val)
+{
+    return pksizeof((unsigned char)val);
+}
+
+
+///
+/// Unpacks an EAP-GTC method authentication mode
+///
+/// \param[inout] cursor  Memory cursor
+/// \param[out]   val     Authentication mode to unpack to
+///
+inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ eap::config_method_eapgtc::auth_mode_t &val)
+{
+    val = (eap::config_method_eapgtc::auth_mode_t)0; // Reset higher bytes to zero before reading to lower byte.
+    cursor >> (unsigned char&)val;
+}
+
+/// @}

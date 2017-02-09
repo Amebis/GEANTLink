@@ -9,7 +9,7 @@ Suite of EAP supplicants for Microsoft Windows - IEEE 802.1X plug-ins for enterp
     - PAP
     - MSCHAPv2
     - EAP-MSCHAPv2
-    - EAP-GTC
+    - EAP-GTC: Challenge/Response and Password authentication modes
     - System-installed EAP method chaining (experimental)
 
 ### Security

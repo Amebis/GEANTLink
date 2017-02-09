@@ -298,7 +298,18 @@ void eap::peer_ttls_ui::invoke_identity_ui(
                                 case eap_type_legacy_pap     : panel = new wxPAPCredentialsPanel     (*cfg_prov, *dynamic_cast<const eap::config_method_pap        *>(cfg_method->m_inner.get()), *dynamic_cast<eap::credentials_pass    *>(cred->m_inner.get()), &dlg, false); break;
                                 case eap_type_legacy_mschapv2: panel = new wxMSCHAPv2CredentialsPanel(*cfg_prov, *dynamic_cast<const eap::config_method_mschapv2   *>(cfg_method->m_inner.get()), *dynamic_cast<eap::credentials_pass    *>(cred->m_inner.get()), &dlg, false); break;
                                 case eap_type_mschapv2       : panel = new wxMSCHAPv2CredentialsPanel(*cfg_prov, *dynamic_cast<const eap::config_method_eapmschapv2*>(cfg_method->m_inner.get()), *dynamic_cast<eap::credentials_pass    *>(cred->m_inner.get()), &dlg, false); break;
-                                case eap_type_gtc            : panel = new wxGTCCredentialsPanel     (*cfg_prov, *dynamic_cast<const eap::config_method_eapgtc     *>(cfg_method->m_inner.get()), *dynamic_cast<eap::credentials_identity*>(cred->m_inner.get()), &dlg, false); break;
+                                case eap_type_gtc            : {
+                                    // EAP-GTC credential prompt differes for "Challenge/Response" and "Password" authentication modes.
+                                    eap::credentials_identity *cred_resp;
+                                    eap::credentials_pass     *cred_pass;
+                                    if ((cred_resp = dynamic_cast<eap::credentials_identity*>(cred->m_inner.get())) != NULL)
+                                        panel = new wxGTCResponseCredentialsPanel(*cfg_prov, *dynamic_cast<const eap::config_method_eapgtc*>(cfg_method->m_inner.get()), *cred_resp, &dlg, false);
+                                    else if ((cred_pass = dynamic_cast<eap::credentials_pass*>(cred->m_inner.get())) != NULL)
+                                        panel = new wxGTCPasswordCredentialsPanel(*cfg_prov, *dynamic_cast<const eap::config_method_eapgtc*>(cfg_method->m_inner.get()), *cred_pass, &dlg, false);
+                                    else
+                                        wxLogError("Unsupported authentication mode.");
+                                    break;
+                                }
                                 default                      : wxLogError("Unsupported inner authentication method.");
                             }
                             panel->SetRemember(src_inner == eap::credentials::source_storage);

@@ -25,36 +25,86 @@
 // wxGTCConfigPanel
 //////////////////////////////////////////////////////////////////////
 
-wxGTCConfigPanel::wxGTCConfigPanel(const eap::config_provider &prov, eap::config_method_eapgtc &cfg, wxWindow* parent) : wxPanel(parent)
+wxGTCConfigPanel::wxGTCConfigPanel(const eap::config_provider &prov, eap::config_method_eapgtc &cfg, wxWindow* parent) :
+    m_prov    (prov                     ),
+    m_cfg     (cfg                      ),
+    m_cfg_resp(cfg.m_module, cfg.m_level),
+    m_cfg_pass(cfg.m_module, cfg.m_level),
+    wxGTCConfigPanelBase(parent)
 {
-    wxBoxSizer* sb_content;
-    sb_content = new wxBoxSizer( wxVERTICAL );
+    // Initialize Password authentication mode properly. Challenge/Response mode does not require initialization, since it is initialized so by default.
+    m_cfg_pass.m_cred.reset(new eap::credentials_pass(m_cfg.m_module));
 
-    m_credentials = new wxGTCCredentialsConfigPanel(prov, cfg, this, _("GTC User ID"));
-    sb_content->Add(m_credentials, 0, wxEXPAND, 5);
-
-    this->SetSizer(sb_content);
-    this->Layout();
-
-    // Connect Events
-    this->Connect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(wxGTCConfigPanel::OnInitDialog));
-}
-
-
-wxGTCConfigPanel::~wxGTCConfigPanel()
-{
-    // Disconnect Events
-    this->Disconnect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(wxGTCConfigPanel::OnInitDialog));
+    m_credentials_resp = new wxGTCResponseCredentialsConfigPanel(m_prov, m_cfg_resp, m_auth_mode);
+    m_auth_mode->AddPage(m_credentials_resp, _("Challenge/Response"));
+    m_credentials_pass = new wxGTCPasswordCredentialsConfigPanel(m_prov, m_cfg_pass, m_auth_mode);
+    m_auth_mode->AddPage(m_credentials_pass, _("Password"));
 }
 
 
 /// \cond internal
-void wxGTCConfigPanel::OnInitDialog(wxInitDialogEvent& event)
+
+bool wxGTCConfigPanel::TransferDataToWindow()
 {
-    // Forward the event to child panels.
-    if (m_credentials)
-        m_credentials->GetEventHandler()->ProcessEvent(event);
+    eap::credentials_identity *cred_resp;
+    eap::credentials_pass     *cred_pass;
+
+    if ((cred_resp = dynamic_cast<eap::credentials_identity*>(m_cfg.m_cred.get())) != NULL) {
+        m_cfg_resp = m_cfg;
+        m_auth_mode->SetSelection(0); // 0=Challenge/Response
+    } else if ((cred_pass = dynamic_cast<eap::credentials_pass*>(m_cfg.m_cred.get())) != NULL) {
+        m_cfg_pass = m_cfg;
+        m_auth_mode->SetSelection(1); // 1=Password
+    } else
+        wxFAIL_MSG(wxT("Unsupported authentication mode."));
+
+    return wxGTCConfigPanelBase::TransferDataToWindow();
 }
+
+
+bool wxGTCConfigPanel::TransferDataFromWindow()
+{
+    wxCHECK(wxGTCConfigPanelBase::TransferDataFromWindow(), false);
+
+    if (!m_prov.m_read_only) {
+        // This is not a provider-locked configuration. Save the data.
+        switch (m_auth_mode->GetSelection()) {
+        case 0: // 0=Challenge/Response
+            m_cfg = m_cfg_resp;
+            break;
+
+        case 1: // 1=Password
+            m_cfg = m_cfg_pass;
+            break;
+
+        default:
+            wxFAIL_MSG(wxT("Unsupported authentication mode."));
+        }
+    }
+
+    return true;
+}
+
+
+void wxGTCConfigPanel::OnUpdateUI(wxUpdateUIEvent& event)
+{
+    UNREFERENCED_PARAMETER(event);
+
+    if (m_prov.m_read_only) {
+        // This is provider-locked configuration. Disable controls.
+        m_auth_mode_label ->Enable(false);
+        m_auth_mode       ->Enable(false);
+        m_credentials_resp->Enable(false);
+        m_credentials_pass->Enable(false);
+    } else {
+        // This is not a provider-locked configuration. Enable controls.
+        m_auth_mode_label ->Enable(true);
+        m_auth_mode       ->Enable(true);
+        m_credentials_resp->Enable(true);
+        m_credentials_pass ->Enable(true);
+    }
+}
+
 /// \endcond
 
 

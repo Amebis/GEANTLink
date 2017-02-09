@@ -29,25 +29,30 @@ class wxGTCResponsePanel;
 /// @{
 
 ///
-/// GTC credential entry panel
+/// GTC challenge/response credential entry panel
 ///
-typedef wxIdentityCredentialsPanel<eap::credentials_identity, wxIdentityCredentialsPanelBase> wxGTCCredentialsPanel;
+typedef wxIdentityCredentialsPanel<eap::credentials_identity, wxIdentityCredentialsPanelBase> wxGTCResponseCredentialsPanel;
 
 ///
-/// GTC credential configuration panel
+/// GTC challenge/response credential configuration panel
 ///
-typedef wxEAPCredentialsConfigPanel<eap::credentials_identity, wxGTCCredentialsPanel> wxGTCCredentialsConfigPanel;
+typedef wxEAPCredentialsConfigPanel<eap::credentials_identity, wxGTCResponseCredentialsPanel> wxGTCResponseCredentialsConfigPanel;
+
+///
+/// GTC password credential entry panel
+///
+typedef wxPasswordCredentialsPanel<eap::credentials_pass, wxPasswordCredentialsPanelBase> wxGTCPasswordCredentialsPanel;
+
+///
+/// GTC password credential configuration panel
+///
+typedef wxEAPCredentialsConfigPanel<eap::credentials_pass, wxGTCPasswordCredentialsPanel> wxGTCPasswordCredentialsConfigPanel;
 
 /// @}
 
 #pragma once
 
 #include "../res/wxGTC_UI.h"
-
-#include <wx/panel.h>
-#include <wx/stattext.h>
-
-#include <string>
 
 #include <Windows.h>
 
@@ -58,7 +63,7 @@ typedef wxEAPCredentialsConfigPanel<eap::credentials_identity, wxGTCCredentialsP
 ///
 /// GTC configuration panel
 ///
-class wxGTCConfigPanel : public wxPanel
+class wxGTCConfigPanel : public wxGTCConfigPanelBase
 {
 public:
     ///
@@ -66,18 +71,23 @@ public:
     ///
     wxGTCConfigPanel(const eap::config_provider &prov, eap::config_method_eapgtc &cfg, wxWindow* parent);
 
-    ///
-    /// Destructs the configuration panel
-    ///
-    virtual ~wxGTCConfigPanel();
-
 protected:
     /// \cond internal
-    virtual void OnInitDialog(wxInitDialogEvent& event);
+    virtual bool TransferDataToWindow();
+    virtual bool TransferDataFromWindow();
+    virtual void OnUpdateUI(wxUpdateUIEvent& event);
     /// \endcond
 
 protected:
-    wxGTCCredentialsConfigPanel *m_credentials; ///< Credentials configuration panel
+    const eap::config_provider &m_prov;                         ///< EAP provider
+    eap::config_method_eapgtc &m_cfg;                           ///< EAP-GTC configuration
+
+    wxGTCResponseCredentialsConfigPanel *m_credentials_resp;    ///< Challenge/response credentials configuration panel
+    wxGTCPasswordCredentialsConfigPanel *m_credentials_pass;    ///< Password credentials configuration panel
+
+    // Temporary configurations to hold data until applied
+    eap::config_method_eapgtc m_cfg_resp;                       ///< Method configuration for challenge/response mode
+    eap::config_method_eapgtc m_cfg_pass;                       ///< Method configuration for password mode
 };
 
 
