@@ -1153,9 +1153,11 @@ inline size_t pksizeof(_In_ const winstd::cert_context &val)
 inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ winstd::cert_context &val)
 {
     DWORD dwCertEncodingType;
+    assert(sizeof(dwCertEncodingType) == sizeof(unsigned int));
     cursor >> (unsigned int&)dwCertEncodingType;
 
     DWORD dwCertEncodedSize;
+    assert(sizeof(dwCertEncodingType) == sizeof(unsigned int));
     cursor >> (unsigned int&)dwCertEncodedSize;
 
     if (dwCertEncodedSize) {
@@ -1182,6 +1184,7 @@ inline size_t pksizeof(_In_ const winstd::eap_type_t &val)
 
 inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ winstd::eap_type_t &val)
 {
+    val = (winstd::eap_type_t)0; // Reset higher bytes to zero before reading to lower byte.
     cursor >> (unsigned char&)val;
 }
 
