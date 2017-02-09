@@ -510,6 +510,7 @@ inline size_t pksizeof(_In_ const eap::config_method::status_t &val)
 ///
 inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ eap::config_method::status_t &val)
 {
+    val = (eap::config_method::status_t)0; // Reset higher bytes to zero before reading to lower byte.
     cursor >> (unsigned char&)val;
 }
 
