@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: EAPMethods\n"
-"POT-Creation-Date: 2017-02-09 08:06+0100\n"
+"POT-Creation-Date: 2017-02-02 18:14+0100\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
 "Last-Translator: Simon Rozman <simon.rozman@amebis.si>\n"
 "Language-Team: Amebis, d. o. o., Kamnik <info@amebis.si>\n"
@@ -782,7 +782,7 @@ msgid "EAP-MSCHAPv2"
 msgstr ""
 
 #: master/lib/TTLS_UI/src/TTLS_UI.cpp:132
-msgid "EAP-GTC (Token Generator)"
+msgid "EAP-GTC"
 msgstr ""
 
 #: master/lib/TTLS_UI/src/TTLS_UI.cpp:135
@@ -884,38 +884,62 @@ msgstr ""
 msgid "EAP Identity Provider"
 msgstr ""
 
+#: master/EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
 #: master/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
+#: master/EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
 #: master/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
+#: ver1.0/EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
 #: ver1.0/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
+#: ver1.0/EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
 #: ver1.0/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
+#: ver1.1/EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
 #: ver1.1/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
+#: ver1.1/EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
 #: ver1.1/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
 msgid "EAP Methods"
 msgstr ""
 
+#: master/EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
 #: master/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
+#: master/EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
 #: master/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
+#: ver1.0/EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
 #: ver1.0/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
+#: ver1.0/EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
 #: ver1.0/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
+#: ver1.1/EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
 #: ver1.1/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
+#: ver1.1/EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
 #: ver1.1/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
 msgid "Modules to support individual EAP methods"
 msgstr ""
 
+#: master/EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:5
 #: master/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:5
+#: master/EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:5
 #: master/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:5
+#: ver1.0/EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:5
 #: ver1.0/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:5
+#: ver1.0/EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:5
 #: ver1.0/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:5
+#: ver1.1/EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:5
 #: ver1.1/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:5
+#: ver1.1/EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:5
 #: ver1.1/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:5
 msgid "TTLS"
 msgstr ""
 
+#: master/EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:5
 #: master/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:5
+#: master/EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:5
 #: master/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:5
+#: ver1.0/EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:5
 #: ver1.0/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:5
+#: ver1.0/EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:5
 #: ver1.0/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:5
+#: ver1.1/EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:5
 #: ver1.1/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:5
+#: ver1.1/EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:5
 #: ver1.1/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:5
 msgid "Tunneled Transport Layer Security"
 msgstr ""
