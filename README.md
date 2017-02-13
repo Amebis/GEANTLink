@@ -35,6 +35,9 @@ Suite of EAP supplicants for Microsoft Windows - IEEE 802.1X plug-ins for enterp
 - [CredWrite utility](https://github.com/Amebis/GEANTLink/tree/master/CredWrite) for automated user credential import to Credential Manager
 - [WLANManager utility](https://github.com/Amebis/GEANTLink/tree/master/WLANManager) to allow network profile configuration dialog shortcuts
 
+## Download
+Binaries are available for download [here](https://github.com/Amebis/GEANTLink/releases).
+
 ## Building
 
 ### Building Environment Requirements
@@ -117,3 +120,6 @@ Command            | Explanation
 `nmake SetupDebug` | Builds a debug version of project and debug MSI setup files. The resulting files can be found in `output\Setup` folder.
 
 The `/ls` flag can be appended to the commands above to reduce NMAKE’s verbosity. You can combine multiple targets (i.e. nmake Unregister Clean). Please, see NMAKE reference for further reading.
+
+### Translating into your language
+GÉANTLink is fully localizable. We kindly invite you to help [translating it on Transifex](https://www.transifex.com/eduroam_devel/geantlink/).
