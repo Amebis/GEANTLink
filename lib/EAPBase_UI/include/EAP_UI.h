@@ -359,6 +359,14 @@ public:
     ///
     /// Constructs a credential dialog
     ///
+    /// \param[in] prov    Provider configuration data
+    /// \param[in] parent  Parent window
+    /// \param[in] id      An identifier for the dialog. A value of -1 is taken to mean a default.
+    /// \param[in] title   The title of the dialog
+    /// \param[in] pos     The dialog position. The value \c wxDefaultPosition indicates a default position, chosen by either the windowing system or wxWidgets, depending on platform.
+    /// \param[in] size    The dialog size. The value \c wxDefaultSize indicates a default size, chosen by either the windowing system or wxWidgets, depending on platform.
+    /// \param[in] style   The window style
+    ///
     wxEAPCredentialsDialog(const eap::config_provider &prov, wxWindow *parent, wxWindowID id = wxID_ANY, const wxString &title = _("EAP Credentials"), const wxPoint &pos = wxDefaultPosition, const wxSize &size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE);
 };
 
