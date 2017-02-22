@@ -43,7 +43,7 @@ public:
 protected:
     static wxCriticalSection s_lock;        ///< Initialization lock
     static unsigned long s_init_ref_count;  ///< Initialization reference counter
-    static wxLocale s_locale;               ///< Locale
+    static wxLocale *s_locale;              ///< Locale
 };
 
 
@@ -415,9 +415,10 @@ wxInitializerPeer::wxInitializerPeer(_In_ HINSTANCE instance)
 
     // Do our wxWidgets configuration and localization initialization.
     wxInitializeConfig();
-    if (wxInitializeLocale(s_locale)) {
-        s_locale.AddCatalog(wxT("wxExtend") wxT(wxExtendVersion));
-        s_locale.AddCatalog(wxT("EAPTTLSUI"));
+    s_locale = new wxLocale;
+    if (wxInitializeLocale(*s_locale)) {
+        s_locale->AddCatalog(wxT("wxExtend") wxT(wxExtendVersion));
+        s_locale->AddCatalog(wxT("EAPTTLSUI"));
     }
 }
 
@@ -429,9 +430,14 @@ wxInitializerPeer::~wxInitializerPeer()
         return;
 
     wxEntryCleanup();
+
+    if (s_locale) {
+        delete s_locale;
+        s_locale = NULL;
+    }
 }
 
 
 wxCriticalSection wxInitializerPeer::s_lock;
 unsigned long wxInitializerPeer::s_init_ref_count = 0;
-wxLocale wxInitializerPeer::s_locale;
+wxLocale *wxInitializerPeer::s_locale = NULL;
