@@ -130,7 +130,10 @@ void eap::peer_ttls_ui::invoke_config_ui(
 
         // Create and launch configuration dialog.
         wxEAPConfigDialog<wxTTLSConfigWindow> dlg(cfg, parent);
-        if (!parent) ::FlashWindow(dlg.GetHWND(), TRUE);
+        if (!parent) {
+            FLASHWINFO fwi = { sizeof(FLASHWINFO), dlg.GetHWND(), FLASHW_ALL | FLASHW_TIMERNOFG };
+            ::FlashWindowEx(&fwi);
+        }
         result = dlg.ShowModal();
 
         if (parent) {
@@ -202,7 +205,10 @@ void eap::peer_ttls_ui::invoke_identity_ui(
 
             // Centre and display dialog.
             dlg.Centre(wxBOTH);
-            if (!parent) ::FlashWindow(dlg.GetHWND(), TRUE);
+            if (!parent) {
+                FLASHWINFO fwi = { sizeof(FLASHWINFO), dlg.GetHWND(), FLASHW_ALL | FLASHW_TIMERNOFG };
+                ::FlashWindowEx(&fwi);
+            }
             if ((result = dlg.ShowModal()) == wxID_OK) {
                 cfg_prov = dlg.GetSelection();
                 assert(cfg_prov);
@@ -265,7 +271,10 @@ void eap::peer_ttls_ui::invoke_identity_ui(
 
                 // Centre and display dialog.
                 dlg.Centre(wxBOTH);
-                if (!parent) ::FlashWindow(dlg.GetHWND(), TRUE);
+                if (!parent) {
+                    FLASHWINFO fwi = { sizeof(FLASHWINFO), dlg.GetHWND(), FLASHW_ALL | FLASHW_TIMERNOFG };
+                    ::FlashWindowEx(&fwi);
+                }
                 if ((result = dlg.ShowModal()) == wxID_OK) {
                     // Write credentials to credential manager.
                     if (panel->GetRemember()) {
@@ -334,7 +343,10 @@ void eap::peer_ttls_ui::invoke_identity_ui(
 
                         // Centre and display dialog.
                         dlg.Centre(wxBOTH);
-                        if (!parent) ::FlashWindow(dlg.GetHWND(), TRUE);
+                        if (!parent) {
+                            FLASHWINFO fwi = { sizeof(FLASHWINFO), dlg.GetHWND(), FLASHW_ALL | FLASHW_TIMERNOFG };
+                            ::FlashWindowEx(&fwi);
+                        }
                         if ((result = dlg.ShowModal()) == wxID_OK) {
                             // Write credentials to credential manager.
                             if (panel->GetRemember()) {
@@ -475,7 +487,10 @@ void eap::peer_ttls_ui::invoke_interactive_ui(
 
                 // Centre and display dialog.
                 dlg.Centre(wxBOTH);
-                if (!parent) ::FlashWindow(dlg.GetHWND(), TRUE);
+                if (!parent) {
+                    FLASHWINFO fwi = { sizeof(FLASHWINFO), dlg.GetHWND(), FLASHW_ALL | FLASHW_TIMERNOFG };
+                    ::FlashWindowEx(&fwi);
+                }
                 if ((result = dlg.ShowModal()) == wxID_OK) {
                     // Save response.
                     ctx.m_data.assign(
