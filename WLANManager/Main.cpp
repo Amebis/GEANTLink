@@ -90,7 +90,6 @@ static int WLANManager()
         }
 
         // Launch WLAN profile config dialog.
-        // Note: When a debugger is attached to this process the WlanUIEditProfile() will raise an exception and fail.
         WLAN_REASON_CODE wlrc;
         DWORD dwResult = WlanUIEditProfile(WLAN_UI_API_VERSION, pwcArglist[2], &(interfaces->InterfaceInfo[i].InterfaceGuid), NULL, WLSecurityPage, NULL, &wlrc);
         if (dwResult != ERROR_SUCCESS) {
@@ -119,17 +118,25 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_ HINSTANCE hPrevInstance, _In
     UNREFERENCED_PARAMETER(lpCmdLine);
     UNREFERENCED_PARAMETER(nCmdShow);
 
+    int res = 0;
+
     {
-        // Initialize Windows XP visual styles
-        INITCOMMONCONTROLSEX icc;
-        icc.dwSize = sizeof(INITCOMMONCONTROLSEX);
-        icc.dwICC = ICC_WIN95_CLASSES | ICC_STANDARD_CLASSES | ICC_LINK_CLASS;
-        InitCommonControlsEx(&icc);
+        // Note: When a debugger is attached to this process, the WlanUIEditProfile() will raise an exception and fail.
+        // It was accidentially discovered, that COM initialization resolves this issue.
+        com_initializer com_init(NULL);
+
+        {
+            // Initialize Windows XP visual styles
+            INITCOMMONCONTROLSEX icc;
+            icc.dwSize = sizeof(INITCOMMONCONTROLSEX);
+            icc.dwICC = ICC_WIN95_CLASSES | ICC_STANDARD_CLASSES | ICC_LINK_CLASS;
+            InitCommonControlsEx(&icc);
+        }
+
+        pfnWlanReasonCodeToString = WlanReasonCodeToString;
+
+        res = WLANManager();
     }
-
-    pfnWlanReasonCodeToString = WlanReasonCodeToString;
-
-    int res = WLANManager();
 
     assert(!_CrtDumpMemoryLeaks());
     return res;
