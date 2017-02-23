@@ -108,10 +108,10 @@ void eap::config_method_eapgtc::load(_In_ IXMLDOMNode *pConfigRoot)
     } else
         throw invalid_argument(string_printf(__FUNCTION__ " Unsupported authentication mode (%ls).", (BSTR)auth_mode));
 
+    m_module.log_config((xpath + L"/AuthMode").c_str(), (BSTR)auth_mode);
+
     // Load method configuration.
     config_method_with_cred::load(pConfigRoot);
-
-    m_module.log_config((xpath + L"/AuthMode").c_str(), auth_mode);
 }
 
 
