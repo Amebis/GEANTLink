@@ -55,7 +55,6 @@ wxTLSServerTrustPanelBase::wxTLSServerTrustPanelBase( wxWindow* parent, wxWindow
 	sb_root_ca_btn->Add( m_root_ca_add_file, 0, wxRIGHT|wxLEFT, 5 );
 	
 	m_root_ca_remove = new wxButton( sb_server_trust->GetStaticBox(), wxID_ANY, _("&Remove CA"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_root_ca_remove->Enable( false );
 	m_root_ca_remove->SetToolTip( _("Removes selected certificate authorities from the list") );
 	
 	sb_root_ca_btn->Add( m_root_ca_remove, 0, wxLEFT, 5 );
