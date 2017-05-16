@@ -1,7 +1,7 @@
-#WLANManager
+# WLANManager
 Invokes standard Windows Wireless Network Properties dialog
 
-##Usage
+## Usage
 ```
 WLANManager profile <profile name> [interface <interface name>]
 ```
