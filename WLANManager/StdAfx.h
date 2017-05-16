@@ -28,6 +28,7 @@
 
 #include <Windows.h>
 #include <CommCtrl.h>
+#include <devguid.h>
 #include <tchar.h>
 
 #include <memory>
