@@ -3,7 +3,7 @@ Invokes standard Windows Wireless Network Properties dialog
 
 ##Usage
 ```
-WLANManager profile <name>
+WLANManager profile <name> [interface <name>]
 ```
 
 - `name` - The name of the network profile (not neccessarely the same as SSID)
