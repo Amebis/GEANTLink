@@ -3,10 +3,11 @@ Invokes standard Windows Wireless Network Properties dialog
 
 ##Usage
 ```
-WLANManager profile <name> [interface <name>]
+WLANManager profile <profile name> [interface <interface name>]
 ```
 
-- `name` - The name of the network profile (not neccessarely the same as SSID)
+- `profile name`   - The name of the network profile (not neccessarely the same as SSID)
+- `interface name` - The name of the specific network interface to search the profile at
 
 Return codes:
 - -1 = Invalid parameters
