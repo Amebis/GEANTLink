@@ -1,8 +1,10 @@
 # GÉANTLink
 
-Suite of EAP supplicants for Microsoft Windows - IEEE 802.1X plug-ins for enterprise network authentication
+Suite of EAP supplicants for Microsoft Windows - IEEE 802.1X clients for enterprise network authentication
 
 ## Features
+- Integrates into Windows seamlessly
+- Wired and wireless network support
 
 ### Authentication methods
 - EAP-TTLS with the following inner methods:
@@ -13,7 +15,7 @@ Suite of EAP supplicants for Microsoft Windows - IEEE 802.1X plug-ins for enterp
 
 ### Security
 - Microsoft Windows Credential Manager stored user credentials
-- User credentials can be shared between different network profiles
+- User credentials can be shared between different network profiles, regardless of their connection: wired or wireless
 - Encrypted EapHost inter-process communication
 - TLS:
    - Separate trusted root CA list
@@ -29,10 +31,14 @@ Suite of EAP supplicants for Microsoft Windows - IEEE 802.1X plug-ins for enterp
 - Lockable network profile configuration
 
 ### Deployment
-- Released as multi-lingual 32 and 64-bit MSI packages
+- Released as multi-lingual 32 and 64-bit MSI packages; Group Policy deployment supported
 - [MsiUseFeature utility](https://github.com/Amebis/GEANTLink/tree/ver1.1/MsiUseFeature) for GÉANTLink install state testing (for embedding GÉANTLink into other setup packages)
 - [CredWrite utility](https://github.com/Amebis/GEANTLink/tree/ver1.1/CredWrite) for automated user credential import to Credential Manager
 - [WLANManager utility](https://github.com/Amebis/GEANTLink/tree/ver1.1/WLANManager) to allow network profile configuration dialog shortcuts
+
+### Supported operating systems
+- Windows Vista, Windows Server 2008
+- Windows 7, Windows Server 2008 R2
 
 ## Download
 Binaries are available for download [here](https://github.com/Amebis/GEANTLink/releases).
