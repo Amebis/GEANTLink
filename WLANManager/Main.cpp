@@ -132,7 +132,8 @@ static int WLANManager()
         WLAN_REASON_CODE wlrc = L2_REASON_CODE_SUCCESS;
         DWORD dwResult = WlanUIEditProfile(WLAN_UI_API_VERSION, pwcArglist[2], &(interfaces->InterfaceInfo[i].InterfaceGuid), NULL, WLSecurityPage, NULL, &wlrc);
         if (dwResult != ERROR_SUCCESS) {
-            DisplayError(_T("%s function failed (error %u)."), _T("WlanUIEditProfile"), dwResult);
+            // WlanUIEditProfile() displays own error dialog on failure.
+            //DisplayError(_T("%s function failed (error %u)."), _T("WlanUIEditProfile"), dwResult);
             return 5;
         } else if (wlrc != WLAN_REASON_CODE_SUCCESS) {
             tstring reason;
