@@ -38,16 +38,13 @@ Suite of EAP supplicants for Microsoft Windows - IEEE 802.1X clients for enterpr
 - [WLANManager utility](https://github.com/Amebis/GEANTLink/tree/master/WLANManager) to allow network profile configuration dialog shortcuts
 
 ### Supported operating systems
-- Windows Vista
-- Windows 7
-- Windows 8 Desktop
-- Windows 8.1 Desktop
-- Windows 10 Desktop
-- Windows Server 2008
-- Windows Server 2008 R2
-- Windows Server 2012
-- Windows Server 2012 R2
-- Windows Server 2016
+- Windows Vista, Windows Server 2008
+- Windows 7, Windows Server 2008 R2
+
+#### Versions 1.2 and later also support:
+- Windows 8 Desktop, Windows Server 2012
+- Windows 8.1 Desktop, Windows Server 2012 R2
+- Windows 10 Desktop, Windows Server 2016
 
 ## Download
 Binaries are available for download [here](https://github.com/Amebis/GEANTLink/releases).
