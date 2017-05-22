@@ -29,7 +29,7 @@
 // Product version as a single DWORD
 // Note: Used for version comparison within C/C++ code.
 //
-#define PRODUCT_VERSION          0x01020400
+#define PRODUCT_VERSION          0x01020500
 
 //
 // Product version by components
@@ -39,26 +39,26 @@
 //
 #define PRODUCT_VERSION_MAJ      1
 #define PRODUCT_VERSION_MIN      2
-#define PRODUCT_VERSION_REV      4
+#define PRODUCT_VERSION_REV      5
 #define PRODUCT_VERSION_BUILD    0
 
 //
 // Human readable product version and build year for UI
 //
-#define PRODUCT_VERSION_STR      "1.2"
+#define PRODUCT_VERSION_STR      "1.2a"
 #define PRODUCT_BUILD_YEAR_STR   "2017"
 
 //
 // Numerical version presentation for ProductVersion propery in
 // MSI packages (syntax: N.N[.N[.N]])
 //
-#define PRODUCT_VERSION_INST     "1.2.4"
+#define PRODUCT_VERSION_INST     "1.2.5"
 
 //
 // The product code for ProductCode property in MSI packages
 // Replace with new on every version change, regardless how minor it is.
 //
-#define PRODUCT_VERSION_GUID     "{3490271F-380F-4618-83F9-114A340E2C00}"
+#define PRODUCT_VERSION_GUID     "{B43F5526-283F-4634-8841-51B7CB6D5AEC}"
 
 //
 // Product vendor
