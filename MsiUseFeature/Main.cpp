@@ -47,32 +47,7 @@ static int MsiUseFeature()
     }
 
     // Perform the Microsoft Installer's feature completeness check.
-    switch (MsiUseFeatureW(_L(PRODUCT_VERSION_GUID), pwcArglist[1])) {
-    case INSTALLSTATE_LOCAL:
-        // All components of the feature were checked and present.
-        break;
-
-    case INSTALLSTATE_BROKEN: {
-        // Some of the components are reported missing.
-        //
-        // Unfortunately, the feature state is falsely reported as broken, when MsiUseFeature() lacks privilege
-        // to check the presence of at least one component installed in an inaccessible folder or registry key.
-        // If our process is not elevated and feature does contain such components, this is the expected result.
-        // However, even when we are "Run as Administrator", this does not guarantee we can access all the
-        // components. Some might be restricted from Administrators group aswell.
-        win_handle token;
-        TOKEN_ELEVATION Elevation; DWORD dwSize;
-        if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &token) &&
-            GetTokenInformation(token, TokenElevation, &Elevation, sizeof(Elevation), &dwSize) &&
-            !Elevation.TokenIsElevated)
-        {
-            // We are not elevated.
-            OutputDebugStr(_T("The feature is reported broken and the elevation is required for a more reliable test. Silently assuming the feature is complete.\n"));
-            break;
-        }
-    }
-
-    default:
+    if (MsiUseFeatureW(_L(PRODUCT_VERSION_GUID), pwcArglist[1]) != INSTALLSTATE_LOCAL) {
         OutputDebugStr(_T("The feature is not installed locally.\n"));
         return 2;
     }
