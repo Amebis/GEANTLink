@@ -3,9 +3,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: EAPMethods\n"
-"POT-Creation-Date: 2017-02-02 18:14+0100\n"
+"POT-Creation-Date: 2017-02-09 13:15+0100\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
-"Last-Translator: Simon Rozman <simon@rozman.si>, 2016\n"
+"Last-Translator: Tom Ivar Myren <tom.myren@uninett.no>, 2017\n"
 "Language-Team: Norwegian Bokmål (https://www.transifex.com/eduroam_devel/teams/11799/nb/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -113,7 +113,7 @@ msgstr ""
 #: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:255
 #: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:299
 msgid "Identity:"
-msgstr ""
+msgstr "Identitet:"
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:262
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:262
@@ -221,7 +221,7 @@ msgstr "Bruker ID"
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:433
 msgid "Please provide your user ID."
-msgstr ""
+msgstr "Vennligst oppgi bruker ID."
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:473
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:424
@@ -528,30 +528,43 @@ msgstr "Konfigurasjon av EAP metode feilet (feil %u, %s, %s)."
 msgid "Configuring EAP method failed (error %u)."
 msgstr "Konfigurasjon av EAP metode feilet (feil %u)."
 
-#: master/lib/GTC_UI/res/wxGTC_UI.cpp:16 master/lib/GTC_UI/include/GTC_UI.h:93
+#: master/lib/GTC_UI/res/wxGTC_UI.cpp:16
+#: master/lib/GTC_UI/include/GTC_UI.h:103
 msgid "GTC Challenge"
-msgstr ""
+msgstr "GTC Challenge"
 
 #: master/lib/GTC_UI/res/wxGTC_UI.cpp:26
 msgid "Please provide your response."
-msgstr ""
+msgstr "Vennligst responder."
 
 #: master/lib/GTC_UI/res/wxGTC_UI.cpp:38
 msgid "Server challenge"
-msgstr ""
+msgstr "Server challenge"
 
 #: master/lib/GTC_UI/res/wxGTC_UI.cpp:43
 msgid "Enter your response here"
-msgstr ""
+msgstr "Skriv din respons her"
 
-#: master/lib/GTC_UI/src/GTC_UI.cpp:33
-msgid "GTC User ID"
-msgstr ""
+#: master/lib/GTC_UI/res/wxGTC_UI.cpp:70
+msgid "EAP-GTC authentication &mode:"
+msgstr "EAP-GTC autentisering &modus:"
 
-#: master/lib/GTC_UI/src/GTC_UI.cpp:69
+#: master/lib/GTC_UI/res/wxGTC_UI.cpp:75
+msgid "Select EAP-GTC authentication mode from the list"
+msgstr "Velg EAP-GTC autentiseringsmodus fra listen"
+
+#: master/lib/GTC_UI/src/GTC_UI.cpp:39
+msgid "Challenge/Response"
+msgstr "Challenge/Response"
+
+#: master/lib/GTC_UI/src/GTC_UI.cpp:41
+msgid "Password"
+msgstr "Passord"
+
+#: master/lib/GTC_UI/src/GTC_UI.cpp:119
 #, c-format
 msgid "%s Challenge"
-msgstr ""
+msgstr "%s Challenge"
 
 #: master/lib/MSCHAPv2_UI/src/MSCHAPv2_UI.cpp:33
 #: ver1.0/lib/MSCHAPv2_UI/src/MSCHAPv2_UI.cpp:33
@@ -778,7 +791,7 @@ msgstr "Spesifiser tilpasset ytre identitet"
 msgid "Custom outer identity to use"
 msgstr "Tilpasset ytre identitet som brukes"
 
-#: master/lib/TTLS_UI/src/Module.cpp:262 master/lib/TTLS_UI/src/Module.cpp:319
+#: master/lib/TTLS_UI/src/Module.cpp:262 master/lib/TTLS_UI/src/Module.cpp:330
 #: ver1.0/lib/TTLS_UI/src/Module.cpp:274 ver1.0/lib/TTLS_UI/src/Module.cpp:284
 #: ver1.1/lib/TTLS_UI/src/Module.cpp:262 ver1.1/lib/TTLS_UI/src/Module.cpp:318
 #: master/lib/EAPBase_UI/include/EAP_UI.h:785
@@ -790,7 +803,7 @@ msgstr ""
 "Feil under skriving av brukeropplysninger til Credential Manager: %hs (feil "
 "%u)"
 
-#: master/lib/TTLS_UI/src/Module.cpp:264 master/lib/TTLS_UI/src/Module.cpp:321
+#: master/lib/TTLS_UI/src/Module.cpp:264 master/lib/TTLS_UI/src/Module.cpp:332
 #: ver1.0/lib/TTLS_UI/src/Module.cpp:276 ver1.0/lib/TTLS_UI/src/Module.cpp:286
 #: ver1.1/lib/TTLS_UI/src/Module.cpp:264 ver1.1/lib/TTLS_UI/src/Module.cpp:320
 #: master/lib/EAPBase_UI/include/EAP_UI.h:788
@@ -799,25 +812,25 @@ msgstr ""
 msgid "Writing credentials failed."
 msgstr "Skriving av brukeropplysninger feilet."
 
-#: master/lib/TTLS_UI/src/Module.cpp:356 ver1.1/lib/TTLS_UI/src/Module.cpp:355
+#: master/lib/TTLS_UI/src/Module.cpp:367 ver1.1/lib/TTLS_UI/src/Module.cpp:355
 #, c-format
 msgid "Invoking EAP identity UI failed (error %u, %s, %s)."
 msgstr "Kall av EAP identitet UI feilet (feil %u, %s, %s)."
 
-#: master/lib/TTLS_UI/src/Module.cpp:358 ver1.1/lib/TTLS_UI/src/Module.cpp:357
+#: master/lib/TTLS_UI/src/Module.cpp:369 ver1.1/lib/TTLS_UI/src/Module.cpp:357
 #, c-format
 msgid "Invoking EAP identity UI failed (error %u)."
 msgstr "Kall av EAP identitet UI feilet (feil %u)."
 
-#: master/lib/TTLS_UI/src/Module.cpp:485
+#: master/lib/TTLS_UI/src/Module.cpp:496
 #, c-format
 msgid "Invoking EAP interactive UI failed (error %u, %s, %s)."
-msgstr ""
+msgstr "Kall av EAP interaktivt UI feilet (feil %u, %s, %s)."
 
-#: master/lib/TTLS_UI/src/Module.cpp:488
+#: master/lib/TTLS_UI/src/Module.cpp:499
 #, c-format
 msgid "Invoking EAP interactive UI failed (error %u)."
-msgstr ""
+msgstr "Kall av EAP interaktivt UI feilet (feil %u)."
 
 #: master/lib/TTLS_UI/src/TTLS_UI.cpp:118
 #: ver1.0/lib/TTLS_UI/src/TTLS_UI.cpp:36
@@ -955,62 +968,38 @@ msgstr "Konfigurasjon av EAP forbindelse"
 msgid "EAP Identity Provider"
 msgstr "EAP Identitetstilbyder"
 
-#: master/EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
 #: master/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
-#: master/EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
 #: master/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
-#: ver1.0/EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
 #: ver1.0/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
-#: ver1.0/EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
 #: ver1.0/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
-#: ver1.1/EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
 #: ver1.1/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
-#: ver1.1/EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
 #: ver1.1/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
 msgid "EAP Methods"
 msgstr "EAP Metoder"
 
-#: master/EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
 #: master/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
-#: master/EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
 #: master/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
-#: ver1.0/EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
 #: ver1.0/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
-#: ver1.0/EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
 #: ver1.0/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
-#: ver1.1/EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
 #: ver1.1/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
-#: ver1.1/EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
 #: ver1.1/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
 msgid "Modules to support individual EAP methods"
 msgstr "Moduler for støtte av individuelle EAP metoder"
 
-#: master/EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:5
 #: master/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:5
-#: master/EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:5
 #: master/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:5
-#: ver1.0/EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:5
 #: ver1.0/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:5
-#: ver1.0/EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:5
 #: ver1.0/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:5
-#: ver1.1/EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:5
 #: ver1.1/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:5
-#: ver1.1/EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:5
 #: ver1.1/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:5
 msgid "TTLS"
 msgstr "TTLS"
 
-#: master/EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:5
 #: master/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:5
-#: master/EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:5
 #: master/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:5
-#: ver1.0/EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:5
 #: ver1.0/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:5
-#: ver1.0/EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:5
 #: ver1.0/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:5
-#: ver1.1/EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:5
 #: ver1.1/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:5
-#: ver1.1/EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:5
 #: ver1.1/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:5
 msgid "Tunneled Transport Layer Security"
 msgstr "Tunneled Transport Layer Security"

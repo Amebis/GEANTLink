@@ -3,7 +3,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: EAPMethods\n"
-"POT-Creation-Date: 2017-02-02 18:14+0100\n"
+"POT-Creation-Date: 2017-02-09 13:15+0100\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
 "Last-Translator: Simon Rozman <simon@rozman.si>, 2016\n"
 "Language-Team: Hungarian (https://www.transifex.com/eduroam_devel/teams/11799/hu/)\n"
@@ -502,7 +502,8 @@ msgstr ""
 msgid "Configuring EAP method failed (error %u)."
 msgstr ""
 
-#: master/lib/GTC_UI/res/wxGTC_UI.cpp:16 master/lib/GTC_UI/include/GTC_UI.h:93
+#: master/lib/GTC_UI/res/wxGTC_UI.cpp:16
+#: master/lib/GTC_UI/include/GTC_UI.h:103
 msgid "GTC Challenge"
 msgstr ""
 
@@ -518,11 +519,23 @@ msgstr ""
 msgid "Enter your response here"
 msgstr ""
 
-#: master/lib/GTC_UI/src/GTC_UI.cpp:33
-msgid "GTC User ID"
+#: master/lib/GTC_UI/res/wxGTC_UI.cpp:70
+msgid "EAP-GTC authentication &mode:"
 msgstr ""
 
-#: master/lib/GTC_UI/src/GTC_UI.cpp:69
+#: master/lib/GTC_UI/res/wxGTC_UI.cpp:75
+msgid "Select EAP-GTC authentication mode from the list"
+msgstr ""
+
+#: master/lib/GTC_UI/src/GTC_UI.cpp:39
+msgid "Challenge/Response"
+msgstr ""
+
+#: master/lib/GTC_UI/src/GTC_UI.cpp:41
+msgid "Password"
+msgstr ""
+
+#: master/lib/GTC_UI/src/GTC_UI.cpp:119
 #, c-format
 msgid "%s Challenge"
 msgstr ""
@@ -743,7 +756,7 @@ msgstr ""
 msgid "Custom outer identity to use"
 msgstr ""
 
-#: master/lib/TTLS_UI/src/Module.cpp:262 master/lib/TTLS_UI/src/Module.cpp:319
+#: master/lib/TTLS_UI/src/Module.cpp:262 master/lib/TTLS_UI/src/Module.cpp:330
 #: ver1.0/lib/TTLS_UI/src/Module.cpp:274 ver1.0/lib/TTLS_UI/src/Module.cpp:284
 #: ver1.1/lib/TTLS_UI/src/Module.cpp:262 ver1.1/lib/TTLS_UI/src/Module.cpp:318
 #: master/lib/EAPBase_UI/include/EAP_UI.h:785
@@ -753,7 +766,7 @@ msgstr ""
 msgid "Error writing credentials to Credential Manager: %hs (error %u)"
 msgstr ""
 
-#: master/lib/TTLS_UI/src/Module.cpp:264 master/lib/TTLS_UI/src/Module.cpp:321
+#: master/lib/TTLS_UI/src/Module.cpp:264 master/lib/TTLS_UI/src/Module.cpp:332
 #: ver1.0/lib/TTLS_UI/src/Module.cpp:276 ver1.0/lib/TTLS_UI/src/Module.cpp:286
 #: ver1.1/lib/TTLS_UI/src/Module.cpp:264 ver1.1/lib/TTLS_UI/src/Module.cpp:320
 #: master/lib/EAPBase_UI/include/EAP_UI.h:788
@@ -762,22 +775,22 @@ msgstr ""
 msgid "Writing credentials failed."
 msgstr ""
 
-#: master/lib/TTLS_UI/src/Module.cpp:356 ver1.1/lib/TTLS_UI/src/Module.cpp:355
+#: master/lib/TTLS_UI/src/Module.cpp:367 ver1.1/lib/TTLS_UI/src/Module.cpp:355
 #, c-format
 msgid "Invoking EAP identity UI failed (error %u, %s, %s)."
 msgstr ""
 
-#: master/lib/TTLS_UI/src/Module.cpp:358 ver1.1/lib/TTLS_UI/src/Module.cpp:357
+#: master/lib/TTLS_UI/src/Module.cpp:369 ver1.1/lib/TTLS_UI/src/Module.cpp:357
 #, c-format
 msgid "Invoking EAP identity UI failed (error %u)."
 msgstr ""
 
-#: master/lib/TTLS_UI/src/Module.cpp:485
+#: master/lib/TTLS_UI/src/Module.cpp:496
 #, c-format
 msgid "Invoking EAP interactive UI failed (error %u, %s, %s)."
 msgstr ""
 
-#: master/lib/TTLS_UI/src/Module.cpp:488
+#: master/lib/TTLS_UI/src/Module.cpp:499
 #, c-format
 msgid "Invoking EAP interactive UI failed (error %u)."
 msgstr ""
@@ -917,62 +930,38 @@ msgstr ""
 msgid "EAP Identity Provider"
 msgstr ""
 
-#: master/EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
 #: master/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
-#: master/EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
 #: master/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
-#: ver1.0/EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
 #: ver1.0/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
-#: ver1.0/EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
 #: ver1.0/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
-#: ver1.1/EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
 #: ver1.1/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
-#: ver1.1/EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
 #: ver1.1/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
 msgid "EAP Methods"
 msgstr ""
 
-#: master/EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
 #: master/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
-#: master/EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
 #: master/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
-#: ver1.0/EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
 #: ver1.0/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
-#: ver1.0/EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
 #: ver1.0/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
-#: ver1.1/EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
 #: ver1.1/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
-#: ver1.1/EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
 #: ver1.1/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
 msgid "Modules to support individual EAP methods"
 msgstr ""
 
-#: master/EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:5
 #: master/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:5
-#: master/EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:5
 #: master/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:5
-#: ver1.0/EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:5
 #: ver1.0/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:5
-#: ver1.0/EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:5
 #: ver1.0/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:5
-#: ver1.1/EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:5
 #: ver1.1/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:5
-#: ver1.1/EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:5
 #: ver1.1/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:5
 msgid "TTLS"
 msgstr "TTLS"
 
-#: master/EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:5
 #: master/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:5
-#: master/EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:5
 #: master/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:5
-#: ver1.0/EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:5
 #: ver1.0/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:5
-#: ver1.0/EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:5
 #: ver1.0/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:5
-#: ver1.1/EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:5
 #: ver1.1/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:5
-#: ver1.1/EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:5
 #: ver1.1/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:5
 msgid "Tunneled Transport Layer Security"
 msgstr ""
