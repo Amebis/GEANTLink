@@ -47,17 +47,17 @@ msgstr ""
 #: master/EventMonitor/ETWLog.cpp:171 ver1.0/EventMonitor/ETWLog.cpp:171
 #: ver1.1/EventMonitor/ETWLog.cpp:171
 msgid "Time"
-msgstr ""
+msgstr "Tempo"
 
 #: master/EventMonitor/ETWLog.cpp:172 ver1.0/EventMonitor/ETWLog.cpp:172
 #: ver1.1/EventMonitor/ETWLog.cpp:172
 msgid "PID"
-msgstr ""
+msgstr "PID"
 
 #: master/EventMonitor/ETWLog.cpp:173 ver1.0/EventMonitor/ETWLog.cpp:173
 #: ver1.1/EventMonitor/ETWLog.cpp:173
 msgid "TID"
-msgstr ""
+msgstr "TID"
 
 #: master/EventMonitor/ETWLog.cpp:174 ver1.0/EventMonitor/ETWLog.cpp:174
 #: ver1.1/EventMonitor/ETWLog.cpp:174
@@ -212,7 +212,7 @@ msgstr ""
 #: ver1.0/EventMonitor/Frame.cpp:127 ver1.0/EventMonitor/Frame.cpp:178
 #: ver1.1/EventMonitor/Frame.cpp:127 ver1.1/EventMonitor/Frame.cpp:178
 msgid "Informational"
-msgstr ""
+msgstr "Informativo"
 
 #: master/EventMonitor/Frame.cpp:127 master/EventMonitor/Frame.cpp:178
 #: ver1.0/EventMonitor/Frame.cpp:127 ver1.0/EventMonitor/Frame.cpp:178
@@ -322,7 +322,7 @@ msgstr ""
 #: ver1.1/EventMonitor/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
 #: ver1.1/EventMonitor/MSIBuild/en_US.x64.Release.Shortcut-2.idtx:4
 msgid "Real-time display of internal events"
-msgstr ""
+msgstr "Apresentação em tempo real de eventos internos"
 
 #: master/EventMonitor/MSIBuild/en_US.Win32.Debug.Shortcut-2.idtx:4
 #: master/EventMonitor/MSIBuild/en_US.Win32.Release.Shortcut-2.idtx:4
