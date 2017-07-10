@@ -90,7 +90,8 @@ void eap::peer_ttls_ui::config_blob2xml(
 
     // Unpack configuration.
     config_connection cfg(*this);
-    unpack(cfg, pConnectionData, dwConnectionDataSize);
+    if (dwConnectionDataSize)
+        unpack(cfg, pConnectionData, dwConnectionDataSize);
 
     // Save configuration to XML.
     cfg.save(pDoc, pConfigRoot);
