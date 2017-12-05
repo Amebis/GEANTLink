@@ -5,6 +5,7 @@ msgstr ""
 "Project-Id-Version: EventMonitor\n"
 "POT-Creation-Date: 2017-02-02 18:14+0100\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
+"Last-Translator: Nunzio Napolitano <nunzio.napolitano@uniparthenope.it>, 2017\n"
 "Language-Team: Italian (Italy) (https://www.transifex.com/eduroam_devel/teams/11799/it_IT/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -35,7 +36,7 @@ msgstr ""
 #: ver1.1/EventMonitor/MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
 #: ver1.1/EventMonitor/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
 msgid "Event Monitor"
-msgstr ""
+msgstr "Monitor delgi eventi"
 
 #: master/EventMonitor/ETWLog.cpp:83 ver1.0/EventMonitor/ETWLog.cpp:83
 #: ver1.1/EventMonitor/ETWLog.cpp:83
@@ -46,27 +47,27 @@ msgstr ""
 #: master/EventMonitor/ETWLog.cpp:171 ver1.0/EventMonitor/ETWLog.cpp:171
 #: ver1.1/EventMonitor/ETWLog.cpp:171
 msgid "Time"
-msgstr ""
+msgstr "Ora"
 
 #: master/EventMonitor/ETWLog.cpp:172 ver1.0/EventMonitor/ETWLog.cpp:172
 #: ver1.1/EventMonitor/ETWLog.cpp:172
 msgid "PID"
-msgstr ""
+msgstr "PID"
 
 #: master/EventMonitor/ETWLog.cpp:173 ver1.0/EventMonitor/ETWLog.cpp:173
 #: ver1.1/EventMonitor/ETWLog.cpp:173
 msgid "TID"
-msgstr ""
+msgstr "TID"
 
 #: master/EventMonitor/ETWLog.cpp:174 ver1.0/EventMonitor/ETWLog.cpp:174
 #: ver1.1/EventMonitor/ETWLog.cpp:174
 msgid "Source"
-msgstr ""
+msgstr "Origine"
 
 #: master/EventMonitor/ETWLog.cpp:175 ver1.0/EventMonitor/ETWLog.cpp:175
 #: ver1.1/EventMonitor/ETWLog.cpp:175
 msgid "Event"
-msgstr ""
+msgstr "Evento"
 
 #: master/EventMonitor/ETWLog.cpp:232 ver1.0/EventMonitor/ETWLog.cpp:232
 #: ver1.1/EventMonitor/ETWLog.cpp:232
@@ -117,17 +118,17 @@ msgstr ""
 #: master/EventMonitor/Frame.cpp:65 ver1.0/EventMonitor/Frame.cpp:65
 #: ver1.1/EventMonitor/Frame.cpp:65
 msgid "Quits this program"
-msgstr ""
+msgstr "Esci dal programma"
 
 #: master/EventMonitor/Frame.cpp:69 ver1.0/EventMonitor/Frame.cpp:69
 #: ver1.1/EventMonitor/Frame.cpp:69
 msgid "&Program"
-msgstr ""
+msgstr "&Programma"
 
 #: master/EventMonitor/Frame.cpp:73 ver1.0/EventMonitor/Frame.cpp:73
 #: ver1.1/EventMonitor/Frame.cpp:73
 msgid "&Copy"
-msgstr ""
+msgstr "&Copia"
 
 #: master/EventMonitor/Frame.cpp:73 master/EventMonitor/Frame.cpp:154
 #: ver1.0/EventMonitor/Frame.cpp:73 ver1.0/EventMonitor/Frame.cpp:154
@@ -161,7 +162,7 @@ msgstr ""
 #: master/EventMonitor/Frame.cpp:90 ver1.0/EventMonitor/Frame.cpp:90
 #: ver1.1/EventMonitor/Frame.cpp:90
 msgid "Select &All"
-msgstr ""
+msgstr "Seleziona &tutto"
 
 #: master/EventMonitor/Frame.cpp:90 ver1.0/EventMonitor/Frame.cpp:90
 #: ver1.1/EventMonitor/Frame.cpp:90
