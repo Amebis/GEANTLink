@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: EAPMethods\n"
 "POT-Creation-Date: 2017-02-09 13:15+0100\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
-"Last-Translator: Simon Rozman <simon@rozman.si>, 2016\n"
+"Last-Translator: Dubravko Penezic <dpenezic@gmail.com>, 2016\n"
 "Language-Team: Croatian (Croatia) (https://www.transifex.com/eduroam_devel/teams/11799/hr_HR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -82,19 +82,20 @@ msgstr "Otvaranje dialoga s postavkama davatelja usluge"
 #: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:665
 #, c-format
 msgid "%s User Credentials"
-msgstr ""
+msgstr "%s korisničke vjerodajnice"
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:240
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:240
 #: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:240
 msgid "Select the source where your credentials used to connect are stored."
 msgstr ""
+"Odaberite izvor na kojem su pohranjene vaše vjerodajnice za povezivanje."
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:244
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:244
 #: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:244
 msgid "Use credentials from Credential &Manager"
-msgstr ""
+msgstr "Upotrijebite vjerodajnice iz &Credential i upravitelja"
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:245
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:245
@@ -103,6 +104,8 @@ msgid ""
 "Select this option if you would like to use credentials stored in Windows "
 "Credential Manager"
 msgstr ""
+"Odaberite ovu opciju ako želite koristiti vjerodajnice pohranjene u Windows "
+"Credential Manager-u"
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:255
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:299
@@ -111,19 +114,19 @@ msgstr ""
 #: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:255
 #: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:299
 msgid "Identity:"
-msgstr ""
+msgstr "Identitet"
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:262
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:262
 #: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:262
 msgid "Your present credentials stored in Windows Credential Manager"
-msgstr ""
+msgstr "Vaše vjerodajnice pohranjene u sustavu Windows Credential Manager"
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:272
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:272
 #: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:272
 msgid "&Clear Credentials"
-msgstr "&Obriši korisničke podatke"
+msgstr "&Izbriši vjerodajnice"
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:273
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:273
@@ -157,7 +160,7 @@ msgstr "Odaberi ako je potrebno postaviti korisničke podatke"
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:288
 #: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:288
 msgid "Use credentials from &profile configuration"
-msgstr ""
+msgstr "Upotrijebite vjerodajnice iz konfiguracije &profila"
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:289
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:289
@@ -166,18 +169,20 @@ msgid ""
 "Select this option if you would like to store credentials as a part of  "
 "profile configuration"
 msgstr ""
+"Odaberite ovu opciju ako želite pohraniti vjerodajnice kao dio konfiguracije"
+" profila"
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:306
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:306
 #: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:306
 msgid "Profile configuration credentials"
-msgstr ""
+msgstr "Potvrde o konfiguraciji profila"
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:359
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:359
 #: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:359
 msgid "User ID and Password"
-msgstr ""
+msgstr "Korisnički ID i lozinka"
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:369
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:369
@@ -217,7 +222,7 @@ msgstr "Korisnička oznaka"
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:433
 msgid "Please provide your user ID."
-msgstr ""
+msgstr "Unesite korisničko ime i zaporku."
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:473
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:424
@@ -473,105 +478,107 @@ msgid ""
 "The %s version installed on this computer logs credentials in visible and "
 "easy to read way."
 msgstr ""
+"%s verzija instalirana na ovom računalu prijavljuje vjerodajnice na vidljiv "
+"i jednostavan način za čitanje."
 
 #: master/lib/EAPBase_UI/src/EAP_UI.cpp:251
 #: ver1.0/lib/EAPBase_UI/src/EAP_UI.cpp:283
 #: ver1.1/lib/EAPBase_UI/src/EAP_UI.cpp:251
 msgid "Please, reconsider necessity to enter your credentials."
-msgstr ""
+msgstr "Molimo, ponovno razmotrite potrebu za unos vjerodajnica."
 
 #: master/lib/EapHost_UI/res/wxEapHost_UI.cpp:17
 #: ver1.1/lib/EapHost_UI/res/wxEapHost_UI.cpp:17
 msgid "Inner EAP Method"
-msgstr ""
+msgstr "Unutarnja EAP metoda"
 
 #: master/lib/EapHost_UI/res/wxEapHost_UI.cpp:28
 #: ver1.1/lib/EapHost_UI/res/wxEapHost_UI.cpp:28
 msgid "Select and configure inner EAP method"
-msgstr ""
+msgstr "Odaberite i konfigurirajte unutarnju EAP metodu"
 
 #: master/lib/EapHost_UI/res/wxEapHost_UI.cpp:40
 #: ver1.1/lib/EapHost_UI/res/wxEapHost_UI.cpp:40
 msgid "&Settings"
-msgstr ""
+msgstr "&Postavke"
 
 #: master/lib/EapHost_UI/src/EapHost_UI.cpp:59
 #: ver1.1/lib/EapHost_UI/src/EapHost_UI.cpp:59
 #, c-format
 msgid "Enumerating EAP methods failed (error %u, %s, %s)."
-msgstr ""
+msgstr "Nije uspjelo nabrajanje metoda EAP (pogreška% u,% s,% s)."
 
 #: master/lib/EapHost_UI/src/EapHost_UI.cpp:61
 #: ver1.1/lib/EapHost_UI/src/EapHost_UI.cpp:61
 #, c-format
 msgid "Enumerating EAP methods failed (error %u)."
-msgstr ""
+msgstr "Nije uspjelo nabrajanje metoda EAP (pogreška% u)."
 
 #: master/lib/EapHost_UI/src/EapHost_UI.cpp:136
 #: ver1.1/lib/EapHost_UI/src/EapHost_UI.cpp:136
 #, c-format
 msgid "Configuring EAP method failed (error %u, %s, %s)."
-msgstr ""
+msgstr "Nije uspjela konfiguracija EAP metode (pogreška% u,% s,% s)."
 
 #: master/lib/EapHost_UI/src/EapHost_UI.cpp:138
 #: ver1.1/lib/EapHost_UI/src/EapHost_UI.cpp:138
 #, c-format
 msgid "Configuring EAP method failed (error %u)."
-msgstr ""
+msgstr "Nije uspjela konfiguracija EAP metode (pogreška% u)."
 
 #: master/lib/GTC_UI/res/wxGTC_UI.cpp:16
 #: master/lib/GTC_UI/include/GTC_UI.h:103
 msgid "GTC Challenge"
-msgstr ""
+msgstr "GTC izazov"
 
 #: master/lib/GTC_UI/res/wxGTC_UI.cpp:26
 msgid "Please provide your response."
-msgstr ""
+msgstr "Navedite odgovor."
 
 #: master/lib/GTC_UI/res/wxGTC_UI.cpp:38
 msgid "Server challenge"
-msgstr ""
+msgstr "Izazov poslužitelja"
 
 #: master/lib/GTC_UI/res/wxGTC_UI.cpp:43
 msgid "Enter your response here"
-msgstr ""
+msgstr "Unesite svoj odgovor ovdje"
 
 #: master/lib/GTC_UI/res/wxGTC_UI.cpp:70
 msgid "EAP-GTC authentication &mode:"
-msgstr ""
+msgstr "EAP-GTC autentifikacija i &način rada:"
 
 #: master/lib/GTC_UI/res/wxGTC_UI.cpp:75
 msgid "Select EAP-GTC authentication mode from the list"
-msgstr ""
+msgstr "Na popisu odaberite način provjere autentikacije EAP-GTC"
 
 #: master/lib/GTC_UI/src/GTC_UI.cpp:39
 msgid "Challenge/Response"
-msgstr ""
+msgstr "Izazov / Odgovor"
 
 #: master/lib/GTC_UI/src/GTC_UI.cpp:41
 msgid "Password"
-msgstr ""
+msgstr "Lozinka"
 
 #: master/lib/GTC_UI/src/GTC_UI.cpp:119
 #, c-format
 msgid "%s Challenge"
-msgstr ""
+msgstr "$s Izazov"
 
 #: master/lib/MSCHAPv2_UI/src/MSCHAPv2_UI.cpp:33
 #: ver1.0/lib/MSCHAPv2_UI/src/MSCHAPv2_UI.cpp:33
 #: ver1.1/lib/MSCHAPv2_UI/src/MSCHAPv2_UI.cpp:33
 msgid "MSCHAPv2 User ID and Password"
-msgstr ""
+msgstr "Korisnički ID i lozinka MSCHAPv2"
 
 #: master/lib/PAP_UI/src/PAP_UI.cpp:33 ver1.0/lib/PAP_UI/src/PAP_UI.cpp:33
 #: ver1.1/lib/PAP_UI/src/PAP_UI.cpp:33
 msgid "PAP User ID and Password"
-msgstr ""
+msgstr "PAP User ID i Lozinka"
 
 #: master/lib/TLS_UI/res/wxTLS_UI.cpp:17 ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:17
 #: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:17
 msgid "Server Trust"
-msgstr "Server Trust"
+msgstr "Povjerenje poslužitelja"
 
 #: master/lib/TLS_UI/res/wxTLS_UI.cpp:28 ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:28
 #: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:28
@@ -591,7 +598,7 @@ msgstr "Prihvatljivi certifikat autoriteti: "
 msgid ""
 "Server's certificate must be issued by one of certificate authorities listed"
 " here"
-msgstr ""
+msgstr "Certifikat poslužitelja mora izdati ovlašteni izdavatelj certifikata"
 
 #: master/lib/TLS_UI/res/wxTLS_UI.cpp:47 ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:47
 #: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:47
@@ -647,13 +654,13 @@ msgstr "(Primjer: pero.hr;freeradius.primjer.hr)"
 #: ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:119 ver1.0/lib/TLS_UI/src/TLS_UI.cpp:317
 #: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:119 ver1.1/lib/TLS_UI/src/TLS_UI.cpp:325
 msgid "User Certificate"
-msgstr ""
+msgstr "Korisnički certifikat"
 
 #: master/lib/TLS_UI/res/wxTLS_UI.cpp:129
 #: ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:129
 #: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:129
 msgid "Please select your &certificate to use for authentication."
-msgstr ""
+msgstr "Odaberite &certifikat koji ćete koristiti za autentikaciju."
 
 #: master/lib/TLS_UI/res/wxTLS_UI.cpp:136
 #: ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:136
@@ -665,7 +672,7 @@ msgstr "Klijentski certifikat za autentikaciju"
 #: ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:143
 #: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:143
 msgid "Custom &identity:"
-msgstr "Samostalno odabrani &identitet"
+msgstr "Samostalno odabrani &identitet:"
 
 #: master/lib/TLS_UI/res/wxTLS_UI.cpp:148
 #: ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:148
@@ -769,7 +776,7 @@ msgstr ""
 #: ver1.0/lib/TTLS_UI/res/wxTTLS_UI.cpp:48
 #: ver1.1/lib/TTLS_UI/res/wxTTLS_UI.cpp:48
 msgid "&Custom outer identity:"
-msgstr "&Samostalno odabrani vanjski identitet"
+msgstr "&Samostalno odabrani vanjski identitet:"
 
 #: master/lib/TTLS_UI/res/wxTTLS_UI.cpp:49
 #: ver1.0/lib/TTLS_UI/res/wxTTLS_UI.cpp:49
@@ -807,22 +814,22 @@ msgstr "Zapisivanje podataka o identitetu nije uspijelo."
 #: master/lib/TTLS_UI/src/Module.cpp:367 ver1.1/lib/TTLS_UI/src/Module.cpp:355
 #, c-format
 msgid "Invoking EAP identity UI failed (error %u, %s, %s)."
-msgstr ""
+msgstr "Neuspjelo otvaranje korisničkog sučelja EAP identiteta."
 
 #: master/lib/TTLS_UI/src/Module.cpp:369 ver1.1/lib/TTLS_UI/src/Module.cpp:357
 #, c-format
 msgid "Invoking EAP identity UI failed (error %u)."
-msgstr ""
+msgstr "Otvaranje korisničkog sučelja za identitet EAP nije uspjelo"
 
 #: master/lib/TTLS_UI/src/Module.cpp:496
 #, c-format
 msgid "Invoking EAP interactive UI failed (error %u, %s, %s)."
-msgstr ""
+msgstr "Neuspješno pokretanje interaktivnog korisničkog sučelja EAP."
 
 #: master/lib/TTLS_UI/src/Module.cpp:499
 #, c-format
 msgid "Invoking EAP interactive UI failed (error %u)."
-msgstr ""
+msgstr "Pokretanje EAP interaktivnog korisničkog sučelja nije uspjelo."
 
 #: master/lib/TTLS_UI/src/TTLS_UI.cpp:118
 #: ver1.0/lib/TTLS_UI/src/TTLS_UI.cpp:36
@@ -861,7 +868,7 @@ msgstr "EAP-GTC"
 #: master/lib/TTLS_UI/src/TTLS_UI.cpp:135
 #: ver1.1/lib/TTLS_UI/src/TTLS_UI.cpp:132
 msgid "Other EAP methods..."
-msgstr ""
+msgstr "Ostale EAP metode..."
 
 #: master/lib/TTLS_UI/src/TTLS_UI.cpp:141
 #: ver1.0/lib/TTLS_UI/src/TTLS_UI.cpp:61
@@ -942,7 +949,7 @@ msgstr "&Podsjeti"
 #: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:855
 #: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:911
 msgid "Check if you would like to save credentials"
-msgstr ""
+msgstr "Provjerite želite li spremiti vjerodajnice"
 
 #: master/lib/EAPBase_UI/include/EAP_UI.h:1123
 #: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:1000
@@ -959,7 +966,7 @@ msgstr "Parametri EAP konekcije"
 #: master/lib/EAPBase_UI/res/wxEAP_UI.h:336
 #: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.h:314
 msgid "EAP Identity Provider"
-msgstr ""
+msgstr "Davatelj EAP identiteta"
 
 #: master/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
 #: master/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
