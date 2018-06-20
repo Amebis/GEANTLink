@@ -39,7 +39,7 @@
   <ItemGroup />
   <Target Name="Sign" Condition="'$(ManifestCertificateThumbprint)' != '' and ('$(ConfigurationType)' == 'Application' or '$(ConfigurationType)' == 'DynamicLibrary')" AfterTargets="_Manifest" BeforeTargets="RegisterOutput" Inputs="$(OutDir)$(TargetName)$(TargetExt)" Outputs="$(IntDir)$(TargetName).sign">
     <Message Text="Signing output file..." />
-    <SignFile CertificateThumbprint="$(ManifestCertificateThumbprint)" SigningTarget="$(OutDir)$(TargetName)$(TargetExt)" />
+    <Exec Command="signtool.exe sign /sha1 &quot;%ManifestCertificateThumbprint%&quot; /fd sha256 /q &quot;$(OutDir)$(TargetName)$(TargetExt)&quot;" />
     <Touch Files="$(IntDir)$(TargetName).sign" AlwaysCreate="true" />
   </Target>
 </Project>

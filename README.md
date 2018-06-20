@@ -81,7 +81,7 @@ In order to have the build process digitally sign output files, one should provi
 1. A signing certificate installed in the current user’s certificate store.
 2. The following variables in the environment:
   - `ManifestCertificateThumbprint` - set the value to certificate’s SHA1 thumbprint (hexadecimal, without spaces, i.e. `bc0d8da45f9eeefcbe4e334e1fc262804df88d7e`).
-  - `ManifestTimestampUrl` - set the value to URL used to perform timestamp signature (i.e. `http://timestamp.verisign.com/scripts/timstamp.dll`). In order to perform timestamp signing successfully, the computer running the build should be online and able to access this URL.
+  - `ManifestTimestampRFC3161Url` - set the value to URL used to perform RFC3161 timestamp signature (i.e. `http://sha256timestamp.ws.symantec.com/sha256/timestamp`). In order to perform timestamp signing successfully, the computer running the build should be online and able to access this URL.
 
 Please note that only Release builds are configured for timestamp signing. Debug configurations do not attempt to timestamp sign the resulting DLL and EXE files in order to speed up the building process and enable offline building.
 
