@@ -510,23 +510,23 @@ msgstr ""
 
 #: lib/EAPBase_UI/include/EAP_UI.h:739
 #, c-format
-msgid "<error %u>"
+msgid "(error %u)"
 msgstr ""
 
 #: lib/EAPBase_UI/include/EAP_UI.h:743
-msgid "<error>"
+msgid "(error)"
 msgstr ""
 
 #: lib/EAPBase_UI/include/EAP_UI.h:754 lib/EAPBase_UI/include/EAP_UI.h:764
-msgid "<empty>"
+msgid "(empty)"
 msgstr ""
 
 #: lib/EAPBase_UI/include/EAP_UI.h:754 lib/EAPBase_UI/include/EAP_UI.h:764
-msgid "<blank ID>"
+msgid "(blank ID)"
 msgstr ""
 
 #: lib/EAPBase_UI/include/EAP_UI.h:964
-msgid "<Your Organization>"
+msgid "(Your Organization)"
 msgstr ""
 
 #: lib/EAPBase_UI/res/wxEAP_UI.h:69

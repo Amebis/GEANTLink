@@ -708,8 +708,8 @@ msgstr ""
 #: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:812
 #: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:861
 #: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:870
-msgid "<empty>"
-msgstr "<pusty>"
+msgid "(empty)"
+msgstr "(pusty)"
 
 #: master/lib/TLS_UI/src/TLS_UI.cpp:252 ver1.0/lib/TLS_UI/src/TLS_UI.cpp:246
 #: ver1.1/lib/TLS_UI/src/TLS_UI.cpp:252
@@ -932,14 +932,14 @@ msgstr "Błąd przy usuwaniu poświadczeń (błąd %u)."
 #: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:788
 #: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:846
 #, c-format
-msgid "<error %u>"
-msgstr "<błąd %u>"
+msgid "(error %u)"
+msgstr "(błąd %u)"
 
 #: master/lib/EAPBase_UI/include/EAP_UI.h:851
 #: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:792
 #: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:850
-msgid "<error>"
-msgstr "<błąd>"
+msgid "(error)"
+msgstr "(błąd)"
 
 #: master/lib/EAPBase_UI/include/EAP_UI.h:862
 #: master/lib/EAPBase_UI/include/EAP_UI.h:871
@@ -947,8 +947,8 @@ msgstr "<błąd>"
 #: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:812
 #: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:861
 #: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:870
-msgid "<blank ID>"
-msgstr "<puste ID>"
+msgid "(blank ID)"
+msgstr "(puste ID)"
 
 #: master/lib/EAPBase_UI/include/EAP_UI.h:911
 #: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:854
@@ -965,8 +965,8 @@ msgstr "Zaznacz, jeżeli chcesz zachować swoje poświadczenia"
 #: master/lib/EAPBase_UI/include/EAP_UI.h:1123
 #: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:1000
 #: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:1069
-msgid "<Your Organization>"
-msgstr "<Twoja Instytucja>"
+msgid "(Your Organization)"
+msgstr "(Twoja Instytucja)"
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.h:69
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.h:69

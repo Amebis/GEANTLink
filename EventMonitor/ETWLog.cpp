@@ -805,7 +805,7 @@ static tstring MapToString(_In_ const EVENT_MAP_INFO *pMapInfo, _In_ ULONG ulDat
         return out.empty() ? tstring_printf(_T("%lu"), ulData) : out;
     }
 
-    return _T("<unknown map>");
+    return _T("(unknown map)");
 }
 
 
@@ -930,7 +930,7 @@ static tstring DataToString(_In_ USHORT InType, _In_ USHORT OutType, _In_count_(
                     RtlIpv6AddressToString((IN6_ADDR*)pData, szIPv6Addr);
                     return tstring_printf(_T("%s"), szIPv6Addr);
                 } else
-                    return _T("<IPv6 address>");
+                    return _T("(IPv6 address)");
             }
             default: {
                 tstring out;
@@ -956,7 +956,7 @@ static tstring DataToString(_In_ USHORT InType, _In_ USHORT OutType, _In_count_(
             case sizeof(ULONGLONG): return tstring_printf(_T("0x%016I64x"), *(PULONGLONG)pData);
             default: // Unsupported pointer size.
                 assert(0);
-                return _T("<pointer>");
+                return _T("(pointer)");
             }
 
         case TDH_INTYPE_SIZET:
@@ -966,7 +966,7 @@ static tstring DataToString(_In_ USHORT InType, _In_ USHORT OutType, _In_count_(
             case sizeof(ULONGLONG): return tstring_printf(_T("%I64u"), *(PULONGLONG)pData);
             default: // Unsupported size_t size.
                 assert(0);
-                return _T("<size_t>");
+                return _T("(size_t)");
             }
 
         case TDH_INTYPE_FILETIME: {
@@ -983,7 +983,7 @@ static tstring DataToString(_In_ USHORT InType, _In_ USHORT OutType, _In_count_(
             case TDH_OUTTYPE_CULTURE_INSENSITIVE_DATETIME: return tstring_printf(_T("%04d-%02d-%02d %02d:%02d:%02d.%03u"), ((PSYSTEMTIME)pData)->wYear, ((PSYSTEMTIME)pData)->wMonth, ((PSYSTEMTIME)pData)->wDay, ((PSYSTEMTIME)pData)->wHour, ((PSYSTEMTIME)pData)->wMinute, ((PSYSTEMTIME)pData)->wSecond, ((PSYSTEMTIME)pData)->wMilliseconds);
             default: {
                 tstring out;
-                return GetDateFormat(LOCALE_USER_DEFAULT, DATE_LONGDATE, (PSYSTEMTIME)pData, NULL, out) ? out : tstring(_T("<time>"));
+                return GetDateFormat(LOCALE_USER_DEFAULT, DATE_LONGDATE, (PSYSTEMTIME)pData, NULL, out) ? out : tstring(_T("(time)"));
             }}
 
         case TDH_INTYPE_WBEMSID:
@@ -995,7 +995,7 @@ static tstring DataToString(_In_ USHORT InType, _In_ USHORT OutType, _In_count_(
             // 32-bit computer and 16 bytes on a 64-bit computer.
             // Doubling the pointer size handles both cases.
             assert(nDataSize >= (SIZE_T)nPtrSize * 2);
-            return (PULONG)pData > 0 ? DataToString(TDH_INTYPE_SID, OutType, pData + nPtrSize * 2, nDataSize - nPtrSize * 2, pMapInfo, nPtrSize) : _T("<WBEM SID>");
+            return (PULONG)pData > 0 ? DataToString(TDH_INTYPE_SID, OutType, pData + nPtrSize * 2, nDataSize - nPtrSize * 2, pMapInfo, nPtrSize) : _T("(WBEM SID)");
 
         case TDH_INTYPE_SID: {
             assert(nDataSize >= sizeof(SID));
@@ -1009,14 +1009,14 @@ static tstring DataToString(_In_ USHORT InType, _In_ USHORT OutType, _In_count_(
                     ConvertSidToStringSid((PSID)pData, (LPTSTR*)&sid))
                     return tstring_printf(_T("%s"), sid.get());
                 else
-                    return _T("<SID>");
+                    return _T("(SID)");
             }
         }
 
     default:
         // It is not actually an error if we do not understand the given data type.
         assert(0);
-        return _T("<unknown data type>");
+        return _T("(unknown data type)");
     }
 }
 
@@ -1053,7 +1053,7 @@ static tstring PropertyToString(PEVENT_RECORD pEvent, PTRACE_EVENT_INFO pInfo, U
     // Get the size of the array if the property is an array.
     ULONG ulArraySize = 0;
     if ((ulResult = GetArraySize(pEvent, pInfo, ulPropIndex, &ulArraySize)) != ERROR_SUCCESS)
-        return tstring_printf(_T("<Error getting array size (error %u)>"), ulResult);;
+        return tstring_printf(_T("(Error getting array size (error %u))"), ulResult);;
 
     tstring out;
     bool out_nonfirst = false;
@@ -1078,7 +1078,7 @@ static tstring PropertyToString(PEVENT_RECORD pEvent, PTRACE_EVENT_INFO pInfo, U
                 // The TDH API does not support IPv6 addresses. If the output type is TDH_OUTTYPE_IPV6,
                 // you will not be able to consume the rest of the event. If you try to consume the
                 // remainder of the event, you will get ERROR_EVT_INVALID_EVENT_DATA.
-                return _T("<The event contains an IPv6 address. Skipping.>");
+                return _T("(The event contains an IPv6 address. Skipping.)");
             } else {
                 vector<BYTE> data;
                 if (pStructureName) {
@@ -1098,7 +1098,7 @@ static tstring PropertyToString(PEVENT_RECORD pEvent, PTRACE_EVENT_INFO pInfo, U
                     // This happens with empty/NULL data. Not an error actually.
                     assert(data.empty());
                 } else if (ulResult != ERROR_SUCCESS)
-                    return tstring_printf(_T("<Error getting property (error %u)>"), ulResult);
+                    return tstring_printf(_T("(Error getting property (error %u))"), ulResult);
 
                 // Get the name/value mapping if the property specifies a value map.
                 unique_ptr<EVENT_MAP_INFO> map_info;
@@ -1107,7 +1107,7 @@ static tstring PropertyToString(PEVENT_RECORD pEvent, PTRACE_EVENT_INFO pInfo, U
                     // name/value mapping not found. Not an error actually.
                     assert(!map_info);
                 } else if (ulResult != ERROR_SUCCESS)
-                    return tstring_printf(_T("<Error getting map information (error %u)>"), ulResult);
+                    return tstring_printf(_T("(Error getting map information (error %u))"), ulResult);
                 else if (pInfo->DecodingSource == DecodingSourceXMLFile) {
                     // The mapped string values defined in a manifest will contain a trailing space
                     // in the EVENT_MAP_ENTRY structure. Replace the trailing space with a null-
@@ -1126,7 +1126,7 @@ static tstring PropertyToString(PEVENT_RECORD pEvent, PTRACE_EVENT_INFO pInfo, U
                     data.data(),
                     data.size(),
                     map_info.get(),
-                    nPtrSize) : _T("<null>");
+                    nPtrSize) : _T("(null)");
             }
         }
     }

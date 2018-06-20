@@ -362,7 +362,7 @@ msgstr ""
 
 #: lib/TLS_UI/src/TLS_UI.cpp:59 lib/EAPBase_UI/include/EAP_UI.h:803
 #: lib/EAPBase_UI/include/EAP_UI.h:812
-msgid "<empty>"
+msgid "(empty)"
 msgstr ""
 
 #: lib/TLS_UI/src/TLS_UI.cpp:246
@@ -481,15 +481,15 @@ msgstr ""
 
 #: lib/EAPBase_UI/include/EAP_UI.h:788
 #, c-format
-msgid "<error %u>"
+msgid "(error %u)"
 msgstr ""
 
 #: lib/EAPBase_UI/include/EAP_UI.h:792
-msgid "<error>"
+msgid "(error)"
 msgstr ""
 
 #: lib/EAPBase_UI/include/EAP_UI.h:803 lib/EAPBase_UI/include/EAP_UI.h:812
-msgid "<blank ID>"
+msgid "(blank ID)"
 msgstr ""
 
 #: lib/EAPBase_UI/include/EAP_UI.h:854
@@ -501,7 +501,7 @@ msgid "Check if you would like to save credentials"
 msgstr ""
 
 #: lib/EAPBase_UI/include/EAP_UI.h:1000
-msgid "<Your Organization>"
+msgid "(Your Organization)"
 msgstr ""
 
 #: lib/EAPBase_UI/res/wxEAP_UI.h:69

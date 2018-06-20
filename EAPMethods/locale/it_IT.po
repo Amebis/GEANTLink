@@ -707,8 +707,8 @@ msgstr ""
 #: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:812
 #: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:861
 #: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:870
-msgid "<empty>"
-msgstr "<empty>"
+msgid "(empty)"
+msgstr ""
 
 #: master/lib/TLS_UI/src/TLS_UI.cpp:252 ver1.0/lib/TLS_UI/src/TLS_UI.cpp:246
 #: ver1.1/lib/TLS_UI/src/TLS_UI.cpp:252
@@ -938,14 +938,14 @@ msgstr "Cancellazione delle credenziali non riuscita (errore %u)."
 #: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:788
 #: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:846
 #, c-format
-msgid "<error %u>"
-msgstr "<error %u>"
+msgid "(error %u)"
+msgstr ""
 
 #: master/lib/EAPBase_UI/include/EAP_UI.h:851
 #: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:792
 #: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:850
-msgid "<error>"
-msgstr "<error>"
+msgid "(error)"
+msgstr ""
 
 #: master/lib/EAPBase_UI/include/EAP_UI.h:862
 #: master/lib/EAPBase_UI/include/EAP_UI.h:871
@@ -953,8 +953,8 @@ msgstr "<error>"
 #: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:812
 #: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:861
 #: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:870
-msgid "<blank ID>"
-msgstr "<blank ID>"
+msgid "(blank ID)"
+msgstr ""
 
 #: master/lib/EAPBase_UI/include/EAP_UI.h:911
 #: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:854
@@ -971,8 +971,8 @@ msgstr "Smarca se desideri salvare le credenziali"
 #: master/lib/EAPBase_UI/include/EAP_UI.h:1123
 #: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:1000
 #: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:1069
-msgid "<Your Organization>"
-msgstr "<Your Organization>"
+msgid "(Your Organization)"
+msgstr ""
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.h:69
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.h:69

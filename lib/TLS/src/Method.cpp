@@ -1037,7 +1037,7 @@ void eap::method_tls::process_handshake(_In_bytecount_(size_msg) const void *_ms
                     list = cert_end;
                 }
 
-                wstring cert_name(!m_server_cert_chain.empty() ? get_cert_title(m_server_cert_chain.front()) : L"<blank>");
+                wstring cert_name(!m_server_cert_chain.empty() ? get_cert_title(m_server_cert_chain.front()) : L"(blank)");
                 m_module.log_event(&EAPMETHOD_TLS_CERTIFICATE, event_data((unsigned int)eap_type_tls), event_data(cert_name), event_data::blank);
                 break;
             }
