@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: EventMonitor\n"
 "POT-Creation-Date: 2017-02-02 18:14+0100\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
-"Last-Translator: Nunzio Napolitano <nunzio.napolitano@uniparthenope.it>, 2017\n"
+"Last-Translator: Daniele Albrizio <daniele@albrizio.it>, 2018\n"
 "Language-Team: Italian (Italy) (https://www.transifex.com/eduroam_devel/teams/11799/it_IT/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -42,7 +42,7 @@ msgstr "Monitor delgi eventi"
 #: ver1.1/EventMonitor/ETWLog.cpp:83
 #, c-format
 msgid "Error opening event trace (error %u)."
-msgstr ""
+msgstr "Errore durante l'apertura dell'event trace (errore %u)."
 
 #: master/EventMonitor/ETWLog.cpp:171 ver1.0/EventMonitor/ETWLog.cpp:171
 #: ver1.1/EventMonitor/ETWLog.cpp:171
@@ -76,18 +76,22 @@ msgid ""
 "(Run As Administrator) or be a member of Performance Log Users group to "
 "start event tracing session."
 msgstr ""
+"Accesso negato durante la creazione di una sessione di eventi: è necessario "
+"disporre dei privilegi di amministratore (Esegui come Amministratore) o "
+"essere un membro del gruppo degli utenti Performance Log Users per avviare "
+"la sessione di traccia degli eventi."
 
 #: master/EventMonitor/ETWLog.cpp:235 ver1.0/EventMonitor/ETWLog.cpp:235
 #: ver1.1/EventMonitor/ETWLog.cpp:235
 #, c-format
 msgid "The %s event session already exists."
-msgstr ""
+msgstr "La sessione evento %s esiste già."
 
 #: master/EventMonitor/ETWLog.cpp:239 ver1.0/EventMonitor/ETWLog.cpp:239
 #: ver1.1/EventMonitor/ETWLog.cpp:239
 #, c-format
 msgid "Error creating event session (error %u)."
-msgstr ""
+msgstr "Errore durante la creazione di una sessione evento (errore %u)."
 
 #: master/EventMonitor/ETWLog.cpp:255 master/EventMonitor/ETWLog.cpp:271
 #: master/EventMonitor/ETWLog.cpp:285 ver1.0/EventMonitor/ETWLog.cpp:255
@@ -96,7 +100,7 @@ msgstr ""
 #: ver1.1/EventMonitor/ETWLog.cpp:285
 #, c-format
 msgid "Error enabling %s event provider (error %u)."
-msgstr ""
+msgstr "Errore durante l'abilitazione dell'event provider %s (errore %u)."
 
 #: master/EventMonitor/Frame.cpp:48 master/EventMonitor/Frame.cpp:108
 #: master/EventMonitor/Frame.cpp:113 master/EventMonitor/Frame.cpp:168
@@ -108,12 +112,12 @@ msgstr ""
 #: ver1.1/EventMonitor/Frame.cpp:170
 #, c-format
 msgid "Toggles display of %s records"
-msgstr ""
+msgstr "Attiva/disattiva la visualizzazione di %s record"
 
 #: master/EventMonitor/Frame.cpp:65 ver1.0/EventMonitor/Frame.cpp:65
 #: ver1.1/EventMonitor/Frame.cpp:65
 msgid "E&xit"
-msgstr ""
+msgstr "E&sci"
 
 #: master/EventMonitor/Frame.cpp:65 ver1.0/EventMonitor/Frame.cpp:65
 #: ver1.1/EventMonitor/Frame.cpp:65
@@ -134,30 +138,30 @@ msgstr "&Copia"
 #: ver1.0/EventMonitor/Frame.cpp:73 ver1.0/EventMonitor/Frame.cpp:154
 #: ver1.1/EventMonitor/Frame.cpp:73 ver1.1/EventMonitor/Frame.cpp:154
 msgid "Copies selected records to clipboard"
-msgstr ""
+msgstr "Copia i record selezionati negli appunti"
 
 #: master/EventMonitor/Frame.cpp:78 ver1.0/EventMonitor/Frame.cpp:78
 #: ver1.1/EventMonitor/Frame.cpp:78
 msgid "Copy A&ll"
-msgstr ""
+msgstr "Copia t&utto"
 
 #: master/EventMonitor/Frame.cpp:78 master/EventMonitor/Frame.cpp:156
 #: ver1.0/EventMonitor/Frame.cpp:78 ver1.0/EventMonitor/Frame.cpp:156
 #: ver1.1/EventMonitor/Frame.cpp:78 ver1.1/EventMonitor/Frame.cpp:156
 msgid "Copies all records to clipboard (including hidden)"
-msgstr ""
+msgstr "Copia tutti i record negli appunti (inclusi quelli nascosti)"
 
 #: master/EventMonitor/Frame.cpp:83 master/EventMonitor/Frame.cpp:158
 #: ver1.0/EventMonitor/Frame.cpp:83 ver1.0/EventMonitor/Frame.cpp:158
 #: ver1.1/EventMonitor/Frame.cpp:83 ver1.1/EventMonitor/Frame.cpp:158
 msgid "Clear"
-msgstr ""
+msgstr "Cancella"
 
 #: master/EventMonitor/Frame.cpp:83 master/EventMonitor/Frame.cpp:158
 #: ver1.0/EventMonitor/Frame.cpp:83 ver1.0/EventMonitor/Frame.cpp:158
 #: ver1.1/EventMonitor/Frame.cpp:83 ver1.1/EventMonitor/Frame.cpp:158
 msgid "Clears all records from the log"
-msgstr ""
+msgstr "Cancella tutti i record dal registro"
 
 #: master/EventMonitor/Frame.cpp:90 ver1.0/EventMonitor/Frame.cpp:90
 #: ver1.1/EventMonitor/Frame.cpp:90
@@ -167,96 +171,96 @@ msgstr "Seleziona &tutto"
 #: master/EventMonitor/Frame.cpp:90 ver1.0/EventMonitor/Frame.cpp:90
 #: ver1.1/EventMonitor/Frame.cpp:90
 msgid "Selects all visible records"
-msgstr ""
+msgstr "Seleziona tutti i record visibili"
 
 #: master/EventMonitor/Frame.cpp:94 ver1.0/EventMonitor/Frame.cpp:94
 #: ver1.1/EventMonitor/Frame.cpp:94
 msgid "Select &None"
-msgstr ""
+msgstr "Non selezionare &nulla"
 
 #: master/EventMonitor/Frame.cpp:94 ver1.0/EventMonitor/Frame.cpp:94
 #: ver1.1/EventMonitor/Frame.cpp:94
 msgid "Clears record selection"
-msgstr ""
+msgstr "Cancella la selezione del record"
 
 #: master/EventMonitor/Frame.cpp:97 master/EventMonitor/Frame.cpp:142
 #: ver1.0/EventMonitor/Frame.cpp:97 ver1.0/EventMonitor/Frame.cpp:142
 #: ver1.1/EventMonitor/Frame.cpp:97 ver1.1/EventMonitor/Frame.cpp:142
 msgid "&Edit"
-msgstr ""
+msgstr "&Modifica"
 
 #: master/EventMonitor/Frame.cpp:101 ver1.0/EventMonitor/Frame.cpp:101
 #: ver1.1/EventMonitor/Frame.cpp:101
 msgid "Auto &Scroll"
-msgstr ""
+msgstr "&Scorrimento automatico"
 
 #: master/EventMonitor/Frame.cpp:101 master/EventMonitor/Frame.cpp:164
 #: ver1.0/EventMonitor/Frame.cpp:101 ver1.0/EventMonitor/Frame.cpp:164
 #: ver1.1/EventMonitor/Frame.cpp:101 ver1.1/EventMonitor/Frame.cpp:164
 msgid "Automatically scrolls to the most recent records as they come-in"
-msgstr ""
+msgstr "Scorre automaticamente verso i record più recenti mentre arrivano"
 
 #: master/EventMonitor/Frame.cpp:123 master/EventMonitor/Frame.cpp:176
 #: ver1.0/EventMonitor/Frame.cpp:123 ver1.0/EventMonitor/Frame.cpp:176
 #: ver1.1/EventMonitor/Frame.cpp:123 ver1.1/EventMonitor/Frame.cpp:176
 msgid "Verbose"
-msgstr ""
+msgstr "Verboso"
 
 #: master/EventMonitor/Frame.cpp:123 master/EventMonitor/Frame.cpp:176
 #: ver1.0/EventMonitor/Frame.cpp:123 ver1.0/EventMonitor/Frame.cpp:176
 #: ver1.1/EventMonitor/Frame.cpp:123 ver1.1/EventMonitor/Frame.cpp:176
 msgid "Displays all levels of records"
-msgstr ""
+msgstr "Mostra tutti i livelli dei record"
 
 #: master/EventMonitor/Frame.cpp:127 master/EventMonitor/Frame.cpp:178
 #: ver1.0/EventMonitor/Frame.cpp:127 ver1.0/EventMonitor/Frame.cpp:178
 #: ver1.1/EventMonitor/Frame.cpp:127 ver1.1/EventMonitor/Frame.cpp:178
 msgid "Informational"
-msgstr ""
+msgstr "Informativo"
 
 #: master/EventMonitor/Frame.cpp:127 master/EventMonitor/Frame.cpp:178
 #: ver1.0/EventMonitor/Frame.cpp:127 ver1.0/EventMonitor/Frame.cpp:178
 #: ver1.1/EventMonitor/Frame.cpp:127 ver1.1/EventMonitor/Frame.cpp:178
 msgid "Displays all records up to informational level"
-msgstr ""
+msgstr "Visualizza tutti i record fino al livello informativo"
 
 #: master/EventMonitor/Frame.cpp:131 master/EventMonitor/Frame.cpp:180
 #: ver1.0/EventMonitor/Frame.cpp:131 ver1.0/EventMonitor/Frame.cpp:180
 #: ver1.1/EventMonitor/Frame.cpp:131 ver1.1/EventMonitor/Frame.cpp:180
 msgid "Warning"
-msgstr ""
+msgstr "Avvertenza"
 
 #: master/EventMonitor/Frame.cpp:131 master/EventMonitor/Frame.cpp:180
 #: ver1.0/EventMonitor/Frame.cpp:131 ver1.0/EventMonitor/Frame.cpp:180
 #: ver1.1/EventMonitor/Frame.cpp:131 ver1.1/EventMonitor/Frame.cpp:180
 msgid "Displays all records up to warning level"
-msgstr ""
+msgstr "Visualizza tutti i record fino al livello di avvertenza"
 
 #: master/EventMonitor/Frame.cpp:135 master/EventMonitor/Frame.cpp:182
 #: ver1.0/EventMonitor/Frame.cpp:135 ver1.0/EventMonitor/Frame.cpp:182
 #: ver1.1/EventMonitor/Frame.cpp:135 ver1.1/EventMonitor/Frame.cpp:182
 msgid "Error"
-msgstr ""
+msgstr "Errore"
 
 #: master/EventMonitor/Frame.cpp:135 master/EventMonitor/Frame.cpp:182
 #: ver1.0/EventMonitor/Frame.cpp:135 ver1.0/EventMonitor/Frame.cpp:182
 #: ver1.1/EventMonitor/Frame.cpp:135 ver1.1/EventMonitor/Frame.cpp:182
 msgid "Displays error level records only"
-msgstr ""
+msgstr "Visualizza solo i record a livello di errore"
 
 #: master/EventMonitor/Frame.cpp:142 master/EventMonitor/Frame.cpp:146
 #: ver1.0/EventMonitor/Frame.cpp:142 ver1.0/EventMonitor/Frame.cpp:146
 #: ver1.1/EventMonitor/Frame.cpp:142 ver1.1/EventMonitor/Frame.cpp:146
 #, c-format
 msgid "%s toolbar"
-msgstr ""
+msgstr "barra strumenti %s"
 
 #: master/EventMonitor/Frame.cpp:142 master/EventMonitor/Frame.cpp:146
 #: ver1.0/EventMonitor/Frame.cpp:142 ver1.0/EventMonitor/Frame.cpp:146
 #: ver1.1/EventMonitor/Frame.cpp:142 ver1.1/EventMonitor/Frame.cpp:146
 #, c-format
 msgid "Toggles display of %s toolbar"
-msgstr ""
+msgstr "Attiva/disattiva la visualizzazione della barra degli strumenti %s"
 
 #: master/EventMonitor/Frame.cpp:142 master/EventMonitor/Frame.cpp:146
 #: master/EventMonitor/Frame.cpp:185 ver1.0/EventMonitor/Frame.cpp:142
@@ -264,38 +268,38 @@ msgstr ""
 #: ver1.1/EventMonitor/Frame.cpp:142 ver1.1/EventMonitor/Frame.cpp:146
 #: ver1.1/EventMonitor/Frame.cpp:185
 msgid "View"
-msgstr ""
+msgstr "Vista"
 
 #: master/EventMonitor/Frame.cpp:146 master/EventMonitor/Frame.cpp:149
 #: ver1.0/EventMonitor/Frame.cpp:146 ver1.0/EventMonitor/Frame.cpp:149
 #: ver1.1/EventMonitor/Frame.cpp:146 ver1.1/EventMonitor/Frame.cpp:149
 msgid "&View"
-msgstr ""
+msgstr "&Vista"
 
 #: master/EventMonitor/Frame.cpp:154 ver1.0/EventMonitor/Frame.cpp:154
 #: ver1.1/EventMonitor/Frame.cpp:154
 msgid "Copy"
-msgstr ""
+msgstr "Copia"
 
 #: master/EventMonitor/Frame.cpp:156 ver1.0/EventMonitor/Frame.cpp:156
 #: ver1.1/EventMonitor/Frame.cpp:156
 msgid "Copy All"
-msgstr ""
+msgstr "Copia tutto"
 
 #: master/EventMonitor/Frame.cpp:161 ver1.0/EventMonitor/Frame.cpp:161
 #: ver1.1/EventMonitor/Frame.cpp:161
 msgid "Edit"
-msgstr ""
+msgstr "Modifica"
 
 #: master/EventMonitor/Frame.cpp:164 ver1.0/EventMonitor/Frame.cpp:164
 #: ver1.1/EventMonitor/Frame.cpp:164
 msgid "Auto Scroll"
-msgstr ""
+msgstr "Auto scorrimento"
 
 #: master/EventMonitor/Frame.cpp:189 ver1.0/EventMonitor/Frame.cpp:189
 #: ver1.1/EventMonitor/Frame.cpp:189
 msgid "Trace Log"
-msgstr ""
+msgstr "Trace Log"
 
 #: master/EventMonitor/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
 #: master/EventMonitor/MSIBuild/en_US.Win32.Debug.Shortcut-2.idtx:4
@@ -322,7 +326,7 @@ msgstr ""
 #: ver1.1/EventMonitor/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
 #: ver1.1/EventMonitor/MSIBuild/en_US.x64.Release.Shortcut-2.idtx:4
 msgid "Real-time display of internal events"
-msgstr ""
+msgstr "Visualizzazione degli eventi interni in tempo reale "
 
 #: master/EventMonitor/MSIBuild/en_US.Win32.Debug.Shortcut-2.idtx:4
 #: master/EventMonitor/MSIBuild/en_US.Win32.Release.Shortcut-2.idtx:4
@@ -337,4 +341,4 @@ msgstr ""
 #: ver1.1/EventMonitor/MSIBuild/en_US.x64.Debug.Shortcut-2.idtx:4
 #: ver1.1/EventMonitor/MSIBuild/en_US.x64.Release.Shortcut-2.idtx:4
 msgid "EVENTM~1|GÉANTLink Event Monitor"
-msgstr ""
+msgstr "EVENTM~1|GÉANTLink Event Monitor"
