@@ -708,8 +708,8 @@ msgstr ""
 #: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:812
 #: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:861
 #: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:870
-msgid "<empty>"
-msgstr "<prazno>"
+msgid "(empty)"
+msgstr "(prazno)"
 
 #: master/lib/TLS_UI/src/TLS_UI.cpp:252 ver1.0/lib/TLS_UI/src/TLS_UI.cpp:246
 #: ver1.1/lib/TLS_UI/src/TLS_UI.cpp:252
@@ -940,14 +940,14 @@ msgstr "Brisanje kredencijala neuspešno (greška %u)."
 #: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:788
 #: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:846
 #, c-format
-msgid "<error %u>"
-msgstr "<greška %u>"
+msgid "(error %u)"
+msgstr "(greška %u)"
 
 #: master/lib/EAPBase_UI/include/EAP_UI.h:851
 #: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:792
 #: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:850
-msgid "<error>"
-msgstr "<greška>"
+msgid "(error)"
+msgstr "(greška)"
 
 #: master/lib/EAPBase_UI/include/EAP_UI.h:862
 #: master/lib/EAPBase_UI/include/EAP_UI.h:871
@@ -955,8 +955,8 @@ msgstr "<greška>"
 #: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:812
 #: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:861
 #: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:870
-msgid "<blank ID>"
-msgstr "<prazan ID>"
+msgid "(blank ID)"
+msgstr "(prazan ID)"
 
 #: master/lib/EAPBase_UI/include/EAP_UI.h:911
 #: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:854
@@ -973,8 +973,8 @@ msgstr "Označite ako želite da sačuvate kredencijale"
 #: master/lib/EAPBase_UI/include/EAP_UI.h:1123
 #: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:1000
 #: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:1069
-msgid "<Your Organization>"
-msgstr "<Vaša organizacija>"
+msgid "(Your Organization)"
+msgstr "(Vaša organizacija)"
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.h:69
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.h:69

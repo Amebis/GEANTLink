@@ -94,7 +94,7 @@ inline wxIcon wxLoadIconFromResource(HINSTANCE hinst, PCWSTR pszName, const wxSi
 ///
 /// \returns
 /// - \p id when \p id is not blank;
-/// - localized "<Your Organization>" otherwise.
+/// - localized "(Your Organization)" otherwise.
 ///
 inline wxString wxEAPGetProviderName(const std::wstring &id);
 
@@ -851,11 +851,11 @@ protected:
                 m_cred_storage.clear();
                 m_has_storage = false;
             } else {
-                m_storage_identity->SetLabel(wxString::Format(_("<error %u>"), err.number()));
+                m_storage_identity->SetLabel(wxString::Format(_("(error %u)"), err.number()));
                 m_has_storage = true;
             }
         } catch (...) {
-            m_storage_identity->SetLabel(_("<error>"));
+            m_storage_identity->SetLabel(_("(error)"));
             m_has_storage = true;
         }
     }
@@ -866,7 +866,7 @@ protected:
         wxString identity(m_cred_storage.get_identity());
         m_storage_identity->SetLabel(
             !identity.empty() ? identity :
-            m_cred_storage.empty() ? _("<empty>") : _("<blank ID>"));
+            m_cred_storage.empty() ? _("(empty)") : _("(blank ID)"));
     }
 
 
@@ -875,7 +875,7 @@ protected:
         wxString identity(m_cred_config.get_identity());
         m_config_identity->SetLabel(
             !identity.empty() ? identity :
-            m_cred_config.empty() ? _("<empty>") : _("<blank ID>"));
+            m_cred_config.empty() ? _("(empty)") : _("(blank ID)"));
     }
 
     /// \endcond
@@ -1074,7 +1074,7 @@ inline wxIcon wxLoadIconFromResource(HINSTANCE hinst, PCWSTR pszName, const wxSi
 inline wxString wxEAPGetProviderName(const std::wstring &id)
 {
     return
-        !id.empty() ? id : _("<Your Organization>");
+        !id.empty() ? id : _("(Your Organization)");
 }
 
 

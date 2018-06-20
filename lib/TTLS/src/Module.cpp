@@ -618,7 +618,7 @@ DWORD WINAPI eap::peer_ttls::crl_checker::verify(_In_ crl_checker *obj)
             PCCERT_CONTEXT cert = *(c + status_rev.dwIndex);
             wstring subj;
             if (!CertGetNameStringW(cert, CERT_NAME_DNS_TYPE, CERT_NAME_STR_ENABLE_PUNYCODE_FLAG, NULL, subj))
-                sprintf(subj, L"<error %u>", GetLastError());
+                sprintf(subj, L"(error %u)", GetLastError());
 
             switch (status_rev.dwError) {
             case CRYPT_E_NO_REVOCATION_CHECK:
