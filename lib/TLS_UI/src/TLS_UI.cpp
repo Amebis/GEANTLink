@@ -58,7 +58,7 @@ wxTLSCredentialsPanel::wxTLSCredentialsPanel(const eap::config_provider &prov, c
 bool wxTLSCredentialsPanel::TransferDataToWindow()
 {
     // Populate certificate list.
-    m_certificate->Append(_("<empty>"), (wxCertificateClientData*)NULL);
+    m_certificate->Append(_("(empty)"), (wxCertificateClientData*)NULL);
     bool is_found = false;
     winstd::cert_store store;
     if (store.create(CERT_STORE_PROV_SYSTEM, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, (HCRYPTPROV)NULL, CERT_SYSTEM_STORE_CURRENT_USER, _T("My"))) {

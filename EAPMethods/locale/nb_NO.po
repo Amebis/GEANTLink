@@ -697,8 +697,8 @@ msgstr ""
 #: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:812
 #: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:861
 #: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:870
-msgid "<empty>"
-msgstr "<tom>"
+msgid "(empty)"
+msgstr "(tom)"
 
 #: master/lib/TLS_UI/src/TLS_UI.cpp:252 ver1.0/lib/TLS_UI/src/TLS_UI.cpp:246
 #: ver1.1/lib/TLS_UI/src/TLS_UI.cpp:252
@@ -921,14 +921,14 @@ msgstr "Sletting av brukeropplysninger feilet (feil %u)"
 #: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:788
 #: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:846
 #, c-format
-msgid "<error %u>"
-msgstr "<feil %u>"
+msgid "(error %u)"
+msgstr "(feil %u)"
 
 #: master/lib/EAPBase_UI/include/EAP_UI.h:851
 #: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:792
 #: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:850
-msgid "<error>"
-msgstr "<feil>"
+msgid "(error)"
+msgstr "(feil)"
 
 #: master/lib/EAPBase_UI/include/EAP_UI.h:862
 #: master/lib/EAPBase_UI/include/EAP_UI.h:871
@@ -936,8 +936,8 @@ msgstr "<feil>"
 #: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:812
 #: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:861
 #: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:870
-msgid "<blank ID>"
-msgstr "<blank ID>"
+msgid "(blank ID)"
+msgstr ""
 
 #: master/lib/EAPBase_UI/include/EAP_UI.h:911
 #: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:854
@@ -954,8 +954,8 @@ msgstr "Huk av om du vil lagre brukeropplysninger "
 #: master/lib/EAPBase_UI/include/EAP_UI.h:1123
 #: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:1000
 #: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:1069
-msgid "<Your Organization>"
-msgstr "<Din organisasjon>"
+msgid "(Your Organization)"
+msgstr "(Din organisasjon)"
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.h:69
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.h:69
