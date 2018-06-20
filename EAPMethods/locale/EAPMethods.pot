@@ -2,536 +2,933 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: EAPMethods\n"
-"POT-Creation-Date: 2016-11-07 12:58+0100\n"
+"POT-Creation-Date: 2018-06-20 15:30+0200\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
 "Last-Translator: Simon Rozman <simon.rozman@amebis.si>\n"
 "Language-Team: Amebis, d. o. o., Kamnik <info@amebis.si>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.10\n"
-"X-Poedit-Basepath: ../..\n"
+"X-Generator: Poedit 2.0.8\n"
+"X-Poedit-Basepath: ../../..\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-KeywordsList: _\n"
-"X-Poedit-SearchPath-0: lib/EAPBase_UI\n"
-"X-Poedit-SearchPath-1: lib/MSCHAPv2_UI\n"
-"X-Poedit-SearchPath-2: lib/PAP_UI\n"
-"X-Poedit-SearchPath-3: lib/TLS_UI\n"
-"X-Poedit-SearchPath-4: lib/TTLS_UI\n"
-"X-Poedit-SearchPath-5: EAPMethods\n"
+"X-Poedit-SearchPath-0: master/lib/EAPBase_UI\n"
+"X-Poedit-SearchPath-1: master/lib/EapHost_UI\n"
+"X-Poedit-SearchPath-2: master/lib/GTC_UI\n"
+"X-Poedit-SearchPath-3: master/lib/MSCHAPv2_UI\n"
+"X-Poedit-SearchPath-4: master/lib/PAP_UI\n"
+"X-Poedit-SearchPath-5: master/lib/TLS_UI\n"
+"X-Poedit-SearchPath-6: master/lib/TTLS_UI\n"
+"X-Poedit-SearchPath-7: master/EAPMethods\n"
+"X-Poedit-SearchPath-8: ver1.1/lib/EAPBase_UI\n"
+"X-Poedit-SearchPath-9: ver1.1/lib/EapHost_UI\n"
+"X-Poedit-SearchPath-10: ver1.1/lib/MSCHAPv2_UI\n"
+"X-Poedit-SearchPath-11: ver1.1/lib/PAP_UI\n"
+"X-Poedit-SearchPath-12: ver1.1/lib/TLS_UI\n"
+"X-Poedit-SearchPath-13: ver1.1/lib/TTLS_UI\n"
+"X-Poedit-SearchPath-14: ver1.1/EAPMethods\n"
+"X-Poedit-SearchPath-15: ver1.0/lib/EAPBase_UI\n"
+"X-Poedit-SearchPath-16: ver1.0/lib/MSCHAPv2_UI\n"
+"X-Poedit-SearchPath-17: ver1.0/lib/PAP_UI\n"
+"X-Poedit-SearchPath-18: ver1.0/lib/TLS_UI\n"
+"X-Poedit-SearchPath-19: ver1.0/lib/TTLS_UI\n"
+"X-Poedit-SearchPath-20: ver1.0/EAPMethods\n"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:37
-msgid "+"
+#: master/lib/EAPBase_UI/include/EAP_UI.h:285
+#: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:302
+#: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:284
+#, c-format
+msgid "Are you sure you want to permanently remove %s provider from configuration?"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:38
-msgid "Adds new provider"
+#: master/lib/EAPBase_UI/include/EAP_UI.h:285
+#: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:302
+#: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:284
+msgid "Warning"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:42
-msgid "-"
+#: master/lib/EAPBase_UI/include/EAP_UI.h:371
+#: master/lib/EAPBase_UI/res/wxEAP_UI.h:119
+#: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:367
+#: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:377
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.h:119
+#: ver1.0/lib/EAPBase_UI/src/EAP_UI.cpp:128
+#: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:370
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.h:119
+msgid "EAP Credentials"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:43
-msgid "Removes selected provider"
+#: master/lib/EAPBase_UI/include/EAP_UI.h:641
+#: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:576
+#: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:640
+msgid "Provider Settings"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:47
-msgid "Advanced..."
-msgstr ""
-
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:48
-msgid "Opens dialog with provider settings"
-msgstr ""
-
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:229 lib/EAPBase_UI/include/EAP_UI.h:605
+#: master/lib/EAPBase_UI/include/EAP_UI.h:674
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:229
+#: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:605
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:229
+#: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:673
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:229
 #, c-format
 msgid "%s User Credentials"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:240
+#: master/lib/EAPBase_UI/include/EAP_UI.h:793
+#: master/lib/TTLS_UI/src/Module.cpp:285 master/lib/TTLS_UI/src/Module.cpp:357
+#: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:724
+#: ver1.0/lib/TTLS_UI/src/Module.cpp:275 ver1.0/lib/TTLS_UI/src/Module.cpp:285
+#: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:792
+#: ver1.1/lib/TTLS_UI/src/Module.cpp:263 ver1.1/lib/TTLS_UI/src/Module.cpp:319
+#, c-format
+msgid "Error writing credentials to Credential Manager: %hs (error %u)"
+msgstr ""
+
+#: master/lib/EAPBase_UI/include/EAP_UI.h:796
+#: master/lib/TTLS_UI/src/Module.cpp:287 master/lib/TTLS_UI/src/Module.cpp:359
+#: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:727
+#: ver1.0/lib/TTLS_UI/src/Module.cpp:277 ver1.0/lib/TTLS_UI/src/Module.cpp:287
+#: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:795
+#: ver1.1/lib/TTLS_UI/src/Module.cpp:265 ver1.1/lib/TTLS_UI/src/Module.cpp:321
+msgid "Writing credentials failed."
+msgstr ""
+
+#: master/lib/EAPBase_UI/include/EAP_UI.h:816
+#: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:747
+#: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:815
+#, c-format
+msgid "Deleting credentials failed (error %u)."
+msgstr ""
+
+#: master/lib/EAPBase_UI/include/EAP_UI.h:855
+#: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:788
+#: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:854
+#, c-format
+msgid "(error %u)"
+msgstr ""
+
+#: master/lib/EAPBase_UI/include/EAP_UI.h:859
+#: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:792
+#: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:858
+msgid "(error)"
+msgstr ""
+
+#: master/lib/EAPBase_UI/include/EAP_UI.h:870
+#: master/lib/EAPBase_UI/include/EAP_UI.h:879
+#: master/lib/TLS_UI/src/TLS_UI.cpp:61
+#: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:803
+#: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:812
+#: ver1.0/lib/TLS_UI/src/TLS_UI.cpp:59
+#: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:869
+#: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:878
+#: ver1.1/lib/TLS_UI/src/TLS_UI.cpp:61
+msgid "(empty)"
+msgstr ""
+
+#: master/lib/EAPBase_UI/include/EAP_UI.h:870
+#: master/lib/EAPBase_UI/include/EAP_UI.h:879
+#: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:803
+#: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:812
+#: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:869
+#: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:878
+msgid "(blank ID)"
+msgstr ""
+
+#: master/lib/EAPBase_UI/include/EAP_UI.h:919
+#: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:854
+#: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:918
+msgid "&Remember"
+msgstr ""
+
+#: master/lib/EAPBase_UI/include/EAP_UI.h:920
+#: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:855
+#: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:919
+msgid "Check if you would like to save credentials"
+msgstr ""
+
+#: master/lib/EAPBase_UI/include/EAP_UI.h:1131
+#: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:1000
+#: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:1077
+msgid "(Your Organization)"
+msgstr ""
+
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:37
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:37
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:37
+msgid "+"
+msgstr ""
+
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:38
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:38
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:38
+msgid "Adds new provider"
+msgstr ""
+
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:42
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:42
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:42
+msgid "-"
+msgstr ""
+
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:43
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:43
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:43
+msgid "Removes selected provider"
+msgstr ""
+
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:47
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:47
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:47
+msgid "Advanced..."
+msgstr ""
+
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:48
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:48
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:48
+msgid "Opens dialog with provider settings"
+msgstr ""
+
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:240
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:240
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:240
 msgid "Select the source where your credentials used to connect are stored."
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:244
-msgid "Use credentials from Credential &Manager:"
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:244
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:244
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:244
+msgid "Use credentials from Credential &Manager"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:245
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:245
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:245
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:245
 msgid "Select this option if you would like to use credentials stored in Windows Credential Manager"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:253
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:255
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:299
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:255
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:299
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:255
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:299
+msgid "Identity:"
+msgstr ""
+
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:262
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:262
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:262
 msgid "Your present credentials stored in Windows Credential Manager"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:260
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:272
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:272
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:272
 msgid "&Clear Credentials"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:261
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:273
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:273
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:273
 msgid ""
 "Click to clear your credentials from Credential Manager.\n"
 "Note: You will be prompted to enter credentials when connecting."
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:265 lib/EAPBase_UI/res/wxEAP_UI.cpp:292
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:277
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:316
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:277
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:316
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:277
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:316
 msgid "&Set Credentials..."
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:266 lib/EAPBase_UI/res/wxEAP_UI.cpp:293
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:278
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:317
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:278
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:317
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:278
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:317
 msgid "Click here to set or modify your credentials"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:276
-msgid "Use credentials from &profile configuration:"
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:288
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:288
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:288
+msgid "Use credentials from &profile configuration"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:277
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:289
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:289
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:289
 msgid "Select this option if you would like to store credentials as a part of  profile configuration"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:285
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:306
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:306
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:306
 msgid "Profile configuration credentials"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:335
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:359
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:359
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:359
 msgid "User ID and Password"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:345
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:369
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:369
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:369
 msgid "Please provide your user ID and password."
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:355
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:379
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:443
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:379
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:379
 msgid "User ID:"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:360
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:384
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:448
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:384
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:384
 msgid "Enter your user name here (user@domain.org, DOMAIN\\User, etc.)"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:364
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:388
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:388
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:388
 msgid "Password:"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:369
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:393
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:393
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:393
 msgid "Enter your password here"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:400
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:423
+msgid "User ID"
+msgstr ""
+
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:433
+msgid "Please provide your user ID."
+msgstr ""
+
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:473
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:424
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:424
 msgid "Your Organization"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:411
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:484
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:435
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:435
 msgid "Describe your organization to customize user prompts.  When organization is introduced, end-users find program messages easier to understand and act."
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:418
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:491
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:442
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:442
 msgid "Your organization &name:"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:423
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:496
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:447
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:447
 msgid "Your organization name as it will appear on helpdesk contact notifications"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:427
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:500
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:451
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:451
 msgid "(Keep it short, please)"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:437
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:510
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:461
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:461
 msgid "Helpdesk contact &information:"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:447
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:520
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:471
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:471
 msgid "¶"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:454
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:527
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:478
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:478
 msgid "Your helpdesk website address"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:458
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:531
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:482
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:482
 msgid "*"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:465
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:538
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:489
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:489
 msgid "Your helpdesk e-mail address"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:469
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:542
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:493
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:493
 msgid ")"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:476
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:549
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:500
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:500
 msgid "Your helpdesk phone number"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:504
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:577
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:528
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:528
 msgid "Provider Unique Identifier"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:515
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:588
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:539
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:539
 msgid "Assign your organization a unique ID to allow sharing the same credential set across different network profiles."
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:522
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:595
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:546
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:546
 msgid "&Namespace:"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:526
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:599
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:550
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:550
 msgid "urn:RFC4282:realm"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:526
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:599
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:550
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:550
 msgid "urn:uuid"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:538
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:611
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:562
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:562
 msgid "Provider unique &identifier:"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:543
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:616
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:567
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:567
 msgid "Your organization ID to assign same credentials from other profiles"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:568
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:641
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:592
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:592
 msgid "Configuration Lock"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:579
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:652
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:603
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:603
 msgid "Your configuration can be locked to prevent accidental modification by end-users. Users will only be allowed to enter credentials."
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:586
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:659
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:610
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:610
 msgid "&Lock this configuration and prevent any further modification via user interface."
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:589
+#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:662
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:613
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:613
 msgid "(Warning: Once locked, you can not revert using this dialog!)"
 msgstr ""
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:99
+#: master/lib/EAPBase_UI/res/wxEAP_UI.h:69
+#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.h:69
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.h:69
+msgid "EAP Connection Configuration"
+msgstr ""
+
+#: master/lib/EAPBase_UI/res/wxEAP_UI.h:336
+#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.h:314
+msgid "EAP Identity Provider"
+msgstr ""
+
+#: master/lib/EAPBase_UI/src/EAP_UI.cpp:103
+#: ver1.0/lib/EAPBase_UI/src/EAP_UI.cpp:99
+#: ver1.1/lib/EAPBase_UI/src/EAP_UI.cpp:103
 #, c-format
 msgid "%s Credentials"
 msgstr ""
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:128 lib/EAPBase_UI/include/EAP_UI.h:367
-#: lib/EAPBase_UI/include/EAP_UI.h:377 lib/EAPBase_UI/res/wxEAP_UI.h:119
-msgid "EAP Credentials"
-msgstr ""
-
-#: lib/EAPBase_UI/src/EAP_UI.cpp:173
+#: master/lib/EAPBase_UI/src/EAP_UI.cpp:139
+#: ver1.0/lib/EAPBase_UI/src/EAP_UI.cpp:173
+#: ver1.1/lib/EAPBase_UI/src/EAP_UI.cpp:139
 #, c-format
 msgid "For additional help and instructions, please contact %s at:"
 msgstr ""
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:174
+#: master/lib/EAPBase_UI/src/EAP_UI.cpp:140
+#: ver1.0/lib/EAPBase_UI/src/EAP_UI.cpp:174
+#: ver1.1/lib/EAPBase_UI/src/EAP_UI.cpp:140
 msgid "your provider"
 msgstr ""
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:193
+#: master/lib/EAPBase_UI/src/EAP_UI.cpp:159
+#: ver1.0/lib/EAPBase_UI/src/EAP_UI.cpp:193
+#: ver1.1/lib/EAPBase_UI/src/EAP_UI.cpp:159
 msgid "Open the default web browser"
 msgstr ""
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:204
+#: master/lib/EAPBase_UI/src/EAP_UI.cpp:170
+#: ver1.0/lib/EAPBase_UI/src/EAP_UI.cpp:204
+#: ver1.1/lib/EAPBase_UI/src/EAP_UI.cpp:170
 msgid "Open your e-mail program"
 msgstr ""
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:215
+#: master/lib/EAPBase_UI/src/EAP_UI.cpp:181
+#: ver1.0/lib/EAPBase_UI/src/EAP_UI.cpp:215
+#: ver1.1/lib/EAPBase_UI/src/EAP_UI.cpp:181
 msgid "Dial the phone number"
 msgstr ""
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:235
+#: master/lib/EAPBase_UI/src/EAP_UI.cpp:203
+#: ver1.0/lib/EAPBase_UI/src/EAP_UI.cpp:235
+#: ver1.1/lib/EAPBase_UI/src/EAP_UI.cpp:203
 #, c-format
 msgid "%s has pre-set parts of this configuration. Those parts are locked to prevent accidental modification."
 msgstr ""
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:236
+#: master/lib/EAPBase_UI/src/EAP_UI.cpp:204
+#: ver1.0/lib/EAPBase_UI/src/EAP_UI.cpp:236
+#: ver1.1/lib/EAPBase_UI/src/EAP_UI.cpp:204
 msgid "Your provider"
 msgstr ""
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:257
+#: master/lib/EAPBase_UI/src/EAP_UI.cpp:225
+#: ver1.0/lib/EAPBase_UI/src/EAP_UI.cpp:257
+#: ver1.1/lib/EAPBase_UI/src/EAP_UI.cpp:225
 msgid "Previous attempt to connect reported invalid credentials."
 msgstr ""
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:258
+#: master/lib/EAPBase_UI/src/EAP_UI.cpp:226
+#: ver1.0/lib/EAPBase_UI/src/EAP_UI.cpp:258
+#: ver1.1/lib/EAPBase_UI/src/EAP_UI.cpp:226
 msgid "Previous attempt to connect reported your credentials expired."
 msgstr ""
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:259
+#: master/lib/EAPBase_UI/src/EAP_UI.cpp:227
+#: ver1.0/lib/EAPBase_UI/src/EAP_UI.cpp:259
+#: ver1.1/lib/EAPBase_UI/src/EAP_UI.cpp:227
 msgid "Previous attempt to connect reported your credentials are being changed."
 msgstr ""
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:260
+#: master/lib/EAPBase_UI/src/EAP_UI.cpp:228
+#: ver1.0/lib/EAPBase_UI/src/EAP_UI.cpp:260
+#: ver1.1/lib/EAPBase_UI/src/EAP_UI.cpp:228
 msgid "Previous attempt to connect failed."
 msgstr ""
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:261
+#: master/lib/EAPBase_UI/src/EAP_UI.cpp:229
+#: ver1.0/lib/EAPBase_UI/src/EAP_UI.cpp:261
+#: ver1.1/lib/EAPBase_UI/src/EAP_UI.cpp:229
 msgid "Please, make sure your credentials are correct, or try again later."
 msgstr ""
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:282
+#: master/lib/EAPBase_UI/src/EAP_UI.cpp:250
+#: ver1.0/lib/EAPBase_UI/src/EAP_UI.cpp:282
+#: ver1.1/lib/EAPBase_UI/src/EAP_UI.cpp:250
 #, c-format
 msgid "The %s version installed on this computer logs credentials in visible and easy to read way."
 msgstr ""
 
-#: lib/EAPBase_UI/src/EAP_UI.cpp:283
+#: master/lib/EAPBase_UI/src/EAP_UI.cpp:251
+#: ver1.0/lib/EAPBase_UI/src/EAP_UI.cpp:283
+#: ver1.1/lib/EAPBase_UI/src/EAP_UI.cpp:251
 msgid "Please, reconsider necessity to enter your credentials."
 msgstr ""
 
-#: lib/MSCHAPv2_UI/src/MSCHAPv2_UI.cpp:33
+#: master/lib/EapHost_UI/res/wxEapHost_UI.cpp:17
+#: ver1.1/lib/EapHost_UI/res/wxEapHost_UI.cpp:17
+msgid "Inner EAP Method"
+msgstr ""
+
+#: master/lib/EapHost_UI/res/wxEapHost_UI.cpp:28
+#: ver1.1/lib/EapHost_UI/res/wxEapHost_UI.cpp:28
+msgid "Select and configure inner EAP method"
+msgstr ""
+
+#: master/lib/EapHost_UI/res/wxEapHost_UI.cpp:40
+#: ver1.1/lib/EapHost_UI/res/wxEapHost_UI.cpp:40
+msgid "&Settings"
+msgstr ""
+
+#: master/lib/EapHost_UI/src/EapHost_UI.cpp:59
+#: ver1.1/lib/EapHost_UI/src/EapHost_UI.cpp:59
+#, c-format
+msgid "Enumerating EAP methods failed (error %u, %s, %s)."
+msgstr ""
+
+#: master/lib/EapHost_UI/src/EapHost_UI.cpp:61
+#: ver1.1/lib/EapHost_UI/src/EapHost_UI.cpp:61
+#, c-format
+msgid "Enumerating EAP methods failed (error %u)."
+msgstr ""
+
+#: master/lib/EapHost_UI/src/EapHost_UI.cpp:136
+#: ver1.1/lib/EapHost_UI/src/EapHost_UI.cpp:136
+#, c-format
+msgid "Configuring EAP method failed (error %u, %s, %s)."
+msgstr ""
+
+#: master/lib/EapHost_UI/src/EapHost_UI.cpp:138
+#: ver1.1/lib/EapHost_UI/src/EapHost_UI.cpp:138
+#, c-format
+msgid "Configuring EAP method failed (error %u)."
+msgstr ""
+
+#: master/lib/GTC_UI/include/GTC_UI.h:111 master/lib/GTC_UI/res/wxGTC_UI.cpp:16
+msgid "GTC Challenge"
+msgstr ""
+
+#: master/lib/GTC_UI/res/wxGTC_UI.cpp:26
+msgid "Please provide your response."
+msgstr ""
+
+#: master/lib/GTC_UI/res/wxGTC_UI.cpp:38
+msgid "Server challenge"
+msgstr ""
+
+#: master/lib/GTC_UI/res/wxGTC_UI.cpp:43
+msgid "Enter your response here"
+msgstr ""
+
+#: master/lib/GTC_UI/res/wxGTC_UI.cpp:70
+msgid "EAP-GTC authentication &mode:"
+msgstr ""
+
+#: master/lib/GTC_UI/res/wxGTC_UI.cpp:75
+msgid "Select EAP-GTC authentication mode from the list"
+msgstr ""
+
+#: master/lib/GTC_UI/src/GTC_UI.cpp:39
+msgid "Challenge/Response"
+msgstr ""
+
+#: master/lib/GTC_UI/src/GTC_UI.cpp:41
+msgid "Password"
+msgstr ""
+
+#: master/lib/GTC_UI/src/GTC_UI.cpp:119
+#, c-format
+msgid "%s Challenge"
+msgstr ""
+
+#: master/lib/MSCHAPv2_UI/src/MSCHAPv2_UI.cpp:33
+#: ver1.0/lib/MSCHAPv2_UI/src/MSCHAPv2_UI.cpp:33
+#: ver1.1/lib/MSCHAPv2_UI/src/MSCHAPv2_UI.cpp:33
 msgid "MSCHAPv2 User ID and Password"
 msgstr ""
 
-#: lib/PAP_UI/src/PAP_UI.cpp:33
+#: master/lib/PAP_UI/src/PAP_UI.cpp:33 ver1.0/lib/PAP_UI/src/PAP_UI.cpp:33
+#: ver1.1/lib/PAP_UI/src/PAP_UI.cpp:33
 msgid "PAP User ID and Password"
 msgstr ""
 
-#: lib/TLS_UI/res/wxTLS_UI.cpp:17
+#: master/lib/TLS_UI/res/wxTLS_UI.cpp:17 ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:17
+#: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:17
 msgid "Server Trust"
 msgstr ""
 
-#: lib/TLS_UI/res/wxTLS_UI.cpp:28
+#: master/lib/TLS_UI/res/wxTLS_UI.cpp:28 ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:28
+#: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:28
 msgid "Describe the servers you trust to prevent credential interception in case of man-in-the-middle attacks."
 msgstr ""
 
-#: lib/TLS_UI/res/wxTLS_UI.cpp:35
+#: master/lib/TLS_UI/res/wxTLS_UI.cpp:35 ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:35
+#: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:35
 msgid "Acceptable Certificate Authorities:"
 msgstr ""
 
-#: lib/TLS_UI/res/wxTLS_UI.cpp:40
+#: master/lib/TLS_UI/res/wxTLS_UI.cpp:40 ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:40
+#: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:40
 msgid "Server's certificate must be issued by one of certificate authorities listed here"
 msgstr ""
 
-#: lib/TLS_UI/res/wxTLS_UI.cpp:47
+#: master/lib/TLS_UI/res/wxTLS_UI.cpp:47 ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:47
+#: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:47
 msgid "Add CA from Store..."
 msgstr ""
 
-#: lib/TLS_UI/res/wxTLS_UI.cpp:48
+#: master/lib/TLS_UI/res/wxTLS_UI.cpp:48 ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:48
+#: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:48
 msgid "Adds a new certificate authority from the certificate store to the list"
 msgstr ""
 
-#: lib/TLS_UI/res/wxTLS_UI.cpp:52
+#: master/lib/TLS_UI/res/wxTLS_UI.cpp:52 ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:52
+#: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:52
 msgid "Add CA from File..."
 msgstr ""
 
-#: lib/TLS_UI/res/wxTLS_UI.cpp:53
+#: master/lib/TLS_UI/res/wxTLS_UI.cpp:53 ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:53
+#: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:53
 msgid "Adds a new certificate authority from the file to the list"
 msgstr ""
 
-#: lib/TLS_UI/res/wxTLS_UI.cpp:57
+#: master/lib/TLS_UI/res/wxTLS_UI.cpp:57 ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:57
+#: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:57
 msgid "&Remove CA"
 msgstr ""
 
-#: lib/TLS_UI/res/wxTLS_UI.cpp:59
+#: master/lib/TLS_UI/res/wxTLS_UI.cpp:58 ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:58
+#: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:58
 msgid "Removes selected certificate authorities from the list"
 msgstr ""
 
-#: lib/TLS_UI/res/wxTLS_UI.cpp:72
+#: master/lib/TLS_UI/res/wxTLS_UI.cpp:71 ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:71
+#: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:71
 msgid "Acceptable server &names:"
 msgstr ""
 
-#: lib/TLS_UI/res/wxTLS_UI.cpp:77
+#: master/lib/TLS_UI/res/wxTLS_UI.cpp:76 ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:76
+#: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:76
 msgid "A semicolon delimited list of acceptable server FQDN names; blank to skip name check; Unicode characters allowed"
 msgstr ""
 
-#: lib/TLS_UI/res/wxTLS_UI.cpp:81
+#: master/lib/TLS_UI/res/wxTLS_UI.cpp:80 ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:80
+#: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:80
 msgid "(Example: foo.bar.com;server2.bar.com)"
 msgstr ""
 
-#: lib/TLS_UI/res/wxTLS_UI.cpp:119 lib/TLS_UI/src/TLS_UI.cpp:317
+#: master/lib/TLS_UI/res/wxTLS_UI.cpp:118 master/lib/TLS_UI/src/TLS_UI.cpp:325
+#: ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:118 ver1.0/lib/TLS_UI/src/TLS_UI.cpp:317
+#: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:118 ver1.1/lib/TLS_UI/src/TLS_UI.cpp:325
 msgid "User Certificate"
 msgstr ""
 
-#: lib/TLS_UI/res/wxTLS_UI.cpp:129
+#: master/lib/TLS_UI/res/wxTLS_UI.cpp:128
+#: ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:128
+#: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:128
 msgid "Please select your &certificate to use for authentication."
 msgstr ""
 
-#: lib/TLS_UI/res/wxTLS_UI.cpp:136
+#: master/lib/TLS_UI/res/wxTLS_UI.cpp:135
+#: ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:135
+#: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:135
 msgid "Client certificate to use for authentication"
 msgstr ""
 
-#: lib/TLS_UI/res/wxTLS_UI.cpp:143
+#: master/lib/TLS_UI/res/wxTLS_UI.cpp:142
+#: ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:142
+#: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:142
 msgid "Custom &identity:"
 msgstr ""
 
-#: lib/TLS_UI/res/wxTLS_UI.cpp:148
+#: master/lib/TLS_UI/res/wxTLS_UI.cpp:147
+#: ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:147
+#: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:147
 msgid "Your identity (username@domain) to override one from certificate; or blank to use one provided in certificate"
 msgstr ""
 
-#: lib/TLS_UI/src/TLS_UI.cpp:59 lib/EAPBase_UI/include/EAP_UI.h:803
-#: lib/EAPBase_UI/include/EAP_UI.h:812
-msgid "(empty)"
-msgstr ""
-
-#: lib/TLS_UI/src/TLS_UI.cpp:246
+#: master/lib/TLS_UI/src/TLS_UI.cpp:252 ver1.0/lib/TLS_UI/src/TLS_UI.cpp:246
+#: ver1.1/lib/TLS_UI/src/TLS_UI.cpp:252
 msgid "Add Certificate"
 msgstr ""
 
-#: lib/TLS_UI/src/TLS_UI.cpp:247
+#: master/lib/TLS_UI/src/TLS_UI.cpp:253 ver1.0/lib/TLS_UI/src/TLS_UI.cpp:247
+#: ver1.1/lib/TLS_UI/src/TLS_UI.cpp:253
 msgid "Certificate Files (*.cer;*.crt;*.der;*.p7b;*.pem)"
 msgstr ""
 
-#: lib/TLS_UI/src/TLS_UI.cpp:248
+#: master/lib/TLS_UI/src/TLS_UI.cpp:254 ver1.0/lib/TLS_UI/src/TLS_UI.cpp:248
+#: ver1.1/lib/TLS_UI/src/TLS_UI.cpp:254
 msgid "X.509 Certificate Files (*.cer;*.crt;*.der;*.pem)"
 msgstr ""
 
-#: lib/TLS_UI/src/TLS_UI.cpp:249
+#: master/lib/TLS_UI/src/TLS_UI.cpp:255 ver1.0/lib/TLS_UI/src/TLS_UI.cpp:249
+#: ver1.1/lib/TLS_UI/src/TLS_UI.cpp:255
 msgid "PKCS #7 Certificate Files (*.p7b)"
 msgstr ""
 
-#: lib/TLS_UI/src/TLS_UI.cpp:250
+#: master/lib/TLS_UI/src/TLS_UI.cpp:256 ver1.0/lib/TLS_UI/src/TLS_UI.cpp:250
+#: ver1.1/lib/TLS_UI/src/TLS_UI.cpp:256
 msgid "All Files (*.*)"
 msgstr ""
 
-#: lib/TLS_UI/src/TLS_UI.cpp:264
+#: master/lib/TLS_UI/src/TLS_UI.cpp:270 ver1.0/lib/TLS_UI/src/TLS_UI.cpp:264
+#: ver1.1/lib/TLS_UI/src/TLS_UI.cpp:270
 #, c-format
 msgid "Invalid or unsupported certificate file %s"
 msgstr ""
 
-#: lib/TLS_UI/src/TLS_UI.cpp:264
+#: master/lib/TLS_UI/src/TLS_UI.cpp:270 ver1.0/lib/TLS_UI/src/TLS_UI.cpp:264
+#: ver1.1/lib/TLS_UI/src/TLS_UI.cpp:270
 msgid "Error"
 msgstr ""
 
-#: lib/TTLS_UI/res/wxTTLS_UI.cpp:17
+#: master/lib/TTLS_UI/res/wxTTLS_UI.cpp:17
+#: ver1.0/lib/TTLS_UI/res/wxTTLS_UI.cpp:17
+#: ver1.1/lib/TTLS_UI/res/wxTTLS_UI.cpp:17
 msgid "Outer Identity"
 msgstr ""
 
-#: lib/TTLS_UI/res/wxTTLS_UI.cpp:28
+#: master/lib/TTLS_UI/res/wxTTLS_UI.cpp:28
+#: ver1.0/lib/TTLS_UI/res/wxTTLS_UI.cpp:28
+#: ver1.1/lib/TTLS_UI/res/wxTTLS_UI.cpp:28
 msgid "Select the user ID supplicant introduces itself as to authenticator:"
 msgstr ""
 
-#: lib/TTLS_UI/res/wxTTLS_UI.cpp:35
+#: master/lib/TTLS_UI/res/wxTTLS_UI.cpp:35
+#: ver1.0/lib/TTLS_UI/res/wxTTLS_UI.cpp:35
+#: ver1.1/lib/TTLS_UI/res/wxTTLS_UI.cpp:35
 msgid "&True identity"
 msgstr ""
 
-#: lib/TTLS_UI/res/wxTTLS_UI.cpp:36
+#: master/lib/TTLS_UI/res/wxTTLS_UI.cpp:36
+#: ver1.0/lib/TTLS_UI/res/wxTTLS_UI.cpp:36
+#: ver1.1/lib/TTLS_UI/res/wxTTLS_UI.cpp:36
 msgid "Use my true user name"
 msgstr ""
 
-#: lib/TTLS_UI/res/wxTTLS_UI.cpp:40
-msgid "Use &empty outer identity (RFC 4822)"
+#: master/lib/TTLS_UI/res/wxTTLS_UI.cpp:40
+#: ver1.0/lib/TTLS_UI/res/wxTTLS_UI.cpp:40
+#: ver1.1/lib/TTLS_UI/res/wxTTLS_UI.cpp:40
+msgid "Use &empty outer identity"
 msgstr ""
 
-#: lib/TTLS_UI/res/wxTTLS_UI.cpp:41
+#: master/lib/TTLS_UI/res/wxTTLS_UI.cpp:41
+#: ver1.0/lib/TTLS_UI/res/wxTTLS_UI.cpp:41
+#: ver1.1/lib/TTLS_UI/res/wxTTLS_UI.cpp:41
 msgid "Ommit my user name and use @mydomain.org only"
 msgstr ""
 
-#: lib/TTLS_UI/res/wxTTLS_UI.cpp:48
+#: master/lib/TTLS_UI/res/wxTTLS_UI.cpp:48
+#: ver1.0/lib/TTLS_UI/res/wxTTLS_UI.cpp:48
+#: ver1.1/lib/TTLS_UI/res/wxTTLS_UI.cpp:48
 msgid "&Custom outer identity:"
 msgstr ""
 
-#: lib/TTLS_UI/res/wxTTLS_UI.cpp:49
+#: master/lib/TTLS_UI/res/wxTTLS_UI.cpp:49
+#: ver1.0/lib/TTLS_UI/res/wxTTLS_UI.cpp:49
+#: ver1.1/lib/TTLS_UI/res/wxTTLS_UI.cpp:49
 msgid "Specify custom outer identity"
 msgstr ""
 
-#: lib/TTLS_UI/res/wxTTLS_UI.cpp:54
+#: master/lib/TTLS_UI/res/wxTTLS_UI.cpp:54
+#: ver1.0/lib/TTLS_UI/res/wxTTLS_UI.cpp:54
+#: ver1.1/lib/TTLS_UI/res/wxTTLS_UI.cpp:54
 msgid "Custom outer identity to use"
 msgstr ""
 
-#: lib/TTLS_UI/src/Module.cpp:274 lib/TTLS_UI/src/Module.cpp:284
-#: lib/EAPBase_UI/include/EAP_UI.h:724
+#: master/lib/TTLS_UI/src/Module.cpp:394 ver1.1/lib/TTLS_UI/src/Module.cpp:356
 #, c-format
-msgid "Error writing credentials to Credential Manager: %hs (error %u)"
+msgid "Invoking EAP identity UI failed (error %u, %s, %s)."
 msgstr ""
 
-#: lib/TTLS_UI/src/Module.cpp:276 lib/TTLS_UI/src/Module.cpp:286
-#: lib/EAPBase_UI/include/EAP_UI.h:727
-msgid "Writing credentials failed."
+#: master/lib/TTLS_UI/src/Module.cpp:396 ver1.1/lib/TTLS_UI/src/Module.cpp:358
+#, c-format
+msgid "Invoking EAP identity UI failed (error %u)."
 msgstr ""
 
-#: lib/TTLS_UI/src/TTLS_UI.cpp:36 lib/TTLS_UI/src/TTLS_UI.cpp:182
+#: master/lib/TTLS_UI/src/Module.cpp:532
+#, c-format
+msgid "Invoking EAP interactive UI failed (error %u, %s, %s)."
+msgstr ""
+
+#: master/lib/TTLS_UI/src/Module.cpp:535
+#, c-format
+msgid "Invoking EAP interactive UI failed (error %u)."
+msgstr ""
+
+#: master/lib/TTLS_UI/src/TTLS_UI.cpp:118 ver1.0/lib/TTLS_UI/src/TTLS_UI.cpp:36
+#: ver1.0/lib/TTLS_UI/src/TTLS_UI.cpp:182
+#: ver1.1/lib/TTLS_UI/src/TTLS_UI.cpp:117
 msgid "Inner Authentication"
 msgstr ""
 
-#: lib/TTLS_UI/src/TTLS_UI.cpp:61 lib/TTLS_UI/src/TTLS_UI.cpp:197
-msgid "Outer Authentication"
-msgstr ""
-
-#: lib/TTLS_UI/src/TTLS_UI.cpp:188
+#: master/lib/TTLS_UI/src/TTLS_UI.cpp:124
+#: ver1.0/lib/TTLS_UI/src/TTLS_UI.cpp:188
+#: ver1.1/lib/TTLS_UI/src/TTLS_UI.cpp:123
 msgid "Select inner authentication method from the list"
 msgstr ""
 
-#: lib/TTLS_UI/src/TTLS_UI.cpp:190
+#: master/lib/TTLS_UI/src/TTLS_UI.cpp:126
+#: ver1.0/lib/TTLS_UI/src/TTLS_UI.cpp:190
+#: ver1.1/lib/TTLS_UI/src/TTLS_UI.cpp:125
 msgid "PAP"
 msgstr ""
 
-#: lib/TTLS_UI/src/TTLS_UI.cpp:192
+#: master/lib/TTLS_UI/src/TTLS_UI.cpp:128
+#: ver1.0/lib/TTLS_UI/src/TTLS_UI.cpp:192
+#: ver1.1/lib/TTLS_UI/src/TTLS_UI.cpp:127
 msgid "MSCHAPv2"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:302
-#, c-format
-msgid "Are you sure you want to permanently remove %s provider from configuration?"
+#: master/lib/TTLS_UI/src/TTLS_UI.cpp:130
+#: ver1.1/lib/TTLS_UI/src/TTLS_UI.cpp:129
+msgid "EAP-MSCHAPv2"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:302
-msgid "Warning"
+#: master/lib/TTLS_UI/src/TTLS_UI.cpp:132
+msgid "EAP-GTC"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:576
-msgid "Provider Settings"
+#: master/lib/TTLS_UI/src/TTLS_UI.cpp:135
+#: ver1.1/lib/TTLS_UI/src/TTLS_UI.cpp:132
+msgid "Other EAP methods..."
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:747
-#, c-format
-msgid "Deleting credentials failed (error %u)."
+#: master/lib/TTLS_UI/src/TTLS_UI.cpp:141 ver1.0/lib/TTLS_UI/src/TTLS_UI.cpp:61
+#: ver1.0/lib/TTLS_UI/src/TTLS_UI.cpp:197
+#: ver1.1/lib/TTLS_UI/src/TTLS_UI.cpp:138
+msgid "Outer Authentication"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:788
-#, c-format
-msgid "(error %u)"
-msgstr ""
-
-#: lib/EAPBase_UI/include/EAP_UI.h:792
-msgid "(error)"
-msgstr ""
-
-#: lib/EAPBase_UI/include/EAP_UI.h:803 lib/EAPBase_UI/include/EAP_UI.h:812
-msgid "(blank ID)"
-msgstr ""
-
-#: lib/EAPBase_UI/include/EAP_UI.h:854
-msgid "&Remember"
-msgstr ""
-
-#: lib/EAPBase_UI/include/EAP_UI.h:855
-msgid "Check if you would like to save credentials"
-msgstr ""
-
-#: lib/EAPBase_UI/include/EAP_UI.h:1000
-msgid "(Your Organization)"
-msgstr ""
-
-#: lib/EAPBase_UI/res/wxEAP_UI.h:69
-msgid "EAP Connection Configuration"
-msgstr ""
-
-#: EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
-#: EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
-#: EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
-#: EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
+#: master/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
+#: master/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
+#: ver1.0/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
+#: ver1.0/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
+#: ver1.1/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
+#: ver1.1/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
 msgid "EAP Methods"
 msgstr ""
 
-#: EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
-#: EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
-#: EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
-#: EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
+#: master/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
+#: master/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
+#: ver1.0/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
+#: ver1.0/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
+#: ver1.1/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
+#: ver1.1/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
 msgid "Modules to support individual EAP methods"
 msgstr ""
 
-#: EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:5
-#: EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:5
-#: EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:5
-#: EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:5
+#: master/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:5
+#: master/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:5
+#: ver1.0/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:5
+#: ver1.0/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:5
+#: ver1.1/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:5
+#: ver1.1/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:5
 msgid "TTLS"
 msgstr ""
 
-#: EAPMethods/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:5
-#: EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:5
-#: EAPMethods/MSIBuild/en_US.x64.Debug.Feature-2.idtx:5
-#: EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:5
+#: master/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:5
+#: master/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:5
+#: ver1.0/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:5
+#: ver1.0/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:5
+#: ver1.1/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:5
+#: ver1.1/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:5
 msgid "Tunneled Transport Layer Security"
 msgstr ""
