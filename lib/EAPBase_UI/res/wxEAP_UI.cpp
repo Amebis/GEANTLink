@@ -1,8 +1,8 @@
 ﻿///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Jun 17 2015)
+// C++ code generated with wxFormBuilder (version Aug  8 2018)
 // http://www.wxformbuilder.org/
 //
-// PLEASE DO "NOT" EDIT THIS FILE!
+// PLEASE DO *NOT* EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
 #include <StdAfx.h>
@@ -171,7 +171,7 @@ wxEAPCredentialsConnectionDialogBase::~wxEAPCredentialsConnectionDialogBase()
 	
 }
 
-wxEAPBannerPanelBase::wxEAPBannerPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+wxEAPBannerPanelBase::wxEAPBannerPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name ) : wxPanel( parent, id, pos, size, style, name )
 {
 	this->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_HIGHLIGHT ) );
 	this->SetMinSize( wxSize( -1,48 ) );
@@ -181,7 +181,7 @@ wxEAPBannerPanelBase::wxEAPBannerPanelBase( wxWindow* parent, wxWindowID id, con
 	
 	m_title = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
 	m_title->Wrap( -1 );
-	m_title->SetFont( wxFont( 18, 70, 90, 90, false, wxEmptyString ) );
+	m_title->SetFont( wxFont( 18, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxEmptyString ) );
 	m_title->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_HIGHLIGHTTEXT ) );
 	
 	sb_content->Add( m_title, 0, wxALL|wxEXPAND, 5 );
@@ -196,7 +196,7 @@ wxEAPBannerPanelBase::~wxEAPBannerPanelBase()
 {
 }
 
-wxEAPNotePanelBase::wxEAPNotePanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+wxEAPNotePanelBase::wxEAPNotePanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name ) : wxPanel( parent, id, pos, size, style, name )
 {
 	this->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_INFOBK ) );
 	
@@ -224,7 +224,7 @@ wxEAPNotePanelBase::~wxEAPNotePanelBase()
 {
 }
 
-wxEAPCredentialsConfigPanelBase::wxEAPCredentialsConfigPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+wxEAPCredentialsConfigPanelBase::wxEAPCredentialsConfigPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name ) : wxPanel( parent, id, pos, size, style, name )
 {
 	m_sb_credentials = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("%s User Credentials") ), wxVERTICAL );
 	
@@ -258,7 +258,7 @@ wxEAPCredentialsConfigPanelBase::wxEAPCredentialsConfigPanelBase( wxWindow* pare
 	
 	m_storage_identity = new wxStaticText( m_sb_credentials->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	m_storage_identity->Wrap( -1 );
-	m_storage_identity->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
+	m_storage_identity->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxEmptyString ) );
 	m_storage_identity->SetToolTip( _("Your present credentials stored in Windows Credential Manager") );
 	
 	sb_storage_identity->Add( m_storage_identity, 1, wxEXPAND|wxLEFT, 5 );
@@ -302,7 +302,7 @@ wxEAPCredentialsConfigPanelBase::wxEAPCredentialsConfigPanelBase( wxWindow* pare
 	
 	m_config_identity = new wxStaticText( m_sb_credentials->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	m_config_identity->Wrap( -1 );
-	m_config_identity->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 92, false, wxEmptyString ) );
+	m_config_identity->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxEmptyString ) );
 	m_config_identity->SetToolTip( _("Profile configuration credentials") );
 	
 	sb_config_identity->Add( m_config_identity, 1, wxEXPAND|wxLEFT, 5 );
@@ -354,7 +354,7 @@ wxEAPCredentialsConfigPanelBase::~wxEAPCredentialsConfigPanelBase()
 	
 }
 
-wxPasswordCredentialsPanelBase::wxPasswordCredentialsPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxEAPCredentialsPanelBase( parent, id, pos, size, style )
+wxPasswordCredentialsPanelBase::wxPasswordCredentialsPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name ) : wxEAPCredentialsPanelBase( parent, id, pos, size, style, name )
 {
 	m_sb_credentials = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("User ID and Password") ), wxVERTICAL );
 	
@@ -418,7 +418,7 @@ wxPasswordCredentialsPanelBase::~wxPasswordCredentialsPanelBase()
 	
 }
 
-wxIdentityCredentialsPanelBase::wxIdentityCredentialsPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxEAPCredentialsPanelBase( parent, id, pos, size, style )
+wxIdentityCredentialsPanelBase::wxIdentityCredentialsPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name ) : wxEAPCredentialsPanelBase( parent, id, pos, size, style, name )
 {
 	m_sb_credentials = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("User ID") ), wxVERTICAL );
 	
@@ -467,7 +467,7 @@ wxIdentityCredentialsPanelBase::~wxIdentityCredentialsPanelBase()
 {
 }
 
-wxEAPProviderContactInfoPanelBase::wxEAPProviderContactInfoPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+wxEAPProviderContactInfoPanelBase::wxEAPProviderContactInfoPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name ) : wxPanel( parent, id, pos, size, style, name )
 {
 	wxStaticBoxSizer* sb_provider_contact;
 	sb_provider_contact = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Your Organization") ), wxVERTICAL );
@@ -519,7 +519,7 @@ wxEAPProviderContactInfoPanelBase::wxEAPProviderContactInfoPanelBase( wxWindow* 
 	
 	m_provider_web_icon = new wxStaticText( sb_provider_contact->GetStaticBox(), wxID_ANY, _("¶"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_provider_web_icon->Wrap( -1 );
-	m_provider_web_icon->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 90, false, wxT("Wingdings") ) );
+	m_provider_web_icon->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Wingdings") ) );
 	
 	sb_provider_helpdesk_inner->Add( m_provider_web_icon, 0, wxALIGN_CENTER_VERTICAL|wxBOTTOM|wxRIGHT, 5 );
 	
@@ -530,7 +530,7 @@ wxEAPProviderContactInfoPanelBase::wxEAPProviderContactInfoPanelBase( wxWindow* 
 	
 	m_provider_email_icon = new wxStaticText( sb_provider_contact->GetStaticBox(), wxID_ANY, _("*"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_provider_email_icon->Wrap( -1 );
-	m_provider_email_icon->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 90, false, wxT("Wingdings") ) );
+	m_provider_email_icon->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Wingdings") ) );
 	
 	sb_provider_helpdesk_inner->Add( m_provider_email_icon, 0, wxALIGN_CENTER_VERTICAL|wxBOTTOM|wxRIGHT, 5 );
 	
@@ -541,7 +541,7 @@ wxEAPProviderContactInfoPanelBase::wxEAPProviderContactInfoPanelBase( wxWindow* 
 	
 	m_provider_phone_icon = new wxStaticText( sb_provider_contact->GetStaticBox(), wxID_ANY, _(")"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_provider_phone_icon->Wrap( -1 );
-	m_provider_phone_icon->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 90, false, wxT("Wingdings") ) );
+	m_provider_phone_icon->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Wingdings") ) );
 	
 	sb_provider_helpdesk_inner->Add( m_provider_phone_icon, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
 	
@@ -571,7 +571,7 @@ wxEAPProviderContactInfoPanelBase::~wxEAPProviderContactInfoPanelBase()
 {
 }
 
-wxEAPProviderIDPanelBase::wxEAPProviderIDPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+wxEAPProviderIDPanelBase::wxEAPProviderIDPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name ) : wxPanel( parent, id, pos, size, style, name )
 {
 	wxStaticBoxSizer* sb_provider_id;
 	sb_provider_id = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Provider Unique Identifier") ), wxVERTICAL );
@@ -635,7 +635,7 @@ wxEAPProviderIDPanelBase::~wxEAPProviderIDPanelBase()
 {
 }
 
-wxEAPProviderLockPanelBase::wxEAPProviderLockPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+wxEAPProviderLockPanelBase::wxEAPProviderLockPanelBase( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name ) : wxPanel( parent, id, pos, size, style, name )
 {
 	wxStaticBoxSizer* sb_provider_lock;
 	sb_provider_lock = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Configuration Lock") ), wxVERTICAL );

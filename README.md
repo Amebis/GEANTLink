@@ -58,22 +58,22 @@ Binaries are available for download [here](https://github.com/Amebis/GEANTLink/r
 - _MsiDb.Exe_ and other command line utilities for MSI packaging distributed as a part of Microsoft Windows SDK (installed with Visual Studio). Add SDK's `Bin` folder to the system path.
 
 ### wxWidgets
-GÉANTLink is using wxWidgets v3.0.2 static libraries. Unfortunately, only dynamic libraries (DLL) variant is available as a binary download. Therefore static libraries needs to be compiled from [source](https://github.com/wxWidgets/wxWidgets).
+GÉANTLink is using wxWidgets v3.1.1 static libraries. Unfortunately, only dynamic libraries (DLL) variant is available as a binary download. Therefore static libraries needs to be compiled from [source](https://github.com/wxWidgets/wxWidgets).
 
 #### Compiling wxWidgets Win32 static libraries
 1. Start _Visual Studio Command Prompt (2010)_
 2. Change working folder to `build\msw`
-3. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0`
-4. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 BUILD=release`
+3. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 COMPILER_VERSION=100`
+4. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 COMPILER_VERSION=100 BUILD=release`
 
 #### Compiling wxWidgets x64 static libraries
 1. Start _Visual Studio x64 Cross Tools Command Prompt (2010)_
 2. Change working folder to `build\msw`
-3. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 TARGET_CPU=X64`
-4. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 TARGET_CPU=X64 BUILD=release`
+3. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 COMPILER_VERSION=100 TARGET_CPU=X64`
+4. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 COMPILER_VERSION=100 TARGET_CPU=X64 BUILD=release`
 
 #### Specifying wxWidgets path
-GÉANTLink compilation references wxWidgets libraries using `WXWIN` environment variable. Please set it to wxWidgets folder (i.e. `C:\SDK\wxWidgets\3.0.2`).
+GÉANTLink compilation references wxWidgets libraries using `WXWIN` environment variable. Please set it to wxWidgets folder (i.e. `C:\SDK\wxWidgets\3.1.1`).
 
 ### Digital Signing of Build Outputs
 In order to have the build process digitally sign output files, one should provide the following:

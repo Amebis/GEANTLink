@@ -24,7 +24,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <LibraryPath>$(WXWIN)\lib\vc_x64_lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(WXWIN)\lib\vc$(PlatformToolsetVersion)_x64_lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <Lib>
