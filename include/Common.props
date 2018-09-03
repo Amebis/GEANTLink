@@ -32,7 +32,7 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
-      <PreprocessorDefinitions>_WIN32_WINNT=0x0600;ISOLATION_AWARE_ENABLED=1;SECURITY_WIN32;CERT_CHAIN_PARA_HAS_EXTRA_FIELDS;EAP_TLS=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WIN32_WINNT=0x0600;ISOLATION_AWARE_ENABLED=1;SECURITY_WIN32;CERT_CHAIN_PARA_HAS_EXTRA_FIELDS;EAP_TLS=1;wxMSVC_VERSION=$(PlatformToolsetVersion);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>StdAfx.h</PrecompiledHeaderFile>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
