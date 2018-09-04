@@ -1,5 +1,5 @@
 ﻿/*
-    Copyright 2015-2016 Amebis
+    Copyright 2015-2018 Amebis
     Copyright 2016 GÉANT
 
     This file is part of GÉANTLink.
@@ -215,7 +215,7 @@ void eap::method_tls::begin_session(
     PCCERT_CONTEXT certs[] = { m_cred.m_cert ? (PCCERT_CONTEXT)m_cred.m_cert : NULL };
     SCHANNEL_CRED cred = {
         SCHANNEL_CRED_VERSION,                                                // dwVersion
-        m_cred.m_cert ? 1 : 0,                                                // cCreds
+        m_cred.m_cert ? 1ul : 0ul,                                            // cCreds
         certs,                                                                // paCred
         NULL,                                                                 // hRootStore: Not valid for client credentials
         0,                                                                    // cMappers
@@ -236,7 +236,7 @@ void eap::method_tls::begin_session(
         SCH_CRED_IGNORE_REVOCATION_OFFLINE                                |   // dwFlags: Ignore offline-revocation errors - we do not expect to have network connection yet
         SCH_CRED_NO_DEFAULT_CREDS                                         |   // dwFlags: If client certificate we provided is not acceptable, do not try to select one on your own
         (m_cfg.m_server_names.empty() ? SCH_CRED_NO_SERVERNAME_CHECK : 0) |   // dwFlags: When no expected server name is given, do not do the server name check.
-        0x00400000 /*SCH_USE_STRONG_CRYPTO*/,                                 // dwFlags: Do not use broken ciphers
+        0x00400000ul /*SCH_USE_STRONG_CRYPTO*/,                               // dwFlags: Do not use broken ciphers
         0                                                                     // dwCredFormat
     };
     SECURITY_STATUS stat = m_sc_cred.acquire(NULL, UNISP_NAME, SECPKG_CRED_OUTBOUND, NULL, &cred);
