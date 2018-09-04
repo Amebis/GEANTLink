@@ -1,5 +1,5 @@
 ﻿/*
-    Copyright 2015-2016 Amebis
+    Copyright 2015-2018 Amebis
     Copyright 2016 GÉANT
 
     This file is part of GÉANTLink.
@@ -204,11 +204,11 @@ wxETWListCtrl::wxETWListCtrl(wxWindow *parent, wxWindowID id, const wxPoint& pos
     ULONG ulResult;
     for (unsigned int i = 0; ; i++) {
         //tstring log_file(tstring_printf(i ? _T("test.etl") : _T("test %u.etl"), i));
-        tstring name(tstring_printf(i ? _T(PRODUCT_NAME_STR) _T(" Event Monitor Session %u") : _T(PRODUCT_NAME_STR) _T(" Event Monitor Session"), i));
+        tstring session_name(tstring_printf(i ? _T(PRODUCT_NAME_STR) _T(" Event Monitor Session %u") : _T(PRODUCT_NAME_STR) _T(" Event Monitor Session"), i));
 
         // Allocate session properties.
         ULONG
-            ulSizeName    = (ULONG)((name    .length() + 1)*sizeof(TCHAR)),
+            ulSizeName    = (ULONG)((session_name.length() + 1)*sizeof(TCHAR)),
             //ulSizeLogFile = (ULONG)((log_file.length() + 1)*sizeof(TCHAR)),
             ulSize        = sizeof(EVENT_TRACE_PROPERTIES) + ulSizeName /*+ ulSizeLogFile*/;
         unique_ptr<EVENT_TRACE_PROPERTIES> properties(reinterpret_cast<EVENT_TRACE_PROPERTIES*>(new char[ulSize]));
@@ -226,13 +226,13 @@ wxETWListCtrl::wxETWListCtrl(wxWindow *parent, wxWindowID id, const wxPoint& pos
         //properties->LogFileNameOffset   = sizeof(EVENT_TRACE_PROPERTIES) + ulSizeName;
         //memcpy(reinterpret_cast<char*>(properties.get()) + properties->LogFileNameOffset, log_file.c_str(), ulSizeLogFile);
 
-        if ((ulResult = m_session.create(name.c_str(), properties.get())) == ERROR_SUCCESS) {
+        if ((ulResult = m_session.create(session_name.c_str(), properties.get())) == ERROR_SUCCESS) {
             break;
         } else if (ulResult == ERROR_ACCESS_DENIED) {
             wxLogError(_("Access denied creating event session: you need administrative privileges (Run As Administrator) or be a member of Performance Log Users group to start event tracing session."));
             return;
         } else if (ulResult == ERROR_ALREADY_EXISTS) {
-            wxLogDebug(_("The %s event session already exists."), name);
+            wxLogDebug(_("The %s event session already exists."), session_name);
             // Do not despair... Retry with a new session name and ID.
             continue;
         } else {

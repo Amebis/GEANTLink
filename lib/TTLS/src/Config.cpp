@@ -1,5 +1,5 @@
 ﻿/*
-    Copyright 2015-2016 Amebis
+    Copyright 2015-2018 Amebis
     Copyright 2016 GÉANT
 
     This file is part of GÉANTLink.
@@ -121,24 +121,19 @@ void eap::config_method_ttls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode 
     // <InnerAuthenticationMethod>/...
     m_inner->save(pDoc, pXmlElInnerAuthenticationMethod);
 
-    {
-        com_obj<IXMLDOMNode> pXmlElClientSideCredential;
-        if (SUCCEEDED(hr = eapxml::select_node(pConfigRoot, bstr(L"eap-metadata:ClientSideCredential"), pXmlElClientSideCredential))) {
-            // Fix 1: Configured outer credentials in draft-winter-opsawg-eap-metadata has some bizarre presence/absence/blank logic for EAP-TTLS methods only.
-            // To keep our code clean, we do some post-processing, to make draft compliant XML on output, while keeping things simple on the inside.
-            if (m_use_cred && m_cred->empty()) {
-                // For empty configured client certificate <ClientCertificate/> must not be present.
-                com_obj<IXMLDOMNode> pXmlElClientCertificate;
-                if (SUCCEEDED(hr = eapxml::select_node(pXmlElClientSideCredential, bstr(L"eap-metadata:ClientCertificate"), pXmlElClientCertificate))) {
-                    com_obj<IXMLDOMNode> pXmlElClientCertificateOld;
-                    hr = pXmlElClientSideCredential->removeChild(pXmlElClientCertificate, &pXmlElClientCertificateOld);
-                }
-            } else if (!m_use_cred) {
-                // When not using configured client certificate (user must supply one), add empty <ClientCertificate/>.
-                com_obj<IXMLDOMElement> pXmlElClientCertificate;
-                hr = eapxml::create_element(pDoc, pXmlElClientSideCredential, bstr(L"eap-metadata:ClientCertificate"), bstr(L"ClientCertificate"), namespace_eapmetadata, pXmlElClientCertificate);
-            }
+    // Fix 1: Configured outer credentials in draft-winter-opsawg-eap-metadata has some bizarre presence/absence/blank logic for EAP-TTLS methods only.
+    // To keep our code clean, we do some post-processing, to make draft compliant XML on output, while keeping things simple on the inside.
+    if (m_use_cred && m_cred->empty()) {
+        // For empty configured client certificate <ClientCertificate/> must not be present.
+        com_obj<IXMLDOMNode> pXmlElClientCertificate;
+        if (SUCCEEDED(hr = eapxml::select_node(pXmlElClientSideCredential, bstr(L"eap-metadata:ClientCertificate"), pXmlElClientCertificate))) {
+            com_obj<IXMLDOMNode> pXmlElClientCertificateOld;
+            hr = pXmlElClientSideCredential->removeChild(pXmlElClientCertificate, &pXmlElClientCertificateOld);
         }
+    } else if (!m_use_cred) {
+        // When not using configured client certificate (user must supply one), add empty <ClientCertificate/>.
+        com_obj<IXMLDOMElement> pXmlElClientCertificate;
+        hr = eapxml::create_element(pDoc, pXmlElClientSideCredential, bstr(L"eap-metadata:ClientCertificate"), bstr(L"ClientCertificate"), namespace_eapmetadata, pXmlElClientCertificate);
     }
 }
 
@@ -165,8 +160,8 @@ void eap::config_method_ttls::load(_In_ IXMLDOMNode *pConfigRoot)
                     }
                 } else {
                     // Nonexisting <ClientSideCredential> means: use blank configured credentials.
-                    com_obj<IXMLDOMElement> pXmlElClientCertificate;
-                    hr = eapxml::create_element(pDoc, pXmlElClientSideCredential, bstr(L"eap-metadata:ClientCertificate"), bstr(L"ClientCertificate"), namespace_eapmetadata, pXmlElClientCertificate);
+                    com_obj<IXMLDOMElement> pXmlElClientCertificate_blank;
+                    hr = eapxml::create_element(pDoc, pXmlElClientSideCredential, bstr(L"eap-metadata:ClientCertificate"), bstr(L"ClientCertificate"), namespace_eapmetadata, pXmlElClientCertificate_blank);
                 }
             }
         }

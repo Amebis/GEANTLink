@@ -1,5 +1,5 @@
 ﻿/*
-    Copyright 2015-2016 Amebis
+    Copyright 2015-2018 Amebis
     Copyright 2016 GÉANT
 
     This file is part of GÉANTLink.
@@ -480,7 +480,7 @@ eap::monitor_ui::monitor_ui(_In_ HINSTANCE module, _In_ const GUID &guid) :
     m_hwnd_popup(NULL)
 {
     // Verify if the monitor is already running.
-    const WNDCLASSEX wnd_class_desc = {
+    const WNDCLASSEX wnd_class_desc_master = {
         sizeof(WNDCLASSEX), // cbSize
         0,                  // style
         winproc,            // lpfnWndProc
@@ -494,7 +494,7 @@ eap::monitor_ui::monitor_ui(_In_ HINSTANCE module, _In_ const GUID &guid) :
         _T(__FUNCTION__),   // lpszClassName
         NULL                // hIconSm
     };
-    ATOM wnd_class = RegisterClassEx(&wnd_class_desc);
+    ATOM wnd_class = RegisterClassEx(&wnd_class_desc_master);
     if (!wnd_class)
         throw win_runtime_error(__FUNCTION__ " Error registering master monitor window class.");
     tstring_guid guid_str(guid);
@@ -504,7 +504,7 @@ eap::monitor_ui::monitor_ui(_In_ HINSTANCE module, _In_ const GUID &guid) :
         m_is_master = false;
 
         // Register slave windows class slightly different, not to include slaves in FindWindowEx().
-        const WNDCLASSEX wnd_class_desc = {
+        const WNDCLASSEX wnd_class_desc_slave = {
             sizeof(WNDCLASSEX),             // cbSize
             0,                              // style
             winproc,                        // lpfnWndProc
@@ -518,7 +518,7 @@ eap::monitor_ui::monitor_ui(_In_ HINSTANCE module, _In_ const GUID &guid) :
             _T(__FUNCTION__) _T("-Slave"),  // lpszClassName
             NULL                            // hIconSm
         };
-        wnd_class = RegisterClassEx(&wnd_class_desc);
+        wnd_class = RegisterClassEx(&wnd_class_desc_slave);
         if (!wnd_class)
             throw win_runtime_error(__FUNCTION__ " Error registering slave monitor window class.");
     } else {
