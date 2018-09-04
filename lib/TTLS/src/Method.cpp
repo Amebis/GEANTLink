@@ -1,5 +1,5 @@
 ﻿/*
-    Copyright 2015-2016 Amebis
+    Copyright 2015-2018 Amebis
     Copyright 2016 GÉANT
 
     This file is part of GÉANTLink.
@@ -553,8 +553,7 @@ EapPeerMethodResponseAction eap::method_ttls::process_request_packet(
 
         if (status == SEC_E_OK) {
             // Get server certificate.
-            SECURITY_STATUS status = QueryContextAttributes(m_sc_ctx, SECPKG_ATTR_REMOTE_CERT_CONTEXT, (PVOID)&m_sc_cert);
-            if (FAILED(status))
+            if (FAILED(status = QueryContextAttributes(m_sc_ctx, SECPKG_ATTR_REMOTE_CERT_CONTEXT, (PVOID)&m_sc_cert)))
                 throw sec_runtime_error(status, __FUNCTION__ " Error retrieving server certificate from Schannel.");
 
             // Add all trusted root CAs to server certificate's store. This allows CertGetIssuerCertificateFromStore() in the following CRL check to test the root CA for revocation too.
@@ -637,13 +636,11 @@ EapPeerMethodResponseAction eap::method_ttls::process_request_packet(
                     // Push keying material to inner MSCHAPv2 method.
                     static const DWORD s_key_id = 0x02; // EAP-TTLSv0 Challenge Data
                     static const SecPkgContext_EapPrfInfo s_prf_info = { 0, sizeof(s_key_id), (PBYTE)&s_key_id };
-                    SECURITY_STATUS status = SetContextAttributes(m_sc_ctx, SECPKG_ATTR_EAP_PRF_INFO, (void*)&s_prf_info, sizeof(s_prf_info));
-                    if (FAILED(status))
+                    if (FAILED(status = SetContextAttributes(m_sc_ctx, SECPKG_ATTR_EAP_PRF_INFO, (void*)&s_prf_info, sizeof(s_prf_info))))
                         throw sec_runtime_error(status, __FUNCTION__ " Error setting TTLS PRF in Schannel.");
 
                     SecPkgContext_EapKeyBlock key_block;
-                    status = QueryContextAttributes(m_sc_ctx, SECPKG_ATTR_EAP_KEY_BLOCK, &key_block);
-                    if (FAILED(status))
+                    if (FAILED(status = QueryContextAttributes(m_sc_ctx, SECPKG_ATTR_EAP_KEY_BLOCK, &key_block)))
                         throw sec_runtime_error(status, __FUNCTION__ " Error generating PRF in Schannel.");
 
                     inner_mschapv2->m_challenge_server.assign(key_block.rgbKeys, key_block.rgbKeys + sizeof(challenge_mschapv2));
@@ -671,7 +668,7 @@ EapPeerMethodResponseAction eap::method_ttls::process_request_packet(
                         { 0, SECBUFFER_EMPTY, NULL },
                     };
                     SecBufferDesc buf_desc = { SECBUFFER_VERSION, _countof(buf), buf };
-                    SECURITY_STATUS status = DecryptMessage(m_sc_ctx, &buf_desc, 0, NULL);
+                    status = DecryptMessage(m_sc_ctx, &buf_desc, 0, NULL);
                     if (status == SEC_E_OK) {
                         // Process data (only the first SECBUFFER_DATA found).
                         for (size_t i = 0; i < _countof(buf); i++)
