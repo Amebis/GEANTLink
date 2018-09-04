@@ -1,5 +1,5 @@
 ﻿/*
-    Copyright 2015-2016 Amebis
+    Copyright 2015-2018 Amebis
     Copyright 2016 GÉANT
 
     This file is part of GÉANTLink.
@@ -919,8 +919,8 @@ inline static basic_string<_Elem, _Traits, _Ax> kph_encode(_In_ unsigned char da
 {
     // Encode one byte of data.
     _Elem str[3] = {
-        'A' + (data >> 4       ),
-        'a' + (data      & 0x0f),
+        static_cast<_Elem>('A' + (data >> 4       )),
+        static_cast<_Elem>('a' + (data      & 0x0f)),
     };
     return str;
 } 
