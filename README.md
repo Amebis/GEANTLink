@@ -93,7 +93,7 @@ GÉANTLink has some submodules. When cloning Git repository, make sure to use `-
 
 After clone is complete, grant _Users_ local group read and execute permissions to `output` subfolder (when working folder is private). This allows _EapHost_ service to load GÉANTLink's DLL, and Event Viewer to display GÉANTLink events.
 
-GÉANTLink can be build and debugged opening _VS10Solution.sln_ in Visual C++ 2010 IDE.
+GÉANTLink can be build and debugged opening _GEANTLink.sln_ in Visual C++ 2010 IDE.
 
 Before one can attempt to debug EAP DLLs, you should run `nmake register` from an elevated command prompt. See _Building in command line_ chapter below.
 
@@ -102,7 +102,7 @@ Next, one must configure a network profile actually using GÉANTLink for the aut
 GÉANTLink EAP modules are divided into two DLLs: backend (i.e. _EAPTTLS.dll_) and GUI (i.e. _EAPTTLSUI.dll_).
 
 ##### Backend DLL
-The backend DLL is loaded by _Eap3Host.exe_ process when connecting to the network. One approach to debug the module is to start Visual C++ elevated, open _VS10Solution.sln_, and attach to the running _Eap3Host.exe_ process.
+The backend DLL is loaded by _Eap3Host.exe_ process when connecting to the network. One approach to debug the module is to start Visual C++ elevated, open _GEANTLink.sln_, and attach to the running _Eap3Host.exe_ process.
 
 On initial connection attempt _Eap3Host.exe_ will load the DLL and will not release it until _EapHost_ service is restarted. To release our DLL (i.e. for rebuild) you have to restart _EapHost_ service manually or run `nmake register` again.
 
