@@ -193,7 +193,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
                     log_event(&EAPMETHOD_TRACE_EVT_CRED_NO_METHOD, event_data(target_name), event_data::blank);
                     continue;
                 }
-                config_method_ttls *cfg_method = dynamic_cast<config_method_ttls*>(cfg_prov->m_methods.front().get());
+                cfg_method = dynamic_cast<config_method_ttls*>(cfg_prov->m_methods.front().get());
                 assert(cfg_method);
 
                 // Prepare new set of credentials for given provider.

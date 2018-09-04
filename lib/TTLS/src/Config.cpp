@@ -1,5 +1,5 @@
 ﻿/*
-    Copyright 2015-2016 Amebis
+    Copyright 2015-2018 Amebis
     Copyright 2016 GÉANT
 
     This file is part of GÉANTLink.
@@ -92,15 +92,17 @@ void eap::config_method_ttls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode 
 
     HRESULT hr;
 
-    // <ClientSideCredential>
-    com_obj<IXMLDOMElement> pXmlElClientSideCredential;
-    if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:ClientSideCredential"), bstr(L"ClientSideCredential"), namespace_eapmetadata, pXmlElClientSideCredential)))
-        throw com_runtime_error(hr, __FUNCTION__ " Error creating <ClientSideCredential> element.");
+    {
+        // <ClientSideCredential>
+        com_obj<IXMLDOMElement> pXmlElClientSideCredential;
+        if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:ClientSideCredential"), bstr(L"ClientSideCredential"), namespace_eapmetadata, pXmlElClientSideCredential)))
+            throw com_runtime_error(hr, __FUNCTION__ " Error creating <ClientSideCredential> element.");
 
-    // <ClientSideCredential>/<AnonymousIdentity>
-    if (!m_anonymous_identity.empty())
-        if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElClientSideCredential, bstr(L"AnonymousIdentity"), namespace_eapmetadata, bstr(m_anonymous_identity))))
-            throw com_runtime_error(hr, __FUNCTION__ " Error creating <AnonymousIdentity> element.");
+        // <ClientSideCredential>/<AnonymousIdentity>
+        if (!m_anonymous_identity.empty())
+            if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElClientSideCredential, bstr(L"AnonymousIdentity"), namespace_eapmetadata, bstr(m_anonymous_identity))))
+                throw com_runtime_error(hr, __FUNCTION__ " Error creating <AnonymousIdentity> element.");
+    }
 
     // <InnerAuthenticationMethod>
     com_obj<IXMLDOMElement> pXmlElInnerAuthenticationMethod;
@@ -165,8 +167,8 @@ void eap::config_method_ttls::load(_In_ IXMLDOMNode *pConfigRoot)
                     }
                 } else {
                     // Nonexisting <ClientSideCredential> means: use blank configured credentials.
-                    com_obj<IXMLDOMElement> pXmlElClientCertificate;
-                    hr = eapxml::create_element(pDoc, pXmlElClientSideCredential, bstr(L"eap-metadata:ClientCertificate"), bstr(L"ClientCertificate"), namespace_eapmetadata, pXmlElClientCertificate);
+                    com_obj<IXMLDOMElement> pXmlElClientCertificate_blank;
+                    hr = eapxml::create_element(pDoc, pXmlElClientSideCredential, bstr(L"eap-metadata:ClientCertificate"), bstr(L"ClientCertificate"), namespace_eapmetadata, pXmlElClientCertificate_blank);
                 }
             }
         }
@@ -178,14 +180,16 @@ void eap::config_method_ttls::load(_In_ IXMLDOMNode *pConfigRoot)
 
     m_anonymous_identity.clear();
 
-    // <ClientSideCredential>
-    com_obj<IXMLDOMElement> pXmlElClientSideCredential;
-    if (SUCCEEDED(eapxml::select_element(pConfigRoot, bstr(L"eap-metadata:ClientSideCredential"), pXmlElClientSideCredential))) {
-        wstring xpathClientSideCredential(xpath + L"/ClientSideCredential");
+    {
+        // <ClientSideCredential>
+        com_obj<IXMLDOMElement> pXmlElClientSideCredential;
+        if (SUCCEEDED(eapxml::select_element(pConfigRoot, bstr(L"eap-metadata:ClientSideCredential"), pXmlElClientSideCredential))) {
+            wstring xpathClientSideCredential(xpath + L"/ClientSideCredential");
 
-        // <AnonymousIdentity>
-        eapxml::get_element_value(pXmlElClientSideCredential, bstr(L"eap-metadata:AnonymousIdentity"), m_anonymous_identity);
-        m_module.log_config((xpathClientSideCredential + L"/AnonymousIdentity").c_str(), m_anonymous_identity.c_str());
+            // <AnonymousIdentity>
+            eapxml::get_element_value(pXmlElClientSideCredential, bstr(L"eap-metadata:AnonymousIdentity"), m_anonymous_identity);
+            m_module.log_config((xpathClientSideCredential + L"/AnonymousIdentity").c_str(), m_anonymous_identity.c_str());
+        }
     }
 
     // <InnerAuthenticationMethod>
