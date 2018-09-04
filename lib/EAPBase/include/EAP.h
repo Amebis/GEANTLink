@@ -513,6 +513,16 @@ namespace eap
         ///
         /// Moves the BLOB
         ///
+        /// \param[inout] other  BLOB to move from
+        ///
+        inline sanitizing_blob_f(_Inout_ sanitizing_blob_f<N> &&other)
+        {
+            memcpy(data, other.data, N);
+        }
+
+        ///
+        /// Moves the BLOB
+        ///
         /// \param[inout] other  Zero-initialized BLOB to move from
         ///
         inline sanitizing_blob_f(_Inout_ sanitizing_blob_zf<N> &&other)
@@ -546,7 +556,21 @@ namespace eap
         ///
         /// Moves the BLOB
         ///
-        /// \param[inout] other  Zero-initialized BLOB to copy from
+        /// \param[inout] other  BLOB to move from
+        ///
+        /// \returns Reference to this object
+        ///
+        inline sanitizing_blob_f& operator=(_Inout_ sanitizing_blob_f<N> &&other)
+        {
+            if (this != std::addressof(other))
+                memcpy(data, other.data, N);
+            return *this;
+        }
+
+        ///
+        /// Moves the BLOB
+        ///
+        /// \param[inout] other  Zero-initialized BLOB to move from
         ///
         /// \returns Reference to this object
         ///
@@ -626,9 +650,9 @@ namespace eap
         ///
         /// Copies a BLOB
         ///
-        /// \param[in] other  BLOB to copy from
+        /// \param[in] other  Zero-initialized BLOB to copy from
         ///
-        inline sanitizing_blob_zf(_In_ const sanitizing_blob_f<N> &other) :
+        inline sanitizing_blob_zf(_In_ const sanitizing_blob_zf<N> &other) :
             sanitizing_blob_f<N>(other)
         {
         }
@@ -641,6 +665,85 @@ namespace eap
         inline sanitizing_blob_zf(_Inout_ sanitizing_blob_zf<N> &&other) :
             sanitizing_blob_f<N>(std::move(other))
         {
+            memset(other.data, 0, N);
+        }
+
+        ///
+        /// Copies a BLOB
+        ///
+        /// \param[in] other  BLOB to copy from
+        ///
+        inline sanitizing_blob_zf(_In_ const sanitizing_blob_f<N> &other) :
+            sanitizing_blob_f<N>(other)
+        {
+        }
+
+        ///
+        /// Moves the BLOB
+        ///
+        /// \param[inout] other  BLOB to move from
+        ///
+        inline sanitizing_blob_zf(_Inout_ sanitizing_blob_f<N> &&other) :
+            sanitizing_blob_f<N>(std::move(other))
+        {
+        }
+
+        ///
+        /// Copies a BLOB
+        ///
+        /// \param[in] other  Zero-initialized BLOB to copy from
+        ///
+        /// \returns Reference to this object
+        ///
+        inline sanitizing_blob_zf& operator=(_In_ const sanitizing_blob_zf<N> &other)
+        {
+            if (this != std::addressof(other))
+                memcpy(data, other.data, N);
+            return *this;
+        }
+
+        ///
+        /// Moves the BLOB
+        ///
+        /// \param[inout] other  Zero-initialized BLOB to move from
+        ///
+        /// \returns Reference to this object
+        ///
+        inline sanitizing_blob_zf& operator=(_Inout_ sanitizing_blob_zf<N> &&other)
+        {
+            if (this != std::addressof(other)) {
+                memcpy(data, other.data, N);
+                memset(other.data, 0, N);
+            }
+            return *this;
+        }
+
+        ///
+        /// Copies a BLOB
+        ///
+        /// \param[in] other  BLOB to copy from
+        ///
+        /// \returns Reference to this object
+        ///
+        inline sanitizing_blob_zf& operator=(_In_ const sanitizing_blob_f<N> &other)
+        {
+            if (this != std::addressof(other))
+                memcpy(data, other.data, N);
+            return *this;
+        }
+
+        ///
+        /// Moves the BLOB
+        ///
+        /// \param[inout] other  BLOB to move from
+        ///
+        /// \returns Reference to this object
+        ///
+        inline sanitizing_blob_zf& operator=(_Inout_ sanitizing_blob_f<N> &&other)
+        {
+            if (this != std::addressof(other))
+                memcpy(data, other.data, N);
+            return *this;
         }
     };
 #pragma pack(pop)
