@@ -1,5 +1,5 @@
 ﻿/*
-    Copyright 2015-2016 Amebis
+    Copyright 2015-2018 Amebis
     Copyright 2016 GÉANT
 
     This file is part of GÉANTLink.
@@ -651,7 +651,7 @@ namespace eap
     ///
     /// Sanitizing BLOB of fixed size
     ///
-    template<size_t N> struct WINSTD_NOVTABLE sanitizing_blob_f<N>
+    template<size_t N> struct WINSTD_NOVTABLE sanitizing_blob_f
     {
         unsigned char data[N]; ///< BLOB data
 
@@ -778,7 +778,7 @@ namespace eap
     ///
     /// Sanitizing BLOB of fixed size (zero initialized)
     ///
-    template<size_t N> struct WINSTD_NOVTABLE sanitizing_blob_zf<N> : sanitizing_blob_f<N>
+    template<size_t N> struct WINSTD_NOVTABLE sanitizing_blob_zf : sanitizing_blob_f<N>
     {
         ///
         /// Constructor
