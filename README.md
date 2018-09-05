@@ -47,7 +47,7 @@ Binaries are available for download [here](https://github.com/Amebis/GEANTLink/r
 
 ### Building Environment Requirements
 - Microsoft Windows Vista or later
-- Microsoft Visual Studio 2010 SP1
+- Microsoft Visual Studio 2017
 - _msgfmt.exe_ from [gettext](https://www.gnu.org/software/gettext/);
   Hint: [Poedit](https://poedit.net/) contains up-to-date binary Win32 compiled gettext-utilities. Install it and add `GettextTools\bin` folder to the system path.
 - _sed.exe_ and _grep.exe_
@@ -57,16 +57,16 @@ Binaries are available for download [here](https://github.com/Amebis/GEANTLink/r
 GÉANTLink is using wxWidgets v3.1.1 static libraries. Unfortunately, only dynamic libraries (DLL) variant is available as a binary download. Therefore static libraries needs to be compiled from [source](https://github.com/wxWidgets/wxWidgets).
 
 #### Compiling wxWidgets Win32 static libraries
-1. Start _Visual Studio Command Prompt (2010)_
+1. Start _x86 Native Tools Command Prompt for VS 2017_
 2. Change working folder to `build\msw`
-3. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 COMPILER_VERSION=100`
-4. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 COMPILER_VERSION=100 BUILD=release`
+3. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 COMPILER_VERSION=141`
+4. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 COMPILER_VERSION=141 BUILD=release`
 
 #### Compiling wxWidgets x64 static libraries
-1. Start _Visual Studio x64 Cross Tools Command Prompt (2010)_
+1. Start _x64 Native Tools Command Prompt for VS 2017_
 2. Change working folder to `build\msw`
-3. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 COMPILER_VERSION=100 TARGET_CPU=X64`
-4. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 COMPILER_VERSION=100 TARGET_CPU=X64 BUILD=release`
+3. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 COMPILER_VERSION=141 TARGET_CPU=X64`
+4. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 COMPILER_VERSION=141 TARGET_CPU=X64 BUILD=release`
 
 #### Specifying wxWidgets path
 GÉANTLink compilation references wxWidgets libraries using `WXWIN` environment variable. Please set it to wxWidgets folder (i.e. `C:\SDK\wxWidgets\3.1.1`).
@@ -89,7 +89,7 @@ GÉANTLink has some submodules. When cloning Git repository, make sure to use `-
 
 After clone is complete, grant _Users_ local group read and execute permissions to `output` subfolder (when working folder is private). This allows _EapHost_ service to load GÉANTLink's DLL, and Event Viewer to display GÉANTLink events.
 
-GÉANTLink can be build and debugged opening _GEANTLink.sln_ in Visual C++ 2010 IDE.
+GÉANTLink can be build and debugged opening _GEANTLink.sln_ in Visual C++ IDE.
 
 Before one can attempt to debug EAP DLLs, you should run `nmake register` from an elevated command prompt. See _Building in command line_ chapter below.
 
@@ -112,7 +112,7 @@ A few seconds after desired function call has finished, _DllHost.exe_ terminates
 To debug early life of our GUI DLL, uncomment `Sleep(10000)` in `DllMain()` of the module, and set breakpoints. This should give you plenty of time to attach the debugger to _DllHost.exe_ process before our DLL starts.
 
 #### Building in command line
-Use of standard command prompt is recommended, providing that Microsoft Visual Studio 2010 folders containing _nmake.exe_ and _devenv.com_ are added to the system path.
+Open _x64 Native Tools Command Prompt for VS 2017_ for building.
 
 Use Microsoft NMAKE to build the project.
 
