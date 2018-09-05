@@ -92,15 +92,17 @@ void eap::config_method_ttls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode 
 
     HRESULT hr;
 
-    // <ClientSideCredential>
-    com_obj<IXMLDOMElement> pXmlElClientSideCredential;
-    if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:ClientSideCredential"), bstr(L"ClientSideCredential"), namespace_eapmetadata, pXmlElClientSideCredential)))
-        throw com_runtime_error(hr, __FUNCTION__ " Error creating <ClientSideCredential> element.");
+    {
+        // <ClientSideCredential>
+        com_obj<IXMLDOMElement> pXmlElClientSideCredential;
+        if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:ClientSideCredential"), bstr(L"ClientSideCredential"), namespace_eapmetadata, pXmlElClientSideCredential)))
+            throw com_runtime_error(hr, __FUNCTION__ " Error creating <ClientSideCredential> element.");
 
-    // <ClientSideCredential>/<AnonymousIdentity>
-    if (!m_anonymous_identity.empty())
-        if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElClientSideCredential, bstr(L"AnonymousIdentity"), namespace_eapmetadata, bstr(m_anonymous_identity))))
-            throw com_runtime_error(hr, __FUNCTION__ " Error creating <AnonymousIdentity> element.");
+        // <ClientSideCredential>/<AnonymousIdentity>
+        if (!m_anonymous_identity.empty())
+            if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElClientSideCredential, bstr(L"AnonymousIdentity"), namespace_eapmetadata, bstr(m_anonymous_identity))))
+                throw com_runtime_error(hr, __FUNCTION__ " Error creating <AnonymousIdentity> element.");
+    }
 
     // <InnerAuthenticationMethod>
     com_obj<IXMLDOMElement> pXmlElInnerAuthenticationMethod;
@@ -121,19 +123,24 @@ void eap::config_method_ttls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode 
     // <InnerAuthenticationMethod>/...
     m_inner->save(pDoc, pXmlElInnerAuthenticationMethod);
 
-    // Fix 1: Configured outer credentials in draft-winter-opsawg-eap-metadata has some bizarre presence/absence/blank logic for EAP-TTLS methods only.
-    // To keep our code clean, we do some post-processing, to make draft compliant XML on output, while keeping things simple on the inside.
-    if (m_use_cred && m_cred->empty()) {
-        // For empty configured client certificate <ClientCertificate/> must not be present.
-        com_obj<IXMLDOMNode> pXmlElClientCertificate;
-        if (SUCCEEDED(hr = eapxml::select_node(pXmlElClientSideCredential, bstr(L"eap-metadata:ClientCertificate"), pXmlElClientCertificate))) {
-            com_obj<IXMLDOMNode> pXmlElClientCertificateOld;
-            hr = pXmlElClientSideCredential->removeChild(pXmlElClientCertificate, &pXmlElClientCertificateOld);
+    {
+        com_obj<IXMLDOMNode> pXmlElClientSideCredential;
+        if (SUCCEEDED(hr = eapxml::select_node(pConfigRoot, bstr(L"eap-metadata:ClientSideCredential"), pXmlElClientSideCredential))) {
+            // Fix 1: Configured outer credentials in draft-winter-opsawg-eap-metadata has some bizarre presence/absence/blank logic for EAP-TTLS methods only.
+            // To keep our code clean, we do some post-processing, to make draft compliant XML on output, while keeping things simple on the inside.
+            if (m_use_cred && m_cred->empty()) {
+                // For empty configured client certificate <ClientCertificate/> must not be present.
+                com_obj<IXMLDOMNode> pXmlElClientCertificate;
+                if (SUCCEEDED(hr = eapxml::select_node(pXmlElClientSideCredential, bstr(L"eap-metadata:ClientCertificate"), pXmlElClientCertificate))) {
+                    com_obj<IXMLDOMNode> pXmlElClientCertificateOld;
+                    hr = pXmlElClientSideCredential->removeChild(pXmlElClientCertificate, &pXmlElClientCertificateOld);
+                }
+            } else if (!m_use_cred) {
+                // When not using configured client certificate (user must supply one), add empty <ClientCertificate/>.
+                com_obj<IXMLDOMElement> pXmlElClientCertificate;
+                hr = eapxml::create_element(pDoc, pXmlElClientSideCredential, bstr(L"eap-metadata:ClientCertificate"), bstr(L"ClientCertificate"), namespace_eapmetadata, pXmlElClientCertificate);
+            }
         }
-    } else if (!m_use_cred) {
-        // When not using configured client certificate (user must supply one), add empty <ClientCertificate/>.
-        com_obj<IXMLDOMElement> pXmlElClientCertificate;
-        hr = eapxml::create_element(pDoc, pXmlElClientSideCredential, bstr(L"eap-metadata:ClientCertificate"), bstr(L"ClientCertificate"), namespace_eapmetadata, pXmlElClientCertificate);
     }
 }
 
@@ -173,14 +180,16 @@ void eap::config_method_ttls::load(_In_ IXMLDOMNode *pConfigRoot)
 
     m_anonymous_identity.clear();
 
-    // <ClientSideCredential>
-    com_obj<IXMLDOMElement> pXmlElClientSideCredential;
-    if (SUCCEEDED(eapxml::select_element(pConfigRoot, bstr(L"eap-metadata:ClientSideCredential"), pXmlElClientSideCredential))) {
-        wstring xpathClientSideCredential(xpath + L"/ClientSideCredential");
+    {
+        // <ClientSideCredential>
+        com_obj<IXMLDOMElement> pXmlElClientSideCredential;
+        if (SUCCEEDED(eapxml::select_element(pConfigRoot, bstr(L"eap-metadata:ClientSideCredential"), pXmlElClientSideCredential))) {
+            wstring xpathClientSideCredential(xpath + L"/ClientSideCredential");
 
-        // <AnonymousIdentity>
-        eapxml::get_element_value(pXmlElClientSideCredential, bstr(L"eap-metadata:AnonymousIdentity"), m_anonymous_identity);
-        m_module.log_config((xpathClientSideCredential + L"/AnonymousIdentity").c_str(), m_anonymous_identity.c_str());
+            // <AnonymousIdentity>
+            eapxml::get_element_value(pXmlElClientSideCredential, bstr(L"eap-metadata:AnonymousIdentity"), m_anonymous_identity);
+            m_module.log_config((xpathClientSideCredential + L"/AnonymousIdentity").c_str(), m_anonymous_identity.c_str());
+        }
     }
 
     // <InnerAuthenticationMethod>
