@@ -1,5 +1,5 @@
 ﻿/*
-    Copyright 2015-2016 Amebis
+    Copyright 2015-2018 Amebis
     Copyright 2016 GÉANT
 
     This file is part of GÉANTLink.
@@ -283,16 +283,17 @@ eap::credentials::source_t eap::credentials_eaphost::combine(
         src != source_unknown ? (DWORD)m_cred_blob.size() : 0, src != source_unknown ? m_cred_blob.data() : NULL,
         hTokenImpersonateUser,
         &fInvokeUI,
-        &cred_data_size, &cred_data._Myptr,
-        &identity._Myptr,
-        &error._Myptr,
+        &cred_data_size, get_ptr(cred_data),
+        get_ptr(identity),
+        get_ptr(error),
         NULL);
     if (dwResult == ERROR_SUCCESS) {
         if (identity && !fInvokeUI) {
             // Inner EAP method provided identity and does not require additional UI prompt.
             m_identity = identity.get();
-            m_cred_blob.assign(cred_data.get(), cred_data.get() + cred_data_size);
-            SecureZeroMemory(cred_data.get(), cred_data_size);
+            BYTE *_cred_data = cred_data.get();
+            m_cred_blob.assign(_cred_data, _cred_data + cred_data_size);
+            SecureZeroMemory(_cred_data, cred_data_size);
             m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_EAPHOST, event_data((unsigned int)cfg.get_method_id()), event_data(get_name()), event_data(pszTargetName), event_data::blank);
             return source_lower;
         } else

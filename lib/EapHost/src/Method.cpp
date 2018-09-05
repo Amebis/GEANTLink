@@ -1,5 +1,5 @@
 ﻿/*
-    Copyright 2015-2016 Amebis
+    Copyright 2015-2018 Amebis
     Copyright 2016 GÉANT
 
     This file is part of GÉANTLink.
@@ -86,7 +86,7 @@ void eap::method_eaphost::begin_session(
         dwMaxSendPacketSize,
         NULL, NULL, NULL,
         &m_session_id,
-        &error._Myptr);
+        get_ptr(error));
     if (dwResult == ERROR_SUCCESS) {
         // Session succesfully created.
     } else if (error)
@@ -100,7 +100,7 @@ void eap::method_eaphost::end_session()
 {
     // End EapHost peer session.
     eap_error_runtime error;
-    DWORD dwResult = EapHostPeerEndSession(m_session_id, &error._Myptr);
+    DWORD dwResult = EapHostPeerEndSession(m_session_id, get_ptr(error));
     if (dwResult == ERROR_SUCCESS) {
         // Session successfuly ended.
     } else if (error)
@@ -126,7 +126,7 @@ EapPeerMethodResponseAction eap::method_eaphost::process_request_packet(
         dwReceivedPacketSize,
         reinterpret_cast<const BYTE*>(pReceivedPacket),
         &action,
-        &error._Myptr);
+        get_ptr(error));
     if (dwResult == ERROR_SUCCESS) {
         // Packet successfuly processed.
         return action_h2p(action);
@@ -147,11 +147,12 @@ void eap::method_eaphost::get_response_packet(
     DWORD dwResult = EapHostPeerGetSendPacket(
         m_session_id,
         &size_max,
-        &_packet._Myptr,
-        &error._Myptr);
+        get_ptr(_packet),
+        get_ptr(error));
     if (dwResult == ERROR_SUCCESS) {
         // Packet successfuly prepared.
-        packet.assign(_packet.get(), _packet.get() + size_max);
+        const BYTE *__packet = _packet.get();
+        packet.assign(__packet, __packet + size_max);
     } else if (error)
         throw eap_runtime_error(*error  , __FUNCTION__ " EapHostPeerGetSendPacket failed.");
     else
@@ -170,7 +171,7 @@ void eap::method_eaphost::get_result(
         m_session_id,
         EapHostPeerMethodResultFromMethod,
         &result,
-        &error._Myptr);
+        get_ptr(error));
     if (dwResult == ERROR_SUCCESS) {
         // Result successfuly returned.
         method::get_result(reason, pResult);
@@ -219,7 +220,7 @@ void eap::method_eaphost::get_ui_context(_Out_ sanitizing_blob &context_data)
         m_session_id,
         &dwUIContextDataSize,
         &pUIContextData,
-        &error._Myptr);
+        get_ptr(error));
     if (dwResult == ERROR_SUCCESS) {
         // UI context data successfuly returned.
         context_data.assign(pUIContextData, pUIContextData + dwUIContextDataSize);
@@ -245,7 +246,7 @@ EapPeerMethodResponseAction eap::method_eaphost::set_ui_context(
         dwUIContextDataSize,
         pUIContextData,
         &action,
-        &error._Myptr);
+        get_ptr(error));
     if (dwResult == ERROR_SUCCESS) {
         // UI context data successfuly returned.
         return action_h2p(action);
@@ -263,7 +264,7 @@ void eap::method_eaphost::get_response_attributes(_Inout_ EapAttributes *pAttrib
     DWORD dwResult = EapHostPeerGetResponseAttributes(
         m_session_id,
         pAttribs,
-        &error._Myptr);
+        get_ptr(error));
     if (dwResult == ERROR_SUCCESS) {
         // Response attributes successfuly returned.
     } else if (error)
@@ -282,7 +283,7 @@ EapPeerMethodResponseAction eap::method_eaphost::set_response_attributes(_In_ co
         m_session_id,
         pAttribs,
         &action,
-        &error._Myptr);
+        get_ptr(error));
     if (dwResult == ERROR_SUCCESS) {
         // Response attributes successfuly set.
         return action_h2p(action);
