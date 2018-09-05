@@ -1,5 +1,5 @@
 ﻿/*
-    Copyright 2015-2016 Amebis
+    Copyright 2015-2018 Amebis
     Copyright 2016 GÉANT
 
     This file is part of GÉANTLink.
@@ -338,16 +338,17 @@ void eap::peer_ttls_ui::invoke_identity_ui(
                                 hwndParent,
                                 (DWORD)cfg_inner_eaphost->m_cfg_blob.size(), cfg_inner_eaphost->m_cfg_blob.data(),
                                 (DWORD)cred_inner->m_cred_blob.size(), cred_inner->m_cred_blob.data(),
-                                &cred_data_size, &cred_data._Myptr,
-                                &identity._Myptr,
-                                &error._Myptr,
+                                &cred_data_size, get_ptr(cred_data),
+                                get_ptr(identity),
+                                get_ptr(error),
                                 NULL);
                             result = dwResult == ERROR_SUCCESS ? wxID_OK : wxID_CANCEL;
                             if (dwResult == ERROR_SUCCESS) {
                                 // Inner EAP method provided credentials.
                                 cred_inner->m_identity = identity.get();
-                                cred_inner->m_cred_blob.assign(cred_data.get(), cred_data.get() + cred_data_size);
-                                SecureZeroMemory(cred_data.get(), cred_data_size);
+                                BYTE *_cred_data = cred_data.get();
+                                cred_inner->m_cred_blob.assign(_cred_data, _cred_data + cred_data_size);
+                                SecureZeroMemory(_cred_data, cred_data_size);
 
                                 // TODO: If we ever choose to store EapHost credentials to Windows Credential Manager, add a "Save credentials? Yes/No" prompt here and write them to Credential Manager.
                             } else if (dwResult == ERROR_CANCELLED) {

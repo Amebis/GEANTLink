@@ -1,5 +1,5 @@
 ﻿/*
-    Copyright 2015-2016 Amebis
+    Copyright 2015-2018 Amebis
     Copyright 2016 GÉANT
 
     This file is part of GÉANTLink.
@@ -51,7 +51,7 @@ wxEapHostMethodConfigPanel::wxEapHostMethodConfigPanel(const eap::config_provide
 
     winstd::eap_method_info_array methods;
     winstd::eap_error error;
-    DWORD dwResult = EapHostPeerGetMethods(&methods, &error._Myptr);
+    DWORD dwResult = EapHostPeerGetMethods(&methods, get_ptr(error));
     if (dwResult == ERROR_SUCCESS) {
         for (DWORD i = 0; i < methods.dwNumberOfMethods; i++)
             m_method->Append(methods.pEapMethods[i].pwszFriendlyName, new wxEAPMethodTypeClientData(methods.pEapMethods[i].eaptype, methods.pEapMethods[i].eapProperties));
@@ -126,7 +126,7 @@ void wxEapHostMethodConfigPanel::OnSettings(wxCommandEvent& event)
         DWORD cfg_data_size = 0;
         winstd::eap_blob cfg_data;
         winstd::eap_error error;
-        DWORD dwResult = EapHostPeerInvokeConfigUI(GetHWND(), 0, data->m_type, (DWORD)data->m_cfg_blob.size(), data->m_cfg_blob.data(), &cfg_data_size, &cfg_data._Myptr, &error._Myptr);
+        DWORD dwResult = EapHostPeerInvokeConfigUI(GetHWND(), 0, data->m_type, (DWORD)data->m_cfg_blob.size(), data->m_cfg_blob.data(), &cfg_data_size, get_ptr(cfg_data), get_ptr(error));
         if (dwResult == ERROR_SUCCESS) {
             const BYTE *_cfg_data = cfg_data.get();
             data->m_cfg_blob.assign(_cfg_data, _cfg_data + cfg_data_size);
