@@ -28,7 +28,7 @@ Suite of EAP supplicants for Microsoft Windows - IEEE 802.1X clients for enterpr
 - Lockable network profile configuration
 
 ### Deployment
-- Released as multi-lingual 32 and 64-bit MSI packages; Group Policy deployment supported
+- Released as multi-lingual x86, x64, and ARM64 MSI packages; Group Policy deployment supported
 - [MsiUseFeature utility](https://github.com/Amebis/GEANTLink/tree/ver1.0/MsiUseFeature) for GÉANTLink install state testing (for embedding GÉANTLink into other setup packages)
 - [CredWrite utility](https://github.com/Amebis/GEANTLink/tree/ver1.0/CredWrite) for automated user credential import to Credential Manager
 - [WLANManager utility](https://github.com/Amebis/GEANTLink/tree/ver1.0/WLANManager) to allow network profile configuration dialog shortcuts
@@ -36,6 +36,9 @@ Suite of EAP supplicants for Microsoft Windows - IEEE 802.1X clients for enterpr
 ### Supported operating systems
 - Windows Vista, Windows Server 2008
 - Windows 7, Windows Server 2008 R2
+- Windows 8 Desktop, Windows Server 2012
+- Windows 8.1 Desktop, Windows Server 2012 R2
+- Windows 10 Desktop, Windows Server 2016
 
 ## Download
 Binaries are available for download [here](https://github.com/Amebis/GEANTLink/releases).
@@ -51,9 +54,9 @@ Binaries are available for download [here](https://github.com/Amebis/GEANTLink/r
 - _MsiDb.Exe_ and other command line utilities for MSI packaging distributed as a part of Microsoft Windows SDK (installed with Visual Studio). Add SDK's `Bin` folder to the system path.
 
 ### wxWidgets
-GÉANTLink is using wxWidgets v3.1.1 static libraries. Unfortunately, only dynamic libraries (DLL) variant is available as a binary download. Therefore static libraries needs to be compiled from [source](https://github.com/wxWidgets/wxWidgets).
+GÉANTLink is using wxWidgets static libraries. Since upstream wxWidgets libraries don't support ARM64 yet, a clone with ARM64 support was prepared at [GitHub](https://github.com/Amebis/wxWidgets.git).
 
-#### Compiling wxWidgets Win32 static libraries
+#### Compiling wxWidgets x86 static libraries
 1. Start _x86 Native Tools Command Prompt for VS 2017_
 2. Change working folder to `build\msw`
 3. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 COMPILER_VERSION=141`
@@ -65,8 +68,15 @@ GÉANTLink is using wxWidgets v3.1.1 static libraries. Unfortunately, only dynam
 3. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 COMPILER_VERSION=141 TARGET_CPU=X64`
 4. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 COMPILER_VERSION=141 TARGET_CPU=X64 BUILD=release`
 
+#### Compiling wxWidgets ARM64 static libraries
+1. Start command prompt
+2. Change working folder to `build\msw`
+3. Run: `"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsamd64_arm64.bat"`
+3. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 COMPILER_VERSION=141 TARGET_CPU=ARM64 USE_OPENGL=0`
+4. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 COMPILER_VERSION=141 TARGET_CPU=ARM64 USE_OPENGL=0 BUILD=release`
+
 #### Specifying wxWidgets path
-GÉANTLink compilation references wxWidgets libraries using `WXWIN` environment variable. Please set it to wxWidgets folder (i.e. `C:\SDK\wxWidgets\3.1.1`).
+GÉANTLink compilation references wxWidgets libraries using `WXWIN` environment variable. Please set it to wxWidgets folder (i.e. `C:\SDK\wxWidgets`).
 
 ### Digital Signing of Build Outputs
 In order to have the build process digitally sign output files, one should provide the following:

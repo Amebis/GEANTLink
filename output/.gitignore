@@ -1,4 +1,6 @@
 /*.tmp
+/ARM64.Debug
+/ARM64.Release
 /Win32.Debug
 /Win32.Release
 /x64.Debug
