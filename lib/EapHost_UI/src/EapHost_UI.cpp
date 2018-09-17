@@ -152,7 +152,7 @@ wxEapHostConfigPanel::wxEapHostConfigPanel(const eap::config_provider &prov, eap
     sb_content = new wxBoxSizer( wxVERTICAL );
 
     m_method = new wxEapHostMethodConfigPanel(prov, cfg, this);
-    sb_content->Add(m_method, 0, wxEXPAND, 5);
+    sb_content->Add(m_method, 0, wxEXPAND, FromDIP(5));
 
     this->SetSizer(sb_content);
     this->Layout();

@@ -917,7 +917,7 @@ public:
         if (!is_config && !m_cfg.m_use_cred && m_cfg.m_allow_save) {
             m_remember = new wxCheckBox(m_sb_credentials->GetStaticBox(), wxID_ANY, _("&Remember"));
             m_remember->SetHelpText(_("Check if you would like to save credentials"));
-            m_sb_credentials_vert->Add(m_remember, 0, wxALL|wxEXPAND, 5);
+            m_sb_credentials_vert->Add(m_remember, 0, wxALL|wxEXPAND, FromDIP(5));
         } else
             m_remember = NULL;
     }
@@ -980,7 +980,7 @@ public:
         bool layout = false;
         if (!m_prov.m_lbl_alt_credential.empty()) {
             m_credentials_label->SetLabel(m_prov.m_lbl_alt_credential);
-            m_credentials_label->Wrap( 440 );
+            m_credentials_label->Wrap( FromDIP(440) );
             layout = true;
         }
 
