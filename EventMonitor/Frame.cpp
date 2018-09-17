@@ -26,10 +26,10 @@
 //////////////////////////////////////////////////////////////////////////
 
 
-wxEventMonitorFrame::wxEventMonitorFrame(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style, const wxString& name) :
-    wxFrame(parent, id, title, pos, size, style, name)
+wxEventMonitorFrame::wxEventMonitorFrame(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, long style, const wxString& name) :
+    wxFrame(parent, id, title, pos, parent->FromDIP(wxSize(600,400)), style, name)
 {
-    this->SetSizeHints(wxSize(150,150), wxDefaultSize);
+    this->SetSizeHints(FromDIP(wxSize(150,150)), wxDefaultSize);
     m_mgr.SetManagedWindow(this);
     m_mgr.SetFlags(wxAUI_MGR_DEFAULT);
 

@@ -47,6 +47,9 @@
     <POCompile>
       <OutputFile>$(OutDir)..\locale\%(Filename)\$(ProjectName).mo</OutputFile>
     </POCompile>
+    <Manifest>
+      <EnableDpiAwareness>true</EnableDpiAwareness>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup />
 </Project>

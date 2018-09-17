@@ -135,7 +135,7 @@ wxGTCResponsePanel::wxGTCResponsePanel(winstd::sanitizing_wstring &response, con
 
     // Set challenge label.
     m_challenge->SetLabelText(challenge);
-    m_challenge->Wrap(200);
+    m_challenge->Wrap(FromDIP(200));
 
     this->Layout();
 }

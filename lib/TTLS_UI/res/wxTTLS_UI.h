@@ -50,7 +50,7 @@ class wxTTLSConfigPanelBase : public wxPanel
 	
 	public:
 		
-		wxTTLSConfigPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL ); 
+		wxTTLSConfigPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, long style = wxTAB_TRAVERSAL ); 
 		~wxTTLSConfigPanelBase();
 	
 };

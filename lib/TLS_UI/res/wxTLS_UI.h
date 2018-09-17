@@ -63,7 +63,7 @@ class wxTLSServerTrustPanelBase : public wxPanel
 	
 	public:
 		
-		wxTLSServerTrustPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL ); 
+		wxTLSServerTrustPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, long style = wxTAB_TRAVERSAL ); 
 		~wxTLSServerTrustPanelBase();
 	
 };
@@ -90,7 +90,7 @@ class wxTLSCredentialsPanelBase : public wxEAPCredentialsPanelBase
 	
 	public:
 		
-		wxTLSCredentialsPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL ); 
+		wxTLSCredentialsPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, long style = wxTAB_TRAVERSAL ); 
 		~wxTLSCredentialsPanelBase();
 	
 };

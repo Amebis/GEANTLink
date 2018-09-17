@@ -31,7 +31,7 @@ wxPAPConfigPanel::wxPAPConfigPanel(const eap::config_provider &prov, eap::config
     sb_content = new wxBoxSizer( wxVERTICAL );
 
     m_credentials = new wxPAPCredentialsConfigPanel(prov, cfg, this, _("PAP User ID and Password"));
-    sb_content->Add(m_credentials, 0, wxEXPAND, 5);
+    sb_content->Add(m_credentials, 0, wxEXPAND, FromDIP(5));
 
     this->SetSizer(sb_content);
     this->Layout();

@@ -72,7 +72,7 @@ public:
     /// \param[in] style   The window style. See `wxFrame` class description.
     /// \param[in] name    The name of the window. This parameter is used to associate a name with the item, allowing the application user to set Motif resource values for individual windows.
     ///
-    wxEventMonitorFrame(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Event Monitor"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(600,400), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL, const wxString& name = wxT("EventMonitor"));
+    wxEventMonitorFrame(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Event Monitor"), const wxPoint& pos = wxDefaultPosition, long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL, const wxString& name = wxT("EventMonitor"));
 
     ///
     /// Destructor

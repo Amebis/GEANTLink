@@ -49,7 +49,7 @@ class wxEapHostMethodConfigPanelBase : public wxPanel
 	
 	public:
 		
-		wxEapHostMethodConfigPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL ); 
+		wxEapHostMethodConfigPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, long style = wxTAB_TRAVERSAL ); 
 		~wxEapHostMethodConfigPanelBase();
 	
 };

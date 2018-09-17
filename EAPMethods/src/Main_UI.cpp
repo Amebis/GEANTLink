@@ -51,6 +51,11 @@ BOOL WINAPI DllMain(_In_ HINSTANCE hinstDLL, _In_ DWORD fdwReason, _In_ LPVOID l
 #endif
         g_peer.m_instance = hinstDLL;
 
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+        // Declare our DllHost process as DPI-aware.
+        SetProcessDPIAware();
+#endif
+
         // Save current activation context, as proper activation context is set at this time only (LoadLibrary() call).
         GetCurrentActCtx(&g_act_ctx);
     } else if (fdwReason == DLL_PROCESS_DETACH) {

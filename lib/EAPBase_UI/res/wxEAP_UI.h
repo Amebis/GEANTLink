@@ -150,7 +150,7 @@ class wxEAPNotePanelBase : public wxPanel
 	
 	public:
 		
-		wxEAPNotePanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL|wxBORDER_SIMPLE, const wxString& name = wxEmptyString ); 
+		wxEAPNotePanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, long style = wxTAB_TRAVERSAL|wxBORDER_SIMPLE, const wxString& name = wxEmptyString ); 
 		~wxEAPNotePanelBase();
 	
 };
@@ -187,7 +187,7 @@ class wxEAPCredentialsConfigPanelBase : public wxPanel
 	
 	public:
 		
-		wxEAPCredentialsConfigPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxEmptyString ); 
+		wxEAPCredentialsConfigPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, long style = wxTAB_TRAVERSAL, const wxString& name = wxEmptyString ); 
 		~wxEAPCredentialsConfigPanelBase();
 	
 };
@@ -215,7 +215,7 @@ class wxPasswordCredentialsPanelBase : public wxEAPCredentialsPanelBase
 	
 	public:
 		
-		wxPasswordCredentialsPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxEmptyString ); 
+		wxPasswordCredentialsPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, long style = wxTAB_TRAVERSAL, const wxString& name = wxEmptyString ); 
 		~wxPasswordCredentialsPanelBase();
 	
 };
@@ -237,7 +237,7 @@ class wxIdentityCredentialsPanelBase : public wxEAPCredentialsPanelBase
 	
 	public:
 		
-		wxIdentityCredentialsPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxEmptyString ); 
+		wxIdentityCredentialsPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, long style = wxTAB_TRAVERSAL, const wxString& name = wxEmptyString ); 
 		~wxIdentityCredentialsPanelBase();
 	
 };
@@ -265,7 +265,7 @@ class wxEAPProviderContactInfoPanelBase : public wxPanel
 	
 	public:
 		
-		wxEAPProviderContactInfoPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxEmptyString ); 
+		wxEAPProviderContactInfoPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, long style = wxTAB_TRAVERSAL, const wxString& name = wxEmptyString ); 
 		~wxEAPProviderContactInfoPanelBase();
 	
 };
@@ -287,7 +287,7 @@ class wxEAPProviderIDPanelBase : public wxPanel
 	
 	public:
 		
-		wxEAPProviderIDPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxEmptyString ); 
+		wxEAPProviderIDPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, long style = wxTAB_TRAVERSAL, const wxString& name = wxEmptyString ); 
 		~wxEAPProviderIDPanelBase();
 	
 };
@@ -307,7 +307,7 @@ class wxEAPProviderLockPanelBase : public wxPanel
 	
 	public:
 		
-		wxEAPProviderLockPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxEmptyString ); 
+		wxEAPProviderLockPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, long style = wxTAB_TRAVERSAL, const wxString& name = wxEmptyString ); 
 		~wxEAPProviderLockPanelBase();
 	
 };

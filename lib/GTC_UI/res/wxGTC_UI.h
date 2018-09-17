@@ -46,7 +46,7 @@ class wxGTCResponsePanelBase : public wxPanel
 	
 	public:
 		
-		wxGTCResponsePanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL ); 
+		wxGTCResponsePanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, long style = wxTAB_TRAVERSAL ); 
 		~wxGTCResponsePanelBase();
 	
 };
@@ -68,7 +68,7 @@ class wxGTCConfigPanelBase : public wxPanel
 	
 	public:
 		
-		wxGTCConfigPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,-1 ), long style = wxTAB_TRAVERSAL ); 
+		wxGTCConfigPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, long style = wxTAB_TRAVERSAL ); 
 		~wxGTCConfigPanelBase();
 	
 };
