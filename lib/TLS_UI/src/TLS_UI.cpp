@@ -312,10 +312,10 @@ wxTLSConfigPanel::wxTLSConfigPanel(const eap::config_provider &prov, eap::config
     sb_content = new wxBoxSizer( wxVERTICAL );
 
     m_server_trust = new wxTLSServerTrustPanel(prov, cfg, this);
-    sb_content->Add(m_server_trust, 0, wxDOWN|wxEXPAND, 5);
+    sb_content->Add(m_server_trust, 0, wxDOWN|wxEXPAND, FromDIP(5));
 
     m_credentials = new wxTLSCredentialsConfigPanel(prov, cfg, this, _("User Certificate"));
-    sb_content->Add(m_credentials, 0, wxUP|wxEXPAND, 5);
+    sb_content->Add(m_credentials, 0, wxUP|wxEXPAND, FromDIP(5));
 
     this->SetSizer(sb_content);
     this->Layout();

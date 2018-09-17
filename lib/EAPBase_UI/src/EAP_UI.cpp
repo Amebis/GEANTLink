@@ -64,7 +64,7 @@ void wxEAPGeneralDialog::AddContent(wxPanel **contents, size_t content_count)
 {
     if (content_count) {
         for (size_t i = 0; i < content_count; i++)
-            m_panels->Add(contents[i], 0, wxALL|wxEXPAND, 5);
+            m_panels->Add(contents[i], 0, wxALL|wxEXPAND, FromDIP(5));
 
         this->Layout();
         this->GetSizer()->Fit(this);
@@ -172,11 +172,11 @@ void wxEAPNotePanel::CreateContactFields(const eap::config_provider &prov)
     if (!prov.m_help_email.empty() || !prov.m_help_web.empty() || !prov.m_help_phone.empty()) {
         m_provider_notice = new wxStaticText(this, wxID_ANY, wxString::Format(_("For additional help and instructions, please contact %s at:"),
             !prov.m_name.empty() ? prov.m_name.c_str() : _("your provider")), wxDefaultPosition, wxDefaultSize, 0);
-        m_provider_notice->Wrap(449);
-        m_note_vert->Add(m_provider_notice, 0, wxUP|wxLEFT|wxRIGHT|wxEXPAND, 5);
+        m_provider_notice->Wrap(FromDIP(449));
+        m_note_vert->Add(m_provider_notice, 0, wxUP|wxLEFT|wxRIGHT|wxEXPAND, FromDIP(5));
 
         wxFlexGridSizer* sb_contact_tbl;
-        sb_contact_tbl = new wxFlexGridSizer(0, 2, 5, 5);
+        sb_contact_tbl = new wxFlexGridSizer(0, 2, FromDIP(5), FromDIP(5));
         sb_contact_tbl->AddGrowableCol(1);
         sb_contact_tbl->SetFlexibleDirection(wxBOTH);
         sb_contact_tbl->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
@@ -187,36 +187,36 @@ void wxEAPNotePanel::CreateContactFields(const eap::config_provider &prov)
             m_help_web_label = new wxStaticText(this, wxID_ANY, wxT("\xb6"), wxDefaultPosition, wxDefaultSize, 0);
             m_help_web_label->Wrap(-1);
             m_help_web_label->SetFont(font_wingdings);
-            sb_contact_tbl->Add(m_help_web_label, 0, wxEXPAND|wxALIGN_TOP, 5);
+            sb_contact_tbl->Add(m_help_web_label, 0, wxEXPAND|wxALIGN_TOP, FromDIP(5));
 
             m_help_web_value = new wxHyperlinkCtrl(this, wxID_ANY, prov.m_help_web, prov.m_help_web, wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE);
             m_help_web_value->SetToolTip(_("Open the default web browser"));
-            sb_contact_tbl->Add(m_help_web_value, 0, wxEXPAND|wxALIGN_TOP, 5);
+            sb_contact_tbl->Add(m_help_web_value, 0, wxEXPAND|wxALIGN_TOP, FromDIP(5));
         }
 
         if (!prov.m_help_email.empty()) {
             m_help_email_label = new wxStaticText(this, wxID_ANY, wxT("\x2a"), wxDefaultPosition, wxDefaultSize, 0);
             m_help_email_label->Wrap(-1);
             m_help_email_label->SetFont(font_wingdings);
-            sb_contact_tbl->Add(m_help_email_label, 0, wxEXPAND|wxALIGN_TOP, 5);
+            sb_contact_tbl->Add(m_help_email_label, 0, wxEXPAND|wxALIGN_TOP, FromDIP(5));
 
             m_help_email_value = new wxHyperlinkCtrl(this, wxID_ANY, prov.m_help_email, wxString(wxT("mailto:")) + prov.m_help_email, wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE);
             m_help_email_value->SetToolTip(_("Open your e-mail program"));
-            sb_contact_tbl->Add(m_help_email_value, 0, wxEXPAND|wxALIGN_TOP, 5);
+            sb_contact_tbl->Add(m_help_email_value, 0, wxEXPAND|wxALIGN_TOP, FromDIP(5));
         }
 
         if (!prov.m_help_phone.empty()) {
             m_help_phone_label = new wxStaticText(this, wxID_ANY, wxT("\x29"), wxDefaultPosition, wxDefaultSize, 0);
             m_help_phone_label->Wrap(-1);
             m_help_phone_label->SetFont(font_wingdings);
-            sb_contact_tbl->Add(m_help_phone_label, 0, wxEXPAND|wxALIGN_TOP, 5);
+            sb_contact_tbl->Add(m_help_phone_label, 0, wxEXPAND|wxALIGN_TOP, FromDIP(5));
 
             m_help_phone_value = new wxHyperlinkCtrl(this, wxID_ANY, prov.m_help_phone, wxString(wxT("tel:")) + GetPhoneNumber(prov.m_help_phone.c_str()), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE);
             m_help_phone_value->SetToolTip(_("Dial the phone number"));
-            sb_contact_tbl->Add(m_help_phone_value, 0, wxEXPAND|wxALIGN_TOP, 5);
+            sb_contact_tbl->Add(m_help_phone_value, 0, wxEXPAND|wxALIGN_TOP, FromDIP(5));
         }
 
-        m_note_vert->Add(sb_contact_tbl, 0, wxLEFT|wxRIGHT|wxDOWN|wxEXPAND, 5);
+        m_note_vert->Add(sb_contact_tbl, 0, wxLEFT|wxRIGHT|wxDOWN|wxEXPAND, FromDIP(5));
     }
 }
 
@@ -234,7 +234,7 @@ wxEAPProviderLockedPanel::wxEAPProviderLockedPanel(const eap::config_provider &p
 
     m_note_label->SetLabel(wxString::Format(_("%s has pre-set parts of this configuration. Those parts are locked to prevent accidental modification."),
         !prov.m_name.empty() ? prov.m_name.c_str() : _("Your provider")));
-    m_note_label->Wrap(449);
+    m_note_label->Wrap(FromDIP(449));
 
     CreateContactFields(prov);
 
@@ -259,7 +259,7 @@ wxEAPCredentialWarningPanel::wxEAPCredentialWarningPanel(const eap::config_provi
         status == eap::config_method::status_cred_changing ? _("Previous attempt to connect reported your credentials are being changed.") :
                                                              _("Previous attempt to connect failed.")) + " " +
         _("Please, make sure your credentials are correct, or try again later."));
-    m_note_label->Wrap(449);
+    m_note_label->Wrap(FromDIP(449));
 
     CreateContactFields(prov);
 
@@ -281,7 +281,7 @@ wxEAPCredentialLogWarningPanel::wxEAPCredentialLogWarningPanel(wxWindow* parent)
 
     m_note_label->SetLabel(wxString::Format(_("The %s version installed on this computer logs credentials in visible and easy to read way."), wxT(PRODUCT_NAME_STR)) + " " +
         _("Please, reconsider necessity to enter your credentials."));
-    m_note_label->Wrap(449);
+    m_note_label->Wrap(FromDIP(449));
 
     this->Layout();
 }
@@ -297,7 +297,7 @@ wxEAPConfigWindow::wxEAPConfigWindow(eap::config_provider &prov, eap::config_met
     m_cfg(cfg),
     wxScrolledWindow(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxVSCROLL)
 {
-    this->SetScrollRate(5, 5);
+    this->SetScrollRate(FromDIP(5), FromDIP(5));
 
     // Connect Events
     this->Connect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(wxEAPConfigWindow::OnInitDialog));
