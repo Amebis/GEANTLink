@@ -1,3 +1,6 @@
+# Translators:
+# Indrek Rokk <indrek.rokk@eenet.ee>, 2018
+# Anne M <anne@eenet.ee>, 2018
 # 
 #, fuzzy
 msgid ""
@@ -5,12 +8,13 @@ msgstr ""
 "Project-Id-Version: EventMonitor\n"
 "POT-Creation-Date: 2017-02-02 18:14+0100\n"
 "PO-Revision-Date: 2016-08-27 11:21+0000\n"
-"Language-Team: Slovak (Slovakia) (https://www.transifex.com/eduroam_devel/teams/11799/sk_SK/)\n"
+"Last-Translator: Anne M <anne@eenet.ee>, 2018\n"
+"Language-Team: Estonian (https://www.transifex.com/eduroam_devel/teams/11799/et/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: sk_SK\n"
-"Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n == 1 ? 0 : n % 1 == 0 && n >= 2 && n <= 4 ? 1 : n % 1 != 0 ? 2: 3);\n"
+"Language: et\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 1.8.11\n"
 "X-Poedit-Basepath: ../../..\n"
 "X-Poedit-KeywordsList: _\n"
@@ -35,38 +39,38 @@ msgstr ""
 #: ver1.1/EventMonitor/MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
 #: ver1.1/EventMonitor/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
 msgid "Event Monitor"
-msgstr ""
+msgstr "Sündmuste monitor"
 
 #: master/EventMonitor/ETWLog.cpp:83 ver1.0/EventMonitor/ETWLog.cpp:83
 #: ver1.1/EventMonitor/ETWLog.cpp:83
 #, c-format
 msgid "Error opening event trace (error %u)."
-msgstr ""
+msgstr "Viga sündmuse jälitamise avamisel (viga %u)."
 
 #: master/EventMonitor/ETWLog.cpp:171 ver1.0/EventMonitor/ETWLog.cpp:171
 #: ver1.1/EventMonitor/ETWLog.cpp:171
 msgid "Time"
-msgstr ""
+msgstr "Aeg"
 
 #: master/EventMonitor/ETWLog.cpp:172 ver1.0/EventMonitor/ETWLog.cpp:172
 #: ver1.1/EventMonitor/ETWLog.cpp:172
 msgid "PID"
-msgstr ""
+msgstr "PID"
 
 #: master/EventMonitor/ETWLog.cpp:173 ver1.0/EventMonitor/ETWLog.cpp:173
 #: ver1.1/EventMonitor/ETWLog.cpp:173
 msgid "TID"
-msgstr ""
+msgstr "TID"
 
 #: master/EventMonitor/ETWLog.cpp:174 ver1.0/EventMonitor/ETWLog.cpp:174
 #: ver1.1/EventMonitor/ETWLog.cpp:174
 msgid "Source"
-msgstr ""
+msgstr "Allikas"
 
 #: master/EventMonitor/ETWLog.cpp:175 ver1.0/EventMonitor/ETWLog.cpp:175
 #: ver1.1/EventMonitor/ETWLog.cpp:175
 msgid "Event"
-msgstr ""
+msgstr "Sündmus"
 
 #: master/EventMonitor/ETWLog.cpp:232 ver1.0/EventMonitor/ETWLog.cpp:232
 #: ver1.1/EventMonitor/ETWLog.cpp:232
@@ -75,18 +79,22 @@ msgid ""
 "(Run As Administrator) or be a member of Performance Log Users group to "
 "start event tracing session."
 msgstr ""
+"Puudub pääsuluba sündmuse seansi: sündmuse jälitusseansi alustamiseks on Sul"
+" vaja administraatoriõigusi (käivita administraatorina, inglise keeles Run "
+"As Administrator) või kuulumist soorituste logi (Performance Log) kasutajate"
+" gruppi"
 
 #: master/EventMonitor/ETWLog.cpp:235 ver1.0/EventMonitor/ETWLog.cpp:235
 #: ver1.1/EventMonitor/ETWLog.cpp:235
 #, c-format
 msgid "The %s event session already exists."
-msgstr ""
+msgstr "%s sündmuse seanss on juba olemas."
 
 #: master/EventMonitor/ETWLog.cpp:239 ver1.0/EventMonitor/ETWLog.cpp:239
 #: ver1.1/EventMonitor/ETWLog.cpp:239
 #, c-format
 msgid "Error creating event session (error %u)."
-msgstr ""
+msgstr "Viga sündmuse seansi loomisel (viga %u)."
 
 #: master/EventMonitor/ETWLog.cpp:255 master/EventMonitor/ETWLog.cpp:271
 #: master/EventMonitor/ETWLog.cpp:285 ver1.0/EventMonitor/ETWLog.cpp:255
@@ -95,7 +103,7 @@ msgstr ""
 #: ver1.1/EventMonitor/ETWLog.cpp:285
 #, c-format
 msgid "Error enabling %s event provider (error %u)."
-msgstr ""
+msgstr "Viga %s sündmuse looja võimaldamisel (viga %u)."
 
 #: master/EventMonitor/Frame.cpp:48 master/EventMonitor/Frame.cpp:108
 #: master/EventMonitor/Frame.cpp:113 master/EventMonitor/Frame.cpp:168
@@ -107,155 +115,156 @@ msgstr ""
 #: ver1.1/EventMonitor/Frame.cpp:170
 #, c-format
 msgid "Toggles display of %s records"
-msgstr ""
+msgstr "Lülitab %s kirjete näitamise sisse"
 
 #: master/EventMonitor/Frame.cpp:65 ver1.0/EventMonitor/Frame.cpp:65
 #: ver1.1/EventMonitor/Frame.cpp:65
 msgid "E&xit"
-msgstr ""
+msgstr "V&älju"
 
 #: master/EventMonitor/Frame.cpp:65 ver1.0/EventMonitor/Frame.cpp:65
 #: ver1.1/EventMonitor/Frame.cpp:65
 msgid "Quits this program"
-msgstr ""
+msgstr "Lõpetab selle programmi"
 
 #: master/EventMonitor/Frame.cpp:69 ver1.0/EventMonitor/Frame.cpp:69
 #: ver1.1/EventMonitor/Frame.cpp:69
 msgid "&Program"
-msgstr ""
+msgstr "&Programm"
 
 #: master/EventMonitor/Frame.cpp:73 ver1.0/EventMonitor/Frame.cpp:73
 #: ver1.1/EventMonitor/Frame.cpp:73
 msgid "&Copy"
-msgstr ""
+msgstr "&Kopeeri"
 
 #: master/EventMonitor/Frame.cpp:73 master/EventMonitor/Frame.cpp:154
 #: ver1.0/EventMonitor/Frame.cpp:73 ver1.0/EventMonitor/Frame.cpp:154
 #: ver1.1/EventMonitor/Frame.cpp:73 ver1.1/EventMonitor/Frame.cpp:154
 msgid "Copies selected records to clipboard"
-msgstr ""
+msgstr "Kopeerib valitud kirjed lõikelauale"
 
 #: master/EventMonitor/Frame.cpp:78 ver1.0/EventMonitor/Frame.cpp:78
 #: ver1.1/EventMonitor/Frame.cpp:78
 msgid "Copy A&ll"
-msgstr ""
+msgstr "Kopee&ri kõik"
 
 #: master/EventMonitor/Frame.cpp:78 master/EventMonitor/Frame.cpp:156
 #: ver1.0/EventMonitor/Frame.cpp:78 ver1.0/EventMonitor/Frame.cpp:156
 #: ver1.1/EventMonitor/Frame.cpp:78 ver1.1/EventMonitor/Frame.cpp:156
 msgid "Copies all records to clipboard (including hidden)"
-msgstr ""
+msgstr "Kopeerib kõik (sh varjatud) kirjed lõikelauale"
 
 #: master/EventMonitor/Frame.cpp:83 master/EventMonitor/Frame.cpp:158
 #: ver1.0/EventMonitor/Frame.cpp:83 ver1.0/EventMonitor/Frame.cpp:158
 #: ver1.1/EventMonitor/Frame.cpp:83 ver1.1/EventMonitor/Frame.cpp:158
 msgid "Clear"
-msgstr ""
+msgstr "Kustuta"
 
 #: master/EventMonitor/Frame.cpp:83 master/EventMonitor/Frame.cpp:158
 #: ver1.0/EventMonitor/Frame.cpp:83 ver1.0/EventMonitor/Frame.cpp:158
 #: ver1.1/EventMonitor/Frame.cpp:83 ver1.1/EventMonitor/Frame.cpp:158
 msgid "Clears all records from the log"
-msgstr ""
+msgstr "Kustutab logist kõik kirjed"
 
 #: master/EventMonitor/Frame.cpp:90 ver1.0/EventMonitor/Frame.cpp:90
 #: ver1.1/EventMonitor/Frame.cpp:90
 msgid "Select &All"
-msgstr ""
+msgstr "Vali k&õik"
 
 #: master/EventMonitor/Frame.cpp:90 ver1.0/EventMonitor/Frame.cpp:90
 #: ver1.1/EventMonitor/Frame.cpp:90
 msgid "Selects all visible records"
-msgstr ""
+msgstr "Valib kõik nähtavad kirjed"
 
 #: master/EventMonitor/Frame.cpp:94 ver1.0/EventMonitor/Frame.cpp:94
 #: ver1.1/EventMonitor/Frame.cpp:94
 msgid "Select &None"
-msgstr ""
+msgstr "Valiku &nullimine"
 
 #: master/EventMonitor/Frame.cpp:94 ver1.0/EventMonitor/Frame.cpp:94
 #: ver1.1/EventMonitor/Frame.cpp:94
 msgid "Clears record selection"
-msgstr ""
+msgstr "Tühjendab kirjete valiku"
 
 #: master/EventMonitor/Frame.cpp:97 master/EventMonitor/Frame.cpp:142
 #: ver1.0/EventMonitor/Frame.cpp:97 ver1.0/EventMonitor/Frame.cpp:142
 #: ver1.1/EventMonitor/Frame.cpp:97 ver1.1/EventMonitor/Frame.cpp:142
 msgid "&Edit"
-msgstr ""
+msgstr "R&edigeeri"
 
 #: master/EventMonitor/Frame.cpp:101 ver1.0/EventMonitor/Frame.cpp:101
 #: ver1.1/EventMonitor/Frame.cpp:101
 msgid "Auto &Scroll"
-msgstr ""
+msgstr "A&utomaatne kerimine"
 
 #: master/EventMonitor/Frame.cpp:101 master/EventMonitor/Frame.cpp:164
 #: ver1.0/EventMonitor/Frame.cpp:101 ver1.0/EventMonitor/Frame.cpp:164
 #: ver1.1/EventMonitor/Frame.cpp:101 ver1.1/EventMonitor/Frame.cpp:164
 msgid "Automatically scrolls to the most recent records as they come-in"
 msgstr ""
+"Kerib automaatselt kõige värskemate kirjeteni vastavalt nende tekkimisele"
 
 #: master/EventMonitor/Frame.cpp:123 master/EventMonitor/Frame.cpp:176
 #: ver1.0/EventMonitor/Frame.cpp:123 ver1.0/EventMonitor/Frame.cpp:176
 #: ver1.1/EventMonitor/Frame.cpp:123 ver1.1/EventMonitor/Frame.cpp:176
 msgid "Verbose"
-msgstr ""
+msgstr "Pikk tulemus"
 
 #: master/EventMonitor/Frame.cpp:123 master/EventMonitor/Frame.cpp:176
 #: ver1.0/EventMonitor/Frame.cpp:123 ver1.0/EventMonitor/Frame.cpp:176
 #: ver1.1/EventMonitor/Frame.cpp:123 ver1.1/EventMonitor/Frame.cpp:176
 msgid "Displays all levels of records"
-msgstr ""
+msgstr "Kõigi tasemete kirjete kuvamine"
 
 #: master/EventMonitor/Frame.cpp:127 master/EventMonitor/Frame.cpp:178
 #: ver1.0/EventMonitor/Frame.cpp:127 ver1.0/EventMonitor/Frame.cpp:178
 #: ver1.1/EventMonitor/Frame.cpp:127 ver1.1/EventMonitor/Frame.cpp:178
 msgid "Informational"
-msgstr ""
+msgstr "Informatiivne"
 
 #: master/EventMonitor/Frame.cpp:127 master/EventMonitor/Frame.cpp:178
 #: ver1.0/EventMonitor/Frame.cpp:127 ver1.0/EventMonitor/Frame.cpp:178
 #: ver1.1/EventMonitor/Frame.cpp:127 ver1.1/EventMonitor/Frame.cpp:178
 msgid "Displays all records up to informational level"
-msgstr ""
+msgstr "Kirjete kuvamine informatiivse tasemeni"
 
 #: master/EventMonitor/Frame.cpp:131 master/EventMonitor/Frame.cpp:180
 #: ver1.0/EventMonitor/Frame.cpp:131 ver1.0/EventMonitor/Frame.cpp:180
 #: ver1.1/EventMonitor/Frame.cpp:131 ver1.1/EventMonitor/Frame.cpp:180
 msgid "Warning"
-msgstr ""
+msgstr "Hoiatused"
 
 #: master/EventMonitor/Frame.cpp:131 master/EventMonitor/Frame.cpp:180
 #: ver1.0/EventMonitor/Frame.cpp:131 ver1.0/EventMonitor/Frame.cpp:180
 #: ver1.1/EventMonitor/Frame.cpp:131 ver1.1/EventMonitor/Frame.cpp:180
 msgid "Displays all records up to warning level"
-msgstr ""
+msgstr "Kirjete kuvamine hoiatustasemeni"
 
 #: master/EventMonitor/Frame.cpp:135 master/EventMonitor/Frame.cpp:182
 #: ver1.0/EventMonitor/Frame.cpp:135 ver1.0/EventMonitor/Frame.cpp:182
 #: ver1.1/EventMonitor/Frame.cpp:135 ver1.1/EventMonitor/Frame.cpp:182
 msgid "Error"
-msgstr ""
+msgstr "Vead"
 
 #: master/EventMonitor/Frame.cpp:135 master/EventMonitor/Frame.cpp:182
 #: ver1.0/EventMonitor/Frame.cpp:135 ver1.0/EventMonitor/Frame.cpp:182
 #: ver1.1/EventMonitor/Frame.cpp:135 ver1.1/EventMonitor/Frame.cpp:182
 msgid "Displays error level records only"
-msgstr ""
+msgstr "Kirjete kuvamine ainult veatasemel"
 
 #: master/EventMonitor/Frame.cpp:142 master/EventMonitor/Frame.cpp:146
 #: ver1.0/EventMonitor/Frame.cpp:142 ver1.0/EventMonitor/Frame.cpp:146
 #: ver1.1/EventMonitor/Frame.cpp:142 ver1.1/EventMonitor/Frame.cpp:146
 #, c-format
 msgid "%s toolbar"
-msgstr ""
+msgstr "%s tööriistariba"
 
 #: master/EventMonitor/Frame.cpp:142 master/EventMonitor/Frame.cpp:146
 #: ver1.0/EventMonitor/Frame.cpp:142 ver1.0/EventMonitor/Frame.cpp:146
 #: ver1.1/EventMonitor/Frame.cpp:142 ver1.1/EventMonitor/Frame.cpp:146
 #, c-format
 msgid "Toggles display of %s toolbar"
-msgstr ""
+msgstr "Vahetab %s tööriistariba kuvamise"
 
 #: master/EventMonitor/Frame.cpp:142 master/EventMonitor/Frame.cpp:146
 #: master/EventMonitor/Frame.cpp:185 ver1.0/EventMonitor/Frame.cpp:142
@@ -263,38 +272,38 @@ msgstr ""
 #: ver1.1/EventMonitor/Frame.cpp:142 ver1.1/EventMonitor/Frame.cpp:146
 #: ver1.1/EventMonitor/Frame.cpp:185
 msgid "View"
-msgstr ""
+msgstr "Vaata"
 
 #: master/EventMonitor/Frame.cpp:146 master/EventMonitor/Frame.cpp:149
 #: ver1.0/EventMonitor/Frame.cpp:146 ver1.0/EventMonitor/Frame.cpp:149
 #: ver1.1/EventMonitor/Frame.cpp:146 ver1.1/EventMonitor/Frame.cpp:149
 msgid "&View"
-msgstr ""
+msgstr "&Vaata"
 
 #: master/EventMonitor/Frame.cpp:154 ver1.0/EventMonitor/Frame.cpp:154
 #: ver1.1/EventMonitor/Frame.cpp:154
 msgid "Copy"
-msgstr ""
+msgstr "Kopeeri"
 
 #: master/EventMonitor/Frame.cpp:156 ver1.0/EventMonitor/Frame.cpp:156
 #: ver1.1/EventMonitor/Frame.cpp:156
 msgid "Copy All"
-msgstr ""
+msgstr "Kopeeri kõik"
 
 #: master/EventMonitor/Frame.cpp:161 ver1.0/EventMonitor/Frame.cpp:161
 #: ver1.1/EventMonitor/Frame.cpp:161
 msgid "Edit"
-msgstr ""
+msgstr "Redigeeri"
 
 #: master/EventMonitor/Frame.cpp:164 ver1.0/EventMonitor/Frame.cpp:164
 #: ver1.1/EventMonitor/Frame.cpp:164
 msgid "Auto Scroll"
-msgstr ""
+msgstr "Automaatne kerimine"
 
 #: master/EventMonitor/Frame.cpp:189 ver1.0/EventMonitor/Frame.cpp:189
 #: ver1.1/EventMonitor/Frame.cpp:189
 msgid "Trace Log"
-msgstr ""
+msgstr "Jälituslogi"
 
 #: master/EventMonitor/MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
 #: master/EventMonitor/MSIBuild/en_US.Win32.Debug.Shortcut-2.idtx:4
@@ -321,7 +330,7 @@ msgstr ""
 #: ver1.1/EventMonitor/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
 #: ver1.1/EventMonitor/MSIBuild/en_US.x64.Release.Shortcut-2.idtx:4
 msgid "Real-time display of internal events"
-msgstr ""
+msgstr "Sisesündmuste reaalajas kuvamine"
 
 #: master/EventMonitor/MSIBuild/en_US.Win32.Debug.Shortcut-2.idtx:4
 #: master/EventMonitor/MSIBuild/en_US.Win32.Release.Shortcut-2.idtx:4
@@ -336,4 +345,4 @@ msgstr ""
 #: ver1.1/EventMonitor/MSIBuild/en_US.x64.Debug.Shortcut-2.idtx:4
 #: ver1.1/EventMonitor/MSIBuild/en_US.x64.Release.Shortcut-2.idtx:4
 msgid "EVENTM~1|GÉANTLink Event Monitor"
-msgstr ""
+msgstr "EVENTM~1|GÉANTLink Event Monitor"

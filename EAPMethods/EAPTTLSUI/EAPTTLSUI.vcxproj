@@ -202,6 +202,7 @@
     <POCompile Include="..\locale\de_DE.po" />
     <POCompile Include="..\locale\el_GR.po" />
     <POCompile Include="..\locale\es_ES.po" />
+    <POCompile Include="..\locale\et_EE.po" />
     <POCompile Include="..\locale\eu_ES.po" />
     <POCompile Include="..\locale\fi_FI.po" />
     <POCompile Include="..\locale\fr_CA.po" />

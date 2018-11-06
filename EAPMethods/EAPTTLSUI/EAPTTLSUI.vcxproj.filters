@@ -132,5 +132,8 @@
     <POCompile Include="..\locale\ko_KR.po">
       <Filter>Resource Files\Localization</Filter>
     </POCompile>
+    <POCompile Include="..\locale\et_EE.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
   </ItemGroup>
 </Project>

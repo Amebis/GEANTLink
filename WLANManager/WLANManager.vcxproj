@@ -149,6 +149,37 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="locale\bg_BG.po" />
+    <None Include="locale\ca_ES.po" />
+    <None Include="locale\cs_CZ.po" />
+    <None Include="locale\cy_UK.po" />
+    <None Include="locale\de_DE.po" />
+    <None Include="locale\el_GR.po" />
+    <None Include="locale\es_ES.po" />
+    <None Include="locale\et_EE.po" />
+    <None Include="locale\eu_ES.po" />
+    <None Include="locale\fi_FI.po" />
+    <None Include="locale\fr_CA.po" />
+    <None Include="locale\fr_FR.po" />
+    <None Include="locale\gl_ES.po" />
+    <None Include="locale\hr_HR.po" />
+    <None Include="locale\hu_HU.po" />
+    <None Include="locale\is_IS.po" />
+    <None Include="locale\it_IT.po" />
+    <None Include="locale\ko_KR.po" />
+    <None Include="locale\lt_LT.po" />
+    <None Include="locale\nb_NO.po" />
+    <None Include="locale\nl_NL.po" />
+    <None Include="locale\pl_PL.po" />
+    <None Include="locale\pt_PT.po" />
+    <None Include="locale\ru_RU.po" />
+    <None Include="locale\sk_SK.po" />
+    <None Include="locale\sl_SI.po" />
+    <None Include="locale\sr_RS.po" />
+    <None Include="locale\sv_SE.po" />
+    <None Include="locale\tr_TR.po" />
+    <None Include="locale\vi_VN.po" />
+    <None Include="locale\WLANManager.pot" />
     <None Include="README.md" />
     <None Include="res\WLANManager.ico" />
   </ItemGroup>
