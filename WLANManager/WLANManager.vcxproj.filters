@@ -13,6 +13,10 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Resource Files\Localization">
+      <UniqueIdentifier>{e43059ae-37ac-4b28-84fb-18d1b3972b30}</UniqueIdentifier>
+      <Extensions>po;pot</Extensions>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="StdAfx.h">
@@ -36,6 +40,99 @@
     <None Include="README.md" />
     <None Include="res\WLANManager.ico">
       <Filter>Resource Files</Filter>
+    </None>
+    <None Include="locale\bg_BG.po">
+      <Filter>Resource Files\Localization</Filter>
+    </None>
+    <None Include="locale\ca_ES.po">
+      <Filter>Resource Files\Localization</Filter>
+    </None>
+    <None Include="locale\cs_CZ.po">
+      <Filter>Resource Files\Localization</Filter>
+    </None>
+    <None Include="locale\cy_UK.po">
+      <Filter>Resource Files\Localization</Filter>
+    </None>
+    <None Include="locale\de_DE.po">
+      <Filter>Resource Files\Localization</Filter>
+    </None>
+    <None Include="locale\el_GR.po">
+      <Filter>Resource Files\Localization</Filter>
+    </None>
+    <None Include="locale\es_ES.po">
+      <Filter>Resource Files\Localization</Filter>
+    </None>
+    <None Include="locale\et_EE.po">
+      <Filter>Resource Files\Localization</Filter>
+    </None>
+    <None Include="locale\eu_ES.po">
+      <Filter>Resource Files\Localization</Filter>
+    </None>
+    <None Include="locale\fi_FI.po">
+      <Filter>Resource Files\Localization</Filter>
+    </None>
+    <None Include="locale\fr_CA.po">
+      <Filter>Resource Files\Localization</Filter>
+    </None>
+    <None Include="locale\fr_FR.po">
+      <Filter>Resource Files\Localization</Filter>
+    </None>
+    <None Include="locale\gl_ES.po">
+      <Filter>Resource Files\Localization</Filter>
+    </None>
+    <None Include="locale\hr_HR.po">
+      <Filter>Resource Files\Localization</Filter>
+    </None>
+    <None Include="locale\hu_HU.po">
+      <Filter>Resource Files\Localization</Filter>
+    </None>
+    <None Include="locale\is_IS.po">
+      <Filter>Resource Files\Localization</Filter>
+    </None>
+    <None Include="locale\it_IT.po">
+      <Filter>Resource Files\Localization</Filter>
+    </None>
+    <None Include="locale\ko_KR.po">
+      <Filter>Resource Files\Localization</Filter>
+    </None>
+    <None Include="locale\lt_LT.po">
+      <Filter>Resource Files\Localization</Filter>
+    </None>
+    <None Include="locale\nb_NO.po">
+      <Filter>Resource Files\Localization</Filter>
+    </None>
+    <None Include="locale\nl_NL.po">
+      <Filter>Resource Files\Localization</Filter>
+    </None>
+    <None Include="locale\pl_PL.po">
+      <Filter>Resource Files\Localization</Filter>
+    </None>
+    <None Include="locale\pt_PT.po">
+      <Filter>Resource Files\Localization</Filter>
+    </None>
+    <None Include="locale\ru_RU.po">
+      <Filter>Resource Files\Localization</Filter>
+    </None>
+    <None Include="locale\sk_SK.po">
+      <Filter>Resource Files\Localization</Filter>
+    </None>
+    <None Include="locale\sl_SI.po">
+      <Filter>Resource Files\Localization</Filter>
+    </None>
+    <None Include="locale\sr_RS.po">
+      <Filter>Resource Files\Localization</Filter>
+    </None>
+    <None Include="locale\sv_SE.po">
+      <Filter>Resource Files\Localization</Filter>
+    </None>
+    <None Include="locale\tr_TR.po">
+      <Filter>Resource Files\Localization</Filter>
+    </None>
+    <None Include="locale\vi_VN.po">
+      <Filter>Resource Files\Localization</Filter>
+    </None>
+    <None Include="locale\WLANManager.pot">
+      <Filter>Resource Files\Localization</Filter>
     </None>
   </ItemGroup>
 </Project>
