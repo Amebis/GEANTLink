@@ -1,32 +1,38 @@
+# Translators:
+# Park DOHO <fdd@korea.com>, 2016
+# 
+#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: WLANManager\n"
-"POT-Creation-Date: 2016-09-12 12:19+0200\n"
-"PO-Revision-Date: 2016-09-12 12:19+0200\n"
-"Language-Team: Amebis, d. o. o., Kamnik <info@amebis.si>\n"
+"POT-Creation-Date: 2016-11-08 11:51+0100\n"
+"PO-Revision-Date: 2016-08-28 10:03+0000\n"
+"Last-Translator: Park DOHO <fdd@korea.com>, 2016\n"
+"Language-Team: Korean (Korea) (https://www.transifex.com/eduroam_devel/teams/11799/ko_KR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.8\n"
-"X-Poedit-Basepath: ..\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
-"X-Poedit-SourceCharset: UTF-8\n"
-"X-Poedit-KeywordsList: _\n"
-"Last-Translator: Simon Rozman <simon.rozman@amebis.si>\n"
 "Language: ko_KR\n"
-"X-Poedit-SearchPath-0: .\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Poedit 1.8.11\n"
+"X-Poedit-Basepath: ../../..\n"
+"X-Poedit-KeywordsList: _\n"
+"X-Poedit-SearchPath-0: master/WLANManager\n"
+"X-Poedit-SearchPath-1: ver1.1/WLANManager\n"
+"X-Poedit-SearchPath-2: ver1.0/WLANManager\n"
+"X-Poedit-SourceCharset: UTF-8\n"
 
-#: MSIBuild/En.Win32.Release.Feature-2.idtx:3
-#: MSIBuild/En.x64.Release.Feature-2.idtx:3
-msgid "1252"
-msgstr "949"
-
-#: MSIBuild/En.Win32.Release.Feature-2.idtx:4
-#: MSIBuild/En.x64.Release.Feature-2.idtx:4
-msgid "Helper utility to support direct shortcuts to Wireless Network Properties"
-msgstr ""
-
-#: MSIBuild/En.Win32.Release.Feature-2.idtx:4
-#: MSIBuild/En.x64.Release.Feature-2.idtx:4
+#: MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
+#: MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
+#: MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
+#: MSIBuild/en_US.x64.Release.Feature-2.idtx:4
 msgid "WLAN Manager"
-msgstr ""
+msgstr "무선랜 관리자"
+
+#: MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
+#: MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
+#: MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
+#: MSIBuild/en_US.x64.Release.Feature-2.idtx:4
+msgid ""
+"Helper utility to support direct shortcuts to Wireless Network Properties"
+msgstr "무선 네트워크 프로파일 관리자"

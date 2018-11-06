@@ -1,3 +1,5 @@
+# Translators:
+# Anne M <anne@eenet.ee>, 2018
 # 
 #, fuzzy
 msgid ""
@@ -5,12 +7,13 @@ msgstr ""
 "Project-Id-Version: WLANManager\n"
 "POT-Creation-Date: 2016-11-08 11:51+0100\n"
 "PO-Revision-Date: 2016-08-28 10:03+0000\n"
-"Language-Team: Russian (Russia) (https://www.transifex.com/eduroam_devel/teams/11799/ru_RU/)\n"
+"Last-Translator: Anne M <anne@eenet.ee>, 2018\n"
+"Language-Team: Estonian (https://www.transifex.com/eduroam_devel/teams/11799/et/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ru_RU\n"
-"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
+"Language: et\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 1.8.11\n"
 "X-Poedit-Basepath: ../../..\n"
 "X-Poedit-KeywordsList: _\n"
@@ -24,7 +27,7 @@ msgstr ""
 #: MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
 #: MSIBuild/en_US.x64.Release.Feature-2.idtx:4
 msgid "WLAN Manager"
-msgstr ""
+msgstr "WLANi haldur"
 
 #: MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
 #: MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
@@ -32,4 +35,4 @@ msgstr ""
 #: MSIBuild/en_US.x64.Release.Feature-2.idtx:4
 msgid ""
 "Helper utility to support direct shortcuts to Wireless Network Properties"
-msgstr ""
+msgstr "Abivahend toetamaks otselinke traadita võrgu omaduste seadistamisele"
