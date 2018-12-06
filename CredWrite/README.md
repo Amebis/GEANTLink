@@ -1,7 +1,7 @@
-#CredWrite
-Imports given credentials to Windows Credential Manager for GÉANTLink use
+# CredWrite
+Imports given credentials to Windows Credential Manager for GÃ‰ANTLink use
 
-##Usage
+## Usage
 ```
 CredWrite <username> <password> [<realm> [level]]
 ```
