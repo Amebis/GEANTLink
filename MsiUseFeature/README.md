@@ -1,7 +1,7 @@
-#MsiUseFeature
-Checks the installation state of the given feature of GÉANTLink product
+# MsiUseFeature
+Checks the installation state of the given feature of GÃ‰ANTLink product
 
-##Usage
+## Usage
 ```
 MsiUseFeature <feature name> [language]
 ```
