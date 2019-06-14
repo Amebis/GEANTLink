@@ -1,6 +1,6 @@
 # Translators:
 # Indrek Rokk <indrek.rokk@eenet.ee>, 2018
-# Anne M <anne@eenet.ee>, 2018
+# Anne M <anne@eenet.ee>, 2019
 # 
 #, fuzzy
 msgid ""
@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: EventMonitor\n"
 "POT-Creation-Date: 2017-02-02 18:14+0100\n"
 "PO-Revision-Date: 2016-08-27 11:21+0000\n"
-"Last-Translator: Anne M <anne@eenet.ee>, 2018\n"
+"Last-Translator: Anne M <anne@eenet.ee>, 2019\n"
 "Language-Team: Estonian (https://www.transifex.com/eduroam_devel/teams/11799/et/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -79,10 +79,9 @@ msgid ""
 "(Run As Administrator) or be a member of Performance Log Users group to "
 "start event tracing session."
 msgstr ""
-"Puudub pääsuluba sündmuse seansi: sündmuse jälitusseansi alustamiseks on Sul"
-" vaja administraatoriõigusi (käivita administraatorina, inglise keeles Run "
-"As Administrator) või kuulumist soorituste logi (Performance Log) kasutajate"
-" gruppi"
+"Puudub pääsuluba: sündmuse jälitusseansi loomiseks vajad "
+"administraatoriõigusi (Run As Administrator) või kuulumist soorituste logi "
+"kasutajagruppi (Performance Log Users)"
 
 #: master/EventMonitor/ETWLog.cpp:235 ver1.0/EventMonitor/ETWLog.cpp:235
 #: ver1.1/EventMonitor/ETWLog.cpp:235

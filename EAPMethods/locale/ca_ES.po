@@ -1,6 +1,7 @@
 # Translators:
-# eduki <ecercos@xtec.cat>, 2017
 # Simon Rozman <simon@rozman.si>, 2018
+# eduki <ecercos@xtec.cat>, 2018
+# jmontane, 2019
 # 
 #, fuzzy
 msgid ""
@@ -8,7 +9,7 @@ msgstr ""
 "Project-Id-Version: EAPMethods\n"
 "POT-Creation-Date: 2018-06-20 15:30+0200\n"
 "PO-Revision-Date: 2016-08-25 06:18+0000\n"
-"Last-Translator: Simon Rozman <simon@rozman.si>, 2018\n"
+"Last-Translator: jmontane, 2019\n"
 "Language-Team: Catalan (Spain) (https://www.transifex.com/eduroam_devel/teams/11799/ca_ES/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -116,13 +117,13 @@ msgstr "Ha fallat l'esborrat de credencials (error %u)."
 #: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:854
 #, c-format
 msgid "(error %u)"
-msgstr ""
+msgstr "(error %u)"
 
 #: master/lib/EAPBase_UI/include/EAP_UI.h:859
 #: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:792
 #: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:858
 msgid "(error)"
-msgstr ""
+msgstr "(error)"
 
 #: master/lib/EAPBase_UI/include/EAP_UI.h:870
 #: master/lib/EAPBase_UI/include/EAP_UI.h:879
@@ -143,7 +144,7 @@ msgstr "(buit)"
 #: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:869
 #: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:878
 msgid "(blank ID)"
-msgstr ""
+msgstr "(ID buit)"
 
 #: master/lib/EAPBase_UI/include/EAP_UI.h:919
 #: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:854
@@ -173,7 +174,7 @@ msgstr "+"
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:38
 #: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:38
 msgid "Adds new provider"
-msgstr "Afegir nou proveidor"
+msgstr "Afegeix un proveïdor nou"
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:42
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:42
@@ -185,7 +186,7 @@ msgstr "-"
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:43
 #: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:43
 msgid "Removes selected provider"
-msgstr "Esborrar proveidor seleccionat"
+msgstr "Esborra el proveïdor seleccionat"
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:47
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:47
@@ -242,7 +243,7 @@ msgstr ""
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:272
 #: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:272
 msgid "&Clear Credentials"
-msgstr "&Esborrar Credencials"
+msgstr "&Esborra les credencials"
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:273
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:273
@@ -261,7 +262,7 @@ msgstr ""
 #: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:277
 #: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:316
 msgid "&Set Credentials..."
-msgstr "&Desar Credencials..."
+msgstr "&Desa les credencials..."
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:278
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:317
@@ -304,7 +305,7 @@ msgstr "ID d'usuari i contrasenya"
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:369
 #: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:369
 msgid "Please provide your user ID and password."
-msgstr "Sisplau introduiu el vostre ID d'usuari i contrasenya"
+msgstr "Introduïu el vostre ID d'usuari i contrasenya"
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:379
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:443
@@ -319,7 +320,7 @@ msgstr "ID d'usuari:"
 #: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:384
 msgid "Enter your user name here (user@domain.org, DOMAIN\\User, etc.)"
 msgstr ""
-"Introduiu el vostre identificador aquí (identificador@domini.org, "
+"Introduïu el vostre identificador aquí (identificador@domini.org, "
 "DOMINI\\identificador, etc.)"
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:388
@@ -332,7 +333,7 @@ msgstr "Contrasenya:"
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:393
 #: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:393
 msgid "Enter your password here"
-msgstr "Introduiu la vostra contrasenya aquí"
+msgstr "Introduïu la vostra contrasenya aquí"
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:423
 msgid "User ID"
@@ -340,7 +341,7 @@ msgstr "ID d'usuari"
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:433
 msgid "Please provide your user ID."
-msgstr "Sisplau introduïu el vostre ID."
+msgstr "Introduïu el vostre ID."
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:473
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:424
@@ -377,7 +378,7 @@ msgstr ""
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:451
 #: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:451
 msgid "(Keep it short, please)"
-msgstr "(Sigueu breus, sisplau)"
+msgstr "(Sigueu breu)"
 
 #: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:510
 #: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:461
@@ -618,8 +619,7 @@ msgstr ""
 #: ver1.0/lib/EAPBase_UI/src/EAP_UI.cpp:283
 #: ver1.1/lib/EAPBase_UI/src/EAP_UI.cpp:251
 msgid "Please, reconsider necessity to enter your credentials."
-msgstr ""
-"Sisplau, reconsidereu la necessitat d'introduir les vostres credencials."
+msgstr "Reconsidereu la necessitat d'introduir les vostres credencials."
 
 #: master/lib/EapHost_UI/res/wxEapHost_UI.cpp:17
 #: ver1.1/lib/EapHost_UI/res/wxEapHost_UI.cpp:17
@@ -667,11 +667,11 @@ msgstr "Repte GTC"
 
 #: master/lib/GTC_UI/res/wxGTC_UI.cpp:26
 msgid "Please provide your response."
-msgstr "Faciliteu sisplau la vostra resposta."
+msgstr "Indiqueu la vostra resposta."
 
 #: master/lib/GTC_UI/res/wxGTC_UI.cpp:38
 msgid "Server challenge"
-msgstr "Repte del Servidor"
+msgstr "Repte del servidor"
 
 #: master/lib/GTC_UI/res/wxGTC_UI.cpp:43
 msgid "Enter your response here"
@@ -752,7 +752,7 @@ msgstr ""
 #: master/lib/TLS_UI/res/wxTLS_UI.cpp:52 ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:52
 #: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:52
 msgid "Add CA from File..."
-msgstr "Afegir CA des d'un fitxer..."
+msgstr "Afegeix CA des d'un fitxer..."
 
 #: master/lib/TLS_UI/res/wxTLS_UI.cpp:53 ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:53
 #: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:53
@@ -762,7 +762,7 @@ msgstr "Afegeix una nova autoritat de certificació des de d'un arxiu"
 #: master/lib/TLS_UI/res/wxTLS_UI.cpp:57 ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:57
 #: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:57
 msgid "&Remove CA"
-msgstr "&Eliminar CA"
+msgstr "&Elimina CA"
 
 #: master/lib/TLS_UI/res/wxTLS_UI.cpp:58 ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:58
 #: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:58
@@ -810,7 +810,7 @@ msgstr "Certificat de client per a l'autenticació"
 #: ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:142
 #: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:142
 msgid "Custom &identity:"
-msgstr "Personalitzar la &identitat:"
+msgstr "Personalitza la &identitat:"
 
 #: master/lib/TLS_UI/res/wxTLS_UI.cpp:147
 #: ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:147
@@ -825,7 +825,7 @@ msgstr ""
 #: master/lib/TLS_UI/src/TLS_UI.cpp:252 ver1.0/lib/TLS_UI/src/TLS_UI.cpp:246
 #: ver1.1/lib/TLS_UI/src/TLS_UI.cpp:252
 msgid "Add Certificate"
-msgstr "Afegir Certificat"
+msgstr "Afegeix un certificat"
 
 #: master/lib/TLS_UI/src/TLS_UI.cpp:253 ver1.0/lib/TLS_UI/src/TLS_UI.cpp:247
 #: ver1.1/lib/TLS_UI/src/TLS_UI.cpp:253

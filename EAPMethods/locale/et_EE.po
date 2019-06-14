@@ -1,7 +1,7 @@
 # Translators:
 # Simon Rozman <simon@rozman.si>, 2018
 # Indrek Rokk <indrek.rokk@eenet.ee>, 2018
-# Anne M <anne@eenet.ee>, 2018
+# Anne M <anne@eenet.ee>, 2019
 # 
 #, fuzzy
 msgid ""
@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: EAPMethods\n"
 "POT-Creation-Date: 2018-06-20 15:30+0200\n"
 "PO-Revision-Date: 2016-08-25 06:18+0000\n"
-"Last-Translator: Anne M <anne@eenet.ee>, 2018\n"
+"Last-Translator: Anne M <anne@eenet.ee>, 2019\n"
 "Language-Team: Estonian (https://www.transifex.com/eduroam_devel/teams/11799/et/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -94,7 +94,7 @@ msgstr "%s kasutajakonto andmed"
 #, c-format
 msgid "Error writing credentials to Credential Manager: %hs (error %u)"
 msgstr ""
-"Viga kasutajakonto andmete kirjustamisel kasutajakonto halduris (Credential "
+"Viga kasutajakonto andmete kirjutamisel kasutajakonto halduris (Credential "
 "Manager): %hs (viga %u)"
 
 #: master/lib/EAPBase_UI/include/EAP_UI.h:796
