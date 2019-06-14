@@ -55,6 +55,7 @@ Binaries are available for download [here](https://github.com/Amebis/GEANTLink/r
 - _msgfmt.exe_ from [gettext](https://www.gnu.org/software/gettext/);
   Hint: [Poedit](https://poedit.net/) contains up-to-date binary Win32 compiled gettext-utilities. Install it and add `GettextTools\bin` folder to the system path.
 - _sed.exe_ and _grep.exe_
+  Hint: [Git for Windows](https://gitforwindows.org/) contains up-to-date set of GNU utilities.
 - _MsiDb.Exe_ and other command line utilities for MSI packaging distributed as a part of Microsoft Windows SDK (installed with Visual Studio). Add SDK's `Bin` folder to the system path.
 
 ### wxWidgets
