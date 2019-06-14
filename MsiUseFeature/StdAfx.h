@@ -27,6 +27,7 @@
 
 #include <Windows.h>
 #include <Msi.h>
+#include <shellapi.h>
 #include <tchar.h>
 
 #include <memory>

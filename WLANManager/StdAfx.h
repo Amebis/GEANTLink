@@ -29,6 +29,7 @@
 #include <Windows.h>
 #include <CommCtrl.h>
 #include <devguid.h>
+#include <shellapi.h>
 #include <tchar.h>
 
 #include <memory>

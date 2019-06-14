@@ -29,6 +29,7 @@
 
 #include <Windows.h>
 #include <eaptypes.h> // Must include after <Windows.h>
+#include <shellapi.h>
 #include <tchar.h>
 
 #include <memory>
