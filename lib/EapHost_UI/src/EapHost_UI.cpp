@@ -128,7 +128,7 @@ void wxEapHostMethodConfigPanel::OnSettings(wxCommandEvent& event)
         winstd::eap_error error;
         DWORD dwResult = EapHostPeerInvokeConfigUI(GetHWND(), 0, data->m_type, (DWORD)data->m_cfg_blob.size(), data->m_cfg_blob.data(), &cfg_data_size, get_ptr(cfg_data), get_ptr(error));
         if (dwResult == ERROR_SUCCESS) {
-            const BYTE *_cfg_data = cfg_data.get();
+            LPCBYTE _cfg_data = cfg_data.get();
             data->m_cfg_blob.assign(_cfg_data, _cfg_data + cfg_data_size);
         } else if (dwResult == ERROR_CANCELLED) {
             // Not really an error.

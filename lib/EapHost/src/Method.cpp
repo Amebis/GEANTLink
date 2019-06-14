@@ -151,7 +151,7 @@ void eap::method_eaphost::get_response_packet(
         get_ptr(error));
     if (dwResult == ERROR_SUCCESS) {
         // Packet successfuly prepared.
-        const BYTE *__packet = _packet.get();
+        LPCBYTE __packet = _packet.get();
         packet.assign(__packet, __packet + size_max);
     } else if (error)
         throw eap_runtime_error(*error  , __FUNCTION__ " EapHostPeerGetSendPacket failed.");

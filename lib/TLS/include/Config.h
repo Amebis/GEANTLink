@@ -155,7 +155,7 @@ namespace eap
         /// - \c true when adding succeeds;
         /// - \c false otherwise.
         ///
-        bool add_trusted_ca(_In_ DWORD dwCertEncodingType, _In_ const BYTE *pbCertEncoded, _In_ DWORD cbCertEncoded);
+        bool add_trusted_ca(_In_ DWORD dwCertEncodingType, _In_ LPCBYTE pbCertEncoded, _In_ DWORD cbCertEncoded);
 
     public:
         std::list<winstd::cert_context> m_trusted_root_ca;  ///< Trusted root CAs

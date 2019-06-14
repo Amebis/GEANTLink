@@ -130,7 +130,7 @@ void eap::config_method_eaphost::load(_In_ IXMLDOMNode *pConfigRoot)
         DWORD dwResult = EapHostPeerConfigXml2Blob(0, pXmlElEapHostConfig, &cfg_data_size, get_ptr(cfg_data), &m_type, get_ptr(error));
         if (dwResult == ERROR_SUCCESS) {
             update_type();
-            const BYTE *_cfg_data = cfg_data.get();
+            LPCBYTE _cfg_data = cfg_data.get();
             m_cfg_blob.assign(_cfg_data, _cfg_data + cfg_data_size);
         } else if (error)
             throw eap_runtime_error(*error  , __FUNCTION__ " EapHostPeerConfigXml2Blob failed.");

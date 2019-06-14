@@ -272,7 +272,7 @@ eap::credentials* eap::config_method_tls::make_credentials() const
 }
 
 
-bool eap::config_method_tls::add_trusted_ca(_In_  DWORD dwCertEncodingType, _In_  const BYTE *pbCertEncoded, _In_  DWORD cbCertEncoded)
+bool eap::config_method_tls::add_trusted_ca(_In_  DWORD dwCertEncodingType, _In_  LPCBYTE pbCertEncoded, _In_  DWORD cbCertEncoded)
 {
     cert_context cert;
     if (!cert.create(dwCertEncodingType, pbCertEncoded, cbCertEncoded)) {
