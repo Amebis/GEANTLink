@@ -51,7 +51,7 @@ Binaries are available for download [here](https://github.com/Amebis/GEANTLink/r
 
 ### Building Environment Requirements
 - Microsoft Windows Vista or later
-- Microsoft Visual Studio 2017
+- Microsoft Visual Studio 2019
 - _msgfmt.exe_ from [gettext](https://www.gnu.org/software/gettext/);
   Hint: [Poedit](https://poedit.net/) contains up-to-date binary Win32 compiled gettext-utilities. Install it and add `GettextTools\bin` folder to the system path.
 - _sed.exe_ and _grep.exe_
@@ -62,23 +62,23 @@ Binaries are available for download [here](https://github.com/Amebis/GEANTLink/r
 GÉANTLink is using wxWidgets static libraries. Since upstream wxWidgets libraries don't support ARM64 yet, a clone with ARM64 support was prepared at [GitHub](https://github.com/Amebis/wxWidgets.git).
 
 #### Compiling wxWidgets x86 static libraries
-1. Start _x86 Native Tools Command Prompt for VS 2017_
+1. Start _x86 Native Tools Command Prompt for VS 2019_
 2. Change working folder to `build\msw`
-3. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 COMPILER_VERSION=141`
-4. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 COMPILER_VERSION=141 BUILD=release`
+3. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 COMPILER_VERSION=142`
+4. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 COMPILER_VERSION=142 BUILD=release`
 
 #### Compiling wxWidgets x64 static libraries
-1. Start _x64 Native Tools Command Prompt for VS 2017_
+1. Start _x64 Native Tools Command Prompt for VS 2019_
 2. Change working folder to `build\msw`
-3. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 COMPILER_VERSION=141 TARGET_CPU=X64`
-4. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 COMPILER_VERSION=141 TARGET_CPU=X64 BUILD=release`
+3. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 COMPILER_VERSION=142 TARGET_CPU=X64`
+4. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 COMPILER_VERSION=142 TARGET_CPU=X64 BUILD=release`
 
 #### Compiling wxWidgets ARM64 static libraries
 1. Start command prompt
 2. Change working folder to `build\msw`
-3. Run: `"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsamd64_arm64.bat"`
-3. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 COMPILER_VERSION=141 TARGET_CPU=ARM64 USE_OPENGL=0`
-4. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 COMPILER_VERSION=141 TARGET_CPU=ARM64 USE_OPENGL=0 BUILD=release`
+3. Run: `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsamd64_arm64.bat"`
+3. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 COMPILER_VERSION=142 TARGET_CPU=ARM64 USE_OPENGL=0`
+4. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 COMPILER_VERSION=142 TARGET_CPU=ARM64 USE_OPENGL=0 BUILD=release`
 
 #### Specifying wxWidgets path
 GÉANTLink compilation references wxWidgets libraries using `WXWIN` environment variable. Please set it to wxWidgets folder (i.e. `C:\SDK\wxWidgets`).
@@ -124,7 +124,7 @@ A few seconds after desired function call has finished, _DllHost.exe_ terminates
 To debug early life of our GUI DLL, uncomment `Sleep(10000)` in `DllMain()` of the module, and set breakpoints. This should give you plenty of time to attach the debugger to _DllHost.exe_ process before our DLL starts.
 
 #### Building in command line
-Open _x64 Native Tools Command Prompt for VS 2017_ for building.
+Open _x64 Native Tools Command Prompt for VS 2019_ for building.
 
 Use Microsoft NMAKE to build the project.
 
