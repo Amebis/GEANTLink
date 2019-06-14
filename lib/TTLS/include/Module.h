@@ -244,10 +244,10 @@ namespace eap
             static DWORD WINAPI verify(_In_ crl_checker *obj);
 
         public:
-            module &m_module;               ///< Module
-            winstd::win_handle m_thread;    ///< Thread
-            winstd::win_handle m_abort;     ///< Thread abort event
-            winstd::cert_context m_cert;    ///< Server certificate
+            module &m_module;                  ///< Module
+            winstd::win_handle<NULL> m_thread; ///< Thread
+            winstd::win_handle<NULL> m_abort;  ///< Thread abort event
+            winstd::cert_context m_cert;       ///< Server certificate
         };
 
         std::list<crl_checker> m_crl_checkers;  ///< List of certificate revocation check threads
