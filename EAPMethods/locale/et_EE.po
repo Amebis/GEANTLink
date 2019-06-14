@@ -888,7 +888,7 @@ msgstr "Kasuta t&ühja välist identiteeti"
 #: master/lib/TTLS_UI/res/wxTTLS_UI.cpp:41
 #: ver1.0/lib/TTLS_UI/res/wxTTLS_UI.cpp:41
 #: ver1.1/lib/TTLS_UI/res/wxTTLS_UI.cpp:41
-msgid "Ommit my user name and use @mydomain.org only"
+msgid "Omit my user name and use @mydomain.org only"
 msgstr "Jäta mu kasutajanimi ära ja kasuta ainult @minudomeeni"
 
 #: master/lib/TTLS_UI/res/wxTTLS_UI.cpp:48

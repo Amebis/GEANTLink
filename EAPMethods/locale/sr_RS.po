@@ -896,7 +896,7 @@ msgstr "Koristi &empty spoljni identitet"
 #: master/lib/TTLS_UI/res/wxTTLS_UI.cpp:41
 #: ver1.0/lib/TTLS_UI/res/wxTTLS_UI.cpp:41
 #: ver1.1/lib/TTLS_UI/res/wxTTLS_UI.cpp:41
-msgid "Ommit my user name and use @mydomain.org only"
+msgid "Omit my user name and use @mydomain.org only"
 msgstr "Izostavi korisničko ime i koristi samo @mojdomen.ac.rs"
 
 #: master/lib/TTLS_UI/res/wxTTLS_UI.cpp:48

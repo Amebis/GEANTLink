@@ -38,7 +38,7 @@ wxTTLSConfigPanelBase::wxTTLSConfigPanelBase( wxWindow* parent, wxWindowID id, c
 	sb_outer_identity_radio->Add( m_outer_identity_same, 1, wxEXPAND, FromDIP(5) );
 	
 	m_outer_identity_empty = new wxRadioButton( sb_outer_identity->GetStaticBox(), wxID_ANY, _("Use &empty outer identity"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_outer_identity_empty->SetToolTip( _("Ommit my user name and use @mydomain.org only") );
+	m_outer_identity_empty->SetToolTip( _("Omit my user name and use @mydomain.org only") );
 	
 	sb_outer_identity_radio->Add( m_outer_identity_empty, 1, wxEXPAND, FromDIP(5) );
 	
