@@ -497,13 +497,13 @@ const eap::config_method_ttls* eap::peer_ttls::combine_credentials(
         if ((dwFlags & EAP_FLAG_MACHINE_AUTH) == 0) {
             if (config_method::status_cred_begin <= cfg_method->m_last_status && cfg_method->m_last_status < config_method::status_cred_end) {
                 // Outer: Credentials failed on last connection attempt.
-                log_event(&EAPMETHOD_TRACE_EVT_CRED_PROBLEM1, event_data(target_name), event_data((unsigned int)eap_type_tls), event_data::blank);
+                log_event(&EAPMETHOD_TRACE_EVT_CRED_PROBLEM2, event_data(target_name), event_data((unsigned int)eap_type_tls), event_data((unsigned int)cfg_method->m_last_status), event_data::blank);
                 continue;
             }
 
             if (config_method::status_cred_begin <= cfg_method->m_inner->m_last_status && cfg_method->m_inner->m_last_status < config_method::status_cred_end) {
                 // Inner: Credentials failed on last connection attempt.
-                log_event(&EAPMETHOD_TRACE_EVT_CRED_PROBLEM1, event_data(target_name), event_data((unsigned int)cfg_method->m_inner->get_method_id()), event_data::blank);
+                log_event(&EAPMETHOD_TRACE_EVT_CRED_PROBLEM2, event_data(target_name), event_data((unsigned int)cfg_method->m_inner->get_method_id()), event_data((unsigned int)cfg_method->m_inner->m_last_status), event_data::blank);
                 continue;
             }
         }
