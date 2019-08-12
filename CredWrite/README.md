@@ -1,7 +1,9 @@
 # CredWrite
+
 Imports given credentials to Windows Credential Manager for GÉANTLink use
 
 ## Usage
+
 ```
 CredWrite <username> <password> [<realm> [level]]
 ```
@@ -13,8 +15,15 @@ CredWrite <username> <password> [<realm> [level]]
 
 The credentials are stored to Windows Credential Manager in invoking user's roaming profile.
 
-Return codes:
+### Return codes
+
 - -1 = Invalid parameters
 - 0  = Success
 - 1  = Error parsing command line
 - 2  = Error encrypting password or writing credentials
+
+### Example
+
+```
+CredWrite dXNlckBjb250b3NvLmNvbQ== cGFzc3dvcmQxMjM= urn:RFC4282:realm:contoso.com 1
+```

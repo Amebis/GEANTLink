@@ -1,7 +1,9 @@
 # MsiUseFeature
+
 Checks the installation state of the given feature of GÉANTLink product
 
 ## Usage
+
 ```
 MsiUseFeature <feature name> [language]
 ```
@@ -11,7 +13,8 @@ MsiUseFeature <feature name> [language]
 
 Note: The MSI product code changes on every release. Therefore, `MsiUseFeature` utility with identical version should be used.
 
-Return codes:
+### Return codes
+
 - -1 = Invalid parameters
 - 0  = Success
 - 1  = The product is not installed, or feature state is unknown

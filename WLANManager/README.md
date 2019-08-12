@@ -1,7 +1,9 @@
 # WLANManager
+
 Invokes standard Windows Wireless Network Properties dialog
 
 ## Usage
+
 ```
 WLANManager profile <profile name> [interface <interface name>]
 ```
@@ -9,7 +11,8 @@ WLANManager profile <profile name> [interface <interface name>]
 - `profile name`   - The name of the network profile (not neccessarely the same as SSID)
 - `interface name` - The name of the specific network interface to search the profile at
 
-Return codes:
+### Return codes
+
 - -1 = Invalid parameters
 - 0  = Success
 - 1  = Error parsing command line
