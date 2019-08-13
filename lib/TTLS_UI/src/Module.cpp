@@ -33,12 +33,15 @@ public:
     ///
     /// Initialize peer
     ///
-    wxInitializerPeer(_In_ HINSTANCE instance);
+    wxInitializerPeer(_In_ HINSTANCE instance, _In_opt_ HWND hwndParent);
 
     ///
     /// Uninitialize peer
     ///
     virtual ~wxInitializerPeer();
+
+public:
+    wxWindow* m_parent;                     ///< Parent window
 
 protected:
     static wxCriticalSection s_lock;        ///< Initialization lock
@@ -117,30 +120,15 @@ void eap::peer_ttls_ui::invoke_config_ui(
     int result;
     {
         // Initialize application.
-        wxInitializerPeer init(m_instance);
-
-        wxWindow *parent;
-        if (hwndParent) {
-            // Create wxWidget-approved parent window.
-            parent = new wxWindow;
-            parent->SetHWND((WXHWND)hwndParent);
-            parent->AdoptAttributesFromHWND();
-            wxTopLevelWindows.Append(parent);
-        } else
-            parent = NULL;
+        wxInitializerPeer init(m_instance, hwndParent);
 
         // Create and launch configuration dialog.
-        wxEAPConfigDialog<wxTTLSConfigWindow> dlg(cfg, parent);
-        if (!parent) {
+        wxEAPConfigDialog<wxTTLSConfigWindow> dlg(cfg, init.m_parent);
+        if (!init.m_parent) {
             FLASHWINFO fwi = { sizeof(FLASHWINFO), dlg.GetHWND(), FLASHW_ALL | FLASHW_TIMERNOFG };
             ::FlashWindowEx(&fwi);
         }
         result = dlg.ShowModal();
-
-        if (parent) {
-            wxTopLevelWindows.DeleteObject(parent);
-            parent->SetHWND((WXHWND)NULL);
-        }
     }
 
     if (result != wxID_OK)
@@ -188,25 +176,15 @@ void eap::peer_ttls_ui::invoke_identity_ui(
     int result;
     {
         // Initialize application.
-        wxInitializerPeer init(m_instance);
-
-        wxWindow *parent;
-        if (hwndParent) {
-            // Create wxWidget-approved parent window.
-            parent = new wxWindow;
-            parent->SetHWND((WXHWND)hwndParent);
-            parent->AdoptAttributesFromHWND();
-            wxTopLevelWindows.Append(parent);
-        } else
-            parent = NULL;
+        wxInitializerPeer init(m_instance, hwndParent);
 
         if (cfg.m_providers.size() > 1) {
             // Multiple identity providers: User has to select one first.
-            wxEAPProviderSelectDialog dlg(cfg, parent);
+            wxEAPProviderSelectDialog dlg(cfg, init.m_parent);
 
             // Centre and display dialog.
             dlg.Centre(wxBOTH);
-            if (!parent) {
+            if (!init.m_parent) {
                 FLASHWINFO fwi = { sizeof(FLASHWINFO), dlg.GetHWND(), FLASHW_ALL | FLASHW_TIMERNOFG };
                 ::FlashWindowEx(&fwi);
             }
@@ -259,7 +237,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
                 src_outer != eap::credentials::source_config && eap::config_method::status_cred_begin <= cfg_method->m_last_status && cfg_method->m_last_status < eap::config_method::status_cred_end)
             {
                 // Build dialog to prompt for outer credentials.
-                wxEAPCredentialsDialog dlg(*cfg_prov, parent);
+                wxEAPCredentialsDialog dlg(*cfg_prov, init.m_parent);
                 if (eap::config_method::status_cred_begin <= cfg_method->m_last_status && cfg_method->m_last_status < eap::config_method::status_cred_end)
                     dlg.AddContent(new wxEAPCredentialWarningPanel(*cfg_prov, cfg_method->m_last_status, &dlg));
                 auto panel = new wxTLSCredentialsPanel(*cfg_prov, *cfg_method, *cred, &dlg, false);
@@ -272,13 +250,13 @@ void eap::peer_ttls_ui::invoke_identity_ui(
 
                 // Centre and display dialog.
                 dlg.Centre(wxBOTH);
-                if (!parent) {
+                if (!init.m_parent) {
                     FLASHWINFO fwi = { sizeof(FLASHWINFO), dlg.GetHWND(), FLASHW_ALL | FLASHW_TIMERNOFG };
                     ::FlashWindowEx(&fwi);
                 }
                 if ((result = dlg.ShowModal()) == wxID_OK) {
-                    // Write credentials to credential manager.
                     if (panel->GetRemember()) {
+                        // Write credentials to credential manager.
                         try {
                             cred->credentials_tls::store(target_name.c_str(), 0);
                         } catch (winstd::win_runtime_error &err) {
@@ -313,7 +291,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
 #endif
                     {
                         // Native inner methods. Build dialog to prompt for inner credentials.
-                        wxEAPCredentialsDialog dlg(*cfg_prov, parent);
+                        wxEAPCredentialsDialog dlg(*cfg_prov, init.m_parent);
                         if (eap::config_method::status_cred_begin <= cfg_method->m_inner->m_last_status && cfg_method->m_inner->m_last_status < eap::config_method::status_cred_end)
                             dlg.AddContent(new wxEAPCredentialWarningPanel(*cfg_prov, cfg_method->m_inner->m_last_status, &dlg));
                         wxEAPCredentialsPanelBase *panel = NULL;
@@ -344,7 +322,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
 
                         // Centre and display dialog.
                         dlg.Centre(wxBOTH);
-                        if (!parent) {
+                        if (!init.m_parent) {
                             FLASHWINFO fwi = { sizeof(FLASHWINFO), dlg.GetHWND(), FLASHW_ALL | FLASHW_TIMERNOFG };
                             ::FlashWindowEx(&fwi);
                         }
@@ -401,11 +379,6 @@ void eap::peer_ttls_ui::invoke_identity_ui(
                     result = wxID_OK;
             }
         }
-
-        if (parent) {
-            wxTopLevelWindows.DeleteObject(parent);
-            parent->SetHWND((WXHWND)NULL);
-        }
     }
 
     if (result != wxID_OK)
@@ -461,49 +434,32 @@ void eap::peer_ttls_ui::invoke_interactive_ui(
         int result;
         {
             // Initialize application.
-            wxInitializerPeer init(m_instance);
+            wxInitializerPeer init(m_instance, hwndParent);
 
-            wxWindow *parent;
-            if (hwndParent) {
-                // Create wxWidget-approved parent window.
-                parent = new wxWindow;
-                parent->SetHWND((WXHWND)hwndParent);
-                parent->AdoptAttributesFromHWND();
-                wxTopLevelWindows.Append(parent);
-            } else
-                parent = NULL;
+            sanitizing_wstring
+                challenge(reinterpret_cast<sanitizing_wstring::const_pointer>(ctx.m_data.data()), ctx.m_data.size()/sizeof(sanitizing_wstring::value_type)),
+                response;
 
-            {
-                sanitizing_wstring
-                    challenge(reinterpret_cast<sanitizing_wstring::const_pointer>(ctx.m_data.data()), ctx.m_data.size()/sizeof(sanitizing_wstring::value_type)),
-                    response;
+            // Build dialog to prompt for response.
+            wxGTCResponseDialog dlg(*cfg_prov, init.m_parent);
+            auto panel = new wxGTCResponsePanel(response, challenge.c_str(), &dlg);
+            dlg.AddContent(panel);
 
-                // Build dialog to prompt for response.
-                wxGTCResponseDialog dlg(*cfg_prov, parent);
-                auto panel = new wxGTCResponsePanel(response, challenge.c_str(), &dlg);
-                dlg.AddContent(panel);
+            // Update dialog layout.
+            dlg.Layout();
+            dlg.GetSizer()->Fit(&dlg);
 
-                // Update dialog layout.
-                dlg.Layout();
-                dlg.GetSizer()->Fit(&dlg);
-
-                // Centre and display dialog.
-                dlg.Centre(wxBOTH);
-                if (!parent) {
-                    FLASHWINFO fwi = { sizeof(FLASHWINFO), dlg.GetHWND(), FLASHW_ALL | FLASHW_TIMERNOFG };
-                    ::FlashWindowEx(&fwi);
-                }
-                if ((result = dlg.ShowModal()) == wxID_OK) {
-                    // Save response.
-                    ctx.m_data.assign(
-                        reinterpret_cast<sanitizing_blob::const_pointer>(response.data()                    ),
-                        reinterpret_cast<sanitizing_blob::const_pointer>(response.data() + response.length()));
-                }
+            // Centre and display dialog.
+            dlg.Centre(wxBOTH);
+            if (!init.m_parent) {
+                FLASHWINFO fwi = { sizeof(FLASHWINFO), dlg.GetHWND(), FLASHW_ALL | FLASHW_TIMERNOFG };
+                ::FlashWindowEx(&fwi);
             }
-
-            if (parent) {
-                wxTopLevelWindows.DeleteObject(parent);
-                parent->SetHWND((WXHWND)NULL);
+            if ((result = dlg.ShowModal()) == wxID_OK) {
+                // Save response.
+                ctx.m_data.assign(
+                    reinterpret_cast<sanitizing_blob::const_pointer>(response.data()                    ),
+                    reinterpret_cast<sanitizing_blob::const_pointer>(response.data() + response.length()));
             }
         }
 
@@ -548,37 +504,51 @@ void eap::peer_ttls_ui::invoke_interactive_ui(
 // wxInitializerPeer
 //////////////////////////////////////////////////////////////////////
 
-wxInitializerPeer::wxInitializerPeer(_In_ HINSTANCE instance)
+wxInitializerPeer::wxInitializerPeer(_In_ HINSTANCE instance, _In_opt_ HWND hwndParent)
 {
     wxCriticalSectionLocker locker(s_lock);
-    if (s_init_ref_count++)
-        return;
 
-    // Initialize application.
-    new wxApp();
-    wxEntryStart(instance);
+    if (s_init_ref_count++ == 0) {
+        // Initialize application.
+        new wxApp();
+        wxEntryStart(instance);
 
-    // Do our wxWidgets configuration and localization initialization.
-    wxInitializeConfig();
-    s_locale = new wxLocale;
-    if (wxInitializeLocale(*s_locale)) {
-        s_locale->AddCatalog(wxT("wxExtend") wxT(wxExtendVersion));
-        s_locale->AddCatalog(wxT("EAPTTLSUI"));
+        // Do our wxWidgets configuration and localization initialization.
+        wxInitializeConfig();
+        s_locale = new wxLocale;
+        if (wxInitializeLocale(*s_locale)) {
+            s_locale->AddCatalog(wxT("wxExtend") wxT(wxExtendVersion));
+            s_locale->AddCatalog(wxT("EAPTTLSUI"));
+        }
     }
+
+    if (hwndParent) {
+        // Create wxWidget-approved parent window.
+        m_parent = new wxWindow;
+        m_parent->SetHWND((WXHWND)hwndParent);
+        m_parent->AdoptAttributesFromHWND();
+        wxTopLevelWindows.Append(m_parent);
+    } else
+        m_parent = NULL;
 }
 
 
 wxInitializerPeer::~wxInitializerPeer()
 {
     wxCriticalSectionLocker locker(s_lock);
-    if (--s_init_ref_count)
-        return;
 
-    wxEntryCleanup();
+    if (m_parent) {
+        wxTopLevelWindows.DeleteObject(m_parent);
+        m_parent->SetHWND((WXHWND)NULL);
+    }
 
-    if (s_locale) {
-        delete s_locale;
-        s_locale = NULL;
+    if (--s_init_ref_count == 0) {
+        wxEntryCleanup();
+
+        if (s_locale) {
+            delete s_locale;
+            s_locale = NULL;
+        }
     }
 }
 
