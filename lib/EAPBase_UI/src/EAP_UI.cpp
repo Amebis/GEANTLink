@@ -608,12 +608,13 @@ LRESULT eap::monitor_ui::winproc(
         assert(m_is_master);
         m_slaves.push_back((HWND)lparam);
 
-        if (m_hwnd_popup) {
+        HWND hwnd_popup = m_hwnd_popup;
+        if (hwnd_popup) {
             // Bring pop-up window up.
-            if (::IsIconic(m_hwnd_popup))
-                ::SendMessage(m_hwnd_popup, WM_SYSCOMMAND, SC_RESTORE, 0);
-            ::SetActiveWindow(m_hwnd_popup);
-            ::SetForegroundWindow(m_hwnd_popup);
+            if (::IsIconic(hwnd_popup))
+                ::SendMessage(hwnd_popup, WM_SYSCOMMAND, SC_RESTORE, 0);
+            ::SetActiveWindow(hwnd_popup);
+            ::SetForegroundWindow(hwnd_popup);
         }
 
         return TRUE;

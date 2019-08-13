@@ -1219,7 +1219,7 @@ namespace eap
         bool m_is_master;                   ///< Is this monitor master?
         HWND m_hwnd;                        ///< Message window handle
         std::list<HWND> m_slaves;           ///< List of slaves to notify on finish
-        HWND m_hwnd_popup;                  ///< Pop-up window handle
+        volatile HWND m_hwnd_popup;         ///< Pop-up window handle
         std::vector<unsigned char> m_data;  ///< Data master sent
 
         // Custom window messages
