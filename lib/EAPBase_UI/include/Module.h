@@ -21,6 +21,7 @@
 namespace eap
 {
     class peer_ui;
+    class monitor_ui;
 }
 
 #pragma once
@@ -145,6 +146,94 @@ namespace eap
             _In_                                  DWORD dwUIContextDataSize,
             _Inout_                               BYTE  **ppDataFromInteractiveUI,
             _Inout_                               DWORD *pdwDataFromInteractiveUISize) = 0;
+    };
+
+    /// @}
+
+    /// \addtogroup EAPBaseGUI
+    /// @{
+
+    ///
+    /// Base class to enable single instance of the same dialog (master) return result to multiple threads (slaves)
+    ///
+    class monitor_ui
+    {
+    public:
+        ///
+        /// Constructs a UI monitor
+        ///
+        monitor_ui(_In_ HINSTANCE module, _In_ const GUID &guid);
+
+        ///
+        /// Destructs the UI monitor
+        ///
+        virtual ~monitor_ui();
+
+        ///
+        /// Sets pop-up window handle
+        ///
+        /// \param[in] hwnd  Handle of window to set as a new pop-up
+        ///
+        void set_popup(_In_ HWND hwnd);
+
+        ///
+        /// Notifies all slaves waiting for this master and send them result data
+        ///
+        /// \param[in] data  Pointer to result data
+        /// \param[in] size  \p data size in bytes
+        ///
+        void release_slaves(_In_bytecount_(size) const void *data, _In_ size_t size) const;
+
+        ///
+        /// Returns true if this is a master
+        ///
+        inline bool is_master() const
+        {
+            return m_is_master;
+        }
+
+        ///
+        /// Returns true if this is a slave
+        ///
+        inline bool is_slave() const
+        {
+            return !is_master();
+        }
+
+        ///
+        /// Returns the data master send
+        ///
+        inline const std::vector<unsigned char>& master_data() const
+        {
+            return m_data;
+        }
+
+    protected:
+        /// \cond internal
+
+        virtual LRESULT winproc(
+            _In_ UINT   msg,
+            _In_ WPARAM wparam,
+            _In_ LPARAM lparam);
+
+        static LRESULT CALLBACK winproc(
+            _In_ HWND   hwnd,
+            _In_ UINT   msg,
+            _In_ WPARAM wparam,
+            _In_ LPARAM lparam);
+
+        /// \endcond
+
+    protected:
+        bool m_is_master;                   ///< Is this monitor master?
+        HWND m_hwnd;                        ///< Message window handle
+        std::list<HWND> m_slaves;           ///< List of slaves to notify on finish
+        volatile HWND m_hwnd_popup;         ///< Pop-up window handle
+        std::vector<unsigned char> m_data;  ///< Data master sent
+
+        // Custom window messages
+        static const UINT s_msg_attach;     ///< Slave sends this message to attach to master
+        static const UINT s_msg_finish;     ///< Master sends this message to slaves to notify them it has finished (wparam has size, lparam has data)
     };
 
     /// @}
