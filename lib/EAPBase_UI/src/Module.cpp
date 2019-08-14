@@ -54,11 +54,16 @@ eap::monitor_ui::monitor_ui(_In_ HINSTANCE module, _In_ const GUID &guid) :
         _T(__FUNCTION__),   // lpszClassName
         NULL                // hIconSm
     };
-    ATOM wnd_class = RegisterClassEx(&wnd_class_desc_master);
-    if (!wnd_class)
-        throw win_runtime_error(__FUNCTION__ " Error registering master monitor window class.");
+    LPCTSTR wnd_class = reinterpret_cast<LPCTSTR>(RegisterClassEx(&wnd_class_desc_master));
+    if (!wnd_class) {
+        DWORD dwResult = GetLastError();
+        if (dwResult == ERROR_CLASS_ALREADY_EXISTS)
+            wnd_class = _T(__FUNCTION__);
+        else
+            throw win_runtime_error(dwResult, __FUNCTION__ " Error registering master monitor window class.");
+    }
     tstring_guid guid_str(guid);
-    HWND hwnd_master = FindWindowEx(HWND_MESSAGE, NULL, reinterpret_cast<LPCTSTR>(wnd_class), guid_str.c_str());
+    HWND hwnd_master = FindWindowEx(HWND_MESSAGE, NULL, wnd_class, guid_str.c_str());
     if (hwnd_master) {
         // Another monitor is already running.
         m_is_master = false;
@@ -78,9 +83,14 @@ eap::monitor_ui::monitor_ui(_In_ HINSTANCE module, _In_ const GUID &guid) :
             _T(__FUNCTION__) _T("-Slave"),  // lpszClassName
             NULL                            // hIconSm
         };
-        wnd_class = RegisterClassEx(&wnd_class_desc_slave);
-        if (!wnd_class)
-            throw win_runtime_error(__FUNCTION__ " Error registering slave monitor window class.");
+        wnd_class = reinterpret_cast<LPCTSTR>(RegisterClassEx(&wnd_class_desc_slave));
+        if (!wnd_class) {
+            DWORD dwResult = GetLastError();
+            if (dwResult == ERROR_CLASS_ALREADY_EXISTS)
+                wnd_class = _T(__FUNCTION__) _T("-Slave");
+            else
+                throw win_runtime_error(dwResult, __FUNCTION__ " Error registering slave monitor window class.");
+        }
     } else {
         // This is a fresh monitor.
         m_is_master = true;
