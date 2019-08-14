@@ -1260,7 +1260,7 @@ inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ winstd::cert_contex
     cursor >> (unsigned int&)dwCertEncodingType;
 
     DWORD dwCertEncodedSize;
-    assert(sizeof(dwCertEncodingType) == sizeof(unsigned int));
+    assert(sizeof(dwCertEncodedSize) == sizeof(unsigned int));
     cursor >> (unsigned int&)dwCertEncodedSize;
 
     if (dwCertEncodedSize) {
