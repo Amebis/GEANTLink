@@ -1096,9 +1096,14 @@ inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ std::basic_string<c
 template<class _Traits, class _Ax>
 inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const std::basic_string<wchar_t, _Traits, _Ax> &val)
 {
-    std::string val_utf8;
-    WideCharToMultiByte(CP_UTF8, 0, val, val_utf8, NULL, NULL);
-    cursor << val_utf8;
+    size_t count = val.length();
+    assert(wcslen(val.c_str()) == count); // String should not contain zero terminators.
+    size_t size_max = cursor.ptr_end - cursor.ptr;
+    assert(size_max <= INT_MAX);
+    size_t size = WideCharToMultiByte(CP_UTF8, 0, val.c_str(), (int)count, (char*)cursor.ptr, (int)size_max, NULL, NULL);
+    assert(!count && !size || count && size);
+    cursor.ptr += size;
+    cursor << (unsigned char)0;
 }
 
 
@@ -1112,9 +1117,11 @@ inline size_t pksizeof(_In_ const std::basic_string<wchar_t, _Traits, _Ax> &val)
 template<class _Traits, class _Ax>
 inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ std::basic_string<wchar_t, _Traits, _Ax> &val)
 {
-    std::string val_utf8;
-    cursor >> val_utf8;
-    MultiByteToWideChar(CP_UTF8, 0, val_utf8, val);
+    size_t count_max = cursor.ptr_end - cursor.ptr;
+    size_t count = strnlen((const char*)cursor.ptr, count_max);
+    assert(count < count_max); // String should be zero terminated.
+    MultiByteToWideChar(CP_UTF8, 0, (const char*)cursor.ptr, (int)count, val);
+    cursor.ptr += sizeof(char)*(count + 1);
 }
 
 
