@@ -145,6 +145,26 @@ void eap::peer_ttls_ui::invoke_identity_ui(
     _Out_                                  DWORD  *pdwUserDataOutSize,
     _Out_                                  LPWSTR *ppwszIdentity)
 {
+    static HWND volatile hWndCurrent = NULL;
+
+    class ui_canceller
+    {
+    public:
+        ui_canceller(_In_ HWND hWnd)
+        {
+            HWND hWndPrev = (HWND)InterlockedCompareExchangePointer((PVOID volatile *)&hWndCurrent, hWnd, NULL);
+            if (hWndPrev) {
+                PostMessage(hWndPrev, WM_CLOSE, 0, 0);
+                throw win_runtime_error(ERROR_CANCELLED, __FUNCTION__ " Aborted.");
+            }
+        }
+
+        ~ui_canceller()
+        {
+            InterlockedExchangePointer((PVOID volatile *)&hWndCurrent, NULL);
+        }
+    };
+
     assert(ppwszIdentity);
 
     // Unpack configuration.
@@ -178,8 +198,11 @@ void eap::peer_ttls_ui::invoke_identity_ui(
             FLASHWINFO fwi = { sizeof(FLASHWINFO), dlg.GetHWND(), FLASHW_ALL | FLASHW_TIMERNOFG };
             ::FlashWindowEx(&fwi);
         }
-        if (dlg.ShowModal() != wxID_OK)
-            throw win_runtime_error(ERROR_CANCELLED, __FUNCTION__ " Cancelled.");
+        {
+            ui_canceller lock(dlg.GetHWND());
+            if (dlg.ShowModal() != wxID_OK)
+                throw win_runtime_error(ERROR_CANCELLED, __FUNCTION__ " Cancelled.");
+        }
 
         cfg_prov = dlg.GetSelection();
         assert(cfg_prov);
@@ -244,8 +267,11 @@ void eap::peer_ttls_ui::invoke_identity_ui(
             FLASHWINFO fwi = { sizeof(FLASHWINFO), dlg.GetHWND(), FLASHW_ALL | FLASHW_TIMERNOFG };
             ::FlashWindowEx(&fwi);
         }
-        if (dlg.ShowModal() != wxID_OK)
-            throw win_runtime_error(ERROR_CANCELLED, __FUNCTION__ " Cancelled.");
+        {
+            ui_canceller lock(dlg.GetHWND());
+            if (dlg.ShowModal() != wxID_OK)
+                throw win_runtime_error(ERROR_CANCELLED, __FUNCTION__ " Cancelled.");
+        }
 
         if (panel->GetRemember()) {
             // Write credentials to credential manager.
@@ -315,8 +341,11 @@ void eap::peer_ttls_ui::invoke_identity_ui(
                 FLASHWINFO fwi = { sizeof(FLASHWINFO), dlg.GetHWND(), FLASHW_ALL | FLASHW_TIMERNOFG };
                 ::FlashWindowEx(&fwi);
             }
-            if (dlg.ShowModal() != wxID_OK)
-                throw win_runtime_error(ERROR_CANCELLED, __FUNCTION__ " Cancelled.");
+            {
+                ui_canceller lock(dlg.GetHWND());
+                if (dlg.ShowModal() != wxID_OK)
+                    throw win_runtime_error(ERROR_CANCELLED, __FUNCTION__ " Cancelled.");
+            }
 
             // Write credentials to credential manager.
             if (panel->GetRemember()) {
