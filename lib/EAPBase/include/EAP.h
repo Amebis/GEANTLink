@@ -262,7 +262,7 @@ inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ size_t &val);
 /// \param[inout] cursor  Memory cursor
 /// \param[in]    val     String to pack
 ///
-template<class _Elem, class _Traits, class _Ax> inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const std::basic_string<_Elem, _Traits, _Ax> &val);
+template<class _Traits, class _Ax> inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const std::basic_string<char, _Traits, _Ax> &val);
 
 ///
 /// Returns packed size of a string
@@ -271,7 +271,7 @@ template<class _Elem, class _Traits, class _Ax> inline void operator<<(_Inout_ e
 ///
 /// \returns Size of data when packed (in bytes)
 ///
-template<class _Elem, class _Traits, class _Ax> inline size_t pksizeof(_In_ const std::basic_string<_Elem, _Traits, _Ax> &val);
+template<class _Traits, class _Ax> inline size_t pksizeof(_In_ const std::basic_string<char, _Traits, _Ax> &val);
 
 ///
 /// Unpacks a string
@@ -279,7 +279,7 @@ template<class _Elem, class _Traits, class _Ax> inline size_t pksizeof(_In_ cons
 /// \param[inout] cursor  Memory cursor
 /// \param[out]   val     String to unpack to
 ///
-template<class _Elem, class _Traits, class _Ax> inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ std::basic_string<_Elem, _Traits, _Ax> &val);
+template<class _Traits, class _Ax> inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ std::basic_string<char, _Traits, _Ax> &val);
 
 ///
 /// Packs a wide string
@@ -1062,34 +1062,34 @@ inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ size_t &val)
 #endif
 
 
-template<class _Elem, class _Traits, class _Ax>
-inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const std::basic_string<_Elem, _Traits, _Ax> &val)
+template<class _Traits, class _Ax>
+inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const std::basic_string<char, _Traits, _Ax> &val)
 {
     size_t count = val.length();
     assert(strlen(val.c_str()) == count); // String should not contain zero terminators.
-    size_t size = sizeof(_Elem)*(count + 1);
+    size_t size = sizeof(char)*(count + 1);
     auto ptr_end = cursor.ptr + size;
     assert(ptr_end <= cursor.ptr_end);
-    memcpy(cursor.ptr, (const _Elem*)val.c_str(), size);
+    memcpy(cursor.ptr, (const char*)val.c_str(), size);
     cursor.ptr = ptr_end;
 }
 
 
-template<class _Elem, class _Traits, class _Ax>
-inline size_t pksizeof(_In_ const std::basic_string<_Elem, _Traits, _Ax> &val)
+template<class _Traits, class _Ax>
+inline size_t pksizeof(_In_ const std::basic_string<char, _Traits, _Ax> &val)
 {
-    return sizeof(_Elem)*(val.length() + 1);
+    return sizeof(char)*(val.length() + 1);
 }
 
 
-template<class _Elem, class _Traits, class _Ax>
-inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ std::basic_string<_Elem, _Traits, _Ax> &val)
+template<class _Traits, class _Ax>
+inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ std::basic_string<char, _Traits, _Ax> &val)
 {
     size_t count_max = cursor.ptr_end - cursor.ptr;
-    size_t count = strnlen((const _Elem*&)cursor.ptr, count_max);
+    size_t count = strnlen((const char*)cursor.ptr, count_max);
     assert(count < count_max); // String should be zero terminated.
-    val.assign((const _Elem*&)cursor.ptr, count);
-    cursor.ptr += sizeof(_Elem)*(count + 1);
+    val.assign((const char*)cursor.ptr, count);
+    cursor.ptr += sizeof(char)*(count + 1);
 }
 
 
