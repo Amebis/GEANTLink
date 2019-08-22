@@ -191,6 +191,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
     if (cfg.m_providers.size() > 1) {
         // Multiple identity providers: User has to select one first.
         wxEAPProviderSelectDialog dlg(cfg, init.m_parent);
+        ui_canceller lock(dlg.GetHWND());
 
         // Centre and display dialog.
         dlg.Centre(wxBOTH);
@@ -198,11 +199,8 @@ void eap::peer_ttls_ui::invoke_identity_ui(
             FLASHWINFO fwi = { sizeof(FLASHWINFO), dlg.GetHWND(), FLASHW_ALL | FLASHW_TIMERNOFG };
             ::FlashWindowEx(&fwi);
         }
-        {
-            ui_canceller lock(dlg.GetHWND());
-            if (dlg.ShowModal() != wxID_OK)
-                throw win_runtime_error(ERROR_CANCELLED, __FUNCTION__ " Cancelled.");
-        }
+        if (dlg.ShowModal() != wxID_OK)
+            throw win_runtime_error(ERROR_CANCELLED, __FUNCTION__ " Cancelled.");
 
         cfg_prov = dlg.GetSelection();
         assert(cfg_prov);
@@ -251,6 +249,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
     {
         // Build dialog to prompt for outer credentials.
         wxEAPCredentialsDialog dlg(*cfg_prov, init.m_parent);
+        ui_canceller lock(dlg.GetHWND());
         if (eap::config_method::status_cred_begin <= cfg_method->m_last_status && cfg_method->m_last_status < eap::config_method::status_cred_end)
             dlg.AddContent(new wxEAPCredentialWarningPanel(*cfg_prov, cfg_method->m_last_status, &dlg));
         auto panel = new wxTLSCredentialsPanel(*cfg_prov, *cfg_method, *cred, &dlg, false);
@@ -267,11 +266,8 @@ void eap::peer_ttls_ui::invoke_identity_ui(
             FLASHWINFO fwi = { sizeof(FLASHWINFO), dlg.GetHWND(), FLASHW_ALL | FLASHW_TIMERNOFG };
             ::FlashWindowEx(&fwi);
         }
-        {
-            ui_canceller lock(dlg.GetHWND());
-            if (dlg.ShowModal() != wxID_OK)
-                throw win_runtime_error(ERROR_CANCELLED, __FUNCTION__ " Cancelled.");
-        }
+        if (dlg.ShowModal() != wxID_OK)
+            throw win_runtime_error(ERROR_CANCELLED, __FUNCTION__ " Cancelled.");
 
         if (panel->GetRemember()) {
             // Write credentials to credential manager.
@@ -307,6 +303,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
         {
             // Native inner methods. Build dialog to prompt for inner credentials.
             wxEAPCredentialsDialog dlg(*cfg_prov, init.m_parent);
+            ui_canceller lock(dlg.GetHWND());
             if (eap::config_method::status_cred_begin <= cfg_method->m_inner->m_last_status && cfg_method->m_inner->m_last_status < eap::config_method::status_cred_end)
                 dlg.AddContent(new wxEAPCredentialWarningPanel(*cfg_prov, cfg_method->m_inner->m_last_status, &dlg));
             wxEAPCredentialsPanelBase *panel = NULL;
@@ -341,11 +338,8 @@ void eap::peer_ttls_ui::invoke_identity_ui(
                 FLASHWINFO fwi = { sizeof(FLASHWINFO), dlg.GetHWND(), FLASHW_ALL | FLASHW_TIMERNOFG };
                 ::FlashWindowEx(&fwi);
             }
-            {
-                ui_canceller lock(dlg.GetHWND());
-                if (dlg.ShowModal() != wxID_OK)
-                    throw win_runtime_error(ERROR_CANCELLED, __FUNCTION__ " Cancelled.");
-            }
+            if (dlg.ShowModal() != wxID_OK)
+                throw win_runtime_error(ERROR_CANCELLED, __FUNCTION__ " Cancelled.");
 
             // Write credentials to credential manager.
             if (panel->GetRemember()) {
