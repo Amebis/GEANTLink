@@ -42,7 +42,7 @@ eap::credentials_eaphost::credentials_eaphost(_In_ const credentials_eaphost &ot
 }
 
 
-eap::credentials_eaphost::credentials_eaphost(_Inout_ credentials_eaphost &&other) :
+eap::credentials_eaphost::credentials_eaphost(_Inout_ credentials_eaphost &&other) noexcept :
     m_cred_blob(std::move(other.m_cred_blob)),
     credentials(std::move(other            ))
 {
@@ -60,7 +60,7 @@ eap::credentials_eaphost& eap::credentials_eaphost::operator=(_In_ const credent
 }
 
 
-eap::credentials_eaphost& eap::credentials_eaphost::operator=(_Inout_ credentials_eaphost &&other)
+eap::credentials_eaphost& eap::credentials_eaphost::operator=(_Inout_ credentials_eaphost &&other) noexcept
 {
     if (this != &other) {
         (credentials&)*this = std::move(other);
@@ -220,7 +220,7 @@ LPCTSTR eap::credentials_eaphost::target_suffix() const
 
 eap::credentials::source_t eap::credentials_eaphost::combine(
     _In_             DWORD         dwFlags,
-    _In_             HANDLE        hTokenImpersonateUser,
+    _In_opt_         HANDLE        hTokenImpersonateUser,
     _In_opt_   const credentials   *cred_cached,
     _In_       const config_method &cfg,
     _In_opt_z_       LPCTSTR       pszTargetName)

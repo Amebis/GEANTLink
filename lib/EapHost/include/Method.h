@@ -61,7 +61,7 @@ namespace eap
         ///
         /// \param[in] other  EAP method to move from
         ///
-        method_eaphost(_Inout_ method_eaphost &&other);
+        method_eaphost(_Inout_ method_eaphost &&other) noexcept;
 
         ///
         /// Moves an EAP method
@@ -70,7 +70,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        method_eaphost& operator=(_Inout_ method_eaphost &&other);
+        method_eaphost& operator=(_Inout_ method_eaphost &&other) noexcept;
 
         /// \name Session management
         /// @{
@@ -99,8 +99,8 @@ namespace eap
         /// @}
 
         virtual void get_result(
-            _In_   EapPeerMethodResultReason reason,
-            _Out_ EapPeerMethodResult       *pResult);
+            _In_    EapPeerMethodResultReason reason,
+            _Inout_ EapPeerMethodResult       *pResult);
 
         /// \name User Interaction
         /// @{

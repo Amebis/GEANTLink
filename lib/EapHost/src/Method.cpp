@@ -37,7 +37,7 @@ eap::method_eaphost::method_eaphost(_In_ module &mod, _In_ config_method_eaphost
 }
 
 
-eap::method_eaphost::method_eaphost(_Inout_ method_eaphost &&other) :
+eap::method_eaphost::method_eaphost(_Inout_ method_eaphost &&other) noexcept :
     m_cfg       (          other.m_cfg        ),
     m_cred      (          other.m_cred       ),
     m_session_id(std::move(other.m_session_id)),
@@ -46,7 +46,7 @@ eap::method_eaphost::method_eaphost(_Inout_ method_eaphost &&other) :
 }
 
 
-eap::method_eaphost& eap::method_eaphost::operator=(_Inout_ method_eaphost &&other)
+eap::method_eaphost& eap::method_eaphost::operator=(_Inout_ method_eaphost &&other) noexcept
 {
     if (this != std::addressof(other)) {
         assert(std::addressof(m_cfg ) == std::addressof(other.m_cfg )); // Move method within same configuration only!
@@ -257,7 +257,7 @@ EapPeerMethodResponseAction eap::method_eaphost::set_ui_context(
 }
 
 
-void eap::method_eaphost::get_response_attributes(_Inout_ EapAttributes *pAttribs)
+void eap::method_eaphost::get_response_attributes(_Out_ EapAttributes *pAttribs)
 {
     // Get response attributes from EapHost peer.
     eap_error_runtime error;

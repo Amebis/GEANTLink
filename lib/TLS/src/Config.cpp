@@ -80,7 +80,7 @@ eap::config_method_tls::config_method_tls(_In_ const config_method_tls &other) :
 }
 
 
-eap::config_method_tls::config_method_tls(_Inout_ config_method_tls &&other) :
+eap::config_method_tls::config_method_tls(_Inout_ config_method_tls &&other) noexcept :
     m_trusted_root_ca(std::move(other.m_trusted_root_ca)),
     m_server_names(std::move(other.m_server_names)),
     config_method_with_cred(std::move(other))
@@ -100,7 +100,7 @@ eap::config_method_tls& eap::config_method_tls::operator=(_In_ const config_meth
 }
 
 
-eap::config_method_tls& eap::config_method_tls::operator=(_Inout_ config_method_tls &&other)
+eap::config_method_tls& eap::config_method_tls::operator=(_Inout_ config_method_tls &&other) noexcept
 {
     if (this != &other) {
         (config_method_with_cred&&)*this = std::move(other);

@@ -132,11 +132,8 @@ VOID WINAPI wxEventTraceProcessorThread::EventRecordCallback(_In_ PEVENT_RECORD 
     wxASSERT_MSG(pEvent->UserContext, wxT("thread is NULL"));
 
     wxEventTraceProcessorThread *_this = ((wxEventTraceProcessorThread*)pEvent->UserContext);
-
-    if (_this->TestDestroy()) {
-        // Event processing is pending destruction.
+    if (!_this || _this->TestDestroy())
         return;
-    }
 
     _this->m_parent->QueueEvent(new wxETWEvent(wxEVT_ETW_EVENT, *pEvent));
 }
@@ -178,7 +175,7 @@ wxETWListCtrl::wxETWListCtrl(wxWindow *parent, wxWindowID id, const wxPoint& pos
     m_col_format_width[0] = 26;
     m_col_format_width[1] = 5;
     m_col_format_width[2] = 5;
-    m_col_format_width[3] = std::max<int>(std::max<int>(_countof("EapHost"), _countof("Schannel")), _countof(PRODUCT_NAME_STR)) - 1;
+    m_col_format_width[3] = std::max<size_t>(std::max<size_t>(_countof("EapHost"), _countof("Schannel")), _countof(PRODUCT_NAME_STR)) - 1;
     m_col_format_width[4] = 0;
 
     // Prepare all possible item attributes.
@@ -219,7 +216,11 @@ wxETWListCtrl::wxETWListCtrl(wxWindow *parent, wxWindowID id, const wxPoint& pos
         properties->Wnode.BufferSize    = ulSize;
         properties->Wnode.Flags         = WNODE_FLAG_TRACED_GUID;
         properties->Wnode.ClientContext = 1; //QPC clock resolution
-        CoCreateGuid(&(properties->Wnode.Guid));
+        HRESULT hr = CoCreateGuid(&(properties->Wnode.Guid));
+        if (FAILED(hr)) {
+            wxLogError(winstd::tstring_printf(wxT("error 0x%08x generating GUID"), hr).c_str());
+            continue;
+        }
         properties->LogFileMode         = /*EVENT_TRACE_FILE_MODE_SEQUENTIAL |*/ EVENT_TRACE_REAL_TIME_MODE;
         properties->MaximumFileSize     = 1;  // 1 MB
         properties->LoggerNameOffset    = sizeof(EVENT_TRACE_PROPERTIES);
@@ -776,13 +777,13 @@ static tstring MapToString(_In_ const EVENT_MAP_INFO *pMapInfo, _In_ ULONG ulDat
         ((pMapInfo->Flag &  EVENTMAP_INFO_FLAG_WBEM_VALUEMAP    ) && (pMapInfo->Flag & ~EVENTMAP_INFO_FLAG_WBEM_VALUEMAP) != EVENTMAP_INFO_FLAG_WBEM_FLAG))
     {
         if ((pMapInfo->Flag & EVENTMAP_INFO_FLAG_WBEM_NO_MAP) == EVENTMAP_INFO_FLAG_WBEM_NO_MAP)
-            return tstring_printf(_T("%ls"), (PBYTE)pMapInfo + pMapInfo->MapEntryArray[ulData].OutputOffset);
+            return tstring_printf(_T("%ls"), (LPCWSTR)((PBYTE)pMapInfo + pMapInfo->MapEntryArray[ulData].OutputOffset));
         else {
             for (ULONG i = 0; ; i++) {
                 if (i >= pMapInfo->EntryCount)
                     return tstring_printf(_T("%lu"), ulData);
                 else if (pMapInfo->MapEntryArray[i].Value == ulData)
-                    return tstring_printf(_T("%ls"), (PBYTE)pMapInfo + pMapInfo->MapEntryArray[i].OutputOffset);
+                    return tstring_printf(_T("%ls"), (LPCWSTR)((PBYTE)pMapInfo + pMapInfo->MapEntryArray[i].OutputOffset));
             }
         }
     } else if (
@@ -817,7 +818,7 @@ static tstring DataToString(_In_ USHORT InType, _In_ USHORT OutType, _In_count_(
         case TDH_INTYPE_UNICODESTRING:
         case TDH_INTYPE_NONNULLTERMINATEDSTRING:
         case TDH_INTYPE_UNICODECHAR:
-            return tstring_printf(_T("%.*ls"), nDataSize/sizeof(WCHAR), pData);
+            return tstring_printf(_T("%.*ls"), (unsigned int)(nDataSize/sizeof(WCHAR)), (LPCWSTR)pData);
 
         case TDH_INTYPE_ANSISTRING:
         case TDH_INTYPE_NONNULLTERMINATEDANSISTRING:
@@ -918,6 +919,7 @@ static tstring DataToString(_In_ USHORT InType, _In_ USHORT OutType, _In_count_(
         case TDH_INTYPE_BINARY:
             switch (OutType) {
             case TDH_OUTTYPE_IPV6: {
+                #pragma warning(suppress: 6387) // ntdll.dll *must* exist.
                 auto RtlIpv6AddressToString = (LPTSTR(NTAPI*)(const IN6_ADDR*, LPTSTR))GetProcAddress(GetModuleHandle(_T("ntdll.dll")),
 #ifdef _UNICODE
                     "RtlIpv6AddressToStringW"
@@ -945,8 +947,12 @@ static tstring DataToString(_In_ USHORT InType, _In_ USHORT OutType, _In_count_(
         case TDH_INTYPE_GUID: {
             assert(nDataSize >= sizeof(GUID));
             WCHAR szGuid[39];
-            StringFromGUID2(*(GUID*)pData, szGuid, _countof(szGuid));
-            return tstring_printf(_T("%ls"), szGuid);
+            if (StringFromGUID2(*(GUID*)pData, szGuid, _countof(szGuid)))
+                return tstring_printf(_T("%ls"), szGuid);
+            else {
+                assert(0);
+                return _T("(GUID)");
+            }
         }
 
         case TDH_INTYPE_POINTER:
@@ -995,7 +1001,7 @@ static tstring DataToString(_In_ USHORT InType, _In_ USHORT OutType, _In_count_(
             // 32-bit computer and 16 bytes on a 64-bit computer.
             // Doubling the pointer size handles both cases.
             assert(nDataSize >= (SIZE_T)nPtrSize * 2);
-            return (PULONG)pData > 0 ? DataToString(TDH_INTYPE_SID, OutType, pData + nPtrSize * 2, nDataSize - nPtrSize * 2, pMapInfo, nPtrSize) : _T("(WBEM SID)");
+            return (PULONG)pData > 0 ? DataToString(TDH_INTYPE_SID, OutType, pData + (SIZE_T)nPtrSize * 2, nDataSize - (SIZE_T)nPtrSize * 2, pMapInfo, nPtrSize) : _T("(WBEM SID)");
 
         case TDH_INTYPE_SID: {
             assert(nDataSize >= sizeof(SID));
@@ -1027,7 +1033,7 @@ static ULONG GetArraySize(PEVENT_RECORD pEvent, PTRACE_EVENT_INFO pInfo, ULONG i
         ULONG ulResult;
 
         // Get array count property.
-        PROPERTY_DATA_DESCRIPTOR data_desc = { (ULONGLONG)(reinterpret_cast<LPBYTE>(pInfo) + pInfo->EventPropertyInfoArray[pInfo->EventPropertyInfoArray[i].countPropertyIndex].NameOffset), ULONG_MAX };
+        PROPERTY_DATA_DESCRIPTOR data_desc = { (ULONGLONG)pInfo + pInfo->EventPropertyInfoArray[pInfo->EventPropertyInfoArray[i].countPropertyIndex].NameOffset, ULONG_MAX };
         vector<unsigned char> count;
         if ((ulResult = TdhGetProperty(pEvent, 0, NULL, 1, &data_desc, count)) != ERROR_SUCCESS)
             return ulResult;
@@ -1067,7 +1073,7 @@ static tstring PropertyToString(PEVENT_RECORD pEvent, PTRACE_EVENT_INFO pInfo, U
             if (out_nonfirst) out += _T(", "); else out_nonfirst = true;
             out += _T('(');
             for (USHORT j = pInfo->EventPropertyInfoArray[ulPropIndex].structType.StructStartIndex, usLastMember = pInfo->EventPropertyInfoArray[ulPropIndex].structType.StructStartIndex + pInfo->EventPropertyInfoArray[ulPropIndex].structType.NumOfStructMembers; j < usLastMember; j++) {
-                out += tstring_printf(_T("%ls: "), reinterpret_cast<LPBYTE>(pInfo) + pInfo->EventPropertyInfoArray[j].NameOffset);
+                out += tstring_printf(_T("%ls: "), (LPCWSTR)(reinterpret_cast<LPBYTE>(pInfo) + pInfo->EventPropertyInfoArray[j].NameOffset));
                 out += PropertyToString(pEvent, pInfo, j, reinterpret_cast<LPWSTR>(reinterpret_cast<LPBYTE>(pInfo) + pInfo->EventPropertyInfoArray[ulPropIndex].NameOffset), k, nPtrSize);
             }
             out += _T(')');
@@ -1086,12 +1092,12 @@ static tstring PropertyToString(PEVENT_RECORD pEvent, PTRACE_EVENT_INFO pInfo, U
                     // The first descriptor in the array identifies the name of the structure and the second 
                     // descriptor defines the member of the structure whose data you want to retrieve. 
                     PROPERTY_DATA_DESCRIPTOR data_desc[2] = {
-                        { (ULONGLONG)pStructureName                                                                           , ulStructIndex },
-                        { (ULONGLONG)(reinterpret_cast<LPBYTE>(pInfo) + pInfo->EventPropertyInfoArray[ulPropIndex].NameOffset), k             }
+                        { (ULONGLONG)pStructureName                                               , ulStructIndex },
+                        { (ULONGLONG)pInfo + pInfo->EventPropertyInfoArray[ulPropIndex].NameOffset, k             }
                     };
                     ulResult = TdhGetProperty(pEvent, 0, NULL, _countof(data_desc), data_desc, data);
                 } else {
-                    PROPERTY_DATA_DESCRIPTOR data_desc = { (ULONGLONG)(reinterpret_cast<LPBYTE>(pInfo) + pInfo->EventPropertyInfoArray[ulPropIndex].NameOffset), k };
+                    PROPERTY_DATA_DESCRIPTOR data_desc = { (ULONGLONG)pInfo + pInfo->EventPropertyInfoArray[ulPropIndex].NameOffset, k };
                     ulResult = TdhGetProperty(pEvent, 0, NULL, 1, &data_desc, data);
                 }
                 if (ulResult == ERROR_EVT_INVALID_EVENT_DATA) {

@@ -65,7 +65,7 @@ namespace eap
         ///
         /// \param[in] other  Configuration to move from
         ///
-        config_method_eaphost(_Inout_ config_method_eaphost &&other);
+        config_method_eaphost(_Inout_ config_method_eaphost &&other) noexcept;
 
         ///
         /// Copies configuration
@@ -83,7 +83,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        config_method_eaphost& operator=(_Inout_ config_method_eaphost &&other);
+        config_method_eaphost& operator=(_Inout_ config_method_eaphost &&other) noexcept;
 
         virtual config* clone() const;
 

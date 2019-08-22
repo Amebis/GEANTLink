@@ -40,7 +40,7 @@ eap::config_method_pap::config_method_pap(_In_ const config_method_pap &other) :
 }
 
 
-eap::config_method_pap::config_method_pap(_Inout_ config_method_pap &&other) :
+eap::config_method_pap::config_method_pap(_Inout_ config_method_pap &&other) noexcept :
     config_method_with_cred(std::move(other))
 {
 }
@@ -55,7 +55,7 @@ eap::config_method_pap& eap::config_method_pap::operator=(_In_ const config_meth
 }
 
 
-eap::config_method_pap& eap::config_method_pap::operator=(_Inout_ config_method_pap &&other)
+eap::config_method_pap& eap::config_method_pap::operator=(_Inout_ config_method_pap &&other) noexcept
 {
     if (this != &other)
         (config_method_with_cred&&)*this = std::move(other);

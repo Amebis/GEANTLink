@@ -41,7 +41,7 @@ eap::ui_context_ttls::ui_context_ttls(_In_ const ui_context_ttls &other) :
 }
 
 
-eap::ui_context_ttls::ui_context_ttls(_Inout_ ui_context_ttls &&other) :
+eap::ui_context_ttls::ui_context_ttls(_Inout_ ui_context_ttls &&other) noexcept :
     m_data    (std::move(other.m_data)),
     ui_context(std::move(other       ))
 {
@@ -59,7 +59,7 @@ eap::ui_context_ttls& eap::ui_context_ttls::operator=(_In_ const ui_context_ttls
 }
 
 
-eap::ui_context_ttls& eap::ui_context_ttls::operator=(_Inout_ ui_context_ttls &&other)
+eap::ui_context_ttls& eap::ui_context_ttls::operator=(_Inout_ ui_context_ttls &&other) noexcept
 {
     if (this != &other) {
         (ui_context&)*this = std::move(other       );

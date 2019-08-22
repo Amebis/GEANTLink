@@ -28,7 +28,7 @@ using namespace winstd;
 // eap::module
 //////////////////////////////////////////////////////////////////////
 
-eap::module::module(eap_type_t eap_method) :
+eap::module::module(_In_ eap_type_t eap_method) :
     m_eap_method(eap_method),
     m_instance(NULL)
 {
@@ -141,16 +141,16 @@ EAP_ERROR* eap::module::make_error(_In_ const EAP_ERROR *err) const
 }
 
 
-BYTE* eap::module::alloc_memory(_In_ size_t size)
+BYTE* eap::module::alloc_memory(_In_ size_t size) const
 {
     BYTE *p = (BYTE*)HeapAlloc(m_heap, 0, size);
     if (!p)
-        throw win_runtime_error(winstd::string_printf(__FUNCTION__ " Error allocating memory for BLOB (%uB).", size));
+        throw win_runtime_error(winstd::string_printf(__FUNCTION__ " Error allocating memory for BLOB (%zuB).", size));
     return p;
 }
 
 
-void eap::module::free_memory(_In_ BYTE *ptr)
+void eap::module::free_memory(_In_ BYTE *ptr) const
 {
 #if !EAP_ENCRYPT_BLOBS
     // Since we do security here and some of the BLOBs contain credentials, sanitize every memory block before freeing.
@@ -160,7 +160,7 @@ void eap::module::free_memory(_In_ BYTE *ptr)
 }
 
 
-void eap::module::free_error_memory(_In_ EAP_ERROR *err)
+void eap::module::free_error_memory(_In_ EAP_ERROR *err) const
 {
     // pRootCauseString and pRepairString always trail the ppEapError to reduce number of (de)allocations.
     HeapFree(m_heap, 0, err);
@@ -193,7 +193,7 @@ eap::config_method* eap::module::make_config_method()
 }
 
 
-std::vector<unsigned char> eap::module::encrypt(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _Out_opt_ HCRYPTHASH hHash) const
+std::vector<unsigned char> eap::module::encrypt(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _In_opt_ HCRYPTHASH hHash) const
 {
     // Generate 256-bit AES session key.
     crypt_key key_aes;
@@ -202,9 +202,11 @@ std::vector<unsigned char> eap::module::encrypt(_In_ HCRYPTPROV hProv, _In_bytec
 
     // Import the public RSA key.
     HRSRC res = FindResource(m_instance, MAKEINTRESOURCE(IDR_EAP_KEY_PUBLIC), RT_RCDATA);
-    assert(res);
+    if (!res)
+        throw winstd::win_runtime_error(__FUNCTION__ " FindResource failed.");
     HGLOBAL res_handle = LoadResource(m_instance, res);
-    assert(res_handle);
+    if (!res_handle)
+        throw winstd::win_runtime_error(__FUNCTION__ " LoadResource failed.");
     crypt_key key_rsa;
     unique_ptr<CERT_PUBLIC_KEY_INFO, LocalFree_delete<CERT_PUBLIC_KEY_INFO> > keyinfo_data;
     DWORD keyinfo_size = 0;
@@ -321,13 +323,13 @@ void eap::peer::query_interactive_ui_input_fields(
 
 
 void eap::peer::query_ui_blob_from_interactive_ui_input_fields(
-    _In_                                  DWORD                   dwVersion,
-    _In_                                  DWORD                   dwFlags,
-    _In_                                  DWORD                   dwUIContextDataSize,
-    _In_count_(dwUIContextDataSize) const BYTE                    *pUIContextData,
-    _In_                            const EAP_INTERACTIVE_UI_DATA *pEapInteractiveUIData,
-    _Out_                                 DWORD                   *pdwDataFromInteractiveUISize,
-    _Out_                                 BYTE                    **ppDataFromInteractiveUI) const
+    _In_                                                        DWORD                   dwVersion,
+    _In_                                                        DWORD                   dwFlags,
+    _In_                                                        DWORD                   dwUIContextDataSize,
+    _In_count_(dwUIContextDataSize)                       const BYTE                    *pUIContextData,
+    _In_                                                  const EAP_INTERACTIVE_UI_DATA *pEapInteractiveUIData,
+    _Out_                                                       DWORD                   *pdwDataFromInteractiveUISize,
+    _Outptr_result_buffer_(*pdwDataFromInteractiveUISize)       BYTE                    **ppDataFromInteractiveUI) const
 {
     UNREFERENCED_PARAMETER(dwVersion);
     UNREFERENCED_PARAMETER(dwFlags);

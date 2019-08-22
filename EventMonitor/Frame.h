@@ -34,6 +34,9 @@ class wxPersistentEventMonitorFrame;
 
 #include <WinStd/Win.h>
 
+#pragma warning(push)
+#pragma warning(disable: 26444)
+
 
 /// \addtogroup EventMonitor
 /// @{
@@ -173,3 +176,5 @@ inline wxPersistentObject *wxCreatePersistentObject(wxEventMonitorFrame *wnd)
 }
 
 /// @}
+
+#pragma warning(pop)

@@ -551,7 +551,7 @@ inline unsigned __int64 htonll(unsigned __int64 val);
 /// \param[in ] val  A 24-bit unsigned number in host byte order
 /// \param[out] out  A 24-bit unsigned number in network byte order
 ///
-inline void hton24(_In_ unsigned int val, _Out_ unsigned char out[3]);
+inline void hton24(_In_ unsigned int val, _Out_writes_(3) unsigned char out[3]);
 
 ///
 /// Converts a 24-bit integer from TCP/IP network to host byte order.
@@ -658,6 +658,9 @@ namespace eap
         ///
         /// Constructor
         ///
+        /// Note: This constructor does not initialize data. Use sanitizing_blob_zf class when zero-initialization is required.
+        ///
+        #pragma warning(suppress: 26495)
         inline sanitizing_blob_f()
         {
         }
@@ -677,7 +680,7 @@ namespace eap
         ///
         /// \param[inout] other  BLOB to move from
         ///
-        inline sanitizing_blob_f(_Inout_ sanitizing_blob_f<N> &&other)
+        inline sanitizing_blob_f(_Inout_ sanitizing_blob_f<N> &&other) noexcept
         {
             memcpy(data, other.data, N);
         }
@@ -687,7 +690,7 @@ namespace eap
         ///
         /// \param[inout] other  Zero-initialized BLOB to move from
         ///
-        inline sanitizing_blob_f(_Inout_ sanitizing_blob_zf<N> &&other)
+        inline sanitizing_blob_f(_Inout_ sanitizing_blob_zf<N> &&other) noexcept
         {
             memcpy(data, other.data, N);
             memset(other.data, 0, N);
@@ -722,7 +725,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        inline sanitizing_blob_f& operator=(_Inout_ sanitizing_blob_f<N> &&other)
+        inline sanitizing_blob_f& operator=(_Inout_ sanitizing_blob_f<N> &&other) noexcept
         {
             if (this != std::addressof(other))
                 memcpy(data, other.data, N);
@@ -736,7 +739,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        inline sanitizing_blob_f& operator=(_Inout_ sanitizing_blob_zf<N> &&other)
+        inline sanitizing_blob_f& operator=(_Inout_ sanitizing_blob_zf<N> &&other) noexcept
         {
             if (this != std::addressof(other)) {
                 memcpy(data, other.data, N);
@@ -827,7 +830,7 @@ namespace eap
         ///
         /// \param[inout] other  Zero-initialized BLOB to move from
         ///
-        inline sanitizing_blob_zf(_Inout_ sanitizing_blob_zf<N> &&other) :
+        inline sanitizing_blob_zf(_Inout_ sanitizing_blob_zf<N> &&other) noexcept :
             sanitizing_blob_f<N>(std::move(other))
         {
             memset(other.data, 0, N);
@@ -848,7 +851,7 @@ namespace eap
         ///
         /// \param[inout] other  BLOB to move from
         ///
-        inline sanitizing_blob_zf(_Inout_ sanitizing_blob_f<N> &&other) :
+        inline sanitizing_blob_zf(_Inout_ sanitizing_blob_f<N> &&other) noexcept :
             sanitizing_blob_f<N>(std::move(other))
         {
         }
@@ -874,7 +877,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        inline sanitizing_blob_zf& operator=(_Inout_ sanitizing_blob_zf<N> &&other)
+        inline sanitizing_blob_zf& operator=(_Inout_ sanitizing_blob_zf<N> &&other) noexcept
         {
             if (this != std::addressof(other)) {
                 memcpy(data, other.data, N);
@@ -904,7 +907,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        inline sanitizing_blob_zf& operator=(_Inout_ sanitizing_blob_f<N> &&other)
+        inline sanitizing_blob_zf& operator=(_Inout_ sanitizing_blob_f<N> &&other) noexcept
         {
             if (this != std::addressof(other))
                 memcpy(data, other.data, N);
@@ -1110,7 +1113,7 @@ inline void operator<<(_Inout_ eap::cursor_out &cursor, _In_ const std::basic_st
 template<class _Traits, class _Ax>
 inline size_t pksizeof(_In_ const std::basic_string<wchar_t, _Traits, _Ax> &val)
 {
-    return sizeof(char)*(WideCharToMultiByte(CP_UTF8, 0, val.c_str(), (int)val.length(), NULL, 0, NULL, NULL) + 1);
+    return sizeof(char)*(WideCharToMultiByte(CP_UTF8, 0, val.c_str(), (int)val.length(), NULL, 0, NULL, NULL)) + sizeof(char);
 }
 
 
@@ -1407,7 +1410,7 @@ inline unsigned __int64 htonll(unsigned __int64 val)
 #endif
 
 
-inline void hton24(_In_ unsigned int val, _Out_ unsigned char out[3])
+inline void hton24(_In_ unsigned int val, _Out_writes_(3) unsigned char out[3])
 {
     assert(val <= 0xffffff);
     out[0] = (val >> 16) & 0xff;

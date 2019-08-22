@@ -57,7 +57,7 @@ namespace eap
         ///
         /// \param[in] other  GTC method to move from
         ///
-        method_gtc(_Inout_ method_gtc &&other);
+        method_gtc(_Inout_ method_gtc &&other) noexcept;
 
         ///
         /// Moves a GTC method
@@ -66,7 +66,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        method_gtc& operator=(_Inout_ method_gtc &&other);
+        method_gtc& operator=(_Inout_ method_gtc &&other) noexcept;
 
         /// \name Session management
         /// @{
@@ -93,8 +93,8 @@ namespace eap
         /// @}
 
         virtual void get_result(
-            _In_  EapPeerMethodResultReason reason,
-            _Out_ EapPeerMethodResult       *pResult);
+            _In_    EapPeerMethodResultReason reason,
+            _Inout_ EapPeerMethodResult       *pResult);
 
         /// \name User Interaction
         /// @{

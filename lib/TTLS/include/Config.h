@@ -69,7 +69,7 @@ namespace eap
         ///
         /// \param[in] other  Configuration to move from
         ///
-        config_method_ttls(_Inout_ config_method_ttls &&other);
+        config_method_ttls(_Inout_ config_method_ttls &&other) noexcept;
 
         ///
         /// Copies configuration
@@ -87,7 +87,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        config_method_ttls& operator=(_Inout_ config_method_ttls &&other);
+        config_method_ttls& operator=(_Inout_ config_method_ttls &&other) noexcept;
 
         virtual config* clone() const;
 

@@ -37,7 +37,7 @@ eap::method_defrag::method_defrag(_In_ module &mod, _In_ method *inner) :
 }
 
 
-eap::method_defrag::method_defrag(_Inout_ method_defrag &&other) :
+eap::method_defrag::method_defrag(_Inout_ method_defrag &&other) noexcept :
     m_data_req   (std::move(other.m_data_req)),
     m_data_res   (std::move(other.m_data_res)),
     m_send_res   (std::move(other.m_send_res)),
@@ -46,7 +46,7 @@ eap::method_defrag::method_defrag(_Inout_ method_defrag &&other) :
 }
 
 
-eap::method_defrag& eap::method_defrag::operator=(_Inout_ method_defrag &&other)
+eap::method_defrag& eap::method_defrag::operator=(_Inout_ method_defrag &&other) noexcept
 {
     if (this != std::addressof(other)) {
         (method_tunnel&)*this = std::move(other           );
@@ -181,7 +181,7 @@ eap::method_eapmsg::method_eapmsg(_In_ module &mod, _In_ const wchar_t *identity
 }
 
 
-eap::method_eapmsg::method_eapmsg(_Inout_ method_eapmsg &&other) :
+eap::method_eapmsg::method_eapmsg(_Inout_ method_eapmsg &&other) noexcept :
     m_identity   (std::move(other.m_identity  )),
     m_phase      (std::move(other.m_phase     )),
     m_packet_res (std::move(other.m_packet_res)),
@@ -190,7 +190,7 @@ eap::method_eapmsg::method_eapmsg(_Inout_ method_eapmsg &&other) :
 }
 
 
-eap::method_eapmsg& eap::method_eapmsg::operator=(_Inout_ method_eapmsg &&other)
+eap::method_eapmsg& eap::method_eapmsg::operator=(_Inout_ method_eapmsg &&other) noexcept
 {
     if (this != std::addressof(other)) {
         (method_tunnel&)*this = std::move(other             );
@@ -215,7 +215,7 @@ void eap::method_eapmsg::begin_session(
     // Inner method can generate packets of up to 16MB (less the Diameter AVP header).
     // Initialize inner method with appropriately less packet size maximum.
     if (dwMaxSendPacketSize < sizeof(diameter_avp_header))
-        throw invalid_argument(string_printf(__FUNCTION__ " Maximum packet size too small (minimum: %u, available: %u).", sizeof(diameter_avp_header) + 1, dwMaxSendPacketSize));
+        throw invalid_argument(string_printf(__FUNCTION__ " Maximum packet size too small (minimum: %zu, available: %u).", sizeof(diameter_avp_header) + 1, dwMaxSendPacketSize));
     assert(m_inner);
     m_inner->begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, std::min<DWORD>(dwMaxSendPacketSize, 0xffffff) - sizeof(diameter_avp_header));
 
@@ -325,7 +325,7 @@ void eap::method_eapmsg::get_response_packet(
         packet.insert(packet.end(), (unsigned int)((4 - size_packet) % 4), 0);
     } else {
         if (m_packet_res.size() > size_max)
-            throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %u, maximum: %u).", m_packet_res.size(), size_max));
+            throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %zu, maximum: %u).", m_packet_res.size(), size_max));
 
         packet.assign(m_packet_res.begin(), m_packet_res.end());
     }
@@ -344,10 +344,12 @@ eap::method_ttls::method_ttls(_In_ module &mod, _In_ config_method_ttls &cfg, _I
     m_packet_res_inner(false),
     method_tunnel(mod, inner)
 {
+    m_eap_attr_desc.dwNumberOfAttributes = 0;
+    m_eap_attr_desc.pAttribs = NULL;
 }
 
 
-eap::method_ttls::method_ttls(_Inout_ method_ttls &&other) :
+eap::method_ttls::method_ttls(_Inout_ method_ttls &&other) noexcept :
     m_cfg             (          other.m_cfg              ),
     m_cred            (          other.m_cred             ),
     m_user_ctx        (std::move(other.m_user_ctx        )),
@@ -362,10 +364,12 @@ eap::method_ttls::method_ttls(_Inout_ method_ttls &&other) :
     m_eap_attr        (std::move(other.m_eap_attr        )),
     method_tunnel     (std::move(other                   ))
 {
+    m_eap_attr_desc.dwNumberOfAttributes = (DWORD)m_eap_attr.size();
+    m_eap_attr_desc.pAttribs = m_eap_attr.data();
 }
 
 
-eap::method_ttls& eap::method_ttls::operator=(_Inout_ method_ttls &&other)
+eap::method_ttls& eap::method_ttls::operator=(_Inout_ method_ttls &&other) noexcept
 {
     if (this != std::addressof(other)) {
         assert(std::addressof(m_cfg ) == std::addressof(other.m_cfg )); // Move method within same configuration only!
@@ -770,11 +774,11 @@ void eap::method_ttls::get_response_packet(
         if (FAILED(status))
             throw sec_runtime_error(status, __FUNCTION__ " Error getting Schannel required encryption sizes.");
         if (m_packet_res.size() + sizes.cbHeader + sizes.cbTrailer > size_max)
-            throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %u, maximum: %u).", m_packet_res.size(), size_max));
+            throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %zu, maximum: %u).", m_packet_res.size(), size_max));
         sizes.cbMaximumMessage = std::min<unsigned long>(sizes.cbMaximumMessage, size_max - (unsigned long)(m_packet_res.size() + sizes.cbHeader + sizes.cbTrailer));
 
         // Get inner response packet.
-        packet.reserve(sizes.cbHeader + sizes.cbMaximumMessage + sizes.cbTrailer);
+        packet.reserve((size_t)sizes.cbHeader + sizes.cbMaximumMessage + sizes.cbTrailer);
         method_tunnel::get_response_packet(packet, sizes.cbMaximumMessage);
         if (!packet.empty()) {
             DWORD size_data = (DWORD)packet.size();
@@ -799,7 +803,7 @@ void eap::method_ttls::get_response_packet(
             m_packet_res.insert(m_packet_res.end(), reinterpret_cast<const unsigned char*>(buf[0].pvBuffer), reinterpret_cast<const unsigned char*>(buf[0].pvBuffer) + buf[0].cbBuffer + buf[1].cbBuffer + buf[2].cbBuffer);
         }
     } else if (m_packet_res.size() > size_max)
-        throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %u, maximum: %u).", m_packet_res.size(), size_max));
+        throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %zu, maximum: %u).", m_packet_res.size(), size_max));
 
     packet.assign(m_packet_res.begin(), m_packet_res.end());
 }
@@ -819,7 +823,7 @@ void eap::method_ttls::get_result(
 
         // Prepare EAP result attributes.
         if (pResult->pAttribArray) {
-            m_eap_attr.reserve(pResult->pAttribArray->dwNumberOfAttributes + 3);
+            m_eap_attr.reserve((size_t)pResult->pAttribArray->dwNumberOfAttributes + 3);
             m_eap_attr.clear();
             // Copy all EAP attributes from inner method up to blank terminator. Exclude any MPPE-Recv-Key or MPPE-Send-Key if found.
             for (auto attr = pResult->pAttribArray->pAttribs, attr_end = pResult->pAttribArray->pAttribs + pResult->pAttribArray->dwNumberOfAttributes; attr != attr_end && attr->eaType; ++attr) {

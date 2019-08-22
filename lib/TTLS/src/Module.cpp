@@ -92,6 +92,8 @@ void eap::peer_ttls::get_identity(
     _Out_                                  BOOL   *pfInvokeUI,
     _Out_                                  WCHAR  **ppwszIdentity)
 {
+    assert(ppUserDataOut);
+    assert(pdwUserDataOutSize);
     assert(pfInvokeUI);
     assert(ppwszIdentity);
 
@@ -111,7 +113,10 @@ void eap::peer_ttls::get_identity(
         if ((dwFlags & EAP_FLAG_MACHINE_AUTH) == 0) {
             // Per-user authentication, request UI.
             log_event(&EAPMETHOD_TRACE_EVT_CRED_INVOKE_UI2, event_data::blank);
+            *ppUserDataOut = NULL;
+            *pdwUserDataOutSize = 0;
             *pfInvokeUI = TRUE;
+            *ppwszIdentity = NULL;
             return;
         } else {
             // Per-machine authentication, cannot use UI.
@@ -308,9 +313,9 @@ void eap::peer_ttls::process_request_packet(
 
 
 void eap::peer_ttls::get_response_packet(
-    _In_                               EAP_SESSION_HANDLE hSession,
-    _Inout_bytecap_(*dwSendPacketSize) EapPacket          *pSendPacket,
-    _Inout_                            DWORD              *pdwSendPacketSize)
+    _In_                                   EAP_SESSION_HANDLE hSession,
+    _Out_bytecapcount_(*pdwSendPacketSize) EapPacket          *pSendPacket,
+    _Inout_                                DWORD              *pdwSendPacketSize)
 {
     assert(pdwSendPacketSize);
     assert(pSendPacket || !*pdwSendPacketSize);
@@ -393,8 +398,8 @@ void eap::peer_ttls::set_ui_context(
 
 
 void eap::peer_ttls::get_response_attributes(
-    _In_    EAP_SESSION_HANDLE hSession,
-    _Inout_ EapAttributes      *pAttribs)
+    _In_  EAP_SESSION_HANDLE hSession,
+    _Out_ EapAttributes      *pAttribs)
 {
     static_cast<session*>(hSession)->m_method->get_response_attributes(pAttribs);
 }
@@ -422,12 +427,12 @@ void eap::peer_ttls::spawn_crl_check(_Inout_ winstd::cert_context &&cert)
 }
 
 
-const eap::config_method_ttls* eap::peer_ttls::combine_credentials(
+_Success_(return != 0) const eap::config_method_ttls* eap::peer_ttls::combine_credentials(
     _In_                             DWORD                   dwFlags,
     _In_                       const config_connection       &cfg,
     _In_count_(dwUserDataSize) const BYTE                    *pUserData,
     _In_                             DWORD                   dwUserDataSize,
-    _Out_                            credentials_connection& cred_out,
+    _Inout_                          credentials_connection& cred_out,
     _In_                             HANDLE                  hTokenImpersonateUser)
 {
 #if EAP_USE_NATIVE_CREDENTIAL_CACHE
@@ -560,7 +565,7 @@ eap::peer_ttls::crl_checker::crl_checker(_In_ module &mod, _Inout_ winstd::cert_
 }
 
 
-eap::peer_ttls::crl_checker::crl_checker(_Inout_ crl_checker &&other) :
+eap::peer_ttls::crl_checker::crl_checker(_Inout_ crl_checker &&other) noexcept :
     m_module(          other.m_module ),
     m_thread(std::move(other.m_thread)),
     m_abort (std::move(other.m_abort )),
@@ -569,7 +574,7 @@ eap::peer_ttls::crl_checker::crl_checker(_Inout_ crl_checker &&other) :
 }
 
 
-eap::peer_ttls::crl_checker& eap::peer_ttls::crl_checker::operator=(_Inout_ crl_checker &&other)
+eap::peer_ttls::crl_checker& eap::peer_ttls::crl_checker::operator=(_Inout_ crl_checker &&other) noexcept
 {
     if (this != std::addressof(other)) {
         assert(std::addressof(m_module) == std::addressof(other.m_module)); // Move threads within same module only!
@@ -627,7 +632,7 @@ DWORD WINAPI eap::peer_ttls::crl_checker::verify(_In_ crl_checker *obj)
             switch (status_rev.dwError) {
             case CRYPT_E_NO_REVOCATION_CHECK:
                 // Revocation check could not be performed.
-                c += status_rev.dwIndex + 1;
+                c += (size_t)status_rev.dwIndex + 1;
                 if (c == c_end) {
                     // This "error" is expected for the root CA certificate.
                 } else {
@@ -663,7 +668,7 @@ DWORD WINAPI eap::peer_ttls::crl_checker::verify(_In_ crl_checker *obj)
                 }}
 
                 // Resume checking the rest of the chain.
-                c += status_rev.dwIndex + 1;
+                c += (size_t)status_rev.dwIndex + 1;
                 break;
 
             case ERROR_SUCCESS:
@@ -674,7 +679,7 @@ DWORD WINAPI eap::peer_ttls::crl_checker::verify(_In_ crl_checker *obj)
             default:
                 // Checking one of the certificates in the chain for revocation failed. Resume checking the rest.
                 obj->m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_REVOKE_FAILED, event_data((unsigned int)eap_type_ttls), event_data(subj), event_data(status_rev.dwError), event_data::blank);
-                c += status_rev.dwIndex + 1;
+                c += (size_t)status_rev.dwIndex + 1;
             }
         } else {
             // Revocation check finished.

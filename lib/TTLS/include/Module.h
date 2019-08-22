@@ -115,16 +115,16 @@ namespace eap
             _Out_                                      EapPeerMethodOutput *pEapOutput);
 
         virtual void get_response_packet(
-            _In_                               EAP_SESSION_HANDLE hSession,
-            _Inout_bytecap_(*dwSendPacketSize) EapPacket          *pSendPacket,
-            _Inout_                            DWORD              *pdwSendPacketSize);
+            _In_                                   EAP_SESSION_HANDLE hSession,
+            _Out_bytecapcount_(*pdwSendPacketSize) EapPacket          *pSendPacket,
+            _Inout_                                DWORD              *pdwSendPacketSize);
 
         /// @}
 
         virtual void get_result(
-            _In_  EAP_SESSION_HANDLE        hSession,
-            _In_  EapPeerMethodResultReason reason,
-            _Out_ EapPeerMethodResult       *pResult);
+            _In_    EAP_SESSION_HANDLE        hSession,
+            _In_    EapPeerMethodResultReason reason,
+            _Inout_ EapPeerMethodResult       *pResult);
 
         /// \name User Interaction
         /// @{
@@ -167,12 +167,12 @@ namespace eap
         ///
         /// Checks all configured providers and tries to combine credentials.
         ///
-        const config_method_ttls* combine_credentials(
+        _Success_(return != 0) const config_method_ttls* combine_credentials(
             _In_                             DWORD                   dwFlags,
             _In_                       const config_connection       &cfg,
             _In_count_(dwUserDataSize) const BYTE                    *pUserData,
             _In_                             DWORD                   dwUserDataSize,
-            _Out_                            credentials_connection& cred_out,
+            _Inout_                          credentials_connection& cred_out,
             _In_                             HANDLE                  hTokenImpersonateUser);
 
     protected:
@@ -223,7 +223,7 @@ namespace eap
             ///
             /// \param[in] other  Thread to move from
             ///
-            crl_checker(_Inout_ crl_checker &&other);
+            crl_checker(_Inout_ crl_checker &&other) noexcept;
 
             ///
             /// Moves a thread
@@ -232,7 +232,7 @@ namespace eap
             ///
             /// \returns Reference to this object
             ///
-            crl_checker& operator=(_Inout_ crl_checker &&other);
+            crl_checker& operator=(_Inout_ crl_checker &&other) noexcept;
 
             ///
             /// Verifies server's certificate if it has been revoked

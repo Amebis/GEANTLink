@@ -40,7 +40,7 @@ eap::config_method_mschapv2::config_method_mschapv2(_In_ const config_method_msc
 }
 
 
-eap::config_method_mschapv2::config_method_mschapv2(_Inout_ config_method_mschapv2 &&other) :
+eap::config_method_mschapv2::config_method_mschapv2(_Inout_ config_method_mschapv2 &&other) noexcept :
     config_method_with_cred(std::move(other))
 {
 }
@@ -55,7 +55,7 @@ eap::config_method_mschapv2& eap::config_method_mschapv2::operator=(_In_ const c
 }
 
 
-eap::config_method_mschapv2& eap::config_method_mschapv2::operator=(_Inout_ config_method_mschapv2 &&other)
+eap::config_method_mschapv2& eap::config_method_mschapv2::operator=(_Inout_ config_method_mschapv2 &&other) noexcept
 {
     if (this != &other)
         (config_method_with_cred&&)*this = std::move(other);
@@ -103,7 +103,7 @@ eap::config_method_eapmschapv2::config_method_eapmschapv2(_In_ const config_meth
 }
 
 
-eap::config_method_eapmschapv2::config_method_eapmschapv2(_Inout_ config_method_eapmschapv2 &&other) :
+eap::config_method_eapmschapv2::config_method_eapmschapv2(_Inout_ config_method_eapmschapv2 &&other) noexcept :
     config_method_mschapv2(std::move(other))
 {
 }
@@ -118,7 +118,7 @@ eap::config_method_eapmschapv2& eap::config_method_eapmschapv2::operator=(_In_ c
 }
 
 
-eap::config_method_eapmschapv2& eap::config_method_eapmschapv2::operator=(_Inout_ config_method_eapmschapv2 &&other)
+eap::config_method_eapmschapv2& eap::config_method_eapmschapv2::operator=(_Inout_ config_method_eapmschapv2 &&other) noexcept
 {
     if (this != &other)
         (config_method_mschapv2&&)*this = std::move(other);

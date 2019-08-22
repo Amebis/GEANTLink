@@ -83,7 +83,7 @@ namespace eap
         ///
         /// \param[in] other  Configuration to move from
         ///
-        config(_Inout_ config &&other);
+        config(_Inout_ config &&other) noexcept;
 
         ///
         /// Copies configuration
@@ -101,7 +101,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        config& operator=(_Inout_ config &&other);
+        config& operator=(_Inout_ config &&other) noexcept;
 
         ///
         /// Clones this object
@@ -187,7 +187,7 @@ namespace eap
         ///
         /// \param[in] other  Configuration to move from
         ///
-        config_method(_Inout_ config_method &&other);
+        config_method(_Inout_ config_method &&other) noexcept;
 
         ///
         /// Copies configuration
@@ -205,7 +205,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        config_method& operator=(_Inout_ config_method &&other);
+        config_method& operator=(_Inout_ config_method &&other) noexcept;
 
         /// \name XML management
         /// @{
@@ -271,7 +271,7 @@ namespace eap
         ///
         /// \param[in] other  Configuration to move from
         ///
-        config_method_with_cred(_Inout_ config_method_with_cred &&other);
+        config_method_with_cred(_Inout_ config_method_with_cred &&other) noexcept;
 
         ///
         /// Copies configuration
@@ -289,7 +289,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        config_method_with_cred& operator=(_Inout_ config_method_with_cred &&other);
+        config_method_with_cred& operator=(_Inout_ config_method_with_cred &&other) noexcept;
 
         /// \name XML management
         /// @{
@@ -335,7 +335,7 @@ namespace eap
         ///
         /// \param[in] other  Configuration to move from
         ///
-        config_provider(_Inout_ config_provider &&other);
+        config_provider(_Inout_ config_provider &&other) noexcept;
 
         ///
         /// Copies configuration
@@ -353,7 +353,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        config_provider& operator=(_Inout_ config_provider &&other);
+        config_provider& operator=(_Inout_ config_provider &&other) noexcept;
 
         virtual config* clone() const;
 
@@ -431,7 +431,7 @@ namespace eap
         ///
         /// \param[in] other  Configuration to move from
         ///
-        config_connection(_Inout_ config_connection &&other);
+        config_connection(_Inout_ config_connection &&other) noexcept;
 
         ///
         /// Copies configuration
@@ -449,7 +449,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        config_connection& operator=(_Inout_ config_connection &&other);
+        config_connection& operator=(_Inout_ config_connection &&other) noexcept;
 
         virtual config* clone() const;
 

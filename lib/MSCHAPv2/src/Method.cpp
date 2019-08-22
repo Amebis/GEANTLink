@@ -37,7 +37,7 @@ eap::method_mschapv2_base::method_mschapv2_base(_In_ module &mod, _In_ config_me
 }
 
 
-eap::method_mschapv2_base::method_mschapv2_base(_Inout_ method_mschapv2_base &&other) :
+eap::method_mschapv2_base::method_mschapv2_base(_Inout_ method_mschapv2_base &&other) noexcept :
     m_cfg             (          other.m_cfg              ),
     m_cred            (          other.m_cred             ),
     m_cp              (std::move(other.m_cp              )),
@@ -51,7 +51,7 @@ eap::method_mschapv2_base::method_mschapv2_base(_Inout_ method_mschapv2_base &&o
 }
 
 
-eap::method_mschapv2_base& eap::method_mschapv2_base::operator=(_Inout_ method_mschapv2_base &&other)
+eap::method_mschapv2_base& eap::method_mschapv2_base::operator=(_Inout_ method_mschapv2_base &&other) noexcept
 {
     if (this != std::addressof(other)) {
         assert(std::addressof(m_cfg ) == std::addressof(other.m_cfg )); // Move method within same configuration only!
@@ -93,7 +93,7 @@ void eap::method_mschapv2_base::get_response_packet(
     _In_opt_ DWORD           size_max)
 {
     if (m_packet_res.size() > size_max)
-        throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %u, maximum: %u).", m_packet_res.size(), size_max));
+        throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %zu, maximum: %u).", m_packet_res.size(), size_max));
 
     packet.assign(m_packet_res.begin(), m_packet_res.end());
 }
@@ -211,13 +211,13 @@ eap::method_mschapv2::method_mschapv2(_In_ module &mod, _In_ config_method_mscha
 }
 
 
-eap::method_mschapv2::method_mschapv2(_Inout_ method_mschapv2 &&other) :
+eap::method_mschapv2::method_mschapv2(_Inout_ method_mschapv2 &&other) noexcept :
     method_mschapv2_base(std::move(other        ))
 {
 }
 
 
-eap::method_mschapv2& eap::method_mschapv2::operator=(_Inout_ method_mschapv2 &&other)
+eap::method_mschapv2& eap::method_mschapv2::operator=(_Inout_ method_mschapv2 &&other) noexcept
 {
     if (this != std::addressof(other))
         (method_mschapv2_base&)*this = std::move(other);
@@ -328,14 +328,14 @@ eap::method_mschapv2_diameter::method_mschapv2_diameter(_In_ module &mod, _In_ c
 }
 
 
-eap::method_mschapv2_diameter::method_mschapv2_diameter(_Inout_ method_mschapv2_diameter &&other) :
+eap::method_mschapv2_diameter::method_mschapv2_diameter(_Inout_ method_mschapv2_diameter &&other) noexcept :
     m_phase             (std::move(other.m_phase)),
     method_mschapv2_base(std::move(other        ))
 {
 }
 
 
-eap::method_mschapv2_diameter& eap::method_mschapv2_diameter::operator=(_Inout_ method_mschapv2_diameter &&other)
+eap::method_mschapv2_diameter& eap::method_mschapv2_diameter::operator=(_Inout_ method_mschapv2_diameter &&other) noexcept
 {
     if (this != std::addressof(other)) {
         (method_mschapv2_base&)*this = std::move(other        );

@@ -150,7 +150,7 @@ protected:
 
 private:
     /// \cond internal
-    static VOID WINAPI EventRecordCallback(PEVENT_RECORD pEvent);
+    static VOID WINAPI EventRecordCallback(_In_ PEVENT_RECORD pEvent);
     /// \endcond
 
 protected:

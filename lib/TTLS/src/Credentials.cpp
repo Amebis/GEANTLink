@@ -41,7 +41,7 @@ eap::credentials_ttls::credentials_ttls(_In_ const credentials_ttls &other) :
 }
 
 
-eap::credentials_ttls::credentials_ttls(_Inout_ credentials_ttls &&other) :
+eap::credentials_ttls::credentials_ttls(_Inout_ credentials_ttls &&other) noexcept :
     m_inner(std::move(other.m_inner)),
     credentials_tls(std::move(other))
 {
@@ -59,7 +59,7 @@ eap::credentials_ttls& eap::credentials_ttls::operator=(_In_ const credentials_t
 }
 
 
-eap::credentials_ttls& eap::credentials_ttls::operator=(_Inout_ credentials_ttls &&other)
+eap::credentials_ttls& eap::credentials_ttls::operator=(_Inout_ credentials_ttls &&other) noexcept
 {
     if (this != &other) {
         (credentials_tls&)*this = std::move(other);
@@ -180,7 +180,7 @@ wstring eap::credentials_ttls::get_identity() const
 
 eap::credentials::source_t eap::credentials_ttls::combine(
     _In_             DWORD         dwFlags,
-    _In_             HANDLE        hTokenImpersonateUser,
+    _In_opt_         HANDLE        hTokenImpersonateUser,
     _In_opt_   const credentials   *cred_cached,
     _In_       const config_method &cfg,
     _In_opt_z_       LPCTSTR       pszTargetName)

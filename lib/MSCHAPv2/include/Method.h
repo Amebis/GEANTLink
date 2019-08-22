@@ -62,7 +62,7 @@ namespace eap
         ///
         /// \param[in] other  MSCHAPv2 method to move from
         ///
-        method_mschapv2_base(_Inout_ method_mschapv2_base &&other);
+        method_mschapv2_base(_Inout_ method_mschapv2_base &&other) noexcept;
 
         ///
         /// Moves a MSCHAPv2 method
@@ -71,7 +71,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        method_mschapv2_base& operator=(_Inout_ method_mschapv2_base &&other);
+        method_mschapv2_base& operator=(_Inout_ method_mschapv2_base &&other) noexcept;
 
         /// \name Session management
         /// @{
@@ -94,8 +94,8 @@ namespace eap
         /// @}
 
         virtual void get_result(
-            _In_  EapPeerMethodResultReason reason,
-            _Out_ EapPeerMethodResult       *pResult);
+            _In_    EapPeerMethodResultReason reason,
+            _Inout_ EapPeerMethodResult       *pResult);
 
     protected:
         ///
@@ -162,7 +162,7 @@ namespace eap
         ///
         /// \param[in] other  MSCHAPv2 method to move from
         ///
-        method_mschapv2(_Inout_ method_mschapv2 &&other);
+        method_mschapv2(_Inout_ method_mschapv2 &&other) noexcept;
 
         ///
         /// Moves a MSCHAPv2 method
@@ -171,7 +171,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        method_mschapv2& operator=(_Inout_ method_mschapv2 &&other);
+        method_mschapv2& operator=(_Inout_ method_mschapv2 &&other) noexcept;
 
         /// \name Packet processing
         /// @{
@@ -208,7 +208,7 @@ namespace eap
         ///
         /// \param[in] other  MSCHAPv2 method to move from
         ///
-        method_mschapv2_diameter(_Inout_ method_mschapv2_diameter &&other);
+        method_mschapv2_diameter(_Inout_ method_mschapv2_diameter &&other) noexcept;
 
         ///
         /// Moves a MSCHAPv2 method
@@ -217,7 +217,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        method_mschapv2_diameter& operator=(_Inout_ method_mschapv2_diameter &&other);
+        method_mschapv2_diameter& operator=(_Inout_ method_mschapv2_diameter &&other) noexcept;
 
         /// \name Session management
         /// @{

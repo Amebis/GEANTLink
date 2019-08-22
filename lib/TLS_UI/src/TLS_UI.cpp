@@ -225,8 +225,10 @@ void wxTLSServerTrustPanel::OnRootCADClick(wxCommandEvent& event)
     wxTLSServerTrustPanelBase::OnRootCADClick(event);
 
     wxCertificateClientData *cert = dynamic_cast<wxCertificateClientData*>(event.GetClientObject());
-    if (cert)
+    if (cert) {
+        #pragma warning(suppress: 6387) // The pvReserved parameter is annotated as _In_
         CryptUIDlgViewContext(CERT_STORE_CERTIFICATE_CONTEXT, cert->m_cert, this->GetHWND(), NULL, 0, NULL);
+    }
 }
 
 
@@ -237,6 +239,7 @@ void wxTLSServerTrustPanel::OnRootCAAddStore(wxCommandEvent& event)
     winstd::cert_store store;
     if (store.create(NULL, _T("ROOT"))) {
         winstd::cert_context cert;
+        #pragma warning(suppress: 6387) // The pvReserved parameter is annotated as _In_
         cert.attach(CryptUIDlgSelectCertificateFromStore(store, this->GetHWND(), NULL, NULL, 0, 0, NULL));
         if (cert)
             AddRootCA(cert);

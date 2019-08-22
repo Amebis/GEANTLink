@@ -58,7 +58,7 @@ namespace eap
         ///
         /// \param[in] other  PAP method to move from
         ///
-        method_pap_diameter(_Inout_ method_pap_diameter &&other);
+        method_pap_diameter(_Inout_ method_pap_diameter &&other) noexcept;
 
         ///
         /// Moves a PAP method
@@ -67,7 +67,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        method_pap_diameter& operator=(_Inout_ method_pap_diameter &&other);
+        method_pap_diameter& operator=(_Inout_ method_pap_diameter &&other) noexcept;
 
         /// \name Session management
         /// @{
@@ -94,8 +94,8 @@ namespace eap
         /// @}
 
         virtual void get_result(
-            _In_  EapPeerMethodResultReason reason,
-            _Out_ EapPeerMethodResult       *pResult);
+            _In_    EapPeerMethodResultReason reason,
+            _Inout_ EapPeerMethodResult       *pResult);
 
     protected:
         config_method_pap &m_cfg;       ///< Method configuration

@@ -108,8 +108,10 @@ inline void wxInitializeConfig();
 
 #pragma once
 
-#include <wx/msw/winundef.h> // Fixes `CreateDialog` name collision
+#pragma warning(push)
+#pragma warning(disable: 26444)
 #include "../res/wxEAP_UI.h"
+#pragma warning(pop)
 
 #include "../../EAPBase/include/Config.h"
 #include "../../EAPBase/include/Credentials.h"
@@ -125,6 +127,10 @@ inline void wxInitializeConfig();
 
 #include <list>
 #include <memory>
+
+#pragma warning(push)
+#pragma warning(disable: 26444)
+
 
 /// \addtogroup EAPBaseGUI
 /// @{
@@ -195,7 +201,7 @@ public:
                         m_providers),
                     is_single ?
                         wxEAPGetProviderName(provider->m_name) :
-                        winstd::tstring_printf(_T("%s (%u)"), static_cast<LPCTSTR>(wxEAPGetProviderName(provider->m_name)), count));
+                        winstd::tstring_printf(_T("%s (%zu)"), static_cast<LPCTSTR>(wxEAPGetProviderName(provider->m_name)), count));
             }
         }
 
@@ -248,7 +254,11 @@ protected:
         // Create provider.
         eap::config_provider cfg_provider(m_cfg.m_module);
         GUID guid;
-        CoCreateGuid(&guid);
+        HRESULT hr = CoCreateGuid(&guid);
+        if (FAILED(hr)) {
+            wxLogError(winstd::tstring_printf(wxT("error 0x%08x generating GUID"), hr).c_str());
+            return;
+        }
         cfg_provider.m_namespace = L"urn:uuid";
         cfg_provider.m_id        = winstd::wstring_guid(guid).substr(1, 36);
         cfg_provider.m_methods.push_back(std::move(cfg_method));
@@ -258,7 +268,7 @@ protected:
         eap::config_provider &cfg_provider2 = m_cfg.m_providers.back();
         eap::config_method *cfg_method2 = cfg_provider2.m_methods.front().get();
         _wxT *page = new _wxT(cfg_provider2, *cfg_method2, m_providers);
-        m_providers->InsertPage(m_providers->GetSelection() + 1, page, wxEAPGetProviderName(cfg_provider2.m_name), true);
+        m_providers->InsertPage((size_t)m_providers->GetSelection() + 1, page, wxEAPGetProviderName(cfg_provider2.m_name), true);
 
         this->Layout();
         this->GetSizer()->Fit(this);
@@ -1132,3 +1142,5 @@ inline void wxInitializeConfig()
     wxConfigBase *cfgPrev = wxConfigBase::Set(new wxConfig(wxT(PRODUCT_NAME_STR), wxT(VENDOR_NAME_STR)));
     if (cfgPrev) wxDELETE(cfgPrev);
 }
+
+#pragma warning(pop)

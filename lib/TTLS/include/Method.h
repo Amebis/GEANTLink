@@ -93,7 +93,7 @@ namespace eap
         ///
         /// \param[in] other  Method to move from
         ///
-        method_defrag(_Inout_ method_defrag &&other);
+        method_defrag(_Inout_ method_defrag &&other) noexcept;
 
         ///
         /// Moves a method
@@ -102,7 +102,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        method_defrag& operator=(_Inout_ method_defrag &&other);
+        method_defrag& operator=(_Inout_ method_defrag &&other) noexcept;
 
         /// \name Session management
         /// @{
@@ -129,7 +129,6 @@ namespace eap
         /// @}
 
     protected:
-        DWORD m_size_frag_max;      ///< Maximum size of a fragment
         sanitizing_blob m_data_req; ///< Data in request
         sanitizing_blob m_data_res; ///< Data in response
         bool m_send_res;            ///< Are we sending a response?
@@ -156,7 +155,7 @@ namespace eap
         ///
         /// \param[in] other  Method to move from
         ///
-        method_eapmsg(_Inout_ method_eapmsg &&other);
+        method_eapmsg(_Inout_ method_eapmsg &&other) noexcept;
 
         ///
         /// Moves a method
@@ -165,7 +164,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        method_eapmsg& operator=(_Inout_ method_eapmsg &&other);
+        method_eapmsg& operator=(_Inout_ method_eapmsg &&other) noexcept;
 
         /// \name Session management
         /// @{
@@ -230,7 +229,7 @@ namespace eap
         ///
         /// \param[in] other  TTLS method to move from
         ///
-        method_ttls(_Inout_ method_ttls &&other);
+        method_ttls(_Inout_ method_ttls &&other) noexcept;
 
         ///
         /// Moves a TTLS method
@@ -239,7 +238,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        method_ttls& operator=(_Inout_ method_ttls &&other);
+        method_ttls& operator=(_Inout_ method_ttls &&other) noexcept;
 
         /// \name Session management
         /// @{
@@ -266,8 +265,8 @@ namespace eap
         /// @}
 
         virtual void get_result(
-            _In_  EapPeerMethodResultReason reason,
-            _Out_ EapPeerMethodResult       *pResult);
+            _In_    EapPeerMethodResultReason reason,
+            _Inout_ EapPeerMethodResult       *pResult);
 
     protected:
 #if EAP_TLS < EAP_TLS_SCHANNEL_FULL

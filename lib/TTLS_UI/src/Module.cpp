@@ -323,8 +323,10 @@ void eap::peer_ttls_ui::invoke_identity_ui(
                         wxLogError("Unsupported authentication mode.");
                     break;
                 }
-                default                      : wxLogError("Unsupported inner authentication method.");
+                default: wxLogError("Unsupported inner authentication method.");
             }
+            if (!panel)
+                throw invalid_argument("Invalid authentication mode");
             panel->SetRemember(src_inner == eap::credentials::source_storage);
             dlg.AddContent(panel);
 

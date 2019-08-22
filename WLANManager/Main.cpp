@@ -130,6 +130,7 @@ static int WLANManager()
 
         // Launch WLAN profile config dialog.
         WLAN_REASON_CODE wlrc = L2_REASON_CODE_SUCCESS;
+        #pragma warning(suppress: 6387) // TODO: MSDN nor SAL annotation don't indicate NULL HWND are OK with WlanUIEditProfile().
         DWORD dwResult = WlanUIEditProfile(WLAN_UI_API_VERSION, pwcArglist[2], &(interfaces->InterfaceInfo[i].InterfaceGuid), NULL, WLSecurityPage, NULL, &wlrc);
         if (dwResult != ERROR_SUCCESS) {
             // WlanUIEditProfile() displays own error dialog on failure.
@@ -153,7 +154,8 @@ static int WLANManager()
 }
 
 
-int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow)
+_Use_decl_annotations_
+int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
     UNREFERENCED_PARAMETER(hInstance);
     UNREFERENCED_PARAMETER(hPrevInstance);

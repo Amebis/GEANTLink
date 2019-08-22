@@ -43,7 +43,7 @@ eap::ui_context::ui_context(_In_ const ui_context &other) :
 }
 
 
-eap::ui_context::ui_context(_Inout_ ui_context &&other) :
+eap::ui_context::ui_context(_Inout_ ui_context &&other) noexcept :
     m_cfg   (          other.m_cfg  ),
     m_cred  (          other.m_cred ),
     packable(std::move(other       ))
@@ -63,7 +63,7 @@ eap::ui_context& eap::ui_context::operator=(_In_ const ui_context &other)
 }
 
 
-eap::ui_context& eap::ui_context::operator=(_Inout_ ui_context &&other)
+eap::ui_context& eap::ui_context::operator=(_Inout_ ui_context &&other) noexcept
 {
     if (this != &other) {
         assert(std::addressof(m_cfg ) == std::addressof(other.m_cfg )); // Move context within same configuration only!

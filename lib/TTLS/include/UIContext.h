@@ -61,7 +61,7 @@ namespace eap
         ///
         /// \param[in] other  Credentials to move from
         ///
-        ui_context_ttls(_Inout_ ui_context_ttls &&other);
+        ui_context_ttls(_Inout_ ui_context_ttls &&other) noexcept;
 
         ///
         /// Copies context
@@ -79,7 +79,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        ui_context_ttls& operator=(_Inout_ ui_context_ttls &&other);
+        ui_context_ttls& operator=(_Inout_ ui_context_ttls &&other) noexcept;
 
         /// \name BLOB management
         /// @{

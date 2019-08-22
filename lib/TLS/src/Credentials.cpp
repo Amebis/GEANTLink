@@ -40,7 +40,7 @@ eap::credentials_tls::credentials_tls(_In_ const credentials_tls &other) :
 }
 
 
-eap::credentials_tls::credentials_tls(_Inout_ credentials_tls &&other) :
+eap::credentials_tls::credentials_tls(_Inout_ credentials_tls &&other) noexcept :
     m_cert(std::move(other.m_cert)),
     credentials(std::move(other))
 {
@@ -58,7 +58,7 @@ eap::credentials_tls& eap::credentials_tls::operator=(_In_ const credentials_tls
 }
 
 
-eap::credentials_tls& eap::credentials_tls::operator=(_Inout_ credentials_tls &&other)
+eap::credentials_tls& eap::credentials_tls::operator=(_Inout_ credentials_tls &&other) noexcept
 {
     if (this != &other) {
         (credentials&)*this = std::move(other);
@@ -260,7 +260,7 @@ std::wstring eap::credentials_tls::get_identity() const
             unique_ptr<CERT_ALT_NAME_INFO, LocalFree_delete<CERT_ALT_NAME_INFO> > san_info;
             if (strcmp(m_cert->pCertInfo->rgExtension[idx_ext].pszObjId, szOID_SUBJECT_ALT_NAME2) == 0) {
                 unsigned char *output = NULL;
-                DWORD size_output;
+                DWORD size_output = 0;
                 if (!CryptDecodeObjectEx(
                         X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
                         szOID_SUBJECT_ALT_NAME2,
@@ -272,7 +272,7 @@ std::wstring eap::credentials_tls::get_identity() const
                 san_info.reset((CERT_ALT_NAME_INFO*)output);
             } else if (strcmp(m_cert->pCertInfo->rgExtension[idx_ext].pszObjId, szOID_SUBJECT_ALT_NAME) == 0) {
                 unsigned char *output = NULL;
-                DWORD size_output;
+                DWORD size_output = 0;
                 if (!CryptDecodeObjectEx(
                         X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
                         szOID_SUBJECT_ALT_NAME,
@@ -300,7 +300,7 @@ std::wstring eap::credentials_tls::get_identity() const
 
 eap::credentials::source_t eap::credentials_tls::combine(
     _In_             DWORD         dwFlags,
-    _In_             HANDLE        hTokenImpersonateUser,
+    _In_opt_         HANDLE        hTokenImpersonateUser,
     _In_opt_   const credentials   *cred_cached,
     _In_       const config_method &cfg,
     _In_opt_z_       LPCTSTR       pszTargetName)

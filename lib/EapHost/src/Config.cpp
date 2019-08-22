@@ -45,7 +45,7 @@ eap::config_method_eaphost::config_method_eaphost(_In_ const config_method_eapho
 }
 
 
-eap::config_method_eaphost::config_method_eaphost(_Inout_ config_method_eaphost &&other) :
+eap::config_method_eaphost::config_method_eaphost(_Inout_ config_method_eaphost &&other) noexcept :
     m_type       (std::move(other.m_type    )),
     m_type_str   (std::move(other.m_type_str)),
     m_cfg_blob   (std::move(other.m_cfg_blob)),
@@ -67,7 +67,7 @@ eap::config_method_eaphost& eap::config_method_eaphost::operator=(_In_ const con
 }
 
 
-eap::config_method_eaphost& eap::config_method_eaphost::operator=(_Inout_ config_method_eaphost &&other)
+eap::config_method_eaphost& eap::config_method_eaphost::operator=(_Inout_ config_method_eaphost &&other) noexcept
 {
     if (this != &other) {
         (config_method&&)*this = std::move(other           );

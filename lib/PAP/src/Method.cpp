@@ -37,7 +37,7 @@ eap::method_pap_diameter::method_pap_diameter(_In_ module &mod, _In_ config_meth
 }
 
 
-eap::method_pap_diameter::method_pap_diameter(_Inout_ method_pap_diameter &&other) :
+eap::method_pap_diameter::method_pap_diameter(_Inout_ method_pap_diameter &&other) noexcept :
     m_cfg       (          other.m_cfg        ),
     m_cred      (          other.m_cred       ),
     m_phase     (std::move(other.m_phase     )),
@@ -47,7 +47,7 @@ eap::method_pap_diameter::method_pap_diameter(_Inout_ method_pap_diameter &&othe
 }
 
 
-eap::method_pap_diameter& eap::method_pap_diameter::operator=(_Inout_ method_pap_diameter &&other)
+eap::method_pap_diameter& eap::method_pap_diameter::operator=(_Inout_ method_pap_diameter &&other) noexcept
 {
     if (this != std::addressof(other)) {
         assert(std::addressof(m_cfg ) == std::addressof(other.m_cfg )); // Move method within same configuration only!
@@ -122,7 +122,7 @@ void eap::method_pap_diameter::get_response_packet(
     _In_opt_ DWORD           size_max)
 {
     if (m_packet_res.size() > size_max)
-        throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %u, maximum: %u).", m_packet_res.size(), size_max));
+        throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %zu, maximum: %u).", m_packet_res.size(), size_max));
 
     packet.assign(m_packet_res.begin(), m_packet_res.end());
 }

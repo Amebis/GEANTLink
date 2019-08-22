@@ -69,7 +69,7 @@ namespace eap
         ///
         /// \param[in] other  Method to move from
         ///
-        method(_Inout_ method &&other);
+        method(_Inout_ method &&other) noexcept;
 
         ///
         /// Moves a method
@@ -78,7 +78,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        method& operator=(_Inout_ method &&other);
+        method& operator=(_Inout_ method &&other) noexcept;
 
         /// \name Session management
         /// @{
@@ -144,12 +144,12 @@ namespace eap
         ///
         /// \sa [EapPeerGetResult function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363611.aspx)
         ///
-        /// \param[in ] reason   The reason code for the authentication result returned in \p pResult.
-        /// \param[out] pResult  A pointer to a structure that contains the authentication results.
+        /// \param[in   ] reason   The reason code for the authentication result returned in \p pResult.
+        /// \param[inout] pResult  A pointer to a structure that contains the authentication results.
         ///
         virtual void get_result(
-            _In_  EapPeerMethodResultReason reason,
-            _Out_ EapPeerMethodResult       *pResult);
+            _In_    EapPeerMethodResultReason reason,
+            _Inout_ EapPeerMethodResult       *pResult);
 
         /// \name User Interaction
         /// @{
@@ -236,7 +236,7 @@ namespace eap
         ///
         /// \param[in] other  Method to move from
         ///
-        method_tunnel(_Inout_ method_tunnel &&other);
+        method_tunnel(_Inout_ method_tunnel &&other) noexcept;
 
         ///
         /// Moves a method
@@ -245,7 +245,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        method_tunnel& operator=(_Inout_ method_tunnel &&other);
+        method_tunnel& operator=(_Inout_ method_tunnel &&other) noexcept;
 
         /// \name Session management
         /// @{
@@ -274,8 +274,8 @@ namespace eap
         /// @}
 
         virtual void get_result(
-            _In_  EapPeerMethodResultReason reason,
-            _Out_ EapPeerMethodResult       *pResult);
+            _In_    EapPeerMethodResultReason reason,
+            _Inout_ EapPeerMethodResult       *pResult);
 
         /// \name User Interaction
         /// @{
@@ -326,7 +326,7 @@ namespace eap
         ///
         /// \param[in] other  Method to move from
         ///
-        method_eap(_Inout_ method_eap &&other);
+        method_eap(_Inout_ method_eap &&other) noexcept;
 
         ///
         /// Moves a method
@@ -335,7 +335,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        method_eap& operator=(_Inout_ method_eap &&other);
+        method_eap& operator=(_Inout_ method_eap &&other) noexcept;
 
         /// \name Session management
         /// @{

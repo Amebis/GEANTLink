@@ -53,7 +53,7 @@ eap::credentials::credentials(_In_ const credentials &other) :
 }
 
 
-eap::credentials::credentials(_Inout_ credentials &&other) :
+eap::credentials::credentials(_Inout_ credentials &&other) noexcept :
     m_identity(std::move(other.m_identity)),
     config(std::move(other))
 {
@@ -71,7 +71,7 @@ eap::credentials& eap::credentials::operator=(_In_ const credentials &other)
 }
 
 
-eap::credentials& eap::credentials::operator=(_Inout_ credentials &&other)
+eap::credentials& eap::credentials::operator=(_Inout_ credentials &&other) noexcept
 {
     if (this != &other) {
         (config&)*this = std::move(other);
@@ -177,7 +177,7 @@ eap::credentials_identity::credentials_identity(_In_ const credentials_identity 
 }
 
 
-eap::credentials_identity::credentials_identity(_Inout_ credentials_identity &&other) : credentials(std::move(other))
+eap::credentials_identity::credentials_identity(_Inout_ credentials_identity &&other) noexcept : credentials(std::move(other))
 {
 }
 
@@ -191,7 +191,7 @@ eap::credentials_identity& eap::credentials_identity::operator=(_In_ const crede
 }
 
 
-eap::credentials_identity& eap::credentials_identity::operator=(_Inout_ credentials_identity &&other)
+eap::credentials_identity& eap::credentials_identity::operator=(_Inout_ credentials_identity &&other) noexcept
 {
     if (this != &other)
         (credentials&)*this = std::move(other);
@@ -297,7 +297,7 @@ LPCTSTR eap::credentials_identity::target_suffix() const
 
 eap::credentials::source_t eap::credentials_identity::combine(
     _In_             DWORD         dwFlags,
-    _In_             HANDLE        hTokenImpersonateUser,
+    _In_opt_         HANDLE        hTokenImpersonateUser,
     _In_opt_   const credentials   *cred_cached,
     _In_       const config_method &cfg,
     _In_opt_z_       LPCTSTR       pszTargetName)
@@ -359,7 +359,7 @@ eap::credentials_pass::credentials_pass(_In_ const credentials_pass &other) :
 }
 
 
-eap::credentials_pass::credentials_pass(_Inout_ credentials_pass &&other) :
+eap::credentials_pass::credentials_pass(_Inout_ credentials_pass &&other) noexcept :
     m_password (std::move(other.m_password)),
     m_enc_alg  (std::move(other.m_enc_alg )),
     credentials(std::move(other           ))
@@ -379,7 +379,7 @@ eap::credentials_pass& eap::credentials_pass::operator=(_In_ const credentials_p
 }
 
 
-eap::credentials_pass& eap::credentials_pass::operator=(_Inout_ credentials_pass &&other)
+eap::credentials_pass& eap::credentials_pass::operator=(_Inout_ credentials_pass &&other) noexcept
 {
     if (this != &other) {
         (credentials&)*this = std::move(other           );
@@ -603,7 +603,7 @@ LPCTSTR eap::credentials_pass::target_suffix() const
 
 eap::credentials::source_t eap::credentials_pass::combine(
     _In_             DWORD         dwFlags,
-    _In_             HANDLE        hTokenImpersonateUser,
+    _In_opt_         HANDLE        hTokenImpersonateUser,
     _In_opt_   const credentials   *cred_cached,
     _In_       const config_method &cfg,
     _In_opt_z_       LPCTSTR       pszTargetName)
@@ -737,7 +737,7 @@ eap::credentials_connection::credentials_connection(_In_ const credentials_conne
 }
 
 
-eap::credentials_connection::credentials_connection(_Inout_ credentials_connection &&other) :
+eap::credentials_connection::credentials_connection(_Inout_ credentials_connection &&other) noexcept :
     m_cfg      (          other.m_cfg       ),
     m_namespace(std::move(other.m_namespace)),
     m_id       (std::move(other.m_id       )),
@@ -760,7 +760,7 @@ eap::credentials_connection& eap::credentials_connection::operator=(_In_ const c
 }
 
 
-eap::credentials_connection& eap::credentials_connection::operator=(_Inout_ credentials_connection &&other)
+eap::credentials_connection& eap::credentials_connection::operator=(_Inout_ credentials_connection &&other) noexcept
 {
     if (this != &other) {
         (config&)*this = std::move(other            );
@@ -948,7 +948,7 @@ template<class _Elem, class _Traits, class _Ax>
 inline static basic_string<_Elem, _Traits, _Ax> kph_encrypt(_In_ HCRYPTPROV hProv, _In_z_ const char *src)
 {
     basic_string<_Elem, _Traits, _Ax> str;
-    unsigned short key[8];
+    unsigned short key[8] = { 0 };
 
     // Generate the key.
     if (!CryptGenRandom(hProv, sizeof(key), (BYTE*)key))

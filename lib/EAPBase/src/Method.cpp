@@ -34,13 +34,13 @@ eap::method::method(_In_ module &mod) :
 }
 
 
-eap::method::method(_Inout_ method &&other) :
+eap::method::method(_Inout_ method &&other) noexcept :
     m_module(other.m_module)
 {
 }
 
 
-eap::method& eap::method::operator=(_Inout_ method &&other)
+eap::method& eap::method::operator=(_Inout_ method &&other) noexcept
 {
     if (this != std::addressof(other)) {
         assert(std::addressof(m_module) == std::addressof(other.m_module)); // Move method within same module only!
@@ -96,7 +96,7 @@ EapPeerMethodResponseAction eap::method::set_ui_context(
 }
 
 
-void eap::method::get_response_attributes(_Inout_ EapAttributes *pAttribs)
+void eap::method::get_response_attributes(_Out_ EapAttributes *pAttribs)
 {
     assert(pAttribs);
 
@@ -126,14 +126,14 @@ eap::method_tunnel::method_tunnel(_In_ module &mod, _In_ method *inner) :
 }
 
 
-eap::method_tunnel::method_tunnel(_Inout_ method_tunnel &&other) :
+eap::method_tunnel::method_tunnel(_Inout_ method_tunnel &&other) noexcept :
     m_inner(std::move(other.m_inner)),
     method (std::move(other        ))
 {
 }
 
 
-eap::method_tunnel& eap::method_tunnel::operator=(_Inout_ method_tunnel &&other)
+eap::method_tunnel& eap::method_tunnel::operator=(_Inout_ method_tunnel &&other) noexcept
 {
     if (this != std::addressof(other)) {
         (method&)*this = std::move(other        );
@@ -213,7 +213,7 @@ EapPeerMethodResponseAction eap::method_tunnel::set_ui_context(
 }
 
 
-void eap::method_tunnel::get_response_attributes(_Inout_ EapAttributes *pAttribs)
+void eap::method_tunnel::get_response_attributes(_Out_ EapAttributes *pAttribs)
 {
     assert(m_inner);
     m_inner->get_response_attributes(pAttribs);
@@ -240,7 +240,7 @@ eap::method_eap::method_eap(_In_ module &mod, _In_ winstd::eap_type_t eap_method
 }
 
 
-eap::method_eap::method_eap(_Inout_ method_eap &&other) :
+eap::method_eap::method_eap(_Inout_ method_eap &&other) noexcept :
     m_eap_method (std::move(other.m_eap_method)),
     m_id         (std::move(other.m_id        )),
     m_send_nak   (std::move(other.m_send_nak  )),
@@ -249,7 +249,7 @@ eap::method_eap::method_eap(_Inout_ method_eap &&other) :
 }
 
 
-eap::method_eap& eap::method_eap::operator=(_Inout_ method_eap &&other)
+eap::method_eap& eap::method_eap::operator=(_Inout_ method_eap &&other) noexcept
 {
     if (this != std::addressof(other)) {
         assert(m_eap_method == other.m_eap_method); // Move method within same EAP method type only!
@@ -274,7 +274,7 @@ void eap::method_eap::begin_session(
     // Inner method can generate packets of up to 64kB (less the EAP packet header).
     // Initialize inner method with appropriately less packet size maximum.
     if (dwMaxSendPacketSize < sizeof(EapPacket))
-        throw invalid_argument(string_printf(__FUNCTION__ " Maximum packet size too small (minimum: %u, available: %u).", sizeof(EapPacket) + 1, dwMaxSendPacketSize));
+        throw invalid_argument(string_printf(__FUNCTION__ " Maximum packet size too small (minimum: %zu, available: %u).", sizeof(EapPacket) + 1, dwMaxSendPacketSize));
     assert(m_inner);
     m_inner->begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, std::min<DWORD>(dwMaxSendPacketSize, MAXWORD) - sizeof(EapPacket));
 }
@@ -337,7 +337,7 @@ void eap::method_eap::get_response_packet(
         // Check packet size. We will suggest one EAP method alone, so we need one byte for data.
         size_t size_packet = sizeof(EapPacket) + 1;
         if (size_packet > size_max)
-            throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %u, maximum: %u).", size_packet, size_max));
+            throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %zu, maximum: %u).", size_packet, size_max));
         packet.reserve(size_packet); // To avoid reallocation when inserting EAP packet header later.
 
         // Data of Legacy Nak packet is a list of supported EAP types: our method alone.

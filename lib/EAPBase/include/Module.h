@@ -93,17 +93,17 @@ namespace eap
         ///
         /// Allocate BLOB
         ///
-        BYTE* alloc_memory(_In_ size_t size);
+        BYTE* alloc_memory(_In_ size_t size) const;
 
         ///
         /// Free BLOB allocated with this peer
         ///
-        void free_memory(_In_ BYTE *ptr);
+        void free_memory(_In_ BYTE *ptr) const;
 
         ///
         /// Free EAP_ERROR allocated with `make_error()` method
         ///
-        void free_error_memory(_In_ EAP_ERROR *err);
+        void free_error_memory(_In_ EAP_ERROR *err) const;
 
         ///
         /// Makes a new method configuration
@@ -146,6 +146,35 @@ namespace eap
         /// Logs error
         ///
         void log_error(_In_ const EAP_ERROR *err) const;
+
+        ///
+        /// Logs error and optionally returns EAP_ERROR
+        ///
+        inline DWORD log_error(_Out_opt_ EAP_ERROR **eap_err, _In_ DWORD dwErrorCode, _In_opt_z_ LPCWSTR pszRootCauseString = NULL, _In_opt_z_ LPCWSTR pszRepairString = NULL, _In_opt_ DWORD dwReasonCode = 0, _In_opt_ LPCGUID pRootCauseGuid = NULL, _In_opt_ LPCGUID pRepairGuid = NULL, _In_opt_ LPCGUID pHelpLinkGuid = NULL) const
+        {
+            EAP_ERROR *e = make_error(dwErrorCode, pszRootCauseString, pszRepairString, dwReasonCode, pRootCauseGuid, pRepairGuid, pHelpLinkGuid);
+            log_error(e);
+            if (eap_err)
+                *eap_err = e;
+            else
+                free_error_memory(e);
+            return dwErrorCode;
+        }
+
+        ///
+        /// Logs error and optionally returns EAP_ERROR
+        ///
+        inline DWORD log_error(_Out_opt_ EAP_ERROR **eap_err, _In_ std::exception &err) const
+        {
+            EAP_ERROR *e = make_error(err);
+            log_error(e);
+            DWORD dwWinError = e->dwWinError;
+            if (eap_err)
+                *eap_err = e;
+            else
+                free_error_memory(e);
+            return dwWinError;
+        }
 
         ///
         /// Logs Unicode string config value
@@ -288,7 +317,7 @@ namespace eap
         ///
         /// \returns Encrypted data
         ///
-        std::vector<unsigned char> encrypt(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _Out_opt_ HCRYPTHASH hHash = NULL) const;
+        std::vector<unsigned char> encrypt(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _In_opt_ HCRYPTHASH hHash = NULL) const;
 
 
         ///
@@ -301,7 +330,7 @@ namespace eap
         /// \returns Encrypted data
         ///
         template<class _Elem, class _Traits, class _Ax>
-        std::vector<unsigned char> encrypt(_In_ HCRYPTPROV hProv, _In_ const std::basic_string<_Elem, _Traits, _Ax> &val, _Out_opt_ HCRYPTHASH hHash = NULL) const
+        std::vector<unsigned char> encrypt(_In_ HCRYPTPROV hProv, _In_ const std::basic_string<_Elem, _Traits, _Ax> &val, _In_opt_ HCRYPTHASH hHash = NULL) const
         {
             return encrypt(hProv, val.c_str(), val.length()*sizeof(_Elem), hHash);
         }
@@ -317,7 +346,7 @@ namespace eap
         /// \returns Encrypted data
         ///
         template<class _Traits, class _Ax>
-        std::vector<unsigned char> encrypt(_In_ HCRYPTPROV hProv, _In_ const std::basic_string<wchar_t, _Traits, _Ax> &val, _Out_opt_ HCRYPTHASH hHash = NULL) const
+        std::vector<unsigned char> encrypt(_In_ HCRYPTPROV hProv, _In_ const std::basic_string<wchar_t, _Traits, _Ax> &val, _In_opt_ HCRYPTHASH hHash = NULL) const
         {
             winstd::sanitizing_string val_utf8;
             WideCharToMultiByte(CP_UTF8, 0, val, val_utf8, NULL, NULL);
@@ -380,13 +409,15 @@ namespace eap
         /// \returns Decrypted data
         ///
         template<class _Ty, class _Ax>
-        std::vector<_Ty, _Ax> decrypt(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _Out_opt_ HCRYPTHASH hHash = NULL) const
+        std::vector<_Ty, _Ax> decrypt(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _In_opt_ HCRYPTHASH hHash = NULL) const
         {
             // Import the private RSA key.
             HRSRC res = FindResource(m_instance, MAKEINTRESOURCE(IDR_EAP_KEY_PRIVATE), RT_RCDATA);
-            assert(res);
+            if (!res)
+                throw winstd::win_runtime_error(__FUNCTION__ " FindResource failed.");
             HGLOBAL res_handle = LoadResource(m_instance, res);
-            assert(res_handle);
+            if (!res_handle)
+                throw winstd::win_runtime_error(__FUNCTION__ " LoadResource failed.");
             winstd::crypt_key key_rsa;
             std::unique_ptr<unsigned char[], winstd::LocalFree_delete<unsigned char[]> > keyinfo_data;
             DWORD keyinfo_size = 0;
@@ -423,7 +454,7 @@ namespace eap
         /// \returns Decrypted string
         ///
         template<class _Elem, class _Traits, class _Ax>
-        std::basic_string<_Elem, _Traits, _Ax> decrypt_str(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _Out_opt_ HCRYPTHASH hHash = NULL) const
+        std::basic_string<_Elem, _Traits, _Ax> decrypt_str(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _In_opt_ HCRYPTHASH hHash = NULL) const
         {
             std::vector<_Elem, sanitizing_allocator<_Elem> > buf(std::move(decrypt(hProv, data, size, hHash)));
             return std::basic_string<_Elem, _Traits, _Ax>(buf.data(), buf.size());
@@ -441,7 +472,7 @@ namespace eap
         /// \returns Decrypted string
         ///
         template<class _Traits, class _Ax>
-        std::basic_string<wchar_t, _Traits, _Ax> decrypt_str(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _Out_opt_ HCRYPTHASH hHash = NULL) const
+        std::basic_string<wchar_t, _Traits, _Ax> decrypt_str(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _In_opt_ HCRYPTHASH hHash = NULL) const
         {
             winstd::sanitizing_string buf(std::move(decrypt_str(hProv, data, size, hHash)));
             std::basic_string<wchar_t, _Traits, _Ax> dec;
@@ -865,13 +896,13 @@ namespace eap
         /// \param[out] ppDataFromInteractiveUI       A pointer that receives a credentials BLOB that can be used in authentication. The caller should free the inner pointers using the function \p EapPeerFreeMemory(), starting at the innermost pointer. If a non-NULL value is supplied for this parameter, meaning that an existing data BLOB is passed to it, the supplied data BLOB will be updated and returned in this parameter.
         ///
         virtual void query_ui_blob_from_interactive_ui_input_fields(
-            _In_                                  DWORD                   dwVersion,
-            _In_                                  DWORD                   dwFlags,
-            _In_                                  DWORD                   dwUIContextDataSize,
-            _In_count_(dwUIContextDataSize) const BYTE                    *pUIContextData,
-            _In_                            const EAP_INTERACTIVE_UI_DATA *pEapInteractiveUIData,
-            _Out_                                 DWORD                   *pdwDataFromInteractiveUISize,
-            _Out_                                 BYTE                    **ppDataFromInteractiveUI) const;
+            _In_                                                        DWORD                   dwVersion,
+            _In_                                                        DWORD                   dwFlags,
+            _In_                                                        DWORD                   dwUIContextDataSize,
+            _In_count_(dwUIContextDataSize)                       const BYTE                    *pUIContextData,
+            _In_                                                  const EAP_INTERACTIVE_UI_DATA *pEapInteractiveUIData,
+            _Out_                                                       DWORD                   *pdwDataFromInteractiveUISize,
+            _Outptr_result_buffer_(*pdwDataFromInteractiveUISize)       BYTE                    **ppDataFromInteractiveUI) const;
 
         /// \name Session management
         /// @{
@@ -942,9 +973,9 @@ namespace eap
         /// \param[inout] pdwSendPacketSize  A pointer to a value that contains the size in bytes of the buffer allocated for the response packet. On return, this parameter receives a pointer to the actual size in bytes of \p pSendPacket.
         ///
         virtual void get_response_packet(
-            _In_                               EAP_SESSION_HANDLE hSession,
-            _Inout_bytecap_(*dwSendPacketSize) EapPacket          *pSendPacket,
-            _Inout_                            DWORD              *pdwSendPacketSize) = 0;
+            _In_                                   EAP_SESSION_HANDLE hSession,
+            _Out_bytecapcount_(*pdwSendPacketSize) EapPacket          *pSendPacket,
+            _Inout_                                DWORD              *pdwSendPacketSize) = 0;
 
         /// @}
 
@@ -953,14 +984,14 @@ namespace eap
         ///
         /// \sa [EapPeerGetResult function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363611.aspx)
         ///
-        /// \param[in ] hSession  A unique handle for this EAP authentication session on the EAPHost server. This handle is returned in the \p pSessionHandle parameter in a previous call to `EapPeerBeginSession()`.
-        /// \param[in ] reason    The reason code for the authentication result returned in \p pResult.
-        /// \param[out] pResult   A pointer to a structure that contains the authentication results.
+        /// \param[in   ] hSession  A unique handle for this EAP authentication session on the EAPHost server. This handle is returned in the \p pSessionHandle parameter in a previous call to `EapPeerBeginSession()`.
+        /// \param[in   ] reason    The reason code for the authentication result returned in \p pResult.
+        /// \param[inout] pResult   A pointer to a structure that contains the authentication results.
         ///
         virtual void get_result(
-            _In_  EAP_SESSION_HANDLE        hSession,
-            _In_  EapPeerMethodResultReason reason,
-            _Out_ EapPeerMethodResult       *pResult) = 0;
+            _In_    EAP_SESSION_HANDLE        hSession,
+            _In_    EapPeerMethodResultReason reason,
+            _Inout_ EapPeerMethodResult       *pResult) = 0;
 
         /// \name User Interaction
         /// @{

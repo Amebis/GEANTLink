@@ -45,7 +45,7 @@ eap::config_method_ttls::config_method_ttls(const _In_ config_method_ttls &other
 }
 
 
-eap::config_method_ttls::config_method_ttls(_Inout_ config_method_ttls &&other) :
+eap::config_method_ttls::config_method_ttls(_Inout_ config_method_ttls &&other) noexcept :
     m_inner(std::move(other.m_inner)),
     m_anonymous_identity(std::move(other.m_anonymous_identity)),
     config_method_tls(std::move(other))
@@ -65,7 +65,7 @@ eap::config_method_ttls& eap::config_method_ttls::operator=(const _In_ config_me
 }
 
 
-eap::config_method_ttls& eap::config_method_ttls::operator=(_Inout_ config_method_ttls &&other)
+eap::config_method_ttls& eap::config_method_ttls::operator=(_Inout_ config_method_ttls &&other) noexcept
 {
     if (this != &other) {
         (config_method_tls&&)*this = std::move(other);

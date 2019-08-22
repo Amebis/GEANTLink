@@ -36,7 +36,7 @@ eap::method_gtc::method_gtc(_In_ module &mod, _In_ config_method_eapgtc &cfg, _I
 }
 
 
-eap::method_gtc::method_gtc(_Inout_ method_gtc &&other) :
+eap::method_gtc::method_gtc(_Inout_ method_gtc &&other) noexcept :
     m_cfg      (          other.m_cfg       ),
     m_cred     (          other.m_cred      ),
     m_challenge(std::move(other.m_challenge)),
@@ -46,7 +46,7 @@ eap::method_gtc::method_gtc(_Inout_ method_gtc &&other) :
 }
 
 
-eap::method_gtc& eap::method_gtc::operator=(_Inout_ method_gtc &&other)
+eap::method_gtc& eap::method_gtc::operator=(_Inout_ method_gtc &&other) noexcept
 {
     if (this != std::addressof(other)) {
         assert(std::addressof(m_cfg ) == std::addressof(other.m_cfg )); // Move method within same configuration only!
@@ -113,7 +113,7 @@ void eap::method_gtc::get_response_packet(
     WideCharToMultiByte(CP_UTF8, 0, m_response, response_utf8, NULL, NULL);
 
     if (sizeof(sanitizing_string::value_type)*response_utf8.length() > size_max)
-        throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %u, maximum: %u).", sizeof(sanitizing_string::value_type)*response_utf8.length(), size_max));
+        throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %zu, maximum: %u).", sizeof(sanitizing_string::value_type)*response_utf8.length(), size_max));
 
     packet.assign(response_utf8.begin(), response_utf8.end());
 }

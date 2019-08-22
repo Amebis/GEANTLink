@@ -66,7 +66,7 @@ namespace eap
         ///
         /// \param[in] other  Configuration to move from
         ///
-        config_method_mschapv2(_Inout_ config_method_mschapv2 &&other);
+        config_method_mschapv2(_Inout_ config_method_mschapv2 &&other) noexcept;
 
         ///
         /// Copies configuration
@@ -84,7 +84,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        config_method_mschapv2& operator=(_Inout_ config_method_mschapv2 &&other);
+        config_method_mschapv2& operator=(_Inout_ config_method_mschapv2 &&other) noexcept;
 
         virtual config* clone() const;
 
@@ -134,7 +134,7 @@ namespace eap
         ///
         /// \param[in] other  Configuration to move from
         ///
-        config_method_eapmschapv2(_Inout_ config_method_eapmschapv2 &&other);
+        config_method_eapmschapv2(_Inout_ config_method_eapmschapv2 &&other) noexcept;
 
         ///
         /// Copies configuration
@@ -152,7 +152,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        config_method_eapmschapv2& operator=(_Inout_ config_method_eapmschapv2 &&other);
+        config_method_eapmschapv2& operator=(_Inout_ config_method_eapmschapv2 &&other) noexcept;
 
         virtual config* clone() const;
 

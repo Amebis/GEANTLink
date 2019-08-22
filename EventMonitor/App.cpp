@@ -28,6 +28,7 @@
 // wxEventMonitorApp
 //////////////////////////////////////////////////////////////////////////
 
+#pragma warning(suppress: 28251)
 wxIMPLEMENT_APP(wxEventMonitorApp);
 
 

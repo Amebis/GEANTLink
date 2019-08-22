@@ -74,7 +74,7 @@ namespace eap
         ///
         /// \param[in] other  Configuration to move from
         ///
-        config_method_eapgtc(_Inout_ config_method_eapgtc &&other);
+        config_method_eapgtc(_Inout_ config_method_eapgtc &&other) noexcept;
 
         ///
         /// Copies configuration
@@ -92,7 +92,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        config_method_eapgtc& operator=(_Inout_ config_method_eapgtc &&other);
+        config_method_eapgtc& operator=(_Inout_ config_method_eapgtc &&other) noexcept;
 
         virtual config* clone() const;
 

@@ -41,7 +41,7 @@ eap::config_method_eapgtc::config_method_eapgtc(_In_ const config_method_eapgtc 
 }
 
 
-eap::config_method_eapgtc::config_method_eapgtc(_Inout_ config_method_eapgtc &&other) :
+eap::config_method_eapgtc::config_method_eapgtc(_Inout_ config_method_eapgtc &&other) noexcept :
     config_method_with_cred(std::move(other))
 {
 }
@@ -56,7 +56,7 @@ eap::config_method_eapgtc& eap::config_method_eapgtc::operator=(_In_ const confi
 }
 
 
-eap::config_method_eapgtc& eap::config_method_eapgtc::operator=(_Inout_ config_method_eapgtc &&other)
+eap::config_method_eapgtc& eap::config_method_eapgtc::operator=(_Inout_ config_method_eapgtc &&other) noexcept
 {
     if (this != &other)
         (config_method_with_cred&&)*this = std::move(other);

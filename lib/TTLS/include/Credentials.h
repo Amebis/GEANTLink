@@ -62,7 +62,7 @@ namespace eap
         ///
         /// \param[in] other  Credentials to move from
         ///
-        credentials_ttls(_Inout_ credentials_ttls &&other);
+        credentials_ttls(_Inout_ credentials_ttls &&other) noexcept;
 
         ///
         /// Copies credentials
@@ -80,7 +80,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        credentials_ttls& operator=(_Inout_ credentials_ttls &&other);
+        credentials_ttls& operator=(_Inout_ credentials_ttls &&other) noexcept;
 
         virtual config* clone() const;
         virtual void clear();
@@ -127,7 +127,7 @@ namespace eap
         ///
         virtual source_t combine(
             _In_             DWORD         dwFlags,
-            _In_             HANDLE        hTokenImpersonateUser,
+            _In_opt_         HANDLE        hTokenImpersonateUser,
             _In_opt_   const credentials   *cred_cached,
             _In_       const config_method &cfg,
             _In_opt_z_       LPCTSTR       pszTargetName);

@@ -76,7 +76,8 @@ BOOL WINAPI DllMain(_In_ HINSTANCE hinstDLL, _In_ DWORD fdwReason, _In_ LPVOID l
 ///
 /// \sa [EapPeerFreeMemory function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363606.aspx)
 ///
-VOID WINAPI EapPeerFreeMemory(_In_ void *pUIContextData)
+_Use_decl_annotations_
+VOID WINAPI EapPeerFreeMemory(void *pUIContextData)
 {
     event_fn_auto event_auto(g_peer.get_event_fn_auto(__FUNCTION__));
 
@@ -90,7 +91,8 @@ VOID WINAPI EapPeerFreeMemory(_In_ void *pUIContextData)
 ///
 /// \sa [EapPeerFreeErrorMemory function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363605.aspx)
 ///
-VOID WINAPI EapPeerFreeErrorMemory(_In_ EAP_ERROR *ppEapError)
+_Use_decl_annotations_
+VOID WINAPI EapPeerFreeErrorMemory(EAP_ERROR *ppEapError)
 {
     event_fn_auto event_auto(g_peer.get_event_fn_auto(__FUNCTION__));
 
@@ -104,13 +106,14 @@ VOID WINAPI EapPeerFreeErrorMemory(_In_ EAP_ERROR *ppEapError)
 ///
 /// \sa [EapPeerConfigXml2Blob function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363602.aspx)
 ///
+_Use_decl_annotations_
 DWORD WINAPI EapPeerConfigXml2Blob(
-    _In_  DWORD            dwFlags,
-    _In_  EAP_METHOD_TYPE  eapMethodType,
-    _In_  IXMLDOMDocument2 *pConfigDoc,
-    _Out_ BYTE             **pConnectionDataOut,
-    _Out_ DWORD            *pdwConnectionDataOutSize,
-    _Out_ EAP_ERROR        **ppEapError)
+    DWORD            dwFlags,
+    EAP_METHOD_TYPE  eapMethodType,
+    IXMLDOMDocument2 *pConfigDoc,
+    BYTE             **pConnectionDataOut,
+    DWORD            *pdwConnectionDataOutSize,
+    EAP_ERROR        **ppEapError)
 {
     DWORD dwResult = ERROR_SUCCESS;
     event_fn_auto_ret<DWORD> event_auto(g_peer.get_event_fn_auto(__FUNCTION__, dwResult));
@@ -118,42 +121,35 @@ DWORD WINAPI EapPeerConfigXml2Blob(
     //Sleep(10000);
 #endif
 
+    // Initialize output parameters.
+    if (pConnectionDataOut)
+        *pConnectionDataOut = NULL;
+    if (pdwConnectionDataOutSize)
+        *pdwConnectionDataOutSize = 0;
+    if (ppEapError)
+        *ppEapError = NULL;
+
     // Parameter check
-    if (!ppEapError)
+    if (eapMethodType.eapType.type != EAPMETHOD_TYPE || eapMethodType.dwAuthorId != 67532)
+        return dwResult = ERROR_NOT_SUPPORTED;
+    if (!pConfigDoc || !pConnectionDataOut || !pdwConnectionDataOutSize)
         return dwResult = ERROR_INVALID_PARAMETER;
 
-    assert(!*ppEapError);
+    // Configure XML selection namespaces used.
+    pConfigDoc->setProperty(bstr(L"SelectionNamespaces"), variant(L"xmlns:eap-metadata=\"urn:ietf:params:xml:ns:yang:ietf-eap-metadata\" xmlns:eaphostconfig=\"http://www.microsoft.com/provisioning/EapHostConfig\""));
 
-    if (eapMethodType.eapType.type != EAPMETHOD_TYPE)
-        g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_NOT_SUPPORTED, wstring_printf(_T(__FUNCTION__) _T(" Input EAP type (%d) does not match the supported EAP type (%d)."), (int)eapMethodType.eapType.type, (int)EAPMETHOD_TYPE).c_str()));
-    else if (eapMethodType.dwAuthorId != 67532)
-        g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_NOT_SUPPORTED, wstring_printf(_T(__FUNCTION__) _T(" EAP author (%d) does not match the supported author (%d)."), (int)eapMethodType.dwAuthorId, (int)67532).c_str()));
-    else if (!pConfigDoc)
-        g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pConfigDoc is NULL.")));
-    else if (!pConnectionDataOut)
-        g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pConnectionDataOut is NULL.")));
-    else if (!pdwConnectionDataOutSize)
-        g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pdwConnectionDataOutSize is NULL.")));
-    else {
-        // Configure XML selection namespaces used.
-        pConfigDoc->setProperty(bstr(L"SelectionNamespaces"), variant(L"xmlns:eap-metadata=\"urn:ietf:params:xml:ns:yang:ietf-eap-metadata\" xmlns:eaphostconfig=\"http://www.microsoft.com/provisioning/EapHostConfig\""));
+    // <Config>
+    com_obj<IXMLDOMElement> pXmlElConfig;
+    if (FAILED(eapxml::select_element(pConfigDoc, bstr(L"//eaphostconfig:Config"), pXmlElConfig)))
+        return dwResult = g_peer.log_error(ppEapError, ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" Error reading <Config> element."));
 
-        // <Config>
-        com_obj<IXMLDOMElement> pXmlElConfig;
-        if (FAILED(eapxml::select_element(pConfigDoc, bstr(L"//eaphostconfig:Config"), pXmlElConfig))) {
-            g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" Error reading <Config> element.")));
-            return dwResult;
-        }
-
-        // Load configuration.
-        try {
-            g_peer.config_xml2blob(dwFlags, pXmlElConfig, pConnectionDataOut, pdwConnectionDataOutSize);
-        } catch (std::exception &err) {
-            g_peer.log_error(*ppEapError = g_peer.make_error(err));
-            dwResult = (*ppEapError)->dwWinError;
-        } catch (...) {
-            dwResult = ERROR_INVALID_DATA;
-        }
+    // Load configuration.
+    try {
+        g_peer.config_xml2blob(dwFlags, pXmlElConfig, pConnectionDataOut, pdwConnectionDataOutSize);
+    } catch (std::exception &err) {
+        dwResult = g_peer.log_error(ppEapError, err);
+    } catch (...) {
+        dwResult = ERROR_INVALID_DATA;
     }
 
     return dwResult;
@@ -167,13 +163,14 @@ DWORD WINAPI EapPeerConfigXml2Blob(
 ///
 /// \sa [EapPeerConfigBlob2Xml function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363601.aspx)
 ///
+_Use_decl_annotations_
 DWORD WINAPI EapPeerConfigBlob2Xml(
-    _In_                                   DWORD            dwFlags,
-    _In_                                   EAP_METHOD_TYPE  eapMethodType,
-    _In_count_(dwConnectionDataSize) const BYTE             *pConnectionData,
-    _In_                                   DWORD            dwConnectionDataSize,
-    _Out_                                  IXMLDOMDocument2 **ppConfigDoc,
-    _Out_                                  EAP_ERROR        **ppEapError)
+          DWORD            dwFlags,
+          EAP_METHOD_TYPE  eapMethodType,
+    const BYTE             *pConnectionData,
+          DWORD            dwConnectionDataSize,
+          IXMLDOMDocument2 **ppConfigDoc,
+          EAP_ERROR        **ppEapError)
 {
     DWORD dwResult = ERROR_SUCCESS;
     event_fn_auto_ret<DWORD> event_auto(g_peer.get_event_fn_auto(__FUNCTION__, dwResult));
@@ -181,66 +178,53 @@ DWORD WINAPI EapPeerConfigBlob2Xml(
     //Sleep(10000);
 #endif
 
+    // Initialize output parameters.
+    if (ppConfigDoc)
+        *ppConfigDoc = NULL;
+    if (ppEapError)
+        *ppEapError = NULL;
+
     // Parameter check
-    if (!ppEapError)
+    if (eapMethodType.eapType.type != EAPMETHOD_TYPE || eapMethodType.dwAuthorId != 67532)
+        return dwResult = ERROR_NOT_SUPPORTED;
+    if (!pConnectionData && dwConnectionDataSize || !ppConfigDoc)
         return dwResult = ERROR_INVALID_PARAMETER;
 
-    assert(!*ppEapError);
+    HRESULT hr;
 
-    if (eapMethodType.eapType.type != EAPMETHOD_TYPE)
-        g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_NOT_SUPPORTED, wstring_printf(_T(__FUNCTION__) _T(" Input EAP type (%d) does not match the supported EAP type (%d)."), (int)eapMethodType.eapType.type, (int)EAPMETHOD_TYPE).c_str()));
-    else if (eapMethodType.dwAuthorId != 67532)
-        g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_NOT_SUPPORTED, wstring_printf(_T(__FUNCTION__) _T(" EAP author (%d) does not match the supported author (%d)."), (int)eapMethodType.dwAuthorId, (int)67532).c_str()));
-    else if (!pConnectionData && dwConnectionDataSize)
-        g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pConnectionData is NULL.")));
-    else if (!ppConfigDoc)
-        g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" ppConfigDoc is NULL.")));
-    else {
-        HRESULT hr;
+    // Create configuration XML document.
+    com_obj<IXMLDOMDocument2> pConfigDoc;
+    if (FAILED(hr = pConfigDoc.create(CLSID_DOMDocument60, NULL, CLSCTX_INPROC_SERVER)))
+        return dwResult = g_peer.log_error(ppEapError, HRESULT_CODE(hr), _T(__FUNCTION__) _T(" Error creating XML document."));
 
-        // Create configuration XML document.
-        com_obj<IXMLDOMDocument2> pConfigDoc;
-        if (FAILED(hr = pConfigDoc.create(CLSID_DOMDocument60, NULL, CLSCTX_INPROC_SERVER))) {
-            g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = HRESULT_CODE(hr), _T(__FUNCTION__) _T(" Error creating XML document.")));
-            return dwResult;
-        }
+    pConfigDoc->put_async(VARIANT_FALSE);
 
-        pConfigDoc->put_async(VARIANT_FALSE);
+    // Load empty XML configuration.
+    VARIANT_BOOL isSuccess = VARIANT_FALSE;
+    if (FAILED((hr = pConfigDoc->loadXML(L"<Config xmlns=\"http://www.microsoft.com/provisioning/EapHostConfig\"></Config>", &isSuccess))))
+        return dwResult = g_peer.log_error(ppEapError, HRESULT_CODE(hr), _T(__FUNCTION__) _T(" Error loading XML document template."));
+    if (!isSuccess)
+        return dwResult = g_peer.log_error(ppEapError, ERROR_XML_PARSE_ERROR, _T(__FUNCTION__) _T(" Loading XML template failed."));
 
-        // Load empty XML configuration.
-        VARIANT_BOOL isSuccess = VARIANT_FALSE;
-        if (FAILED((hr = pConfigDoc->loadXML(L"<Config xmlns=\"http://www.microsoft.com/provisioning/EapHostConfig\"></Config>", &isSuccess)))) {
-            g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = HRESULT_CODE(hr), _T(__FUNCTION__) _T(" Error loading XML document template.")));
-            return dwResult;
-        }
-        if (!isSuccess) {
-            g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_XML_PARSE_ERROR, _T(__FUNCTION__) _T(" Loading XML template failed.")));
-            return dwResult;
-        }
+    // Configure XML selection namespaces used.
+    pConfigDoc->setProperty(bstr(L"SelectionNamespaces"), variant(L"xmlns:eap-metadata=\"urn:ietf:params:xml:ns:yang:ietf-eap-metadata\" xmlns:eaphostconfig=\"http://www.microsoft.com/provisioning/EapHostConfig\""));
 
-        // Configure XML selection namespaces used.
-        pConfigDoc->setProperty(bstr(L"SelectionNamespaces"), variant(L"xmlns:eap-metadata=\"urn:ietf:params:xml:ns:yang:ietf-eap-metadata\" xmlns:eaphostconfig=\"http://www.microsoft.com/provisioning/EapHostConfig\""));
+    // Select <Config> node.
+    com_obj<IXMLDOMNode> pXmlElConfig;
+    if (FAILED(eapxml::select_node(pConfigDoc, bstr(L"eaphostconfig:Config"), pXmlElConfig)))
+        return dwResult = g_peer.log_error(ppEapError, ERROR_NOT_FOUND, _T(__FUNCTION__) _T(" Error selecting <Config> element."));
 
-        // Select <Config> node.
-        com_obj<IXMLDOMNode> pXmlElConfig;
-        if (FAILED(eapxml::select_node(pConfigDoc, bstr(L"eaphostconfig:Config"), pXmlElConfig))) {
-            g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_NOT_FOUND, _T(__FUNCTION__) _T(" Error selecting <Config> element.")));
-            return dwResult;
-        }
-
-        // Save configuration.
-        pConfigDoc->setProperty(bstr(L"SelectionNamespaces"), variant(L"xmlns:eap-metadata=\"urn:ietf:params:xml:ns:yang:ietf-eap-metadata\""));
-        try {
-            g_peer.config_blob2xml(dwFlags, pConnectionData, dwConnectionDataSize, pConfigDoc, pXmlElConfig);
-        } catch (std::exception &err) {
-            g_peer.log_error(*ppEapError = g_peer.make_error(err));
-            return dwResult = (*ppEapError)->dwWinError;
-        } catch (...) {
-            return dwResult = ERROR_INVALID_DATA;
-        }
-
-        *ppConfigDoc = pConfigDoc.detach();
+    // Save configuration.
+    pConfigDoc->setProperty(bstr(L"SelectionNamespaces"), variant(L"xmlns:eap-metadata=\"urn:ietf:params:xml:ns:yang:ietf-eap-metadata\""));
+    try {
+        g_peer.config_blob2xml(dwFlags, pConnectionData, dwConnectionDataSize, pConfigDoc, pXmlElConfig);
+    } catch (std::exception &err) {
+        dwResult = g_peer.log_error(ppEapError, err);
+    } catch (...) {
+        return dwResult = ERROR_INVALID_DATA;
     }
+
+    *ppConfigDoc = pConfigDoc.detach();
 
     return dwResult;
 }
@@ -251,15 +235,16 @@ DWORD WINAPI EapPeerConfigBlob2Xml(
 ///
 /// \sa [EapPeerInvokeConfigUI function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363614.aspx)
 ///
+//_Use_decl_annotations_
 DWORD WINAPI EapPeerInvokeConfigUI(
-    _In_                               const EAP_METHOD_TYPE *pEapType,
-    _In_                                     HWND            hwndParent,
-    _In_                                     DWORD           dwFlags,
-    _In_                                     DWORD           dwConnectionDataInSize,
-    _In_count_(dwConnectionDataInSize) const BYTE            *pConnectionDataIn,
-    _Out_                                    DWORD           *pdwConnectionDataOutSize,
-    _Out_                                    BYTE            **ppConnectionDataOut,
-    _Out_                                    EAP_ERROR       **ppEapError)
+    const EAP_METHOD_TYPE *pEapType,
+          HWND            hwndParent,
+          DWORD           dwFlags,
+          DWORD           dwConnectionDataInSize,
+    const BYTE            *pConnectionDataIn,
+          DWORD           *pdwConnectionDataOutSize,
+          BYTE            **ppConnectionDataOut,
+          EAP_ERROR       **ppEapError)
 {
     UNREFERENCED_PARAMETER(dwFlags);
     DWORD dwResult = ERROR_SUCCESS;
@@ -269,33 +254,26 @@ DWORD WINAPI EapPeerInvokeConfigUI(
     //Sleep(10000);
 #endif
 
+    // Initialize output parameters.
+    if (pdwConnectionDataOutSize)
+        *pdwConnectionDataOutSize = 0;
+    if (ppConnectionDataOut)
+        *ppConnectionDataOut = NULL;
+    if (ppEapError)
+        *ppEapError = NULL;
+
     // Parameter check
-    if (!ppEapError)
+    if (!pEapType || !pConnectionDataIn && dwConnectionDataInSize || !pdwConnectionDataOutSize || !ppConnectionDataOut)
         return dwResult = ERROR_INVALID_PARAMETER;
+    if (pEapType->eapType.type != EAPMETHOD_TYPE || pEapType->dwAuthorId != 67532)
+        return dwResult = ERROR_NOT_SUPPORTED;
 
-    assert(!*ppEapError);
-
-    if (!pEapType)
-        g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pEapType is NULL.")));
-    else if (pEapType->eapType.type != EAPMETHOD_TYPE)
-        g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_NOT_SUPPORTED, wstring_printf(_T(__FUNCTION__) _T(" Input EAP type (%d) does not match the supported EAP type (%d)."), (int)pEapType->eapType.type, (int)EAPMETHOD_TYPE).c_str()));
-    else if (pEapType->dwAuthorId != 67532)
-        g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_NOT_SUPPORTED, wstring_printf(_T(__FUNCTION__) _T(" EAP author (%d) does not match the supported author (%d)."), (int)pEapType->dwAuthorId, (int)67532).c_str()));
-    else if (!pConnectionDataIn && dwConnectionDataInSize)
-        g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pConnectionDataIn is NULL.")));
-    else if (!pdwConnectionDataOutSize)
-        g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pdwConnectionDataOutSize is NULL.")));
-    else if (!ppConnectionDataOut)
-        g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" ppConnectionDataOut is NULL.")));
-    else {
-        try {
-            g_peer.invoke_config_ui(hwndParent, pConnectionDataIn, dwConnectionDataInSize, ppConnectionDataOut, pdwConnectionDataOutSize);
-        } catch (std::exception &err) {
-            g_peer.log_error(*ppEapError = g_peer.make_error(err));
-            dwResult = (*ppEapError)->dwWinError;
-        } catch (...) {
-            dwResult = ERROR_INVALID_DATA;
-        }
+    try {
+        g_peer.invoke_config_ui(hwndParent, pConnectionDataIn, dwConnectionDataInSize, ppConnectionDataOut, pdwConnectionDataOutSize);
+    } catch (std::exception &err) {
+        dwResult = g_peer.log_error(ppEapError, err);
+    } catch (...) {
+        dwResult = ERROR_INVALID_DATA;
     }
 
     return dwResult;
@@ -307,18 +285,19 @@ DWORD WINAPI EapPeerInvokeConfigUI(
 ///
 /// \sa [EapPeerInvokeIdentityUI function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363615.aspx)
 ///
+//_Use_decl_annotations_
 DWORD WINAPI EapPeerInvokeIdentityUI(
-    _In_                             const EAP_METHOD_TYPE *pEapType,
-    _In_                                   DWORD           dwFlags,
-    _In_                                   HWND            hwndParent,
-    _In_                                   DWORD           dwConnectionDataSize,
-    _In_count_(dwConnectionDataSize) const BYTE            *pConnectionData,
-    _In_                                   DWORD           dwUserDataSize,
-    _In_count_(dwUserDataSize)       const BYTE            *pUserData,
-    _Out_                                  DWORD           *pdwUserDataOutSize,
-    _Out_                                  BYTE            **ppUserDataOut,
-    _Out_                                  LPWSTR          *ppwszIdentity,
-    _Out_                                  EAP_ERROR       **ppEapError)
+    const EAP_METHOD_TYPE *pEapType,
+          DWORD           dwFlags,
+          HWND            hwndParent,
+          DWORD           dwConnectionDataSize,
+    const BYTE            *pConnectionData,
+          DWORD           dwUserDataSize,
+    const BYTE            *pUserData,
+          DWORD           *pdwUserDataOutSize,
+          BYTE            **ppUserDataOut,
+          LPWSTR          *ppwszIdentity,
+          EAP_ERROR       **ppEapError)
 {
     DWORD dwResult = ERROR_SUCCESS;
     event_fn_auto_ret<DWORD> event_auto(g_peer.get_event_fn_auto(__FUNCTION__, dwResult));
@@ -327,37 +306,28 @@ DWORD WINAPI EapPeerInvokeIdentityUI(
     //Sleep(10000);
 #endif
 
+    // Initialize output parameters.
+    if (pdwUserDataOutSize)
+        *pdwUserDataOutSize = 0;
+    if (ppUserDataOut)
+        *ppUserDataOut = NULL;
+    if (ppwszIdentity)
+        *ppwszIdentity = NULL;
+    if (ppEapError)
+        *ppEapError = NULL;
+
     // Parameter check
-    if (!ppEapError)
-        dwResult = ERROR_INVALID_PARAMETER;
+    if (!pEapType || !pConnectionData && dwConnectionDataSize || !pUserData && dwUserDataSize || !pdwUserDataOutSize || !ppUserDataOut || !ppwszIdentity)
+        return dwResult = ERROR_INVALID_PARAMETER;
+    if (pEapType->eapType.type != EAPMETHOD_TYPE || pEapType->dwAuthorId != 67532)
+        return dwResult = ERROR_NOT_SUPPORTED;
 
-    assert(!*ppEapError);
-
-    if (!pEapType)
-        g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pEapType is NULL.")));
-    else if (pEapType->eapType.type != EAPMETHOD_TYPE)
-        g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_NOT_SUPPORTED, wstring_printf(_T(__FUNCTION__) _T(" Input EAP type (%d) does not match the supported EAP type (%d)."), (int)pEapType->eapType.type, (int)EAPMETHOD_TYPE).c_str()));
-    else if (pEapType->dwAuthorId != 67532)
-        g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_NOT_SUPPORTED, wstring_printf(_T(__FUNCTION__) _T(" EAP author (%d) does not match the supported author (%d)."), (int)pEapType->dwAuthorId, (int)67532).c_str()));
-    else if (!pConnectionData && dwConnectionDataSize)
-        g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pConnectionData is NULL.")));
-    else if (!pUserData && dwUserDataSize)
-        g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pUserData is NULL.")));
-    else if (!pdwUserDataOutSize)
-        g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pdwUserDataOutSize is NULL.")));
-    else if (!ppUserDataOut)
-        g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" ppUserDataOut is NULL.")));
-    else if (!ppwszIdentity)
-        g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" ppwszIdentity is NULL.")));
-    else {
-        try {
-            g_peer.invoke_identity_ui(hwndParent, dwFlags, pConnectionData, dwConnectionDataSize, pUserData, dwUserDataSize, ppUserDataOut, pdwUserDataOutSize, ppwszIdentity);
-        } catch (std::exception &err) {
-            g_peer.log_error(*ppEapError = g_peer.make_error(err));
-            dwResult = (*ppEapError)->dwWinError;
-        } catch (...) {
-            dwResult = ERROR_INVALID_DATA;
-        }
+    try {
+        g_peer.invoke_identity_ui(hwndParent, dwFlags, pConnectionData, dwConnectionDataSize, pUserData, dwUserDataSize, ppUserDataOut, pdwUserDataOutSize, ppwszIdentity);
+    } catch (std::exception &err) {
+        dwResult = g_peer.log_error(ppEapError, err);
+    } catch (...) {
+        dwResult = ERROR_INVALID_DATA;
     }
 
     return dwResult;
@@ -369,14 +339,15 @@ DWORD WINAPI EapPeerInvokeIdentityUI(
 ///
 /// \sa [EapPeerInvokeInteractiveUI function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363616.aspx)
 ///
+//_Use_decl_annotations_
 DWORD WINAPI EapPeerInvokeInteractiveUI(
-    _In_                            const EAP_METHOD_TYPE *pEapType,
-    _In_                                  HWND            hwndParent,
-    _In_                                  DWORD           dwUIContextDataSize,
-    _In_count_(dwUIContextDataSize) const BYTE            *pUIContextData,
-    _Out_                                 DWORD           *pdwDataFromInteractiveUISize,
-    _Out_                                 BYTE            **ppDataFromInteractiveUI,
-    _Out_                                 EAP_ERROR       **ppEapError)
+    const EAP_METHOD_TYPE *pEapType,
+          HWND            hwndParent,
+          DWORD           dwUIContextDataSize,
+    const BYTE            *pUIContextData,
+          DWORD           *pdwDataFromInteractiveUISize,
+          BYTE            **ppDataFromInteractiveUI,
+          EAP_ERROR       **ppEapError)
 {
     DWORD dwResult = ERROR_SUCCESS;
     event_fn_auto_ret<DWORD> event_auto(g_peer.get_event_fn_auto(__FUNCTION__, dwResult));
@@ -385,33 +356,26 @@ DWORD WINAPI EapPeerInvokeInteractiveUI(
     //Sleep(10000);
 #endif
 
+    // Initialize output parameters.
+    if (pdwDataFromInteractiveUISize)
+        *pdwDataFromInteractiveUISize = 0;
+    if (ppDataFromInteractiveUI)
+        *ppDataFromInteractiveUI = NULL;
+    if (ppEapError)
+        *ppEapError = NULL;
+
     // Parameter check
-    if (!ppEapError)
+    if (!pEapType || !pUIContextData && dwUIContextDataSize || !pdwDataFromInteractiveUISize || !ppDataFromInteractiveUI)
         return dwResult = ERROR_INVALID_PARAMETER;
+    if (pEapType->eapType.type != EAPMETHOD_TYPE || pEapType->dwAuthorId != 67532)
+        return dwResult = ERROR_NOT_SUPPORTED;
 
-    assert(!*ppEapError);
-
-    if (!pEapType)
-        g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pEapType is NULL.")));
-    else if (pEapType->eapType.type != EAPMETHOD_TYPE)
-        g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_NOT_SUPPORTED, wstring_printf(_T(__FUNCTION__) _T(" Input EAP type (%d) does not match the supported EAP type (%d)."), (int)pEapType->eapType.type, (int)EAPMETHOD_TYPE).c_str()));
-    else if (pEapType->dwAuthorId != 67532)
-        g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_NOT_SUPPORTED, wstring_printf(_T(__FUNCTION__) _T(" EAP author (%d) does not match the supported author (%d)."), (int)pEapType->dwAuthorId, (int)67532).c_str()));
-    else if (!pUIContextData && dwUIContextDataSize)
-        g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pUIContextData is NULL.")));
-    else if (!pdwDataFromInteractiveUISize)
-        g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" pdwDataFromInteractiveUISize is NULL.")));
-    else if (!ppDataFromInteractiveUI)
-        g_peer.log_error(*ppEapError = g_peer.make_error(dwResult = ERROR_INVALID_PARAMETER, _T(__FUNCTION__) _T(" ppDataFromInteractiveUI is NULL.")));
-    else {
-        try {
-            g_peer.invoke_interactive_ui(hwndParent, pUIContextData, dwUIContextDataSize, ppDataFromInteractiveUI, pdwDataFromInteractiveUISize);
-        } catch (std::exception &err) {
-            g_peer.log_error(*ppEapError = g_peer.make_error(err));
-            dwResult = (*ppEapError)->dwWinError;
-        } catch (...) {
-            dwResult = ERROR_INVALID_DATA;
-        }
+    try {
+        g_peer.invoke_interactive_ui(hwndParent, pUIContextData, dwUIContextDataSize, ppDataFromInteractiveUI, pdwDataFromInteractiveUISize);
+    } catch (std::exception &err) {
+        dwResult = g_peer.log_error(ppEapError, err);
+    } catch (...) {
+        dwResult = ERROR_INVALID_DATA;
     }
 
     return dwResult;

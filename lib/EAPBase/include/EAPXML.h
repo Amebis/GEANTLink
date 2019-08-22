@@ -357,7 +357,7 @@ namespace eapxml
     /// - <0 if failed.
     /// Use `SUCCEEDED()` macro to test for first two cases (>=0) or `FAILED()` to test for failure.
     ///
-    inline HRESULT put_element_base64(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _In_count_(nValueLen) LPCVOID pValue, _In_ SIZE_T nValueLen, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement = NULL);
+    inline HRESULT put_element_base64(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _In_bytecount_(nValueLen) LPCVOID pValue, _In_ SIZE_T nValueLen, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement = NULL);
 
     ///
     /// Creates a new child element with hexadecimal encoded text from BLOB
@@ -376,7 +376,7 @@ namespace eapxml
     /// - <0 if failed.
     /// Use `SUCCEEDED()` macro to test for first two cases (>=0) or `FAILED()` to test for failure.
     ///
-    inline HRESULT put_element_hex(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _In_count_(nValueLen) LPCVOID pValue, _In_ SIZE_T nValueLen, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement = NULL);
+    inline HRESULT put_element_hex(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _In_bytecount_(nValueLen) LPCVOID pValue, _In_ SIZE_T nValueLen, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement = NULL);
 
     ///
     /// Returns attribute text
@@ -481,7 +481,7 @@ namespace eapxml
     /// - <0 if failed.
     /// Use `SUCCEEDED()` macro to test for first two cases (>=0) or `FAILED()` to test for failure.
     ///
-    inline HRESULT put_attrib_value(_In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrAttributeName, _In_opt_z_ _In_z_ const BSTR bstrValue);
+    inline HRESULT put_attrib_value(_In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrAttributeName, _In_z_ const BSTR bstrValue);
 
     ///
     /// Sets node attribute converted from number
@@ -496,7 +496,7 @@ namespace eapxml
     /// - <0 if failed.
     /// Use `SUCCEEDED()` macro to test for first two cases (>=0) or `FAILED()` to test for failure.
     ///
-    inline HRESULT put_attrib_value(_In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrAttributeName, _In_opt_z_ _In_ DWORD dwValue);
+    inline HRESULT put_attrib_value(_In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrAttributeName, _In_ DWORD dwValue);
 
     ///
     /// Sets node attribute converted from boolean
@@ -511,7 +511,7 @@ namespace eapxml
     /// - <0 if failed.
     /// Use `SUCCEEDED()` macro to test for first two cases (>=0) or `FAILED()` to test for failure.
     ///
-    inline HRESULT put_attrib_value(_In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrAttributeName, _In_opt_z_ _In_ bool bValue);
+    inline HRESULT put_attrib_value(_In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrAttributeName, _In_ bool bValue);
 
     ///
     /// Sets node attribute to Base64 encoded text from BLOB
@@ -527,7 +527,7 @@ namespace eapxml
     /// - <0 if failed.
     /// Use `SUCCEEDED()` macro to test for first two cases (>=0) or `FAILED()` to test for failure.
     ///
-    inline HRESULT put_attrib_base64(_In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrAttributeName, _In_opt_z_ _In_count_(nValueLen) LPCVOID pValue, _In_ SIZE_T nValueLen);
+    inline HRESULT put_attrib_base64(_In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrAttributeName, _In_bytecount_(nValueLen) LPCVOID pValue, _In_ SIZE_T nValueLen);
     ///
     /// Sets node attribute to hexadecimal encoded text from BLOB
     ///
@@ -542,7 +542,7 @@ namespace eapxml
     /// - <0 if failed.
     /// Use `SUCCEEDED()` macro to test for first two cases (>=0) or `FAILED()` to test for failure.
     ///
-    inline HRESULT put_attrib_hex(_In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrAttributeName, _In_count_(nValueLen) LPCVOID pValue, _In_ SIZE_T nValueLen);
+    inline HRESULT put_attrib_hex(_In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrAttributeName, _In_bytecount_(nValueLen) LPCVOID pValue, _In_ SIZE_T nValueLen);
 
     ///
     /// Builds XPath for a given node
@@ -786,7 +786,7 @@ namespace eapxml
                     pbstrValue = std::move(bstrEn);
                     return S_OK;
                 } else
-                    return ERROR_NOT_FOUND;
+                    return HRESULT_FROM_WIN32(ERROR_NOT_FOUND);
             }
 
             winstd::com_obj<IXMLDOMNode> pXmlElLocalizedText;
@@ -831,7 +831,6 @@ namespace eapxml
     {
         assert(pDoc);
         assert(pCurrentDOMNode);
-        assert(ppXmlElement);
 
         static const VARIANT varNodeTypeEl = { VT_I4, 0, 0, 0, { NODE_ELEMENT } };
         HRESULT hr;
@@ -878,7 +877,7 @@ namespace eapxml
     }
 
 
-    inline HRESULT put_element_base64(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _In_count_(nValueLen) LPCVOID pValue, _In_ SIZE_T nValueLen, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement)
+    inline HRESULT put_element_base64(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _In_bytecount_(nValueLen) LPCVOID pValue, _In_ SIZE_T nValueLen, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement)
     {
         std::wstring sBase64;
         winstd::base64_enc enc;
@@ -887,7 +886,7 @@ namespace eapxml
     }
 
 
-    inline HRESULT put_element_hex(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _In_count_(nValueLen) LPCVOID pValue, _In_ SIZE_T nValueLen, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement)
+    inline HRESULT put_element_hex(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _In_bytecount_(nValueLen) LPCVOID pValue, _In_ SIZE_T nValueLen, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement)
     {
         std::wstring sHex;
         winstd::hex_enc enc;
@@ -936,8 +935,6 @@ namespace eapxml
 
     inline HRESULT get_attrib_value(_In_ IXMLDOMNode *pXmlParent, _In_z_ const BSTR bstrAttributeName, _Out_ bool &pbValue)
     {
-        assert(pbValue);
-
         winstd::bstr bstr;
         HRESULT hr = get_attrib_value(pXmlParent, bstrAttributeName, bstr);
         if (SUCCEEDED(hr)) {
@@ -1012,7 +1009,7 @@ namespace eapxml
     }
 
 
-    inline HRESULT put_attrib_base64(_In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrAttributeName, _In_count_(nValueLen) LPCVOID pValue, _In_ SIZE_T nValueLen)
+    inline HRESULT put_attrib_base64(_In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrAttributeName, _In_bytecount_(nValueLen) LPCVOID pValue, _In_ SIZE_T nValueLen)
     {
         std::wstring sBase64;
         winstd::base64_enc enc;
@@ -1021,7 +1018,7 @@ namespace eapxml
     }
 
 
-    inline HRESULT put_attrib_hex(_In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrAttributeName, _In_count_(nValueLen) LPCVOID pValue, _In_ SIZE_T nValueLen)
+    inline HRESULT put_attrib_hex(_In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrAttributeName, _In_bytecount_(nValueLen) LPCVOID pValue, _In_ SIZE_T nValueLen)
     {
         std::wstring sHex;
         winstd::hex_enc enc;

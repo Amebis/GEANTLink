@@ -40,7 +40,7 @@ eap::config::config(_In_ const config &other) :
 }
 
 
-eap::config::config(_Inout_ config &&other) :
+eap::config::config(_Inout_ config &&other) noexcept :
     m_module(other.m_module)
 {
 }
@@ -55,7 +55,7 @@ eap::config& eap::config::operator=(_In_ const config &other)
 }
 
 
-eap::config& eap::config::operator=(_Inout_ config &&other)
+eap::config& eap::config::operator=(_Inout_ config &&other) noexcept
 {
     if (this != &other)
         assert(&m_module == &other.m_module);
@@ -103,7 +103,7 @@ eap::config_method::config_method(_In_ const config_method &other) :
 }
 
 
-eap::config_method::config_method(_Inout_ config_method &&other) :
+eap::config_method::config_method(_Inout_ config_method &&other) noexcept :
     m_level      (std::move(other.m_level      )),
     m_allow_save (std::move(other.m_allow_save )),
     m_last_status(std::move(other.m_last_status)),
@@ -127,7 +127,7 @@ eap::config_method& eap::config_method::operator=(_In_ const config_method &othe
 }
 
 
-eap::config_method& eap::config_method::operator=(_Inout_ config_method &&other)
+eap::config_method& eap::config_method::operator=(_Inout_ config_method &&other) noexcept
 {
     if (this != &other) {
         assert(m_level == other.m_level); // Allow move within same configuration level only.
@@ -231,7 +231,7 @@ eap::config_method_with_cred::config_method_with_cred(_In_ const config_method_w
 }
 
 
-eap::config_method_with_cred::config_method_with_cred(_Inout_ config_method_with_cred &&other) :
+eap::config_method_with_cred::config_method_with_cred(_Inout_ config_method_with_cred &&other) noexcept :
     m_use_cred   (std::move(other.m_use_cred)),
     m_cred       (std::move(other.m_cred    )),
     config_method(std::move(other           ))
@@ -251,7 +251,7 @@ eap::config_method_with_cred& eap::config_method_with_cred::operator=(_In_ const
 }
 
 
-eap::config_method_with_cred& eap::config_method_with_cred::operator=(_Inout_ config_method_with_cred &&other)
+eap::config_method_with_cred& eap::config_method_with_cred::operator=(_Inout_ config_method_with_cred &&other) noexcept
 {
     if (this != &other) {
         (config_method&)*this = std::move(other           );
@@ -362,7 +362,7 @@ eap::config_provider::config_provider(_In_ const config_provider &other) :
 }
 
 
-eap::config_provider::config_provider(_Inout_ config_provider &&other) :
+eap::config_provider::config_provider(_Inout_ config_provider &&other) noexcept :
     m_namespace         (std::move(other.m_namespace         )),
     m_id                (std::move(other.m_id                )),
     m_read_only         (std::move(other.m_read_only         )),
@@ -404,7 +404,7 @@ eap::config_provider& eap::config_provider::operator=(_In_ const config_provider
 }
 
 
-eap::config_provider& eap::config_provider::operator=(_Inout_ config_provider &&other)
+eap::config_provider& eap::config_provider::operator=(_Inout_ config_provider &&other) noexcept
 {
     if (this != &other) {
         (config&&)*this      = std::move(other                     );
@@ -700,7 +700,7 @@ eap::config_connection::config_connection(_In_ const config_connection &other) :
 }
 
 
-eap::config_connection::config_connection(_Inout_ config_connection &&other) :
+eap::config_connection::config_connection(_Inout_ config_connection &&other) noexcept :
     m_providers(std::move(other.m_providers)),
     config     (std::move(other            ))
 {
@@ -718,7 +718,7 @@ eap::config_connection& eap::config_connection::operator=(_In_ const config_conn
 }
 
 
-eap::config_connection& eap::config_connection::operator=(_Inout_ config_connection &&other)
+eap::config_connection& eap::config_connection::operator=(_Inout_ config_connection &&other) noexcept
 {
     if (this != &other) {
         (config&&)*this = std::move(other            );

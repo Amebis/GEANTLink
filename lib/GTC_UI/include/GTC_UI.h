@@ -56,6 +56,9 @@ typedef wxEAPCredentialsConfigPanel<eap::credentials_pass, wxGTCPasswordCredenti
 
 #include <Windows.h>
 
+#pragma warning(push)
+#pragma warning(disable: 26444)
+
 
 /// \addtogroup EAPBaseGUI
 /// @{
@@ -138,3 +141,5 @@ protected:
 };
 
 /// @}
+
+#pragma warning(pop)
