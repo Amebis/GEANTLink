@@ -107,7 +107,7 @@ namespace eap
     /// \addtogroup EAPBaseDiameter
     /// @{
 
-    enum diameter_avp_flags_t;
+    enum diameter_avp_flags_t : unsigned char;
     struct diameter_avp_header;
     struct diameter_avp_header_ven;
 

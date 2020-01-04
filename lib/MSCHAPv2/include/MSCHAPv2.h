@@ -23,7 +23,7 @@
 
 namespace eap
 {
-    enum chap_packet_code_t;
+    enum chap_packet_code_t : unsigned char;
     struct WINSTD_NOVTABLE chap_header;
     struct WINSTD_NOVTABLE challenge_mschapv2;
     struct WINSTD_NOVTABLE challenge_hash;
