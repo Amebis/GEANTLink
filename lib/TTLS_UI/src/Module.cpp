@@ -54,7 +54,7 @@ protected:
 // eap::peer_ttls_ui
 //////////////////////////////////////////////////////////////////////
 
-eap::peer_ttls_ui::peer_ttls_ui() : peer_ui(eap_type_ttls)
+eap::peer_ttls_ui::peer_ttls_ui() : peer_ui(eap_type_t::ttls)
 {
 }
 
@@ -244,16 +244,16 @@ void eap::peer_ttls_ui::invoke_identity_ui(
 #endif
         *cfg_method,
         cfg_method->m_allow_save ? target_name.c_str() : NULL);
-    if (src_outer == eap::credentials::source_unknown ||
-        src_outer != eap::credentials::source_config && eap::config_method::status_cred_begin <= cfg_method->m_last_status && cfg_method->m_last_status < eap::config_method::status_cred_end)
+    if (src_outer == eap::credentials::source_t::unknown ||
+        src_outer != eap::credentials::source_t::config && eap::config_method::status_t::cred_begin <= cfg_method->m_last_status && cfg_method->m_last_status < eap::config_method::status_t::cred_end)
     {
         // Build dialog to prompt for outer credentials.
         wxEAPCredentialsDialog dlg(*cfg_prov, init.m_parent);
         ui_canceller lock(dlg.GetHWND());
-        if (eap::config_method::status_cred_begin <= cfg_method->m_last_status && cfg_method->m_last_status < eap::config_method::status_cred_end)
+        if (eap::config_method::status_t::cred_begin <= cfg_method->m_last_status && cfg_method->m_last_status < eap::config_method::status_t::cred_end)
             dlg.AddContent(new wxEAPCredentialWarningPanel(*cfg_prov, cfg_method->m_last_status, &dlg));
         auto panel = new wxTLSCredentialsPanel(*cfg_prov, *cfg_method, *cred, &dlg, false);
-        panel->SetRemember(src_outer == eap::credentials::source_storage);
+        panel->SetRemember(src_outer == eap::credentials::source_t::storage);
         dlg.AddContent(panel);
 
         // Update dialog layout.
@@ -292,8 +292,8 @@ void eap::peer_ttls_ui::invoke_identity_ui(
 #endif
         *cfg_method->m_inner,
         cfg_method->m_inner->m_allow_save ? target_name.c_str() : NULL);
-    if (src_inner == eap::credentials::source_unknown ||
-        src_inner != eap::credentials::source_config && eap::config_method::status_cred_begin <= cfg_method->m_inner->m_last_status && cfg_method->m_inner->m_last_status < eap::config_method::status_cred_end)
+    if (src_inner == eap::credentials::source_t::unknown ||
+        src_inner != eap::credentials::source_t::config && eap::config_method::status_t::cred_begin <= cfg_method->m_inner->m_last_status && cfg_method->m_inner->m_last_status < eap::config_method::status_t::cred_end)
     {
         // Prompt for inner credentials.
 #if EAP_INNER_EAPHOST
@@ -304,14 +304,14 @@ void eap::peer_ttls_ui::invoke_identity_ui(
             // Native inner methods. Build dialog to prompt for inner credentials.
             wxEAPCredentialsDialog dlg(*cfg_prov, init.m_parent);
             ui_canceller lock(dlg.GetHWND());
-            if (eap::config_method::status_cred_begin <= cfg_method->m_inner->m_last_status && cfg_method->m_inner->m_last_status < eap::config_method::status_cred_end)
+            if (eap::config_method::status_t::cred_begin <= cfg_method->m_inner->m_last_status && cfg_method->m_inner->m_last_status < eap::config_method::status_t::cred_end)
                 dlg.AddContent(new wxEAPCredentialWarningPanel(*cfg_prov, cfg_method->m_inner->m_last_status, &dlg));
             wxEAPCredentialsPanelBase *panel = NULL;
             switch (cfg_method->m_inner->get_method_id()) {
-                case eap_type_legacy_pap     : panel = new wxPAPCredentialsPanel     (*cfg_prov, *dynamic_cast<const eap::config_method_pap        *>(cfg_method->m_inner.get()), *dynamic_cast<eap::credentials_pass    *>(cred->m_inner.get()), &dlg, false); break;
-                case eap_type_legacy_mschapv2: panel = new wxMSCHAPv2CredentialsPanel(*cfg_prov, *dynamic_cast<const eap::config_method_mschapv2   *>(cfg_method->m_inner.get()), *dynamic_cast<eap::credentials_pass    *>(cred->m_inner.get()), &dlg, false); break;
-                case eap_type_mschapv2       : panel = new wxMSCHAPv2CredentialsPanel(*cfg_prov, *dynamic_cast<const eap::config_method_eapmschapv2*>(cfg_method->m_inner.get()), *dynamic_cast<eap::credentials_pass    *>(cred->m_inner.get()), &dlg, false); break;
-                case eap_type_gtc            : {
+                case eap_type_t::legacy_pap     : panel = new wxPAPCredentialsPanel     (*cfg_prov, *dynamic_cast<const eap::config_method_pap        *>(cfg_method->m_inner.get()), *dynamic_cast<eap::credentials_pass    *>(cred->m_inner.get()), &dlg, false); break;
+                case eap_type_t::legacy_mschapv2: panel = new wxMSCHAPv2CredentialsPanel(*cfg_prov, *dynamic_cast<const eap::config_method_mschapv2   *>(cfg_method->m_inner.get()), *dynamic_cast<eap::credentials_pass    *>(cred->m_inner.get()), &dlg, false); break;
+                case eap_type_t::mschapv2       : panel = new wxMSCHAPv2CredentialsPanel(*cfg_prov, *dynamic_cast<const eap::config_method_eapmschapv2*>(cfg_method->m_inner.get()), *dynamic_cast<eap::credentials_pass    *>(cred->m_inner.get()), &dlg, false); break;
+                case eap_type_t::gtc            : {
                     // EAP-GTC credential prompt differes for "Challenge/Response" and "Password" authentication modes.
                     eap::credentials_identity *cred_resp;
                     eap::credentials_pass     *cred_pass;
@@ -327,7 +327,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
             }
             if (!panel)
                 throw invalid_argument("Invalid authentication mode");
-            panel->SetRemember(src_inner == eap::credentials::source_storage);
+            panel->SetRemember(src_inner == eap::credentials::source_t::storage);
             dlg.AddContent(panel);
 
             // Update dialog layout.
@@ -397,7 +397,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
 
     // Build our identity. ;)
     wstring identity(std::move(cfg_method->get_public_identity(*dynamic_cast<const credentials_ttls*>(cred_out.m_cred.get()))));
-    log_event(&EAPMETHOD_TRACE_EVT_CRED_OUTER_ID1, event_data((unsigned int)eap_type_ttls), event_data(identity), event_data::blank);
+    log_event(&EAPMETHOD_TRACE_EVT_CRED_OUTER_ID1, event_data((unsigned int)eap_type_t::ttls), event_data(identity), event_data::blank);
     size_t size = sizeof(WCHAR)*(identity.length() + 1);
     *ppwszIdentity = (WCHAR*)alloc_memory(size);
     memcpy(*ppwszIdentity, identity.c_str(), size);

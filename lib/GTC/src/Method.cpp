@@ -70,7 +70,7 @@ void eap::method_gtc::begin_session(
 
     // Presume authentication will fail with generic protocol failure. (Pesimist!!!)
     // We will reset once we get get_result(Success) call.
-    m_cfg.m_last_status = config_method::status_auth_failed;
+    m_cfg.m_last_status = config_method::status_t::auth_failed;
     m_cfg.m_last_msg.clear();
 }
 
@@ -81,14 +81,14 @@ EapPeerMethodResponseAction eap::method_gtc::process_request_packet(
 {
     assert(pReceivedPacket || dwReceivedPacketSize == 0);
 
-    m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_gtc), event_data::blank);
+    m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_t::gtc), event_data::blank);
 
     credentials_pass *cred_pass;
     if (dynamic_cast<credentials_identity*>(&m_cred)) {
         // Read authenticator challenge as UTF-8 encoded string.
         MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)pReceivedPacket, dwReceivedPacketSize, m_challenge);
 
-        m_module.log_event(&EAPMETHOD_GTC_RESPONSE_REQ, event_data((unsigned int)eap_type_gtc), event_data::blank);
+        m_module.log_event(&EAPMETHOD_GTC_RESPONSE_REQ, event_data((unsigned int)eap_type_t::gtc), event_data::blank);
 
         // User must respond to the challenge.
         return EapPeerMethodResponseActionInvokeUI;
@@ -97,7 +97,7 @@ EapPeerMethodResponseAction eap::method_gtc::process_request_packet(
         m_response = cred_pass->m_password;
 
         // Send the response.
-        m_cfg.m_last_status = config_method::status_cred_invalid; // Blame "credentials" if we fail beyond this point.
+        m_cfg.m_last_status = config_method::status_t::cred_invalid; // Blame "credentials" if we fail beyond this point.
         return EapPeerMethodResponseActionSend;
     } else
         throw invalid_argument(__FUNCTION__ " Unsupported authentication mode.");
@@ -128,7 +128,7 @@ void eap::method_gtc::get_result(
     method::get_result(reason, pResult);
 
     if (reason == EapPeerMethodResultSuccess)
-        m_cfg.m_last_status = config_method::status_success;
+        m_cfg.m_last_status = config_method::status_t::success;
 
     // Always ask EAP host to save the connection data. And it will save it *only* when we report "success".
     // Don't worry. EapHost is well aware of failed authentication condition.
@@ -150,7 +150,7 @@ EapPeerMethodResponseAction eap::method_gtc::set_ui_context(
     _In_count_(dwUIContextDataSize) const BYTE  *pUIContextData,
     _In_                                  DWORD dwUIContextDataSize)
 {
-    m_module.log_event(&EAPMETHOD_GTC_RESPONSE, event_data((unsigned int)eap_type_gtc), event_data::blank);
+    m_module.log_event(&EAPMETHOD_GTC_RESPONSE, event_data((unsigned int)eap_type_t::gtc), event_data::blank);
 
     // Save GTC response.
     m_response.assign(
@@ -158,6 +158,6 @@ EapPeerMethodResponseAction eap::method_gtc::set_ui_context(
         reinterpret_cast<sanitizing_wstring::const_pointer>(pUIContextData + dwUIContextDataSize));
 
     // Send the response.
-    m_cfg.m_last_status = config_method::status_cred_invalid; // Blame "credentials" if we fail beyond this point.
+    m_cfg.m_last_status = config_method::status_t::cred_invalid; // Blame "credentials" if we fail beyond this point.
     return EapPeerMethodResponseActionSend;
 }

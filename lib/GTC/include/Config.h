@@ -48,9 +48,9 @@ namespace eap
         ///
         /// Authentication mode
         ///
-        enum auth_mode_t {
-            auth_mode_response = 0, ///< Challenge/Response
-            auth_mode_password,     ///< Password
+        enum class auth_mode_t {
+            response = 0,   ///< Challenge/Response
+            password,       ///< Password
         };
 
     public:
@@ -111,7 +111,7 @@ namespace eap
 
         ///
         /// @copydoc eap::config_method::get_method_id()
-        /// \returns This implementation always returns `winstd::eap_type_gtc`
+        /// \returns This implementation always returns `winstd::eap_type_t::gtc`
         ///
         virtual winstd::eap_type_t get_method_id() const;
 

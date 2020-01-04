@@ -69,7 +69,7 @@ void eap::method_eaphost::begin_session(
 
     // Presume authentication will fail with generic protocol failure. (Pesimist!!!)
     // We will reset once we get get_result(Success) call.
-    m_cfg.m_last_status = config_method::status_auth_failed;
+    m_cfg.m_last_status = config_method::status_t::auth_failed;
     m_cfg.m_last_msg.clear();
 
     // Create EapHost peer session using available connection data (m_cfg) and user data (m_cred).
@@ -197,7 +197,7 @@ void eap::method_eaphost::get_result(
         }
 
         if (reason == EapPeerMethodResultSuccess)
-            m_cfg.m_last_status = config_method::status_success;
+            m_cfg.m_last_status = config_method::status_t::success;
 
         // Always ask EAP host to save the connection data. And it will save it *only* when we report "success".
         // Don't worry. EapHost is well aware of failed authentication condition.

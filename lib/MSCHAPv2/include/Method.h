@@ -254,12 +254,12 @@ namespace eap
         ///
         /// Communication phase
         ///
-        enum {
-            phase_unknown = -1,                 ///< Unknown phase
-            phase_init = 0,                     ///< Send client challenge
-            phase_challenge_server,             ///< Verify server challenge
-            phase_finished,                     ///< Connection shut down
-        } m_phase;                              ///< What phase is our communication at?
+        enum class phase_t {
+            unknown = -1,       ///< Unknown phase
+            init = 0,           ///< Send client challenge
+            challenge_server,   ///< Verify server challenge
+            finished,           ///< Connection shut down
+        } m_phase;              ///< What phase is our communication at?
     };
 
     /// @}

@@ -30,7 +30,7 @@ using namespace winstd;
 // eap::peer_ttls
 //////////////////////////////////////////////////////////////////////
 
-eap::peer_ttls::peer_ttls() : peer(eap_type_ttls)
+eap::peer_ttls::peer_ttls() : peer(eap_type_t::ttls)
 {
 }
 
@@ -126,7 +126,7 @@ void eap::peer_ttls::get_identity(
 
     // Build our identity. ;)
     wstring identity(std::move(cfg_method->get_public_identity(*dynamic_cast<const credentials_ttls*>(cred_out.m_cred.get()))));
-    log_event(&EAPMETHOD_TRACE_EVT_CRED_OUTER_ID1, event_data((unsigned int)eap_type_ttls), event_data(identity), event_data::blank);
+    log_event(&EAPMETHOD_TRACE_EVT_CRED_OUTER_ID1, event_data((unsigned int)eap_type_t::ttls), event_data(identity), event_data::blank);
     size_t size = sizeof(WCHAR)*(identity.length() + 1);
     *ppwszIdentity = (WCHAR*)alloc_memory(size);
     memcpy(*ppwszIdentity, identity.c_str(), size);
@@ -255,16 +255,16 @@ EAP_SESSION_HANDLE eap::peer_ttls::begin_session(
     {
         // Native inner methods
         switch (cfg_inner->get_method_id()) {
-        case eap_type_legacy_pap     : meth_inner.reset(new method_pap_diameter     (*this, dynamic_cast<config_method_pap     &>(*cfg_inner), dynamic_cast<credentials_pass&>(*cred_inner))); break;
-        case eap_type_legacy_mschapv2: meth_inner.reset(new method_mschapv2_diameter(*this, dynamic_cast<config_method_mschapv2&>(*cfg_inner), dynamic_cast<credentials_pass&>(*cred_inner))); break;
-        case eap_type_mschapv2       : meth_inner.reset(
-                                           new method_eapmsg  (*this, cred_inner->get_identity().c_str(),
-                                           new method_eap     (*this, eap_type_mschapv2,
-                                           new method_mschapv2(*this, dynamic_cast<config_method_mschapv2&>(*cfg_inner), dynamic_cast<credentials_pass&>(*cred_inner))))); break;
-        case eap_type_gtc            : meth_inner.reset(
-                                           new method_eapmsg  (*this, cred_inner->get_identity().c_str(),
-                                           new method_eap     (*this, eap_type_gtc,
-                                           new method_gtc     (*this, dynamic_cast<config_method_eapgtc&>(*cfg_inner), dynamic_cast<credentials&>(*cred_inner))))); break;
+        case eap_type_t::legacy_pap     : meth_inner.reset(new method_pap_diameter     (*this, dynamic_cast<config_method_pap     &>(*cfg_inner), dynamic_cast<credentials_pass&>(*cred_inner))); break;
+        case eap_type_t::legacy_mschapv2: meth_inner.reset(new method_mschapv2_diameter(*this, dynamic_cast<config_method_mschapv2&>(*cfg_inner), dynamic_cast<credentials_pass&>(*cred_inner))); break;
+        case eap_type_t::mschapv2       : meth_inner.reset(
+                                              new method_eapmsg  (*this, cred_inner->get_identity().c_str(),
+                                              new method_eap     (*this, eap_type_t::mschapv2,
+                                              new method_mschapv2(*this, dynamic_cast<config_method_mschapv2&>(*cfg_inner), dynamic_cast<credentials_pass&>(*cred_inner))))); break;
+        case eap_type_t::gtc            : meth_inner.reset(
+                                              new method_eapmsg  (*this, cred_inner->get_identity().c_str(),
+                                              new method_eap     (*this, eap_type_t::gtc,
+                                              new method_gtc     (*this, dynamic_cast<config_method_eapgtc&>(*cfg_inner), dynamic_cast<credentials&>(*cred_inner))))); break;
         default: throw invalid_argument(__FUNCTION__ " Unsupported inner authentication method.");
         }
     }
@@ -277,7 +277,7 @@ EAP_SESSION_HANDLE eap::peer_ttls::begin_session(
     }
 #endif
     s->m_method.reset(
-        new method_eap   (*this, eap_type_ttls,
+        new method_eap   (*this, eap_type_t::ttls,
         new method_defrag(*this,
         new method_ttls  (*this, *cfg_method, *dynamic_cast<credentials_ttls*>(s->m_cred.m_cred.get()), meth_inner.release()))));
 
@@ -476,8 +476,8 @@ _Success_(return != 0) const eap::config_method_ttls* eap::peer_ttls::combine_cr
 #endif
             *cfg_method,
             cfg_method->m_allow_save ? _target_name : NULL);
-        if (src_outer == eap::credentials::source_unknown) {
-            log_event(&EAPMETHOD_TRACE_EVT_CRED_UNKNOWN3, event_data(target_name), event_data((unsigned int)eap_type_tls), event_data::blank);
+        if (src_outer == eap::credentials::source_t::unknown) {
+            log_event(&EAPMETHOD_TRACE_EVT_CRED_UNKNOWN3, event_data(target_name), event_data((unsigned int)eap_type_t::tls), event_data::blank);
             continue;
         }
 
@@ -492,7 +492,7 @@ _Success_(return != 0) const eap::config_method_ttls* eap::peer_ttls::combine_cr
 #endif
             *cfg_method->m_inner,
             cfg_method->m_inner->m_allow_save ? _target_name : NULL);
-        if (src_inner == eap::credentials::source_unknown) {
+        if (src_inner == eap::credentials::source_t::unknown) {
             log_event(&EAPMETHOD_TRACE_EVT_CRED_UNKNOWN3, event_data(target_name), event_data((unsigned int)cfg_method->m_inner->get_method_id()), event_data::blank);
             continue;
         }
@@ -500,13 +500,13 @@ _Success_(return != 0) const eap::config_method_ttls* eap::peer_ttls::combine_cr
         // If we got here, we have all credentials we need. But, wait!
 
         if ((dwFlags & EAP_FLAG_MACHINE_AUTH) == 0) {
-            if (config_method::status_cred_begin <= cfg_method->m_last_status && cfg_method->m_last_status < config_method::status_cred_end) {
+            if (config_method::status_t::cred_begin <= cfg_method->m_last_status && cfg_method->m_last_status < config_method::status_t::cred_end) {
                 // Outer: Credentials failed on last connection attempt.
-                log_event(&EAPMETHOD_TRACE_EVT_CRED_PROBLEM2, event_data(target_name), event_data((unsigned int)eap_type_tls), event_data((unsigned int)cfg_method->m_last_status), event_data::blank);
+                log_event(&EAPMETHOD_TRACE_EVT_CRED_PROBLEM2, event_data(target_name), event_data((unsigned int)eap_type_t::tls), event_data((unsigned int)cfg_method->m_last_status), event_data::blank);
                 continue;
             }
 
-            if (config_method::status_cred_begin <= cfg_method->m_inner->m_last_status && cfg_method->m_inner->m_last_status < config_method::status_cred_end) {
+            if (config_method::status_t::cred_begin <= cfg_method->m_inner->m_last_status && cfg_method->m_inner->m_last_status < config_method::status_t::cred_end) {
                 // Inner: Credentials failed on last connection attempt.
                 log_event(&EAPMETHOD_TRACE_EVT_CRED_PROBLEM2, event_data(target_name), event_data((unsigned int)cfg_method->m_inner->get_method_id()), event_data((unsigned int)cfg_method->m_inner->m_last_status), event_data::blank);
                 continue;
@@ -637,7 +637,7 @@ DWORD WINAPI eap::peer_ttls::crl_checker::verify(_In_ crl_checker *obj)
                     // This "error" is expected for the root CA certificate.
                 } else {
                     // This really was an error, as it appeared before the root CA cerficate in the chain.
-                    obj->m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_REVOKE_SKIPPED, event_data((unsigned int)eap_type_ttls), event_data(subj), event_data::blank);
+                    obj->m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_REVOKE_SKIPPED, event_data((unsigned int)eap_type_t::ttls), event_data(subj), event_data::blank);
                 }
                 break;
 
@@ -649,12 +649,12 @@ DWORD WINAPI eap::peer_ttls::crl_checker::verify(_In_ crl_checker *obj)
                 case CRL_REASON_CESSATION_OF_OPERATION:
                 case CRL_REASON_CERTIFICATE_HOLD:
                     // The revocation was of administrative nature. No need to black-list.
-                    obj->m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_REVOKED1, event_data((unsigned int)eap_type_ttls), event_data(subj), event_data(status_rev.dwReason), event_data::blank);
+                    obj->m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_REVOKED1, event_data((unsigned int)eap_type_t::ttls), event_data(subj), event_data(status_rev.dwReason), event_data::blank);
                     break;
 
                 default: {
                     // One of the certificates in the chain was revoked as compromised. Black-list it.
-                    obj->m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_REVOKED, event_data((unsigned int)eap_type_ttls), event_data(subj), event_data(status_rev.dwReason), event_data::blank);
+                    obj->m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_REVOKED, event_data((unsigned int)eap_type_t::ttls), event_data(subj), event_data(status_rev.dwReason), event_data::blank);
                     reg_key key;
                     if (key.create(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\") _T(VENDOR_NAME_STR) _T("\\") _T(PRODUCT_NAME_STR) _T("\\TLSCRL"), NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE)) {
                         vector<unsigned char> hash;
@@ -678,7 +678,7 @@ DWORD WINAPI eap::peer_ttls::crl_checker::verify(_In_ crl_checker *obj)
 
             default:
                 // Checking one of the certificates in the chain for revocation failed. Resume checking the rest.
-                obj->m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_REVOKE_FAILED, event_data((unsigned int)eap_type_ttls), event_data(subj), event_data(status_rev.dwError), event_data::blank);
+                obj->m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_REVOKE_FAILED, event_data((unsigned int)eap_type_t::ttls), event_data(subj), event_data(status_rev.dwError), event_data::blank);
                 c += (size_t)status_rev.dwIndex + 1;
             }
         } else {
@@ -688,6 +688,6 @@ DWORD WINAPI eap::peer_ttls::crl_checker::verify(_In_ crl_checker *obj)
     }
 
     // Revocation check succeeded.
-    obj->m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_REVOKE_FINISHED, event_data((unsigned int)eap_type_ttls), event_data::blank);
+    obj->m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_REVOKE_FINISHED, event_data((unsigned int)eap_type_t::ttls), event_data::blank);
     return 0;
 }

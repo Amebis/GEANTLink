@@ -150,20 +150,20 @@ namespace eap
         ///
         /// Authentication attempt status
         ///
-        enum status_t {
-            status_success = 0,                             ///< Authentication succeeded
-            status_auth_failed,                             ///< Authentication failed
-            status_cred_invalid,                            ///< Invalid credentials
-            status_cred_expired,                            ///< Credentials expired
-            status_cred_changing,                           ///< Credentials are being changed
-            status_account_disabled,                        ///< Account is disabled
-            status_account_logon_hours,                     ///< Restricted account logon hours
-            status_account_denied,                          ///< Account access is denied
-            status_server_compromised,                      ///< Authentication server might have been compromised (CRL)
+        enum class status_t {
+            success = 0,                    ///< Authentication succeeded
+            auth_failed,                    ///< Authentication failed
+            cred_invalid,                   ///< Invalid credentials
+            cred_expired,                   ///< Credentials expired
+            cred_changing,                  ///< Credentials are being changed
+            account_disabled,               ///< Account is disabled
+            account_logon_hours,            ///< Restricted account logon hours
+            account_denied,                 ///< Account access is denied
+            server_compromised,             ///< Authentication server might have been compromised (CRL)
 
             // Meta statuses
-            status_cred_begin = status_cred_invalid,        ///< First credential related problem
-            status_cred_end   = status_cred_changing + 1,   ///< First problem, that is not credential related any more
+            cred_begin = cred_invalid,      ///< First credential related problem
+            cred_end   = cred_changing + 1, ///< First problem, that is not credential related any more
         };
 
     public:

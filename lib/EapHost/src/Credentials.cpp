@@ -230,29 +230,29 @@ eap::credentials::source_t eap::credentials_eaphost::combine(
     // To mimic that behaviour, we do the same:
     // 1. Retrieve credentials from cache, store, or configuration
     // 2. Call EapHostPeerGetIdentity()
-    source_t src = source_unknown;
+    source_t src = source_t::unknown;
 
     if (cred_cached) {
         // Using EAP service cached credentials.
         *this = *dynamic_cast<const credentials_eaphost*>(cred_cached);
         m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CACHED2, event_data((unsigned int)cfg.get_method_id()), event_data(get_name()), event_data(pszTargetName), event_data::blank);
-        src = source_cache;
+        src = source_t::cache;
     }
 
     // Note: Currently we do not provide credential storage for EapHost methods within configuration.
     // EapHost credentials will never get loaded from configuration, since config_method_eaphost is config_method based, not config_method_with_cred.
     // The code is kept (and maintained) for consistency with another methods, if we choose to provide that feature at a later time.
-    if (src == source_unknown) {
+    if (src == source_t::unknown) {
         auto cfg_with_cred = dynamic_cast<const config_method_with_cred*>(&cfg);
         if (cfg_with_cred && cfg_with_cred->m_use_cred) {
             // Using configured credentials.
             *this = *dynamic_cast<const credentials_eaphost*>(cfg_with_cred->m_cred.get());
             m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CONFIG2, event_data((unsigned int)cfg.get_method_id()), event_data(credentials_eaphost::get_name()), event_data(pszTargetName), event_data::blank);
-            src = source_config;
+            src = source_t::config;
         }
     }
 
-    if (src == source_unknown && pszTargetName) {
+    if (src == source_t::unknown && pszTargetName) {
         // Switch user context.
         user_impersonator impersonating(hTokenImpersonateUser);
 
@@ -263,7 +263,7 @@ eap::credentials::source_t eap::credentials_eaphost::combine(
             // Using stored credentials.
             *this = std::move(cred_loaded);
             m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_STORED2, event_data((unsigned int)cfg.get_method_id()), event_data(get_name()), event_data(pszTargetName), event_data::blank);
-            src = source_storage;
+            src = source_t::storage;
         } catch (...) {
             // Not actually an error.
         }
@@ -280,7 +280,7 @@ eap::credentials::source_t eap::credentials_eaphost::combine(
         dwFlags,
         cfg_eaphost->get_type(),
         (DWORD)cfg_eaphost->m_cfg_blob.size(), cfg_eaphost->m_cfg_blob.data(),
-        src != source_unknown ? (DWORD)m_cred_blob.size() : 0, src != source_unknown ? m_cred_blob.data() : NULL,
+        src != source_t::unknown ? (DWORD)m_cred_blob.size() : 0, src != source_t::unknown ? m_cred_blob.data() : NULL,
         hTokenImpersonateUser,
         &fInvokeUI,
         &cred_data_size, get_ptr(cred_data),
@@ -295,7 +295,7 @@ eap::credentials::source_t eap::credentials_eaphost::combine(
             m_cred_blob.assign(_cred_data, _cred_data + cred_data_size);
             SecureZeroMemory(_cred_data, cred_data_size);
             m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_EAPHOST, event_data((unsigned int)cfg.get_method_id()), event_data(get_name()), event_data(pszTargetName), event_data::blank);
-            return source_lower;
+            return source_t::lower;
         } else
             SecureZeroMemory(cred_data.get(), cred_data_size);
     } else if (error) {
@@ -306,7 +306,7 @@ eap::credentials::source_t eap::credentials_eaphost::combine(
         m_module.log_event(&EAPMETHOD_TRACE_EVT_WIN_ERROR, event_data((unsigned int)dwResult), event_data(__FUNCTION__ " EapHostPeerGetIdentity failed."), event_data::blank);
     }
 
-    return source_unknown;
+    return source_t::unknown;
 }
 
 

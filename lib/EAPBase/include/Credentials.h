@@ -57,12 +57,12 @@ namespace eap
         ///
         /// Credential source when combined
         ///
-        enum source_t {
-            source_unknown = -1, ///< Unknown source
-            source_cache = 0,    ///< Credentials were obtained from EapHost cache
-            source_config,       ///< Credentials were set by method configuration
-            source_storage,      ///< Credentials were loaded from Windows Credential Manager
-            source_lower,        ///< Credentials were set by lower EAP method
+        enum class source_t {
+            unknown = -1,   ///< Unknown source
+            cache = 0,      ///< Credentials were obtained from EapHost cache
+            config,         ///< Credentials were set by method configuration
+            storage,        ///< Credentials were loaded from Windows Credential Manager
+            lower,          ///< Credentials were set by lower EAP method
         };
 
 
@@ -210,9 +210,9 @@ namespace eap
         /// \param[in] pszTargetName          The name in Windows Credential Manager to retrieve credentials from (optional, can be \c NULL)
         ///
         /// \returns
-        /// - \c source_cache   Credentials were obtained from EapHost cache
-        /// - \c source_config  Credentials were set by method configuration
-        /// - \c source_storage Credentials were loaded from Windows Credential Manager
+        /// - \c source_t::cache   Credentials were obtained from EapHost cache
+        /// - \c source_t::config  Credentials were set by method configuration
+        /// - \c source_t::storage Credentials were loaded from Windows Credential Manager
         ///
         virtual source_t combine(
             _In_             DWORD         dwFlags,
@@ -305,9 +305,9 @@ namespace eap
         /// \param[in] pszTargetName          The name in Windows Credential Manager to retrieve credentials from (optional, can be \c NULL)
         ///
         /// \returns
-        /// - \c source_cache   Credentials were obtained from EapHost cache
-        /// - \c source_config  Credentials were set by method configuration
-        /// - \c source_storage Credentials were loaded from Windows Credential Manager
+        /// - \c source_t::cache   Credentials were obtained from EapHost cache
+        /// - \c source_t::config  Credentials were set by method configuration
+        /// - \c source_t::storage Credentials were loaded from Windows Credential Manager
         ///
         virtual source_t combine(
             _In_             DWORD         dwFlags,
@@ -327,11 +327,11 @@ namespace eap
         ///
         /// Password encryption method when loaded/saved to profile configuration XML
         ///
-        enum enc_alg_t {
-            enc_alg_unknown = -1,   ///< Unknown encryption
-            enc_alg_none = 0,       ///< Unencrypted
-            enc_alg_geantlink,      ///< GÉANTLink module encryption
-            enc_alg_kph,            ///< KPH encryption
+        enum class enc_alg_t {
+            unknown = -1,   ///< Unknown encryption
+            none = 0,       ///< Unencrypted
+            native,         ///< native module encryption
+            kph,            ///< KPH encryption
         };
 
     public:
@@ -417,9 +417,9 @@ namespace eap
         /// \param[in] pszTargetName          The name in Windows Credential Manager to retrieve credentials from (optional, can be \c NULL)
         ///
         /// \returns
-        /// - \c source_cache   Credentials were obtained from EapHost cache
-        /// - \c source_config  Credentials were set by method configuration
-        /// - \c source_storage Credentials were loaded from Windows Credential Manager
+        /// - \c source_t::cache   Credentials were obtained from EapHost cache
+        /// - \c source_t::config  Credentials were set by method configuration
+        /// - \c source_t::storage Credentials were loaded from Windows Credential Manager
         ///
         virtual source_t combine(
             _In_             DWORD         dwFlags,

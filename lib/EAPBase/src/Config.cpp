@@ -87,7 +87,7 @@ const bstr eap::config::namespace_eapmetadata(L"urn:ietf:params:xml:ns:yang:ietf
 eap::config_method::config_method(_In_ module &mod, _In_ unsigned int level) :
     m_level      (level),
     m_allow_save (true),
-    m_last_status(status_success),
+    m_last_status(status_t::success),
     config       (mod)
 {
 }
@@ -179,7 +179,7 @@ void eap::config_method::load(_In_ IXMLDOMNode *pConfigRoot)
         m_module.log_config((xpath + L"/allow-save").c_str(), m_allow_save);
     }
 
-    m_last_status = status_success;
+    m_last_status = status_t::success;
     m_last_msg.clear();
 }
 

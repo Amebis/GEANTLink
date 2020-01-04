@@ -23,7 +23,7 @@
 
 namespace eap
 {
-    enum chap_packet_code_t : unsigned char;
+    enum class chap_packet_code_t : unsigned char;
     struct WINSTD_NOVTABLE chap_header;
     struct WINSTD_NOVTABLE challenge_mschapv2;
     struct WINSTD_NOVTABLE challenge_hash;
@@ -65,13 +65,12 @@ namespace eap
     /// CHAP packet codes
     ///
     #pragma warning(suppress: 4480)
-    enum chap_packet_code_t : unsigned char {
-        chap_packet_code_challenge            = 1, ///< Challenge
-        chap_packet_code_response             = 2, ///< Response
-        chap_packet_code_success              = 3, ///< Success
-        chap_packet_code_failure              = 4, ///< Failure
-
-        mschapv2_packet_code_change_password  = 7, ///< Change password
+    enum class chap_packet_code_t : unsigned char {
+        challenge       = 1,    ///< Challenge
+        response        = 2,    ///< Response
+        success         = 3,    ///< Success
+        failure         = 4,    ///< Failure
+        change_password = 7,    ///< Change password
     };
 
 

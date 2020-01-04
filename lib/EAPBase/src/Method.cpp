@@ -299,7 +299,7 @@ EapPeerMethodResponseAction eap::method_eap::process_request_packet(
     // Save request packet ID to make matching response packet in get_response_packet() later.
     m_id = hdr->Id;
 
-    if (hdr->Data[0] != m_eap_method) {
+    if ((eap_type_t)hdr->Data[0] != m_eap_method) {
         // Unsupported EAP method. Respond with Legacy Nak.
         m_send_nak = true;
         return EapPeerMethodResponseActionSend;
@@ -324,7 +324,7 @@ void eap::method_eap::get_response_packet(
     hdr.Id = m_id;
 
     if (!m_send_nak) {
-        hdr.Data[0] = m_eap_method;
+        hdr.Data[0] = (BYTE)m_eap_method;
 
         packet.reserve(size_max); // To avoid reallocation when inserting EAP packet header later.
 
@@ -332,7 +332,7 @@ void eap::method_eap::get_response_packet(
         method_tunnel::get_response_packet(packet, size_max - sizeof(EapPacket));
     } else {
         // Respond with Legacy Nak suggesting our EAP method to continue.
-        hdr.Data[0] = eap_type_nak;
+        hdr.Data[0] = (BYTE)eap_type_t::nak;
 
         // Check packet size. We will suggest one EAP method alone, so we need one byte for data.
         size_t size_packet = sizeof(EapPacket) + 1;
@@ -341,7 +341,7 @@ void eap::method_eap::get_response_packet(
         packet.reserve(size_packet); // To avoid reallocation when inserting EAP packet header later.
 
         // Data of Legacy Nak packet is a list of supported EAP types: our method alone.
-        packet.assign(1, m_eap_method);
+        packet.assign(1, (unsigned char)m_eap_method);
     }
 
     size_t size_packet = packet.size() + sizeof(EapPacket);

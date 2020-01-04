@@ -110,7 +110,7 @@ void eap::config_method_ttls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode 
         throw com_runtime_error(hr, __FUNCTION__ " Error creating <InnerAuthenticationMethod> element.");
 
     eap_type_t eap_type = m_inner->get_method_id();
-    if (eap_type_noneap_start <= eap_type && eap_type < eap_type_noneap_end) {
+    if (eap_type_t::noneap_start <= eap_type && eap_type < eap_type_t::noneap_end) {
         // <InnerAuthenticationMethod>/<NonEAPAuthMethod>
         if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElInnerAuthenticationMethod, bstr(L"NonEAPAuthMethod"), namespace_eapmetadata, bstr(m_inner->get_method_str()))))
             throw com_runtime_error(hr, __FUNCTION__ " Error creating <NonEAPAuthMethod> element.");
@@ -201,7 +201,7 @@ void eap::config_method_ttls::load(_In_ IXMLDOMNode *pConfigRoot)
     DWORD dwMethod;
     bstr bstrMethod;
     if (SUCCEEDED(eapxml::get_element_value(pXmlElInnerAuthenticationMethod, bstr(L"eap-metadata:EAPMethod"), dwMethod)) &&
-        eap_type_start <= dwMethod && dwMethod < eap_type_end)
+        eap_type_t::start <= (eap_type_t)dwMethod && (eap_type_t)dwMethod < eap_type_t::end)
     {
         m_inner.reset(make_config_method((eap_type_t)dwMethod));
         m_module.log_config((xpath + L"/EAPMethod").c_str(), m_inner->get_method_str());
@@ -248,7 +248,7 @@ void eap::config_method_ttls::operator>>(_Inout_ cursor_in &cursor)
 
 eap_type_t eap::config_method_ttls::get_method_id() const
 {
-    return eap_type_ttls;
+    return eap_type_t::ttls;
 }
 
 
@@ -269,14 +269,14 @@ eap::credentials* eap::config_method_ttls::make_credentials() const
 eap::config_method* eap::config_method_ttls::make_config_method(_In_ winstd::eap_type_t eap_type) const
 {
     switch (eap_type) {
-    case eap_type_legacy_pap     : return new config_method_pap        (m_module, m_level + 1);
-    case eap_type_legacy_mschapv2: return new config_method_mschapv2   (m_module, m_level + 1);
-    case eap_type_mschapv2       : return new config_method_eapmschapv2(m_module, m_level + 1);
-    case eap_type_gtc            : return new config_method_eapgtc     (m_module, m_level + 1);
+    case eap_type_t::legacy_pap     : return new config_method_pap        (m_module, m_level + 1);
+    case eap_type_t::legacy_mschapv2: return new config_method_mschapv2   (m_module, m_level + 1);
+    case eap_type_t::mschapv2       : return new config_method_eapmschapv2(m_module, m_level + 1);
+    case eap_type_t::gtc            : return new config_method_eapgtc     (m_module, m_level + 1);
 #if EAP_INNER_EAPHOST
-    default                      : return new config_method_eaphost    (m_module, m_level + 1); // EapHost peer method handles all other method types
+    default                         : return new config_method_eaphost    (m_module, m_level + 1); // EapHost peer method handles all other method types
 #else
-    default                      : throw invalid_argument(string_printf(__FUNCTION__ " Unsupported inner authentication method (%d).", eap_type));
+    default                         : throw invalid_argument(string_printf(__FUNCTION__ " Unsupported inner authentication method (%d).", eap_type));
 #endif
     }
 }

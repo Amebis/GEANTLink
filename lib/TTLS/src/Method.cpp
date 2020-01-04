@@ -175,7 +175,7 @@ void eap::method_defrag::get_response_packet(
 
 eap::method_eapmsg::method_eapmsg(_In_ module &mod, _In_ const wchar_t *identity, _In_ method *inner) :
     m_identity(identity),
-    m_phase(phase_unknown),
+    m_phase(phase_t::unknown),
     method_tunnel(mod, inner)
 {
 }
@@ -219,7 +219,7 @@ void eap::method_eapmsg::begin_session(
     assert(m_inner);
     m_inner->begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, std::min<DWORD>(dwMaxSendPacketSize, 0xffffff) - sizeof(diameter_avp_header));
 
-    m_phase = phase_identity;
+    m_phase = phase_t::identity;
 }
 
 
@@ -228,7 +228,7 @@ EapPeerMethodResponseAction eap::method_eapmsg::process_request_packet(
     _In_                                       DWORD dwReceivedPacketSize)
 {
     switch (m_phase) {
-    case phase_identity: {
+    case phase_t::identity: {
         // Convert identity to UTF-8.
         sanitizing_string identity_utf8;
         WideCharToMultiByte(CP_UTF8, 0, m_identity, identity_utf8, NULL, NULL);
@@ -239,18 +239,18 @@ EapPeerMethodResponseAction eap::method_eapmsg::process_request_packet(
         eap_packet pck;
         if (!pck.create(EapCodeResponse, 0, (WORD)size_packet))
             throw win_runtime_error(__FUNCTION__ " EapPacket creation failed.");
-        pck->Data[0] = eap_type_identity;
+        pck->Data[0] = (BYTE)eap_type_t::identity;
         memcpy(pck->Data + 1, identity_utf8.data(), size_identity);
 
         // Diameter AVP (EAP-Message=79)
         m_packet_res.clear();
         diameter_avp_append(79, diameter_avp_flag_mandatory, (const EapPacket*)pck, (unsigned int)size_packet, m_packet_res);
 
-        m_phase = phase_finished;
+        m_phase = phase_t::finished;
         return EapPeerMethodResponseActionSend;
     }
 
-    case phase_finished: {
+    case phase_t::finished: {
         EapPeerMethodResponseAction action = EapPeerMethodResponseActionNone;
         bool eap_message_found = false;
 
@@ -340,7 +340,7 @@ eap::method_ttls::method_ttls(_In_ module &mod, _In_ config_method_ttls &cfg, _I
     m_cfg(cfg),
     m_cred(cred),
     m_user_ctx(NULL),
-    m_phase(phase_unknown),
+    m_phase(phase_t::unknown),
     m_packet_res_inner(false),
     method_tunnel(mod, inner)
 {
@@ -404,7 +404,7 @@ void eap::method_ttls::begin_session(
 
     // Presume authentication will fail with generic protocol failure. (Pesimist!!!)
     // We will reset once we get get_result(Success) call.
-    m_cfg.m_last_status = config_method::status_auth_failed;
+    m_cfg.m_last_status = config_method::status_t::auth_failed;
     m_cfg.m_last_msg.clear();
 
     m_user_ctx = hTokenImpersonateUser;
@@ -456,7 +456,7 @@ void eap::method_ttls::begin_session(
     if (FAILED(stat))
         throw sec_runtime_error(stat, __FUNCTION__ " Error acquiring Schannel credentials handle.");
 
-    m_phase = phase_handshake_init;
+    m_phase = phase_t::handshake_init;
 }
 
 
@@ -469,8 +469,8 @@ EapPeerMethodResponseAction eap::method_ttls::process_request_packet(
     user_impersonator impersonating(m_user_ctx);
 
     switch (m_phase) {
-    case phase_handshake_init: {
-        m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_ttls), event_data::blank);
+    case phase_t::handshake_init: {
+        m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_t::ttls), event_data::blank);
 
         // Prepare input buffer(s).
         SecBuffer buf_in[] = {
@@ -512,7 +512,7 @@ EapPeerMethodResponseAction eap::method_ttls::process_request_packet(
             } else
                 m_sc_queue.clear();
 
-            m_phase = phase_handshake_cont;
+            m_phase = phase_t::handshake_cont;
             m_packet_res_inner = false;
             return EapPeerMethodResponseActionSend;
         } else if (FAILED(status)) {
@@ -529,7 +529,7 @@ EapPeerMethodResponseAction eap::method_ttls::process_request_packet(
             throw sec_runtime_error(status, __FUNCTION__ " Unexpected Schannel result.");
     }
 
-    case phase_handshake_cont: {
+    case phase_t::handshake_cont: {
         m_sc_queue.insert(m_sc_queue.end(), reinterpret_cast<const unsigned char*>(pReceivedPacket), reinterpret_cast<const unsigned char*>(pReceivedPacket) + dwReceivedPacketSize);
 
         // Prepare input buffer(s).
@@ -577,7 +577,7 @@ EapPeerMethodResponseAction eap::method_ttls::process_request_packet(
                         enc.encode(hash_unicode, hash.data(), hash.size());
                         if (RegQueryValueExW(key, hash_unicode.c_str(), NULL, NULL, subj) == ERROR_SUCCESS) {
                             // A certificate in the chain is found to be revoked as compromised.
-                            m_cfg.m_last_status = config_method::status_server_compromised;
+                            m_cfg.m_last_status = config_method::status_t::server_compromised;
                             throw com_runtime_error(CRYPT_E_REVOKED, __FUNCTION__ " Server certificate or one of its issuer's certificate has been found revoked as compromised. Your credentials were probably sent to this server during previous connection attempts, thus changing your credentials (in a safe manner) is strongly advised. Please, contact your helpdesk immediately.");
                         }
                     }
@@ -607,7 +607,7 @@ EapPeerMethodResponseAction eap::method_ttls::process_request_packet(
 
             if (status == SEC_I_CONTINUE_NEEDED) {
                 // Blame credentials if we fail beyond this point.
-                m_cfg.m_last_status = config_method::status_cred_invalid;
+                m_cfg.m_last_status = config_method::status_t::cred_invalid;
                 m_packet_res_inner = false;
             } else {
                 SecPkgContext_Authority auth;
@@ -619,7 +619,7 @@ EapPeerMethodResponseAction eap::method_ttls::process_request_packet(
                 SecPkgContext_ConnectionInfo info;
                 if (SUCCEEDED(status = QueryContextAttributes(m_sc_ctx, SECPKG_ATTR_CONNECTION_INFO, &info)))
                     m_module.log_event(&EAPMETHOD_TLS_HANDSHAKE_FINISHED,
-                        event_data((unsigned int)eap_type_ttls),
+                        event_data((unsigned int)eap_type_t::ttls),
                         event_data(auth.sAuthorityName),
                         event_data(info.dwProtocol),
                         event_data(info.aiCipher),
@@ -632,8 +632,8 @@ EapPeerMethodResponseAction eap::method_ttls::process_request_packet(
                 else
                     m_module.log_event(&EAPMETHOD_TLS_QUERY_FAILED, event_data((unsigned int)SECPKG_ATTR_CONNECTION_INFO), event_data(status), event_data::blank);
 
-                m_phase = phase_finished;
-                m_cfg.m_last_status = config_method::status_success;
+                m_phase = phase_t::finished;
+                m_cfg.m_last_status = config_method::status_t::success;
 
                 method_mschapv2_diameter *inner_mschapv2 = dynamic_cast<method_mschapv2_diameter*>(m_inner.get());
                 if (inner_mschapv2) {
@@ -712,7 +712,7 @@ EapPeerMethodResponseAction eap::method_ttls::process_request_packet(
             throw sec_runtime_error(status, __FUNCTION__ " Unexpected Schannel result.");
     }
 
-    case phase_finished: {
+    case phase_t::finished: {
         m_packet_res.clear();
         m_sc_queue.insert(m_sc_queue.end(), reinterpret_cast<const unsigned char*>(pReceivedPacket), reinterpret_cast<const unsigned char*>(pReceivedPacket) + dwReceivedPacketSize);
 
@@ -867,7 +867,7 @@ void eap::method_ttls::get_result(
         m_eap_attr_desc.pAttribs = m_eap_attr.data();
         pResult->pAttribArray = &m_eap_attr_desc;
 
-        m_cfg.m_last_status = config_method::status_success;
+        m_cfg.m_last_status = config_method::status_t::success;
 
         // Spawn certificate revocation verify thread.
         dynamic_cast<peer_ttls&>(m_module).spawn_crl_check(std::move(m_sc_cert));
@@ -889,7 +889,7 @@ void eap::method_ttls::verify_server_trust() const
             memcmp(m_sc_cert->pbCertEncoded, (*c)->pbCertEncoded, m_sc_cert->cbCertEncoded) == 0)
         {
             // Server certificate found directly on the trusted root CA list.
-            m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_TRUSTED_EX1, event_data((unsigned int)eap_type_ttls), event_data::blank);
+            m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_TRUSTED_EX1, event_data((unsigned int)eap_type_t::ttls), event_data::blank);
             return;
         }
     }
@@ -938,7 +938,7 @@ void eap::method_ttls::verify_server_trust() const
                     if (san_info->rgAltEntry[idx_entry].dwAltNameChoice == CERT_ALT_NAME_DNS_NAME &&
                         _wcsicmp(s->c_str(), san_info->rgAltEntry[idx_entry].pwszDNSName) == 0)
                     {
-                        m_module.log_event(&EAPMETHOD_TLS_SERVER_NAME_TRUSTED2, event_data((unsigned int)eap_type_ttls), event_data(san_info->rgAltEntry[idx_entry].pwszDNSName), event_data::blank);
+                        m_module.log_event(&EAPMETHOD_TLS_SERVER_NAME_TRUSTED2, event_data((unsigned int)eap_type_t::ttls), event_data(san_info->rgAltEntry[idx_entry].pwszDNSName), event_data::blank);
                         found = true;
                     }
                 }
@@ -953,7 +953,7 @@ void eap::method_ttls::verify_server_trust() const
 
             for (auto s = m_cfg.m_server_names.cbegin(), s_end = m_cfg.m_server_names.cend(); !found && s != s_end; ++s) {
                 if (_wcsicmp(s->c_str(), subj.c_str()) == 0) {
-                    m_module.log_event(&EAPMETHOD_TLS_SERVER_NAME_TRUSTED2, event_data((unsigned int)eap_type_ttls), event_data(subj), event_data::blank);
+                    m_module.log_event(&EAPMETHOD_TLS_SERVER_NAME_TRUSTED2, event_data((unsigned int)eap_type_t::ttls), event_data(subj), event_data::blank);
                     found = true;
                 }
             }
@@ -1043,7 +1043,7 @@ void eap::method_ttls::verify_server_trust() const
         }
     }
 
-    m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_TRUSTED1, event_data((unsigned int)eap_type_ttls), event_data::blank);
+    m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_TRUSTED1, event_data((unsigned int)eap_type_t::ttls), event_data::blank);
 }
 
 #endif

@@ -90,7 +90,7 @@ namespace eap
 
         ///
         /// @copydoc eap::config_method::get_method_id()
-        /// \returns This implementation always returns `winstd::eap_type_legacy_mschapv2`
+        /// \returns This implementation always returns `winstd::eap_type_t::legacy_mschapv2`
         ///
         virtual winstd::eap_type_t get_method_id() const;
 
@@ -158,7 +158,7 @@ namespace eap
 
         ///
         /// @copydoc eap::config_method::get_method_id()
-        /// \returns This implementation always returns `winstd::eap_type_mschapv2`
+        /// \returns This implementation always returns `winstd::eap_type_t::mschapv2`
         ///
         virtual winstd::eap_type_t get_method_id() const;
 

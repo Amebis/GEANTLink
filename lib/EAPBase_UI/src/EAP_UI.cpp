@@ -222,10 +222,10 @@ wxEAPCredentialWarningPanel::wxEAPCredentialWarningPanel(const eap::config_provi
         m_note_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(161)));
 
     m_note_label->SetLabel((
-        status == eap::config_method::status_cred_invalid  ? _("Previous attempt to connect reported invalid credentials.") :
-        status == eap::config_method::status_cred_expired  ? _("Previous attempt to connect reported your credentials expired.") :
-        status == eap::config_method::status_cred_changing ? _("Previous attempt to connect reported your credentials are being changed.") :
-                                                             _("Previous attempt to connect failed.")) + " " +
+        status == eap::config_method::status_t::cred_invalid  ? _("Previous attempt to connect reported invalid credentials.") :
+        status == eap::config_method::status_t::cred_expired  ? _("Previous attempt to connect reported your credentials expired.") :
+        status == eap::config_method::status_t::cred_changing ? _("Previous attempt to connect reported your credentials are being changed.") :
+                                                                _("Previous attempt to connect failed.")) + " " +
         _("Please, make sure your credentials are correct, or try again later."));
     m_note_label->Wrap(FromDIP(449));
 

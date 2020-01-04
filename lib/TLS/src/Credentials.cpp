@@ -310,16 +310,16 @@ eap::credentials::source_t eap::credentials_tls::combine(
     if (cred_cached) {
         // Using EAP service cached credentials.
         *this = *dynamic_cast<const credentials_tls*>(cred_cached);
-        m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CACHED2, event_data((unsigned int)eap_type_tls), event_data(credentials_tls::get_name()), event_data(pszTargetName), event_data::blank);
-        return source_cache;
+        m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CACHED2, event_data((unsigned int)eap_type_t::tls), event_data(credentials_tls::get_name()), event_data(pszTargetName), event_data::blank);
+        return source_t::cache;
     }
 
     auto cfg_with_cred = dynamic_cast<const config_method_with_cred*>(&cfg);
     if (cfg_with_cred && cfg_with_cred->m_use_cred) {
         // Using configured credentials.
         *this = *dynamic_cast<const credentials_tls*>(cfg_with_cred->m_cred.get());
-        m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CONFIG2, event_data((unsigned int)eap_type_tls), event_data(credentials_tls::get_name()), event_data(pszTargetName), event_data::blank);
-        return source_config;
+        m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CONFIG2, event_data((unsigned int)eap_type_t::tls), event_data(credentials_tls::get_name()), event_data(pszTargetName), event_data::blank);
+        return source_t::config;
     }
 
     if (pszTargetName) {
@@ -332,14 +332,14 @@ eap::credentials::source_t eap::credentials_tls::combine(
 
             // Using stored credentials.
             *this = std::move(cred_loaded);
-            m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_STORED2, event_data((unsigned int)eap_type_tls), event_data(credentials_tls::get_name()), event_data(pszTargetName), event_data::blank);
-            return source_storage;
+            m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_STORED2, event_data((unsigned int)eap_type_t::tls), event_data(credentials_tls::get_name()), event_data(pszTargetName), event_data::blank);
+            return source_t::storage;
         } catch (...) {
             // Not actually an error.
         }
     }
 
-    return source_unknown;
+    return source_t::unknown;
 }
 
 

@@ -196,10 +196,10 @@ namespace eap
         ///
         /// Communication phase
         ///
-        enum {
-            phase_unknown = -1,         ///< Unknown phase
-            phase_identity = 0,         ///< Send identity
-            phase_finished,             ///< Connection shut down
+        enum class phase_t {
+            unknown = -1,               ///< Unknown phase
+            identity = 0,               ///< Send identity
+            finished,                   ///< Connection shut down
         } m_phase;                      ///< What phase is our communication at?
 
         sanitizing_blob m_packet_res;   ///< Response packet
@@ -289,11 +289,11 @@ namespace eap
         ///
         /// Communication phase
         ///
-        enum {
-            phase_unknown = -1,                     ///< Unknown phase
-            phase_handshake_init = 0,               ///< Handshake initialize
-            phase_handshake_cont,                   ///< Handshake continue
-            phase_finished,                         ///< Exchange application data
+        enum class phase_t {
+            unknown = -1,                           ///< Unknown phase
+            handshake_init = 0,                     ///< Handshake initialize
+            handshake_cont,                         ///< Handshake continue
+            finished,                               ///< Exchange application data
         } m_phase;                                  ///< What phase is our communication at?
 
         sanitizing_blob m_packet_res;               ///< Response packet

@@ -119,9 +119,9 @@ void eap::config_method_eapgtc::operator<<(_Inout_ cursor_out &cursor) const
 {
     // Save authentication mode first, as credential loading will require this information.
     if (dynamic_cast<credentials_identity*>(m_cred.get()))
-        cursor << auth_mode_response;
+        cursor << auth_mode_t::response;
     else if (dynamic_cast<credentials_pass*>(m_cred.get()))
-        cursor << auth_mode_password;
+        cursor << auth_mode_t::password;
     else
         throw invalid_argument(__FUNCTION__ " Unsupported authentication mode.");
 
@@ -133,9 +133,9 @@ size_t eap::config_method_eapgtc::get_pk_size() const
 {
     auth_mode_t auth_mode;
     if (dynamic_cast<credentials_identity*>(m_cred.get()))
-        auth_mode = auth_mode_response;
+        auth_mode = auth_mode_t::response;
     else if (dynamic_cast<credentials_pass*>(m_cred.get()))
-        auth_mode = auth_mode_password;
+        auth_mode = auth_mode_t::password;
     else
         throw invalid_argument(__FUNCTION__ " Unsupported authentication mode.");
 
@@ -151,9 +151,9 @@ void eap::config_method_eapgtc::operator>>(_Inout_ cursor_in &cursor)
     auth_mode_t auth_mode;
     cursor >> auth_mode;
     switch (auth_mode) {
-    case auth_mode_response: m_cred.reset(new eap::credentials_identity(m_module)); break;
-    case auth_mode_password: m_cred.reset(new eap::credentials_pass    (m_module)); break;
-    default                : throw invalid_argument(string_printf(__FUNCTION__ " Unsupported authentication mode (%u).", auth_mode));
+    case auth_mode_t::response: m_cred.reset(new eap::credentials_identity(m_module)); break;
+    case auth_mode_t::password: m_cred.reset(new eap::credentials_pass    (m_module)); break;
+    default                   : throw invalid_argument(string_printf(__FUNCTION__ " Unsupported authentication mode (%u).", auth_mode));
     }
 
     config_method_with_cred::operator>>(cursor);
@@ -162,7 +162,7 @@ void eap::config_method_eapgtc::operator>>(_Inout_ cursor_in &cursor)
 
 eap_type_t eap::config_method_eapgtc::get_method_id() const
 {
-    return eap_type_gtc;
+    return eap_type_t::gtc;
 }
 
 

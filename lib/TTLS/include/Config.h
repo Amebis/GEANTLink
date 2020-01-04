@@ -106,7 +106,7 @@ namespace eap
 
         ///
         /// @copydoc eap::config_method::get_method_id()
-        /// \returns This implementation always returns `winstd::eap_type_ttls`
+        /// \returns This implementation always returns `winstd::eap_type_t::ttls`
         ///
         virtual winstd::eap_type_t get_method_id() const;
 

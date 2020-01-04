@@ -65,7 +65,7 @@ namespace eap
         ///
         /// \param[in] eap_method  EAP method type ID
         ///
-        module(_In_ winstd::eap_type_t eap_method = winstd::eap_type_undefined);
+        module(_In_ winstd::eap_type_t eap_method = winstd::eap_type_t::undefined);
 
         ///
         /// Destructs the module

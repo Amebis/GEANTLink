@@ -308,7 +308,7 @@ eap::credentials::source_t eap::credentials_identity::combine(
         // Using EAP service cached credentials.
         *this = *dynamic_cast<const credentials_identity*>(cred_cached);
         m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CACHED2, event_data((unsigned int)cfg.get_method_id()), event_data(credentials_identity::get_name()), event_data(pszTargetName), event_data::blank);
-        return source_cache;
+        return source_t::cache;
     }
 
     auto cfg_with_cred = dynamic_cast<const config_method_with_cred*>(&cfg);
@@ -316,7 +316,7 @@ eap::credentials::source_t eap::credentials_identity::combine(
         // Using configured credentials.
         *this = *dynamic_cast<const credentials_identity*>(cfg_with_cred->m_cred.get());
         m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CONFIG2, event_data((unsigned int)cfg.get_method_id()), event_data(credentials_identity::get_name()), event_data(pszTargetName), event_data::blank);
-        return source_config;
+        return source_t::config;
     }
 
     if (pszTargetName) {
@@ -330,13 +330,13 @@ eap::credentials::source_t eap::credentials_identity::combine(
             // Using stored credentials.
             *this = std::move(cred_loaded);
             m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_STORED2, event_data((unsigned int)cfg.get_method_id()), event_data(credentials_identity::get_name()), event_data(pszTargetName), event_data::blank);
-            return source_storage;
+            return source_t::storage;
         } catch (...) {
             // Not actually an error.
         }
     }
 
-    return source_unknown;
+    return source_t::unknown;
 }
 
 
@@ -345,7 +345,7 @@ eap::credentials::source_t eap::credentials_identity::combine(
 //////////////////////////////////////////////////////////////////////
 
 eap::credentials_pass::credentials_pass(_In_ module &mod) :
-    m_enc_alg(enc_alg_geantlink),
+    m_enc_alg(enc_alg_t::native),
     credentials(mod)
 {
 }
@@ -426,7 +426,7 @@ void eap::credentials_pass::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *p
 
     // <Password>
     switch (m_enc_alg) {
-    case enc_alg_kph: {
+    case enc_alg_t::kph: {
         sanitizing_string password_utf8;
         WideCharToMultiByte(CP_UTF8, 0, m_password, password_utf8, NULL, NULL);
         wstring password_enc(std::move(kph_encrypt<wchar_t, char_traits<wchar_t>, allocator<wchar_t> >(cp, password_utf8.c_str())));
@@ -481,18 +481,18 @@ void eap::credentials_pass::load(_In_ IXMLDOMNode *pConfigRoot)
             throw win_runtime_error(__FUNCTION__ " CryptAcquireContext failed.");
 
         m_password = m_module.decrypt_str_md5<char_traits<wchar_t>, sanitizing_allocator<wchar_t> >(cp, password_enc.data(), password_enc.size());
-        m_enc_alg  = enc_alg_geantlink;
+        m_enc_alg  = enc_alg_t::native;
     } else if (encryption && CompareStringEx(LOCALE_NAME_INVARIANT, NORM_IGNORECASE, encryption, encryption.length(), _L("KPH"), -1, NULL, NULL, 0) == CSTR_EQUAL) {
         // Decrypt password.
         sanitizing_string password_utf8(std::move(kph_decrypt<OLECHAR>(password)));
         MultiByteToWideChar(CP_UTF8, 0, password_utf8, m_password);
-        m_enc_alg = enc_alg_kph;
+        m_enc_alg = enc_alg_t::kph;
     } else if (encryption && encryption[0]) {
         // Encryption is defined but unrecognized.
         throw invalid_argument(string_printf(__FUNCTION__ " Unsupported <Password> encryption method (encryption: %ls).", (BSTR)encryption));
     } else {
         m_password = password;
-        m_enc_alg  = enc_alg_none;
+        m_enc_alg  = enc_alg_t::none;
         SecureZeroMemory((BSTR)password, sizeof(OLECHAR)*password.length());
     }
 
@@ -614,7 +614,7 @@ eap::credentials::source_t eap::credentials_pass::combine(
         // Using EAP service cached credentials.
         *this = *dynamic_cast<const credentials_pass*>(cred_cached);
         m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CACHED2, event_data((unsigned int)cfg.get_method_id()), event_data(credentials_pass::get_name()), event_data(pszTargetName), event_data::blank);
-        return source_cache;
+        return source_t::cache;
     }
 
     auto cfg_with_cred = dynamic_cast<const config_method_with_cred*>(&cfg);
@@ -622,7 +622,7 @@ eap::credentials::source_t eap::credentials_pass::combine(
         // Using configured credentials.
         *this = *dynamic_cast<const credentials_pass*>(cfg_with_cred->m_cred.get());
         m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CONFIG2, event_data((unsigned int)cfg.get_method_id()), event_data(credentials_pass::get_name()), event_data(pszTargetName), event_data::blank);
-        return source_config;
+        return source_t::config;
     }
 
     if (pszTargetName) {
@@ -636,13 +636,13 @@ eap::credentials::source_t eap::credentials_pass::combine(
             // Using stored credentials.
             *this = std::move(cred_loaded);
             m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_STORED2, event_data((unsigned int)cfg.get_method_id()), event_data(credentials_pass::get_name()), event_data(pszTargetName), event_data::blank);
-            return source_storage;
+            return source_t::storage;
         } catch (...) {
             // Not actually an error.
         }
     }
 
-    return source_unknown;
+    return source_t::unknown;
 }
 
 

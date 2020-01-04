@@ -72,7 +72,7 @@ eap::config* eap::config_method_mschapv2::clone() const
 
 eap_type_t eap::config_method_mschapv2::get_method_id() const
 {
-    return eap_type_legacy_mschapv2;
+    return eap_type_t::legacy_mschapv2;
 }
 
 
@@ -135,7 +135,7 @@ eap::config* eap::config_method_eapmschapv2::clone() const
 
 eap_type_t eap::config_method_eapmschapv2::get_method_id() const
 {
-    return eap_type_mschapv2;
+    return eap_type_t::mschapv2;
 }
 
 

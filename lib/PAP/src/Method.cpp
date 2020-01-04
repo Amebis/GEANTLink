@@ -31,7 +31,7 @@ using namespace winstd;
 eap::method_pap_diameter::method_pap_diameter(_In_ module &mod, _In_ config_method_pap &cfg, _In_ credentials_pass &cred) :
     m_cfg(cfg),
     m_cred(cred),
-    m_phase(phase_unknown),
+    m_phase(phase_t::unknown),
     method(mod)
 {
 }
@@ -71,10 +71,10 @@ void eap::method_pap_diameter::begin_session(
 
     // Presume authentication will fail with generic protocol failure. (Pesimist!!!)
     // We will reset once we get get_result(Success) call.
-    m_cfg.m_last_status = config_method::status_auth_failed;
+    m_cfg.m_last_status = config_method::status_t::auth_failed;
     m_cfg.m_last_msg.clear();
 
-    m_phase = phase_init;
+    m_phase = phase_t::init;
 }
 
 
@@ -86,8 +86,8 @@ EapPeerMethodResponseAction eap::method_pap_diameter::process_request_packet(
     UNREFERENCED_PARAMETER(dwReceivedPacketSize);
 
     switch (m_phase) {
-    case phase_init: {
-        m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_legacy_pap), event_data::blank);
+    case phase_t::init: {
+        m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_t::legacy_pap), event_data::blank);
 
         // Convert username and password to UTF-8.
         sanitizing_string identity_utf8, password_utf8;
@@ -103,12 +103,12 @@ EapPeerMethodResponseAction eap::method_pap_diameter::process_request_packet(
         diameter_avp_append(1, diameter_avp_flag_mandatory, identity_utf8.data(), (unsigned int)identity_utf8.size(), m_packet_res);
         diameter_avp_append(2, diameter_avp_flag_mandatory, password_utf8.data(), (unsigned int)password_utf8.size(), m_packet_res);
 
-        m_phase = phase_finished;
-        m_cfg.m_last_status = config_method::status_cred_invalid; // Blame credentials if we fail beyond this point.
+        m_phase = phase_t::finished;
+        m_cfg.m_last_status = config_method::status_t::cred_invalid; // Blame credentials if we fail beyond this point.
         return EapPeerMethodResponseActionSend;
     }
 
-    case phase_finished:
+    case phase_t::finished:
         return EapPeerMethodResponseActionNone;
 
     default:
@@ -137,7 +137,7 @@ void eap::method_pap_diameter::get_result(
     method::get_result(reason, pResult);
 
     if (reason == EapPeerMethodResultSuccess)
-        m_cfg.m_last_status = config_method::status_success;
+        m_cfg.m_last_status = config_method::status_t::success;
 
     // Always ask EAP host to save the connection data. And it will save it *only* when we report "success".
     // Don't worry. EapHost is well aware of failed authentication condition.

@@ -79,7 +79,7 @@ void eap::method_mschapv2_base::begin_session(
 
     // Presume authentication will fail with generic protocol failure. (Pesimist!!!)
     // We will reset once we get get_result(Success) call.
-    m_cfg.m_last_status = config_method::status_auth_failed;
+    m_cfg.m_last_status = config_method::status_t::auth_failed;
     m_cfg.m_last_msg.clear();
 
     // Create cryptographics provider for support needs (client challenge ...).
@@ -108,7 +108,7 @@ void eap::method_mschapv2_base::get_result(
     method::get_result(reason, pResult);
 
     if (reason == EapPeerMethodResultSuccess)
-        m_cfg.m_last_status = config_method::status_success;
+        m_cfg.m_last_status = config_method::status_t::success;
 
     // Always ask EAP host to save the connection data. And it will save it *only* when we report "success".
     // Don't worry. EapHost is well aware of failed authentication condition.
@@ -119,7 +119,7 @@ void eap::method_mschapv2_base::get_result(
 
 void eap::method_mschapv2_base::process_success(_In_ const list<string> &argv)
 {
-    assert(m_cfg.m_last_status != config_method::status_success);
+    assert(m_cfg.m_last_status != config_method::status_t::success);
 
     for (auto arg = argv.cbegin(), arg_end = argv.cend(); arg != arg_end; ++arg) {
         const string &val = *arg;
@@ -140,11 +140,11 @@ void eap::method_mschapv2_base::process_success(_In_ const list<string> &argv)
                 throw invalid_argument(__FUNCTION__ " MS-CHAP2-Success authentication response string failed.");
 
             m_module.log_event(&EAPMETHOD_METHOD_SUCCESS, event_data((unsigned int)m_cfg.get_method_id()), event_data::blank);
-            m_cfg.m_last_status = config_method::status_success;
+            m_cfg.m_last_status = config_method::status_t::success;
         }
     }
 
-    if (m_cfg.m_last_status != config_method::status_success)
+    if (m_cfg.m_last_status != config_method::status_t::success)
         throw invalid_argument(__FUNCTION__ " MS-CHAP2-Success authentication response string not found.");
 }
 
@@ -157,12 +157,12 @@ void eap::method_mschapv2_base::process_error(_In_ const list<string> &argv)
             DWORD dwResult = strtoul(val.data() + 2, NULL, 10);
             m_module.log_event(&EAPMETHOD_METHOD_FAILURE_ERROR, event_data((unsigned int)m_cfg.get_method_id()), event_data(dwResult), event_data::blank);
             switch (dwResult) {
-            case ERROR_ACCT_DISABLED         : m_cfg.m_last_status = config_method::status_account_disabled   ; break;
-            case ERROR_RESTRICTED_LOGON_HOURS: m_cfg.m_last_status = config_method::status_account_logon_hours; break;
-            case ERROR_NO_DIALIN_PERMISSION  : m_cfg.m_last_status = config_method::status_account_denied     ; break;
-            case ERROR_PASSWD_EXPIRED        : m_cfg.m_last_status = config_method::status_cred_expired       ; break;
-            case ERROR_CHANGING_PASSWORD     : m_cfg.m_last_status = config_method::status_cred_changing      ; break;
-            default                          : m_cfg.m_last_status = config_method::status_cred_invalid       ;
+            case ERROR_ACCT_DISABLED         : m_cfg.m_last_status = config_method::status_t::account_disabled   ; break;
+            case ERROR_RESTRICTED_LOGON_HOURS: m_cfg.m_last_status = config_method::status_t::account_logon_hours; break;
+            case ERROR_NO_DIALIN_PERMISSION  : m_cfg.m_last_status = config_method::status_t::account_denied     ; break;
+            case ERROR_PASSWD_EXPIRED        : m_cfg.m_last_status = config_method::status_t::cred_expired       ; break;
+            case ERROR_CHANGING_PASSWORD     : m_cfg.m_last_status = config_method::status_t::cred_changing      ; break;
+            default                          : m_cfg.m_last_status = config_method::status_t::cred_invalid       ;
             }
         } else if ((val[0] == 'C' || val[0] == 'c') && val[1] == '=') {
             hex_dec dec;
@@ -247,8 +247,8 @@ EapPeerMethodResponseAction eap::method_mschapv2::process_request_packet(
         m_ident = hdr->ident;
 
         switch (hdr->code) {
-        case chap_packet_code_challenge: {
-            m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_mschapv2), event_data::blank);
+        case chap_packet_code_t::challenge: {
+            m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_t::mschapv2), event_data::blank);
 
             if (msg + 1 > msg_end)
                 throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Incomplete CHAP challenge packet.");
@@ -279,7 +279,7 @@ EapPeerMethodResponseAction eap::method_mschapv2::process_request_packet(
             value.push_back(0); // Flags
 
             chap_header hdr_resp;
-            hdr_resp.code = chap_packet_code_response;
+            hdr_resp.code = chap_packet_code_t::response;
             hdr_resp.ident = m_ident;
             size_t size_value = value.size();
             *reinterpret_cast<unsigned short*>(hdr_resp.length) = htons((unsigned short)(sizeof(chap_header) + 1 + size_value + identity_utf8.length()));
@@ -291,21 +291,21 @@ EapPeerMethodResponseAction eap::method_mschapv2::process_request_packet(
             m_packet_res.insert(m_packet_res.end(), value.begin(), value.end());
             m_packet_res.insert(m_packet_res.end(), identity_utf8.begin(), identity_utf8.end());
 
-            m_cfg.m_last_status = config_method::status_cred_invalid; // Blame credentials if we fail beyond this point.
+            m_cfg.m_last_status = config_method::status_t::cred_invalid; // Blame credentials if we fail beyond this point.
             return EapPeerMethodResponseActionSend;
         }
 
-        case chap_packet_code_success:
+        case chap_packet_code_t::success:
             process_success(parse_response(reinterpret_cast<const char*>(msg), reinterpret_cast<const char*>(msg_end) - reinterpret_cast<const char*>(msg)));
-            if (m_cfg.m_last_status == config_method::status_success) {
-                // Acknowledge the authentication by sending a "3" (chap_packet_code_success).
-                m_packet_res.assign(1, chap_packet_code_success);
-                m_cfg.m_last_status = config_method::status_auth_failed; // Blame protocol if we fail beyond this point.
+            if (m_cfg.m_last_status == config_method::status_t::success) {
+                // Acknowledge the authentication by sending a "3" (chap_packet_code_t::success).
+                m_packet_res.assign(1, (unsigned char)chap_packet_code_t::success);
+                m_cfg.m_last_status = config_method::status_t::auth_failed; // Blame protocol if we fail beyond this point.
                 return EapPeerMethodResponseActionSend;
             } else
                 return EapPeerMethodResponseActionDiscard;
 
-        case chap_packet_code_failure:
+        case chap_packet_code_t::failure:
             process_error(parse_response(reinterpret_cast<const char*>(msg), reinterpret_cast<const char*>(msg_end) - reinterpret_cast<const char*>(msg)));
             return EapPeerMethodResponseActionDiscard;
         }
@@ -322,7 +322,7 @@ EapPeerMethodResponseAction eap::method_mschapv2::process_request_packet(
 //////////////////////////////////////////////////////////////////////
 
 eap::method_mschapv2_diameter::method_mschapv2_diameter(_In_ module &mod, _In_ config_method_mschapv2 &cfg, _In_ credentials_pass &cred) :
-    m_phase(phase_unknown),
+    m_phase(phase_t::unknown),
     method_mschapv2_base(mod, cfg, cred)
 {
 }
@@ -354,7 +354,7 @@ void eap::method_mschapv2_diameter::begin_session(
 {
     method_mschapv2_base::begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
 
-    m_phase = phase_init;
+    m_phase = phase_t::init;
 }
 
 
@@ -365,8 +365,8 @@ EapPeerMethodResponseAction eap::method_mschapv2_diameter::process_request_packe
     assert(pReceivedPacket || dwReceivedPacketSize == 0);
 
     switch (m_phase) {
-    case phase_init: {
-        m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_legacy_mschapv2), event_data::blank);
+    case phase_t::init: {
+        m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_t::legacy_mschapv2), event_data::blank);
 
         // Randomize Peer-Challenge.
         m_challenge_client.randomize(m_cp);
@@ -396,25 +396,25 @@ EapPeerMethodResponseAction eap::method_mschapv2_diameter::process_request_packe
         diameter_avp_append(11, 311, diameter_avp_flag_mandatory, m_challenge_server.data(), (unsigned int)m_challenge_server.size(), m_packet_res);
         diameter_avp_append(25, 311, diameter_avp_flag_mandatory, response          .data(), (unsigned int)response          .size(), m_packet_res);
 
-        m_phase = phase_challenge_server;
-        m_cfg.m_last_status = config_method::status_cred_invalid; // Blame credentials if we fail beyond this point.
+        m_phase = phase_t::challenge_server;
+        m_cfg.m_last_status = config_method::status_t::cred_invalid; // Blame credentials if we fail beyond this point.
         return EapPeerMethodResponseActionSend;
     }
 
-    case phase_challenge_server: {
+    case phase_t::challenge_server: {
         process_packet(pReceivedPacket, dwReceivedPacketSize);
-        if (m_cfg.m_last_status == config_method::status_success) {
-            m_phase = phase_finished;
+        if (m_cfg.m_last_status == config_method::status_t::success) {
+            m_phase = phase_t::finished;
 
             // Acknowledge the authentication by sending an empty response packet.
             m_packet_res.clear();
-            m_cfg.m_last_status = config_method::status_auth_failed; // Blame protocol if we fail beyond this point.
+            m_cfg.m_last_status = config_method::status_t::auth_failed; // Blame protocol if we fail beyond this point.
             return EapPeerMethodResponseActionSend;
         } else
             return EapPeerMethodResponseActionDiscard;
     }
 
-    case phase_finished:
+    case phase_t::finished:
         return EapPeerMethodResponseActionNone;
 
     default:
