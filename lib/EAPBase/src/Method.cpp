@@ -241,7 +241,7 @@ eap::method_eap::method_eap(_In_ module &mod, _In_ winstd::eap_type_t eap_method
 
 
 eap::method_eap::method_eap(_Inout_ method_eap &&other) noexcept :
-    m_eap_method (std::move(other.m_eap_method)),
+    m_eap_method (          other.m_eap_method ),
     m_id         (std::move(other.m_id        )),
     m_send_nak   (std::move(other.m_send_nak  )),
     method_tunnel(std::move(other             ))

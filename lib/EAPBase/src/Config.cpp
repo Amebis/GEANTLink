@@ -104,7 +104,7 @@ eap::config_method::config_method(_In_ const config_method &other) :
 
 
 eap::config_method::config_method(_Inout_ config_method &&other) noexcept :
-    m_level      (std::move(other.m_level      )),
+    m_level      (          other.m_level       ),
     m_allow_save (std::move(other.m_allow_save )),
     m_last_status(std::move(other.m_last_status)),
     m_last_msg   (std::move(other.m_last_msg   )),
