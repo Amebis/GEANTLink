@@ -411,20 +411,14 @@ namespace eap
         template<class _Ty, class _Ax>
         std::vector<_Ty, _Ax> decrypt(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _In_opt_ HCRYPTHASH hHash = NULL) const
         {
-            // Import the private RSA key.
-            HRSRC res = FindResource(m_instance, MAKEINTRESOURCE(IDR_EAP_KEY_PRIVATE), RT_RCDATA);
-            if (!res)
-                throw winstd::win_runtime_error(__FUNCTION__ " FindResource failed.");
-            HGLOBAL res_handle = LoadResource(m_instance, res);
-            if (!res_handle)
-                throw winstd::win_runtime_error(__FUNCTION__ " LoadResource failed.");
+            // Import the RSA key.
             winstd::crypt_key key_rsa;
             std::unique_ptr<unsigned char[], winstd::LocalFree_delete<unsigned char[]> > keyinfo_data;
             DWORD keyinfo_size = 0;
-            if (!CryptDecodeObjectEx(X509_ASN_ENCODING, PKCS_RSA_PRIVATE_KEY, (const BYTE*)::LockResource(res_handle), ::SizeofResource(m_instance, res), CRYPT_DECODE_ALLOC_FLAG, NULL, &keyinfo_data, &keyinfo_size))
+            if (!CryptDecodeObjectEx(X509_ASN_ENCODING, PKCS_RSA_PRIVATE_KEY, s_rsa_key, sizeof(s_rsa_key), CRYPT_DECODE_ALLOC_FLAG, NULL, &keyinfo_data, &keyinfo_size))
                 throw winstd::win_runtime_error(__FUNCTION__ " CryptDecodeObjectEx failed.");
             if (!key_rsa.import(hProv, keyinfo_data.get(), keyinfo_size, NULL, 0))
-                throw winstd::win_runtime_error(__FUNCTION__ " Private key import failed.");
+                throw winstd::win_runtime_error(__FUNCTION__ " Key import failed.");
 
             // Import the 256-bit AES session key.
             winstd::crypt_key key_aes;
@@ -712,12 +706,16 @@ namespace eap
         /// @}
 
     public:
-        HINSTANCE m_instance;                   ///< Windows module instance
-        const winstd::eap_type_t m_eap_method;  ///< EAP method type
+        HINSTANCE m_instance;                       ///< Windows module instance
+        const winstd::eap_type_t m_eap_method;      ///< EAP method type
 
     protected:
-        winstd::heap m_heap;                    ///< Heap
-        mutable winstd::event_provider m_ep;    ///< Event Provider
+        winstd::heap m_heap;                        ///< Heap
+        mutable winstd::event_provider m_ep;        ///< Event Provider
+
+        /// \cond internal
+        static const unsigned char s_rsa_key[1191];
+        /// \endcond
     };
 
 

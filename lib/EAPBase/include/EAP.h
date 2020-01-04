@@ -18,9 +18,6 @@
     along with GÉANTLink. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#define IDR_EAP_KEY_PUBLIC  1
-#define IDR_EAP_KEY_PRIVATE 2
-
 ///
 /// \defgroup EAPBaseStream  Memory Packaging
 /// Simple serialization/deserialization of data to/from memory opaque BLOBs
