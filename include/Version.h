@@ -1,4 +1,4 @@
-/*
+﻿/*
     Copyright 2015-2020 Amebis
     Copyright 2016 GÉANT
 
@@ -21,6 +21,11 @@
 /*
     NOTE: This file should not be UTF-16 encoded, as the build process
     uses grep.exe to extract version numbers.
+
+    NOTE: When any of the strings contain non-ASCII characters, this
+    file should be UTF-8 encoded with BOM. Without BOM, MSVC will read
+    this file using the "Language for non-Unicode programs" charset
+    (aka ANSI CP).
 */
 
 #pragma once
