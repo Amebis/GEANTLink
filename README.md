@@ -39,7 +39,7 @@ Suite of EAP supplicants for Microsoft Windows - IEEE 802.1X clients for enterpr
 ### Deployment
 
 - Released as multi-lingual x86, x64, and ARM64 MSI packages; Group Policy deployment supported
-- [MsiUseFeature utility](https://github.com/Amebis/GEANTLink/tree/master/MsiUseFeature) for GÉANTLink install state testing (for embedding GÉANTLink into other setup packages)
+- [MsiUseFeature utility](https://github.com/Amebis/GEANTLink/tree/master/MsiUseFeature) for the product install state testing (for embedding this product into other setup packages)
 - [CredWrite utility](https://github.com/Amebis/GEANTLink/tree/master/CredWrite) for automated user credential import to Credential Manager
 - [WLANManager utility](https://github.com/Amebis/GEANTLink/tree/master/WLANManager) to allow network profile configuration dialog shortcuts
 
@@ -69,7 +69,7 @@ Binaries are available for download [here](https://github.com/Amebis/GEANTLink/r
 
 ### wxWidgets
 
-GÉANTLink is using wxWidgets static libraries. Since upstream wxWidgets libraries don't support ARM64 yet, a clone with ARM64 support was prepared at [GitHub](https://github.com/Amebis/wxWidgets.git).
+This product is using wxWidgets static libraries. Since upstream wxWidgets libraries don't support ARM64 yet, a clone with ARM64 support was prepared at [GitHub](https://github.com/Amebis/wxWidgets.git).
 
 #### Compiling wxWidgets x86 static libraries
 
@@ -95,7 +95,7 @@ GÉANTLink is using wxWidgets static libraries. Since upstream wxWidgets librari
 
 #### Specifying wxWidgets path
 
-GÉANTLink compilation references wxWidgets libraries using `WXWIN` environment variable. Please set it to wxWidgets folder (i.e. `C:\SDK\wxWidgets`).
+The product compilation references wxWidgets libraries using `WXWIN` environment variable. Please set it to wxWidgets folder (i.e. `C:\SDK\wxWidgets`).
 
 ### Digital Signing of Build Outputs
 
@@ -112,18 +112,18 @@ Please note that only Release builds are configured for timestamp signing. Debug
 
 #### Building in Visual Studio IDE
 
-GÉANTLink has some submodules. When cloning Git repository, make sure to use `--recursive` Git switch to clone submodules too. Example:
+This product has some submodules. When cloning Git repository, make sure to use `--recursive` Git switch to clone submodules too. Example:
 `git clone --recursive "https://github.com/Amebis/GEANTLink.git" "C:\Projects\GEANTLink"`
 
-After clone is complete, grant _Users_ local group read and execute permissions to `output` subfolder (when working folder is private). This allows _EapHost_ service to load GÉANTLink's DLL, and Event Viewer to display GÉANTLink events.
+After clone is complete, grant _Users_ local group read and execute permissions to `output` subfolder (when working folder is private). This allows _EapHost_ service to load DLL, and Event Viewer to display events.
 
-GÉANTLink can be build and debugged opening _GEANTLink.sln_ in Visual C++ IDE.
+The product can be build and debugged opening _GEANTLink.sln_ in Visual C++ IDE.
 
 Before one can attempt to debug EAP DLLs, you should run `nmake register` from an elevated command prompt. See _Building in command line_ chapter below.
 
-Next, one must configure a network profile actually using GÉANTLink for the authentication.
+Next, one must configure a network profile to actually use one of this product's EAP modules for the authentication.
 
-GÉANTLink EAP modules are divided into two DLLs: backend (i.e. _EAPTTLS.dll_) and GUI (i.e. _EAPTTLSUI.dll_).
+EAP modules are divided into two DLLs: backend (i.e. _EAPTTLS.dll_) and GUI (i.e. _EAPTTLSUI.dll_).
 
 ##### Backend DLL
 
@@ -159,4 +159,4 @@ The `/ls` flag can be appended to the commands above to reduce NMAKE’s verbosi
 
 ### Translating into your language
 
-GÉANTLink is fully localizable. We kindly invite you to help [translating it on Transifex](https://www.transifex.com/eduroam_devel/geantlink/).
+This product is fully localizable. We kindly invite you to help [translating it on Transifex](https://www.transifex.com/eduroam_devel/geantlink/).

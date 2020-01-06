@@ -1,6 +1,6 @@
 # MsiUseFeature
 
-Checks the installation state of the given feature of GÉANTLink product
+Checks the installation state of the given feature of the product
 
 ## Usage
 

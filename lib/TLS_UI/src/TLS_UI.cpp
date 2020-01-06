@@ -213,7 +213,7 @@ void wxTLSServerTrustPanel::OnUpdateUI(wxUpdateUIEvent& event)
         m_root_ca_remove   ->Enable(m_root_ca->HasMultipleSelection() && ListBox_GetSelCount(m_root_ca->GetHWND()) > 0 || m_root_ca->GetSelection() != wxNOT_FOUND); // *
         m_server_names     ->Enable(true);
 
-        // * ListBox_GetSelCount() is not cross-platform, but this is Windows EAP Supplicant,
+        // * ListBox_GetSelCount() is not cross-platform, but this is Windows EAP supplicant,
         //   and this is the fastest way to find out if there is a selection in the list box,
         //   observing wxWidgets 3.0.2 has nothing faster to offer.
     }
