@@ -18,7 +18,7 @@
     along with GÉANTLink. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <StdAfx.h>
+#include "StdAfx.h"
 
 using namespace std;
 using namespace winstd;
