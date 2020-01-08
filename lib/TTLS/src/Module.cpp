@@ -20,7 +20,9 @@
 
 #include "StdAfx.h"
 
+#if EAP_INNER_EAPHOST
 #pragma comment(lib, "Eappprxy.lib")
+#endif
 
 using namespace std;
 using namespace winstd;
