@@ -32,7 +32,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="..\res\EAPTTLS_UI.rc">
+    <ResourceCompile Include="..\res\EAPMethod_UI.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>

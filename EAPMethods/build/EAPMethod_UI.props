@@ -59,6 +59,9 @@
     <POCompile Include="..\locale\vi_VN.po" />
   </ItemGroup>
   <ItemGroup>
+    <ResourceCompile Include="..\res\EAPMethod_UI.rc" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\lib\EAPBase_UI\build\EAPBase_UI.vcxproj">
       <Project>{d4b54856-be1f-4937-a8f7-495125be76be}</Project>
     </ProjectReference>

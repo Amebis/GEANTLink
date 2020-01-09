@@ -92,6 +92,9 @@
     <ClCompile>
       <PreprocessorDefinitions>EAPMETHOD_TYPE=21;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>EAPMETHOD_TYPE=21;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
@@ -99,9 +102,6 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" />
-  <ItemGroup>
-    <ResourceCompile Include="..\res\EAPTTLS_UI.rc" />
-  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\lib\EapHost\build\EapHost.vcxproj">
       <Project>{b385ec2b-c3f4-48bb-9bac-8b996de7f754}</Project>

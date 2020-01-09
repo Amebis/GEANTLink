@@ -28,7 +28,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="..\res\EAPTTLS.rc">
+    <ResourceCompile Include="..\res\EAPMethod.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>

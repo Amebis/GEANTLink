@@ -26,12 +26,6 @@ using namespace std;
 using namespace winstd;
 
 
-#if EAPMETHOD_TYPE==21
-#define _EAPMETHOD_PEER_UI eap::peer_ttls_ui
-#else
-#error Unknown EAP Method type.
-#endif
-
 HANDLE g_act_ctx = NULL;
 _EAPMETHOD_PEER_UI g_peer;
 

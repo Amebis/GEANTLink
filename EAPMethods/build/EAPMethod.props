@@ -22,4 +22,7 @@
   <ItemGroup>
     <None Include="EAPMethod.def" />
   </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\res\EAPMethod.rc" />
+  </ItemGroup>
 </Project>
