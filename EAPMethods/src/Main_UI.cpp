@@ -130,7 +130,7 @@ DWORD WINAPI EapPeerConfigXml2Blob(
         *ppEapError = NULL;
 
     // Parameter check
-    if (eapMethodType.eapType.type != EAPMETHOD_TYPE || eapMethodType.dwAuthorId != 67532)
+    if (eapMethodType.eapType.type != EAPMETHOD_TYPE || eapMethodType.dwAuthorId != EAPMETHOD_AUTHOR_ID)
         return dwResult = ERROR_NOT_SUPPORTED;
     if (!pConfigDoc || !pConnectionDataOut || !pdwConnectionDataOutSize)
         return dwResult = ERROR_INVALID_PARAMETER;
@@ -185,7 +185,7 @@ DWORD WINAPI EapPeerConfigBlob2Xml(
         *ppEapError = NULL;
 
     // Parameter check
-    if (eapMethodType.eapType.type != EAPMETHOD_TYPE || eapMethodType.dwAuthorId != 67532)
+    if (eapMethodType.eapType.type != EAPMETHOD_TYPE || eapMethodType.dwAuthorId != EAPMETHOD_AUTHOR_ID)
         return dwResult = ERROR_NOT_SUPPORTED;
     if (!pConnectionData && dwConnectionDataSize || !ppConfigDoc)
         return dwResult = ERROR_INVALID_PARAMETER;
@@ -265,7 +265,7 @@ DWORD WINAPI EapPeerInvokeConfigUI(
     // Parameter check
     if (!pEapType || !pConnectionDataIn && dwConnectionDataInSize || !pdwConnectionDataOutSize || !ppConnectionDataOut)
         return dwResult = ERROR_INVALID_PARAMETER;
-    if (pEapType->eapType.type != EAPMETHOD_TYPE || pEapType->dwAuthorId != 67532)
+    if (pEapType->eapType.type != EAPMETHOD_TYPE || pEapType->dwAuthorId != EAPMETHOD_AUTHOR_ID)
         return dwResult = ERROR_NOT_SUPPORTED;
 
     try {
@@ -319,7 +319,7 @@ DWORD WINAPI EapPeerInvokeIdentityUI(
     // Parameter check
     if (!pEapType || !pConnectionData && dwConnectionDataSize || !pUserData && dwUserDataSize || !pdwUserDataOutSize || !ppUserDataOut || !ppwszIdentity)
         return dwResult = ERROR_INVALID_PARAMETER;
-    if (pEapType->eapType.type != EAPMETHOD_TYPE || pEapType->dwAuthorId != 67532)
+    if (pEapType->eapType.type != EAPMETHOD_TYPE || pEapType->dwAuthorId != EAPMETHOD_AUTHOR_ID)
         return dwResult = ERROR_NOT_SUPPORTED;
 
     try {
@@ -367,7 +367,7 @@ DWORD WINAPI EapPeerInvokeInteractiveUI(
     // Parameter check
     if (!pEapType || !pUIContextData && dwUIContextDataSize || !pdwDataFromInteractiveUISize || !ppDataFromInteractiveUI)
         return dwResult = ERROR_INVALID_PARAMETER;
-    if (pEapType->eapType.type != EAPMETHOD_TYPE || pEapType->dwAuthorId != 67532)
+    if (pEapType->eapType.type != EAPMETHOD_TYPE || pEapType->dwAuthorId != EAPMETHOD_AUTHOR_ID)
         return dwResult = ERROR_NOT_SUPPORTED;
 
     try {

@@ -651,7 +651,7 @@ DWORD WINAPI EapPeerGetMethodProperties(
         *ppEapError = NULL;
 
     // Parameter check
-    if (eapMethodType.eapType.type != EAPMETHOD_TYPE || eapMethodType.dwAuthorId != 67532)
+    if (eapMethodType.eapType.type != EAPMETHOD_TYPE || eapMethodType.dwAuthorId != EAPMETHOD_AUTHOR_ID)
         return dwResult = ERROR_NOT_SUPPORTED;
     if (!pConnectionData && dwConnectionDataSize || !pUserData && dwUserDataSize || !pMethodPropertyArray)
         return dwResult = ERROR_INVALID_PARAMETER;
@@ -699,7 +699,7 @@ DWORD WINAPI EapPeerCredentialsXml2Blob(
         *ppEapError = NULL;
 
     // Parameter check
-    if (eapMethodType.eapType.type != EAPMETHOD_TYPE || eapMethodType.dwAuthorId != 67532)
+    if (eapMethodType.eapType.type != EAPMETHOD_TYPE || eapMethodType.dwAuthorId != EAPMETHOD_AUTHOR_ID)
         return dwResult = ERROR_NOT_SUPPORTED;
     if (!pCredentialsDoc || !pConnectionData && dwConnectionDataSize || !ppCredentialsOut || !pdwCredentialsOutSize)
         return dwResult = ERROR_INVALID_PARAMETER;
@@ -751,7 +751,7 @@ DWORD WINAPI EapPeerQueryCredentialInputFields(
         *ppEapError = NULL;
 
     // Parameter check
-    if (eapMethodType.eapType.type != EAPMETHOD_TYPE || eapMethodType.dwAuthorId != 67532)
+    if (eapMethodType.eapType.type != EAPMETHOD_TYPE || eapMethodType.dwAuthorId != EAPMETHOD_AUTHOR_ID)
         return dwResult = ERROR_NOT_SUPPORTED;
     if (!pConnectionData && dwConnectionDataSize || !pEapConfigInputFieldsArray)
         return dwResult = ERROR_INVALID_PARAMETER;
@@ -797,7 +797,7 @@ DWORD WINAPI EapPeerQueryUserBlobFromCredentialInputFields(
         *ppEapError = NULL;
 
     // Parameter check
-    if (eapMethodType.eapType.type != EAPMETHOD_TYPE || eapMethodType.dwAuthorId != 67532)
+    if (eapMethodType.eapType.type != EAPMETHOD_TYPE || eapMethodType.dwAuthorId != EAPMETHOD_AUTHOR_ID)
         return dwResult = ERROR_NOT_SUPPORTED;
     if (!pConnectionData && dwConnectionDataSize || !pEapConfigInputFieldArray || !pdwUsersBlobSize || !ppUserBlob)
         return dwResult = ERROR_INVALID_PARAMETER;

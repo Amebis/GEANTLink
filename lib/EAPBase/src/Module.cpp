@@ -63,7 +63,7 @@ EAP_ERROR* eap::module::make_error(_In_ DWORD dwErrorCode, _In_opt_z_ LPCWSTR ps
     pError->type.eapType.type         = (BYTE)m_eap_method;
     pError->type.eapType.dwVendorId   = 0;
     pError->type.eapType.dwVendorType = 0;
-    pError->type.dwAuthorId           = 67532;
+    pError->type.dwAuthorId           = EAPMETHOD_AUTHOR_ID;
     pError->dwReasonCode              = dwReasonCode;
     pError->rootCauseGuid             = pRootCauseGuid != NULL ? *pRootCauseGuid : GUID_NULL;
     pError->repairGuid                = pRepairGuid    != NULL ? *pRepairGuid    : GUID_NULL;

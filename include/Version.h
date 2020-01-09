@@ -75,3 +75,8 @@
 // developing it, make it easily customizable.
 //
 #define PRODUCT_NAME_STR         "GÉANTLink"
+
+//
+// EAPHost author ID
+//
+#define EAPMETHOD_AUTHOR_ID        67532
