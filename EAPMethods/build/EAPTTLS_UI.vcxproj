@@ -100,32 +100,14 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" />
   <ItemGroup>
-    <ClInclude Include="..\src\StdAfx_UI.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\src\Main_UI.cpp" />
-    <ClCompile Include="..\src\StdAfx_UI.cpp">
-      <PrecompiledHeader>Create</PrecompiledHeader>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
     <ResourceCompile Include="..\res\EAPTTLS_UI.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\lib\EAPBase\build\EAPBase.vcxproj">
-      <Project>{ad6816a0-9600-4e01-8c49-39d03d1e791f}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\lib\EAPBase_UI\build\EAPBase_UI.vcxproj">
-      <Project>{d4b54856-be1f-4937-a8f7-495125be76be}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\..\lib\EapHost\build\EapHost.vcxproj">
       <Project>{b385ec2b-c3f4-48bb-9bac-8b996de7f754}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\lib\EapHost_UI\build\EapHost_UI.vcxproj">
       <Project>{13d2d8b5-f6aa-459d-b5f7-29b95dd9d583}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\lib\Events\build\Events.vcxproj">
-      <Project>{d63f24bd-92a0-4d6b-8b69-ed947e4d2b1b}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\lib\GTC\build\GTC.vcxproj">
       <Project>{114a70bb-8698-4a0c-8c90-58f22edd8129}</Project>
@@ -157,48 +139,6 @@
     <ProjectReference Include="..\..\lib\TTLS_UI\build\TTLS_UI.vcxproj">
       <Project>{42f0f0f4-c928-4860-a4e4-94991c2c3d90}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\lib\WinStd\build\WinStd-16.0.vcxproj">
-      <Project>{47399d91-7eb9-41de-b521-514ba5db0c43}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\lib\wxExtend\build\wxExtendLib-16.0.vcxproj">
-      <Project>{d3e29951-d9f5-486d-a167-20ae8e90b1fa}</Project>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="EAPMethod_UI.def" />
-    <None Include="..\locale\EAPMethods.pot" />
-  </ItemGroup>
-  <ItemGroup>
-    <POCompile Include="..\locale\bg_BG.po" />
-    <POCompile Include="..\locale\ca_ES.po" />
-    <POCompile Include="..\locale\cs_CZ.po" />
-    <POCompile Include="..\locale\cy_UK.po" />
-    <POCompile Include="..\locale\de_DE.po" />
-    <POCompile Include="..\locale\el_GR.po" />
-    <POCompile Include="..\locale\es_ES.po" />
-    <POCompile Include="..\locale\et_EE.po" />
-    <POCompile Include="..\locale\eu_ES.po" />
-    <POCompile Include="..\locale\fi_FI.po" />
-    <POCompile Include="..\locale\fr_CA.po" />
-    <POCompile Include="..\locale\fr_FR.po" />
-    <POCompile Include="..\locale\gl_ES.po" />
-    <POCompile Include="..\locale\hr_HR.po" />
-    <POCompile Include="..\locale\hu_HU.po" />
-    <POCompile Include="..\locale\is_IS.po" />
-    <POCompile Include="..\locale\it_IT.po" />
-    <POCompile Include="..\locale\ko_KR.po" />
-    <POCompile Include="..\locale\lt_LT.po" />
-    <POCompile Include="..\locale\nb_NO.po" />
-    <POCompile Include="..\locale\nl_NL.po" />
-    <POCompile Include="..\locale\pl_PL.po" />
-    <POCompile Include="..\locale\pt_PT.po" />
-    <POCompile Include="..\locale\ru_RU.po" />
-    <POCompile Include="..\locale\sk_SK.po" />
-    <POCompile Include="..\locale\sl_SI.po" />
-    <POCompile Include="..\locale\sr_RS.po" />
-    <POCompile Include="..\locale\sv_SE.po" />
-    <POCompile Include="..\locale\tr_TR.po" />
-    <POCompile Include="..\locale\vi_VN.po" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
