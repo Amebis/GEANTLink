@@ -7,10 +7,10 @@
   <PropertyGroup />
   <ItemDefinitionGroup>
     <ClCompile>
-      <PrecompiledHeaderFile>StdAfxUI.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>StdAfx_UI.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
-      <ModuleDefinitionFile>EAPMethodUI.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>EAPMethod_UI.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup />

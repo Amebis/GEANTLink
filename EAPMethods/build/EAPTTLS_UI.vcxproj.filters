@@ -19,25 +19,25 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\StdAfxUI.h">
+    <ClInclude Include="..\src\StdAfx_UI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\StdAfxUI.cpp">
+    <ClCompile Include="..\src\StdAfx_UI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\MainUI.cpp">
+    <ClCompile Include="..\src\Main_UI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="..\res\EAPTTLSUI.rc">
+    <ResourceCompile Include="..\res\EAPTTLS_UI.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="EAPMethodUI.def">
+    <None Include="EAPMethod_UI.def">
       <Filter>Source Files</Filter>
     </None>
     <None Include="..\locale\EAPMethods.pot">

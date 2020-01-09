@@ -18,7 +18,7 @@
     along with GÉANTLink. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "StdAfxUI.h"
+#include "StdAfx_UI.h"
 
 #pragma comment(lib, "msxml6.lib")
 

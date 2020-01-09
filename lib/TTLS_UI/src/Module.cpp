@@ -524,7 +524,7 @@ wxInitializerPeer::wxInitializerPeer(_In_ HINSTANCE instance, _In_opt_ HWND hwnd
         s_locale = new wxLocale;
         if (wxInitializeLocale(*s_locale)) {
             s_locale->AddCatalog(wxT("wxExtend") wxT(wxExtendVersion));
-            s_locale->AddCatalog(wxT("EAPTTLSUI"));
+            s_locale->AddCatalog(wxT("EAPTTLS_UI"));
         }
     }
 

@@ -28,7 +28,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{DD7A97CA-F18E-43B7-95C4-D06E6A291624}</ProjectGuid>
-    <RootNamespace>EAPTTLSUI</RootNamespace>
+    <RootNamespace>EAPTTLS_UI</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -78,7 +78,7 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="EAPMethodUI.props" />
+    <Import Project="EAPMethod_UI.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
@@ -100,16 +100,16 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" />
   <ItemGroup>
-    <ClInclude Include="..\src\StdAfxUI.h" />
+    <ClInclude Include="..\src\StdAfx_UI.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\MainUI.cpp" />
-    <ClCompile Include="..\src\StdAfxUI.cpp">
+    <ClCompile Include="..\src\Main_UI.cpp" />
+    <ClCompile Include="..\src\StdAfx_UI.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="..\res\EAPTTLSUI.rc" />
+    <ResourceCompile Include="..\res\EAPTTLS_UI.rc" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\lib\EAPBase\build\EAPBase.vcxproj">
@@ -165,7 +165,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="EAPMethodUI.def" />
+    <None Include="EAPMethod_UI.def" />
     <None Include="..\locale\EAPMethods.pot" />
   </ItemGroup>
   <ItemGroup>
