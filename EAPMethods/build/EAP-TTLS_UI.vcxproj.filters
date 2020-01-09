@@ -1,0 +1,139 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Resource Files\Localization">
+      <UniqueIdentifier>{e43059ae-37ac-4b28-84fb-18d1b3972b30}</UniqueIdentifier>
+      <Extensions>po;pot</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\StdAfx_UI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\StdAfx_UI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Main_UI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\res\EAPMethod_UI.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="EAPMethod_UI.def">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\locale\EAPMethods.pot">
+      <Filter>Resource Files\Localization</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <POCompile Include="..\locale\sl_SI.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="..\locale\bg_BG.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="..\locale\ca_ES.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="..\locale\cs_CZ.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="..\locale\cy_UK.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="..\locale\de_DE.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="..\locale\el_GR.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="..\locale\es_ES.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="..\locale\eu_ES.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="..\locale\fi_FI.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="..\locale\fr_CA.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="..\locale\fr_FR.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="..\locale\gl_ES.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="..\locale\hr_HR.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="..\locale\hu_HU.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="..\locale\is_IS.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="..\locale\it_IT.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="..\locale\lt_LT.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="..\locale\nb_NO.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="..\locale\nl_NL.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="..\locale\pl_PL.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="..\locale\pt_PT.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="..\locale\ru_RU.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="..\locale\sk_SK.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="..\locale\sr_RS.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="..\locale\sv_SE.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="..\locale\tr_TR.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="..\locale\vi_VN.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="..\locale\ko_KR.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+    <POCompile Include="..\locale\et_EE.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
+  </ItemGroup>
+</Project>

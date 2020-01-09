@@ -123,7 +123,7 @@ Before one can attempt to debug EAP DLLs, you should run `nmake register` from a
 
 Next, one must configure a network profile to actually use one of this product's EAP modules for the authentication.
 
-EAP modules are divided into two DLLs: backend (i.e. _EAPTTLS.dll_) and GUI (i.e. _EAPTTLS_UI.dll_).
+EAP modules are divided into two DLLs: backend (i.e. _EAP-TTLS.dll_) and GUI (i.e. _EAP-TTLS_UI.dll_).
 
 ##### Backend DLL
 
