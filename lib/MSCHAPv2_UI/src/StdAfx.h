@@ -20,6 +20,4 @@
 
 #pragma once
 
-#define _CRT_SECURE_NO_WARNINGS // Prevent warnings from wxWidgets headers
-
 #include "../include/MSCHAPv2_UI.h"

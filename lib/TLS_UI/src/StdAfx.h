@@ -20,7 +20,8 @@
 
 #pragma once
 
-#define _CRT_SECURE_NO_WARNINGS // Prevent warnings from wxWidgets headers
+// Prevent warnings from wxWidgets headers
+#define _CRT_SECURE_NO_WARNINGS
 
 #include "../../../include/Version.h"
 

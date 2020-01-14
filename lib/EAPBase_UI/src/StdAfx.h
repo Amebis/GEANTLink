@@ -20,8 +20,6 @@
 
 #pragma once
 
-#define _CRT_SECURE_NO_WARNINGS // Prevent warnings from wxWidgets headers
-
 #include "../include/EAP_UI.h"
 #include "../include/Module.h"
 

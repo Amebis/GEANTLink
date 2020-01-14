@@ -20,6 +20,9 @@
 
 #pragma once
 
+// Prevent warnings from wxWidgets headers
+#define _CRT_SECURE_NO_WARNINGS
+
 #if EAPMETHOD_TYPE == 21
 #include "../../lib/TTLS_UI/include/Module.h"
 #define _EAPMETHOD_PEER_UI eap::peer_ttls_ui
