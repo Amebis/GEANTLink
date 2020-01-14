@@ -25,30 +25,30 @@ using namespace winstd;
 
 
 //////////////////////////////////////////////////////////////////////
-// eap::ui_context_ttls
+// eap::ui_context_tls_tunnel
 //////////////////////////////////////////////////////////////////////
 
-eap::ui_context_ttls::ui_context_ttls(_In_ config_connection &cfg, _In_ credentials_connection &cred) :
+eap::ui_context_tls_tunnel::ui_context_tls_tunnel(_In_ config_connection &cfg, _In_ credentials_connection &cred) :
     ui_context(cfg, cred)
 {
 }
 
 
-eap::ui_context_ttls::ui_context_ttls(_In_ const ui_context_ttls &other) :
+eap::ui_context_tls_tunnel::ui_context_tls_tunnel(_In_ const ui_context_tls_tunnel &other) :
     m_data    (other.m_data),
     ui_context(other       )
 {
 }
 
 
-eap::ui_context_ttls::ui_context_ttls(_Inout_ ui_context_ttls &&other) noexcept :
+eap::ui_context_tls_tunnel::ui_context_tls_tunnel(_Inout_ ui_context_tls_tunnel &&other) noexcept :
     m_data    (std::move(other.m_data)),
     ui_context(std::move(other       ))
 {
 }
 
 
-eap::ui_context_ttls& eap::ui_context_ttls::operator=(_In_ const ui_context_ttls &other)
+eap::ui_context_tls_tunnel& eap::ui_context_tls_tunnel::operator=(_In_ const ui_context_tls_tunnel &other)
 {
     if (this != &other) {
         (ui_context&)*this = other;
@@ -59,7 +59,7 @@ eap::ui_context_ttls& eap::ui_context_ttls::operator=(_In_ const ui_context_ttls
 }
 
 
-eap::ui_context_ttls& eap::ui_context_ttls::operator=(_Inout_ ui_context_ttls &&other) noexcept
+eap::ui_context_tls_tunnel& eap::ui_context_tls_tunnel::operator=(_Inout_ ui_context_tls_tunnel &&other) noexcept
 {
     if (this != &other) {
         (ui_context&)*this = std::move(other       );
@@ -70,14 +70,14 @@ eap::ui_context_ttls& eap::ui_context_ttls::operator=(_Inout_ ui_context_ttls &&
 }
 
 
-void eap::ui_context_ttls::operator<<(_Inout_ cursor_out &cursor) const
+void eap::ui_context_tls_tunnel::operator<<(_Inout_ cursor_out &cursor) const
 {
     ui_context::operator<<(cursor);
     cursor << m_data;
 }
 
 
-size_t eap::ui_context_ttls::get_pk_size() const
+size_t eap::ui_context_tls_tunnel::get_pk_size() const
 {
     return
         ui_context::get_pk_size() +
@@ -85,7 +85,7 @@ size_t eap::ui_context_ttls::get_pk_size() const
 }
 
 
-void eap::ui_context_ttls::operator>>(_Inout_ cursor_in &cursor)
+void eap::ui_context_tls_tunnel::operator>>(_Inout_ cursor_in &cursor)
 {
     ui_context::operator>>(cursor);
     cursor >> m_data;

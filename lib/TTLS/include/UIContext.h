@@ -20,7 +20,7 @@
 
 namespace eap
 {
-    class ui_context_ttls;
+    class ui_context_tls_tunnel;
 }
 
 #pragma once
@@ -36,9 +36,9 @@ namespace eap
     /// @{
 
     ///
-    /// EAP-TTLS UI context
+    /// TLS tunnel UI context
     ///
-    class ui_context_ttls : public ui_context
+    class ui_context_tls_tunnel : public ui_context
     {
     public:
         ///
@@ -47,21 +47,21 @@ namespace eap
         /// \param[in] cfg   Connection configuration
         /// \param[in] cred  Connection credentials
         ///
-        ui_context_ttls(_In_ config_connection &cfg, _In_ credentials_connection &cred);
+        ui_context_tls_tunnel(_In_ config_connection &cfg, _In_ credentials_connection &cred);
 
         ///
         /// Copies context
         ///
         /// \param[in] other  Credentials to copy from
         ///
-        ui_context_ttls(_In_ const ui_context_ttls &other);
+        ui_context_tls_tunnel(_In_ const ui_context_tls_tunnel &other);
 
         ///
         /// Moves context
         ///
         /// \param[in] other  Credentials to move from
         ///
-        ui_context_ttls(_Inout_ ui_context_ttls &&other) noexcept;
+        ui_context_tls_tunnel(_Inout_ ui_context_tls_tunnel &&other) noexcept;
 
         ///
         /// Copies context
@@ -70,7 +70,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        ui_context_ttls& operator=(_In_ const ui_context_ttls &other);
+        ui_context_tls_tunnel& operator=(_In_ const ui_context_tls_tunnel &other);
 
         ///
         /// Moves context
@@ -79,7 +79,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        ui_context_ttls& operator=(_Inout_ ui_context_ttls &&other) noexcept;
+        ui_context_tls_tunnel& operator=(_Inout_ ui_context_tls_tunnel &&other) noexcept;
 
         /// \name BLOB management
         /// @{
