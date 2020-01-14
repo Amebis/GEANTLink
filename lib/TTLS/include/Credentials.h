@@ -20,7 +20,7 @@
 
 namespace eap
 {
-    class credentials_ttls;
+    class credentials_tls_tunnel;
 }
 
 #pragma once
@@ -38,9 +38,9 @@ namespace eap
     /// @{
 
     ///
-    /// TTLS credentials
+    /// TLS tunnel credentials
     ///
-    class credentials_ttls : public credentials_tls
+    class credentials_tls_tunnel : public credentials_tls
     {
     public:
         ///
@@ -48,21 +48,21 @@ namespace eap
         ///
         /// \param[in] mod  EAP module to use for global services
         ///
-        credentials_ttls(_In_ module &mod);
+        credentials_tls_tunnel(_In_ module &mod);
 
         ///
         /// Copies credentials
         ///
         /// \param[in] other  Credentials to copy from
         ///
-        credentials_ttls(_In_ const credentials_ttls &other);
+        credentials_tls_tunnel(_In_ const credentials_tls_tunnel &other);
 
         ///
         /// Moves credentials
         ///
         /// \param[in] other  Credentials to move from
         ///
-        credentials_ttls(_Inout_ credentials_ttls &&other) noexcept;
+        credentials_tls_tunnel(_Inout_ credentials_tls_tunnel &&other) noexcept;
 
         ///
         /// Copies credentials
@@ -71,7 +71,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        credentials_ttls& operator=(_In_ const credentials_ttls &other);
+        credentials_tls_tunnel& operator=(_In_ const credentials_tls_tunnel &other);
 
         ///
         /// Moves credentials
@@ -80,7 +80,7 @@ namespace eap
         ///
         /// \returns Reference to this object
         ///
-        credentials_ttls& operator=(_Inout_ credentials_ttls &&other) noexcept;
+        credentials_tls_tunnel& operator=(_Inout_ credentials_tls_tunnel &&other) noexcept;
 
         virtual config* clone() const;
         virtual void clear();
@@ -116,7 +116,7 @@ namespace eap
         ///
         /// \param[in] dwFlags                A combination of [EAP flags](https://msdn.microsoft.com/en-us/library/windows/desktop/bb891975.aspx) that describe the EAP authentication session behavior
         /// \param[in] hTokenImpersonateUser  Impersonation token for a logged-on user to collect user-related information
-        /// \param[in] cred_cached            Cached credentials (optional, can be \c NULL, must be `credentials_ttls*` type)
+        /// \param[in] cred_cached            Cached credentials (optional, can be \c NULL, must be `credentials_tls_tunnel*` type)
         /// \param[in] cfg                    Method configuration (unused, as must be as config_method_ttls is not derived from `config_method_with_cred`)
         /// \param[in] pszTargetName          The name in Windows Credential Manager to retrieve credentials from (optional, can be \c NULL)
         ///

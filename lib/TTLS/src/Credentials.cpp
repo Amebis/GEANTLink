@@ -25,30 +25,30 @@ using namespace winstd;
 
 
 //////////////////////////////////////////////////////////////////////
-// eap::credentials_ttls
+// eap::credentials_tls_tunnel
 //////////////////////////////////////////////////////////////////////
 
-eap::credentials_ttls::credentials_ttls(_In_ module &mod) :
+eap::credentials_tls_tunnel::credentials_tls_tunnel(_In_ module &mod) :
     credentials_tls(mod)
 {
 }
 
 
-eap::credentials_ttls::credentials_ttls(_In_ const credentials_ttls &other) :
+eap::credentials_tls_tunnel::credentials_tls_tunnel(_In_ const credentials_tls_tunnel &other) :
     m_inner(other.m_inner ? dynamic_cast<credentials*>(other.m_inner->clone()) : nullptr),
     credentials_tls(other)
 {
 }
 
 
-eap::credentials_ttls::credentials_ttls(_Inout_ credentials_ttls &&other) noexcept :
+eap::credentials_tls_tunnel::credentials_tls_tunnel(_Inout_ credentials_tls_tunnel &&other) noexcept :
     m_inner(std::move(other.m_inner)),
     credentials_tls(std::move(other))
 {
 }
 
 
-eap::credentials_ttls& eap::credentials_ttls::operator=(_In_ const credentials_ttls &other)
+eap::credentials_tls_tunnel& eap::credentials_tls_tunnel::operator=(_In_ const credentials_tls_tunnel &other)
 {
     if (this != &other) {
         (credentials_tls&)*this = other;
@@ -59,7 +59,7 @@ eap::credentials_ttls& eap::credentials_ttls::operator=(_In_ const credentials_t
 }
 
 
-eap::credentials_ttls& eap::credentials_ttls::operator=(_Inout_ credentials_ttls &&other) noexcept
+eap::credentials_tls_tunnel& eap::credentials_tls_tunnel::operator=(_Inout_ credentials_tls_tunnel &&other) noexcept
 {
     if (this != &other) {
         (credentials_tls&)*this = std::move(other);
@@ -70,26 +70,26 @@ eap::credentials_ttls& eap::credentials_ttls::operator=(_Inout_ credentials_ttls
 }
 
 
-eap::config* eap::credentials_ttls::clone() const
+eap::config* eap::credentials_tls_tunnel::clone() const
 {
-    return new credentials_ttls(*this);
+    return new credentials_tls_tunnel(*this);
 }
 
 
-void eap::credentials_ttls::clear()
+void eap::credentials_tls_tunnel::clear()
 {
     credentials_tls::clear();
     m_inner->clear();
 }
 
 
-bool eap::credentials_ttls::empty() const
+bool eap::credentials_tls_tunnel::empty() const
 {
     return credentials_tls::empty() && m_inner->empty();
 }
 
 
-void eap::credentials_ttls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot) const
+void eap::credentials_tls_tunnel::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot) const
 {
     assert(pDoc);
     assert(pConfigRoot);
@@ -108,7 +108,7 @@ void eap::credentials_ttls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *p
 }
 
 
-void eap::credentials_ttls::load(_In_ IXMLDOMNode *pConfigRoot)
+void eap::credentials_tls_tunnel::load(_In_ IXMLDOMNode *pConfigRoot)
 {
     assert(pConfigRoot);
     HRESULT hr;
@@ -124,14 +124,14 @@ void eap::credentials_ttls::load(_In_ IXMLDOMNode *pConfigRoot)
 }
 
 
-void eap::credentials_ttls::operator<<(_Inout_ cursor_out &cursor) const
+void eap::credentials_tls_tunnel::operator<<(_Inout_ cursor_out &cursor) const
 {
     credentials_tls::operator<<(cursor);
     cursor << *m_inner;
 }
 
 
-size_t eap::credentials_ttls::get_pk_size() const
+size_t eap::credentials_tls_tunnel::get_pk_size() const
 {
     return
         credentials_tls::get_pk_size() +
@@ -139,14 +139,14 @@ size_t eap::credentials_ttls::get_pk_size() const
 }
 
 
-void eap::credentials_ttls::operator>>(_Inout_ cursor_in &cursor)
+void eap::credentials_tls_tunnel::operator>>(_Inout_ cursor_in &cursor)
 {
     credentials_tls::operator>>(cursor);
     cursor >> *m_inner;
 }
 
 
-void eap::credentials_ttls::store(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int level) const
+void eap::credentials_tls_tunnel::store(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int level) const
 {
     assert(0); // Not that we would ever store inner&outer credentials to Windows Credential Manager joined, but for completness sake... Here we go:
 
@@ -156,7 +156,7 @@ void eap::credentials_ttls::store(_In_z_ LPCTSTR pszTargetName, _In_ unsigned in
 }
 
 
-void eap::credentials_ttls::retrieve(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int level)
+void eap::credentials_tls_tunnel::retrieve(_In_z_ LPCTSTR pszTargetName, _In_ unsigned int level)
 {
     assert(0); // Not that we would ever retrieve inner&outer credentials to Windows Credential Manager joined, but for completness sake... Here we go:
 
@@ -166,7 +166,7 @@ void eap::credentials_ttls::retrieve(_In_z_ LPCTSTR pszTargetName, _In_ unsigned
 }
 
 
-wstring eap::credentials_ttls::get_identity() const
+wstring eap::credentials_tls_tunnel::get_identity() const
 {
     // Outer identity has the right-of-way.
     wstring identity(credentials_tls::get_identity());
@@ -178,7 +178,7 @@ wstring eap::credentials_ttls::get_identity() const
 }
 
 
-eap::credentials::source_t eap::credentials_ttls::combine(
+eap::credentials::source_t eap::credentials_tls_tunnel::combine(
     _In_             DWORD         dwFlags,
     _In_opt_         HANDLE        hTokenImpersonateUser,
     _In_opt_   const credentials   *cred_cached,
@@ -197,7 +197,7 @@ eap::credentials::source_t eap::credentials_ttls::combine(
     source_t src_inner = m_inner->combine(
         dwFlags,
         hTokenImpersonateUser,
-        cred_cached ? dynamic_cast<const credentials_ttls*>(cred_cached)->m_inner.get() : NULL,
+        cred_cached ? dynamic_cast<const credentials_tls_tunnel*>(cred_cached)->m_inner.get() : NULL,
         *dynamic_cast<const config_method_ttls&>(cfg).m_inner,
         pszTargetName);
 

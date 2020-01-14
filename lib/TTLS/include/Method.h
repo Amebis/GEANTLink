@@ -190,7 +190,7 @@ namespace eap
         /// \param[in] cred   User credentials
         /// \param[in] inner  Inner method
         ///
-        method_ttls(_In_ module &mod, _In_ config_method_ttls &cfg, _In_ credentials_ttls &cred, _In_ method *inner);
+        method_ttls(_In_ module &mod, _In_ config_method_ttls &cfg, _In_ credentials_tls_tunnel &cred, _In_ method *inner);
 
         /// \name Session management
         /// @{
@@ -230,7 +230,7 @@ namespace eap
 
     protected:
         config_method_ttls &m_cfg;                  ///< Method configuration
-        credentials_ttls &m_cred;                   ///< Method user credentials
+        credentials_tls_tunnel &m_cred;                   ///< Method user credentials
         HANDLE m_user_ctx;                          ///< Handle to user context
         winstd::tstring m_sc_target_name;           ///< Schannel target name
         winstd::sec_credentials m_sc_cred;          ///< Schannel client credentials

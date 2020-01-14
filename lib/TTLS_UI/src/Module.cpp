@@ -194,7 +194,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
     // Configure output credentials.
     cred_out.m_namespace = cfg_prov->m_namespace;
     cred_out.m_id        = cfg_prov->m_id;
-    auto cred = dynamic_cast<credentials_ttls*>(cfg_method->make_credentials());
+    auto cred = dynamic_cast<credentials_tls_tunnel*>(cfg_method->make_credentials());
     cred_out.m_cred.reset(cred);
 #if EAP_USE_NATIVE_CREDENTIAL_CACHE
     bool has_cached = cred_in.m_cred && cred_in.match(*cfg_prov);
@@ -260,7 +260,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
         dwFlags,
         NULL,
 #if EAP_USE_NATIVE_CREDENTIAL_CACHE
-        has_cached ? dynamic_cast<credentials_ttls*>(cred_in.m_cred.get())->m_inner.get() : NULL,
+        has_cached ? dynamic_cast<credentials_tls_tunnel*>(cred_in.m_cred.get())->m_inner.get() : NULL,
 #else
         NULL,
 #endif

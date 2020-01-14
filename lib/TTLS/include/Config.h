@@ -118,7 +118,7 @@ namespace eap
 
         ///
         /// @copydoc eap::config_method::make_credentials()
-        /// \returns This implementation always returns `eap::credentials_ttls` type of credentials
+        /// \returns This implementation always returns `eap::credentials_tls_tunnel` type of credentials
         ///
         virtual credentials* make_credentials() const;
 

@@ -304,7 +304,7 @@ void eap::method_eapmsg::get_response_packet(
 // eap::method_ttls
 //////////////////////////////////////////////////////////////////////
 
-eap::method_ttls::method_ttls(_In_ module &mod, _In_ config_method_ttls &cfg, _In_ credentials_ttls &cred, _In_ method *inner) :
+eap::method_ttls::method_ttls(_In_ module &mod, _In_ config_method_ttls &cfg, _In_ credentials_tls_tunnel &cred, _In_ method *inner) :
     m_cfg(cfg),
     m_cred(cred),
     m_user_ctx(NULL),

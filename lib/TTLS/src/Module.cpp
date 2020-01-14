@@ -127,7 +127,7 @@ void eap::peer_ttls::get_identity(
     }
 
     // Build our identity. ;)
-    wstring identity(std::move(cfg_method->get_public_identity(*dynamic_cast<const credentials_ttls*>(cred_out.m_cred.get()))));
+    wstring identity(std::move(cfg_method->get_public_identity(*dynamic_cast<const credentials_tls_tunnel*>(cred_out.m_cred.get()))));
     log_event(&EAPMETHOD_TRACE_EVT_CRED_OUTER_ID1, event_data((unsigned int)eap_type_t::ttls), event_data(identity), event_data::blank);
     size_t size = sizeof(WCHAR)*(identity.length() + 1);
     *ppwszIdentity = (WCHAR*)alloc_memory(size);
@@ -204,7 +204,7 @@ void eap::peer_ttls::credentials_xml2blob(
     UNREFERENCED_PARAMETER(dwConnectionDataSize);
 
     // Load credentials from XML.
-    credentials_ttls cred(*this);
+    credentials_tls_tunnel cred(*this);
     cred.load(pConfigRoot);
 
     // Pack credentials.
@@ -249,7 +249,7 @@ EAP_SESSION_HANDLE eap::peer_ttls::begin_session(
     // We have configuration, we have credentials, create method.
     unique_ptr<method> meth_inner;
     auto  cfg_inner        = cfg_method->m_inner.get();
-    auto cred_inner        = dynamic_cast<credentials_ttls*>(s->m_cred.m_cred.get())->m_inner.get();
+    auto cred_inner        = dynamic_cast<credentials_tls_tunnel*>(s->m_cred.m_cred.get())->m_inner.get();
 #if EAP_INNER_EAPHOST
     auto cfg_inner_eaphost = dynamic_cast<config_method_eaphost*>(cfg_inner);
     if (cfg_inner_eaphost) {
@@ -278,7 +278,7 @@ EAP_SESSION_HANDLE eap::peer_ttls::begin_session(
     s->m_method.reset(
         new method_eap   (*this, eap_type_t::ttls, *s->m_cred.m_cred,
         new method_defrag(*this, 0, /* Schannel supports retrieving keying material for EAP-TTLSv0 only. */
-        new method_ttls  (*this, *cfg_method, *dynamic_cast<credentials_ttls*>(s->m_cred.m_cred.get()), meth_inner.release()))));
+        new method_ttls  (*this, *cfg_method, *dynamic_cast<credentials_tls_tunnel*>(s->m_cred.m_cred.get()), meth_inner.release()))));
 
     // Initialize method.
     s->m_method->begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
@@ -456,8 +456,8 @@ _Success_(return != 0) const eap::config_method_ttls* eap::peer_ttls::combine_cr
         const config_method_ttls *cfg_method = dynamic_cast<const config_method_ttls*>(cfg_prov->m_methods.front().get());
         assert(cfg_method);
 
-        // Combine credentials. We could use eap::credentials_ttls() to do all the work, but we would not know which credentials is missing then.
-        credentials_ttls *cred = dynamic_cast<credentials_ttls*>(cfg_method->make_credentials());
+        // Combine credentials. We could use eap::credentials_tls_tunnel() to do all the work, but we would not know which credentials is missing then.
+        credentials_tls_tunnel *cred = dynamic_cast<credentials_tls_tunnel*>(cfg_method->make_credentials());
         cred_out.m_cred.reset(cred);
 #if EAP_USE_NATIVE_CREDENTIAL_CACHE
         bool has_cached = cred_in.m_cred && cred_in.match(*cfg_prov);
@@ -485,7 +485,7 @@ _Success_(return != 0) const eap::config_method_ttls* eap::peer_ttls::combine_cr
             dwFlags,
             hTokenImpersonateUser,
 #if EAP_USE_NATIVE_CREDENTIAL_CACHE
-            has_cached ? dynamic_cast<credentials_ttls*>(cred_in.m_cred.get())->m_inner.get() : NULL,
+            has_cached ? dynamic_cast<credentials_tls_tunnel*>(cred_in.m_cred.get())->m_inner.get() : NULL,
 #else
             NULL,
 #endif
