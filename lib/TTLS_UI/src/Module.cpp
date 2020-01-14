@@ -396,7 +396,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
     }
 
     // Build our identity. ;)
-    wstring identity(std::move(cfg_method->get_public_identity(*dynamic_cast<const credentials_ttls*>(cred_out.m_cred.get()))));
+    wstring identity(std::move(cfg_method->get_public_identity(*cred_out.m_cred.get())));
     log_event(&EAPMETHOD_TRACE_EVT_CRED_OUTER_ID1, event_data((unsigned int)eap_type_t::ttls), event_data(identity), event_data::blank);
     size_t size = sizeof(WCHAR)*(identity.length() + 1);
     *ppwszIdentity = (WCHAR*)alloc_memory(size);

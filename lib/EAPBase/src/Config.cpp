@@ -151,12 +151,12 @@ void eap::config_method::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCon
     HRESULT hr;
 
     // <ClientSideCredential>
-    winstd::com_obj<IXMLDOMElement> pXmlElClientSideCredential;
-    if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, winstd::bstr(L"eap-metadata:ClientSideCredential"), winstd::bstr(L"ClientSideCredential"), namespace_eapmetadata, pXmlElClientSideCredential)))
+    com_obj<IXMLDOMElement> pXmlElClientSideCredential;
+    if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:ClientSideCredential"), bstr(L"ClientSideCredential"), namespace_eapmetadata, pXmlElClientSideCredential)))
         throw com_runtime_error(hr, __FUNCTION__ " Error creating <ClientSideCredential> element.");
 
     // <ClientSideCredential>/<allow-save>
-    if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElClientSideCredential, winstd::bstr(L"allow-save"), namespace_eapmetadata, m_allow_save)))
+    if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElClientSideCredential, bstr(L"allow-save"), namespace_eapmetadata, m_allow_save)))
         throw com_runtime_error(hr, __FUNCTION__ " Error creating <allow-save> element.");
 }
 
@@ -170,12 +170,12 @@ void eap::config_method::load(_In_ IXMLDOMNode *pConfigRoot)
     m_allow_save = true;
 
     // <ClientSideCredential>
-    winstd::com_obj<IXMLDOMElement> pXmlElClientSideCredential;
-    if (SUCCEEDED(eapxml::select_element(pConfigRoot, winstd::bstr(L"eap-metadata:ClientSideCredential"), pXmlElClientSideCredential))) {
-        std::wstring xpath(eapxml::get_xpath(pXmlElClientSideCredential));
+    com_obj<IXMLDOMElement> pXmlElClientSideCredential;
+    if (SUCCEEDED(eapxml::select_element(pConfigRoot, bstr(L"eap-metadata:ClientSideCredential"), pXmlElClientSideCredential))) {
+        wstring xpath(eapxml::get_xpath(pXmlElClientSideCredential));
 
         // <allow-save>
-        eapxml::get_element_value(pXmlElClientSideCredential, winstd::bstr(L"eap-metadata:allow-save"), m_allow_save);
+        eapxml::get_element_value(pXmlElClientSideCredential, bstr(L"eap-metadata:allow-save"), m_allow_save);
         m_module.log_config((xpath + L"/allow-save").c_str(), m_allow_save);
     }
 
@@ -224,17 +224,19 @@ eap::config_method_with_cred::config_method_with_cred(_In_ module &mod, _In_ uns
 
 
 eap::config_method_with_cred::config_method_with_cred(_In_ const config_method_with_cred &other) :
-    m_use_cred   (other.m_use_cred                                                          ),
-    m_cred       (other.m_cred ? dynamic_cast<credentials*>(other.m_cred->clone()) : nullptr),
-    config_method(other                                                                     )
+    m_use_cred          (other.m_use_cred                                                          ),
+    m_cred              (other.m_cred ? dynamic_cast<credentials*>(other.m_cred->clone()) : nullptr),
+    m_anonymous_identity(other.m_anonymous_identity                                                ),
+    config_method       (other                                                                     )
 {
 }
 
 
 eap::config_method_with_cred::config_method_with_cred(_Inout_ config_method_with_cred &&other) noexcept :
-    m_use_cred   (std::move(other.m_use_cred)),
-    m_cred       (std::move(other.m_cred    )),
-    config_method(std::move(other           ))
+    m_use_cred          (std::move(other.m_use_cred          )),
+    m_cred              (std::move(other.m_cred              )),
+    m_anonymous_identity(std::move(other.m_anonymous_identity)),
+    config_method       (std::move(other                     ))
 {
 }
 
@@ -245,6 +247,7 @@ eap::config_method_with_cred& eap::config_method_with_cred::operator=(_In_ const
         (config_method&)*this = other;
         m_use_cred            = other.m_use_cred;
         m_cred.reset(other.m_cred ? dynamic_cast<credentials*>(other.m_cred->clone()) : nullptr);
+        m_anonymous_identity  = other.m_anonymous_identity;
     }
 
     return *this;
@@ -254,9 +257,10 @@ eap::config_method_with_cred& eap::config_method_with_cred::operator=(_In_ const
 eap::config_method_with_cred& eap::config_method_with_cred::operator=(_Inout_ config_method_with_cred &&other) noexcept
 {
     if (this != &other) {
-        (config_method&)*this = std::move(other           );
-        m_use_cred            = std::move(other.m_use_cred);
-        m_cred                = std::move(other.m_cred    );
+        (config_method&)*this = std::move(other                     );
+        m_use_cred            = std::move(other.m_use_cred          );
+        m_cred                = std::move(other.m_cred              );
+        m_anonymous_identity  = std::move(other.m_anonymous_identity);
     }
 
     return *this;
@@ -272,14 +276,18 @@ void eap::config_method_with_cred::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOM
 
     HRESULT hr;
 
-    if (m_use_cred) {
-        // <ClientSideCredential>
-        winstd::com_obj<IXMLDOMElement> pXmlElClientSideCredential;
-        if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, winstd::bstr(L"eap-metadata:ClientSideCredential"), winstd::bstr(L"ClientSideCredential"), namespace_eapmetadata, pXmlElClientSideCredential)))
-            throw com_runtime_error(hr, __FUNCTION__ " Error creating <ClientSideCredential> element.");
+    // <ClientSideCredential>
+    com_obj<IXMLDOMElement> pXmlElClientSideCredential;
+    if (FAILED(hr = eapxml::create_element(pDoc, pConfigRoot, bstr(L"eap-metadata:ClientSideCredential"), bstr(L"ClientSideCredential"), namespace_eapmetadata, pXmlElClientSideCredential)))
+        throw com_runtime_error(hr, __FUNCTION__ " Error creating <ClientSideCredential> element.");
 
+    if (m_use_cred)
         m_cred->save(pDoc, pXmlElClientSideCredential);
-    }
+
+    // <ClientSideCredential>/<AnonymousIdentity>
+    if (!m_anonymous_identity.empty())
+        if (FAILED(hr = eapxml::put_element_value(pDoc, pXmlElClientSideCredential, bstr(L"AnonymousIdentity"), namespace_eapmetadata, bstr(m_anonymous_identity))))
+            throw com_runtime_error(hr, __FUNCTION__ " Error creating <AnonymousIdentity> element.");
 }
 
 
@@ -289,13 +297,14 @@ void eap::config_method_with_cred::load(_In_ IXMLDOMNode *pConfigRoot)
 
     config_method::load(pConfigRoot);
 
-    m_use_cred   = false;
+    m_use_cred = false;
     m_cred->clear();
+    m_anonymous_identity.clear();
 
     // <ClientSideCredential>
-    winstd::com_obj<IXMLDOMElement> pXmlElClientSideCredential;
-    if (SUCCEEDED(eapxml::select_element(pConfigRoot, winstd::bstr(L"eap-metadata:ClientSideCredential"), pXmlElClientSideCredential))) {
-        std::wstring xpath(eapxml::get_xpath(pXmlElClientSideCredential));
+    com_obj<IXMLDOMElement> pXmlElClientSideCredential;
+    if (SUCCEEDED(eapxml::select_element(pConfigRoot, bstr(L"eap-metadata:ClientSideCredential"), pXmlElClientSideCredential))) {
+        wstring xpath(eapxml::get_xpath(pXmlElClientSideCredential));
 
         try {
             m_cred->load(pXmlElClientSideCredential);
@@ -303,6 +312,10 @@ void eap::config_method_with_cred::load(_In_ IXMLDOMNode *pConfigRoot)
         } catch (...) {
             // This is not really an error - merely an indication configured credentials are unavailable.
         }
+
+        // <AnonymousIdentity>
+        eapxml::get_element_value(pXmlElClientSideCredential, bstr(L"eap-metadata:AnonymousIdentity"), m_anonymous_identity);
+        m_module.log_config((xpath + L"/AnonymousIdentity").c_str(), m_anonymous_identity.c_str());
     }
 }
 
@@ -312,6 +325,7 @@ void eap::config_method_with_cred::operator<<(_Inout_ cursor_out &cursor) const
     config_method::operator<<(cursor);
     cursor << m_use_cred;
     cursor << *m_cred;
+    cursor << m_anonymous_identity;
 }
 
 
@@ -319,8 +333,9 @@ size_t eap::config_method_with_cred::get_pk_size() const
 {
     return
         config_method::get_pk_size() +
-        pksizeof(m_use_cred) +
-        pksizeof(*m_cred   );
+        pksizeof(m_use_cred          ) +
+        pksizeof(*m_cred             ) +
+        pksizeof(m_anonymous_identity);
 }
 
 
@@ -329,6 +344,25 @@ void eap::config_method_with_cred::operator>>(_Inout_ cursor_in &cursor)
     config_method::operator>>(cursor);
     cursor >> m_use_cred;
     cursor >> *m_cred;
+    cursor >> m_anonymous_identity;
+}
+
+
+wstring eap::config_method_with_cred::get_public_identity(const credentials &cred) const
+{
+    if (m_anonymous_identity.empty()) {
+        // Use the true identity.
+        return cred.get_identity();
+    } else if (m_anonymous_identity.compare(L"@") == 0) {
+        // Strip username part from identity.
+        wstring identity(std::move(cred.get_identity()));
+        auto offset = identity.find(L'@');
+        if (offset != wstring::npos) identity.erase(0, offset);
+        return identity;
+    } else {
+        // Use configured identity.
+        return m_anonymous_identity;
+    }
 }
 
 

@@ -304,9 +304,15 @@ namespace eap
         virtual void operator>>(_Inout_ cursor_in &cursor);
         /// @}
 
+        ///
+        /// Generates public identity using current configuration and given credentials
+        ///
+        std::wstring get_public_identity(const credentials &cred) const;
+
     public:
         bool m_use_cred;                        ///< Use configured credentials
         std::unique_ptr<credentials> m_cred;    ///< Configured credentials
+        std::wstring m_anonymous_identity;      ///< Public identity override
     };
 
 

@@ -140,14 +140,8 @@ namespace eap
         ///
         config_method* make_config_method(_In_ const wchar_t *eap_type) const;
 
-        ///
-        /// Generates public identity using current configuration and given credentials
-        ///
-        std::wstring get_public_identity(const credentials_ttls &cred) const;
-
     public:
         std::unique_ptr<config_method> m_inner; ///< Inner authentication configuration
-        std::wstring m_anonymous_identity;      ///< Anonymous identity
     };
 
     /// @}
