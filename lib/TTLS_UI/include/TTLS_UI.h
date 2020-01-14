@@ -54,7 +54,7 @@ public:
     ///
     /// Constructs a configuration panel
     ///
-    wxTTLSConfigPanel(const eap::config_provider &prov, eap::config_method_ttls &cfg, wxWindow* parent);
+    wxTTLSConfigPanel(const eap::config_provider &prov, eap::config_method_tls_tunnel &cfg, wxWindow* parent);
 
 protected:
     /// \cond internal
@@ -65,7 +65,7 @@ protected:
 
 protected:
     const eap::config_provider &m_prov; ///< EAP provider
-    eap::config_method_ttls &m_cfg;     ///< TTLS configuration
+    eap::config_method_tls_tunnel &m_cfg;     ///< TLS tunnel configuration
 };
 
 

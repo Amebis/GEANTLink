@@ -198,7 +198,7 @@ eap::credentials::source_t eap::credentials_tls_tunnel::combine(
         dwFlags,
         hTokenImpersonateUser,
         cred_cached ? dynamic_cast<const credentials_tls_tunnel*>(cred_cached)->m_inner.get() : NULL,
-        *dynamic_cast<const config_method_ttls&>(cfg).m_inner,
+        *dynamic_cast<const config_method_tls_tunnel&>(cfg).m_inner,
         pszTargetName);
 
     return std::min<source_t>(src_outer, src_inner);

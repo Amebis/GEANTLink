@@ -25,33 +25,32 @@ using namespace winstd;
 
 
 //////////////////////////////////////////////////////////////////////
-// eap::config_method_ttls
+// eap::config_method_tls_tunnel
 //////////////////////////////////////////////////////////////////////
 
-eap::config_method_ttls::config_method_ttls(_In_ module &mod, _In_ unsigned int level) :
-    m_inner(new config_method_pap(mod, level + 1)),
+eap::config_method_tls_tunnel::config_method_tls_tunnel(_In_ module &mod, _In_ unsigned int level) :
     config_method_tls(mod, level)
 {
-    // TTLS is using blank configured credentials per default.
+    // TLS tunnel is using blank configured credentials per default.
     m_use_cred = true;
 }
 
 
-eap::config_method_ttls::config_method_ttls(const _In_ config_method_ttls &other) :
+eap::config_method_tls_tunnel::config_method_tls_tunnel(const _In_ config_method_tls_tunnel &other) :
     m_inner(other.m_inner ? dynamic_cast<config_method*>(other.m_inner->clone()) : nullptr),
     config_method_tls(other)
 {
 }
 
 
-eap::config_method_ttls::config_method_ttls(_Inout_ config_method_ttls &&other) noexcept :
+eap::config_method_tls_tunnel::config_method_tls_tunnel(_Inout_ config_method_tls_tunnel &&other) noexcept :
     m_inner(std::move(other.m_inner)),
     config_method_tls(std::move(other))
 {
 }
 
 
-eap::config_method_ttls& eap::config_method_ttls::operator=(const _In_ config_method_ttls &other)
+eap::config_method_tls_tunnel& eap::config_method_tls_tunnel::operator=(const _In_ config_method_tls_tunnel &other)
 {
     if (this != &other) {
         (config_method_tls&)*this = other;
@@ -62,12 +61,89 @@ eap::config_method_ttls& eap::config_method_ttls::operator=(const _In_ config_me
 }
 
 
-eap::config_method_ttls& eap::config_method_ttls::operator=(_Inout_ config_method_ttls &&other) noexcept
+eap::config_method_tls_tunnel& eap::config_method_tls_tunnel::operator=(_Inout_ config_method_tls_tunnel &&other) noexcept
 {
     if (this != &other) {
         (config_method_tls&&)*this = std::move(other);
         m_inner                    = std::move(other.m_inner);
     }
+
+    return *this;
+}
+
+
+void eap::config_method_tls_tunnel::operator<<(_Inout_ cursor_out &cursor) const
+{
+    config_method_tls::operator<<(cursor);
+    cursor << m_inner->get_method_id();
+    cursor << *m_inner;
+}
+
+
+size_t eap::config_method_tls_tunnel::get_pk_size() const
+{
+    return
+        config_method_tls::get_pk_size() +
+        pksizeof(m_inner->get_method_id()) +
+        pksizeof(*m_inner);
+}
+
+
+void eap::config_method_tls_tunnel::operator>>(_Inout_ cursor_in &cursor)
+{
+    config_method_tls::operator>>(cursor);
+
+    eap_type_t eap_type;
+    cursor >> eap_type;
+    m_inner.reset(make_config_method(eap_type));
+    cursor >> *m_inner;
+}
+
+
+eap::credentials* eap::config_method_tls_tunnel::make_credentials() const
+{
+    credentials_tls_tunnel *cred = new credentials_tls_tunnel(m_module);
+    cred->m_inner.reset(m_inner->make_credentials());
+    return cred;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// eap::config_method_ttls
+//////////////////////////////////////////////////////////////////////
+
+eap::config_method_ttls::config_method_ttls(_In_ module &mod, _In_ unsigned int level) :
+    config_method_tls_tunnel(mod, level)
+{
+    m_inner.reset(new config_method_pap(mod, level + 1));
+}
+
+
+eap::config_method_ttls::config_method_ttls(const _In_ config_method_ttls &other) :
+    config_method_tls_tunnel(other)
+{
+}
+
+
+eap::config_method_ttls::config_method_ttls(_Inout_ config_method_ttls &&other) noexcept :
+    config_method_tls_tunnel(std::move(other))
+{
+}
+
+
+eap::config_method_ttls& eap::config_method_ttls::operator=(const _In_ config_method_ttls &other)
+{
+    if (this != &other)
+        (config_method_tls_tunnel&)*this = other;
+
+    return *this;
+}
+
+
+eap::config_method_ttls& eap::config_method_ttls::operator=(_Inout_ config_method_ttls &&other) noexcept
+{
+    if (this != &other)
+        (config_method_tls_tunnel&&)*this = std::move(other);
 
     return *this;
 }
@@ -84,7 +160,7 @@ void eap::config_method_ttls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode 
     assert(pDoc);
     assert(pConfigRoot);
 
-    config_method_tls::save(pDoc, pConfigRoot);
+    config_method_tls_tunnel::save(pDoc, pConfigRoot);
 
     HRESULT hr;
 
@@ -158,7 +234,7 @@ void eap::config_method_ttls::load(_In_ IXMLDOMNode *pConfigRoot)
         }
     }
 
-    config_method_tls::load(pConfigRoot);
+    config_method_tls_tunnel::load(pConfigRoot);
 
     std::wstring xpath(eapxml::get_xpath(pConfigRoot));
 
@@ -189,34 +265,6 @@ void eap::config_method_ttls::load(_In_ IXMLDOMNode *pConfigRoot)
 }
 
 
-void eap::config_method_ttls::operator<<(_Inout_ cursor_out &cursor) const
-{
-    config_method_tls::operator<<(cursor);
-    cursor << m_inner->get_method_id();
-    cursor << *m_inner;
-}
-
-
-size_t eap::config_method_ttls::get_pk_size() const
-{
-    return
-        config_method_tls::get_pk_size() +
-        pksizeof(m_inner->get_method_id()) +
-        pksizeof(*m_inner);
-}
-
-
-void eap::config_method_ttls::operator>>(_Inout_ cursor_in &cursor)
-{
-    config_method_tls::operator>>(cursor);
-
-    eap_type_t eap_type;
-    cursor >> eap_type;
-    m_inner.reset(make_config_method(eap_type));
-    cursor >> *m_inner;
-}
-
-
 eap_type_t eap::config_method_ttls::get_method_id() const
 {
     return eap_type_t::ttls;
@@ -226,14 +274,6 @@ eap_type_t eap::config_method_ttls::get_method_id() const
 const wchar_t* eap::config_method_ttls::get_method_str() const
 {
     return L"EAP-TTLS";
-}
-
-
-eap::credentials* eap::config_method_ttls::make_credentials() const
-{
-    credentials_tls_tunnel *cred = new credentials_tls_tunnel(m_module);
-    cred->m_inner.reset(m_inner->make_credentials());
-    return cred;
 }
 
 

@@ -157,7 +157,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
 
     credentials_connection cred_out(*this, cfg);
     config_provider *cfg_prov = NULL;
-    config_method_ttls *cfg_method = NULL;
+    config_method_tls_tunnel *cfg_method = NULL;
 
     // Initialize application.
     wxInitializerPeer init(m_instance, wxT("EAP-TTLS_UI"), hwndParent);
@@ -188,7 +188,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
 
     // The identity provider is selected.
     assert(cfg_prov);
-    cfg_method = dynamic_cast<config_method_ttls*>(cfg_prov->m_methods.front().get());
+    cfg_method = dynamic_cast<config_method_tls_tunnel*>(cfg_prov->m_methods.front().get());
     assert(cfg_method);
 
     // Configure output credentials.
@@ -393,7 +393,7 @@ void eap::peer_ttls_ui::invoke_interactive_ui(
 
     // Look-up the provider.
     config_provider *cfg_prov;
-    config_method_ttls *cfg_method;
+    config_method_tls_tunnel *cfg_method;
     for (auto _cfg_prov = cfg.m_providers.begin(), cfg_prov_end = cfg.m_providers.end();; ++_cfg_prov) {
         if (_cfg_prov != cfg_prov_end) {
             if (cred.match(*_cfg_prov)) {
@@ -401,7 +401,7 @@ void eap::peer_ttls_ui::invoke_interactive_ui(
                 if (_cfg_prov->m_methods.empty())
                     throw invalid_argument(string_printf(__FUNCTION__ " %ls provider has no methods.", _cfg_prov->get_id().c_str()));
                 cfg_prov   = &*_cfg_prov;
-                cfg_method = dynamic_cast<config_method_ttls*>(_cfg_prov->m_methods.front().get());
+                cfg_method = dynamic_cast<config_method_tls_tunnel*>(_cfg_prov->m_methods.front().get());
                 break;
             }
         } else

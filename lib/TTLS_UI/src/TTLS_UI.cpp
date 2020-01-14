@@ -25,7 +25,7 @@
 // wxTTLSConfigPanel
 //////////////////////////////////////////////////////////////////////
 
-wxTTLSConfigPanel::wxTTLSConfigPanel(const eap::config_provider &prov, eap::config_method_ttls &cfg, wxWindow* parent) :
+wxTTLSConfigPanel::wxTTLSConfigPanel(const eap::config_provider &prov, eap::config_method_tls_tunnel &cfg, wxWindow* parent) :
     m_prov(prov),
     m_cfg(cfg),
     wxTTLSConfigPanelBase(parent)
@@ -143,7 +143,7 @@ wxTTLSConfigWindow::wxTTLSConfigWindow(eap::config_provider &prov, eap::config_m
     m_outer_title->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_INACTIVECAPTION ) );
     sb_content->Add(m_outer_title, 0, wxALL|wxALIGN_RIGHT, FromDIP(5));
 
-    m_outer_identity = new wxTTLSConfigPanel(m_prov, dynamic_cast<eap::config_method_ttls&>(m_cfg), this);
+    m_outer_identity = new wxTTLSConfigPanel(m_prov, dynamic_cast<eap::config_method_tls_tunnel&>(m_cfg), this);
     sb_content->Add(m_outer_identity, 0, wxALL|wxEXPAND, FromDIP(5));
 
     m_tls = new wxTLSConfigPanel(m_prov, dynamic_cast<eap::config_method_tls&>(m_cfg), this);
@@ -177,7 +177,7 @@ wxTTLSConfigWindow::~wxTTLSConfigWindow()
 
 bool wxTTLSConfigWindow::TransferDataToWindow()
 {
-    auto &cfg_ttls = dynamic_cast<eap::config_method_ttls&>(m_cfg);
+    auto &cfg_ttls = dynamic_cast<eap::config_method_tls_tunnel&>(m_cfg);
 
     // Native inner methods
     switch (cfg_ttls.m_inner->get_method_id()) {
@@ -220,7 +220,7 @@ bool wxTTLSConfigWindow::TransferDataFromWindow()
 {
     wxCHECK(wxScrolledWindow::TransferDataFromWindow(), false);
 
-    auto &cfg_ttls = dynamic_cast<eap::config_method_ttls&>(m_cfg);
+    auto &cfg_ttls = dynamic_cast<eap::config_method_tls_tunnel&>(m_cfg);
 
     if (!m_prov.m_read_only) {
         // This is not a provider-locked configuration. Save the data.
