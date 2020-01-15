@@ -27,7 +27,7 @@ using namespace winstd;
 
 
 HANDLE g_act_ctx = NULL;
-_EAPMETHOD_PEER_UI g_peer;
+EAPMETHOD_PEER_UI g_peer;
 
 
 ///

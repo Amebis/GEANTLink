@@ -26,7 +26,7 @@ using namespace std;
 using namespace winstd;
 
 
-_EAPMETHOD_PEER g_peer;
+EAPMETHOD_PEER g_peer;
 
 
 ///

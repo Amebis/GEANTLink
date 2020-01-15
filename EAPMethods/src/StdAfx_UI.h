@@ -25,7 +25,7 @@
 
 #if EAPMETHOD_TYPE == 21
 #include "../../lib/TTLS_UI/include/Module.h"
-#define _EAPMETHOD_PEER_UI eap::peer_ttls_ui
+#define EAPMETHOD_PEER_UI eap::peer_ttls_ui
 #else
 #error Unknown EAP Method type.
 #endif
