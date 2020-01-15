@@ -1,29 +1,27 @@
 /*
     Copyright 2015-2020 Amebis
-    Copyright 2016 GÃ‰ANT
+    Copyright 2016 GÉANT
 
-    This file is part of GÃ‰ANTLink.
+    This file is part of GÉANTLink.
 
-    GÃ‰ANTLink is free software: you can redistribute it and/or modify it
+    GÉANTLink is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    GÃ‰ANTLink is distributed in the hope that it will be useful, but
+    GÉANTLink is distributed in the hope that it will be useful, but
     WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with GÃ‰ANTLink. If not, see <http://www.gnu.org/licenses/>.
+    along with GÉANTLink. If not, see <http://www.gnu.org/licenses/>.
 */
 
-class wxTTLSConfigPanel;
+class wxTLSTunnelConfigWindow;
 class wxTTLSConfigWindow;
 
 #pragma once
-
-#include "../res/wxTTLS_UI.h"
 
 #include "../../TLS_UI/include/TLS_UI.h"
 
@@ -46,33 +44,45 @@ class wxTTLSConfigWindow;
 /// @{
 
 ///
-/// TTLS configuration panel
+/// TLS tunnel configuration scrollable window
 ///
-class wxTTLSConfigPanel : public wxTTLSConfigPanelBase
+class wxTLSTunnelConfigWindow : public wxEAPConfigWindow
 {
 public:
     ///
-    /// Constructs a configuration panel
+    /// Constructs a configuration window
     ///
-    wxTTLSConfigPanel(const eap::config_provider &prov, eap::config_method_tls_tunnel &cfg, wxWindow* parent);
+    /// \param[in]    prov    Provider configuration data
+    /// \param[inout] cfg     Method configuration data
+    /// \param[in]    parent  Parent window
+    ///
+    wxTLSTunnelConfigWindow(eap::config_provider &prov, eap::config_method &cfg, wxWindow* parent);
+
+    ///
+    /// Destructs the configuration window
+    ///
+    virtual ~wxTLSTunnelConfigWindow();
 
 protected:
     /// \cond internal
     virtual bool TransferDataToWindow();
-    virtual bool TransferDataFromWindow();
+    virtual void OnInitDialog(wxInitDialogEvent& event);
     virtual void OnUpdateUI(wxUpdateUIEvent& event);
     /// \endcond
 
 protected:
-    const eap::config_provider &m_prov; ///< EAP provider
-    eap::config_method_tls_tunnel &m_cfg;     ///< TLS tunnel configuration
+    wxStaticText *m_outer_title;                ///< Outer authentication title
+    wxEAPIdentityConfigPanel *m_outer_identity; ///< Outer identity configuration panel
+    wxPanel *m_tls;                             ///< TLS configuration panel
+    wxStaticText *m_inner_title;                ///< Inner authentication title
+    wxChoicebook *m_inner_type;                 ///< Inner authentication type
 };
 
 
 ///
 /// TTLS configuration scrollable window
 ///
-class wxTTLSConfigWindow : public wxEAPConfigWindow
+class wxTTLSConfigWindow : public wxTLSTunnelConfigWindow
 {
 public:
     ///
@@ -84,26 +94,13 @@ public:
     ///
     wxTTLSConfigWindow(eap::config_provider &prov, eap::config_method &cfg, wxWindow* parent);
 
-    ///
-    /// Destructs the configuration window
-    ///
-    virtual ~wxTTLSConfigWindow();
-
 protected:
     /// \cond internal
     virtual bool TransferDataToWindow();
     virtual bool TransferDataFromWindow();
-    virtual void OnInitDialog(wxInitDialogEvent& event);
-    virtual void OnUpdateUI(wxUpdateUIEvent& event);
     /// \endcond
 
 protected:
-    wxStaticText *m_outer_title;            ///< Outer authentication title
-    wxTTLSConfigPanel *m_outer_identity;    ///< Outer identity configuration panel
-    wxTLSConfigPanel *m_tls;                ///< TLS configuration panel
-    wxStaticText *m_inner_title;            ///< Inner authentication title
-    wxChoicebook *m_inner_type;             ///< Inner authentication type
-
     // Temporary inner method configurations to hold data until applied
     eap::config_method_pap         m_cfg_pap;           ///< PAP configuration
     eap::config_method_mschapv2    m_cfg_mschapv2;      ///< MSCHAPv2 configuration

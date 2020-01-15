@@ -22,17 +22,10 @@
 
 
 //////////////////////////////////////////////////////////////////////
-// wxTTLSConfigWindow
+// wxTLSTunnelConfigWindow
 //////////////////////////////////////////////////////////////////////
 
-wxTTLSConfigWindow::wxTTLSConfigWindow(eap::config_provider &prov, eap::config_method &cfg, wxWindow* parent) :
-    m_cfg_pap        (cfg.m_module, cfg.m_level + 1),
-    m_cfg_mschapv2   (cfg.m_module, cfg.m_level + 1),
-    m_cfg_eapmschapv2(cfg.m_module, cfg.m_level + 1),
-    m_cfg_eapgtc     (cfg.m_module, cfg.m_level + 1),
-#if EAP_INNER_EAPHOST
-    m_cfg_eaphost    (cfg.m_module, cfg.m_level + 1),
-#endif
+wxTLSTunnelConfigWindow::wxTLSTunnelConfigWindow(eap::config_provider &prov, eap::config_method &cfg, wxWindow* parent) :
     wxEAPConfigWindow(prov, cfg, parent)
 {
     wxBoxSizer* sb_content;
@@ -48,18 +41,6 @@ wxTTLSConfigWindow::wxTTLSConfigWindow(eap::config_provider &prov, eap::config_m
 
     m_inner_type = new wxChoicebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxCHB_DEFAULT);
     m_inner_type->SetToolTip( _("Select inner authentication method from the list") );
-    wxPAPConfigPanel *panel_pap = new wxPAPConfigPanel(m_prov, m_cfg_pap, m_inner_type);
-    m_inner_type->AddPage(panel_pap, _("PAP"));
-    wxMSCHAPv2ConfigPanel *panel_mschapv2 = new wxMSCHAPv2ConfigPanel(m_prov, m_cfg_mschapv2, m_inner_type);
-    m_inner_type->AddPage(panel_mschapv2, _("MSCHAPv2"));
-    wxMSCHAPv2ConfigPanel *panel_eapmschapv2 = new wxMSCHAPv2ConfigPanel(m_prov, m_cfg_eapmschapv2, m_inner_type);
-    m_inner_type->AddPage(panel_eapmschapv2, _("EAP-MSCHAPv2"));
-    wxGTCConfigPanel *panel_eapgtc = new wxGTCConfigPanel(m_prov, m_cfg_eapgtc, m_inner_type);
-    m_inner_type->AddPage(panel_eapgtc, _("EAP-GTC"));
-#if EAP_INNER_EAPHOST
-    wxEapHostConfigPanel *panel_eaphost = new wxEapHostConfigPanel(m_prov, m_cfg_eaphost, m_inner_type);
-    m_inner_type->AddPage(panel_eaphost, _("Other EAP methods..."));
-#endif
     sb_content->Add(m_inner_type, 0, wxALL|wxEXPAND, FromDIP(5));
 
     sb_content->Add(FromDIP(20), FromDIP(20), 1, wxALL|wxEXPAND, FromDIP(5));
@@ -86,16 +67,77 @@ wxTTLSConfigWindow::wxTTLSConfigWindow(eap::config_provider &prov, eap::config_m
     this->SetSizer(sb_content);
     this->Layout();
 
-    // m_inner_type->SetFocusFromKbd(); // This control steals mouse-wheel scrolling for itself
-    panel_pap->SetFocusFromKbd();
-
-    this->Connect(wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxTTLSConfigWindow::OnUpdateUI));
+    this->Connect(wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxTLSTunnelConfigWindow::OnUpdateUI));
 }
 
 
-wxTTLSConfigWindow::~wxTTLSConfigWindow()
+wxTLSTunnelConfigWindow::~wxTLSTunnelConfigWindow()
 {
-    this->Disconnect(wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxTTLSConfigWindow::OnUpdateUI));
+    this->Disconnect(wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxTLSTunnelConfigWindow::OnUpdateUI));
+}
+
+
+/// \cond internal
+
+bool wxTLSTunnelConfigWindow::TransferDataToWindow()
+{
+    // Do not invoke inherited TransferDataToWindow(), as it will call others TransferDataToWindow().
+    // This will handle wxTLSTunnelConfigWindow::OnInitDialog() via wxEVT_INIT_DIALOG forwarding.
+    return true /*wxEAPConfigWindow::TransferDataToWindow()*/;
+}
+
+
+void wxTLSTunnelConfigWindow::OnInitDialog(wxInitDialogEvent& event)
+{
+    wxEAPConfigWindow::OnInitDialog(event);
+
+    // Forward the event to child panels.
+    m_outer_identity->GetEventHandler()->ProcessEvent(event);
+    m_tls->GetEventHandler()->ProcessEvent(event);
+    for (wxWindowList::compatibility_iterator inner = m_inner_type->GetChildren().GetFirst(); inner; inner = inner->GetNext())
+        inner->GetData()->GetEventHandler()->ProcessEvent(event);
+}
+
+
+void wxTLSTunnelConfigWindow::OnUpdateUI(wxUpdateUIEvent& event)
+{
+    m_inner_type->GetChoiceCtrl()->Enable(!m_prov.m_read_only);
+
+    event.Skip();
+}
+
+/// \endcond
+
+
+//////////////////////////////////////////////////////////////////////
+// wxTTLSConfigWindow
+//////////////////////////////////////////////////////////////////////
+
+wxTTLSConfigWindow::wxTTLSConfigWindow(eap::config_provider &prov, eap::config_method &cfg, wxWindow* parent) :
+    m_cfg_pap        (cfg.m_module, cfg.m_level + 1),
+    m_cfg_mschapv2   (cfg.m_module, cfg.m_level + 1),
+    m_cfg_eapmschapv2(cfg.m_module, cfg.m_level + 1),
+    m_cfg_eapgtc     (cfg.m_module, cfg.m_level + 1),
+#if EAP_INNER_EAPHOST
+    m_cfg_eaphost    (cfg.m_module, cfg.m_level + 1),
+#endif
+    wxTLSTunnelConfigWindow(prov, cfg, parent)
+{
+    wxPAPConfigPanel *panel_pap = new wxPAPConfigPanel(m_prov, m_cfg_pap, m_inner_type);
+    m_inner_type->AddPage(panel_pap, _("PAP"));
+    wxMSCHAPv2ConfigPanel *panel_mschapv2 = new wxMSCHAPv2ConfigPanel(m_prov, m_cfg_mschapv2, m_inner_type);
+    m_inner_type->AddPage(panel_mschapv2, _("MSCHAPv2"));
+    wxMSCHAPv2ConfigPanel *panel_eapmschapv2 = new wxMSCHAPv2ConfigPanel(m_prov, m_cfg_eapmschapv2, m_inner_type);
+    m_inner_type->AddPage(panel_eapmschapv2, _("EAP-MSCHAPv2"));
+    wxGTCConfigPanel *panel_eapgtc = new wxGTCConfigPanel(m_prov, m_cfg_eapgtc, m_inner_type);
+    m_inner_type->AddPage(panel_eapgtc, _("EAP-GTC"));
+#if EAP_INNER_EAPHOST
+    wxEapHostConfigPanel *panel_eaphost = new wxEapHostConfigPanel(m_prov, m_cfg_eaphost, m_inner_type);
+    m_inner_type->AddPage(panel_eaphost, _("Other EAP methods..."));
+#endif
+
+    // m_inner_type->SetFocusFromKbd(); // This control steals mouse-wheel scrolling for itself
+    panel_pap->SetFocusFromKbd();
 }
 
 
@@ -144,7 +186,7 @@ bool wxTTLSConfigWindow::TransferDataToWindow()
 
 bool wxTTLSConfigWindow::TransferDataFromWindow()
 {
-    wxCHECK(wxScrolledWindow::TransferDataFromWindow(), false);
+    wxCHECK(wxTLSTunnelConfigWindow::TransferDataFromWindow(), false);
 
     auto &cfg_ttls = dynamic_cast<eap::config_method_tls_tunnel&>(m_cfg);
 
@@ -179,26 +221,6 @@ bool wxTTLSConfigWindow::TransferDataFromWindow()
     }
 
     return true;
-}
-
-
-void wxTTLSConfigWindow::OnInitDialog(wxInitDialogEvent& event)
-{
-    wxEAPConfigWindow::OnInitDialog(event);
-
-    // Forward the event to child panels.
-    m_outer_identity->GetEventHandler()->ProcessEvent(event);
-    m_tls->GetEventHandler()->ProcessEvent(event);
-    for (wxWindowList::compatibility_iterator inner = m_inner_type->GetChildren().GetFirst(); inner; inner = inner->GetNext())
-        inner->GetData()->GetEventHandler()->ProcessEvent(event);
-}
-
-
-void wxTTLSConfigWindow::OnUpdateUI(wxUpdateUIEvent& event)
-{
-    m_inner_type->GetChoiceCtrl()->Enable(!m_prov.m_read_only);
-
-    event.Skip();
 }
 
 /// \endcond
