@@ -27,7 +27,9 @@ using namespace winstd;
 // eap::peer_ui
 //////////////////////////////////////////////////////////////////////
 
-eap::peer_ui::peer_ui(_In_ eap_type_t eap_method) : module(eap_method)
+eap::peer_ui::peer_ui(_In_ eap_type_t eap_method, _In_opt_ LPCTSTR domain) :
+    m_domain(domain ? domain : _T("")),
+    module(eap_method)
 {
 }
 

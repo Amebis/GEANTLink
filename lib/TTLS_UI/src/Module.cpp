@@ -28,7 +28,7 @@ using namespace winstd;
 // eap::peer_ttls_ui
 //////////////////////////////////////////////////////////////////////
 
-eap::peer_ttls_ui::peer_ttls_ui() : peer_ui(eap_type_t::ttls)
+eap::peer_ttls_ui::peer_ttls_ui() : peer_ui(eap_type_t::ttls, _T("EAP-TTLS_UI"))
 {
 }
 
@@ -56,7 +56,7 @@ void eap::peer_ttls_ui::invoke_config_ui(
     }
 
     // Initialize application.
-    wxInitializerPeer init(m_instance, wxT("EAP-TTLS_UI"), hwndParent);
+    wxInitializerPeer init(m_instance, m_domain, hwndParent);
 
     // Create and launch configuration dialog.
     wxEAPConfigDialog<wxTTLSConfigWindow> dlg(cfg, init.m_parent);
@@ -124,7 +124,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
     config_method_tls_tunnel *cfg_method = NULL;
 
     // Initialize application.
-    wxInitializerPeer init(m_instance, wxT("EAP-TTLS_UI"), hwndParent);
+    wxInitializerPeer init(m_instance, m_domain, hwndParent);
 
     if (cfg.m_providers.size() > 1) {
         // Multiple identity providers: User has to select one first.
@@ -403,7 +403,7 @@ void eap::peer_ttls_ui::invoke_interactive_ui(
 #endif
     {
         // Initialize application.
-        wxInitializerPeer init(m_instance, wxT("EAP-TTLS_UI"), hwndParent);
+        wxInitializerPeer init(m_instance, m_domain, hwndParent);
 
         sanitizing_wstring
             challenge(reinterpret_cast<sanitizing_wstring::const_pointer>(ctx.m_data.data()), ctx.m_data.size()/sizeof(sanitizing_wstring::value_type)),

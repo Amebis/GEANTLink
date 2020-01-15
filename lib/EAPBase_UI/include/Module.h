@@ -46,8 +46,9 @@ namespace eap
         /// Constructs a EAP UI peer module for the given EAP type
         ///
         /// \param[in] eap_method  EAP method type ID
+        /// \param[in] domain      Localization catalog domain name. Usually EAP method name followed by "_UI".
         ///
-        peer_ui(_In_ winstd::eap_type_t eap_method);
+        peer_ui(_In_ winstd::eap_type_t eap_method, _In_opt_ LPCTSTR domain = nullptr);
 
         ///
         /// Converts XML into the configuration BLOB.
@@ -146,6 +147,9 @@ namespace eap
             _In_                                  DWORD dwUIContextDataSize,
             _Inout_                               BYTE  **ppDataFromInteractiveUI,
             _Inout_                               DWORD *pdwDataFromInteractiveUISize) = 0;
+
+    public:
+        const winstd::tstring m_domain; ///< Localization catalog domain name
     };
 
     /// @}
