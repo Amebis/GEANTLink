@@ -103,19 +103,14 @@
   <ItemGroup>
     <ClInclude Include="..\include\Module.h" />
     <ClInclude Include="..\include\TTLS_UI.h" />
-    <ClInclude Include="..\res\wxTTLS_UI.h" />
     <ClInclude Include="..\src\StdAfx.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\res\wxTTLS_UI.cpp" />
     <ClCompile Include="..\src\Module.cpp" />
     <ClCompile Include="..\src\StdAfx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\src\TTLS_UI.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\res\wxTTLS_UI.fbp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Events\build\Events.vcxproj">

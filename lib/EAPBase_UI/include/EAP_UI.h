@@ -46,6 +46,7 @@ template <class _Tcred, class _Tbase> class wxEAPCredentialsPanel;
 template <class _Tcred, class _Tbase> class wxIdentityCredentialsPanel;
 template <class _Tcred, class _Tbase> class wxPasswordCredentialsPanel;
 class wxEAPProviderSelectDialog;
+class wxEAPIdentityConfigPanel;
 class wxInitializerPeer;
 
 ///
@@ -409,6 +410,30 @@ protected:
 
 protected:
     eap::config_provider* m_selected;   ///< Pointer to selected provider (or NULL if none selected).
+};
+
+
+///
+/// EAP identity configuration panel
+///
+class wxEAPIdentityConfigPanel : public wxEAPIdentityConfigPanelBase
+{
+public:
+    ///
+    /// Constructs a configuration panel
+    ///
+    wxEAPIdentityConfigPanel(const eap::config_provider &prov, eap::config_method_with_cred &cfg, wxWindow* parent);
+
+protected:
+    /// \cond internal
+    virtual bool TransferDataToWindow();
+    virtual bool TransferDataFromWindow();
+    virtual void OnUpdateUI(wxUpdateUIEvent& event);
+    /// \endcond
+
+protected:
+    const eap::config_provider &m_prov;     ///< EAP provider
+    eap::config_method_with_cred &m_cfg;    ///< EAP configuration
 };
 
 

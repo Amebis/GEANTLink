@@ -21,9 +21,6 @@
     <ClInclude Include="..\include\TTLS_UI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\res\wxTTLS_UI.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\Module.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -32,19 +29,11 @@
     <ClCompile Include="..\src\StdAfx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\res\wxTTLS_UI.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Module.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\TTLS_UI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\res\wxTTLS_UI.fbp">
-      <Filter>Resource Files</Filter>
-    </None>
   </ItemGroup>
 </Project>

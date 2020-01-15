@@ -22,80 +22,6 @@
 
 
 //////////////////////////////////////////////////////////////////////
-// wxTTLSConfigPanel
-//////////////////////////////////////////////////////////////////////
-
-wxTTLSConfigPanel::wxTTLSConfigPanel(const eap::config_provider &prov, eap::config_method_tls_tunnel &cfg, wxWindow* parent) :
-    m_prov(prov),
-    m_cfg(cfg),
-    wxTTLSConfigPanelBase(parent)
-{
-    // Load and set icon.
-    winstd::library lib_shell32;
-    if (lib_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
-        m_outer_identity_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(265)));
-}
-
-
-/// \cond internal
-
-bool wxTTLSConfigPanel::TransferDataToWindow()
-{
-    // Populate identity controls.
-    if (m_cfg.m_anonymous_identity.empty()) {
-        m_outer_identity_same->SetValue(true);
-    } else if (m_cfg.m_anonymous_identity == L"@") {
-        m_outer_identity_empty->SetValue(true);
-    } else {
-        m_outer_identity_custom->SetValue(true);
-        m_outer_identity_custom_val->SetValue(m_cfg.m_anonymous_identity);
-    }
-
-    return wxTTLSConfigPanelBase::TransferDataToWindow();
-}
-
-
-bool wxTTLSConfigPanel::TransferDataFromWindow()
-{
-    wxCHECK(wxTTLSConfigPanelBase::TransferDataFromWindow(), false);
-
-    if (!m_prov.m_read_only) {
-        // This is not a provider-locked configuration. Save the data.
-        if (m_outer_identity_same->GetValue())
-            m_cfg.m_anonymous_identity.clear();
-        else if (m_outer_identity_empty->GetValue())
-            m_cfg.m_anonymous_identity = L"@";
-        else
-            m_cfg.m_anonymous_identity = m_outer_identity_custom_val->GetValue();
-    }
-
-    return true;
-}
-
-
-void wxTTLSConfigPanel::OnUpdateUI(wxUpdateUIEvent& event)
-{
-    wxTTLSConfigPanelBase::OnUpdateUI(event);
-
-    if (m_prov.m_read_only) {
-        // This is provider-locked configuration. Disable controls.
-        m_outer_identity_same      ->Enable(false);
-        m_outer_identity_empty     ->Enable(false);
-        m_outer_identity_custom    ->Enable(false);
-        m_outer_identity_custom_val->Enable(false);
-    } else {
-        // This is not a provider-locked configuration. Selectively enable/disable controls.
-        m_outer_identity_same      ->Enable(true);
-        m_outer_identity_empty     ->Enable(true);
-        m_outer_identity_custom    ->Enable(true);
-        m_outer_identity_custom_val->Enable(m_outer_identity_custom->GetValue());
-    }
-}
-
-/// \endcond
-
-
-//////////////////////////////////////////////////////////////////////
 // wxTTLSConfigWindow
 //////////////////////////////////////////////////////////////////////
 
@@ -143,7 +69,7 @@ wxTTLSConfigWindow::wxTTLSConfigWindow(eap::config_provider &prov, eap::config_m
     m_outer_title->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_INACTIVECAPTION ) );
     sb_content->Add(m_outer_title, 0, wxALL|wxALIGN_RIGHT, FromDIP(5));
 
-    m_outer_identity = new wxTTLSConfigPanel(m_prov, dynamic_cast<eap::config_method_tls_tunnel&>(m_cfg), this);
+    m_outer_identity = new wxEAPIdentityConfigPanel(m_prov, dynamic_cast<eap::config_method_with_cred&>(m_cfg), this);
     sb_content->Add(m_outer_identity, 0, wxALL|wxEXPAND, FromDIP(5));
 
     m_tls = new wxTLSConfigPanel(m_prov, dynamic_cast<eap::config_method_tls&>(m_cfg), this);
