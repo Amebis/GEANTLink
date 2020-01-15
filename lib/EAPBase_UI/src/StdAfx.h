@@ -23,4 +23,7 @@
 #include "../include/EAP_UI.h"
 #include "../include/Module.h"
 
+#include <wxex/common.h>
+
+#include <wx/app.h>
 #include <wx/commandlinkbutton.h>

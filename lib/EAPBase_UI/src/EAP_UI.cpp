@@ -467,3 +467,62 @@ void wxEAPProviderSelectDialog::OnProvSelect(wxCommandEvent& event)
     event.Skip();
 }
 /// \endcond
+
+
+//////////////////////////////////////////////////////////////////////
+// wxInitializerPeer
+//////////////////////////////////////////////////////////////////////
+
+wxInitializerPeer::wxInitializerPeer(_In_ HINSTANCE instance, _In_ const wxString &domain, _In_opt_ HWND hwndParent)
+{
+    wxCriticalSectionLocker locker(s_lock);
+
+    if (s_init_ref_count++ == 0) {
+        // Initialize application.
+        new wxApp();
+        wxEntryStart(instance);
+
+        // Do our wxWidgets configuration and localization initialization.
+        wxInitializeConfig();
+        s_locale = new wxLocale;
+        if (wxInitializeLocale(*s_locale)) {
+            s_locale->AddCatalog(wxT("wxExtend") wxT(wxExtendVersion));
+            if (!domain.IsEmpty())
+                s_locale->AddCatalog(domain);
+        }
+    }
+
+    if (hwndParent) {
+        // Create wxWidget-approved parent window.
+        m_parent = new wxWindow;
+        m_parent->SetHWND((WXHWND)hwndParent);
+        m_parent->AdoptAttributesFromHWND();
+        wxTopLevelWindows.Append(m_parent);
+    } else
+        m_parent = NULL;
+}
+
+
+wxInitializerPeer::~wxInitializerPeer()
+{
+    wxCriticalSectionLocker locker(s_lock);
+
+    if (m_parent) {
+        wxTopLevelWindows.DeleteObject(m_parent);
+        m_parent->SetHWND((WXHWND)NULL);
+    }
+
+    if (--s_init_ref_count == 0) {
+        wxEntryCleanup();
+
+        if (s_locale) {
+            delete s_locale;
+            s_locale = NULL;
+        }
+    }
+}
+
+
+wxCriticalSection wxInitializerPeer::s_lock;
+unsigned long wxInitializerPeer::s_init_ref_count = 0;
+wxLocale *wxInitializerPeer::s_locale = NULL;

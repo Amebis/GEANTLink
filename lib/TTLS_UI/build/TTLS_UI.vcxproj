@@ -91,7 +91,7 @@
   <PropertyGroup />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\Events\build\temp\Events.$(Platform).$(Configuration).$(PlatformToolset);..\..\WinStd\include;..\..\wxExtend\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\Events\build\temp\Events.$(Platform).$(Configuration).$(PlatformToolset);..\..\WinStd\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />

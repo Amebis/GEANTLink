@@ -34,8 +34,4 @@
 #include "../../EapHost/include/Credentials.h"
 #include "../../TTLS/include/UIContext.h"
 
-#include <wxex/common.h>
-
-#include <wx/app.h>
 #include <wx/choicdlg.h>
-#include <wx/thread.h>

@@ -24,32 +24,6 @@ using namespace std;
 using namespace winstd;
 
 
-///
-/// Peer initializer
-///
-class wxInitializerPeer
-{
-public:
-    ///
-    /// Initialize peer
-    ///
-    wxInitializerPeer(_In_ HINSTANCE instance, _In_opt_ HWND hwndParent);
-
-    ///
-    /// Uninitialize peer
-    ///
-    virtual ~wxInitializerPeer();
-
-public:
-    wxWindow* m_parent;                     ///< Parent window
-
-protected:
-    static wxCriticalSection s_lock;        ///< Initialization lock
-    static unsigned long s_init_ref_count;  ///< Initialization reference counter
-    static wxLocale *s_locale;              ///< Locale
-};
-
-
 //////////////////////////////////////////////////////////////////////
 // eap::peer_ttls_ui
 //////////////////////////////////////////////////////////////////////
@@ -118,7 +92,7 @@ void eap::peer_ttls_ui::invoke_config_ui(
     }
 
     // Initialize application.
-    wxInitializerPeer init(m_instance, hwndParent);
+    wxInitializerPeer init(m_instance, wxT("EAP-TTLS_UI"), hwndParent);
 
     // Create and launch configuration dialog.
     wxEAPConfigDialog<wxTTLSConfigWindow> dlg(cfg, init.m_parent);
@@ -186,7 +160,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
     config_method_ttls *cfg_method = NULL;
 
     // Initialize application.
-    wxInitializerPeer init(m_instance, hwndParent);
+    wxInitializerPeer init(m_instance, wxT("EAP-TTLS_UI"), hwndParent);
 
     if (cfg.m_providers.size() > 1) {
         // Multiple identity providers: User has to select one first.
@@ -443,7 +417,7 @@ void eap::peer_ttls_ui::invoke_interactive_ui(
 #endif
     {
         // Initialize application.
-        wxInitializerPeer init(m_instance, hwndParent);
+        wxInitializerPeer init(m_instance, wxT("EAP-TTLS_UI"), hwndParent);
 
         sanitizing_wstring
             challenge(reinterpret_cast<sanitizing_wstring::const_pointer>(ctx.m_data.data()), ctx.m_data.size()/sizeof(sanitizing_wstring::value_type)),
@@ -504,61 +478,3 @@ void eap::peer_ttls_ui::invoke_interactive_ui(
     // Pack output data.
     pack(ctx.m_data, ppDataFromInteractiveUI, pdwDataFromInteractiveUISize);
 }
-
-
-//////////////////////////////////////////////////////////////////////
-// wxInitializerPeer
-//////////////////////////////////////////////////////////////////////
-
-wxInitializerPeer::wxInitializerPeer(_In_ HINSTANCE instance, _In_opt_ HWND hwndParent)
-{
-    wxCriticalSectionLocker locker(s_lock);
-
-    if (s_init_ref_count++ == 0) {
-        // Initialize application.
-        new wxApp();
-        wxEntryStart(instance);
-
-        // Do our wxWidgets configuration and localization initialization.
-        wxInitializeConfig();
-        s_locale = new wxLocale;
-        if (wxInitializeLocale(*s_locale)) {
-            s_locale->AddCatalog(wxT("wxExtend") wxT(wxExtendVersion));
-            s_locale->AddCatalog(wxT("EAP-TTLS_UI"));
-        }
-    }
-
-    if (hwndParent) {
-        // Create wxWidget-approved parent window.
-        m_parent = new wxWindow;
-        m_parent->SetHWND((WXHWND)hwndParent);
-        m_parent->AdoptAttributesFromHWND();
-        wxTopLevelWindows.Append(m_parent);
-    } else
-        m_parent = NULL;
-}
-
-
-wxInitializerPeer::~wxInitializerPeer()
-{
-    wxCriticalSectionLocker locker(s_lock);
-
-    if (m_parent) {
-        wxTopLevelWindows.DeleteObject(m_parent);
-        m_parent->SetHWND((WXHWND)NULL);
-    }
-
-    if (--s_init_ref_count == 0) {
-        wxEntryCleanup();
-
-        if (s_locale) {
-            delete s_locale;
-            s_locale = NULL;
-        }
-    }
-}
-
-
-wxCriticalSection wxInitializerPeer::s_lock;
-unsigned long wxInitializerPeer::s_init_ref_count = 0;
-wxLocale *wxInitializerPeer::s_locale = NULL;

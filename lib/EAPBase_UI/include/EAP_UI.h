@@ -46,6 +46,7 @@ template <class _Tcred, class _Tbase> class wxEAPCredentialsPanel;
 template <class _Tcred, class _Tbase> class wxIdentityCredentialsPanel;
 template <class _Tcred, class _Tbase> class wxPasswordCredentialsPanel;
 class wxEAPProviderSelectDialog;
+class wxInitializerPeer;
 
 ///
 /// \defgroup EAPBaseGUI  GUI
@@ -121,7 +122,9 @@ inline void wxInitializeConfig();
 #include <WinStd/Win.h>
 
 #include <wx/config.h>
+#include <wx/intl.h>
 #include <wx/log.h>
+#include <wx/thread.h>
 
 #include <CommCtrl.h>
 
@@ -406,6 +409,32 @@ protected:
 
 protected:
     eap::config_provider* m_selected;   ///< Pointer to selected provider (or NULL if none selected).
+};
+
+
+///
+/// Peer initializer
+///
+class wxInitializerPeer
+{
+public:
+    ///
+    /// Initialize peer
+    ///
+    wxInitializerPeer(_In_ HINSTANCE instance, _In_ const wxString &domain, _In_opt_ HWND hwndParent);
+
+    ///
+    /// Uninitialize peer
+    ///
+    virtual ~wxInitializerPeer();
+
+public:
+    wxWindow* m_parent;                     ///< Parent window
+
+protected:
+    static wxCriticalSection s_lock;        ///< Initialization lock
+    static unsigned long s_init_ref_count;  ///< Initialization reference counter
+    static wxLocale *s_locale;              ///< Locale
 };
 
 
@@ -1027,8 +1056,6 @@ protected:
 
     /// \endcond
 };
-
-/// @}
 
 
 ///
