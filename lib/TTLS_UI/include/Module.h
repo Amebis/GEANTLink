@@ -52,19 +52,6 @@ namespace eap
         ///
         virtual config_method* make_config_method();
 
-        virtual void config_xml2blob(
-            _In_  DWORD       dwFlags,
-            _In_  IXMLDOMNode *pConfigRoot,
-            _Out_ BYTE        **pConnectionDataOut,
-            _Out_ DWORD       *pdwConnectionDataOutSize);
-
-        virtual void config_blob2xml(
-            _In_                                   DWORD           dwFlags,
-            _In_count_(dwConnectionDataSize) const BYTE            *pConnectionData,
-            _In_                                   DWORD           dwConnectionDataSize,
-            _In_                                   IXMLDOMDocument *pDoc,
-            _In_                                   IXMLDOMNode     *pConfigRoot);
-
         virtual void invoke_config_ui(
             _In_                                     HWND  hwndParent,
             _In_count_(dwConnectionDataInSize) const BYTE  *pConnectionDataIn,

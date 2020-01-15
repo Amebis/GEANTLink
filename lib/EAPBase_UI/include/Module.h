@@ -63,7 +63,7 @@ namespace eap
             _In_  DWORD       dwFlags,
             _In_  IXMLDOMNode *pConfigRoot,
             _Out_ BYTE        **pConnectionDataOut,
-            _Out_ DWORD       *pdwConnectionDataOutSize) = 0;
+            _Out_ DWORD       *pdwConnectionDataOutSize);
 
         ///
         /// Converts the configuration BLOB to XML.
@@ -83,7 +83,7 @@ namespace eap
             _In_count_(dwConnectionDataSize) const BYTE            *pConnectionData,
             _In_                                   DWORD           dwConnectionDataSize,
             _In_                                   IXMLDOMDocument *pDoc,
-            _In_                                   IXMLDOMNode     *pConfigRoot) = 0;
+            _In_                                   IXMLDOMNode     *pConfigRoot);
 
         ///
         /// Raises the EAP method's specific connection configuration user interface dialog on the client.

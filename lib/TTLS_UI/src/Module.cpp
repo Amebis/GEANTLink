@@ -39,42 +39,6 @@ eap::config_method* eap::peer_ttls_ui::make_config_method()
 }
 
 
-void eap::peer_ttls_ui::config_xml2blob(
-    _In_  DWORD       dwFlags,
-    _In_  IXMLDOMNode *pConfigRoot,
-    _Out_ BYTE        **pConnectionDataOut,
-    _Out_ DWORD       *pdwConnectionDataOutSize)
-{
-    UNREFERENCED_PARAMETER(dwFlags);
-
-    // Load configuration from XML.
-    config_connection cfg(*this);
-    cfg.load(pConfigRoot);
-
-    // Pack configuration.
-    pack(cfg, pConnectionDataOut, pdwConnectionDataOutSize);
-}
-
-
-void eap::peer_ttls_ui::config_blob2xml(
-    _In_                                   DWORD           dwFlags,
-    _In_count_(dwConnectionDataSize) const BYTE            *pConnectionData,
-    _In_                                   DWORD           dwConnectionDataSize,
-    _In_                                   IXMLDOMDocument *pDoc,
-    _In_                                   IXMLDOMNode     *pConfigRoot)
-{
-    UNREFERENCED_PARAMETER(dwFlags);
-
-    // Unpack configuration.
-    config_connection cfg(*this);
-    if (dwConnectionDataSize)
-        unpack(cfg, pConnectionData, dwConnectionDataSize);
-
-    // Save configuration to XML.
-    cfg.save(pDoc, pConfigRoot);
-}
-
-
 void eap::peer_ttls_ui::invoke_config_ui(
     _In_                                     HWND  hwndParent,
     _In_count_(dwConnectionDataInSize) const BYTE  *pConnectionDataIn,
