@@ -128,7 +128,7 @@ void eap::peer_ttls::get_identity(
 
     // Build our identity. ;)
     wstring identity(std::move(cfg_method->get_public_identity(*cred_out.m_cred.get())));
-    log_event(&EAPMETHOD_TRACE_EVT_CRED_OUTER_ID1, event_data((unsigned int)eap_type_t::ttls), event_data(identity), event_data::blank);
+    log_event(&EAPMETHOD_TRACE_EVT_CRED_OUTER_ID1, event_data((unsigned int)cfg_method->get_method_id()), event_data(identity), event_data::blank);
     size_t size = sizeof(WCHAR)*(identity.length() + 1);
     *ppwszIdentity = (WCHAR*)alloc_memory(size);
     memcpy(*ppwszIdentity, identity.c_str(), size);
@@ -636,7 +636,7 @@ DWORD WINAPI eap::peer_ttls::crl_checker::verify(_In_ crl_checker *obj)
                     // This "error" is expected for the root CA certificate.
                 } else {
                     // This really was an error, as it appeared before the root CA cerficate in the chain.
-                    obj->m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_REVOKE_SKIPPED, event_data((unsigned int)eap_type_t::ttls), event_data(subj), event_data::blank);
+                    obj->m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_REVOKE_SKIPPED, event_data((unsigned int)obj->m_module.m_eap_method), event_data(subj), event_data::blank);
                 }
                 break;
 
@@ -648,12 +648,12 @@ DWORD WINAPI eap::peer_ttls::crl_checker::verify(_In_ crl_checker *obj)
                 case CRL_REASON_CESSATION_OF_OPERATION:
                 case CRL_REASON_CERTIFICATE_HOLD:
                     // The revocation was of administrative nature. No need to black-list.
-                    obj->m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_REVOKED1, event_data((unsigned int)eap_type_t::ttls), event_data(subj), event_data(status_rev.dwReason), event_data::blank);
+                    obj->m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_REVOKED1, event_data((unsigned int)obj->m_module.m_eap_method), event_data(subj), event_data(status_rev.dwReason), event_data::blank);
                     break;
 
                 default: {
                     // One of the certificates in the chain was revoked as compromised. Black-list it.
-                    obj->m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_REVOKED, event_data((unsigned int)eap_type_t::ttls), event_data(subj), event_data(status_rev.dwReason), event_data::blank);
+                    obj->m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_REVOKED, event_data((unsigned int)obj->m_module.m_eap_method), event_data(subj), event_data(status_rev.dwReason), event_data::blank);
                     reg_key key;
                     if (key.create(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\") _T(VENDOR_NAME_STR) _T("\\") _T(PRODUCT_NAME_STR) _T("\\TLSCRL"), NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE)) {
                         vector<unsigned char> hash;
@@ -677,7 +677,7 @@ DWORD WINAPI eap::peer_ttls::crl_checker::verify(_In_ crl_checker *obj)
 
             default:
                 // Checking one of the certificates in the chain for revocation failed. Resume checking the rest.
-                obj->m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_REVOKE_FAILED, event_data((unsigned int)eap_type_t::ttls), event_data(subj), event_data(status_rev.dwError), event_data::blank);
+                obj->m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_REVOKE_FAILED, event_data((unsigned int)obj->m_module.m_eap_method), event_data(subj), event_data(status_rev.dwError), event_data::blank);
                 c += (size_t)status_rev.dwIndex + 1;
             }
         } else {
@@ -687,6 +687,6 @@ DWORD WINAPI eap::peer_ttls::crl_checker::verify(_In_ crl_checker *obj)
     }
 
     // Revocation check succeeded.
-    obj->m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_REVOKE_FINISHED, event_data((unsigned int)eap_type_t::ttls), event_data::blank);
+    obj->m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_REVOKE_FINISHED, event_data((unsigned int)obj->m_module.m_eap_method), event_data::blank);
     return 0;
 }
