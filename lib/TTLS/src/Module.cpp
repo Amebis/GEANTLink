@@ -29,21 +29,15 @@ using namespace winstd;
 
 
 //////////////////////////////////////////////////////////////////////
-// eap::peer_ttls
+// eap::peer_tls_tunnel
 //////////////////////////////////////////////////////////////////////
 
-eap::peer_ttls::peer_ttls() : peer(eap_type_t::ttls)
+eap::peer_tls_tunnel::peer_tls_tunnel(_In_ eap_type_t eap_method) : peer(eap_method)
 {
 }
 
 
-eap::config_method* eap::peer_ttls::make_config_method()
-{
-    return new config_method_ttls(*this, 0);
-}
-
-
-void eap::peer_ttls::initialize()
+void eap::peer_tls_tunnel::initialize()
 {
     // MSI's feature completeness check removed: It might invoke UI (prompt user for missing MSI),
     // which would be disasterous in EapHost system service.
@@ -64,7 +58,7 @@ void eap::peer_ttls::initialize()
 }
 
 
-void eap::peer_ttls::shutdown()
+void eap::peer_tls_tunnel::shutdown()
 {
     // Signal all certificate revocation verify threads to abort and wait for them (10sec max).
     vector<HANDLE> chks;
@@ -82,7 +76,7 @@ void eap::peer_ttls::shutdown()
 }
 
 
-void eap::peer_ttls::get_identity(
+void eap::peer_tls_tunnel::get_identity(
     _In_                                   DWORD  dwFlags,
     _In_count_(dwConnectionDataSize) const BYTE   *pConnectionData,
     _In_                                   DWORD  dwConnectionDataSize,
@@ -105,7 +99,7 @@ void eap::peer_ttls::get_identity(
 
     // Combine credentials.
     credentials_connection cred_out(*this, cfg);
-    const config_method_ttls *cfg_method = combine_credentials(dwFlags, cfg, pUserData, dwUserDataSize, cred_out, hTokenImpersonateUser);
+    const config_method_tls_tunnel *cfg_method = combine_credentials(dwFlags, cfg, pUserData, dwUserDataSize, cred_out, hTokenImpersonateUser);
 
     if (cfg_method) {
         // No UI will be necessary.
@@ -138,7 +132,7 @@ void eap::peer_ttls::get_identity(
 }
 
 
-void eap::peer_ttls::get_method_properties(
+void eap::peer_tls_tunnel::get_method_properties(
     _In_                                   DWORD                     dwVersion,
     _In_                                   DWORD                     dwFlags,
     _In_                                   HANDLE                    hUserImpersonationToken,
@@ -191,7 +185,7 @@ void eap::peer_ttls::get_method_properties(
 }
 
 
-void eap::peer_ttls::credentials_xml2blob(
+void eap::peer_tls_tunnel::credentials_xml2blob(
     _In_                                   DWORD       dwFlags,
     _In_                                   IXMLDOMNode *pConfigRoot,
     _In_count_(dwConnectionDataSize) const BYTE        *pConnectionData,
@@ -212,7 +206,7 @@ void eap::peer_ttls::credentials_xml2blob(
 }
 
 
-EAP_SESSION_HANDLE eap::peer_ttls::begin_session(
+EAP_SESSION_HANDLE eap::peer_tls_tunnel::begin_session(
     _In_                                   DWORD              dwFlags,
     _In_                           const   EapAttributes      *pAttributeArray,
     _In_                                   HANDLE             hTokenImpersonateUser,
@@ -232,14 +226,14 @@ EAP_SESSION_HANDLE eap::peer_ttls::begin_session(
     unpack(s->m_cred, pUserData, dwUserDataSize);
 
     // Look-up the provider.
-    config_method_ttls *cfg_method;
+    config_method_tls_tunnel *cfg_method;
     for (auto cfg_prov = s->m_cfg.m_providers.begin(), cfg_prov_end = s->m_cfg.m_providers.end();; ++cfg_prov) {
         if (cfg_prov != cfg_prov_end) {
             if (s->m_cred.match(*cfg_prov)) {
                 // Matching provider found.
                 if (cfg_prov->m_methods.empty())
                     throw invalid_argument(string_printf(__FUNCTION__ " %ls provider has no methods.", cfg_prov->get_id().c_str()));
-                cfg_method = dynamic_cast<config_method_ttls*>(cfg_prov->m_methods.front().get());
+                cfg_method = dynamic_cast<config_method_tls_tunnel*>(cfg_prov->m_methods.front().get());
                 break;
             }
         } else
@@ -247,38 +241,7 @@ EAP_SESSION_HANDLE eap::peer_ttls::begin_session(
     }
 
     // We have configuration, we have credentials, create method.
-    unique_ptr<method> meth_inner;
-    auto  cfg_inner        = cfg_method->m_inner.get();
-    auto cred_inner        = dynamic_cast<credentials_tls_tunnel*>(s->m_cred.m_cred.get())->m_inner.get();
-#if EAP_INNER_EAPHOST
-    auto cfg_inner_eaphost = dynamic_cast<config_method_eaphost*>(cfg_inner);
-    if (cfg_inner_eaphost) {
-        // EapHost inner method
-        meth_inner.reset(
-            new method_eapmsg (*this, cred_inner->get_identity().c_str(),
-            new method_eaphost(*this, *cfg_inner_eaphost, dynamic_cast<credentials_eaphost&>(*cred_inner))));
-    } else
-#endif
-    if (cfg_inner) {
-        // Native inner methods
-        switch (cfg_inner->get_method_id()) {
-        case eap_type_t::legacy_pap     : meth_inner.reset(new method_pap_diameter     (*this, dynamic_cast<config_method_pap     &>(*cfg_inner), dynamic_cast<credentials_pass&>(*cred_inner))); break;
-        case eap_type_t::legacy_mschapv2: meth_inner.reset(new method_mschapv2_diameter(*this, dynamic_cast<config_method_mschapv2&>(*cfg_inner), dynamic_cast<credentials_pass&>(*cred_inner))); break;
-        case eap_type_t::mschapv2       : meth_inner.reset(
-                                              new method_eapmsg  (*this, cred_inner->get_identity().c_str(),
-                                              new method_eap     (*this, eap_type_t::mschapv2, *cred_inner,
-                                              new method_mschapv2(*this, dynamic_cast<config_method_mschapv2&>(*cfg_inner), dynamic_cast<credentials_pass&>(*cred_inner))))); break;
-        case eap_type_t::gtc            : meth_inner.reset(
-                                              new method_eapmsg  (*this, cred_inner->get_identity().c_str(),
-                                              new method_eap     (*this, eap_type_t::gtc, *cred_inner,
-                                              new method_gtc     (*this, dynamic_cast<config_method_eapgtc&>(*cfg_inner), dynamic_cast<credentials&>(*cred_inner))))); break;
-        default: throw invalid_argument(__FUNCTION__ " Unsupported inner authentication method.");
-        }
-    }
-    s->m_method.reset(
-        new method_eap   (*this, eap_type_t::ttls, *s->m_cred.m_cred,
-        new method_defrag(*this, 0, /* Schannel supports retrieving keying material for EAP-TTLSv0 only. */
-        new method_ttls  (*this, *cfg_method, *dynamic_cast<credentials_tls_tunnel*>(s->m_cred.m_cred.get()), meth_inner.release()))));
+    s->m_method.reset(make_method(*cfg_method, *dynamic_cast<credentials_tls_tunnel*>(s->m_cred.m_cred.get())));
 
     // Initialize method.
     s->m_method->begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
@@ -287,7 +250,7 @@ EAP_SESSION_HANDLE eap::peer_ttls::begin_session(
 }
 
 
-void eap::peer_ttls::end_session(_In_ EAP_SESSION_HANDLE hSession)
+void eap::peer_tls_tunnel::end_session(_In_ EAP_SESSION_HANDLE hSession)
 {
     assert(hSession);
 
@@ -298,7 +261,7 @@ void eap::peer_ttls::end_session(_In_ EAP_SESSION_HANDLE hSession)
 }
 
 
-void eap::peer_ttls::process_request_packet(
+void eap::peer_tls_tunnel::process_request_packet(
     _In_                                       EAP_SESSION_HANDLE  hSession,
     _In_bytecount_(dwReceivedPacketSize) const EapPacket           *pReceivedPacket,
     _In_                                       DWORD               dwReceivedPacketSize,
@@ -311,7 +274,7 @@ void eap::peer_ttls::process_request_packet(
 }
 
 
-void eap::peer_ttls::get_response_packet(
+void eap::peer_tls_tunnel::get_response_packet(
     _In_                                   EAP_SESSION_HANDLE hSession,
     _Out_bytecapcount_(*pdwSendPacketSize) EapPacket          *pSendPacket,
     _Inout_                                DWORD              *pdwSendPacketSize)
@@ -327,7 +290,7 @@ void eap::peer_ttls::get_response_packet(
 }
 
 
-void eap::peer_ttls::get_result(
+void eap::peer_tls_tunnel::get_result(
     _In_    EAP_SESSION_HANDLE        hSession,
     _In_    EapPeerMethodResultReason reason,
     _Inout_ EapPeerMethodResult       *pResult)
@@ -360,7 +323,7 @@ void eap::peer_ttls::get_result(
 }
 
 
-void eap::peer_ttls::get_ui_context(
+void eap::peer_tls_tunnel::get_ui_context(
     _In_  EAP_SESSION_HANDLE hSession,
     _Out_ BYTE               **ppUIContextData,
     _Out_ DWORD              *pdwUIContextDataSize)
@@ -382,7 +345,7 @@ void eap::peer_ttls::get_ui_context(
 }
 
 
-void eap::peer_ttls::set_ui_context(
+void eap::peer_tls_tunnel::set_ui_context(
     _In_                                  EAP_SESSION_HANDLE  hSession,
     _In_count_(dwUIContextDataSize) const BYTE                *pUIContextData,
     _In_                                  DWORD               dwUIContextDataSize,
@@ -396,7 +359,7 @@ void eap::peer_ttls::set_ui_context(
 }
 
 
-void eap::peer_ttls::get_response_attributes(
+void eap::peer_tls_tunnel::get_response_attributes(
     _In_  EAP_SESSION_HANDLE hSession,
     _Out_ EapAttributes      *pAttribs)
 {
@@ -404,7 +367,7 @@ void eap::peer_ttls::get_response_attributes(
 }
 
 
-void eap::peer_ttls::set_response_attributes(
+void eap::peer_tls_tunnel::set_response_attributes(
     _In_       EAP_SESSION_HANDLE  hSession,
     _In_ const EapAttributes       *pAttribs,
     _Out_      EapPeerMethodOutput *pEapOutput)
@@ -415,7 +378,7 @@ void eap::peer_ttls::set_response_attributes(
 }
 
 
-void eap::peer_ttls::spawn_crl_check(_Inout_ winstd::cert_context &&cert)
+void eap::peer_tls_tunnel::spawn_crl_check(_Inout_ winstd::cert_context &&cert)
 {
     // Create the thread and add it to the list.
     m_crl_checkers.push_back(std::move(crl_checker(*this, std::move(cert))));
@@ -426,7 +389,7 @@ void eap::peer_ttls::spawn_crl_check(_Inout_ winstd::cert_context &&cert)
 }
 
 
-_Success_(return != 0) const eap::config_method_ttls* eap::peer_ttls::combine_credentials(
+_Success_(return != 0) const eap::config_method_tls_tunnel* eap::peer_tls_tunnel::combine_credentials(
     _In_                             DWORD                   dwFlags,
     _In_                       const config_connection       &cfg,
     _In_count_(dwUserDataSize) const BYTE                    *pUserData,
@@ -453,7 +416,7 @@ _Success_(return != 0) const eap::config_method_ttls* eap::peer_ttls::combine_cr
             log_event(&EAPMETHOD_TRACE_EVT_CRED_NO_METHOD, event_data(target_name), event_data::blank);
             continue;
         }
-        const config_method_ttls *cfg_method = dynamic_cast<const config_method_ttls*>(cfg_prov->m_methods.front().get());
+        const config_method_tls_tunnel *cfg_method = dynamic_cast<const config_method_tls_tunnel*>(cfg_prov->m_methods.front().get());
         assert(cfg_method);
 
         // Combine credentials. We could use eap::credentials_tls_tunnel() to do all the work, but we would not know which credentials is missing then.
@@ -522,10 +485,10 @@ _Success_(return != 0) const eap::config_method_ttls* eap::peer_ttls::combine_cr
 
 
 //////////////////////////////////////////////////////////////////////
-// eap::peer_ttls::session
+// eap::peer_tls_tunnel::session
 //////////////////////////////////////////////////////////////////////
 
-eap::peer_ttls::session::session(_In_ module &mod) :
+eap::peer_tls_tunnel::session::session(_In_ module &mod) :
     m_module(mod),
     m_cfg(mod),
     m_cred(mod, m_cfg),
@@ -537,7 +500,7 @@ eap::peer_ttls::session::session(_In_ module &mod) :
 {}
 
 
-eap::peer_ttls::session::~session()
+eap::peer_tls_tunnel::session::~session()
 {
     if (m_blob_cfg)
         m_module.free_memory(m_blob_cfg);
@@ -553,10 +516,10 @@ eap::peer_ttls::session::~session()
 
 
 //////////////////////////////////////////////////////////////////////
-// eap::peer_ttls::crl_checker
+// eap::peer_tls_tunnel::crl_checker
 //////////////////////////////////////////////////////////////////////
 
-eap::peer_ttls::crl_checker::crl_checker(_In_ module &mod, _Inout_ winstd::cert_context &&cert) :
+eap::peer_tls_tunnel::crl_checker::crl_checker(_In_ module &mod, _Inout_ winstd::cert_context &&cert) :
     m_module(mod),
     m_cert  (std::move(cert)),
     m_abort (CreateEvent(NULL, TRUE, FALSE, NULL))
@@ -564,7 +527,7 @@ eap::peer_ttls::crl_checker::crl_checker(_In_ module &mod, _Inout_ winstd::cert_
 }
 
 
-eap::peer_ttls::crl_checker::crl_checker(_Inout_ crl_checker &&other) noexcept :
+eap::peer_tls_tunnel::crl_checker::crl_checker(_Inout_ crl_checker &&other) noexcept :
     m_module(          other.m_module ),
     m_thread(std::move(other.m_thread)),
     m_abort (std::move(other.m_abort )),
@@ -573,7 +536,7 @@ eap::peer_ttls::crl_checker::crl_checker(_Inout_ crl_checker &&other) noexcept :
 }
 
 
-eap::peer_ttls::crl_checker& eap::peer_ttls::crl_checker::operator=(_Inout_ crl_checker &&other) noexcept
+eap::peer_tls_tunnel::crl_checker& eap::peer_tls_tunnel::crl_checker::operator=(_Inout_ crl_checker &&other) noexcept
 {
     if (this != std::addressof(other)) {
         assert(std::addressof(m_module) == std::addressof(other.m_module)); // Move threads within same module only!
@@ -586,7 +549,7 @@ eap::peer_ttls::crl_checker& eap::peer_ttls::crl_checker::operator=(_Inout_ crl_
 }
 
 
-DWORD WINAPI eap::peer_ttls::crl_checker::verify(_In_ crl_checker *obj)
+DWORD WINAPI eap::peer_tls_tunnel::crl_checker::verify(_In_ crl_checker *obj)
 {
     // Initialize COM.
     com_initializer com_init(NULL);
@@ -689,4 +652,70 @@ DWORD WINAPI eap::peer_ttls::crl_checker::verify(_In_ crl_checker *obj)
     // Revocation check succeeded.
     obj->m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_REVOKE_FINISHED, event_data((unsigned int)obj->m_module.m_eap_method), event_data::blank);
     return 0;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// eap::peer_ttls
+//////////////////////////////////////////////////////////////////////
+
+eap::peer_ttls::peer_ttls() : peer_tls_tunnel(eap_type_t::ttls)
+{
+}
+
+
+eap::config_method* eap::peer_ttls::make_config_method()
+{
+    return new config_method_ttls(*this, 0);
+}
+
+
+eap::method* eap::peer_ttls::make_method(_In_ config_method_tls_tunnel &cfg, _In_ credentials_tls_tunnel &cred)
+{
+    unique_ptr<method> meth_inner;
+    auto  cfg_inner        = cfg.m_inner.get();
+    auto cred_inner        = cred.m_inner.get();
+
+    assert(cfg_inner);
+    switch (cfg_inner->get_method_id()) {
+    case eap_type_t::legacy_pap:
+        meth_inner.reset(
+            new method_pap_diameter(*this, dynamic_cast<config_method_pap&>(*cfg_inner), dynamic_cast<credentials_pass&>(*cred_inner)));
+        break;
+
+    case eap_type_t::legacy_mschapv2:
+        meth_inner.reset(
+            new method_mschapv2_diameter(*this, dynamic_cast<config_method_mschapv2&>(*cfg_inner), dynamic_cast<credentials_pass&>(*cred_inner)));
+        break;
+
+    case eap_type_t::mschapv2:
+        meth_inner.reset(
+            new method_eapmsg  (*this, cred_inner->get_identity().c_str(),
+            new method_eap     (*this, eap_type_t::mschapv2, *cred_inner,
+            new method_mschapv2(*this, dynamic_cast<config_method_mschapv2&>(*cfg_inner), dynamic_cast<credentials_pass&>(*cred_inner)))));
+        break;
+
+    case eap_type_t::gtc:
+        meth_inner.reset(
+            new method_eapmsg(*this, cred_inner->get_identity().c_str(),
+            new method_eap   (*this, eap_type_t::gtc, *cred_inner,
+            new method_gtc   (*this, dynamic_cast<config_method_eapgtc&>(*cfg_inner), dynamic_cast<credentials&>(*cred_inner)))));
+        break;
+
+#if EAP_INNER_EAPHOST
+    case eap_type_t::undefined:
+        meth_inner.reset(
+            new method_eapmsg (*this, cred_inner->get_identity().c_str(),
+            new method_eaphost(*this, dynamic_cast<config_method_eaphost&>(*cfg_inner), dynamic_cast<credentials_eaphost&>(*cred_inner))));
+        break;
+#endif
+
+    default:
+        throw invalid_argument(__FUNCTION__ " Unsupported inner authentication method.");
+    }
+
+    return
+        new method_eap       (*this, eap_type_t::ttls, cred,
+        new method_defrag    (*this, 0 /* Schannel supports retrieving keying material for EAP-TTLSv0 only. */,
+        new method_tls_tunnel(*this, eap_type_t::ttls, cfg, cred, meth_inner.release())));
 }

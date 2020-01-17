@@ -20,6 +20,7 @@
 
 namespace eap
 {
+    class peer_tls_tunnel;
     class peer_ttls;
 }
 
@@ -37,21 +38,17 @@ namespace eap
     /// @{
 
     ///
-    /// EAP-TTLS peer
+    /// TLS tunnel peer
     ///
-    class peer_ttls : public peer
+    class peer_tls_tunnel : public peer
     {
     public:
         ///
-        /// Constructs a EAP-TTLS peer module
+        /// Constructs a TLS tunnel peer module
         ///
-        peer_ttls();
-
+        /// \param[in] eap_method  EAP method type ID
         ///
-        /// @copydoc eap::method::make_config_method()
-        /// \returns This implementation always returns `eap::config_method_ttls` type of configuration
-        ///
-        virtual config_method* make_config_method();
+        peer_tls_tunnel(_In_ winstd::eap_type_t eap_method);
 
         virtual void initialize();
         virtual void shutdown();
@@ -163,9 +160,19 @@ namespace eap
 
     protected:
         ///
+        /// Makes a new inner method
+        ///
+        /// \param[in] cfg   Method configuration
+        /// \param[in] cred  Credentials
+        ///
+        /// \returns A new inner method of given type
+        ///
+        virtual method* make_method(_In_ config_method_tls_tunnel &cfg, _In_ credentials_tls_tunnel &cred) = 0;
+
+        ///
         /// Checks all configured providers and tries to combine credentials.
         ///
-        _Success_(return != 0) const config_method_ttls* combine_credentials(
+        _Success_(return != 0) const config_method_tls_tunnel* combine_credentials(
             _In_                             DWORD                   dwFlags,
             _In_                       const config_connection       &cfg,
             _In_count_(dwUserDataSize) const BYTE                    *pUserData,
@@ -175,17 +182,17 @@ namespace eap
 
     protected:
         ///
-        /// EAP-TTLS session
+        /// TTL tunnel session
         ///
         class session {
         public:
             ///
-            /// Constructs a EAP-TTLS session
+            /// Constructs a session
             ///
             session(_In_ module &mod);
 
             ///
-            /// Destructs EAP-TTLS session
+            /// Destructs the session
             ///
             virtual ~session();
 
@@ -193,7 +200,7 @@ namespace eap
             module &m_module;                   ///< Module
             config_connection m_cfg;            ///< Connection configuration
             credentials_connection m_cred;      ///< Connection credentials
-            std::unique_ptr<method> m_method;   ///< EAP-TTLS method
+            std::unique_ptr<method> m_method;   ///< EAP method
 
             // The following members are required to avoid memory leakage in get_result() and get_ui_context().
             BYTE *m_blob_cfg;                   ///< Configuration BLOB
@@ -249,6 +256,29 @@ namespace eap
         };
 
         std::list<crl_checker> m_crl_checkers;  ///< List of certificate revocation check threads
+    };
+
+
+    ///
+    /// EAP-TTLS peer
+    ///
+    class peer_ttls : public peer_tls_tunnel
+    {
+    public:
+        ///
+        /// Constructs a EAP-TTLS peer module
+        ///
+        peer_ttls();
+
+        ///
+        /// @copydoc eap::method::make_config_method()
+        /// \returns This implementation always returns `eap::config_method_ttls` type of configuration
+        ///
+        virtual config_method* make_config_method();
+
+    protected:
+        /// @copydoc eap::method::make_config_method()
+        virtual method* make_method(_In_ config_method_tls_tunnel &cfg, _In_ credentials_tls_tunnel &cred);
     };
 
     /// @}

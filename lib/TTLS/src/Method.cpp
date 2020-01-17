@@ -795,7 +795,7 @@ void eap::method_ttls::get_result(
         m_cfg.m_last_status = config_method::status_t::success;
 
         // Spawn certificate revocation verify thread.
-        dynamic_cast<peer_ttls&>(m_module).spawn_crl_check(std::move(m_sc_cert));
+        dynamic_cast<peer_tls_tunnel&>(m_module).spawn_crl_check(std::move(m_sc_cert));
     }
 
     // Ask EAP host to save the configuration (connection data).
