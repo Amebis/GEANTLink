@@ -301,10 +301,11 @@ void eap::method_eapmsg::get_response_packet(
 
 
 //////////////////////////////////////////////////////////////////////
-// eap::method_ttls
+// eap::method_tls_tunnel
 //////////////////////////////////////////////////////////////////////
 
-eap::method_ttls::method_ttls(_In_ module &mod, _In_ config_method_tls_tunnel &cfg, _In_ credentials_tls_tunnel &cred, _In_ method *inner) :
+eap::method_tls_tunnel::method_tls_tunnel(_In_ module &mod, _In_ eap_type_t eap_method, _In_ config_method_tls_tunnel &cfg, _In_ credentials_tls_tunnel &cred, _In_ method *inner) :
+    m_eap_method(eap_method),
     m_cfg(cfg),
     m_cred(cred),
     m_user_ctx(NULL),
@@ -317,7 +318,7 @@ eap::method_ttls::method_ttls(_In_ module &mod, _In_ config_method_tls_tunnel &c
 }
 
 
-void eap::method_ttls::begin_session(
+void eap::method_tls_tunnel::begin_session(
     _In_        DWORD         dwFlags,
     _In_  const EapAttributes *pAttributeArray,
     _In_        HANDLE        hTokenImpersonateUser,
@@ -386,7 +387,7 @@ void eap::method_ttls::begin_session(
 }
 
 
-EapPeerMethodResponseAction eap::method_ttls::process_request_packet(
+EapPeerMethodResponseAction eap::method_tls_tunnel::process_request_packet(
     _In_bytecount_(dwReceivedPacketSize) const void  *pReceivedPacket,
     _In_                                       DWORD dwReceivedPacketSize)
 {
@@ -396,7 +397,7 @@ EapPeerMethodResponseAction eap::method_ttls::process_request_packet(
 
     switch (m_phase) {
     case phase_t::handshake_init: {
-        m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_t::ttls), event_data::blank);
+        m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)m_eap_method), event_data::blank);
 
         // Prepare input buffer(s).
         SecBuffer buf_in[] = {
@@ -545,7 +546,7 @@ EapPeerMethodResponseAction eap::method_ttls::process_request_packet(
                 SecPkgContext_ConnectionInfo info;
                 if (SUCCEEDED(status = QueryContextAttributes(m_sc_ctx, SECPKG_ATTR_CONNECTION_INFO, &info)))
                     m_module.log_event(&EAPMETHOD_TLS_HANDSHAKE_FINISHED,
-                        event_data((unsigned int)eap_type_t::ttls),
+                        event_data((unsigned int)m_eap_method),
                         event_data(auth.sAuthorityName),
                         event_data(info.dwProtocol),
                         event_data(info.aiCipher),
@@ -688,7 +689,7 @@ EapPeerMethodResponseAction eap::method_ttls::process_request_packet(
 }
 
 
-void eap::method_ttls::get_response_packet(
+void eap::method_tls_tunnel::get_response_packet(
     _Out_    sanitizing_blob &packet,
     _In_opt_ DWORD           size_max)
 {
@@ -734,7 +735,7 @@ void eap::method_ttls::get_response_packet(
 }
 
 
-void eap::method_ttls::get_result(
+void eap::method_tls_tunnel::get_result(
     _In_    EapPeerMethodResultReason reason,
     _Inout_ EapPeerMethodResult       *pResult)
 {
@@ -805,14 +806,14 @@ void eap::method_ttls::get_result(
 
 #if EAP_TLS < EAP_TLS_SCHANNEL_FULL
 
-void eap::method_ttls::verify_server_trust() const
+void eap::method_tls_tunnel::verify_server_trust() const
 {
     for (auto c = m_cfg.m_trusted_root_ca.cbegin(), c_end = m_cfg.m_trusted_root_ca.cend(); c != c_end; ++c) {
         if (m_sc_cert->cbCertEncoded == (*c)->cbCertEncoded &&
             memcmp(m_sc_cert->pbCertEncoded, (*c)->pbCertEncoded, m_sc_cert->cbCertEncoded) == 0)
         {
             // Server certificate found directly on the trusted root CA list.
-            m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_TRUSTED_EX1, event_data((unsigned int)eap_type_t::ttls), event_data::blank);
+            m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_TRUSTED_EX1, event_data((unsigned int)m_eap_method), event_data::blank);
             return;
         }
     }
@@ -861,7 +862,7 @@ void eap::method_ttls::verify_server_trust() const
                     if (san_info->rgAltEntry[idx_entry].dwAltNameChoice == CERT_ALT_NAME_DNS_NAME &&
                         _wcsicmp(s->c_str(), san_info->rgAltEntry[idx_entry].pwszDNSName) == 0)
                     {
-                        m_module.log_event(&EAPMETHOD_TLS_SERVER_NAME_TRUSTED2, event_data((unsigned int)eap_type_t::ttls), event_data(san_info->rgAltEntry[idx_entry].pwszDNSName), event_data::blank);
+                        m_module.log_event(&EAPMETHOD_TLS_SERVER_NAME_TRUSTED2, event_data((unsigned int)m_eap_method), event_data(san_info->rgAltEntry[idx_entry].pwszDNSName), event_data::blank);
                         found = true;
                     }
                 }
@@ -876,7 +877,7 @@ void eap::method_ttls::verify_server_trust() const
 
             for (auto s = m_cfg.m_server_names.cbegin(), s_end = m_cfg.m_server_names.cend(); !found && s != s_end; ++s) {
                 if (_wcsicmp(s->c_str(), subj.c_str()) == 0) {
-                    m_module.log_event(&EAPMETHOD_TLS_SERVER_NAME_TRUSTED2, event_data((unsigned int)eap_type_t::ttls), event_data(subj), event_data::blank);
+                    m_module.log_event(&EAPMETHOD_TLS_SERVER_NAME_TRUSTED2, event_data((unsigned int)m_eap_method), event_data(subj), event_data::blank);
                     found = true;
                 }
             }
@@ -966,7 +967,7 @@ void eap::method_ttls::verify_server_trust() const
         }
     }
 
-    m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_TRUSTED1, event_data((unsigned int)eap_type_t::ttls), event_data::blank);
+    m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_TRUSTED1, event_data((unsigned int)m_eap_method), event_data::blank);
 }
 
 #endif

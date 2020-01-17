@@ -22,7 +22,7 @@ namespace eap
 {
     class method_defrag;
     class method_eapmsg;
-    class method_ttls;
+    class method_tls_tunnel;
 }
 
 #pragma once
@@ -177,20 +177,21 @@ namespace eap
 
 
     ///
-    /// TTLS method
+    /// TLS tunnel method
     ///
-    class method_ttls : public method_tunnel
+    class method_tls_tunnel : public method_tunnel
     {
     public:
         ///
-        /// Constructs an TTLS method
+        /// Constructs a TLS tunnel method
         ///
-        /// \param[in] mod    EAP module to use for global services
-        /// \param[in] cfg    Method configuration
-        /// \param[in] cred   User credentials
-        /// \param[in] inner  Inner method
+        /// \param[in] mod         EAP module to use for global services
+        /// \param[in] eap_method  EAP method type ID
+        /// \param[in] cfg         Method configuration
+        /// \param[in] cred        User credentials
+        /// \param[in] inner       Inner method
         ///
-        method_ttls(_In_ module &mod, _In_ config_method_tls_tunnel &cfg, _In_ credentials_tls_tunnel &cred, _In_ method *inner);
+        method_tls_tunnel(_In_ module &mod, _In_ winstd::eap_type_t eap_method, _In_ config_method_tls_tunnel &cfg, _In_ credentials_tls_tunnel &cred, _In_ method *inner);
 
         /// \name Session management
         /// @{
@@ -229,6 +230,7 @@ namespace eap
 #endif
 
     protected:
+        const winstd::eap_type_t m_eap_method;      ///< EAP method type
         config_method_tls_tunnel &m_cfg;            ///< Method configuration
         credentials_tls_tunnel &m_cred;             ///< Method user credentials
         HANDLE m_user_ctx;                          ///< Handle to user context
