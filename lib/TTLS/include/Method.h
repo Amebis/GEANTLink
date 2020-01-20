@@ -131,10 +131,9 @@ namespace eap
         /// Constructs a method
         ///
         /// \param[in] mod       Module to use for global services
-        /// \param[in] identity  User identity
         /// \param[in] inner     Inner method
         ///
-        method_eapmsg(_In_ module &mod, _In_ const wchar_t *identity, _In_ method *inner);
+        method_eapmsg(_In_ module &mod, _In_ method *inner);
 
         /// \name Session management
         /// @{
@@ -161,8 +160,6 @@ namespace eap
         /// @}
 
     protected:
-        std::wstring m_identity;        ///< User identity
-
         ///
         /// Communication phase
         ///

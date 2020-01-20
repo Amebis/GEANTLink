@@ -673,8 +673,8 @@ eap::config_method* eap::peer_ttls::make_config_method()
 eap::method* eap::peer_ttls::make_method(_In_ config_method_tls_tunnel &cfg, _In_ credentials_tls_tunnel &cred)
 {
     unique_ptr<method> meth_inner;
-    auto  cfg_inner        = cfg.m_inner.get();
-    auto cred_inner        = cred.m_inner.get();
+    auto  cfg_inner = cfg.m_inner.get();
+    auto cred_inner = cred.m_inner.get();
 
     assert(cfg_inner);
     switch (cfg_inner->get_method_id()) {
@@ -690,14 +690,14 @@ eap::method* eap::peer_ttls::make_method(_In_ config_method_tls_tunnel &cfg, _In
 
     case eap_type_t::mschapv2:
         meth_inner.reset(
-            new method_eapmsg  (*this, cred_inner->get_identity().c_str(),
+            new method_eapmsg  (*this,
             new method_eap     (*this, eap_type_t::mschapv2, *cred_inner,
             new method_mschapv2(*this, dynamic_cast<config_method_mschapv2&>(*cfg_inner), dynamic_cast<credentials_pass&>(*cred_inner)))));
         break;
 
     case eap_type_t::gtc:
         meth_inner.reset(
-            new method_eapmsg(*this, cred_inner->get_identity().c_str(),
+            new method_eapmsg(*this,
             new method_eap   (*this, eap_type_t::gtc, *cred_inner,
             new method_gtc   (*this, dynamic_cast<config_method_eapgtc&>(*cfg_inner), dynamic_cast<credentials&>(*cred_inner)))));
         break;
@@ -705,7 +705,7 @@ eap::method* eap::peer_ttls::make_method(_In_ config_method_tls_tunnel &cfg, _In
 #if EAP_INNER_EAPHOST
     case eap_type_t::undefined:
         meth_inner.reset(
-            new method_eapmsg (*this, cred_inner->get_identity().c_str(),
+            new method_eapmsg (*this,
             new method_eaphost(*this, dynamic_cast<config_method_eaphost&>(*cfg_inner), dynamic_cast<credentials_eaphost&>(*cred_inner))));
         break;
 #endif

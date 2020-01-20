@@ -163,8 +163,7 @@ void eap::method_defrag::get_response_packet(
 // eap::method_eapmsg
 //////////////////////////////////////////////////////////////////////
 
-eap::method_eapmsg::method_eapmsg(_In_ module &mod, _In_ const wchar_t *identity, _In_ method *inner) :
-    m_identity(identity),
+eap::method_eapmsg::method_eapmsg(_In_ module &mod, _In_ method *inner) :
     m_phase(phase_t::unknown),
     method_tunnel(mod, inner)
 {
@@ -196,27 +195,17 @@ EapPeerMethodResponseAction eap::method_eapmsg::process_request_packet(
     _In_                                       DWORD dwReceivedPacketSize)
 {
     switch (m_phase) {
-    case phase_t::identity: {
-        // Convert identity to UTF-8.
-        sanitizing_string identity_utf8;
-        WideCharToMultiByte(CP_UTF8, 0, m_identity, identity_utf8, NULL, NULL);
-
+    case phase_t::identity:
         // Build EAP-Response/Identity packet.
-        auto size_identity = identity_utf8.length(), size_packet = size_identity + sizeof(EapPacket);
-        assert(size_packet <= MAXWORD); // Packets spanning over 64kB are not supported.
-        eap_packet pck;
-        if (!pck.create(EapCodeResponse, 0, (WORD)size_packet))
-            throw win_runtime_error(__FUNCTION__ " EapPacket creation failed.");
-        pck->Data[0] = (BYTE)eap_type_t::identity;
-        memcpy(pck->Data + 1, identity_utf8.data(), size_identity);
-
-        // Diameter AVP (EAP-Message=79)
-        m_packet_res.clear();
-        diameter_avp_append(79, diameter_avp_flag_mandatory, (const EapPacket*)pck, (unsigned int)size_packet, m_packet_res);
+        EapPacket hdr_req;
+        hdr_req.Code = EapCodeRequest;
+        hdr_req.Id   = 0;
+        *reinterpret_cast<unsigned short*>(hdr_req.Length) = htons(sizeof(EapPacket));
+        hdr_req.Data[0] = (BYTE)eap_type_t::identity;
 
         m_phase = phase_t::finished;
-        return EapPeerMethodResponseActionSend;
-    }
+        m_packet_res.clear();
+        return method_tunnel::process_request_packet(&hdr_req, sizeof(EapPacket));
 
     case phase_t::finished: {
         EapPeerMethodResponseAction action = EapPeerMethodResponseActionNone;
@@ -271,16 +260,15 @@ void eap::method_eapmsg::get_response_packet(
     _In_opt_ DWORD           size_max)
 {
     if (m_packet_res.empty()) {
-        assert(size_max >= sizeof(diameter_avp_header)); // We should be able to respond with at least Diameter AVP header.
-
         if (size_max > 0xffffff) size_max = 0xffffff; // Diameter AVP maximum size is 16MB.
 
         // Get data from underlying method.
+        assert(size_max >= sizeof(diameter_avp_header)); // We should be able to respond with at least Diameter AVP header.
         method_tunnel::get_response_packet(packet, size_max - sizeof(diameter_avp_header));
 
         // Prepare EAP-Message Diameter AVP header.
         diameter_avp_header hdr;
-        *reinterpret_cast<unsigned int*>(hdr.code) = htonl(79);
+        *reinterpret_cast<unsigned int*>(hdr.code) = htonl(79); // EAP-Message=79
         hdr.flags = diameter_avp_flag_mandatory;
         size_t size_packet = packet.size() + sizeof(diameter_avp_header);
         assert(size_packet <= 0xffffff); // Packets spanning over 16MB are not supported.
@@ -292,10 +280,12 @@ void eap::method_eapmsg::get_response_packet(
         // Add padding.
         packet.insert(packet.end(), (unsigned int)((4 - size_packet) % 4), 0);
     } else {
-        if (m_packet_res.size() > size_max)
-            throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %zu, maximum: %u).", m_packet_res.size(), size_max));
+        // We have a response packet ready.
+        size_t size_packet = m_packet_res.size();
+        if (size_packet > size_max)
+            throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %zu, maximum: %u).", size_packet, size_max));
 
-        packet.assign(m_packet_res.begin(), m_packet_res.end());
+        packet.assign(m_packet_res.cbegin(), m_packet_res.cend());
     }
 }
 
