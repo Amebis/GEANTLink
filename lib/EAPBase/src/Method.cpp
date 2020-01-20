@@ -200,10 +200,11 @@ EapPeerMethodResponseAction eap::method_tunnel::set_response_attributes(_In_ con
 // eap::method_eap
 //////////////////////////////////////////////////////////////////////
 
-eap::method_eap::method_eap(_In_ module &mod, _In_ winstd::eap_type_t eap_method, _In_ method *inner) :
+eap::method_eap::method_eap(_In_ module &mod, _In_ eap_type_t eap_method, _In_ credentials &cred, _In_ method *inner) :
     m_eap_method(eap_method),
+    m_cred(cred),
     m_id(0),
-    m_send_nak(false),
+    m_phase(phase_t::unknown),
     method_tunnel(mod, inner)
 {
 }
@@ -246,14 +247,18 @@ EapPeerMethodResponseAction eap::method_eap::process_request_packet(
     // Save request packet ID to make matching response packet in get_response_packet() later.
     m_id = hdr->Id;
 
-    if ((eap_type_t)hdr->Data[0] != m_eap_method) {
-        // Unsupported EAP method. Respond with Legacy Nak.
-        m_send_nak = true;
+    if ((eap_type_t)hdr->Data[0] == eap_type_t::identity) {
+        // EAP Identity. Respond with identity.
+        m_phase = phase_t::identity;
         return EapPeerMethodResponseActionSend;
-    } else {
+    } else if ((eap_type_t)hdr->Data[0] == m_eap_method) {
         // Process the data with underlying method.
-        m_send_nak = false;
+        m_phase = phase_t::inner;
         return method_tunnel::process_request_packet(hdr->Data + 1, size_packet - sizeof(EapPacket));
+    } else {
+        // Unsupported EAP method. Respond with Legacy Nak.
+        m_phase = phase_t::nak;
+        return EapPeerMethodResponseActionSend;
     }
 }
 
@@ -270,14 +275,27 @@ void eap::method_eap::get_response_packet(
     hdr.Code = (BYTE)EapCodeResponse;
     hdr.Id = m_id;
 
-    if (!m_send_nak) {
+    switch (m_phase) {
+    case phase_t::identity: {
+        hdr.Data[0] = (BYTE)eap_type_t::identity;
+
+        // Convert identity to UTF-8.
+        sanitizing_string identity_utf8;
+        WideCharToMultiByte(CP_UTF8, 0, m_cred.get_identity(), identity_utf8, NULL, NULL);
+        packet.assign(identity_utf8.cbegin(), identity_utf8.cend());
+        break;
+    }
+
+    case phase_t::inner:
         hdr.Data[0] = (BYTE)m_eap_method;
 
         packet.reserve(size_max); // To avoid reallocation when inserting EAP packet header later.
 
         // Get data from underlying method.
         method_tunnel::get_response_packet(packet, size_max - sizeof(EapPacket));
-    } else {
+        break;
+
+    case phase_t::nak: {
         // Respond with Legacy Nak suggesting our EAP method to continue.
         hdr.Data[0] = (BYTE)eap_type_t::nak;
 
@@ -289,6 +307,11 @@ void eap::method_eap::get_response_packet(
 
         // Data of Legacy Nak packet is a list of supported EAP types: our method alone.
         packet.assign(1, (unsigned char)m_eap_method);
+        break;
+    }
+
+    default:
+        throw invalid_argument(string_printf(__FUNCTION__ " Unknown phase (phase %u).", m_phase));
     }
 
     size_t size_packet = packet.size() + sizeof(EapPacket);

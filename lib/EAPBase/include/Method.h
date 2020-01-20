@@ -280,9 +280,10 @@ namespace eap
         ///
         /// \param[in] mod         Module to use for global services
         /// \param[in] eap_method  EAP method type
+        /// \param[in] cred        User credentials
         /// \param[in] inner       Inner method
         ///
-        method_eap(_In_ module &mod, _In_ winstd::eap_type_t eap_method, _In_ method *inner);
+        method_eap(_In_ module &mod, _In_ winstd::eap_type_t eap_method, _In_ credentials &cred, _In_ method *inner);
 
         /// \name Session management
         /// @{
@@ -310,8 +311,18 @@ namespace eap
 
     protected:
         const winstd::eap_type_t m_eap_method;  ///< EAP method type
+        credentials &m_cred;                    ///< User credentials
         unsigned char m_id;                     ///< Request packet ID
-        bool m_send_nak;                        ///< Are we sending Legacy Nak response?
+
+        ///
+        /// Communication phase
+        ///
+        enum class phase_t {
+            unknown = -1,               ///< Unknown phase
+            identity = 0,               ///< Send identity
+            inner,                      ///< Send inner method response
+            nak,                        ///< Send Legacy Nak response
+        } m_phase;                      ///< What phase is our communication at?
     };
 
     /// @}
