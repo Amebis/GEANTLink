@@ -222,9 +222,11 @@ void eap::method_eap::begin_session(
     // Inner method can generate packets of up to 64kB (less the EAP packet header).
     // Initialize inner method with appropriately less packet size maximum.
     if (dwMaxSendPacketSize < sizeof(EapPacket))
-        throw invalid_argument(string_printf(__FUNCTION__ " Maximum packet size too small (minimum: %zu, available: %u).", sizeof(EapPacket) + 1, dwMaxSendPacketSize));
+        throw invalid_argument(string_printf(__FUNCTION__ " Maximum packet size too small (minimum: %zu, available: %u).", sizeof(EapPacket), dwMaxSendPacketSize));
     assert(m_inner);
     m_inner->begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, std::min<DWORD>(dwMaxSendPacketSize, MAXWORD) - sizeof(EapPacket));
+
+    m_phase = phase_t::init;
 }
 
 
@@ -232,33 +234,54 @@ EapPeerMethodResponseAction eap::method_eap::process_request_packet(
     _In_bytecount_(dwReceivedPacketSize) const void  *pReceivedPacket,
     _In_                                       DWORD dwReceivedPacketSize)
 {
-    assert(dwReceivedPacketSize >= sizeof(EapPacket)); // Request packet should contain an EAP packet header at least.
-    auto hdr = reinterpret_cast<const EapPacket*>(pReceivedPacket);
+    if (dwReceivedPacketSize < offsetof(EapPacket, Data))
+        throw invalid_argument(string_printf(__FUNCTION__ " Incomplete EAP packet header (minimum: %zu, received: %u).", offsetof(EapPacket, Data), dwReceivedPacketSize));
 
-    // This must be an EAP-Request packet.
-    if (hdr->Code != EapCodeRequest)
-        throw invalid_argument(string_printf(__FUNCTION__ " Unknown EAP packet received (expected: %u, received: %u).", EapCodeRequest, (int)hdr->Code));
+    auto hdr = reinterpret_cast<const EapPacket*>(pReceivedPacket);
 
     // Check packet size.
     DWORD size_packet = ntohs(*reinterpret_cast<const unsigned short*>(hdr->Length));
     if (size_packet > dwReceivedPacketSize)
         throw invalid_argument(string_printf(__FUNCTION__ " Incorrect EAP packet length (expected: %u, received: %u).", size_packet, dwReceivedPacketSize));
 
-    // Save request packet ID to make matching response packet in get_response_packet() later.
-    m_id = hdr->Id;
+    switch (hdr->Code) {
+    case EapCodeRequest:
+        if (dwReceivedPacketSize < sizeof(EapPacket))
+            throw invalid_argument(string_printf(__FUNCTION__ " Incomplete EAP packet (minimum: %zu, received: %u).", sizeof(EapPacket), dwReceivedPacketSize));
 
-    if ((eap_type_t)hdr->Data[0] == eap_type_t::identity) {
-        // EAP Identity. Respond with identity.
-        m_phase = phase_t::identity;
-        return EapPeerMethodResponseActionSend;
-    } else if ((eap_type_t)hdr->Data[0] == m_eap_method) {
-        // Process the data with underlying method.
-        m_phase = phase_t::inner;
-        return method_tunnel::process_request_packet(hdr->Data + 1, size_packet - sizeof(EapPacket));
-    } else {
-        // Unsupported EAP method. Respond with Legacy Nak.
-        m_phase = phase_t::nak;
-        return EapPeerMethodResponseActionSend;
+        // Save request packet ID to make matching response packet in get_response_packet() later.
+        m_id = hdr->Id;
+
+        if ((eap_type_t)hdr->Data[0] == eap_type_t::identity) {
+            // EAP Identity. Respond with identity.
+            m_phase = phase_t::identity;
+            return EapPeerMethodResponseActionSend;
+        } else if ((eap_type_t)hdr->Data[0] == m_eap_method) {
+            // Process the data with underlying method.
+            m_phase = phase_t::inner;
+            return method_tunnel::process_request_packet(hdr->Data + 1, size_packet - sizeof(EapPacket));
+        } else {
+            // Unsupported EAP method. Respond with Legacy Nak.
+            m_phase = phase_t::nak;
+            return EapPeerMethodResponseActionSend;
+        }
+
+    // Check EAP Success/Failure packets for inner methods.
+    case EapCodeSuccess:
+        assert(size_packet == 4);
+        if (m_phase == phase_t::init) {
+            // Discard "canned" success packet.
+            return EapPeerMethodResponseActionDiscard;
+        }
+        m_phase = phase_t::finished;
+        return EapPeerMethodResponseActionResult;
+
+    case EapCodeFailure:
+        assert(size_packet == 4);
+        throw invalid_argument(string_printf(__FUNCTION__ " EAP Failure packet received."));
+
+    default:
+        throw invalid_argument(string_printf(__FUNCTION__ " Unknown EAP packet received (expected: %u, received: %u).", EapCodeRequest, (int)hdr->Code));
     }
 }
 

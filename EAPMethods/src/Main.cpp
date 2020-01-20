@@ -358,7 +358,7 @@ DWORD APIENTRY EapPeerProcessRequestPacket(
         *ppEapError = NULL;
 
     // Parameter check
-    if (!hSession || !pReceivedPacket || dwReceivedPacketSize < 6 || pReceivedPacket->Data[0] != EAPMETHOD_TYPE || !pEapOutput)
+    if (!hSession || !pReceivedPacket || dwReceivedPacketSize < sizeof(EapPacket) || pReceivedPacket->Data[0] != EAPMETHOD_TYPE || !pEapOutput)
         return dwResult = ERROR_INVALID_PARAMETER;
 
     try {

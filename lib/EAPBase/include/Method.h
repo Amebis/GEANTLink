@@ -319,9 +319,11 @@ namespace eap
         ///
         enum class phase_t {
             unknown = -1,               ///< Unknown phase
-            identity = 0,               ///< Send identity
+            init = 0,                   ///< Initialize
+            identity,                   ///< Send identity
             inner,                      ///< Send inner method response
             nak,                        ///< Send Legacy Nak response
+            finished,                   ///< EAP Success packet received
         } m_phase;                      ///< What phase is our communication at?
     };
 
