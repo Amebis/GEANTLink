@@ -1,21 +1,21 @@
 /*
     Copyright 2015-2020 Amebis
-    Copyright 2016 GÃ‰ANT
+    Copyright 2016 GÉANT
 
-    This file is part of GÃ‰ANTLink.
+    This file is part of GÉANTLink.
 
-    GÃ‰ANTLink is free software: you can redistribute it and/or modify it
+    GÉANTLink is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    GÃ‰ANTLink is distributed in the hope that it will be useful, but
+    GÉANTLink is distributed in the hope that it will be useful, but
     WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with GÃ‰ANTLink. If not, see <http://www.gnu.org/licenses/>.
+    along with GÉANTLink. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "StdAfx.h"
@@ -121,7 +121,7 @@ void eap::peer_ttls::get_identity(
         } else {
             // Per-machine authentication, cannot use UI.
             throw win_runtime_error(ERROR_NO_SUCH_USER, __FUNCTION__ " Credentials for per-machine authentication not available.");
-        }
+}
     }
 
     // Build our identity. ;)
@@ -138,7 +138,7 @@ void eap::peer_ttls::get_identity(
 
 void eap::peer_ttls::get_method_properties(
     _In_                                   DWORD                     dwVersion,
-    _In_                                   DWORD                     dwFlags,
+    _In_                             DWORD                   dwFlags,
     _In_                                   HANDLE                    hUserImpersonationToken,
     _In_count_(dwConnectionDataSize) const BYTE                      *pConnectionData,
     _In_                                   DWORD                     dwConnectionDataSize,
@@ -278,7 +278,7 @@ EAP_SESSION_HANDLE eap::peer_ttls::begin_session(
 #endif
     s->m_method.reset(
         new method_eap   (*this, eap_type_t::ttls,
-        new method_defrag(*this,
+        new method_defrag(*this, 0, /* Schannel supports retrieving keying material for EAP-TTLSv0 only. */
         new method_ttls  (*this, *cfg_method, *dynamic_cast<credentials_ttls*>(s->m_cred.m_cred.get()), meth_inner.release()))));
 
     // Initialize method.
@@ -596,7 +596,7 @@ DWORD WINAPI eap::peer_ttls::crl_checker::verify(_In_ crl_checker *obj)
     if (WaitForSingleObject(obj->m_abort, 5000) == WAIT_OBJECT_0) {
         // Aborted.
         return 1;
-    }
+}
 
     // Prepare a list of certificates forming certificate chain.
     list<cert_context> context_data;
@@ -605,7 +605,7 @@ DWORD WINAPI eap::peer_ttls::crl_checker::verify(_In_ crl_checker *obj)
         DWORD flags = 0;
         c = CertGetIssuerCertificateFromStore(obj->m_cert->hCertStore, context_data.back(), NULL, &flags);
         if (!c) break;
-    }
+}
 
     // Create an array of pointers to CERT_CONTEXT required by CertVerifyRevocation().
     vector<PCERT_CONTEXT> context;
@@ -623,7 +623,7 @@ DWORD WINAPI eap::peer_ttls::crl_checker::verify(_In_ crl_checker *obj)
         if (!CertVerifyRevocation(X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, CERT_CONTEXT_REVOCATION_TYPE,
             (DWORD)(c_end - c), reinterpret_cast<PVOID*>(&*c),
             CERT_VERIFY_REV_CHAIN_FLAG, NULL, &status_rev))
-        {
+{
             PCCERT_CONTEXT cert = *(c + status_rev.dwIndex);
             wstring subj;
             if (!CertGetNameStringW(cert, CERT_NAME_DNS_TYPE, CERT_NAME_STR_ENABLE_PUNYCODE_FLAG, NULL, subj))
@@ -639,7 +639,7 @@ DWORD WINAPI eap::peer_ttls::crl_checker::verify(_In_ crl_checker *obj)
                     // This really was an error, as it appeared before the root CA cerficate in the chain.
                     obj->m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_REVOKE_SKIPPED, event_data((unsigned int)eap_type_t::ttls), event_data(subj), event_data::blank);
                 }
-                break;
+        break;
 
             case CRYPT_E_REVOKED:
                 // One of the certificates in the chain was revoked.
@@ -650,7 +650,7 @@ DWORD WINAPI eap::peer_ttls::crl_checker::verify(_In_ crl_checker *obj)
                 case CRL_REASON_CERTIFICATE_HOLD:
                     // The revocation was of administrative nature. No need to black-list.
                     obj->m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_REVOKED1, event_data((unsigned int)eap_type_t::ttls), event_data(subj), event_data(status_rev.dwReason), event_data::blank);
-                    break;
+        break;
 
                 default: {
                     // One of the certificates in the chain was revoked as compromised. Black-list it.
@@ -669,18 +669,18 @@ DWORD WINAPI eap::peer_ttls::crl_checker::verify(_In_ crl_checker *obj)
 
                 // Resume checking the rest of the chain.
                 c += (size_t)status_rev.dwIndex + 1;
-                break;
+        break;
 
             case ERROR_SUCCESS:
                 // Odd. CertVerifyRevocation() should return TRUE then. Nevertheless, we take this as a "yes".
                 c = c_end;
-                break;
+        break;
 
-            default:
+    default:
                 // Checking one of the certificates in the chain for revocation failed. Resume checking the rest.
                 obj->m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_REVOKE_FAILED, event_data((unsigned int)eap_type_t::ttls), event_data(subj), event_data(status_rev.dwError), event_data::blank);
                 c += (size_t)status_rev.dwIndex + 1;
-            }
+    }
         } else {
             // Revocation check finished.
             break;

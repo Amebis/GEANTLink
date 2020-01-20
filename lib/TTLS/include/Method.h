@@ -42,7 +42,7 @@ namespace eap
     /// @{
 
     ///
-    /// EAP-(T)TLS class defragging method tunnel
+    /// EAP-(T)TLS/PEAP class defragging method tunnel
     ///
     class method_defrag : public method_tunnel
     {
@@ -51,7 +51,7 @@ namespace eap
 #pragma warning(disable: 4480)
 
         ///
-        /// EAP-(T)TLS request packet flags
+        /// EAP-(T)TLS/PEAP request packet flags
         ///
         /// \sa [The EAP-TLS Authentication Protocol (Chapter: 3.1 EAP-TLS Request Packet)](https://tools.ietf.org/html/rfc5216#section-3.1)
         /// \sa [The EAP-TTLS Authentication Protocol Version 0 (Chapter: 9.1. Packet Format)](https://tools.ietf.org/html/rfc5281#section-9.1)
@@ -64,7 +64,7 @@ namespace eap
         };
 
         ///
-        /// EAP-(T)TLS response packet flags
+        /// EAP-(T)TLS/PEAP response packet flags
         ///
         /// \sa [The EAP-TLS Authentication Protocol (Chapter: 3.2 EAP-TLS Response Packet)](https://tools.ietf.org/html/rfc5216#section-3.2)
         /// \sa [The EAP-TTLS Authentication Protocol Version 0 (Chapter: 9.1. Packet Format)](https://tools.ietf.org/html/rfc5281#section-9.1)
@@ -81,10 +81,11 @@ namespace eap
         ///
         /// Constructs a method
         ///
-        /// \param[in] mod    Module to use for global services
-        /// \param[in] inner  Inner method
+        /// \param[in] mod          Module to use for global services
+        /// \param[in] version_max  Maximum protocol version supported by peer
+        /// \param[in] inner        Inner method
         ///
-        method_defrag(_In_ module &mod, _In_ method *inner);
+        method_defrag(_In_ module &mod, _In_ unsigned char version_max, _In_ method *inner);
 
         /// \name Session management
         /// @{
@@ -110,10 +111,22 @@ namespace eap
 
         /// @}
 
+    public:
+        unsigned char m_version;    ///< Negotiated protocol version
+
     protected:
         sanitizing_blob m_data_req; ///< Data in request
         sanitizing_blob m_data_res; ///< Data in response
         bool m_send_res;            ///< Are we sending a response?
+
+        ///
+        /// Communication phase
+        ///
+        enum class phase_t {
+            unknown = -1,           ///< Unknown phase
+            init = 0,               ///< Binding exchange
+            established,            ///< Connection established
+        } m_phase;                  ///< What phase is our communication at?
     };
 
 

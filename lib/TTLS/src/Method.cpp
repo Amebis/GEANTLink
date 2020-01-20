@@ -1,21 +1,21 @@
 /*
     Copyright 2015-2020 Amebis
-    Copyright 2016 GÃ‰ANT
+    Copyright 2016 GÉANT
 
-    This file is part of GÃ‰ANTLink.
+    This file is part of GÉANTLink.
 
-    GÃ‰ANTLink is free software: you can redistribute it and/or modify it
+    GÉANTLink is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    GÃ‰ANTLink is distributed in the hope that it will be useful, but
+    GÉANTLink is distributed in the hope that it will be useful, but
     WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with GÃ‰ANTLink. If not, see <http://www.gnu.org/licenses/>.
+    along with GÉANTLink. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "StdAfx.h"
@@ -30,7 +30,9 @@ using namespace winstd;
 // eap::method_defrag
 //////////////////////////////////////////////////////////////////////
 
-eap::method_defrag::method_defrag(_In_ module &mod, _In_ method *inner) :
+eap::method_defrag::method_defrag(_In_ module &mod, _In_ unsigned char version_max, _In_ method *inner) :
+    m_version(version_max),
+    m_phase(phase_t::unknown),
     m_send_res(false),
     method_tunnel(mod, inner)
 {
@@ -49,6 +51,8 @@ void eap::method_defrag::begin_session(
     // Inner method can generate packets of up to 4GB.
     assert(m_inner);
     m_inner->begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, MAXDWORD);
+
+    m_phase = phase_t::init;
 }
 
 
@@ -58,6 +62,18 @@ EapPeerMethodResponseAction eap::method_defrag::process_request_packet(
 {
     assert(dwReceivedPacketSize >= 1); // Request packet should contain flags at least.
     auto data_packet = reinterpret_cast<const unsigned char*>(pReceivedPacket);
+
+    // To prevent version downgrade attacks, negotiate protocol version on binding exchange only. Then stick to it!
+    unsigned char data_version = data_packet[0] & flags_req_ver_mask;
+    if (m_phase == phase_t::init) {
+        m_version = min<unsigned char>(data_version, m_version);
+        m_module.log_event(&EAPMETHOD_DEFRAG_VERSION,
+            event_data(m_version),
+            event_data(data_version),
+            event_data::blank);
+        m_phase = phase_t::established;
+    } else if (data_version != m_version)
+        throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Protocol version mismatch.");
 
     // Get packet content pointers for more readable code later on.
     auto
@@ -124,7 +140,7 @@ void eap::method_defrag::get_response_packet(
     packet.clear();
     if (size_data + 1 > size_max) {
         // Write one fragment.
-        packet.push_back(flags_res_length_incl | flags_res_more_frag);
+        packet.push_back(flags_res_length_incl | flags_res_more_frag | m_version);
         unsigned int length = htonl((unsigned int)size_data);
         packet.insert(packet.end(), reinterpret_cast<const unsigned char*>(&length), reinterpret_cast<const unsigned char*>(&length + 1));
         auto data_begin = m_data_res.begin() + 0, data_end = data_begin + (size_max - 5);
@@ -133,7 +149,7 @@ void eap::method_defrag::get_response_packet(
         m_send_res = true;
     } else {
         // Write single/last fragment.
-        packet.push_back(0);
+        packet.push_back(m_version);
         packet.insert(packet.end(), m_data_res.begin(), m_data_res.end());
         m_data_res.clear();
         m_send_res = false;
