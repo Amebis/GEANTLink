@@ -59,18 +59,12 @@ EapPeerMethodResponseAction eap::method_defrag::process_request_packet(
     assert(dwReceivedPacketSize >= 1); // Request packet should contain flags at least.
     auto data_packet = reinterpret_cast<const unsigned char*>(pReceivedPacket);
 
-    // Get packet content pointer and size for more readable code later on.
-    const unsigned char *data_content;
-    size_t size_content;
-    if (data_packet[0] & flags_req_length_incl) {
-        // Length field is included.
-        data_content = data_packet          + 5;
-        size_content = dwReceivedPacketSize - 5;
-    } else {
-        // Length field not included.
-        data_content = data_packet          + 1;
-        size_content = dwReceivedPacketSize - 1;
-    }
+    // Get packet content pointers for more readable code later on.
+    auto
+        data_content     = data_packet + (data_packet[0] & flags_req_length_incl ? 5 : 1),
+        data_content_end = data_packet + dwReceivedPacketSize;
+    if (data_content > data_content_end)
+        throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Incomplete data.");
 
     // Do the defragmentation.
     if (data_packet[0] & flags_req_more_frag) {
@@ -81,7 +75,7 @@ EapPeerMethodResponseAction eap::method_defrag::process_request_packet(
                 m_data_req.reserve(ntohl(*reinterpret_cast<const unsigned int*>(data_packet + 1)));
             }
         }
-        m_data_req.insert(m_data_req.end(), data_content, data_content + size_content);
+        m_data_req.insert(m_data_req.end(), data_content, data_content_end);
 
         // Respond with ACK packet (empty packet).
         m_data_res.clear();
@@ -89,10 +83,10 @@ EapPeerMethodResponseAction eap::method_defrag::process_request_packet(
         return EapPeerMethodResponseActionSend;
     } else if (!m_data_req.empty()) {
         // Last fragment received. Append data.
-        m_data_req.insert(m_data_req.end(), data_content, data_content + size_content);
+        m_data_req.insert(m_data_req.end(), data_content, data_content_end);
     } else {
         // This is a complete non-fragmented packet.
-        m_data_req.assign(data_content, data_content + size_content);
+        m_data_req.assign(data_content, data_content_end);
     }
 
     if (m_send_res) {
