@@ -356,6 +356,16 @@ EapPeerMethodResponseAction eap::method_mschapv2_diameter::process_request_packe
 }
 
 
+void eap::method_mschapv2_diameter::set_challenge_data(
+    _In_bytecount_c_(sizeof(challenge_mschapv2)) const unsigned char *challenge_server,
+    _In_                                               unsigned char ident)
+{
+    assert(challenge_server);
+    m_challenge_server.assign(challenge_server, challenge_server + sizeof(challenge_mschapv2));
+    m_ident = ident;
+}
+
+
 void eap::method_mschapv2_diameter::process_packet(_In_bytecount_(size_pck) const void *_pck, _In_ size_t size_pck)
 {
     for (const unsigned char *pck = reinterpret_cast<const unsigned char*>(_pck), *pck_end = pck + size_pck; pck < pck_end; ) {

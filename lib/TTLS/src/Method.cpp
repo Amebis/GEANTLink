@@ -551,18 +551,17 @@ EapPeerMethodResponseAction eap::method_ttls::process_request_packet(
 
                 method_mschapv2_diameter *inner_mschapv2 = dynamic_cast<method_mschapv2_diameter*>(m_inner.get());
                 if (inner_mschapv2) {
-                    // Push keying material to inner MSCHAPv2 method.
-                    static const DWORD s_key_id = 0x02; // EAP-TTLSv0 Challenge Data
-                    static const SecPkgContext_EapPrfInfo s_prf_info = { 0, sizeof(s_key_id), (PBYTE)&s_key_id };
-                    if (FAILED(status = SetContextAttributes(m_sc_ctx, SECPKG_ATTR_EAP_PRF_INFO, (void*)&s_prf_info, sizeof(s_prf_info))))
+                    // Push EAP-TTLS keying material to inner MSCHAPv2 method.
+                    static const DWORD key_id = 0x02; // EAP-TTLSv0 Challenge Data
+                    static const SecPkgContext_EapPrfInfo prf_info = { 0, sizeof(key_id), (PBYTE)&key_id };
+                    if (FAILED(status = SetContextAttributes(m_sc_ctx, SECPKG_ATTR_EAP_PRF_INFO, (void*)&prf_info, sizeof(prf_info))))
                         throw sec_runtime_error(status, __FUNCTION__ " Error setting TTLS PRF in Schannel.");
 
                     SecPkgContext_EapKeyBlock key_block;
                     if (FAILED(status = QueryContextAttributes(m_sc_ctx, SECPKG_ATTR_EAP_KEY_BLOCK, &key_block)))
                         throw sec_runtime_error(status, __FUNCTION__ " Error generating PRF in Schannel.");
 
-                    inner_mschapv2->m_challenge_server.assign(key_block.rgbKeys, key_block.rgbKeys + sizeof(challenge_mschapv2));
-                    inner_mschapv2->m_ident = key_block.rgbKeys[sizeof(challenge_mschapv2) + 0];
+                    inner_mschapv2->set_challenge_data(key_block.rgbKeys, key_block.rgbKeys[sizeof(challenge_mschapv2)]);
 
                     SecureZeroMemory(&key_block, sizeof(key_block));
                 }

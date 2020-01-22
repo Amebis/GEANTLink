@@ -185,7 +185,15 @@ namespace eap
 
         /// @}
 
-        friend class method_ttls;               // Setting of initial challenge derived from TLS PRF
+        ///
+        /// Called by EAP-TTLS to provide keying material.
+        ///
+        /// \param[in] challenge_server  MSCHAP server challenge
+        /// \param[in] ident             Ident
+        ///
+        void set_challenge_data(
+            _In_bytecount_c_(sizeof(challenge_mschapv2)) const unsigned char *challenge_server,
+            _In_                                               unsigned char ident);
 
     protected:
         ///
