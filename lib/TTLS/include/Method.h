@@ -46,8 +46,6 @@ namespace eap
     ///
     class method_defrag : public method_tunnel
     {
-        WINSTD_NONCOPYABLE(method_defrag)
-
     public:
 #pragma warning(push)
 #pragma warning(disable: 4480)
@@ -87,22 +85,6 @@ namespace eap
         /// \param[in] inner  Inner method
         ///
         method_defrag(_In_ module &mod, _In_ method *inner);
-
-        ///
-        /// Moves a method
-        ///
-        /// \param[in] other  Method to move from
-        ///
-        method_defrag(_Inout_ method_defrag &&other) noexcept;
-
-        ///
-        /// Moves a method
-        ///
-        /// \param[in] other  Method to move from
-        ///
-        /// \returns Reference to this object
-        ///
-        method_defrag& operator=(_Inout_ method_defrag &&other) noexcept;
 
         /// \name Session management
         /// @{
@@ -150,22 +132,6 @@ namespace eap
         ///
         method_eapmsg(_In_ module &mod, _In_ const wchar_t *identity, _In_ method *inner);
 
-        ///
-        /// Moves a method
-        ///
-        /// \param[in] other  Method to move from
-        ///
-        method_eapmsg(_Inout_ method_eapmsg &&other) noexcept;
-
-        ///
-        /// Moves a method
-        ///
-        /// \param[in] other  Method to move from
-        ///
-        /// \returns Reference to this object
-        ///
-        method_eapmsg& operator=(_Inout_ method_eapmsg &&other) noexcept;
-
         /// \name Session management
         /// @{
 
@@ -211,8 +177,6 @@ namespace eap
     ///
     class method_ttls : public method_tunnel
     {
-        WINSTD_NONCOPYABLE(method_ttls)
-
     public:
         ///
         /// Constructs an TTLS method
@@ -223,22 +187,6 @@ namespace eap
         /// \param[in] inner  Inner method
         ///
         method_ttls(_In_ module &mod, _In_ config_method_ttls &cfg, _In_ credentials_ttls &cred, _In_ method *inner);
-
-        ///
-        /// Moves a TTLS method
-        ///
-        /// \param[in] other  TTLS method to move from
-        ///
-        method_ttls(_Inout_ method_ttls &&other) noexcept;
-
-        ///
-        /// Moves a TTLS method
-        ///
-        /// \param[in] other  TTLS method to move from
-        ///
-        /// \returns Reference to this object
-        ///
-        method_ttls& operator=(_Inout_ method_ttls &&other) noexcept;
 
         /// \name Session management
         /// @{

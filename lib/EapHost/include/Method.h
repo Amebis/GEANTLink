@@ -44,8 +44,6 @@ namespace eap
     ///
     class method_eaphost : public method
     {
-        WINSTD_NONCOPYABLE(method_eaphost)
-
     public:
         ///
         /// Constructs an EAP method
@@ -55,22 +53,6 @@ namespace eap
         /// \param[in] cred  User credentials
         ///
         method_eaphost(_In_ module &mod, _In_ config_method_eaphost &cfg, _In_ credentials_eaphost &cred);
-
-        ///
-        /// Moves an EAP method
-        ///
-        /// \param[in] other  EAP method to move from
-        ///
-        method_eaphost(_Inout_ method_eaphost &&other) noexcept;
-
-        ///
-        /// Moves an EAP method
-        ///
-        /// \param[in] other  EAP method to move from
-        ///
-        /// \returns Reference to this object
-        ///
-        method_eaphost& operator=(_Inout_ method_eaphost &&other) noexcept;
 
         /// \name Session management
         /// @{

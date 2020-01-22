@@ -37,30 +37,6 @@ eap::method_pap_diameter::method_pap_diameter(_In_ module &mod, _In_ config_meth
 }
 
 
-eap::method_pap_diameter::method_pap_diameter(_Inout_ method_pap_diameter &&other) noexcept :
-    m_cfg       (          other.m_cfg        ),
-    m_cred      (          other.m_cred       ),
-    m_phase     (std::move(other.m_phase     )),
-    m_packet_res(std::move(other.m_packet_res)),
-    method      (std::move(other             ))
-{
-}
-
-
-eap::method_pap_diameter& eap::method_pap_diameter::operator=(_Inout_ method_pap_diameter &&other) noexcept
-{
-    if (this != std::addressof(other)) {
-        assert(std::addressof(m_cfg ) == std::addressof(other.m_cfg )); // Move method within same configuration only!
-        assert(std::addressof(m_cred) == std::addressof(other.m_cred)); // Move method within same credentials only!
-        (method&)*this = std::move(other             );
-        m_phase        = std::move(other.m_phase     );
-        m_packet_res   = std::move(other.m_packet_res);
-    }
-
-    return *this;
-}
-
-
 void eap::method_pap_diameter::begin_session(
     _In_        DWORD         dwFlags,
     _In_  const EapAttributes *pAttributeArray,

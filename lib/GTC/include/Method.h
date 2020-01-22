@@ -40,8 +40,6 @@ namespace eap
     ///
     class method_gtc : public method
     {
-        WINSTD_NONCOPYABLE(method_gtc)
-
     public:
         ///
         /// Constructs a GTC method
@@ -51,22 +49,6 @@ namespace eap
         /// \param[in] cred  User credentials
         ///
         method_gtc(_In_ module &mod, _In_ config_method_eapgtc &cfg, _In_ credentials &cred);
-
-        ///
-        /// Moves a GTC method
-        ///
-        /// \param[in] other  GTC method to move from
-        ///
-        method_gtc(_Inout_ method_gtc &&other) noexcept;
-
-        ///
-        /// Moves a GTC method
-        ///
-        /// \param[in] other  GTC method to move from
-        ///
-        /// \returns Reference to this object
-        ///
-        method_gtc& operator=(_Inout_ method_gtc &&other) noexcept;
 
         /// \name Session management
         /// @{

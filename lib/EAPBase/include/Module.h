@@ -57,8 +57,6 @@ namespace eap
     ///
     class module
     {
-        WINSTD_NONCOPYABLE(module)
-
     public:
         ///
         /// Constructs a module for the given EAP type
@@ -726,8 +724,6 @@ namespace eap
     ///
     class peer : public module
     {
-        WINSTD_NONCOPYABLE(peer)
-
     public:
         ///
         /// Constructs a EAP peer module for the given EAP type

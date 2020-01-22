@@ -41,8 +41,6 @@ namespace eap
     ///
     class method_pap_diameter : public method
     {
-        WINSTD_NONCOPYABLE(method_pap_diameter)
-
     public:
         ///
         /// Constructs a PAP method
@@ -52,22 +50,6 @@ namespace eap
         /// \param[in] cred  User credentials
         ///
         method_pap_diameter(_In_ module &mod, _In_ config_method_pap &cfg, _In_ credentials_pass &cred);
-
-        ///
-        /// Moves a PAP method
-        ///
-        /// \param[in] other  PAP method to move from
-        ///
-        method_pap_diameter(_Inout_ method_pap_diameter &&other) noexcept;
-
-        ///
-        /// Moves a PAP method
-        ///
-        /// \param[in] other  PAP method to move from
-        ///
-        /// \returns Reference to this object
-        ///
-        method_pap_diameter& operator=(_Inout_ method_pap_diameter &&other) noexcept;
 
         /// \name Session management
         /// @{

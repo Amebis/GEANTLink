@@ -37,28 +37,6 @@ eap::method_eaphost::method_eaphost(_In_ module &mod, _In_ config_method_eaphost
 }
 
 
-eap::method_eaphost::method_eaphost(_Inout_ method_eaphost &&other) noexcept :
-    m_cfg       (          other.m_cfg        ),
-    m_cred      (          other.m_cred       ),
-    m_session_id(std::move(other.m_session_id)),
-    method      (std::move(other             ))
-{
-}
-
-
-eap::method_eaphost& eap::method_eaphost::operator=(_Inout_ method_eaphost &&other) noexcept
-{
-    if (this != std::addressof(other)) {
-        assert(std::addressof(m_cfg ) == std::addressof(other.m_cfg )); // Move method within same configuration only!
-        assert(std::addressof(m_cred) == std::addressof(other.m_cred)); // Move method within same credentials only!
-        (method&)*this = std::move(other             );
-        m_session_id   = std::move(other.m_session_id);
-    }
-
-    return *this;
-}
-
-
 void eap::method_eaphost::begin_session(
     _In_        DWORD         dwFlags,
     _In_  const EapAttributes *pAttributeArray,

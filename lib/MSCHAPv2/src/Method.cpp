@@ -37,38 +37,6 @@ eap::method_mschapv2_base::method_mschapv2_base(_In_ module &mod, _In_ config_me
 }
 
 
-eap::method_mschapv2_base::method_mschapv2_base(_Inout_ method_mschapv2_base &&other) noexcept :
-    m_cfg             (          other.m_cfg              ),
-    m_cred            (          other.m_cred             ),
-    m_cp              (std::move(other.m_cp              )),
-    m_challenge_server(std::move(other.m_challenge_server)),
-    m_challenge_client(std::move(other.m_challenge_client)),
-    m_ident           (std::move(other.m_ident           )),
-    m_nt_resp         (std::move(other.m_nt_resp         )),
-    m_packet_res      (std::move(other.m_packet_res      )),
-    method            (std::move(other                   ))
-{
-}
-
-
-eap::method_mschapv2_base& eap::method_mschapv2_base::operator=(_Inout_ method_mschapv2_base &&other) noexcept
-{
-    if (this != std::addressof(other)) {
-        assert(std::addressof(m_cfg ) == std::addressof(other.m_cfg )); // Move method within same configuration only!
-        assert(std::addressof(m_cred) == std::addressof(other.m_cred)); // Move method within same credentials only!
-        (method&)*this     = std::move(other                   );
-        m_cp               = std::move(other.m_cp              );
-        m_challenge_server = std::move(other.m_challenge_server);
-        m_challenge_client = std::move(other.m_challenge_client);
-        m_ident            = std::move(other.m_ident           );
-        m_nt_resp          = std::move(other.m_nt_resp         );
-        m_packet_res       = std::move(other.m_packet_res      );
-    }
-
-    return *this;
-}
-
-
 void eap::method_mschapv2_base::begin_session(
     _In_        DWORD         dwFlags,
     _In_  const EapAttributes *pAttributeArray,
@@ -209,21 +177,6 @@ eap::method_mschapv2::method_mschapv2(_In_ module &mod, _In_ config_method_mscha
 }
 
 
-eap::method_mschapv2::method_mschapv2(_Inout_ method_mschapv2 &&other) noexcept :
-    method_mschapv2_base(std::move(other        ))
-{
-}
-
-
-eap::method_mschapv2& eap::method_mschapv2::operator=(_Inout_ method_mschapv2 &&other) noexcept
-{
-    if (this != std::addressof(other))
-        (method_mschapv2_base&)*this = std::move(other);
-
-    return *this;
-}
-
-
 EapPeerMethodResponseAction eap::method_mschapv2::process_request_packet(
     _In_bytecount_(dwReceivedPacketSize) const void  *pReceivedPacket,
     _In_                                       DWORD dwReceivedPacketSize)
@@ -323,24 +276,6 @@ eap::method_mschapv2_diameter::method_mschapv2_diameter(_In_ module &mod, _In_ c
     m_phase(phase_t::unknown),
     method_mschapv2_base(mod, cfg, cred)
 {
-}
-
-
-eap::method_mschapv2_diameter::method_mschapv2_diameter(_Inout_ method_mschapv2_diameter &&other) noexcept :
-    m_phase             (std::move(other.m_phase)),
-    method_mschapv2_base(std::move(other        ))
-{
-}
-
-
-eap::method_mschapv2_diameter& eap::method_mschapv2_diameter::operator=(_Inout_ method_mschapv2_diameter &&other) noexcept
-{
-    if (this != std::addressof(other)) {
-        (method_mschapv2_base&)*this = std::move(other        );
-        m_phase                      = std::move(other.m_phase);
-    }
-
-    return *this;
 }
 
 

@@ -36,30 +36,6 @@ eap::method_gtc::method_gtc(_In_ module &mod, _In_ config_method_eapgtc &cfg, _I
 }
 
 
-eap::method_gtc::method_gtc(_Inout_ method_gtc &&other) noexcept :
-    m_cfg      (          other.m_cfg       ),
-    m_cred     (          other.m_cred      ),
-    m_challenge(std::move(other.m_challenge)),
-    m_response (std::move(other.m_response )),
-    method     (std::move(other            ))
-{
-}
-
-
-eap::method_gtc& eap::method_gtc::operator=(_Inout_ method_gtc &&other) noexcept
-{
-    if (this != std::addressof(other)) {
-        assert(std::addressof(m_cfg ) == std::addressof(other.m_cfg )); // Move method within same configuration only!
-        assert(std::addressof(m_cred) == std::addressof(other.m_cred)); // Move method within same credentials only!
-        (method&)*this = std::move(other            );
-        m_challenge    = std::move(other.m_challenge);
-        m_response     = std::move(other.m_response );
-    }
-
-    return *this;
-}
-
-
 void eap::method_gtc::begin_session(
     _In_        DWORD         dwFlags,
     _In_  const EapAttributes *pAttributeArray,

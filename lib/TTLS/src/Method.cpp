@@ -37,28 +37,6 @@ eap::method_defrag::method_defrag(_In_ module &mod, _In_ method *inner) :
 }
 
 
-eap::method_defrag::method_defrag(_Inout_ method_defrag &&other) noexcept :
-    m_data_req   (std::move(other.m_data_req)),
-    m_data_res   (std::move(other.m_data_res)),
-    m_send_res   (std::move(other.m_send_res)),
-    method_tunnel(std::move(other           ))
-{
-}
-
-
-eap::method_defrag& eap::method_defrag::operator=(_Inout_ method_defrag &&other) noexcept
-{
-    if (this != std::addressof(other)) {
-        (method_tunnel&)*this = std::move(other           );
-        m_data_req            = std::move(other.m_data_req);
-        m_data_res            = std::move(other.m_data_res);
-        m_send_res            = std::move(other.m_send_res);
-    }
-
-    return *this;
-}
-
-
 void eap::method_defrag::begin_session(
     _In_        DWORD         dwFlags,
     _In_  const EapAttributes *pAttributeArray,
@@ -178,28 +156,6 @@ eap::method_eapmsg::method_eapmsg(_In_ module &mod, _In_ const wchar_t *identity
     m_phase(phase_t::unknown),
     method_tunnel(mod, inner)
 {
-}
-
-
-eap::method_eapmsg::method_eapmsg(_Inout_ method_eapmsg &&other) noexcept :
-    m_identity   (std::move(other.m_identity  )),
-    m_phase      (std::move(other.m_phase     )),
-    m_packet_res (std::move(other.m_packet_res)),
-    method_tunnel(std::move(other             ))
-{
-}
-
-
-eap::method_eapmsg& eap::method_eapmsg::operator=(_Inout_ method_eapmsg &&other) noexcept
-{
-    if (this != std::addressof(other)) {
-        (method_tunnel&)*this = std::move(other             );
-        m_identity            = std::move(other.m_identity  );
-        m_phase               = std::move(other.m_phase     );
-        m_packet_res          = std::move(other.m_packet_res);
-    }
-
-    return *this;
 }
 
 
@@ -346,48 +302,6 @@ eap::method_ttls::method_ttls(_In_ module &mod, _In_ config_method_ttls &cfg, _I
 {
     m_eap_attr_desc.dwNumberOfAttributes = 0;
     m_eap_attr_desc.pAttribs = NULL;
-}
-
-
-eap::method_ttls::method_ttls(_Inout_ method_ttls &&other) noexcept :
-    m_cfg             (          other.m_cfg              ),
-    m_cred            (          other.m_cred             ),
-    m_user_ctx        (std::move(other.m_user_ctx        )),
-    m_sc_target_name  (std::move(other.m_sc_target_name  )),
-    m_sc_cred         (std::move(other.m_sc_cred         )),
-    m_sc_queue        (std::move(other.m_sc_queue        )),
-    m_sc_ctx          (std::move(other.m_sc_ctx          )),
-    m_sc_cert         (std::move(other.m_sc_cert         )),
-    m_phase           (std::move(other.m_phase           )),
-    m_packet_res      (std::move(other.m_packet_res      )),
-    m_packet_res_inner(std::move(other.m_packet_res_inner)),
-    m_eap_attr        (std::move(other.m_eap_attr        )),
-    method_tunnel     (std::move(other                   ))
-{
-    m_eap_attr_desc.dwNumberOfAttributes = (DWORD)m_eap_attr.size();
-    m_eap_attr_desc.pAttribs = m_eap_attr.data();
-}
-
-
-eap::method_ttls& eap::method_ttls::operator=(_Inout_ method_ttls &&other) noexcept
-{
-    if (this != std::addressof(other)) {
-        assert(std::addressof(m_cfg ) == std::addressof(other.m_cfg )); // Move method within same configuration only!
-        assert(std::addressof(m_cred) == std::addressof(other.m_cred)); // Move method within same credentials only!
-        (method_tunnel&)*this = std::move(other                   );
-        m_user_ctx            = std::move(other.m_user_ctx        );
-        m_sc_target_name      = std::move(other.m_sc_target_name  );
-        m_sc_cred             = std::move(other.m_sc_cred         );
-        m_sc_queue            = std::move(other.m_sc_queue        );
-        m_sc_ctx              = std::move(other.m_sc_ctx          );
-        m_sc_cert             = std::move(other.m_sc_cert         );
-        m_phase               = std::move(other.m_phase           );
-        m_packet_res          = std::move(other.m_packet_res      );
-        m_packet_res_inner    = std::move(other.m_packet_res_inner);
-        m_eap_attr            = std::move(other.m_eap_attr        );
-    }
-
-    return *this;
 }
 
 

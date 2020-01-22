@@ -45,8 +45,6 @@ namespace eap
     ///
     class method_mschapv2_base : public method
     {
-        WINSTD_NONCOPYABLE(method_mschapv2_base)
-
     public:
         ///
         /// Constructs a MSCHAPv2 method
@@ -56,22 +54,6 @@ namespace eap
         /// \param[in] cred  User credentials
         ///
         method_mschapv2_base(_In_ module &mod, _In_ config_method_mschapv2 &cfg, _In_ credentials_pass &cred);
-
-        ///
-        /// Moves a MSCHAPv2 method
-        ///
-        /// \param[in] other  MSCHAPv2 method to move from
-        ///
-        method_mschapv2_base(_Inout_ method_mschapv2_base &&other) noexcept;
-
-        ///
-        /// Moves a MSCHAPv2 method
-        ///
-        /// \param[in] other  MSCHAPv2 method to move from
-        ///
-        /// \returns Reference to this object
-        ///
-        method_mschapv2_base& operator=(_Inout_ method_mschapv2_base &&other) noexcept;
 
         /// \name Session management
         /// @{
@@ -145,8 +127,6 @@ namespace eap
     ///
     class method_mschapv2 : public method_mschapv2_base
     {
-        WINSTD_NONCOPYABLE(method_mschapv2)
-
     public:
         ///
         /// Constructs a MSCHAPv2 method
@@ -156,22 +136,6 @@ namespace eap
         /// \param[in] cred  User credentials
         ///
         method_mschapv2(_In_ module &mod, _In_ config_method_mschapv2 &cfg, _In_ credentials_pass &cred);
-
-        ///
-        /// Moves a MSCHAPv2 method
-        ///
-        /// \param[in] other  MSCHAPv2 method to move from
-        ///
-        method_mschapv2(_Inout_ method_mschapv2 &&other) noexcept;
-
-        ///
-        /// Moves a MSCHAPv2 method
-        ///
-        /// \param[in] other  MSCHAPv2 method to move from
-        ///
-        /// \returns Reference to this object
-        ///
-        method_mschapv2& operator=(_Inout_ method_mschapv2 &&other) noexcept;
 
         /// \name Packet processing
         /// @{
@@ -191,8 +155,6 @@ namespace eap
     ///
     class method_mschapv2_diameter : public method_mschapv2_base
     {
-        WINSTD_NONCOPYABLE(method_mschapv2_diameter)
-
     public:
         ///
         /// Constructs a MSCHAPv2 method
@@ -202,22 +164,6 @@ namespace eap
         /// \param[in] cred  User credentials
         ///
         method_mschapv2_diameter(_In_ module &mod, _In_ config_method_mschapv2 &cfg, _In_ credentials_pass &cred);
-
-        ///
-        /// Moves a MSCHAPv2 method
-        ///
-        /// \param[in] other  MSCHAPv2 method to move from
-        ///
-        method_mschapv2_diameter(_Inout_ method_mschapv2_diameter &&other) noexcept;
-
-        ///
-        /// Moves a MSCHAPv2 method
-        ///
-        /// \param[in] other  MSCHAPv2 method to move from
-        ///
-        /// \returns Reference to this object
-        ///
-        method_mschapv2_diameter& operator=(_Inout_ method_mschapv2_diameter &&other) noexcept;
 
         /// \name Session management
         /// @{

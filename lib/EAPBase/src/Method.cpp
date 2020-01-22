@@ -34,22 +34,6 @@ eap::method::method(_In_ module &mod) :
 }
 
 
-eap::method::method(_Inout_ method &&other) noexcept :
-    m_module(other.m_module)
-{
-}
-
-
-eap::method& eap::method::operator=(_Inout_ method &&other) noexcept
-{
-    if (this != std::addressof(other)) {
-        assert(std::addressof(m_module) == std::addressof(other.m_module)); // Move method within same module only!
-    }
-
-    return *this;
-}
-
-
 void eap::method::begin_session(
     _In_        DWORD         dwFlags,
     _In_  const EapAttributes *pAttributeArray,
@@ -123,24 +107,6 @@ eap::method_tunnel::method_tunnel(_In_ module &mod, _In_ method *inner) :
     m_inner(inner),
     method(mod)
 {
-}
-
-
-eap::method_tunnel::method_tunnel(_Inout_ method_tunnel &&other) noexcept :
-    m_inner(std::move(other.m_inner)),
-    method (std::move(other        ))
-{
-}
-
-
-eap::method_tunnel& eap::method_tunnel::operator=(_Inout_ method_tunnel &&other) noexcept
-{
-    if (this != std::addressof(other)) {
-        (method&)*this = std::move(other        );
-        m_inner        = std::move(other.m_inner);
-    }
-
-    return *this;
 }
 
 
@@ -237,28 +203,6 @@ eap::method_eap::method_eap(_In_ module &mod, _In_ winstd::eap_type_t eap_method
     m_send_nak(false),
     method_tunnel(mod, inner)
 {
-}
-
-
-eap::method_eap::method_eap(_Inout_ method_eap &&other) noexcept :
-    m_eap_method (          other.m_eap_method ),
-    m_id         (std::move(other.m_id        )),
-    m_send_nak   (std::move(other.m_send_nak  )),
-    method_tunnel(std::move(other             ))
-{
-}
-
-
-eap::method_eap& eap::method_eap::operator=(_Inout_ method_eap &&other) noexcept
-{
-    if (this != std::addressof(other)) {
-        assert(m_eap_method == other.m_eap_method); // Move method within same EAP method type only!
-        (method_tunnel&)*this = std::move(other           );
-        m_id                  = std::move(other.m_id      );
-        m_send_nak            = std::move(other.m_send_nak);
-    }
-
-    return *this;
 }
 
 

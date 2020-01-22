@@ -54,8 +54,6 @@ namespace eap
     ///
     class method
     {
-        WINSTD_NONCOPYABLE(method)
-
     public:
         ///
         /// Constructs a method
@@ -63,22 +61,6 @@ namespace eap
         /// \param[in] mod  Module to use for global services
         ///
         method(_In_ module &mod);
-
-        ///
-        /// Moves a method
-        ///
-        /// \param[in] other  Method to move from
-        ///
-        method(_Inout_ method &&other) noexcept;
-
-        ///
-        /// Moves a method
-        ///
-        /// \param[in] other  Method to move from
-        ///
-        /// \returns Reference to this object
-        ///
-        method& operator=(_Inout_ method &&other) noexcept;
 
         /// \name Session management
         /// @{
@@ -220,8 +202,6 @@ namespace eap
     ///
     class method_tunnel : public method
     {
-        WINSTD_NONCOPYABLE(method_tunnel)
-
     public:
         ///
         /// Constructs a method
@@ -230,22 +210,6 @@ namespace eap
         /// \param[in] inner  Inner method
         ///
         method_tunnel(_In_ module &mod, _In_ method *inner);
-
-        ///
-        /// Moves a method
-        ///
-        /// \param[in] other  Method to move from
-        ///
-        method_tunnel(_Inout_ method_tunnel &&other) noexcept;
-
-        ///
-        /// Moves a method
-        ///
-        /// \param[in] other  Method to move from
-        ///
-        /// \returns Reference to this object
-        ///
-        method_tunnel& operator=(_Inout_ method_tunnel &&other) noexcept;
 
         /// \name Session management
         /// @{
@@ -309,8 +273,6 @@ namespace eap
     ///
     class method_eap : public method_tunnel
     {
-        WINSTD_NONCOPYABLE(method_eap)
-
     public:
         ///
         /// Constructs a method
@@ -320,22 +282,6 @@ namespace eap
         /// \param[in] inner       Inner method
         ///
         method_eap(_In_ module &mod, _In_ winstd::eap_type_t eap_method, _In_ method *inner);
-
-        ///
-        /// Moves a method
-        ///
-        /// \param[in] other  Method to move from
-        ///
-        method_eap(_Inout_ method_eap &&other) noexcept;
-
-        ///
-        /// Moves a method
-        ///
-        /// \param[in] other  Method to move from
-        ///
-        /// \returns Reference to this object
-        ///
-        method_eap& operator=(_Inout_ method_eap &&other) noexcept;
 
         /// \name Session management
         /// @{
