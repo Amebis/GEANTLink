@@ -64,7 +64,7 @@ EapPeerMethodResponseAction eap::method_defrag::process_request_packet(
     auto data_packet = reinterpret_cast<const unsigned char*>(pReceivedPacket);
 
     // To prevent version downgrade attacks, negotiate protocol version on binding exchange only. Then stick to it!
-    unsigned char data_version = data_packet[0] & flags_req_ver_mask;
+    unsigned char data_version = data_packet[0] & flags_ver_mask;
     if (m_phase == phase_t::init) {
         m_version = min<unsigned char>(data_version, m_version);
         m_module.log_event(&EAPMETHOD_DEFRAG_VERSION,
@@ -77,16 +77,16 @@ EapPeerMethodResponseAction eap::method_defrag::process_request_packet(
 
     // Get packet content pointers for more readable code later on.
     auto
-        data_content     = data_packet + (data_packet[0] & flags_req_length_incl ? 5 : 1),
+        data_content     = data_packet + (data_packet[0] & flags_length_incl ? 5 : 1),
         data_content_end = data_packet + dwReceivedPacketSize;
     if (data_content > data_content_end)
         throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Incomplete data.");
 
     // Do the defragmentation.
-    if (data_packet[0] & flags_req_more_frag) {
+    if (data_packet[0] & flags_more_frag) {
         if (m_data_req.empty()) {
             // Start a new packet.
-            if (data_packet[0] & flags_req_length_incl) {
+            if (data_packet[0] & flags_length_incl) {
                 // Preallocate data according to the Length field.
                 m_data_req.reserve(ntohl(*reinterpret_cast<const unsigned int*>(data_packet + 1)));
             }
@@ -107,7 +107,7 @@ EapPeerMethodResponseAction eap::method_defrag::process_request_packet(
 
     if (m_send_res) {
         // We are sending a fragmented message.
-        if (m_data_req.empty() && (data_packet[0] & (flags_req_length_incl | flags_req_more_frag | flags_req_start)) == 0) {
+        if (m_data_req.empty() && (data_packet[0] & (flags_length_incl | flags_more_frag | flags_start)) == 0) {
             // Received packet is the ACK of our fragmented message packet. Send the next fragment.
             return EapPeerMethodResponseActionSend;
         } else
@@ -140,7 +140,7 @@ void eap::method_defrag::get_response_packet(
     packet.clear();
     if (size_data + 1 > size_max) {
         // Write one fragment.
-        packet.push_back(flags_res_length_incl | flags_res_more_frag | m_version);
+        packet.push_back(flags_length_incl | flags_more_frag | m_version);
         unsigned int length = htonl((unsigned int)size_data);
         packet.insert(packet.end(), reinterpret_cast<const unsigned char*>(&length), reinterpret_cast<const unsigned char*>(&length + 1));
         auto data_begin = m_data_res.begin() + 0, data_end = data_begin + (size_max - 5);

@@ -51,28 +51,19 @@ namespace eap
 #pragma warning(disable: 4480)
 
         ///
-        /// EAP-(T)TLS/PEAP request packet flags
+        /// EAP-(T)TLS/PEAP request/response packet flags
         ///
         /// \sa [The EAP-TLS Authentication Protocol (Chapter: 3.1 EAP-TLS Request Packet)](https://tools.ietf.org/html/rfc5216#section-3.1)
-        /// \sa [The EAP-TTLS Authentication Protocol Version 0 (Chapter: 9.1. Packet Format)](https://tools.ietf.org/html/rfc5281#section-9.1)
-        ///
-        enum flags_req_t : unsigned char {
-            flags_req_length_incl = 0x80,   ///< Length included
-            flags_req_more_frag   = 0x40,   ///< More fragments
-            flags_req_start       = 0x20,   ///< Start
-            flags_req_ver_mask    = 0x07,   ///< Version mask
-        };
-
-        ///
-        /// EAP-(T)TLS/PEAP response packet flags
-        ///
         /// \sa [The EAP-TLS Authentication Protocol (Chapter: 3.2 EAP-TLS Response Packet)](https://tools.ietf.org/html/rfc5216#section-3.2)
         /// \sa [The EAP-TTLS Authentication Protocol Version 0 (Chapter: 9.1. Packet Format)](https://tools.ietf.org/html/rfc5281#section-9.1)
+        /// \sa [Protected EAP Protocol (PEAP) Version 2 (Chapter: 3.2. PEAPv2 Packet Format)](https://tools.ietf.org/html/draft-josefsson-pppext-eap-tls-eap-10#section-3.2)
         ///
-        enum flags_res_t : unsigned char {
-            flags_res_length_incl = 0x80,   ///< Length included
-            flags_res_more_frag   = 0x40,   ///< More fragments
-            flags_res_ver_mask    = 0x07,   ///< Version mask
+        enum flags_t : unsigned char {
+            flags_length_incl     = 0x80,   ///< Length included
+            flags_more_frag       = 0x40,   ///< More fragments
+            flags_start           = 0x20,   ///< Start
+            flags_tls_length_incl = 0x10,   ///< TLS Length included
+            flags_ver_mask        = 0x07,   ///< Version mask
         };
 
 #pragma warning(pop)
