@@ -29,7 +29,8 @@ using namespace winstd;
 //////////////////////////////////////////////////////////////////////
 
 eap::method::method(_In_ module &mod) :
-    m_module(mod)
+    m_module(mod),
+    m_outer(nullptr)
 {
 }
 
@@ -107,6 +108,8 @@ eap::method_tunnel::method_tunnel(_In_ module &mod, _In_ method *inner) :
     m_inner(inner),
     method(mod)
 {
+    assert(m_inner);
+    m_inner->m_outer = this;
 }
 
 

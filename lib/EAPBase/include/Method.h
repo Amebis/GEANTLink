@@ -192,6 +192,7 @@ namespace eap
 
     public:
         module &m_module;   ///< Module for global services
+        method *m_outer;    ///< Outer method
     };
 
 
