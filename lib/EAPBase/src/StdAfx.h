@@ -33,4 +33,6 @@
 #include <WinStd/ETW.h>
 #include <WinStd/Sec.h>
 
+#include <Windows.h>
+#include <EapHostError.h> // include after Windows.h
 #include <EventsETW.h>

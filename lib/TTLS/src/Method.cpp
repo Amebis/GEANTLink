@@ -1,21 +1,21 @@
 /*
     Copyright 2015-2020 Amebis
-    Copyright 2016 GÉANT
+    Copyright 2016 GÃ‰ANT
 
-    This file is part of GÉANTLink.
+    This file is part of GÃ‰ANTLink.
 
-    GÉANTLink is free software: you can redistribute it and/or modify it
+    GÃ‰ANTLink is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    GÉANTLink is distributed in the hope that it will be useful, but
+    GÃ‰ANTLink is distributed in the hope that it will be useful, but
     WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with GÉANTLink. If not, see <http://www.gnu.org/licenses/>.
+    along with GÃ‰ANTLink. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "StdAfx.h"
@@ -60,8 +60,10 @@ EapPeerMethodResponseAction eap::method_defrag::process_request_packet(
     _In_bytecount_(dwReceivedPacketSize) const void  *pReceivedPacket,
     _In_                                       DWORD dwReceivedPacketSize)
 {
-    assert(dwReceivedPacketSize >= 1); // Request packet should contain flags at least.
     auto data_packet = reinterpret_cast<const unsigned char*>(pReceivedPacket);
+
+    if (dwReceivedPacketSize < 1)
+        throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Incomplete packet flags.");
 
     // To prevent version downgrade attacks, negotiate protocol version on binding exchange only. Then stick to it!
     unsigned char data_version = data_packet[0] & flags_ver_mask;

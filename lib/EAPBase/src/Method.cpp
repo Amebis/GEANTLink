@@ -235,19 +235,19 @@ EapPeerMethodResponseAction eap::method_eap::process_request_packet(
     _In_                                       DWORD dwReceivedPacketSize)
 {
     if (dwReceivedPacketSize < offsetof(EapPacket, Data))
-        throw invalid_argument(string_printf(__FUNCTION__ " Incomplete EAP packet header (minimum: %zu, received: %u).", offsetof(EapPacket, Data), dwReceivedPacketSize));
+        throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Incomplete EAP packet header.");
 
     auto hdr = reinterpret_cast<const EapPacket*>(pReceivedPacket);
 
     // Check packet size.
     DWORD size_packet = ntohs(*reinterpret_cast<const unsigned short*>(hdr->Length));
     if (size_packet > dwReceivedPacketSize)
-        throw invalid_argument(string_printf(__FUNCTION__ " Incorrect EAP packet length (expected: %u, received: %u).", size_packet, dwReceivedPacketSize));
+        throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, string_printf(__FUNCTION__ " Incorrect EAP packet length (expected: %u, received: %u).", size_packet, dwReceivedPacketSize));
 
     switch (hdr->Code) {
     case EapCodeRequest:
         if (dwReceivedPacketSize < sizeof(EapPacket))
-            throw invalid_argument(string_printf(__FUNCTION__ " Incomplete EAP packet (minimum: %zu, received: %u).", sizeof(EapPacket), dwReceivedPacketSize));
+            throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Incomplete EAP packet.");
 
         // Save request packet ID to make matching response packet in get_response_packet() later.
         m_id = hdr->Id;
@@ -281,7 +281,7 @@ EapPeerMethodResponseAction eap::method_eap::process_request_packet(
         throw invalid_argument(string_printf(__FUNCTION__ " EAP Failure packet received."));
 
     default:
-        throw invalid_argument(string_printf(__FUNCTION__ " Unknown EAP packet received (expected: %u, received: %u).", EapCodeRequest, (int)hdr->Code));
+        throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, string_printf(__FUNCTION__ " Unknown EAP packet received (expected: %u, received: %u).", EapCodeRequest, (int)hdr->Code));
     }
 }
 
