@@ -85,8 +85,7 @@ void eap::method_mschapv2_base::get_result(
 
 void eap::method_mschapv2_base::process_success(_In_ const list<string> &argv)
 {
-    assert(m_cfg.m_last_status != config_method::status_t::success);
-
+    bool is_success = false;
     for (auto arg = argv.cbegin(), arg_end = argv.cend(); arg != arg_end; ++arg) {
         const string &val = *arg;
         if ((val[0] == 'S' || val[0] == 's') && val[1] == '=') {
@@ -101,16 +100,17 @@ void eap::method_mschapv2_base::process_success(_In_ const list<string> &argv)
             WideCharToMultiByte(CP_UTF8, 0, m_cred.m_identity, identity_utf8, NULL, NULL);
             authenticator_response resp_exp(m_cp, m_challenge_server, m_challenge_client, identity_utf8.c_str(), m_cred.m_password.c_str(), m_nt_resp);
 
-            // Compare against provided authemticator response.
+            // Compare against provided authenticator response.
             if (resp.size() != sizeof(resp_exp) || memcmp(resp.data(), &resp_exp, sizeof(resp_exp)) != 0)
                 throw invalid_argument(__FUNCTION__ " MS-CHAP2-Success authentication response string failed.");
 
             m_module.log_event(&EAPMETHOD_METHOD_SUCCESS, event_data((unsigned int)m_cfg.get_method_id()), event_data::blank);
-            m_cfg.m_last_status = config_method::status_t::success;
+            is_success = true;
         }
     }
 
-    if (m_cfg.m_last_status != config_method::status_t::success)
+    m_cfg.m_last_status = config_method::status_t::auth_failed; // Blame protocol if we fail beyond this point.
+    if (!is_success)
         throw invalid_argument(__FUNCTION__ " MS-CHAP2-Success authentication response string not found.");
 }
 
@@ -248,17 +248,14 @@ EapPeerMethodResponseAction eap::method_mschapv2::process_request_packet(
 
         case chap_packet_code_t::success:
             process_success(parse_response(reinterpret_cast<const char*>(msg), reinterpret_cast<const char*>(msg_end) - reinterpret_cast<const char*>(msg)));
-            if (m_cfg.m_last_status == config_method::status_t::success) {
-                // Acknowledge the authentication by sending a "3" (chap_packet_code_t::success).
-                m_packet_res.assign(1, (unsigned char)chap_packet_code_t::success);
-                m_cfg.m_last_status = config_method::status_t::auth_failed; // Blame protocol if we fail beyond this point.
-                return EapPeerMethodResponseActionSend;
-            } else
-                return EapPeerMethodResponseActionDiscard;
+
+            // Acknowledge the authentication by sending a "3" (chap_packet_code_t::success).
+            m_packet_res.assign(1, (unsigned char)chap_packet_code_t::success);
+            return EapPeerMethodResponseActionSend;
 
         case chap_packet_code_t::failure:
             process_error(parse_response(reinterpret_cast<const char*>(msg), reinterpret_cast<const char*>(msg_end) - reinterpret_cast<const char*>(msg)));
-            return EapPeerMethodResponseActionDiscard;
+            return EapPeerMethodResponseActionResult;
         }
 
         pck = msg_end;
@@ -336,15 +333,11 @@ EapPeerMethodResponseAction eap::method_mschapv2_diameter::process_request_packe
 
     case phase_t::challenge_server: {
         process_packet(pReceivedPacket, dwReceivedPacketSize);
-        if (m_cfg.m_last_status == config_method::status_t::success) {
-            m_phase = phase_t::finished;
+        m_phase = phase_t::finished;
 
-            // Acknowledge the authentication by sending an empty response packet.
-            m_packet_res.clear();
-            m_cfg.m_last_status = config_method::status_t::auth_failed; // Blame protocol if we fail beyond this point.
-            return EapPeerMethodResponseActionSend;
-        } else
-            return EapPeerMethodResponseActionDiscard;
+        // Acknowledge the authentication by sending an empty response packet.
+        m_packet_res.clear();
+        return EapPeerMethodResponseActionSend;
     }
 
     case phase_t::finished:
