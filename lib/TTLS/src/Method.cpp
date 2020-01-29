@@ -550,7 +550,7 @@ EapPeerMethodResponseAction eap::method_tls_tunnel::process_request_packet(
                     m_module.log_event(&EAPMETHOD_TLS_QUERY_FAILED, event_data((unsigned int)SECPKG_ATTR_CONNECTION_INFO), event_data(status), event_data::blank);
 
                 m_phase = phase_t::finished;
-                m_cfg.m_last_status = config_method::status_t::success;
+                m_cfg.m_last_status = config_method::status_t::auth_failed; // Blame protocol if we fail beyond this point.
 
                 method_mschapv2_diameter *inner_mschapv2 = dynamic_cast<method_mschapv2_diameter*>(m_inner.get());
                 if (inner_mschapv2) {
