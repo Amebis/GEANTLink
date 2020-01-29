@@ -123,17 +123,10 @@ namespace eap
         inline void set_type(_In_ const EAP_METHOD_TYPE &type)
         {
             m_type = type;
-            update_type();
         }
 
     protected:
-        /// \cond internal
-        void update_type();
-        /// \endcond
-
-    protected:
         EAP_METHOD_TYPE m_type;     ///< EapHost method type: (EAP type, vendor ID, vendor type, author ID) tuple
-        std::wstring m_type_str;    ///< EAP method type as a string
 
     public:
         sanitizing_blob m_cfg_blob; ///< Method configuration BLOB

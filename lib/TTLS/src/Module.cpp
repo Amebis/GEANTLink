@@ -252,9 +252,14 @@ EAP_SESSION_HANDLE eap::peer_ttls::begin_session(
     auto cred_inner        = dynamic_cast<credentials_ttls*>(s->m_cred.m_cred.get())->m_inner.get();
 #if EAP_INNER_EAPHOST
     auto cfg_inner_eaphost = dynamic_cast<config_method_eaphost*>(cfg_inner);
-    if (!cfg_inner_eaphost)
+    if (cfg_inner_eaphost) {
+        // EapHost inner method
+        meth_inner.reset(
+            new method_eapmsg (*this, cred_inner->get_identity().c_str(),
+            new method_eaphost(*this, *cfg_inner_eaphost, dynamic_cast<credentials_eaphost&>(*cred_inner))));
+    } else
 #endif
-    {
+    if (cfg_inner) {
         // Native inner methods
         switch (cfg_inner->get_method_id()) {
         case eap_type_t::legacy_pap     : meth_inner.reset(new method_pap_diameter     (*this, dynamic_cast<config_method_pap     &>(*cfg_inner), dynamic_cast<credentials_pass&>(*cred_inner))); break;
@@ -270,14 +275,6 @@ EAP_SESSION_HANDLE eap::peer_ttls::begin_session(
         default: throw invalid_argument(__FUNCTION__ " Unsupported inner authentication method.");
         }
     }
-#if EAP_INNER_EAPHOST
-    else {
-        // EapHost inner method
-        meth_inner.reset(
-            new method_eapmsg (*this, cred_inner->get_identity().c_str(),
-            new method_eaphost(*this, *cfg_inner_eaphost, dynamic_cast<credentials_eaphost&>(*cred_inner))));
-    }
-#endif
     s->m_method.reset(
         new method_eap   (*this, eap_type_t::ttls, *s->m_cred.m_cred,
         new method_defrag(*this, 0, /* Schannel supports retrieving keying material for EAP-TTLSv0 only. */

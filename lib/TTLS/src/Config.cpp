@@ -171,7 +171,11 @@ void eap::config_method_ttls::load(_In_ IXMLDOMNode *pConfigRoot)
     DWORD dwMethod;
     bstr bstrMethod;
     if (SUCCEEDED(eapxml::get_element_value(pXmlElInnerAuthenticationMethod, bstr(L"eap-metadata:EAPMethod"), dwMethod)) &&
-        eap_type_t::start <= (eap_type_t)dwMethod && (eap_type_t)dwMethod < eap_type_t::end)
+        (eap_type_t::start <= (eap_type_t)dwMethod && (eap_type_t)dwMethod < eap_type_t::end
+#if EAP_INNER_EAPHOST
+        || (eap_type_t)dwMethod == eap_type_t::undefined
+#endif
+        ))
     {
         m_inner.reset(make_config_method((eap_type_t)dwMethod));
         m_module.log_config((xpath + L"/EAPMethod").c_str(), m_inner->get_method_str());
@@ -241,10 +245,9 @@ eap::config_method* eap::config_method_ttls::make_config_method(_In_ winstd::eap
     case eap_type_t::mschapv2       : return new config_method_eapmschapv2(m_module, m_level + 1);
     case eap_type_t::gtc            : return new config_method_eapgtc     (m_module, m_level + 1);
 #if EAP_INNER_EAPHOST
-    default                         : return new config_method_eaphost    (m_module, m_level + 1); // EapHost peer method handles all other method types
-#else
-    default                         : throw invalid_argument(string_printf(__FUNCTION__ " Unsupported inner authentication method (%d).", eap_type));
+    case eap_type_t::undefined      : return new config_method_eaphost    (m_module, m_level + 1);
 #endif
+    default                         : throw invalid_argument(string_printf(__FUNCTION__ " Unsupported inner authentication method (%d).", eap_type));
     }
 }
 

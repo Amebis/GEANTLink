@@ -272,7 +272,43 @@ void eap::peer_ttls_ui::invoke_identity_ui(
         // Prompt for inner credentials.
 #if EAP_INNER_EAPHOST
         auto cfg_inner_eaphost = dynamic_cast<config_method_eaphost*>(cfg_method->m_inner.get());
-        if (!cfg_inner_eaphost)
+        if (cfg_inner_eaphost) {
+            // EapHost inner method
+            auto cred_inner = dynamic_cast<eap::credentials_eaphost*>(cred->m_inner.get());
+            DWORD cred_data_size = 0;
+            winstd::eap_blob cred_data;
+            unique_ptr<WCHAR[], EapHostPeerFreeMemory_delete> identity;
+            winstd::eap_error error;
+            DWORD dwResult = EapHostPeerInvokeIdentityUI(
+                0,
+                cfg_inner_eaphost->get_type(),
+                dwFlags,
+                hwndParent,
+                (DWORD)cfg_inner_eaphost->m_cfg_blob.size(), cfg_inner_eaphost->m_cfg_blob.data(),
+                (DWORD)cred_inner->m_cred_blob.size(), cred_inner->m_cred_blob.data(),
+                &cred_data_size, get_ptr(cred_data),
+                get_ptr(identity),
+                get_ptr(error),
+                NULL);
+            if (dwResult == ERROR_SUCCESS) {
+                // Inner EAP method provided credentials.
+                cred_inner->m_identity = identity.get();
+                BYTE *_cred_data = cred_data.get();
+                cred_inner->m_cred_blob.assign(_cred_data, _cred_data + cred_data_size);
+                SecureZeroMemory(_cred_data, cred_data_size);
+
+                // TODO: If we ever choose to store EapHost credentials to Windows Credential Manager, add a "Save credentials? Yes/No" prompt here and write them to Credential Manager.
+            } else if (dwResult == ERROR_CANCELLED) {
+                // Not really an error.
+                throw win_runtime_error(ERROR_CANCELLED, __FUNCTION__ " Cancelled.");
+            } else if (error) {
+                wxLogError(_("Invoking EAP identity UI failed (error %u, %s, %s)."), error->dwWinError, error->pRootCauseString, error->pRepairString);
+                throw eap_runtime_error(*error  , __FUNCTION__ " EapHostPeerInvokeIdentityUI failed.");
+            } else {
+                wxLogError(_("Invoking EAP identity UI failed (error %u)."), dwResult);
+                throw win_runtime_error(dwResult, __FUNCTION__ " EapHostPeerInvokeIdentityUI failed.");
+            }
+        } else
 #endif
         {
             // Native inner methods. Build dialog to prompt for inner credentials.
@@ -328,45 +364,6 @@ void eap::peer_ttls_ui::invoke_identity_ui(
                 }
             }
         }
-#if EAP_INNER_EAPHOST
-        else {
-            // EapHost inner method
-            auto cred_inner = dynamic_cast<eap::credentials_eaphost*>(cred->m_inner.get());
-            DWORD cred_data_size = 0;
-            winstd::eap_blob cred_data;
-            unique_ptr<WCHAR[], EapHostPeerFreeMemory_delete> identity;
-            winstd::eap_error error;
-            DWORD dwResult = EapHostPeerInvokeIdentityUI(
-                0,
-                cfg_inner_eaphost->get_type(),
-                dwFlags,
-                hwndParent,
-                (DWORD)cfg_inner_eaphost->m_cfg_blob.size(), cfg_inner_eaphost->m_cfg_blob.data(),
-                (DWORD)cred_inner->m_cred_blob.size(), cred_inner->m_cred_blob.data(),
-                &cred_data_size, get_ptr(cred_data),
-                get_ptr(identity),
-                get_ptr(error),
-                NULL);
-            if (dwResult == ERROR_SUCCESS) {
-                // Inner EAP method provided credentials.
-                cred_inner->m_identity = identity.get();
-                BYTE *_cred_data = cred_data.get();
-                cred_inner->m_cred_blob.assign(_cred_data, _cred_data + cred_data_size);
-                SecureZeroMemory(_cred_data, cred_data_size);
-
-                // TODO: If we ever choose to store EapHost credentials to Windows Credential Manager, add a "Save credentials? Yes/No" prompt here and write them to Credential Manager.
-            } else if (dwResult == ERROR_CANCELLED) {
-                // Not really an error.
-                throw win_runtime_error(ERROR_CANCELLED, __FUNCTION__ " Cancelled.");
-            } else if (error) {
-                wxLogError(_("Invoking EAP identity UI failed (error %u, %s, %s)."), error->dwWinError, error->pRootCauseString, error->pRepairString);
-                throw eap_runtime_error(*error  , __FUNCTION__ " EapHostPeerInvokeIdentityUI failed.");
-            } else {
-                wxLogError(_("Invoking EAP identity UI failed (error %u)."), dwResult);
-                throw win_runtime_error(dwResult, __FUNCTION__ " EapHostPeerInvokeIdentityUI failed.");
-            }
-        }
-#endif
     }
 
     // Build our identity. ;)
@@ -413,7 +410,32 @@ void eap::peer_ttls_ui::invoke_interactive_ui(
 
 #if EAP_INNER_EAPHOST
     auto cfg_inner_eaphost = dynamic_cast<config_method_eaphost*>(cfg_method->m_inner.get());
-    if (!cfg_inner_eaphost)
+    if (cfg_inner_eaphost) {
+        // EapHost inner method
+        DWORD dwSizeofDataFromInteractiveUI;
+        BYTE *pDataFromInteractiveUI;
+        winstd::eap_error error;
+        DWORD dwResult = EapHostPeerInvokeInteractiveUI(
+            hwndParent,
+            (DWORD)ctx.m_data.size(),
+            ctx.m_data.data(),
+            &dwSizeofDataFromInteractiveUI,
+            &pDataFromInteractiveUI,
+            get_ptr(error));
+        if (dwResult == ERROR_SUCCESS) {
+            // Inner EAP method provided response.
+            ctx.m_data.assign(pDataFromInteractiveUI, pDataFromInteractiveUI + dwSizeofDataFromInteractiveUI);
+        } else if (dwResult == ERROR_CANCELLED) {
+            // Not really an error.
+            throw win_runtime_error(ERROR_CANCELLED, __FUNCTION__ " Cancelled.");
+        } else if (error) {
+            wxLogError(_("Invoking EAP interactive UI failed (error %u, %s, %s)."), error->dwWinError, error->pRootCauseString, error->pRepairString);
+            throw eap_runtime_error(*error  , __FUNCTION__ " EapHostPeerInvokeInteractiveUI failed.");
+        } else {
+            wxLogError(_("Invoking EAP interactive UI failed (error %u)."), dwResult);
+            throw win_runtime_error(dwResult, __FUNCTION__ " EapHostPeerInvokeInteractiveUI failed.");
+        }
+    } else
 #endif
     {
         // Initialize application.
@@ -446,34 +468,6 @@ void eap::peer_ttls_ui::invoke_interactive_ui(
             reinterpret_cast<sanitizing_blob::const_pointer>(response.data()                    ),
             reinterpret_cast<sanitizing_blob::const_pointer>(response.data() + response.length()));
     }
-#if EAP_INNER_EAPHOST
-    else {
-        // EapHost inner method
-        DWORD dwSizeofDataFromInteractiveUI;
-        BYTE *pDataFromInteractiveUI;
-        winstd::eap_error error;
-        DWORD dwResult = EapHostPeerInvokeInteractiveUI(
-            hwndParent,
-            (DWORD)ctx.m_data.size(),
-            ctx.m_data.data(),
-            &dwSizeofDataFromInteractiveUI,
-            &pDataFromInteractiveUI,
-            get_ptr(error));
-        if (dwResult == ERROR_SUCCESS) {
-            // Inner EAP method provided response.
-            ctx.m_data.assign(pDataFromInteractiveUI, pDataFromInteractiveUI + dwSizeofDataFromInteractiveUI);
-        } else if (dwResult == ERROR_CANCELLED) {
-            // Not really an error.
-            throw win_runtime_error(ERROR_CANCELLED, __FUNCTION__ " Cancelled.");
-        } else if (error) {
-            wxLogError(_("Invoking EAP interactive UI failed (error %u, %s, %s)."), error->dwWinError, error->pRootCauseString, error->pRepairString);
-            throw eap_runtime_error(*error  , __FUNCTION__ " EapHostPeerInvokeInteractiveUI failed.");
-        } else {
-            wxLogError(_("Invoking EAP interactive UI failed (error %u)."), dwResult);
-            throw win_runtime_error(dwResult, __FUNCTION__ " EapHostPeerInvokeInteractiveUI failed.");
-        }
-    }
-#endif
 
     // Pack output data.
     pack(ctx.m_data, ppDataFromInteractiveUI, pdwDataFromInteractiveUISize);
