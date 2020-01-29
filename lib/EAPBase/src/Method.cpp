@@ -234,6 +234,8 @@ EapPeerMethodResponseAction eap::method_eap::process_request_packet(
     _In_bytecount_(dwReceivedPacketSize) const void  *pReceivedPacket,
     _In_                                       DWORD dwReceivedPacketSize)
 {
+    if (dwReceivedPacketSize == 0)
+        return EapPeerMethodResponseActionNone;
     if (dwReceivedPacketSize < offsetof(EapPacket, Data))
         throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Incomplete EAP packet header.");
 
