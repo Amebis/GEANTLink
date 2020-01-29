@@ -873,10 +873,8 @@ void eap::method_ttls::get_result(
         dynamic_cast<peer_ttls&>(m_module).spawn_crl_check(std::move(m_sc_cert));
     }
 
-    // Always ask EAP host to save the connection data. And it will save it *only* when we report "success".
-    // Don't worry. EapHost is well aware of failed authentication condition.
+    // Ask EAP host to save the configuration (connection data).
     pResult->fSaveConnectionData = TRUE;
-    pResult->fIsSuccess          = TRUE;
 }
 
 

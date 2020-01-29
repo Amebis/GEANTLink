@@ -139,8 +139,6 @@ void eap::method_pap_diameter::get_result(
     if (reason == EapPeerMethodResultSuccess)
         m_cfg.m_last_status = config_method::status_t::success;
 
-    // Always ask EAP host to save the connection data. And it will save it *only* when we report "success".
-    // Don't worry. EapHost is well aware of failed authentication condition.
+    // Ask EAP host to save the configuration (connection data).
     pResult->fSaveConnectionData = TRUE;
-    pResult->fIsSuccess          = TRUE;
 }
