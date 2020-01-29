@@ -204,7 +204,7 @@ eap::method_eap::method_eap(_In_ module &mod, _In_ eap_type_t eap_method, _In_ c
     m_eap_method(eap_method),
     m_cred(cred),
     m_id(0),
-    m_phase(phase_t::unknown),
+    m_result(EapPeerMethodResultUnknown),
     method_tunnel(mod, inner)
 {
 }
@@ -226,7 +226,8 @@ void eap::method_eap::begin_session(
     assert(m_inner);
     m_inner->begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, std::min<DWORD>(dwMaxSendPacketSize, MAXWORD) - sizeof(EapPacket));
 
-    m_phase = phase_t::init;
+    m_result = EapPeerMethodResultUnknown;
+    m_packet_res.clear();
 }
 
 
@@ -256,31 +257,26 @@ EapPeerMethodResponseAction eap::method_eap::process_request_packet(
 
         if ((eap_type_t)hdr->Data[0] == eap_type_t::identity) {
             // EAP Identity. Respond with identity.
-            m_phase = phase_t::identity;
+            sanitizing_string identity_utf8;
+            WideCharToMultiByte(CP_UTF8, 0, m_cred.get_identity(), identity_utf8, NULL, NULL);
+            make_response_packet(eap_type_t::identity, identity_utf8.c_str(), (DWORD)(sizeof(char)*identity_utf8.length()));
             return EapPeerMethodResponseActionSend;
         } else if ((eap_type_t)hdr->Data[0] == m_eap_method) {
             // Process the data with underlying method.
-            m_phase = phase_t::inner;
+            m_packet_res.clear();
             return method_tunnel::process_request_packet(hdr->Data + 1, size_packet - sizeof(EapPacket));
         } else {
-            // Unsupported EAP method. Respond with Legacy Nak.
-            m_phase = phase_t::nak;
+            // Unsupported EAP method. Respond with Legacy Nak suggesting our EAP method to continue.
+            make_response_packet(eap_type_t::nak, &m_eap_method, sizeof(eap_type_t));
             return EapPeerMethodResponseActionSend;
         }
 
     // Check EAP Success/Failure packets for inner methods.
     case EapCodeSuccess:
-        assert(size_packet == 4);
-        if (m_phase == phase_t::init) {
-            // Discard "canned" success packet.
-            return EapPeerMethodResponseActionDiscard;
-        }
-        m_phase = phase_t::finished;
-        return EapPeerMethodResponseActionResult;
-
     case EapCodeFailure:
         assert(size_packet == 4);
-        throw invalid_argument(string_printf(__FUNCTION__ " EAP Failure packet received."));
+        m_result = (EapPeerMethodResultReason)(hdr->Code - EapCodeSuccess + EapPeerMethodResultSuccess);
+        return EapPeerMethodResponseActionResult;
 
     default:
         throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, string_printf(__FUNCTION__ " Unknown EAP packet received (expected: %u, received: %u).", EapCodeRequest, (int)hdr->Code));
@@ -294,55 +290,70 @@ void eap::method_eap::get_response_packet(
 {
     assert(size_max >= sizeof(EapPacket)); // We should be able to respond with at least an EAP packet header.
     if (size_max > MAXWORD) size_max = MAXWORD; // EAP packets maximum size is 64kB.
+    packet.reserve(size_max); // To avoid reallocation when inserting EAP packet header later.
 
-    // Prepare EAP packet header.
-    EapPacket hdr;
-    hdr.Code = (BYTE)EapCodeResponse;
-    hdr.Id = m_id;
-
-    switch (m_phase) {
-    case phase_t::identity: {
-        hdr.Data[0] = (BYTE)eap_type_t::identity;
-
-        // Convert identity to UTF-8.
-        sanitizing_string identity_utf8;
-        WideCharToMultiByte(CP_UTF8, 0, m_cred.get_identity(), identity_utf8, NULL, NULL);
-        packet.assign(identity_utf8.cbegin(), identity_utf8.cend());
-        break;
-    }
-
-    case phase_t::inner:
-        hdr.Data[0] = (BYTE)m_eap_method;
-
-        packet.reserve(size_max); // To avoid reallocation when inserting EAP packet header later.
-
+    if (m_packet_res.empty()) {
         // Get data from underlying method.
         method_tunnel::get_response_packet(packet, size_max - sizeof(EapPacket));
-        break;
 
-    case phase_t::nak: {
-        // Respond with Legacy Nak suggesting our EAP method to continue.
-        hdr.Data[0] = (BYTE)eap_type_t::nak;
-
-        // Check packet size. We will suggest one EAP method alone, so we need one byte for data.
-        size_t size_packet = sizeof(EapPacket) + 1;
+        size_t size_packet = sizeof(EapPacket) + packet.size();
         if (size_packet > size_max)
             throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %zu, maximum: %u).", size_packet, size_max));
-        packet.reserve(size_packet); // To avoid reallocation when inserting EAP packet header later.
 
-        // Data of Legacy Nak packet is a list of supported EAP types: our method alone.
-        packet.assign(1, (unsigned char)m_eap_method);
-        break;
+        EapPacket hdr;
+        hdr.Code    = (BYTE)EapCodeResponse;
+        hdr.Id      = m_id;
+        assert(size_packet <= MAXWORD); // Packets spanning over 64kB are not supported.
+        *reinterpret_cast<unsigned short*>(hdr.Length) = htons((unsigned short)size_packet);
+        hdr.Data[0] = (BYTE)m_eap_method;
+
+        // Insert EAP packet header before data.
+        packet.insert(packet.begin(),
+            reinterpret_cast<const unsigned char*>(&hdr),
+            reinterpret_cast<const unsigned char*>(&hdr + 1));
+    } else {
+        // We have a response packet ready.
+        size_t size_packet = m_packet_res.size();
+        if (size_packet > size_max)
+            throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %zu, maximum: %u).", size_packet, size_max));
+        packet.assign(m_packet_res.cbegin(), m_packet_res.cend());
     }
+}
 
-    default:
-        throw invalid_argument(string_printf(__FUNCTION__ " Unknown phase (phase %u).", m_phase));
+
+void eap::method_eap::get_result(
+    _In_    EapPeerMethodResultReason reason,
+    _Inout_ EapPeerMethodResult       *pResult)
+{
+    switch (m_result) {
+    case EapPeerMethodResultSuccess:
+    case EapPeerMethodResultFailure: return method_tunnel::get_result(m_result, pResult);
+    default                        : return method_tunnel::get_result(reason  , pResult);
     }
+}
 
-    size_t size_packet = packet.size() + sizeof(EapPacket);
+
+void eap::method_eap::make_response_packet(
+    _In_                                           eap_type_t eap_type,
+    _In_bytecount_(dwResponsePacketDataSize) const void       *pResponsePacketData,
+    _In_                                           DWORD      dwResponsePacketDataSize)
+{
+    assert(pResponsePacketData || !dwResponsePacketDataSize);
+
+    size_t size_packet = sizeof(EapPacket) + dwResponsePacketDataSize;
+
+    EapPacket hdr;
+    hdr.Code    = (BYTE)EapCodeResponse;
+    hdr.Id      = m_id;
     assert(size_packet <= MAXWORD); // Packets spanning over 64kB are not supported.
     *reinterpret_cast<unsigned short*>(hdr.Length) = htons((unsigned short)size_packet);
+    hdr.Data[0] = (BYTE)eap_type;
 
-    // Insert EAP packet header before data.
-    packet.insert(packet.begin(), reinterpret_cast<const unsigned char*>(&hdr), reinterpret_cast<const unsigned char*>(&hdr + 1));
+    m_packet_res.reserve(size_packet);
+    m_packet_res.assign(
+        reinterpret_cast<unsigned char*>(&hdr),
+        reinterpret_cast<unsigned char*>(&hdr + 1));
+    m_packet_res.insert(m_packet_res.cend(), 
+        reinterpret_cast<const unsigned char*>(pResponsePacketData),
+        reinterpret_cast<const unsigned char*>(pResponsePacketData) + dwResponsePacketDataSize);
 }

@@ -309,22 +309,29 @@ namespace eap
 
         /// @}
 
+        virtual void get_result(
+            _In_    EapPeerMethodResultReason reason,
+            _Inout_ EapPeerMethodResult       *pResult);
+
+    protected:
+        ///
+        /// Creates an EAP response packet
+        ///
+        /// \param[in] eap_type                  EAP type
+        /// \param[in] pResponsePacketData       Packet data
+        /// \param[in] dwResponsePacketDataSize  \p pResponsePacketData size in bytes
+        ///
+        void make_response_packet(
+            _In_                                           winstd::eap_type_t eap_type,
+            _In_bytecount_(dwResponsePacketDataSize) const void               *pResponsePacketData,
+            _In_                                           DWORD              dwResponsePacketDataSize);
+
     protected:
         const winstd::eap_type_t m_eap_method;  ///< EAP method type
         credentials &m_cred;                    ///< User credentials
         unsigned char m_id;                     ///< Request packet ID
-
-        ///
-        /// Communication phase
-        ///
-        enum class phase_t {
-            unknown = -1,               ///< Unknown phase
-            init = 0,                   ///< Initialize
-            identity,                   ///< Send identity
-            inner,                      ///< Send inner method response
-            nak,                        ///< Send Legacy Nak response
-            finished,                   ///< EAP Success packet received
-        } m_phase;                      ///< What phase is our communication at?
+        EapPeerMethodResultReason m_result;     ///< The result the authenticator reported with EAP-Success or EAP-Failure
+        sanitizing_blob m_packet_res;           ///< Buffer to hold response packet data
     };
 
     /// @}
