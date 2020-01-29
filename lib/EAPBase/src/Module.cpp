@@ -145,7 +145,7 @@ BYTE* eap::module::alloc_memory(_In_ size_t size) const
 {
     BYTE *p = (BYTE*)HeapAlloc(m_heap, 0, size);
     if (!p)
-        throw win_runtime_error(winstd::string_printf(__FUNCTION__ " Error allocating memory for BLOB (%zuB).", size));
+        throw win_runtime_error(winstd::string_printf(__FUNCTION__ " Error allocating memory for BLOB (%zu).", size));
     return p;
 }
 

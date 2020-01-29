@@ -238,7 +238,7 @@ EapPeerMethodResponseAction eap::method_eap::process_request_packet(
     // Check packet size.
     DWORD size_packet = ntohs(*reinterpret_cast<const unsigned short*>(hdr->Length));
     if (size_packet > dwReceivedPacketSize)
-        throw invalid_argument(string_printf(__FUNCTION__ " Incorrect EAP packet length (expected: %uB, received: %uB).", size_packet, dwReceivedPacketSize));
+        throw invalid_argument(string_printf(__FUNCTION__ " Incorrect EAP packet length (expected: %u, received: %u).", size_packet, dwReceivedPacketSize));
 
     // Save request packet ID to make matching response packet in get_response_packet() later.
     m_id = hdr->Id;
