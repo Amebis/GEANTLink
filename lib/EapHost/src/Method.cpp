@@ -120,17 +120,16 @@ void eap::method_eaphost::get_response_packet(
     _In_opt_ DWORD           size_max)
 {
     // Let EapHost peer prepare response packet.
-    eap_blob_runtime _packet;
+    LPBYTE _packet;
     eap_error_runtime error;
     DWORD dwResult = EapHostPeerGetSendPacket(
         m_session_id,
         &size_max,
-        get_ptr(_packet),
+        &_packet,
         get_ptr(error));
     if (dwResult == ERROR_SUCCESS) {
         // Packet successfuly prepared.
-        LPCBYTE __packet = _packet.get();
-        packet.assign(__packet, __packet + size_max);
+        packet.assign(_packet, _packet + size_max);
     } else if (error)
         throw eap_runtime_error(*error  , __FUNCTION__ " EapHostPeerGetSendPacket failed.");
     else
