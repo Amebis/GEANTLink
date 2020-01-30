@@ -425,7 +425,9 @@ EapPeerMethodResponseAction eap::method_tls_tunnel::process_request_packet(
             m_packet_res.assign(reinterpret_cast<const unsigned char*>(buf_out[0].pvBuffer), reinterpret_cast<const unsigned char*>(buf_out[0].pvBuffer) + buf_out[0].cbBuffer);
             if (buf_in[1].BufferType == SECBUFFER_EXTRA) {
                 // Server appended extra data.
-                m_sc_queue.assign(reinterpret_cast<const unsigned char*>(pReceivedPacket) + dwReceivedPacketSize - buf_in[1].cbBuffer, reinterpret_cast<const unsigned char*>(pReceivedPacket) + dwReceivedPacketSize);
+                m_sc_queue.assign(
+                    reinterpret_cast<const unsigned char*>(pReceivedPacket) + dwReceivedPacketSize - buf_in[1].cbBuffer,
+                    reinterpret_cast<const unsigned char*>(pReceivedPacket) + dwReceivedPacketSize);
             } else
                 m_sc_queue.clear();
 
@@ -607,11 +609,7 @@ EapPeerMethodResponseAction eap::method_tls_tunnel::process_request_packet(
                     else
                         throw sec_runtime_error(status, __FUNCTION__ " Unexpected Schannel result.");
                 }
-                switch (action) {
-                case EapPeerMethodResponseActionSend: m_packet_res_inner = true ; break;
-                case EapPeerMethodResponseActionNone: m_packet_res_inner = false; break;
-                default                             : throw invalid_argument(string_printf(__FUNCTION__ " Inner method returned an unsupported action (action %u).", action));
-                }
+                m_packet_res_inner = action == EapPeerMethodResponseActionSend;
             }
             return EapPeerMethodResponseActionSend;
         } else if (FAILED(status)) {
@@ -635,9 +633,10 @@ EapPeerMethodResponseAction eap::method_tls_tunnel::process_request_packet(
         if (!(m_sc_ctx.m_attrib & ISC_RET_CONFIDENTIALITY))
             throw runtime_error(__FUNCTION__ " Connection is not encrypted.");
 
+        EapPeerMethodResponseAction action = EapPeerMethodResponseActionDiscard;
         if (m_sc_queue.empty()) {
             // No extra data for inner authentication.
-            return method_tunnel::process_request_packet(NULL, 0);
+            action = method_tunnel::process_request_packet(NULL, 0);
         } else {
             // Authenticator sent data for inner authentication. Decrypt it.
 
@@ -652,7 +651,6 @@ EapPeerMethodResponseAction eap::method_tls_tunnel::process_request_packet(
             SECURITY_STATUS status = DecryptMessage(m_sc_ctx, &buf_desc, 0, NULL);
             if (status == SEC_E_OK) {
                 // Process data (only the first SECBUFFER_DATA found).
-                EapPeerMethodResponseAction action = EapPeerMethodResponseActionDiscard;
                 for (size_t i = 0; i < _countof(buf); i++)
                     if (buf[i].BufferType == SECBUFFER_DATA) {
                         action = method_tunnel::process_request_packet(buf[i].pvBuffer, buf[i].cbBuffer);
@@ -664,13 +662,13 @@ EapPeerMethodResponseAction eap::method_tls_tunnel::process_request_packet(
                 for (size_t i = 0; i < _countof(buf); i++)
                     if (buf[i].BufferType == SECBUFFER_EXTRA)
                         m_sc_queue.insert(m_sc_queue.end(), reinterpret_cast<const unsigned char*>(buf[i].pvBuffer), reinterpret_cast<const unsigned char*>(buf[i].pvBuffer) + buf[i].cbBuffer);
-
-                return action;
             } else if (FAILED(status))
                 throw sec_runtime_error(status, __FUNCTION__ " Schannel error.");
             else
                 throw sec_runtime_error(status, __FUNCTION__ " Unexpected Schannel result.");
         }
+        m_packet_res_inner = action == EapPeerMethodResponseActionSend;
+        return action;
     }
 
     default:
@@ -716,7 +714,9 @@ void eap::method_tls_tunnel::get_response_packet(
             if (FAILED(status))
                 throw sec_runtime_error(status, __FUNCTION__ " Error encrypting message.");
 
-            m_packet_res.insert(m_packet_res.end(), reinterpret_cast<const unsigned char*>(buf[0].pvBuffer), reinterpret_cast<const unsigned char*>(buf[0].pvBuffer) + buf[0].cbBuffer + buf[1].cbBuffer + buf[2].cbBuffer);
+            m_packet_res.insert(m_packet_res.end(),
+                reinterpret_cast<const unsigned char*>(buf[0].pvBuffer),
+                reinterpret_cast<const unsigned char*>(buf[0].pvBuffer) + buf[0].cbBuffer + buf[1].cbBuffer + buf[2].cbBuffer);
         }
     } else if (m_packet_res.size() > size_max)
         throw invalid_argument(string_printf(__FUNCTION__ " This method does not support packet fragmentation, but the data size is too big to fit in one packet (packet: %zu, maximum: %u).", m_packet_res.size(), size_max));
