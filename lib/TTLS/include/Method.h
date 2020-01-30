@@ -219,6 +219,11 @@ namespace eap
             _Inout_ EapPeerMethodResult       *pResult);
 
     protected:
+        ///
+        /// Decrypts data and forwards it to the inner method.
+        ///
+        EapPeerMethodResponseAction decrypt_request_data();
+
 #if EAP_TLS < EAP_TLS_SCHANNEL_FULL
         ///
         /// Verifies server certificate if trusted by configuration

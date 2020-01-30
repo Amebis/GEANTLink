@@ -572,44 +572,7 @@ EapPeerMethodResponseAction eap::method_tls_tunnel::process_request_packet(
                 }
 
                 // Piggyback initial inner response.
-                if (!(m_sc_ctx.m_attrib & ISC_RET_CONFIDENTIALITY))
-                    throw runtime_error(__FUNCTION__ " Connection is not encrypted.");
-
-                EapPeerMethodResponseAction action = EapPeerMethodResponseActionDiscard;
-                if (m_sc_queue.empty()) {
-                    // No extra initial data for inner authentication avaliable.
-                    action = method_tunnel::process_request_packet(NULL, 0);
-                } else {
-                    // Authenticator sent some data for inner authentication. Decrypt it.
-
-                    // Decrypt the message.
-                    SecBuffer buf[] = {
-                        { (unsigned long)m_sc_queue.size(), SECBUFFER_DATA, m_sc_queue.data() },
-                        { 0, SECBUFFER_EMPTY, NULL },
-                        { 0, SECBUFFER_EMPTY, NULL },
-                        { 0, SECBUFFER_EMPTY, NULL },
-                    };
-                    SecBufferDesc buf_desc = { SECBUFFER_VERSION, _countof(buf), buf };
-                    status = DecryptMessage(m_sc_ctx, &buf_desc, 0, NULL);
-                    if (status == SEC_E_OK) {
-                        // Process data (only the first SECBUFFER_DATA found).
-                        for (size_t i = 0; i < _countof(buf); i++)
-                            if (buf[i].BufferType == SECBUFFER_DATA) {
-                                action = method_tunnel::process_request_packet(buf[i].pvBuffer, buf[i].cbBuffer);
-                                break;
-                            }
-
-                        // Queue remaining data for the next time.
-                        m_sc_queue.clear();
-                        for (size_t i = 0; i < _countof(buf); i++)
-                            if (buf[i].BufferType == SECBUFFER_EXTRA)
-                                m_sc_queue.insert(m_sc_queue.end(), reinterpret_cast<const unsigned char*>(buf[i].pvBuffer), reinterpret_cast<const unsigned char*>(buf[i].pvBuffer) + buf[i].cbBuffer);
-                    } else if (FAILED(status))
-                        throw sec_runtime_error(status, __FUNCTION__ " Schannel error.");
-                    else
-                        throw sec_runtime_error(status, __FUNCTION__ " Unexpected Schannel result.");
-                }
-                m_packet_res_inner = action == EapPeerMethodResponseActionSend;
+                decrypt_request_data();
             }
             return EapPeerMethodResponseActionSend;
         } else if (FAILED(status)) {
@@ -629,46 +592,7 @@ EapPeerMethodResponseAction eap::method_tls_tunnel::process_request_packet(
     case phase_t::finished: {
         m_packet_res.clear();
         m_sc_queue.insert(m_sc_queue.end(), reinterpret_cast<const unsigned char*>(pReceivedPacket), reinterpret_cast<const unsigned char*>(pReceivedPacket) + dwReceivedPacketSize);
-
-        if (!(m_sc_ctx.m_attrib & ISC_RET_CONFIDENTIALITY))
-            throw runtime_error(__FUNCTION__ " Connection is not encrypted.");
-
-        EapPeerMethodResponseAction action = EapPeerMethodResponseActionDiscard;
-        if (m_sc_queue.empty()) {
-            // No extra data for inner authentication.
-            action = method_tunnel::process_request_packet(NULL, 0);
-        } else {
-            // Authenticator sent data for inner authentication. Decrypt it.
-
-            // Decrypt the message.
-            SecBuffer buf[] = {
-                { (unsigned long)m_sc_queue.size(), SECBUFFER_DATA, m_sc_queue.data() },
-                { 0, SECBUFFER_EMPTY, NULL },
-                { 0, SECBUFFER_EMPTY, NULL },
-                { 0, SECBUFFER_EMPTY, NULL },
-            };
-            SecBufferDesc buf_desc = { SECBUFFER_VERSION, _countof(buf), buf };
-            SECURITY_STATUS status = DecryptMessage(m_sc_ctx, &buf_desc, 0, NULL);
-            if (status == SEC_E_OK) {
-                // Process data (only the first SECBUFFER_DATA found).
-                for (size_t i = 0; i < _countof(buf); i++)
-                    if (buf[i].BufferType == SECBUFFER_DATA) {
-                        action = method_tunnel::process_request_packet(buf[i].pvBuffer, buf[i].cbBuffer);
-                        break;
-                    }
-
-                // Queue remaining data for the next time.
-                m_sc_queue.clear();
-                for (size_t i = 0; i < _countof(buf); i++)
-                    if (buf[i].BufferType == SECBUFFER_EXTRA)
-                        m_sc_queue.insert(m_sc_queue.end(), reinterpret_cast<const unsigned char*>(buf[i].pvBuffer), reinterpret_cast<const unsigned char*>(buf[i].pvBuffer) + buf[i].cbBuffer);
-            } else if (FAILED(status))
-                throw sec_runtime_error(status, __FUNCTION__ " Schannel error.");
-            else
-                throw sec_runtime_error(status, __FUNCTION__ " Unexpected Schannel result.");
-        }
-        m_packet_res_inner = action == EapPeerMethodResponseActionSend;
-        return action;
+        return decrypt_request_data();
     }
 
     default:
@@ -791,6 +715,50 @@ void eap::method_tls_tunnel::get_result(
 
     // Ask EAP host to save the configuration (connection data).
     pResult->fSaveConnectionData = TRUE;
+}
+
+
+EapPeerMethodResponseAction eap::method_tls_tunnel::decrypt_request_data()
+{
+    if (!(m_sc_ctx.m_attrib & ISC_RET_CONFIDENTIALITY))
+        throw runtime_error(__FUNCTION__ " Connection is not encrypted.");
+
+    EapPeerMethodResponseAction action = EapPeerMethodResponseActionDiscard;
+    if (m_sc_queue.empty()) {
+        // No data for inner authentication avaliable.
+        action = method_tunnel::process_request_packet(NULL, 0);
+    } else {
+        // Authenticator sent data for inner authentication. Decrypt it.
+
+        // Decrypt the message.
+        SecBuffer buf[] = {
+            { (unsigned long)m_sc_queue.size(), SECBUFFER_DATA, m_sc_queue.data() },
+            { 0, SECBUFFER_EMPTY, NULL },
+            { 0, SECBUFFER_EMPTY, NULL },
+            { 0, SECBUFFER_EMPTY, NULL },
+        };
+        SecBufferDesc buf_desc = { SECBUFFER_VERSION, _countof(buf), buf };
+        SECURITY_STATUS status = DecryptMessage(m_sc_ctx, &buf_desc, 0, NULL);
+        if (status == SEC_E_OK) {
+            // Process data (only the first SECBUFFER_DATA found).
+            for (size_t i = 0; i < _countof(buf); i++)
+                if (buf[i].BufferType == SECBUFFER_DATA) {
+                    action = method_tunnel::process_request_packet(buf[i].pvBuffer, buf[i].cbBuffer);
+                    break;
+                }
+
+            // Queue remaining data for the next time.
+            m_sc_queue.clear();
+            for (size_t i = 0; i < _countof(buf); i++)
+                if (buf[i].BufferType == SECBUFFER_EXTRA)
+                    m_sc_queue.insert(m_sc_queue.end(), reinterpret_cast<const unsigned char*>(buf[i].pvBuffer), reinterpret_cast<const unsigned char*>(buf[i].pvBuffer) + buf[i].cbBuffer);
+        } else if (FAILED(status))
+            throw sec_runtime_error(status, __FUNCTION__ " Schannel error.");
+        else
+            throw sec_runtime_error(status, __FUNCTION__ " Unexpected Schannel result.");
+    }
+    m_packet_res_inner = action == EapPeerMethodResponseActionSend;
+    return action;
 }
 
 
