@@ -48,7 +48,10 @@ void eap::method_defrag::begin_session(
     // Initialize tunnel method session only.
     method::begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
 
-    // Inner method can generate packets of up to 4GB.
+    // Inner method may generate packets of up to 4GB.
+    // But, we can not do the fragmentation if we have less space than flags+length.
+    if (dwMaxSendPacketSize < 5)
+        throw invalid_argument(string_printf(__FUNCTION__ " Maximum packet size too small (minimum: %u, available: %u).", 5, dwMaxSendPacketSize));
     assert(m_inner);
     m_inner->begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, MAXDWORD);
 
@@ -129,7 +132,7 @@ void eap::method_defrag::get_response_packet(
     _Out_    sanitizing_blob &packet,
     _In_opt_ DWORD           size_max)
 {
-    assert(size_max > 5); // We can not do the fragmentation if we have less space than flags+length+at least one byte of data.
+    assert(size_max >= 5); // We can not do the fragmentation if we have less space than flags+length.
 
     if (!m_send_res) {
         // Get data from underlying method.
@@ -179,10 +182,10 @@ void eap::method_eapmsg::begin_session(
     // Initialize tunnel method session only.
     method::begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
 
-    // Inner method can generate packets of up to 16MB (less the Diameter AVP header).
+    // Inner method may generate packets of up to 16MB (less the Diameter AVP header).
     // Initialize inner method with appropriately less packet size maximum.
     if (dwMaxSendPacketSize < sizeof(diameter_avp_header))
-        throw invalid_argument(string_printf(__FUNCTION__ " Maximum packet size too small (minimum: %zu, available: %u).", sizeof(diameter_avp_header) + 1, dwMaxSendPacketSize));
+        throw invalid_argument(string_printf(__FUNCTION__ " Maximum packet size too small (minimum: %zu, available: %u).", sizeof(diameter_avp_header), dwMaxSendPacketSize));
     assert(m_inner);
     m_inner->begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, std::min<DWORD>(dwMaxSendPacketSize, 0xffffff) - sizeof(diameter_avp_header));
 

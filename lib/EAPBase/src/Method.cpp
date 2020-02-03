@@ -219,7 +219,7 @@ void eap::method_eap::begin_session(
     // Initialize tunnel method session only.
     method::begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
 
-    // Inner method can generate packets of up to 64kB (less the EAP packet header).
+    // Inner method may generate packets of up to 64kB (less the EAP packet header).
     // Initialize inner method with appropriately less packet size maximum.
     if (dwMaxSendPacketSize < sizeof(EapPacket))
         throw invalid_argument(string_printf(__FUNCTION__ " Maximum packet size too small (minimum: %zu, available: %u).", sizeof(EapPacket), dwMaxSendPacketSize));
