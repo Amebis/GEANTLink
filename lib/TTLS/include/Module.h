@@ -42,7 +42,7 @@ namespace eap
     ///
     /// TLS tunnel peer
     ///
-    class peer_tls_tunnel : public peer_tls
+    class peer_tls_tunnel : public peer_tls_base
     {
     public:
         ///

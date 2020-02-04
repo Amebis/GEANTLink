@@ -32,14 +32,14 @@ using namespace winstd;
 // eap::peer_tls_tunnel
 //////////////////////////////////////////////////////////////////////
 
-eap::peer_tls_tunnel::peer_tls_tunnel(_In_ eap_type_t eap_method) : peer_tls(eap_method)
+eap::peer_tls_tunnel::peer_tls_tunnel(_In_ eap_type_t eap_method) : peer_tls_base(eap_method)
 {
 }
 
 
 void eap::peer_tls_tunnel::initialize()
 {
-    peer_tls::initialize();
+    peer_tls_base::initialize();
 
 #if EAP_INNER_EAPHOST
     // Initialize EapHost based inner authentication methods.
@@ -57,7 +57,7 @@ void eap::peer_tls_tunnel::shutdown()
     EapHostPeerUninitialize();
 #endif
 
-    peer_tls::shutdown();
+    peer_tls_base::shutdown();
 }
 
 

@@ -25,15 +25,15 @@ using namespace winstd;
 
 
 //////////////////////////////////////////////////////////////////////
-// eap::peer_tls
+// eap::peer_tls_base
 //////////////////////////////////////////////////////////////////////
 
-eap::peer_tls::peer_tls(_In_ eap_type_t eap_method) : peer(eap_method)
+eap::peer_tls_base::peer_tls_base(_In_ eap_type_t eap_method) : peer(eap_method)
 {
 }
 
 
-void eap::peer_tls::shutdown()
+void eap::peer_tls_base::shutdown()
 {
     // Signal all certificate revocation verify threads to abort and wait for them (10sec max).
     vector<HANDLE> chks;
@@ -48,7 +48,7 @@ void eap::peer_tls::shutdown()
 }
 
 
-void eap::peer_tls::get_identity(
+void eap::peer_tls_base::get_identity(
     _In_                                   DWORD  dwFlags,
     _In_count_(dwConnectionDataSize) const BYTE   *pConnectionData,
     _In_                                   DWORD  dwConnectionDataSize,
@@ -104,7 +104,7 @@ void eap::peer_tls::get_identity(
 }
 
 
-void eap::peer_tls::get_method_properties(
+void eap::peer_tls_base::get_method_properties(
     _In_                                   DWORD                     dwVersion,
     _In_                                   DWORD                     dwFlags,
     _In_                                   HANDLE                    hUserImpersonationToken,
@@ -157,7 +157,7 @@ void eap::peer_tls::get_method_properties(
 }
 
 
-void eap::peer_tls::credentials_xml2blob(
+void eap::peer_tls_base::credentials_xml2blob(
     _In_                                   DWORD       dwFlags,
     _In_                                   IXMLDOMNode *pConfigRoot,
     _In_count_(dwConnectionDataSize) const BYTE        *pConnectionData,
@@ -179,7 +179,7 @@ void eap::peer_tls::credentials_xml2blob(
 }
 
 
-EAP_SESSION_HANDLE eap::peer_tls::begin_session(
+EAP_SESSION_HANDLE eap::peer_tls_base::begin_session(
     _In_                                   DWORD              dwFlags,
     _In_                           const   EapAttributes      *pAttributeArray,
     _In_                                   HANDLE             hTokenImpersonateUser,
@@ -223,7 +223,7 @@ EAP_SESSION_HANDLE eap::peer_tls::begin_session(
 }
 
 
-void eap::peer_tls::end_session(_In_ EAP_SESSION_HANDLE hSession)
+void eap::peer_tls_base::end_session(_In_ EAP_SESSION_HANDLE hSession)
 {
     assert(hSession);
 
@@ -234,7 +234,7 @@ void eap::peer_tls::end_session(_In_ EAP_SESSION_HANDLE hSession)
 }
 
 
-void eap::peer_tls::process_request_packet(
+void eap::peer_tls_base::process_request_packet(
     _In_                                       EAP_SESSION_HANDLE  hSession,
     _In_bytecount_(dwReceivedPacketSize) const EapPacket           *pReceivedPacket,
     _In_                                       DWORD               dwReceivedPacketSize,
@@ -247,7 +247,7 @@ void eap::peer_tls::process_request_packet(
 }
 
 
-void eap::peer_tls::get_response_packet(
+void eap::peer_tls_base::get_response_packet(
     _In_                                   EAP_SESSION_HANDLE hSession,
     _Out_bytecapcount_(*pdwSendPacketSize) EapPacket          *pSendPacket,
     _Inout_                                DWORD              *pdwSendPacketSize)
@@ -263,7 +263,7 @@ void eap::peer_tls::get_response_packet(
 }
 
 
-void eap::peer_tls::get_result(
+void eap::peer_tls_base::get_result(
     _In_    EAP_SESSION_HANDLE        hSession,
     _In_    EapPeerMethodResultReason reason,
     _Inout_ EapPeerMethodResult       *pResult)
@@ -296,7 +296,7 @@ void eap::peer_tls::get_result(
 }
 
 
-void eap::peer_tls::get_ui_context(
+void eap::peer_tls_base::get_ui_context(
     _In_  EAP_SESSION_HANDLE hSession,
     _Out_ BYTE               **ppUIContextData,
     _Out_ DWORD              *pdwUIContextDataSize)
@@ -318,7 +318,7 @@ void eap::peer_tls::get_ui_context(
 }
 
 
-void eap::peer_tls::set_ui_context(
+void eap::peer_tls_base::set_ui_context(
     _In_                                  EAP_SESSION_HANDLE  hSession,
     _In_count_(dwUIContextDataSize) const BYTE                *pUIContextData,
     _In_                                  DWORD               dwUIContextDataSize,
@@ -332,7 +332,7 @@ void eap::peer_tls::set_ui_context(
 }
 
 
-void eap::peer_tls::get_response_attributes(
+void eap::peer_tls_base::get_response_attributes(
     _In_  EAP_SESSION_HANDLE hSession,
     _Out_ EapAttributes      *pAttribs)
 {
@@ -340,7 +340,7 @@ void eap::peer_tls::get_response_attributes(
 }
 
 
-void eap::peer_tls::set_response_attributes(
+void eap::peer_tls_base::set_response_attributes(
     _In_       EAP_SESSION_HANDLE  hSession,
     _In_ const EapAttributes       *pAttribs,
     _Out_      EapPeerMethodOutput *pEapOutput)
@@ -351,7 +351,7 @@ void eap::peer_tls::set_response_attributes(
 }
 
 
-void eap::peer_tls::spawn_crl_check(_Inout_ winstd::cert_context &&cert)
+void eap::peer_tls_base::spawn_crl_check(_Inout_ winstd::cert_context &&cert)
 {
     // Create the thread and add it to the list.
     m_crl_checkers.push_back(std::move(crl_checker(*this, std::move(cert))));
@@ -363,10 +363,10 @@ void eap::peer_tls::spawn_crl_check(_Inout_ winstd::cert_context &&cert)
 
 
 //////////////////////////////////////////////////////////////////////
-// eap::peer_tls_tunnel::session
+// eap::peer_tls_base::session
 //////////////////////////////////////////////////////////////////////
 
-eap::peer_tls::session::session(_In_ module &mod) :
+eap::peer_tls_base::session::session(_In_ module &mod) :
     m_module(mod),
     m_cfg(mod),
     m_cred(mod, m_cfg),
@@ -378,7 +378,7 @@ eap::peer_tls::session::session(_In_ module &mod) :
 {}
 
 
-eap::peer_tls::session::~session()
+eap::peer_tls_base::session::~session()
 {
     if (m_blob_cfg)
         m_module.free_memory(m_blob_cfg);
@@ -394,10 +394,10 @@ eap::peer_tls::session::~session()
 
 
 //////////////////////////////////////////////////////////////////////
-// eap::peer_tls::crl_checker
+// eap::peer_tls_base::crl_checker
 //////////////////////////////////////////////////////////////////////
 
-eap::peer_tls::crl_checker::crl_checker(_In_ module &mod, _Inout_ winstd::cert_context &&cert) :
+eap::peer_tls_base::crl_checker::crl_checker(_In_ module &mod, _Inout_ winstd::cert_context &&cert) :
     m_module(mod),
     m_cert  (std::move(cert)),
     m_abort (CreateEvent(NULL, TRUE, FALSE, NULL))
@@ -405,7 +405,7 @@ eap::peer_tls::crl_checker::crl_checker(_In_ module &mod, _Inout_ winstd::cert_c
 }
 
 
-eap::peer_tls::crl_checker::crl_checker(_Inout_ crl_checker &&other) noexcept :
+eap::peer_tls_base::crl_checker::crl_checker(_Inout_ crl_checker &&other) noexcept :
     m_module(          other.m_module ),
     m_thread(std::move(other.m_thread)),
     m_abort (std::move(other.m_abort )),
@@ -414,7 +414,7 @@ eap::peer_tls::crl_checker::crl_checker(_Inout_ crl_checker &&other) noexcept :
 }
 
 
-eap::peer_tls::crl_checker& eap::peer_tls::crl_checker::operator=(_Inout_ crl_checker &&other) noexcept
+eap::peer_tls_base::crl_checker& eap::peer_tls_base::crl_checker::operator=(_Inout_ crl_checker &&other) noexcept
 {
     if (this != std::addressof(other)) {
         assert(std::addressof(m_module) == std::addressof(other.m_module)); // Move threads within same module only!
@@ -427,7 +427,7 @@ eap::peer_tls::crl_checker& eap::peer_tls::crl_checker::operator=(_Inout_ crl_ch
 }
 
 
-DWORD WINAPI eap::peer_tls::crl_checker::verify(_In_ crl_checker *obj)
+DWORD WINAPI eap::peer_tls_base::crl_checker::verify(_In_ crl_checker *obj)
 {
     // Initialize COM.
     com_initializer com_init(NULL);

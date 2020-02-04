@@ -20,7 +20,7 @@
 
 namespace eap
 {
-    class peer_tls;
+    class peer_tls_base;
 }
 
 #pragma once
@@ -38,7 +38,7 @@ namespace eap
     ///
     /// TLS tunnel peer
     ///
-    class peer_tls : public peer
+    class peer_tls_base : public peer
     {
     public:
         ///
@@ -46,7 +46,7 @@ namespace eap
         ///
         /// \param[in] eap_method  EAP method type ID
         ///
-        peer_tls(_In_ winstd::eap_type_t eap_method = winstd::eap_type_t::tls);
+        peer_tls_base(_In_ winstd::eap_type_t eap_method = winstd::eap_type_t::tls);
 
         virtual void shutdown();
 
