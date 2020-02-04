@@ -28,10 +28,13 @@ using namespace winstd;
 // eap::method
 //////////////////////////////////////////////////////////////////////
 
-eap::method::method(_In_ module &mod) :
+eap::method::method(_In_ module &mod, _In_opt_ method *inner) :
     m_module(mod),
-    m_outer(nullptr)
+    m_outer(nullptr),
+    m_inner(inner)
 {
+    if (m_inner)
+        m_inner->m_outer = this;
 }
 
 
@@ -41,15 +44,36 @@ void eap::method::begin_session(
     _In_        HANDLE        hTokenImpersonateUser,
     _In_opt_    DWORD         dwMaxSendPacketSize)
 {
-    UNREFERENCED_PARAMETER(dwFlags);
-    UNREFERENCED_PARAMETER(pAttributeArray);
-    UNREFERENCED_PARAMETER(hTokenImpersonateUser);
-    UNREFERENCED_PARAMETER(dwMaxSendPacketSize);
+    if (m_inner)
+        m_inner->begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
 }
 
 
 void eap::method::end_session()
 {
+    if (m_inner)
+        m_inner->end_session();
+}
+
+
+EapPeerMethodResponseAction eap::method::process_request_packet(
+    _In_bytecount_(dwReceivedPacketSize) const void  *pReceivedPacket,
+    _In_                                       DWORD dwReceivedPacketSize)
+{
+    return m_inner ?
+        m_inner->process_request_packet(pReceivedPacket, dwReceivedPacketSize) :
+        EapPeerMethodResponseActionSend;
+}
+
+
+void eap::method::get_response_packet(
+    _Out_    sanitizing_blob &packet,
+    _In_opt_ DWORD           size_max)
+{
+    if (m_inner)
+        m_inner->get_response_packet(packet, size_max);
+    else
+        packet.clear();
 }
 
 
@@ -57,15 +81,17 @@ void eap::method::get_result(
     _In_    EapPeerMethodResultReason reason,
     _Inout_ EapPeerMethodResult       *pResult)
 {
-    UNREFERENCED_PARAMETER(reason);
-    UNREFERENCED_PARAMETER(pResult);
+    if (m_inner)
+        m_inner->get_result(reason, pResult);
 }
 
 
 void eap::method::get_ui_context(_Out_ sanitizing_blob &context_data)
 {
-    // Default implementation returns blank context data.
-    context_data.clear();
+    if (m_inner)
+        m_inner->get_ui_context(context_data);
+    else
+        context_data.clear();
 }
 
 
@@ -73,11 +99,9 @@ EapPeerMethodResponseAction eap::method::set_ui_context(
     _In_count_(dwUIContextDataSize) const BYTE  *pUIContextData,
     _In_                                  DWORD dwUIContextDataSize)
 {
-    UNREFERENCED_PARAMETER(pUIContextData);
-    UNREFERENCED_PARAMETER(dwUIContextDataSize);
-
-    // Default implementation does nothing with context data.
-    return EapPeerMethodResponseActionNone;
+    return m_inner ?
+        m_inner->set_ui_context(pUIContextData, dwUIContextDataSize) :
+        EapPeerMethodResponseActionNone;
 }
 
 
@@ -85,114 +109,20 @@ void eap::method::get_response_attributes(_Out_ EapAttributes *pAttribs)
 {
     assert(pAttribs);
 
-    // Default implementation returns no EAP attributes.
-    pAttribs->dwNumberOfAttributes = 0;
-    pAttribs->pAttribs             = NULL;
+    if (m_inner)
+        m_inner->get_response_attributes(pAttribs);
+    else {
+        pAttribs->dwNumberOfAttributes = 0;
+        pAttribs->pAttribs = NULL;
+    }
 }
 
 
 EapPeerMethodResponseAction eap::method::set_response_attributes(_In_ const EapAttributes *pAttribs)
 {
-    UNREFERENCED_PARAMETER(pAttribs);
-
-    // Default implementation does nothing with EAP attributes.
-    return EapPeerMethodResponseActionNone;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// eap::method_tunnel
-//////////////////////////////////////////////////////////////////////
-
-eap::method_tunnel::method_tunnel(_In_ module &mod, _In_ method *inner) :
-    m_inner(inner),
-    method(mod)
-{
-    assert(m_inner);
-    m_inner->m_outer = this;
-}
-
-
-void eap::method_tunnel::begin_session(
-    _In_        DWORD         dwFlags,
-    _In_  const EapAttributes *pAttributeArray,
-    _In_        HANDLE        hTokenImpersonateUser,
-    _In_opt_    DWORD         dwMaxSendPacketSize)
-{
-    method::begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
-
-    assert(m_inner);
-    m_inner->begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
-}
-
-
-void eap::method_tunnel::end_session()
-{
-    assert(m_inner);
-    m_inner->end_session();
-
-    method::end_session();
-}
-
-
-EapPeerMethodResponseAction eap::method_tunnel::process_request_packet(
-    _In_bytecount_(dwReceivedPacketSize) const void  *pReceivedPacket,
-    _In_                                       DWORD dwReceivedPacketSize)
-{
-    assert(m_inner);
-    return m_inner->process_request_packet(pReceivedPacket, dwReceivedPacketSize);
-}
-
-
-void eap::method_tunnel::get_response_packet(
-    _Out_    sanitizing_blob &packet,
-    _In_opt_ DWORD           size_max)
-{
-    assert(m_inner);
-    m_inner->get_response_packet(packet, size_max);
-}
-
-
-void eap::method_tunnel::get_result(
-    _In_    EapPeerMethodResultReason reason,
-    _Inout_ EapPeerMethodResult       *pResult)
-{
-    assert(m_inner);
-    m_inner->get_result(reason, pResult);
-}
-
-
-void eap::method_tunnel::get_ui_context(_Out_ sanitizing_blob &context_data)
-{
-    assert(m_inner);
-
-    // Default implementation forwards UI context handling to the inner method.
-    m_inner->get_ui_context(context_data);
-}
-
-
-EapPeerMethodResponseAction eap::method_tunnel::set_ui_context(
-    _In_count_(dwUIContextDataSize) const BYTE  *pUIContextData,
-    _In_                                  DWORD dwUIContextDataSize)
-{
-    assert(m_inner);
-
-    // Default implementation forwards UI context handling to the inner method.
-    return m_inner->set_ui_context(pUIContextData, dwUIContextDataSize);
-}
-
-
-void eap::method_tunnel::get_response_attributes(_Out_ EapAttributes *pAttribs)
-{
-    assert(m_inner);
-    m_inner->get_response_attributes(pAttribs);
-}
-
-
-EapPeerMethodResponseAction eap::method_tunnel::set_response_attributes(_In_ const EapAttributes *pAttribs)
-{
-    assert(m_inner);
-    return m_inner->set_response_attributes(pAttribs);
+    return m_inner ?
+        m_inner->set_response_attributes(pAttribs) :
+        EapPeerMethodResponseActionNone;
 }
 
 
@@ -205,7 +135,7 @@ eap::method_eap::method_eap(_In_ module &mod, _In_ eap_type_t eap_method, _In_ c
     m_cred(cred),
     m_id(0),
     m_result(EapPeerMethodResultUnknown),
-    method_tunnel(mod, inner)
+    method(mod, inner)
 {
 }
 
@@ -216,15 +146,11 @@ void eap::method_eap::begin_session(
     _In_        HANDLE        hTokenImpersonateUser,
     _In_opt_    DWORD         dwMaxSendPacketSize)
 {
-    // Initialize tunnel method session only.
-    method::begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
-
     // Inner method may generate packets of up to 64kB (less the EAP packet header).
     // Initialize inner method with appropriately less packet size maximum.
     if (dwMaxSendPacketSize < sizeof(EapPacket))
         throw invalid_argument(string_printf(__FUNCTION__ " Maximum packet size too small (minimum: %zu, available: %u).", sizeof(EapPacket), dwMaxSendPacketSize));
-    assert(m_inner);
-    m_inner->begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, std::min<DWORD>(dwMaxSendPacketSize, MAXWORD) - sizeof(EapPacket));
+    method::begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, std::min<DWORD>(dwMaxSendPacketSize, MAXWORD) - sizeof(EapPacket));
 
     m_result = EapPeerMethodResultUnknown;
     m_packet_res.clear();
@@ -264,7 +190,7 @@ EapPeerMethodResponseAction eap::method_eap::process_request_packet(
         } else if ((eap_type_t)hdr->Data[0] == m_eap_method) {
             // Process the data with underlying method.
             m_packet_res.clear();
-            return method_tunnel::process_request_packet(hdr->Data + 1, size_packet - sizeof(EapPacket));
+            return method::process_request_packet(hdr->Data + 1, size_packet - sizeof(EapPacket));
         } else {
             // Unsupported EAP method. Respond with Legacy Nak suggesting our EAP method to continue.
             make_response_packet(eap_type_t::nak, &m_eap_method, sizeof(eap_type_t));
@@ -294,7 +220,7 @@ void eap::method_eap::get_response_packet(
 
     if (m_packet_res.empty()) {
         // Get data from underlying method.
-        method_tunnel::get_response_packet(packet, size_max - sizeof(EapPacket));
+        method::get_response_packet(packet, size_max - sizeof(EapPacket));
 
         size_t size_packet = sizeof(EapPacket) + packet.size();
         if (size_packet > size_max)
@@ -327,8 +253,8 @@ void eap::method_eap::get_result(
 {
     switch (m_result) {
     case EapPeerMethodResultSuccess:
-    case EapPeerMethodResultFailure: return method_tunnel::get_result(m_result, pResult);
-    default                        : return method_tunnel::get_result(reason  , pResult);
+    case EapPeerMethodResultFailure: return method::get_result(m_result, pResult);
+    default                        : return method::get_result(reason  , pResult);
     }
 }
 

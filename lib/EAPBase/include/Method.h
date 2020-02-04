@@ -21,7 +21,6 @@
 namespace eap
 {
     class method;
-    class method_tunnel;
     class method_eap;
 }
 
@@ -58,9 +57,10 @@ namespace eap
         ///
         /// Constructs a method
         ///
-        /// \param[in] mod  Module to use for global services
+        /// \param[in] mod    Module to use for global services
+        /// \param[in] inner  Inner method
         ///
-        method(_In_ module &mod);
+        method(_In_ module &mod, _In_opt_ method *inner = nullptr);
 
         /// \name Session management
         /// @{
@@ -105,7 +105,7 @@ namespace eap
         ///
         virtual EapPeerMethodResponseAction process_request_packet(
             _In_bytecount_(dwReceivedPacketSize) const void  *pReceivedPacket,
-            _In_                                       DWORD dwReceivedPacketSize) = 0;
+            _In_                                       DWORD dwReceivedPacketSize);
 
         ///
         /// Obtains a response packet from the EAP method.
@@ -117,7 +117,7 @@ namespace eap
         ///
         virtual void get_response_packet(
             _Out_    sanitizing_blob &packet,
-            _In_opt_ DWORD           size_max = MAXDWORD) = 0;
+            _In_opt_ DWORD           size_max = MAXDWORD);
 
         /// @}
 
@@ -191,78 +191,8 @@ namespace eap
         /// @}
 
     public:
-        module &m_module;   ///< Module for global services
-        method *m_outer;    ///< Outer method
-    };
-
-
-    ///
-    /// Tunnel method base class
-    ///
-    /// This is a base class for all the methods that encapsulate inner methods to provide stacking framework.
-    ///
-    class method_tunnel : public method
-    {
-    public:
-        ///
-        /// Constructs a method
-        ///
-        /// \param[in] mod    Module to use for global services
-        /// \param[in] inner  Inner method
-        ///
-        method_tunnel(_In_ module &mod, _In_ method *inner);
-
-        /// \name Session management
-        /// @{
-
-        virtual void begin_session(
-            _In_        DWORD         dwFlags,
-            _In_  const EapAttributes *pAttributeArray,
-            _In_        HANDLE        hTokenImpersonateUser,
-            _In_opt_    DWORD         dwMaxSendPacketSize = MAXDWORD);
-
-        virtual void end_session();
-
-        /// @}
-
-        /// \name Packet processing
-        /// @{
-
-        virtual EapPeerMethodResponseAction process_request_packet(
-            _In_bytecount_(dwReceivedPacketSize) const void  *pReceivedPacket,
-            _In_                                       DWORD dwReceivedPacketSize);
-
-        virtual void get_response_packet(
-            _Out_    sanitizing_blob &packet,
-            _In_opt_ DWORD           size_max = MAXDWORD);
-
-        /// @}
-
-        virtual void get_result(
-            _In_    EapPeerMethodResultReason reason,
-            _Inout_ EapPeerMethodResult       *pResult);
-
-        /// \name User Interaction
-        /// @{
-
-        virtual void get_ui_context(_Out_ sanitizing_blob &context_data);
-
-        virtual EapPeerMethodResponseAction set_ui_context(
-            _In_count_(dwUIContextDataSize) const BYTE  *pUIContextData,
-            _In_                                  DWORD dwUIContextDataSize);
-
-        /// @}
-
-        /// \name EAP Response Attributes
-        /// @{
-
-        virtual void get_response_attributes(_Out_ EapAttributes *pAttribs);
-
-        virtual EapPeerMethodResponseAction set_response_attributes(_In_ const EapAttributes *pAttribs);
-
-        /// @}
-
-    protected:
+        module &m_module;                   ///< Module for global services
+        method *m_outer;                    ///< Outer method
         std::unique_ptr<method> m_inner;    ///< Inner method
     };
 
@@ -272,7 +202,7 @@ namespace eap
     ///
     /// This method encapsulates inner data in EAP packets.
     ///
-    class method_eap : public method_tunnel
+    class method_eap : public method
     {
     public:
         ///

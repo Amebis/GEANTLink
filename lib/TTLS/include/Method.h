@@ -44,7 +44,7 @@ namespace eap
     ///
     /// EAP-(T)TLS/PEAP class defragging method tunnel
     ///
-    class method_defrag : public method_tunnel
+    class method_defrag : public method
     {
     public:
 #pragma warning(push)
@@ -124,14 +124,14 @@ namespace eap
     ///
     /// Diameter EAP-Message tunnel method
     ///
-    class method_eapmsg : public method_tunnel
+    class method_eapmsg : public method
     {
     public:
         ///
         /// Constructs a method
         ///
-        /// \param[in] mod       Module to use for global services
-        /// \param[in] inner     Inner method
+        /// \param[in] mod    Module to use for global services
+        /// \param[in] inner  Inner method
         ///
         method_eapmsg(_In_ module &mod, _In_ method *inner);
 
@@ -176,7 +176,7 @@ namespace eap
     ///
     /// TLS tunnel method
     ///
-    class method_tls_tunnel : public method_tunnel
+    class method_tls_tunnel : public method
     {
     public:
         ///

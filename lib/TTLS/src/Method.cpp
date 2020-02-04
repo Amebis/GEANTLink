@@ -34,7 +34,7 @@ eap::method_defrag::method_defrag(_In_ module &mod, _In_ unsigned char version_m
     m_version(version_max),
     m_phase(phase_t::unknown),
     m_send_res(false),
-    method_tunnel(mod, inner)
+    method(mod, inner)
 {
 }
 
@@ -45,15 +45,11 @@ void eap::method_defrag::begin_session(
     _In_        HANDLE        hTokenImpersonateUser,
     _In_opt_    DWORD         dwMaxSendPacketSize)
 {
-    // Initialize tunnel method session only.
-    method::begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
-
     // Inner method may generate packets of up to 4GB.
     // But, we can not do the fragmentation if we have less space than flags+length.
     if (dwMaxSendPacketSize < 5)
         throw invalid_argument(string_printf(__FUNCTION__ " Maximum packet size too small (minimum: %u, available: %u).", 5, dwMaxSendPacketSize));
-    assert(m_inner);
-    m_inner->begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, MAXDWORD);
+    method::begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, MAXDWORD);
 
     m_phase = phase_t::init;
 }
@@ -120,7 +116,7 @@ EapPeerMethodResponseAction eap::method_defrag::process_request_packet(
     }
 
     // Process the data with underlying method.
-    auto action = method_tunnel::process_request_packet(m_data_req.data(), (DWORD)m_data_req.size());
+    auto action = method::process_request_packet(m_data_req.data(), (DWORD)m_data_req.size());
 
     // Packet was processed. Clear its data since we use the absence of data to detect first of fragmented message packages.
     m_data_req.clear();
@@ -136,7 +132,7 @@ void eap::method_defrag::get_response_packet(
 
     if (!m_send_res) {
         // Get data from underlying method.
-        method_tunnel::get_response_packet(m_data_res, MAXDWORD);
+        method::get_response_packet(m_data_res, MAXDWORD);
     }
 
     size_t size_data = m_data_res.size();
@@ -168,7 +164,7 @@ void eap::method_defrag::get_response_packet(
 
 eap::method_eapmsg::method_eapmsg(_In_ module &mod, _In_ method *inner) :
     m_phase(phase_t::unknown),
-    method_tunnel(mod, inner)
+    method(mod, inner)
 {
 }
 
@@ -179,15 +175,11 @@ void eap::method_eapmsg::begin_session(
     _In_        HANDLE        hTokenImpersonateUser,
     _In_opt_    DWORD         dwMaxSendPacketSize)
 {
-    // Initialize tunnel method session only.
-    method::begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
-
     // Inner method may generate packets of up to 16MB (less the Diameter AVP header).
     // Initialize inner method with appropriately less packet size maximum.
     if (dwMaxSendPacketSize < sizeof(diameter_avp_header))
         throw invalid_argument(string_printf(__FUNCTION__ " Maximum packet size too small (minimum: %zu, available: %u).", sizeof(diameter_avp_header), dwMaxSendPacketSize));
-    assert(m_inner);
-    m_inner->begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, std::min<DWORD>(dwMaxSendPacketSize, 0xffffff) - sizeof(diameter_avp_header));
+    method::begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, std::min<DWORD>(dwMaxSendPacketSize, 0xffffff) - sizeof(diameter_avp_header));
 
     m_phase = phase_t::identity;
 }
@@ -208,7 +200,7 @@ EapPeerMethodResponseAction eap::method_eapmsg::process_request_packet(
 
         m_phase = phase_t::finished;
         m_packet_res.clear();
-        return method_tunnel::process_request_packet(&hdr_req, sizeof(EapPacket));
+        return method::process_request_packet(&hdr_req, sizeof(EapPacket));
 
     case phase_t::finished: {
         EapPeerMethodResponseAction action = EapPeerMethodResponseActionNone;
@@ -232,7 +224,7 @@ EapPeerMethodResponseAction eap::method_eapmsg::process_request_packet(
             switch (code) {
             case 79: // EAP-Message
                 if (!eap_message_found) {
-                    action = method_tunnel::process_request_packet(msg, (DWORD)(msg_end - msg));
+                    action = method::process_request_packet(msg, (DWORD)(msg_end - msg));
                     eap_message_found = true;
                     break;
                 }
@@ -267,7 +259,7 @@ void eap::method_eapmsg::get_response_packet(
 
         // Get data from underlying method.
         assert(size_max >= sizeof(diameter_avp_header)); // We should be able to respond with at least Diameter AVP header.
-        method_tunnel::get_response_packet(packet, size_max - sizeof(diameter_avp_header));
+        method::get_response_packet(packet, size_max - sizeof(diameter_avp_header));
 
         // Prepare EAP-Message Diameter AVP header.
         diameter_avp_header hdr;
@@ -304,7 +296,7 @@ eap::method_tls_tunnel::method_tls_tunnel(_In_ module &mod, _In_ eap_type_t eap_
     m_user_ctx(NULL),
     m_phase(phase_t::unknown),
     m_packet_res_inner(false),
-    method_tunnel(mod, inner)
+    method(mod, inner)
 {
     m_eap_attr_desc.dwNumberOfAttributes = 0;
     m_eap_attr_desc.pAttribs = NULL;
@@ -320,7 +312,7 @@ void eap::method_tls_tunnel::begin_session(
     // In TLS, maximum packet length can precisely be calculated only after handshake is complete.
     // Therefore, we allow inner method same maximum packet size as this method.
     // Initialize tunnel and inner method session with same parameters.
-    method_tunnel::begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
+    method::begin_session(dwFlags, pAttributeArray, hTokenImpersonateUser, dwMaxSendPacketSize);
 
     // Presume authentication will fail with generic protocol failure. (Pesimist!!!)
     // We will reset once we get get_result(Success) call.
@@ -620,7 +612,7 @@ void eap::method_tls_tunnel::get_response_packet(
 
         // Get inner response packet.
         packet.reserve((size_t)sizes.cbHeader + sizes.cbMaximumMessage + sizes.cbTrailer);
-        method_tunnel::get_response_packet(packet, sizes.cbMaximumMessage);
+        method::get_response_packet(packet, sizes.cbMaximumMessage);
         if (!packet.empty()) {
             DWORD size_data = (DWORD)packet.size();
 
@@ -659,7 +651,7 @@ void eap::method_tls_tunnel::get_result(
     assert(pResult);
 
     // Get inner result.
-    method_tunnel::get_result(reason, pResult);
+    method::get_result(reason, pResult);
 
     if (reason == EapPeerMethodResultSuccess) {
         eap_attr a;
@@ -729,7 +721,7 @@ EapPeerMethodResponseAction eap::method_tls_tunnel::decrypt_request_data()
     EapPeerMethodResponseAction action = EapPeerMethodResponseActionDiscard;
     if (m_sc_queue.empty()) {
         // No data for inner authentication avaliable.
-        action = method_tunnel::process_request_packet(NULL, 0);
+        action = method::process_request_packet(NULL, 0);
     } else {
         // Authenticator sent data for inner authentication. Decrypt it.
 
@@ -746,7 +738,7 @@ EapPeerMethodResponseAction eap::method_tls_tunnel::decrypt_request_data()
             // Process data (only the first SECBUFFER_DATA found).
             for (size_t i = 0; i < _countof(buf); i++)
                 if (buf[i].BufferType == SECBUFFER_DATA) {
-                    action = method_tunnel::process_request_packet(buf[i].pvBuffer, buf[i].cbBuffer);
+                    action = method::process_request_packet(buf[i].pvBuffer, buf[i].cbBuffer);
                     break;
                 }
 
