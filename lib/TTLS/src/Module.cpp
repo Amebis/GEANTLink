@@ -174,8 +174,10 @@ eap::config_method* eap::peer_ttls::make_config_method()
 eap::method* eap::peer_ttls::make_method(_In_ config_method_tls &cfg, _In_ credentials_tls &cred)
 {
     unique_ptr<method> meth_inner;
-    auto  cfg_inner = dynamic_cast<config_method_tls_tunnel&>(cfg).m_inner.get();
-    auto cred_inner = dynamic_cast<credentials_tls_tunnel&>(cred).m_inner.get();
+    auto &cfg_ttls    = dynamic_cast<config_method_ttls&>(cfg);
+    auto  cfg_inner   = cfg_ttls.m_inner.get();
+    auto &cred_tunnel = dynamic_cast<credentials_tls_tunnel&>(cred);
+    auto  cred_inner  = cred_tunnel.m_inner.get();
 
     assert(cfg_inner);
     switch (cfg_inner->get_method_id()) {
@@ -218,5 +220,5 @@ eap::method* eap::peer_ttls::make_method(_In_ config_method_tls &cfg, _In_ crede
     return
         new method_eap   (*this, eap_type_t::ttls, cred,
         new method_defrag(*this, 0 /* Schannel supports retrieving keying material for EAP-TTLSv0 only. */,
-        new method_tls   (*this, cfg, cred, meth_inner.release())));
+        new method_ttls  (*this, cfg_ttls, cred_tunnel, meth_inner.release())));
 }

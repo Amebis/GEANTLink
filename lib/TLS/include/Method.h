@@ -164,6 +164,19 @@ namespace eap
 
     protected:
         ///
+        /// Pushes keying material to the inner method.
+        ///
+        virtual void push_keying_material();
+
+        ///
+        /// Retrieves keying material.
+        ///
+        /// \param[out] recv_key  Enc-RECV-Key, 32 bytes
+        /// \param[out] send_key  Enc-SEND-Key, 32 bytes
+        ///
+        virtual void get_keying_material(_Out_ sanitizing_blob_xf<32> &recv_key, _Out_ sanitizing_blob_xf<32> &send_key);
+
+        ///
         /// Decrypts data and forwards it to the inner method.
         ///
         EapPeerMethodResponseAction decrypt_request_data();

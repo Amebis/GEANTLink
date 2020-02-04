@@ -420,23 +420,7 @@ EapPeerMethodResponseAction eap::method_tls::process_request_packet(
 
                 m_phase = phase_t::finished;
                 m_cfg.m_last_status = config_method::status_t::auth_failed; // Blame protocol if we fail beyond this point.
-
-                method_mschapv2_diameter *inner_mschapv2 = dynamic_cast<method_mschapv2_diameter*>(m_inner.get());
-                if (inner_mschapv2) {
-                    // Push EAP-TTLS keying material to inner MSCHAPv2 method.
-                    static const DWORD key_id = 0x02; // EAP-TTLSv0 Challenge Data
-                    static const SecPkgContext_EapPrfInfo prf_info = { 0, sizeof(key_id), (PBYTE)&key_id };
-                    if (FAILED(status = SetContextAttributes(m_sc_ctx, SECPKG_ATTR_EAP_PRF_INFO, (void*)&prf_info, sizeof(prf_info))))
-                        throw sec_runtime_error(status, __FUNCTION__ " Error setting TTLS PRF in Schannel.");
-
-                    SecPkgContext_EapKeyBlock key_block;
-                    if (FAILED(status = QueryContextAttributes(m_sc_ctx, SECPKG_ATTR_EAP_KEY_BLOCK, &key_block)))
-                        throw sec_runtime_error(status, __FUNCTION__ " Error generating PRF in Schannel.");
-
-                    inner_mschapv2->set_challenge_data(key_block.rgbKeys, key_block.rgbKeys[sizeof(challenge_mschapv2)]);
-
-                    SecureZeroMemory(&key_block, sizeof(key_block));
-                }
+                push_keying_material();
 
                 // Piggyback initial inner response.
                 decrypt_request_data();
@@ -542,32 +526,17 @@ void eap::method_tls::get_result(
             m_eap_attr.clear();
         }
 
-        // Derive MSK keys.
-        DWORD key_id =
-            m_cfg.get_method_id() == eap_type_t::ttls ? 0x01 : // EAP-TTLSv0 Keying Material
-                                                        0x00;  // PPP EAP TLS Key Data
-        const SecPkgContext_EapPrfInfo prf_info = { 0, sizeof(key_id), (PBYTE)&key_id };
-        SECURITY_STATUS status = SetContextAttributes(m_sc_ctx, SECPKG_ATTR_EAP_PRF_INFO, (void*)&prf_info, sizeof(prf_info));
-        if (FAILED(status))
-            throw sec_runtime_error(status, __FUNCTION__ " Error setting PRF in Schannel.");
-
-        SecPkgContext_EapKeyBlock key_block;
-        status = QueryContextAttributes(m_sc_ctx, SECPKG_ATTR_EAP_KEY_BLOCK, &key_block);
-        if (FAILED(status))
-            throw sec_runtime_error(status, __FUNCTION__ " Error generating MSK in Schannel.");
-        const unsigned char *_key_block = key_block.rgbKeys;
+        // Make MSK keys.
+        sanitizing_blob_xf<32> recv, send;
+        get_keying_material(recv, send);
 
         // MSK: MPPE-Recv-Key
-        a.create_ms_mppe_key(16, _key_block, 32);
+        a.create_ms_mppe_key(16, recv.data, sizeof(recv.data));
         m_eap_attr.push_back(std::move(a));
-        _key_block += 32;
 
         // MSK: MPPE-Send-Key
-        a.create_ms_mppe_key(17, _key_block, 32);
+        a.create_ms_mppe_key(17, send.data, sizeof(send.data));
         m_eap_attr.push_back(std::move(a));
-        _key_block += 32;
-
-        SecureZeroMemory(&key_block, sizeof(key_block));
 
         // Append blank EAP attribute.
         m_eap_attr.push_back(eap_attr::blank);
@@ -584,6 +553,30 @@ void eap::method_tls::get_result(
 
     // Ask EAP host to save the configuration (connection data).
     pResult->fSaveConnectionData = TRUE;
+}
+
+
+void eap::method_tls::push_keying_material()
+{
+}
+
+
+void eap::method_tls::get_keying_material(_Out_ sanitizing_blob_xf<32> &recv_key, _Out_ sanitizing_blob_xf<32> &send_key)
+{
+    // Derive MSK keys.
+    DWORD key_id = 0x00; // PPP EAP TLS Key Data
+    const SecPkgContext_EapPrfInfo prf_info = { 0, sizeof(key_id), (PBYTE)&key_id };
+    SECURITY_STATUS status = SetContextAttributes(m_sc_ctx, SECPKG_ATTR_EAP_PRF_INFO, (void*)&prf_info, sizeof(prf_info));
+    if (FAILED(status))
+        throw sec_runtime_error(status, __FUNCTION__ " Error setting PRF in Schannel.");
+
+    SecPkgContext_EapKeyBlock key_block;
+    status = QueryContextAttributes(m_sc_ctx, SECPKG_ATTR_EAP_KEY_BLOCK, &key_block);
+    if (FAILED(status))
+        throw sec_runtime_error(status, __FUNCTION__ " Error generating MSK in Schannel.");
+    memcpy(recv_key.data, key_block.rgbKeys     , 32);
+    memcpy(send_key.data, key_block.rgbKeys + 32, 32);
+    SecureZeroMemory(&key_block, sizeof(key_block));
 }
 
 

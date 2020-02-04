@@ -21,6 +21,7 @@
 namespace eap
 {
     class method_eapmsg;
+    class method_ttls;
 }
 
 #pragma once
@@ -29,7 +30,7 @@ namespace eap
 #include "Credentials.h"
 #include "TTLS.h"
 
-#include "../../EAPBase/include/Method.h"
+#include "../../TLS/include/Method.h"
 
 
 namespace eap
@@ -86,6 +87,28 @@ namespace eap
         } m_phase;                      ///< What phase is our communication at?
 
         sanitizing_blob m_packet_res;   ///< Response packet
+    };
+
+
+    ///
+    /// EAP-TTLS method
+    ///
+    class method_ttls : public method_tls
+    {
+    public:
+        ///
+        /// Constructs an EAP-TTLS method
+        ///
+        /// \param[in] mod    EAP module to use for global services
+        /// \param[in] cfg    Method configuration
+        /// \param[in] cred   User credentials
+        /// \param[in] inner  Inner method
+        ///
+        method_ttls(_In_ module &mod, _In_ config_method_ttls &cfg, _In_ credentials_tls_tunnel &cred, _In_ method *inner);
+
+    protected:
+        virtual void push_keying_material();
+        virtual void get_keying_material(_Out_ sanitizing_blob_xf<32> &recv_key, _Out_ sanitizing_blob_xf<32> &send_key);
     };
 
     /// @}

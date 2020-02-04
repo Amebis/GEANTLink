@@ -20,6 +20,8 @@
 
 #include "StdAfx.h"
 
+#pragma comment(lib, "Secur32.lib")
+
 using namespace std;
 using namespace winstd;
 
@@ -148,4 +150,55 @@ void eap::method_eapmsg::get_response_packet(
 
         packet.assign(m_packet_res.cbegin(), m_packet_res.cend());
     }
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// eap::method_ttls
+//////////////////////////////////////////////////////////////////////
+
+eap::method_ttls::method_ttls(_In_ module &mod, _In_ config_method_ttls &cfg, _In_ credentials_tls_tunnel &cred, _In_ method *inner) :
+    method_tls(mod, cfg, cred, inner)
+{
+}
+
+
+void eap::method_ttls::push_keying_material()
+{
+    method_mschapv2_diameter *inner_mschapv2 = dynamic_cast<method_mschapv2_diameter*>(m_inner.get());
+    if (inner_mschapv2) {
+        // Push EAP-TTLS keying material to inner MSCHAPv2 method.
+        SECURITY_STATUS status;
+        static const DWORD key_id = 0x02; // EAP-TTLSv0 Challenge Data
+        static const SecPkgContext_EapPrfInfo prf_info = { 0, sizeof(key_id), (PBYTE)&key_id };
+        if (FAILED(status = SetContextAttributes(m_sc_ctx, SECPKG_ATTR_EAP_PRF_INFO, (void*)&prf_info, sizeof(prf_info))))
+            throw sec_runtime_error(status, __FUNCTION__ " Error setting TTLS PRF in Schannel.");
+
+        SecPkgContext_EapKeyBlock key_block;
+        if (FAILED(status = QueryContextAttributes(m_sc_ctx, SECPKG_ATTR_EAP_KEY_BLOCK, &key_block)))
+            throw sec_runtime_error(status, __FUNCTION__ " Error generating PRF in Schannel.");
+
+        inner_mschapv2->set_challenge_data(key_block.rgbKeys, key_block.rgbKeys[sizeof(challenge_mschapv2)]);
+
+        SecureZeroMemory(&key_block, sizeof(key_block));
+    }
+}
+
+
+void eap::method_ttls::get_keying_material(_Out_ sanitizing_blob_xf<32> &recv_key, _Out_ sanitizing_blob_xf<32> &send_key)
+{
+    // Derive MSK keys.
+    DWORD key_id = 0x01; // EAP-TTLSv0 Keying Material
+    const SecPkgContext_EapPrfInfo prf_info = { 0, sizeof(key_id), (PBYTE)&key_id };
+    SECURITY_STATUS status = SetContextAttributes(m_sc_ctx, SECPKG_ATTR_EAP_PRF_INFO, (void*)&prf_info, sizeof(prf_info));
+    if (FAILED(status))
+        throw sec_runtime_error(status, __FUNCTION__ " Error setting PRF in Schannel.");
+
+    SecPkgContext_EapKeyBlock key_block;
+    status = QueryContextAttributes(m_sc_ctx, SECPKG_ATTR_EAP_KEY_BLOCK, &key_block);
+    if (FAILED(status))
+        throw sec_runtime_error(status, __FUNCTION__ " Error generating MSK in Schannel.");
+    memcpy(recv_key.data, key_block.rgbKeys     , 32);
+    memcpy(send_key.data, key_block.rgbKeys + 32, 32);
+    SecureZeroMemory(&key_block, sizeof(key_block));
 }
