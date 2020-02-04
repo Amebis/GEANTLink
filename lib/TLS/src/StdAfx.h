@@ -28,6 +28,7 @@
 #include "../../MSCHAPv2/include/Method.h"
 
 #include "../../EAPBase/include/EAPXML.h"
+#include "../../EAPBase/include/UIContext.h"
 
 #include <WinStd/Cred.h>
 #include <WinStd/EAP.h>

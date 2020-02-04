@@ -43,7 +43,6 @@
 #include "../../EapHost/include/Method.h"
 
 #include "../../EAPBase/include/EAPXML.h"
-#include "../../EAPBase/include/UIContext.h"
 
 #include <WinStd/EAP.h>
 
