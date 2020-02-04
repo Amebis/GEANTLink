@@ -103,10 +103,12 @@
   <ItemGroup>
     <ClInclude Include="..\include\Config.h" />
     <ClInclude Include="..\include\Credentials.h" />
+    <ClInclude Include="..\include\Method.h" />
     <ClInclude Include="..\src\StdAfx.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Config.cpp" />
+    <ClCompile Include="..\src\Method.cpp" />
     <ClCompile Include="..\src\StdAfx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>

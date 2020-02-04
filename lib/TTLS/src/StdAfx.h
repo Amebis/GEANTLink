@@ -27,6 +27,8 @@
 #include "../include/Method.h"
 #include "../include/Module.h"
 
+#include "../../TLS/include/Method.h"
+
 #include "../../PAP/include/Config.h"
 #include "../../PAP/include/Method.h"
 
