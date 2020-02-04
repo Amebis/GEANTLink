@@ -41,16 +41,6 @@ void eap::peer_tls_tunnel::initialize()
 {
     peer_tls::initialize();
 
-    // MSI's feature completeness check removed: It might invoke UI (prompt user for missing MSI),
-    // which would be disasterous in EapHost system service.
-#if 0
-    // Perform the Microsoft Installer's feature completeness check manually.
-    // If execution got this far in the first place (dependent DLLs are present and loadable).
-    // Furthermore, this increments program usage counter.
-    if (MsiQueryFeatureState(_T(PRODUCT_VERSION_GUID), _T("featEAPTTLS")) != INSTALLSTATE_UNKNOWN)
-        MsiUseFeature(_T(PRODUCT_VERSION_GUID), _T("featEAPTTLS"));
-#endif
-
 #if EAP_INNER_EAPHOST
     // Initialize EapHost based inner authentication methods.
     DWORD dwResult = EapHostPeerInitialize();
