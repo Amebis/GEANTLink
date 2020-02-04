@@ -106,7 +106,6 @@
     <ClInclude Include="..\include\Method.h" />
     <ClInclude Include="..\include\Module.h" />
     <ClInclude Include="..\include\TTLS.h" />
-    <ClInclude Include="..\include\UIContext.h" />
     <ClInclude Include="..\src\StdAfx.h" />
   </ItemGroup>
   <ItemGroup>
@@ -117,7 +116,6 @@
     <ClCompile Include="..\src\StdAfx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\src\UIContext.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Events\build\Events.vcxproj">

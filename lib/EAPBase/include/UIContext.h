@@ -96,6 +96,7 @@ namespace eap
     public:
         config_connection &m_cfg;       ///< Connection configuration
         credentials_connection &m_cred; ///< Connection credentials
+        sanitizing_blob m_data;         ///< Context data
     };
 
     /// @}

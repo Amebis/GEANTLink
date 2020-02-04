@@ -334,7 +334,7 @@ void eap::peer_tls_tunnel::get_ui_context(
     auto s = static_cast<session*>(hSession);
 
     // Get context data from method.
-    ui_context_tls_tunnel ctx(s->m_cfg, s->m_cred);
+    ui_context ctx(s->m_cfg, s->m_cred);
     s->m_method->get_ui_context(ctx.m_data);
 
     // Pack context data.

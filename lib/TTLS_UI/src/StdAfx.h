@@ -32,6 +32,6 @@
 #include "../../GTC_UI/include/GTC_UI.h"
 
 #include "../../EapHost/include/Credentials.h"
-#include "../../TTLS/include/UIContext.h"
+#include "../../EapBase/include/UIContext.h"
 
 #include <wx/choicdlg.h>

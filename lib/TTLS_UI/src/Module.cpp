@@ -352,7 +352,7 @@ void eap::peer_ttls_ui::invoke_interactive_ui(
     // Unpack context data.
     config_connection cfg(*this);
     credentials_connection cred(*this, cfg);
-    ui_context_tls_tunnel ctx(cfg, cred);
+    ui_context ctx(cfg, cred);
     unpack(ctx, pUIContextData, dwUIContextDataSize);
 
     // Look-up the provider.

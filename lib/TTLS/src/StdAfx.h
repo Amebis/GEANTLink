@@ -26,7 +26,6 @@
 #include "../include/Credentials.h"
 #include "../include/Method.h"
 #include "../include/Module.h"
-#include "../include/UIContext.h"
 
 #include "../../PAP/include/Config.h"
 #include "../../PAP/include/Method.h"
@@ -42,6 +41,7 @@
 #include "../../EapHost/include/Method.h"
 
 #include "../../EAPBase/include/EAPXML.h"
+#include "../../EAPBase/include/UIContext.h"
 
 #include <WinStd/EAP.h>
 
