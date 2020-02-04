@@ -342,6 +342,16 @@ eap::peer::peer(_In_ eap_type_t eap_method) : module(eap_method)
 }
 
 
+void eap::peer::initialize()
+{
+}
+
+
+void eap::peer::shutdown()
+{
+}
+
+
 void eap::peer::query_credential_input_fields(
     _In_                                   HANDLE                       hUserImpersonationToken,
     _In_                                   DWORD                        dwFlags,

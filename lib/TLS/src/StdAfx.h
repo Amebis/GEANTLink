@@ -23,6 +23,9 @@
 #include "../include/Config.h"
 #include "../include/Credentials.h"
 #include "../include/Method.h"
+#include "../include/Module.h"
+
+#include "../../MSCHAPv2/include/Method.h"
 
 #include "../../EAPBase/include/EAPXML.h"
 

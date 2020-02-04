@@ -31,6 +31,8 @@ namespace eap
 #include "Method.h"
 #include "TTLS.h"
 
+#include "..\..\TLS\include\Module.h"
+
 
 namespace eap
 {
@@ -40,7 +42,7 @@ namespace eap
     ///
     /// TLS tunnel peer
     ///
-    class peer_tls_tunnel : public peer
+    class peer_tls_tunnel : public peer_tls
     {
     public:
         ///
@@ -151,13 +153,6 @@ namespace eap
 
         /// @}
 
-        ///
-        /// Spawns a new certificate revocation check thread
-        ///
-        /// \param[inout] cert  Certificate context to check for revocation. `hCertStore` member should contain all certificates in chain up to and including root CA to test them for revocation too.
-        ///
-        void spawn_crl_check(_Inout_ winstd::cert_context &&cert);
-
     protected:
         ///
         /// Makes a new inner method
@@ -209,53 +204,6 @@ namespace eap
 #endif
             BYTE *m_blob_ui_ctx;                ///< User Interface context data
         };
-
-        ///
-        ///< Post-festum server certificate revocation verify thread
-        ///
-        class crl_checker {
-        public:
-            ///
-            /// Constructs a thread
-            ///
-            /// \param[in   ] mod   EAP module to use for global services
-            /// \param[inout] cert  Certificate context to check for revocation. `hCertStore` member should contain all certificates in chain up to and including root CA to test them for revocation too.
-            ///
-            crl_checker(_In_ module &mod, _Inout_ winstd::cert_context &&cert);
-
-            ///
-            /// Moves a thread
-            ///
-            /// \param[in] other  Thread to move from
-            ///
-            crl_checker(_Inout_ crl_checker &&other) noexcept;
-
-            ///
-            /// Moves a thread
-            ///
-            /// \param[in] other  Thread to move from
-            ///
-            /// \returns Reference to this object
-            ///
-            crl_checker& operator=(_Inout_ crl_checker &&other) noexcept;
-
-            ///
-            /// Verifies server's certificate if it has been revoked
-            ///
-            /// \param[in] obj  Pointer to the instance of this object
-            ///
-            /// \returns Thread exit code
-            ///
-            static DWORD WINAPI verify(_In_ crl_checker *obj);
-
-        public:
-            module &m_module;                  ///< Module
-            winstd::win_handle<NULL> m_thread; ///< Thread
-            winstd::win_handle<NULL> m_abort;  ///< Thread abort event
-            winstd::cert_context m_cert;       ///< Server certificate
-        };
-
-        std::list<crl_checker> m_crl_checkers;  ///< List of certificate revocation check threads
     };
 
 

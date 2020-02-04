@@ -737,14 +737,14 @@ namespace eap
         ///
         /// \sa [EapPeerGetInfo function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363613.aspx)
         ///
-        virtual void initialize() = 0;
+        virtual void initialize();
 
         ///
         /// Shuts down the EAP method and prepares to unload its corresponding DLL.
         ///
         /// \sa [EapPeerShutdown function](https://msdn.microsoft.com/en-us/library/windows/desktop/aa363627.aspx)
         ///
-        virtual void shutdown() = 0;
+        virtual void shutdown();
 
         ///
         /// Returns the user data and user identity after being called by EapHost.
