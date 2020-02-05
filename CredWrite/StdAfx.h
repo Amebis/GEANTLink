@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include "../lib/EAPBase/include/Config.h"
 #include "../lib/EAPBase/include/Credentials.h"
 #include "../lib/EAPBase/include/Module.h"
 

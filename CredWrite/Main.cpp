@@ -23,7 +23,9 @@
 using namespace std;
 using namespace winstd;
 
-eap::module g_module;
+class module_dummy : public eap::module {
+    virtual eap::config_method* make_config() { return nullptr; }
+} g_module;
 
 
 static int CredWrite()
