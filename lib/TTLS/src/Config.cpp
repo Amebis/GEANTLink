@@ -1,21 +1,21 @@
 /*
     Copyright 2015-2020 Amebis
-    Copyright 2016 GÃ‰ANT
+    Copyright 2016 GÉANT
 
-    This file is part of GÃ‰ANTLink.
+    This file is part of GÉANTLink.
 
-    GÃ‰ANTLink is free software: you can redistribute it and/or modify it
+    GÉANTLink is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    GÃ‰ANTLink is distributed in the hope that it will be useful, but
+    GÉANTLink is distributed in the hope that it will be useful, but
     WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with GÃ‰ANTLink. If not, see <http://www.gnu.org/licenses/>.
+    along with GÉANTLink. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "StdAfx.h"
@@ -95,7 +95,7 @@ void eap::config_method_tls_tunnel::operator>>(_Inout_ cursor_in &cursor)
 
     eap_type_t eap_type;
     cursor >> eap_type;
-    m_inner.reset(make_config_method(eap_type));
+    m_inner.reset(make_inner_config(eap_type));
     cursor >> *m_inner;
 }
 
@@ -253,10 +253,10 @@ void eap::config_method_ttls::load(_In_ IXMLDOMNode *pConfigRoot)
 #endif
         ))
     {
-        m_inner.reset(make_config_method((eap_type_t)dwMethod));
+        m_inner.reset(make_inner_config((eap_type_t)dwMethod));
         m_module.log_config((xpath + L"/EAPMethod").c_str(), m_inner->get_method_str());
     } else if (SUCCEEDED(eapxml::get_element_value(pXmlElInnerAuthenticationMethod, bstr(L"eap-metadata:NonEAPAuthMethod"), bstrMethod))) {
-        m_inner.reset(make_config_method(bstrMethod));
+        m_inner.reset(make_inner_config(bstrMethod));
         m_module.log_config((xpath + L"/NonEAPAuthMethod").c_str(), m_inner->get_method_str());
     } else
         throw win_runtime_error(ERROR_NOT_SUPPORTED, __FUNCTION__ " Unsupported inner authentication method.");
@@ -277,7 +277,7 @@ const wchar_t* eap::config_method_ttls::get_method_str() const
 }
 
 
-eap::config_method* eap::config_method_ttls::make_config_method(_In_ winstd::eap_type_t eap_type) const
+eap::config_method* eap::config_method_ttls::make_inner_config(_In_ winstd::eap_type_t eap_type) const
 {
     switch (eap_type) {
     case eap_type_t::legacy_pap     : return new config_method_pap        (m_module, m_level + 1);
@@ -292,7 +292,7 @@ eap::config_method* eap::config_method_ttls::make_config_method(_In_ winstd::eap
 }
 
 
-eap::config_method* eap::config_method_ttls::make_config_method(_In_ const wchar_t *eap_type) const
+eap::config_method* eap::config_method_ttls::make_inner_config(_In_ const wchar_t *eap_type) const
 {
          if (_wcsicmp(eap_type, L"PAP"         ) == 0) return new config_method_pap        (m_module, m_level + 1);
     else if (_wcsicmp(eap_type, L"MSCHAPv2"    ) == 0) return new config_method_mschapv2   (m_module, m_level + 1);

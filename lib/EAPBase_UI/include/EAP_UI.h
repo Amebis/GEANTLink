@@ -190,7 +190,7 @@ public:
 #endif
 
         // Set banner title.
-        std::unique_ptr<eap::config_method> cfg_dummy(cfg.m_module.make_config_method());
+        std::unique_ptr<eap::config_method> cfg_dummy(cfg.m_module.make_config());
         m_banner->m_title->SetLabel(wxString::Format("%s %s", wxT(PRODUCT_NAME_STR), cfg_dummy->get_method_str()));
 
         for (auto provider = m_cfg.m_providers.begin(), provider_end = m_cfg.m_providers.end(); provider != provider_end; ++provider) {
@@ -253,7 +253,7 @@ protected:
         wxEAPConfigDialogBase::OnProvAdd(event);
 
         // One method
-        std::unique_ptr<eap::config_method> cfg_method(m_cfg.m_module.make_config_method());
+        std::unique_ptr<eap::config_method> cfg_method(m_cfg.m_module.make_config());
 
         // Create provider.
         eap::config_provider cfg_provider(m_cfg.m_module);

@@ -442,7 +442,7 @@ wxEAPProviderSelectDialog::wxEAPProviderSelectDialog(eap::config_connection &cfg
     wxEAPProviderSelectDialogBase(parent)
 {
     // Set banner title.
-    std::unique_ptr<eap::config_method> cfg_dummy(cfg.m_module.make_config_method());
+    std::unique_ptr<eap::config_method> cfg_dummy(cfg.m_module.make_config());
     m_banner->m_title->SetLabel(wxString::Format("%s %s", wxT(PRODUCT_NAME_STR), cfg_dummy->get_method_str()));
 
     // Iterate over providers.

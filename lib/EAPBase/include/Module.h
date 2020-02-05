@@ -108,7 +108,7 @@ namespace eap
         ///
         /// \returns New method configuration
         ///
-        virtual config_method* make_config_method();
+        virtual config_method* make_config();
 
         /// @}
 

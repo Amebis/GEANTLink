@@ -1,21 +1,21 @@
 /*
     Copyright 2015-2020 Amebis
-    Copyright 2016 GÃ‰ANT
+    Copyright 2016 GÉANT
 
-    This file is part of GÃ‰ANTLink.
+    This file is part of GÉANTLink.
 
-    GÃ‰ANTLink is free software: you can redistribute it and/or modify it
+    GÉANTLink is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    GÃ‰ANTLink is distributed in the hope that it will be useful, but
+    GÉANTLink is distributed in the hope that it will be useful, but
     WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with GÃ‰ANTLink. If not, see <http://www.gnu.org/licenses/>.
+    along with GÉANTLink. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <sal.h>
@@ -103,6 +103,7 @@ namespace eap
         ///
         virtual credentials* make_credentials() const;
 
+    protected:
         ///
         /// Makes a new inner method config
         ///
@@ -110,7 +111,7 @@ namespace eap
         ///
         /// \returns A new inner method config of given type
         ///
-        virtual config_method* make_config_method(_In_ winstd::eap_type_t eap_type) const = 0;
+        virtual config_method* make_inner_config(_In_ winstd::eap_type_t eap_type) const = 0;
 
         ///
         /// Makes a new inner method config
@@ -119,7 +120,7 @@ namespace eap
         ///
         /// \returns A new inner method config of given type
         ///
-        virtual config_method* make_config_method(_In_ const wchar_t *eap_type) const = 0;
+        virtual config_method* make_inner_config(_In_ const wchar_t *eap_type) const = 0;
 
     public:
         std::unique_ptr<config_method> m_inner; ///< Inner authentication configuration
@@ -192,23 +193,16 @@ namespace eap
         ///
         virtual const wchar_t* get_method_str() const;
 
+    protected:
         ///
-        /// Makes a new inner method config
+        /// @copydoc eap::config_method_tls_tunnel::make_inner_config()
         ///
-        /// \param[in] eap_type  EAP type
-        ///
-        /// \returns A new inner method config of given type
-        ///
-        virtual config_method* make_config_method(_In_ winstd::eap_type_t eap_type) const;
+        virtual config_method* make_inner_config(_In_ winstd::eap_type_t eap_type) const;
 
         ///
-        /// Makes a new inner method config
+        /// @copydoc eap::config_method_tls_tunnel::make_inner_config()
         ///
-        /// \param[in] eap_type  EAP type
-        ///
-        /// \returns A new inner method config of given type
-        ///
-        virtual config_method* make_config_method(_In_ const wchar_t *eap_type) const;
+        virtual config_method* make_inner_config(_In_ const wchar_t *eap_type) const;
     };
 
     /// @}

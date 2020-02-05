@@ -632,7 +632,7 @@ void eap::config_provider::load(_In_ IXMLDOMNode *pConfigRoot)
         com_obj<IXMLDOMNode> pXmlElMethod;
         pXmlListMethods->get_item(i, &pXmlElMethod);
 
-        unique_ptr<config_method> cfg(m_module.make_config_method());
+        unique_ptr<config_method> cfg(m_module.make_config());
 
         // Check EAP method type (<EAPMethod>).
         DWORD dwMethodID;
@@ -709,7 +709,7 @@ void eap::config_provider::operator>>(_Inout_ cursor_in &cursor)
         bool is_nonnull;
         cursor >> is_nonnull;
         if (is_nonnull) {
-            unique_ptr<config_method> el(m_module.make_config_method());
+            unique_ptr<config_method> el(m_module.make_config());
             cursor >> *el;
             m_methods.push_back(std::move(el));
         } else

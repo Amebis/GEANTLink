@@ -187,7 +187,7 @@ void eap::module::log_error(_In_ const EAP_ERROR *err) const
 }
 
 
-eap::config_method* eap::module::make_config_method()
+eap::config_method* eap::module::make_config()
 {
     return NULL;
 }

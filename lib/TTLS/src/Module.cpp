@@ -165,7 +165,7 @@ eap::peer_ttls::peer_ttls() : peer_tls_tunnel(eap_type_t::ttls)
 }
 
 
-eap::config_method* eap::peer_ttls::make_config_method()
+eap::config_method* eap::peer_ttls::make_config()
 {
     return new config_method_ttls(*this, 0);
 }
