@@ -202,7 +202,7 @@ eap::method* eap::peer_ttls::make_method(_In_ config_method_tls &cfg, _In_ crede
         meth_inner.reset(
             new method_eapmsg(*this,
             new method_eap   (*this, eap_type_t::gtc, *cred_inner,
-            new method_gtc   (*this, dynamic_cast<config_method_eapgtc&>(*cfg_inner), dynamic_cast<credentials&>(*cred_inner)))));
+            new method_gtc   (*this, dynamic_cast<config_method_eapgtc&>(*cfg_inner), *cred_inner))));
         break;
 
 #if EAP_INNER_EAPHOST

@@ -28,6 +28,7 @@ namespace eap
 #include "../../TTLS/include/Config.h"
 #include "../../TTLS/include/Credentials.h"
 #include "../../EAPBase_UI/include/Module.h"
+#include "../../EAPBase_UI/include/wxEAP_UIBase.h"
 
 
 namespace eap

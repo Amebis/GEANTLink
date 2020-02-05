@@ -23,8 +23,6 @@
 // Prevent warnings from wxWidgets headers
 #define _CRT_SECURE_NO_WARNINGS
 
-#include "../../../include/Version.h"
-
 #include "../include/TLS_UI.h"
 
 #include <wxex/valnet.h>
