@@ -28,7 +28,6 @@ namespace eap
 #pragma once
 
 #include "Config.h"
-#include "Module.h"
 
 #include "../../../include/Version.h"
 
@@ -45,6 +44,8 @@ namespace eap
 
 namespace eap
 {
+    class module;
+
     /// \addtogroup EAPBaseCred
     /// @{
 

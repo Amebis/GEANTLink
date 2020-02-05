@@ -171,7 +171,7 @@ eap::config_method* eap::peer_ttls::make_config()
 }
 
 
-eap::method* eap::peer_ttls::make_method(_In_ config_method_tls &cfg, _In_ credentials_tls &cred)
+eap::method* eap::peer_ttls::make_method(_In_ config_method &cfg, _In_ credentials &cred)
 {
     unique_ptr<method> meth_inner;
     auto &cfg_ttls    = dynamic_cast<config_method_ttls&>(cfg);

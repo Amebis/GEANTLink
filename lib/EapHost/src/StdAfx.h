@@ -24,6 +24,8 @@
 #include "../include/Credentials.h"
 #include "../include/Method.h"
 
+#include "../../EAPBase/include/Module.h"
+
 #include <WinStd/Cred.h>
 #include <WinStd/Win.h>
 

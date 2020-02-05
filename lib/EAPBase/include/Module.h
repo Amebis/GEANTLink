@@ -27,6 +27,9 @@ namespace eap
 #pragma once
 
 #include "EAP.h"
+#include "Config.h"
+#include "Credentials.h"
+#include "Method.h"
 
 #include <WinStd/Crypt.h>
 #include <WinStd/ETW.h>
@@ -772,7 +775,7 @@ namespace eap
             _Out_                                  DWORD  *pdwUserDataOutSize,
             _In_                                   HANDLE hTokenImpersonateUser,
             _Out_                                  BOOL   *pfInvokeUI,
-            _Out_                                  WCHAR  **ppwszIdentity) = 0;
+            _Out_                                  WCHAR  **ppwszIdentity);
 
         ///
         /// Defines the implementation of an EAP method-specific function that retrieves the properties of an EAP method given the connection and user data.
@@ -816,7 +819,7 @@ namespace eap
             _In_count_(dwConnectionDataSize) const BYTE        *pConnectionData,
             _In_                                   DWORD       dwConnectionDataSize,
             _Out_                                  BYTE        **ppCredentialsOut,
-            _Out_                                  DWORD       *pdwCredentialsOutSize) = 0;
+            _Out_                                  DWORD       *pdwCredentialsOutSize);
 
         ///
         /// Defines the implementation of an EAP method-specific function that obtains the EAP Single-Sign-On (SSO) credential input fields for an EAP method.
@@ -925,7 +928,7 @@ namespace eap
             _In_                                   DWORD         dwConnectionDataSize,
             _In_count_(dwUserDataSize)       const BYTE          *pUserData,
             _In_                                   DWORD         dwUserDataSize,
-            _In_                                   DWORD         dwMaxSendPacketSize) = 0;
+            _In_                                   DWORD         dwMaxSendPacketSize);
 
         ///
         /// Ends an EAP authentication session for the EAP method.
@@ -934,7 +937,7 @@ namespace eap
         ///
         /// \param[in] hSession  A unique handle for this EAP authentication session on the EAPHost server. This handle is returned in the \p pSessionHandle parameter in a previous call to `EapPeerBeginSession()`.
         ///
-        virtual void end_session(_In_ EAP_SESSION_HANDLE hSession) = 0;
+        virtual void end_session(_In_ EAP_SESSION_HANDLE hSession);
 
         /// @}
 
@@ -955,7 +958,7 @@ namespace eap
             _In_                                       EAP_SESSION_HANDLE  hSession,
             _In_bytecount_(dwReceivedPacketSize) const EapPacket           *pReceivedPacket,
             _In_                                       DWORD               dwReceivedPacketSize,
-            _Out_                                      EapPeerMethodOutput *pEapOutput) = 0;
+            _Out_                                      EapPeerMethodOutput *pEapOutput);
 
         ///
         /// Obtains a response packet from the EAP method.
@@ -969,7 +972,7 @@ namespace eap
         virtual void get_response_packet(
             _In_                                   EAP_SESSION_HANDLE hSession,
             _Out_bytecapcount_(*pdwSendPacketSize) EapPacket          *pSendPacket,
-            _Inout_                                DWORD              *pdwSendPacketSize) = 0;
+            _Inout_                                DWORD              *pdwSendPacketSize);
 
         /// @}
 
@@ -985,7 +988,7 @@ namespace eap
         virtual void get_result(
             _In_    EAP_SESSION_HANDLE        hSession,
             _In_    EapPeerMethodResultReason reason,
-            _Inout_ EapPeerMethodResult       *pResult) = 0;
+            _Inout_ EapPeerMethodResult       *pResult);
 
         /// \name User Interaction
         /// @{
@@ -1004,7 +1007,7 @@ namespace eap
         virtual void get_ui_context(
             _In_  EAP_SESSION_HANDLE hSession,
             _Out_ BYTE               **ppUIContextData,
-            _Out_ DWORD              *pdwUIContextDataSize) = 0;
+            _Out_ DWORD              *pdwUIContextDataSize);
 
         ///
         /// Provides a user interface context to the EAP method.
@@ -1022,7 +1025,7 @@ namespace eap
             _In_                                  EAP_SESSION_HANDLE  hSession,
             _In_count_(dwUIContextDataSize) const BYTE                *pUIContextData,
             _In_                                  DWORD               dwUIContextDataSize,
-            _Out_                                 EapPeerMethodOutput *pEapOutput) = 0;
+            _Out_                                 EapPeerMethodOutput *pEapOutput);
 
         /// @}
 
@@ -1039,7 +1042,7 @@ namespace eap
         ///
         virtual void get_response_attributes(
             _In_  EAP_SESSION_HANDLE hSession,
-            _Out_ EapAttributes      *pAttribs) = 0;
+            _Out_ EapAttributes      *pAttribs);
 
         ///
         /// Provides an updated array of EAP response attributes to the EAP method.
@@ -1053,9 +1056,63 @@ namespace eap
         virtual void set_response_attributes(
             _In_       EAP_SESSION_HANDLE  hSession,
             _In_ const EapAttributes       *pAttribs,
-            _Out_      EapPeerMethodOutput *pEapOutput) = 0;
+            _Out_      EapPeerMethodOutput *pEapOutput);
 
         /// @}
+
+    protected:
+        ///
+        /// Makes a new method
+        ///
+        /// \param[in] cfg   Method configuration
+        /// \param[in] cred  Credentials
+        ///
+        /// \returns A new method
+        ///
+        virtual method* make_method(_In_ config_method &cfg, _In_ credentials &cred) = 0;
+
+        ///
+        /// Checks all configured providers and tries to combine credentials.
+        ///
+        _Success_(return != 0) virtual const config_method_with_cred* combine_credentials(
+            _In_                             DWORD                   dwFlags,
+            _In_                       const config_connection       &cfg,
+            _In_count_(dwUserDataSize) const BYTE                    *pUserData,
+            _In_                             DWORD                   dwUserDataSize,
+            _Inout_                          credentials_connection& cred_out,
+            _In_                             HANDLE                  hTokenImpersonateUser) = 0;
+
+    protected:
+        ///
+        /// Peer session
+        ///
+        /// Maintains EapHost session context.
+        ///
+        class session {
+        public:
+            ///
+            /// Constructs a session
+            ///
+            session(_In_ module &mod);
+
+            ///
+            /// Destructs the session
+            ///
+            virtual ~session();
+
+        public:
+            module &m_module;                   ///< Module
+            config_connection m_cfg;            ///< Connection configuration
+            credentials_connection m_cred;      ///< Connection credentials
+            std::unique_ptr<method> m_method;   ///< EAP method
+
+            // The following members are required to avoid memory leakage in get_result() and get_ui_context().
+            BYTE *m_blob_cfg;                   ///< Configuration BLOB
+#if EAP_USE_NATIVE_CREDENTIAL_CACHE
+            BYTE *m_blob_cred;                  ///< Credentials BLOB
+#endif
+            BYTE *m_blob_ui_ctx;                ///< User Interface context data
+        };
     };
 
     /// @}

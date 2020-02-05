@@ -56,6 +56,9 @@ namespace eap
         virtual void shutdown();
 
     protected:
+        ///
+        /// @copydoc eap::peer::combine_credentials()
+        ///
         _Success_(return != 0) virtual const config_method_with_cred* combine_credentials(
             _In_                             DWORD                   dwFlags,
             _In_                       const config_connection       &cfg,
@@ -85,9 +88,9 @@ namespace eap
 
     protected:
         ///
-        /// @copydoc eap::peer_tls_base::make_method()
+        /// @copydoc eap::peer::make_method()
         ///
-        virtual method* make_method(_In_ config_method_tls &cfg, _In_ credentials_tls &cred);
+        virtual method* make_method(_In_ config_method &cfg, _In_ credentials &cred);
     };
 
     /// @}

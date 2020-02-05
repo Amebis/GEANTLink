@@ -24,6 +24,8 @@
 #include "../include/Method.h"
 #include "../include/MSCHAPv2.h"
 
+#include "../../EAPBase/include/Module.h"
+
 #include <WinStd/Hex.h>
 
 #include <Windows.h>

@@ -28,7 +28,6 @@ namespace eap
 
 #include "Config.h"
 #include "Credentials.h"
-#include "Module.h"
 
 #include <WinStd/EAP.h>
 
@@ -42,6 +41,8 @@ extern "C" {
 
 namespace eap
 {
+    class module;
+
     ///
     /// \defgroup EAPBaseMethod  Methods
     /// Methods

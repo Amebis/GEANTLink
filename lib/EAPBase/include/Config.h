@@ -33,7 +33,6 @@ namespace eap
 
 #pragma once
 
-#include "Module.h"
 #include "EAPXML.h"
 
 #include "../../../include/Version.h"
@@ -52,6 +51,8 @@ namespace eap
 
 namespace eap
 {
+    class module;
+
     ///
     /// \defgroup EAPBaseConfig  Configuration
     /// Configuration management
