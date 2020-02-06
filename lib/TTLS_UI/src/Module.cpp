@@ -83,27 +83,9 @@ void eap::peer_ttls_ui::invoke_identity_ui(
     _Out_                                  DWORD  *pdwUserDataOutSize,
     _Out_                                  LPWSTR *ppwszIdentity)
 {
-    static HWND volatile hWndCurrent = NULL;
-
-    class ui_canceller
-    {
-    public:
-        ui_canceller(_In_ HWND hWnd)
-        {
-            HWND hWndPrev = (HWND)InterlockedCompareExchangePointer((PVOID volatile *)&hWndCurrent, hWnd, NULL);
-            if (hWndPrev) {
-                PostMessage(hWndPrev, WM_CLOSE, 0, 0);
-                throw win_runtime_error(ERROR_CANCELLED, __FUNCTION__ " Aborted.");
-            }
-        }
-
-        ~ui_canceller()
-        {
-            InterlockedExchangePointer((PVOID volatile *)&hWndCurrent, NULL);
-        }
-    };
-
     assert(ppwszIdentity);
+
+    static HWND volatile hWndCurrent = NULL;
 
     // Unpack configuration.
     config_connection cfg(*this);
@@ -129,7 +111,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
     if (cfg.m_providers.size() > 1) {
         // Multiple identity providers: User has to select one first.
         wxEAPProviderSelectDialog dlg(cfg, init.m_parent);
-        ui_canceller lock(dlg.GetHWND());
+        wxUICanceller lock(hWndCurrent, dlg.GetHWND());
 
         // Centre and display dialog.
         dlg.Centre(wxBOTH);
@@ -186,7 +168,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
     {
         // Build dialog to prompt for outer credentials.
         wxEAPCredentialsDialog dlg(*cfg_prov, init.m_parent);
-        ui_canceller lock(dlg.GetHWND());
+        wxUICanceller lock(hWndCurrent, dlg.GetHWND());
         if (eap::config_method::status_t::cred_begin <= cfg_method->m_last_status && cfg_method->m_last_status < eap::config_method::status_t::cred_end)
             dlg.AddContent(new wxEAPCredentialWarningPanel(*cfg_prov, cfg_method->m_last_status, &dlg));
         auto panel = new wxTLSCredentialsPanel(*cfg_prov, *cfg_method, *cred, &dlg, false);
@@ -275,7 +257,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
         {
             // Native inner methods. Build dialog to prompt for inner credentials.
             wxEAPCredentialsDialog dlg(*cfg_prov, init.m_parent);
-            ui_canceller lock(dlg.GetHWND());
+            wxUICanceller lock(hWndCurrent, dlg.GetHWND());
             if (eap::config_method::status_t::cred_begin <= cfg_method->m_inner->m_last_status && cfg_method->m_inner->m_last_status < eap::config_method::status_t::cred_end)
                 dlg.AddContent(new wxEAPCredentialWarningPanel(*cfg_prov, cfg_method->m_inner->m_last_status, &dlg));
             wxEAPCredentialsPanelBase *panel = NULL;

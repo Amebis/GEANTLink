@@ -600,3 +600,24 @@ wxInitializerPeer::~wxInitializerPeer()
 wxCriticalSection wxInitializerPeer::s_lock;
 unsigned long wxInitializerPeer::s_init_ref_count = 0;
 wxLocale *wxInitializerPeer::s_locale = NULL;
+
+
+//////////////////////////////////////////////////////////////////////
+// wxUICanceller
+//////////////////////////////////////////////////////////////////////
+
+wxUICanceller::wxUICanceller(_Inout_ HWND volatile &hWndCurrent, _In_ HWND hWnd) :
+    m_hWndCurrent(hWndCurrent)
+{
+    HWND hWndPrev = (HWND)InterlockedCompareExchangePointer((PVOID volatile *)&m_hWndCurrent, hWnd, NULL);
+    if (hWndPrev) {
+        PostMessage(hWndPrev, WM_CLOSE, 0, 0);
+        throw winstd::win_runtime_error(ERROR_CANCELLED, __FUNCTION__ " Aborted.");
+    }
+}
+
+
+wxUICanceller::~wxUICanceller()
+{
+    InterlockedExchangePointer((PVOID volatile *)&m_hWndCurrent, NULL);
+}

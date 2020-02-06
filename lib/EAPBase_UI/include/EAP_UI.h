@@ -464,6 +464,30 @@ protected:
 
 
 ///
+/// Closes active window if exists
+///
+class wxUICanceller
+{
+public:
+    ///
+    /// Send WM_CLOSE to the active window if it exists.
+    ///
+    /// \param[inout] hWndCurrent  Reference to a handle of the active window is stored. The variable should be shared between threads.
+    /// \param[in]    hWnd         Handle of a new window to be activated
+    ///
+    wxUICanceller(_Inout_ HWND volatile &hWndCurrent, _In_ HWND hWnd);
+
+    ///
+    /// Clears the active window handle.
+    ///
+    ~wxUICanceller();
+
+protected:
+    HWND volatile &m_hWndCurrent;
+};
+
+
+///
 /// EAP general note
 ///
 class wxEAPNotePanel : public wxEAPNotePanelBase
