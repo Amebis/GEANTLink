@@ -1074,13 +1074,14 @@ namespace eap
         ///
         /// Checks all configured providers and tries to combine credentials.
         ///
+        /// Must be called in the connecting user context.
+        ///
         _Success_(return != 0) virtual const config_method_with_cred* combine_credentials(
             _In_                             DWORD                   dwFlags,
             _In_                       const config_connection       &cfg,
             _In_count_(dwUserDataSize) const BYTE                    *pUserData,
             _In_                             DWORD                   dwUserDataSize,
-            _Inout_                          credentials_connection& cred_out,
-            _In_                             HANDLE                  hTokenImpersonateUser) = 0;
+            _Inout_                          credentials_connection& cred_out) = 0;
 
     protected:
         ///

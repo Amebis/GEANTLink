@@ -174,7 +174,6 @@ void eap::peer_ttls_ui::invoke_identity_ui(
     wstring target_name(std::move(cfg_prov->get_id()));
     eap::credentials::source_t src_outer = cred->credentials_tls::combine(
         dwFlags,
-        NULL,
 #if EAP_USE_NATIVE_CREDENTIAL_CACHE
         has_cached ? cred_in.m_cred.get() : NULL,
 #else
@@ -222,7 +221,6 @@ void eap::peer_ttls_ui::invoke_identity_ui(
     // Combine inner credentials.
     eap::credentials::source_t src_inner = cred->m_inner->combine(
         dwFlags,
-        NULL,
 #if EAP_USE_NATIVE_CREDENTIAL_CACHE
         has_cached ? dynamic_cast<credentials_tls_tunnel*>(cred_in.m_cred.get())->m_inner.get() : NULL,
 #else

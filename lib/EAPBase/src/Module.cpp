@@ -367,9 +367,12 @@ void eap::peer::get_identity(
     config_connection cfg(*this);
     unpack(cfg, pConnectionData, dwConnectionDataSize);
 
+    // Switch user context.
+    user_impersonator impersonating(hTokenImpersonateUser);
+
     // Combine credentials.
     credentials_connection cred_out(*this, cfg);
-    auto cfg_method = combine_credentials(dwFlags, cfg, pUserData, dwUserDataSize, cred_out, hTokenImpersonateUser);
+    auto cfg_method = combine_credentials(dwFlags, cfg, pUserData, dwUserDataSize, cred_out);
 
     if (cfg_method) {
         // No UI will be necessary.

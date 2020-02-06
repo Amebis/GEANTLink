@@ -64,8 +64,7 @@ namespace eap
             _In_                       const config_connection       &cfg,
             _In_count_(dwUserDataSize) const BYTE                    *pUserData,
             _In_                             DWORD                   dwUserDataSize,
-            _Inout_                          credentials_connection& cred_out,
-            _In_                             HANDLE                  hTokenImpersonateUser);
+            _Inout_                          credentials_connection& cred_out);
     };
 
 

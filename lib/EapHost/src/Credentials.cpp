@@ -220,7 +220,6 @@ LPCTSTR eap::credentials_eaphost::target_suffix() const
 
 eap::credentials::source_t eap::credentials_eaphost::combine(
     _In_             DWORD         dwFlags,
-    _In_opt_         HANDLE        hTokenImpersonateUser,
     _In_opt_   const credentials   *cred_cached,
     _In_       const config_method &cfg,
     _In_opt_z_       LPCTSTR       pszTargetName)
@@ -253,9 +252,6 @@ eap::credentials::source_t eap::credentials_eaphost::combine(
     }
 
     if (src == source_t::unknown && pszTargetName) {
-        // Switch user context.
-        user_impersonator impersonating(hTokenImpersonateUser);
-
         try {
             credentials_eaphost cred_loaded(m_module);
             cred_loaded.retrieve(pszTargetName, cfg.m_level);
@@ -281,7 +277,7 @@ eap::credentials::source_t eap::credentials_eaphost::combine(
         cfg_eaphost->get_type(),
         (DWORD)cfg_eaphost->m_cfg_blob.size(), cfg_eaphost->m_cfg_blob.data(),
         src != source_t::unknown ? (DWORD)m_cred_blob.size() : 0, src != source_t::unknown ? m_cred_blob.data() : NULL,
-        hTokenImpersonateUser,
+        NULL,
         &fInvokeUI,
         &cred_data_size, get_ptr(cred_data),
         get_ptr(identity),

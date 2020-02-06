@@ -308,6 +308,8 @@ namespace eap
         ///
         /// Generates public identity using current configuration and given credentials
         ///
+        /// Must be called in the connecting user context.
+        ///
         std::wstring get_public_identity(const credentials &cred) const;
 
     public:

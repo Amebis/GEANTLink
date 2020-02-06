@@ -66,8 +66,7 @@ _Success_(return != 0) const eap::config_method_with_cred* eap::peer_tls_tunnel:
     _In_                       const config_connection       &cfg,
     _In_count_(dwUserDataSize) const BYTE                    *pUserData,
     _In_                             DWORD                   dwUserDataSize,
-    _Inout_                          credentials_connection& cred_out,
-    _In_                             HANDLE                  hTokenImpersonateUser)
+    _Inout_                          credentials_connection& cred_out)
 {
 #if EAP_USE_NATIVE_CREDENTIAL_CACHE
     // Unpack cached credentials.
@@ -102,7 +101,6 @@ _Success_(return != 0) const eap::config_method_with_cred* eap::peer_tls_tunnel:
         LPCTSTR _target_name = (dwFlags & EAP_FLAG_GUEST_ACCESS) == 0 ? target_name.c_str() : NULL;
         eap::credentials::source_t src_outer = cred->credentials_tls::combine(
             dwFlags,
-            hTokenImpersonateUser,
 #if EAP_USE_NATIVE_CREDENTIAL_CACHE
             has_cached ? cred_in.m_cred.get() : NULL,
 #else
@@ -118,7 +116,6 @@ _Success_(return != 0) const eap::config_method_with_cred* eap::peer_tls_tunnel:
         // Combine inner credentials.
         eap::credentials::source_t src_inner = cred->m_inner->combine(
             dwFlags,
-            hTokenImpersonateUser,
 #if EAP_USE_NATIVE_CREDENTIAL_CACHE
             has_cached ? dynamic_cast<credentials_tls_tunnel*>(cred_in.m_cred.get())->m_inner.get() : NULL,
 #else
