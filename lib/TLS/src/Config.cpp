@@ -112,12 +112,6 @@ eap::config_method_tls& eap::config_method_tls::operator=(_Inout_ config_method_
 }
 
 
-eap::config* eap::config_method_tls::clone() const
-{
-    return new config_method_tls(*this);
-}
-
-
 void eap::config_method_tls::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot) const
 {
     assert(pDoc);
@@ -251,18 +245,6 @@ void eap::config_method_tls::operator>>(_Inout_ cursor_in &cursor)
     config_method_with_cred::operator>>(cursor);
     cursor >> m_trusted_root_ca;
     cursor >> m_server_names   ;
-}
-
-
-eap_type_t eap::config_method_tls::get_method_id() const
-{
-    return eap_type_t::tls;
-}
-
-
-const wchar_t* eap::config_method_tls::get_method_str() const
-{
-    return L"EAP-TLS";
 }
 
 

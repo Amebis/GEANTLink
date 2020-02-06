@@ -109,8 +109,6 @@ namespace eap
         ///
         config_method_tls& operator=(_Inout_ config_method_tls &&other) noexcept;
 
-        virtual config* clone() const;
-
         /// \name XML management
         /// @{
         virtual void save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pConfigRoot) const;
@@ -123,18 +121,6 @@ namespace eap
         virtual size_t get_pk_size() const;
         virtual void operator>>(_Inout_ cursor_in &cursor);
         /// @}
-
-        ///
-        /// @copydoc eap::config_method::get_method_id()
-        /// \returns This implementation always returns `winstd::eap_type_t::tls`
-        ///
-        virtual winstd::eap_type_t get_method_id() const;
-
-        ///
-        /// @copydoc eap::config_method::get_method_str()
-        /// \returns This implementation always returns `L"EAP-TLS"`
-        ///
-        virtual const wchar_t* get_method_str() const;
 
         ///
         /// @copydoc eap::config_method::make_credentials()
