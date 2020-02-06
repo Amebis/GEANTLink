@@ -11,11 +11,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\StdAfx.h" />
+    <ClInclude Include="..\src\PCH.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Main.cpp" />
-    <ClCompile Include="..\src\StdAfx.cpp">
+    <ClCompile Include="..\src\PCH.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>

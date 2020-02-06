@@ -38,7 +38,7 @@
       <WarningLevel>Level4</WarningLevel>
       <PreprocessorDefinitions>EAP_INNER_EAPHOST;_WIN32_WINNT=0x0600;ISOLATION_AWARE_ENABLED=1;SECURITY_WIN32;CERT_CHAIN_PARA_HAS_EXTRA_FIELDS;EAP_TLS=1;wxMSVC_VERSION=$(PlatformToolsetVersion);WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>StdAfx.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>PCH.h</PrecompiledHeaderFile>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <StringPooling>true</StringPooling>
       <EnablePREfast>true</EnablePREfast>

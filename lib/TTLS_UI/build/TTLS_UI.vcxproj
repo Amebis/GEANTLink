@@ -103,11 +103,11 @@
   <ItemGroup>
     <ClInclude Include="..\include\Module.h" />
     <ClInclude Include="..\include\TTLS_UI.h" />
-    <ClInclude Include="..\src\StdAfx.h" />
+    <ClInclude Include="..\src\PCH.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Module.cpp" />
-    <ClCompile Include="..\src\StdAfx.cpp">
+    <ClCompile Include="..\src\PCH.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\src\TTLS_UI.cpp" />

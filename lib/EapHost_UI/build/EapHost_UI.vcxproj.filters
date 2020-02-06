@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\StdAfx.h">
+    <ClInclude Include="..\src\PCH.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\EapHost_UI.h">
@@ -26,7 +26,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\StdAfx.cpp">
+    <ClCompile Include="..\src\PCH.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\EapHost_UI.cpp">

@@ -108,7 +108,7 @@
     <ClInclude Include="..\include\Method.h" />
     <ClInclude Include="..\include\Module.h" />
     <ClInclude Include="..\include\UIContext.h" />
-    <ClInclude Include="..\src\StdAfx.h" />
+    <ClInclude Include="..\src\PCH.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Config.cpp" />
@@ -116,7 +116,7 @@
     <ClCompile Include="..\src\EAP.cpp" />
     <ClCompile Include="..\src\Module.cpp" />
     <ClCompile Include="..\src\Method.cpp" />
-    <ClCompile Include="..\src\StdAfx.cpp">
+    <ClCompile Include="..\src\PCH.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\src\UIContext.cpp" />

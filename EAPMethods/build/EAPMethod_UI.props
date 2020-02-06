@@ -7,18 +7,18 @@
   <PropertyGroup />
   <ItemDefinitionGroup>
     <ClCompile>
-      <PrecompiledHeaderFile>StdAfx_UI.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>PCH_UI.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <ModuleDefinitionFile>EAPMethod_UI.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\StdAfx_UI.h" />
+    <ClInclude Include="..\src\PCH_UI.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Main_UI.cpp" />
-    <ClCompile Include="..\src\StdAfx_UI.cpp">
+    <ClCompile Include="..\src\PCH_UI.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>

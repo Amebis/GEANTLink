@@ -120,7 +120,7 @@
     <ClInclude Include="ETWLog.h" />
     <ClInclude Include="Frame.h" />
     <ClInclude Include="LogPanel.h" />
-    <ClInclude Include="StdAfx.h" />
+    <ClInclude Include="PCH.h" />
     <ClInclude Include="res\wxEventMonitor_UI.h" />
   </ItemGroup>
   <ItemGroup>
@@ -128,7 +128,7 @@
     <ClCompile Include="ETWLog.cpp" />
     <ClCompile Include="Frame.cpp" />
     <ClCompile Include="LogPanel.cpp" />
-    <ClCompile Include="StdAfx.cpp">
+    <ClCompile Include="PCH.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="res\wxEventMonitor_UI.cpp" />

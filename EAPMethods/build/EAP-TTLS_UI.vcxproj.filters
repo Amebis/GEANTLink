@@ -19,12 +19,12 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\StdAfx_UI.h">
+    <ClInclude Include="..\src\PCH_UI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\StdAfx_UI.cpp">
+    <ClCompile Include="..\src\PCH_UI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Main_UI.cpp">

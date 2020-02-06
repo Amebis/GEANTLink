@@ -105,13 +105,13 @@
     <ClInclude Include="..\include\Module.h" />
     <ClInclude Include="..\include\wxEAP_UIBase.h" />
     <ClInclude Include="..\res\wxEAP_UI.h" />
-    <ClInclude Include="..\src\StdAfx.h" />
+    <ClInclude Include="..\src\PCH.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\res\wxEAP_UI.cpp" />
     <ClCompile Include="..\src\EAP_UI.cpp" />
     <ClCompile Include="..\src\Module.cpp" />
-    <ClCompile Include="..\src\StdAfx.cpp">
+    <ClCompile Include="..\src\PCH.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>

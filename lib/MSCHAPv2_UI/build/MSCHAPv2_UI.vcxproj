@@ -102,11 +102,11 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" />
   <ItemGroup>
     <ClInclude Include="..\include\MSCHAPv2_UI.h" />
-    <ClInclude Include="..\src\StdAfx.h" />
+    <ClInclude Include="..\src\PCH.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\MSCHAPv2_UI.cpp" />
-    <ClCompile Include="..\src\StdAfx.cpp">
+    <ClCompile Include="..\src\PCH.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>

@@ -103,12 +103,12 @@
   <ItemGroup>
     <ClInclude Include="..\include\TLS_UI.h" />
     <ClInclude Include="..\res\wxTLS_UI.h" />
-    <ClInclude Include="..\src\StdAfx.h" />
+    <ClInclude Include="..\src\PCH.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\res\wxTLS_UI.cpp" />
     <ClCompile Include="..\src\TLS_UI.cpp" />
-    <ClCompile Include="..\src\StdAfx.cpp">
+    <ClCompile Include="..\src\PCH.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>
