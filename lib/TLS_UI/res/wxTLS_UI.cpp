@@ -25,7 +25,7 @@ wxTLSServerTrustPanelBase::wxTLSServerTrustPanelBase( wxWindow* parent, wxWindow
 	wxBoxSizer* sb_server_trust_vert;
 	sb_server_trust_vert = new wxBoxSizer( wxVERTICAL );
 	
-	m_server_trust_label = new wxStaticText( sb_server_trust->GetStaticBox(), wxID_ANY, _("Describe the servers you trust to prevent credential interception in case of man-in-the-middle attacks."), wxDefaultPosition, wxDefaultSize, 0 );
+	m_server_trust_label = new wxStaticText( sb_server_trust->GetStaticBox(), wxID_ANY, _("Describe the servers you trust to prevent man-in-the-middle attacks."), wxDefaultPosition, wxDefaultSize, 0 );
 	m_server_trust_label->Wrap( FromDIP(440) );
 	sb_server_trust_vert->Add( m_server_trust_label, 0, wxALL|wxEXPAND, FromDIP(5) );
 	

@@ -481,7 +481,7 @@ wxEAPIdentityConfigPanel::wxEAPIdentityConfigPanel(const eap::config_provider &p
     // Load and set icon.
     winstd::library lib_shell32;
     if (lib_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
-        m_outer_identity_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(265)));
+        m_identity_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(265)));
 }
 
 
@@ -491,12 +491,12 @@ bool wxEAPIdentityConfigPanel::TransferDataToWindow()
 {
     // Populate identity controls.
     if (m_cfg.m_anonymous_identity.empty()) {
-        m_outer_identity_same->SetValue(true);
+        m_identity_same->SetValue(true);
     } else if (m_cfg.m_anonymous_identity == L"@") {
-        m_outer_identity_empty->SetValue(true);
+        m_identity_empty->SetValue(true);
     } else {
-        m_outer_identity_custom->SetValue(true);
-        m_outer_identity_custom_val->SetValue(m_cfg.m_anonymous_identity);
+        m_identity_custom->SetValue(true);
+        m_identity_custom_val->SetValue(m_cfg.m_anonymous_identity);
     }
 
     return wxEAPIdentityConfigPanelBase::TransferDataToWindow();
@@ -509,12 +509,12 @@ bool wxEAPIdentityConfigPanel::TransferDataFromWindow()
 
     if (!m_prov.m_read_only) {
         // This is not a provider-locked configuration. Save the data.
-        if (m_outer_identity_same->GetValue())
+        if (m_identity_same->GetValue())
             m_cfg.m_anonymous_identity.clear();
-        else if (m_outer_identity_empty->GetValue())
+        else if (m_identity_empty->GetValue())
             m_cfg.m_anonymous_identity = L"@";
         else
-            m_cfg.m_anonymous_identity = m_outer_identity_custom_val->GetValue();
+            m_cfg.m_anonymous_identity = m_identity_custom_val->GetValue();
     }
 
     return true;
@@ -527,16 +527,16 @@ void wxEAPIdentityConfigPanel::OnUpdateUI(wxUpdateUIEvent& event)
 
     if (m_prov.m_read_only) {
         // This is provider-locked configuration. Disable controls.
-        m_outer_identity_same      ->Enable(false);
-        m_outer_identity_empty     ->Enable(false);
-        m_outer_identity_custom    ->Enable(false);
-        m_outer_identity_custom_val->Enable(false);
+        m_identity_same      ->Enable(false);
+        m_identity_empty     ->Enable(false);
+        m_identity_custom    ->Enable(false);
+        m_identity_custom_val->Enable(false);
     } else {
         // This is not a provider-locked configuration. Selectively enable/disable controls.
-        m_outer_identity_same      ->Enable(true);
-        m_outer_identity_empty     ->Enable(true);
-        m_outer_identity_custom    ->Enable(true);
-        m_outer_identity_custom_val->Enable(m_outer_identity_custom->GetValue());
+        m_identity_same      ->Enable(true);
+        m_identity_empty     ->Enable(true);
+        m_identity_custom    ->Enable(true);
+        m_identity_custom_val->Enable(m_identity_custom->GetValue());
     }
 }
 

@@ -2,14 +2,14 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: EAPMethods\n"
-"POT-Creation-Date: 2019-08-12 14:04+0200\n"
+"POT-Creation-Date: 2020-02-06 16:51+0100\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
 "Last-Translator: Simon Rozman <simon.rozman@amebis.si>\n"
 "Language-Team: Amebis, d. o. o., Kamnik <info@amebis.si>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.2.3\n"
+"X-Generator: Poedit 2.2.4\n"
 "X-Poedit-Basepath: ../..\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-KeywordsList: _\n"
@@ -22,71 +22,71 @@ msgstr ""
 "X-Poedit-SearchPath-6: lib/TTLS_UI\n"
 "X-Poedit-SearchPath-7: EAPMethods\n"
 
-#: lib/EAPBase_UI/include/EAP_UI.h:285
+#: lib/EAPBase_UI/include/EAP_UI.h:294
 #, c-format
 msgid "Are you sure you want to permanently remove %s provider from configuration?"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:285
+#: lib/EAPBase_UI/include/EAP_UI.h:294
 msgid "Warning"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:371 lib/EAPBase_UI/res/wxEAP_UI.h:117
+#: lib/EAPBase_UI/include/EAP_UI.h:380 lib/EAPBase_UI/res/wxEAP_UI.h:117
 msgid "EAP Credentials"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:641
+#: lib/EAPBase_UI/include/EAP_UI.h:724
 msgid "Provider Settings"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:674 lib/EAPBase_UI/res/wxEAP_UI.cpp:229
+#: lib/EAPBase_UI/include/EAP_UI.h:757 lib/EAPBase_UI/res/wxEAP_UI.cpp:229
 #, c-format
 msgid "%s User Credentials"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:793 lib/TTLS_UI/src/Module.cpp:285
-#: lib/TTLS_UI/src/Module.cpp:357
+#: lib/EAPBase_UI/include/EAP_UI.h:876 lib/TTLS_UI/src/Module.cpp:196
+#: lib/TTLS_UI/src/Module.cpp:305
 #, c-format
 msgid "Error writing credentials to Credential Manager: %hs (error %u)"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:796 lib/TTLS_UI/src/Module.cpp:287
-#: lib/TTLS_UI/src/Module.cpp:359
+#: lib/EAPBase_UI/include/EAP_UI.h:879 lib/TTLS_UI/src/Module.cpp:198
+#: lib/TTLS_UI/src/Module.cpp:307
 msgid "Writing credentials failed."
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:816
+#: lib/EAPBase_UI/include/EAP_UI.h:899
 #, c-format
 msgid "Deleting credentials failed (error %u)."
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:855
+#: lib/EAPBase_UI/include/EAP_UI.h:938
 #, c-format
 msgid "(error %u)"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:859
+#: lib/EAPBase_UI/include/EAP_UI.h:942
 msgid "(error)"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:870 lib/EAPBase_UI/include/EAP_UI.h:879
+#: lib/EAPBase_UI/include/EAP_UI.h:953 lib/EAPBase_UI/include/EAP_UI.h:962
 #: lib/TLS_UI/src/TLS_UI.cpp:61
-msgid "(empty)"
+msgid "(none)"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:870 lib/EAPBase_UI/include/EAP_UI.h:879
+#: lib/EAPBase_UI/include/EAP_UI.h:953 lib/EAPBase_UI/include/EAP_UI.h:962
 msgid "(blank ID)"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:919
+#: lib/EAPBase_UI/include/EAP_UI.h:1002
 msgid "&Remember"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:920
+#: lib/EAPBase_UI/include/EAP_UI.h:1003
 msgid "Check if you would like to save credentials"
 msgstr ""
 
-#: lib/EAPBase_UI/include/EAP_UI.h:1131
+#: lib/EAPBase_UI/include/EAP_UI.h:1212
 msgid "(Your Organization)"
 msgstr ""
 
@@ -119,7 +119,7 @@ msgid "Select the source where your credentials used to connect are stored."
 msgstr ""
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:244
-msgid "Use credentials from Credential &Manager"
+msgid "Use from Credential &Manager"
 msgstr ""
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:245
@@ -153,7 +153,7 @@ msgid "Click here to set or modify your credentials"
 msgstr ""
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:288
-msgid "Use credentials from &profile configuration"
+msgid "Use from &profile configuration"
 msgstr ""
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:289
@@ -288,6 +288,42 @@ msgstr ""
 msgid "(Warning: Once locked, you can not revert using this dialog!)"
 msgstr ""
 
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:727
+msgid "Identity"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:738
+msgid "Select the user ID supplicant introduces itself as to authenticator:"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:745
+msgid "&True identity"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:746
+msgid "Use my true user name"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:750
+msgid "Use &empty identity"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:751
+msgid "Omit my user name and use @mydomain.org only"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:758
+msgid "&Custom identity:"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:759
+msgid "Specify custom identity"
+msgstr ""
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:764
+msgid "Custom identity to use"
+msgstr ""
+
 #: lib/EAPBase_UI/res/wxEAP_UI.h:67
 msgid "EAP Connection Configuration"
 msgstr ""
@@ -392,7 +428,7 @@ msgstr ""
 msgid "Configuring EAP method failed (error %u)."
 msgstr ""
 
-#: lib/GTC_UI/include/GTC_UI.h:111 lib/GTC_UI/res/wxGTC_UI.cpp:16
+#: lib/GTC_UI/include/GTC_UI.h:114 lib/GTC_UI/res/wxGTC_UI.cpp:16
 msgid "GTC Challenge"
 msgstr ""
 
@@ -442,7 +478,7 @@ msgid "Server Trust"
 msgstr ""
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:28
-msgid "Describe the servers you trust to prevent credential interception in case of man-in-the-middle attacks."
+msgid "Describe the servers you trust to prevent man-in-the-middle attacks."
 msgstr ""
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:35
@@ -489,7 +525,7 @@ msgstr ""
 msgid "(Example: foo.bar.com;server2.bar.com)"
 msgstr ""
 
-#: lib/TLS_UI/res/wxTLS_UI.cpp:118 lib/TLS_UI/src/TLS_UI.cpp:325
+#: lib/TLS_UI/res/wxTLS_UI.cpp:118 lib/TLS_UI/src/TLS_UI.cpp:329
 msgid "User Certificate"
 msgstr ""
 
@@ -509,121 +545,97 @@ msgstr ""
 msgid "Your identity (username@domain) to override one from certificate; or blank to use one provided in certificate"
 msgstr ""
 
-#: lib/TLS_UI/src/TLS_UI.cpp:252
+#: lib/TLS_UI/src/TLS_UI.cpp:256
 msgid "Add Certificate"
 msgstr ""
 
-#: lib/TLS_UI/src/TLS_UI.cpp:253
+#: lib/TLS_UI/src/TLS_UI.cpp:257
 msgid "Certificate Files (*.cer;*.crt;*.der;*.p7b;*.pem)"
 msgstr ""
 
-#: lib/TLS_UI/src/TLS_UI.cpp:254
+#: lib/TLS_UI/src/TLS_UI.cpp:258
 msgid "X.509 Certificate Files (*.cer;*.crt;*.der;*.pem)"
 msgstr ""
 
-#: lib/TLS_UI/src/TLS_UI.cpp:255
+#: lib/TLS_UI/src/TLS_UI.cpp:259
 msgid "PKCS #7 Certificate Files (*.p7b)"
 msgstr ""
 
-#: lib/TLS_UI/src/TLS_UI.cpp:256
+#: lib/TLS_UI/src/TLS_UI.cpp:260
 msgid "All Files (*.*)"
 msgstr ""
 
-#: lib/TLS_UI/src/TLS_UI.cpp:270
+#: lib/TLS_UI/src/TLS_UI.cpp:274
 #, c-format
 msgid "Invalid or unsupported certificate file %s"
 msgstr ""
 
-#: lib/TLS_UI/src/TLS_UI.cpp:270
+#: lib/TLS_UI/src/TLS_UI.cpp:274
 msgid "Error"
 msgstr ""
 
-#: lib/TTLS_UI/res/wxTTLS_UI.cpp:17
-msgid "Outer Identity"
-msgstr ""
-
-#: lib/TTLS_UI/res/wxTTLS_UI.cpp:28
-msgid "Select the user ID supplicant introduces itself as to authenticator:"
-msgstr ""
-
-#: lib/TTLS_UI/res/wxTTLS_UI.cpp:35
-msgid "&True identity"
-msgstr ""
-
-#: lib/TTLS_UI/res/wxTTLS_UI.cpp:36
-msgid "Use my true user name"
-msgstr ""
-
-#: lib/TTLS_UI/res/wxTTLS_UI.cpp:40
-msgid "Use &empty outer identity"
-msgstr ""
-
-#: lib/TTLS_UI/res/wxTTLS_UI.cpp:41
-msgid "Omit my user name and use @mydomain.org only"
-msgstr ""
-
-#: lib/TTLS_UI/res/wxTTLS_UI.cpp:48
-msgid "&Custom outer identity:"
-msgstr ""
-
-#: lib/TTLS_UI/res/wxTTLS_UI.cpp:49
-msgid "Specify custom outer identity"
-msgstr ""
-
-#: lib/TTLS_UI/res/wxTTLS_UI.cpp:54
-msgid "Custom outer identity to use"
-msgstr ""
-
-#: lib/TTLS_UI/src/Module.cpp:395
+#: lib/TTLS_UI/src/Module.cpp:249
 #, c-format
 msgid "Invoking EAP identity UI failed (error %u, %s, %s)."
 msgstr ""
 
-#: lib/TTLS_UI/src/Module.cpp:397
+#: lib/TTLS_UI/src/Module.cpp:252
 #, c-format
 msgid "Invoking EAP identity UI failed (error %u)."
 msgstr ""
 
-#: lib/TTLS_UI/src/Module.cpp:533
+#: lib/TTLS_UI/src/Module.cpp:376
 #, c-format
 msgid "Invoking EAP interactive UI failed (error %u, %s, %s)."
 msgstr ""
 
-#: lib/TTLS_UI/src/Module.cpp:536
+#: lib/TTLS_UI/src/Module.cpp:379
 #, c-format
 msgid "Invoking EAP interactive UI failed (error %u)."
 msgstr ""
 
-#: lib/TTLS_UI/src/TTLS_UI.cpp:118
+#: lib/TTLS_UI/src/TTLS_UI.cpp:37
 msgid "Inner Authentication"
 msgstr ""
 
-#: lib/TTLS_UI/src/TTLS_UI.cpp:124
+#: lib/TTLS_UI/src/TTLS_UI.cpp:43
 msgid "Select inner authentication method from the list"
 msgstr ""
 
-#: lib/TTLS_UI/src/TTLS_UI.cpp:126
+#: lib/TTLS_UI/src/TTLS_UI.cpp:48
+msgid "Outer Authentication"
+msgstr ""
+
+#: lib/TTLS_UI/src/TTLS_UI.cpp:127
 msgid "PAP"
 msgstr ""
 
-#: lib/TTLS_UI/src/TTLS_UI.cpp:128
+#: lib/TTLS_UI/src/TTLS_UI.cpp:129
 msgid "MSCHAPv2"
 msgstr ""
 
-#: lib/TTLS_UI/src/TTLS_UI.cpp:130
+#: lib/TTLS_UI/src/TTLS_UI.cpp:131
 msgid "EAP-MSCHAPv2"
 msgstr ""
 
-#: lib/TTLS_UI/src/TTLS_UI.cpp:132
+#: lib/TTLS_UI/src/TTLS_UI.cpp:133
 msgid "EAP-GTC"
 msgstr ""
 
-#: lib/TTLS_UI/src/TTLS_UI.cpp:135
+#: lib/TTLS_UI/src/TTLS_UI.cpp:136
 msgid "Other EAP methods..."
 msgstr ""
 
-#: lib/TTLS_UI/src/TTLS_UI.cpp:141
-msgid "Outer Authentication"
+#: EAPMethods/MSIBuild.EAP-TTLS/en_US.ARM64.Release.Feature-2.idtx:4
+#: EAPMethods/MSIBuild.EAP-TTLS/en_US.Win32.Release.Feature-2.idtx:4
+#: EAPMethods/MSIBuild.EAP-TTLS/en_US.x64.Release.Feature-2.idtx:4
+msgid "EAP-TTLS"
+msgstr ""
+
+#: EAPMethods/MSIBuild.EAP-TTLS/en_US.ARM64.Release.Feature-2.idtx:4
+#: EAPMethods/MSIBuild.EAP-TTLS/en_US.Win32.Release.Feature-2.idtx:4
+#: EAPMethods/MSIBuild.EAP-TTLS/en_US.x64.Release.Feature-2.idtx:4
+msgid "EAP-TTLS Method"
 msgstr ""
 
 #: EAPMethods/MSIBuild/en_US.ARM64.Release.Feature-2.idtx:4
@@ -636,16 +648,4 @@ msgstr ""
 #: EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
 #: EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
 msgid "Modules to support individual EAP methods"
-msgstr ""
-
-#: EAPMethods/MSIBuild/en_US.ARM64.Release.Feature-2.idtx:5
-#: EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:5
-#: EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:5
-msgid "TTLS"
-msgstr ""
-
-#: EAPMethods/MSIBuild/en_US.ARM64.Release.Feature-2.idtx:5
-#: EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:5
-#: EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:5
-msgid "Tunneled Transport Layer Security"
 msgstr ""

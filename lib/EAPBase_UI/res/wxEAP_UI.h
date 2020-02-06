@@ -344,12 +344,12 @@ class wxEAPIdentityConfigPanelBase : public wxPanel
 	private:
 	
 	protected:
-		wxStaticBitmap* m_outer_identity_icon;
-		wxStaticText* m_outer_identity_label;
-		wxRadioButton* m_outer_identity_same;
-		wxRadioButton* m_outer_identity_empty;
-		wxRadioButton* m_outer_identity_custom;
-		wxTextCtrl* m_outer_identity_custom_val;
+		wxStaticBitmap* m_identity_icon;
+		wxStaticText* m_identity_label;
+		wxRadioButton* m_identity_same;
+		wxRadioButton* m_identity_empty;
+		wxRadioButton* m_identity_custom;
+		wxTextCtrl* m_identity_custom_val;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnUpdateUI( wxUpdateUIEvent& event ) { event.Skip(); }
