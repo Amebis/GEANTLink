@@ -142,12 +142,7 @@ namespace eap
             _In_opt_z_       LPCTSTR       pszTargetName);
 
     public:
-        winstd::cert_context m_cert;                ///< Client certificate
-
-    private:
-        /// \cond internal
-        static const unsigned char s_entropy[1024];
-        /// \endcond
+        std::vector<unsigned char> m_cert_hash; ///< Client certificate SHA-1 thumbprint
     };
 
     /// @}

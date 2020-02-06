@@ -36,6 +36,7 @@
 #include <string>
 
 class wxCertificateClientData;
+class wxCertificateHashClientData;
 class wxTLSCredentialsPanel;
 class wxTLSServerTrustPanel;
 class wxTLSConfigPanel;
@@ -90,6 +91,16 @@ public:
 
 public:
     PCCERT_CONTEXT m_cert;  ///< Certificate
+};
+
+
+///
+/// Helper class for auto-destroyable certificate hashes used in wxWidget's item containers
+///
+class wxCertificateHashClientData : public wxClientData
+{
+public:
+    std::vector<unsigned char> m_cert_hash; ///< Certificate thumbprint
 };
 
 

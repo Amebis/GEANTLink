@@ -143,6 +143,8 @@ namespace eap
             _In_        HANDLE        hTokenImpersonateUser,
             _In_opt_    DWORD         dwMaxSendPacketSize = MAXDWORD);
 
+        virtual void end_session();
+
         /// @}
 
         /// \name Packet processing
@@ -192,6 +194,7 @@ namespace eap
         config_method_tls &m_cfg;                   ///< Method configuration
         credentials_tls &m_cred;                    ///< Method user credentials
         HANDLE m_user_ctx;                          ///< Handle to user context
+        winstd::cert_store m_store;                 ///< User certificate store
         winstd::tstring m_sc_target_name;           ///< Schannel target name
         winstd::sec_credentials m_sc_cred;          ///< Schannel client credentials
         std::vector<unsigned char> m_sc_queue;      ///< TLS data queue

@@ -58,7 +58,7 @@ wxTLSCredentialsPanel::wxTLSCredentialsPanel(const eap::config_provider &prov, c
 bool wxTLSCredentialsPanel::TransferDataToWindow()
 {
     // Populate certificate list.
-    m_certificate->Append(_("(empty)"), (wxCertificateClientData*)NULL);
+    m_certificate->Append(_("(empty)"), (wxCertificateHashClientData*)NULL);
     bool is_found = false;
     winstd::cert_store store;
     if (store.create(CERT_STORE_PROV_SYSTEM, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, (HCRYPTPROV)NULL, CERT_SYSTEM_STORE_CURRENT_USER, _T("My"))) {
@@ -70,13 +70,14 @@ bool wxTLSCredentialsPanel::TransferDataToWindow()
             }
 
             // Prepare certificate information.
-            std::unique_ptr<wxCertificateClientData> data(new wxCertificateClientData(CertDuplicateCertificateContext(cert)));
+            std::unique_ptr<wxCertificateHashClientData> data(new wxCertificateHashClientData);
+            if (!CertGetCertificateContextProperty(cert, CERT_HASH_PROP_ID, data->m_cert_hash)) {
+                // Skip certificates we cannot get thumbprint for.
+                continue;
+            }
 
             // Add to list.
-            bool is_selected =
-                m_cred.m_cert &&
-                m_cred.m_cert->cbCertEncoded == data->m_cert->cbCertEncoded &&
-                memcmp(m_cred.m_cert->pbCertEncoded, data->m_cert->pbCertEncoded, m_cred.m_cert->cbCertEncoded) == 0;
+            bool is_selected = m_cred.m_cert_hash == data->m_cert_hash;
             winstd::tstring name(std::move(eap::get_cert_title(cert)));
             int i = m_certificate->Append(name, data.release());
             if (is_selected) {
@@ -99,14 +100,14 @@ bool wxTLSCredentialsPanel::TransferDataFromWindow()
 {
     // Check if m_certificate control has selected item, and has client object data (at least one user certificate on the list). Then try to get the data from selected item.
     int sel = m_certificate->GetSelection();
-    const wxCertificateClientData *data =
+    const wxCertificateHashClientData *data =
         sel != wxNOT_FOUND && m_certificate->HasClientObjectData() ?
-            dynamic_cast<const wxCertificateClientData*>(m_certificate->GetClientObject(sel)) :
+            dynamic_cast<const wxCertificateHashClientData*>(m_certificate->GetClientObject(sel)) :
             NULL;
     if (data)
-        m_cred.m_cert.attach_duplicated(data->m_cert);
+        m_cred.m_cert_hash = data->m_cert_hash;
     else
-        m_cred.m_cert.free();
+        m_cred.m_cert_hash.clear();
 
     m_cred.m_identity = m_identity->GetValue();
 

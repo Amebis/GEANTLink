@@ -208,39 +208,58 @@ void eap::method_tls::begin_session(
 #endif
     }
 
+    if (!m_store.create(CERT_STORE_PROV_SYSTEM, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, (HCRYPTPROV)NULL, CERT_SYSTEM_STORE_CURRENT_USER, _T("My")))
+        throw win_runtime_error(__FUNCTION__ " CertOpenStore failed.");
+
     // Prepare client credentials for Schannel.
-    PCCERT_CONTEXT certs[] = { m_cred.m_cert ? (PCCERT_CONTEXT)m_cred.m_cert : NULL };
+    vector<PCCERT_CONTEXT> certs;
+    if (!m_cred.empty()) {
+        vector<unsigned char> hash;
+        for (PCCERT_CONTEXT cert = NULL; (cert = CertEnumCertificatesInStore(m_store, cert)) != NULL;) {
+            if (CertGetCertificateContextProperty(cert, CERT_HASH_PROP_ID, hash) &&
+                hash == m_cred.m_cert_hash)
+                certs.push_back(cert);
+        }
+    }
     SCHANNEL_CRED cred = {
-        SCHANNEL_CRED_VERSION,                                                // dwVersion
-        m_cred.m_cert ? 1ul : 0ul,                                            // cCreds
-        certs,                                                                // paCred
-        NULL,                                                                 // hRootStore: Not valid for client credentials
-        0,                                                                    // cMappers
-        NULL,                                                                 // aphMappers
-        0,                                                                    // cSupportedAlgs: Use system configured default
-        NULL,                                                                 // palgSupportedAlgs: Use system configured default
-        SP_PROT_TLS1_X_CLIENT | (SP_PROT_TLS1_2_CLIENT<<2),                   // grbitEnabledProtocols: TLS 1.x
-        0,                                                                    // dwMinimumCipherStrength: Use system configured default
-        0,                                                                    // dwMaximumCipherStrength: Use system configured default
-        0,                                                                    // dwSessionLifespan: Use system configured default = 10hr
+        SCHANNEL_CRED_VERSION,                                              // dwVersion
+        (DWORD)certs.size(),                                                // cCreds
+        certs.data(),                                                       // paCred
+        NULL,                                                               // hRootStore: Not valid for client credentials
+        0,                                                                  // cMappers
+        NULL,                                                               // aphMappers
+        0,                                                                  // cSupportedAlgs: Use system configured default
+        NULL,                                                               // palgSupportedAlgs: Use system configured default
+        SP_PROT_TLS1_X_CLIENT | (SP_PROT_TLS1_2_CLIENT<<2),                 // grbitEnabledProtocols: TLS 1.x
+        0,                                                                  // dwMinimumCipherStrength: Use system configured default
+        0,                                                                  // dwMaximumCipherStrength: Use system configured default
+        0,                                                                  // dwSessionLifespan: Use system configured default = 10hr
 #if EAP_TLS >= EAP_TLS_SCHANNEL_FULL
-        SCH_CRED_AUTO_CRED_VALIDATION                                     |   // dwFlags: Let Schannel verify server certificate
+        SCH_CRED_AUTO_CRED_VALIDATION                                     | // dwFlags: Let Schannel verify server certificate
 #else
-        SCH_CRED_MANUAL_CRED_VALIDATION                                   |   // dwFlags: Prevent Schannel verify server certificate (we want to use custom root CA store and multiple name checking)
+        SCH_CRED_MANUAL_CRED_VALIDATION                                   | // dwFlags: Prevent Schannel verify server certificate (we want to use custom root CA store and multiple name checking)
 #endif
-        SCH_CRED_CACHE_ONLY_URL_RETRIEVAL_ON_CREATE                       |   // dwFlags: Do not attempt online revocation check - we do not expect to have network connection yet
-        SCH_CRED_IGNORE_NO_REVOCATION_CHECK                               |   // dwFlags: Ignore no-revocation-check errors - as we cannot check for revocation, it makes little sense to insist certificate has to have revocation set-up
-        SCH_CRED_IGNORE_REVOCATION_OFFLINE                                |   // dwFlags: Ignore offline-revocation errors - we do not expect to have network connection yet
-        SCH_CRED_NO_DEFAULT_CREDS                                         |   // dwFlags: If client certificate we provided is not acceptable, do not try to select one on your own
-        (m_cfg.m_server_names.empty() ? SCH_CRED_NO_SERVERNAME_CHECK : 0) |   // dwFlags: When no expected server name is given, do not do the server name check.
-        0x00400000ul /*SCH_USE_STRONG_CRYPTO*/,                               // dwFlags: Do not use broken ciphers
-        0                                                                     // dwCredFormat
+        SCH_CRED_CACHE_ONLY_URL_RETRIEVAL_ON_CREATE                       | // dwFlags: Do not attempt online revocation check - we do not expect to have network connection yet
+        SCH_CRED_IGNORE_NO_REVOCATION_CHECK                               | // dwFlags: Ignore no-revocation-check errors - as we cannot check for revocation, it makes little sense to insist certificate has to have revocation set-up
+        SCH_CRED_IGNORE_REVOCATION_OFFLINE                                | // dwFlags: Ignore offline-revocation errors - we do not expect to have network connection yet
+        SCH_CRED_NO_DEFAULT_CREDS                                         | // dwFlags: If client certificate we provided is not acceptable, do not try to select one on your own
+        (m_cfg.m_server_names.empty() ? SCH_CRED_NO_SERVERNAME_CHECK : 0) | // dwFlags: When no expected server name is given, do not do the server name check.
+        0x00400000ul /*SCH_USE_STRONG_CRYPTO*/,                             // dwFlags: Do not use broken ciphers
+        0                                                                   // dwCredFormat
     };
     SECURITY_STATUS stat = m_sc_cred.acquire(NULL, UNISP_NAME, SECPKG_CRED_OUTBOUND, NULL, &cred);
     if (FAILED(stat))
         throw sec_runtime_error(stat, __FUNCTION__ " Error acquiring Schannel credentials handle.");
 
     m_phase = phase_t::handshake_init;
+}
+
+
+void eap::method_tls::end_session()
+{
+    m_store.free();
+
+    method::end_session();
 }
 
 
