@@ -127,7 +127,7 @@ namespace eap
         ///
         /// \param[in] dwFlags        A combination of [EAP flags](https://msdn.microsoft.com/en-us/library/windows/desktop/bb891975.aspx) that describe the EAP authentication session behavior
         /// \param[in] cred_cached    Cached credentials (optional, can be \c NULL, must be `credentials_tls*` type)
-        /// \param[in] cfg            Method configuration (unused, as must be as config_method_tls is not derived from `config_method_with_cred`)
+        /// \param[in] cfg            Method configuration (must be `config_method_tls&` type)
         /// \param[in] pszTargetName  The name in Windows Credential Manager to retrieve credentials from (optional, can be \c NULL)
         ///
         /// \returns
