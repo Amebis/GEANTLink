@@ -222,30 +222,30 @@ void eap::method_tls::begin_session(
         }
     }
     SCHANNEL_CRED cred = {
-        SCHANNEL_CRED_VERSION,                                              // dwVersion
-        (DWORD)certs.size(),                                                // cCreds
-        certs.data(),                                                       // paCred
-        NULL,                                                               // hRootStore: Not valid for client credentials
-        0,                                                                  // cMappers
-        NULL,                                                               // aphMappers
-        0,                                                                  // cSupportedAlgs: Use system configured default
-        NULL,                                                               // palgSupportedAlgs: Use system configured default
-        0,                                                                  // grbitEnabledProtocols: Use system configured default
-        0,                                                                  // dwMinimumCipherStrength: Use system configured default
-        0,                                                                  // dwMaximumCipherStrength: Use system configured default
-        0,                                                                  // dwSessionLifespan: Use system configured default = 10hr
+        SCHANNEL_CRED_VERSION,                                                // dwVersion
+        (DWORD)certs.size(),                                                  // cCreds
+        certs.data(),                                                         // paCred
+        NULL,                                                                 // hRootStore: Not valid for client credentials
+        0,                                                                    // cMappers
+        NULL,                                                                 // aphMappers
+        0,                                                                    // cSupportedAlgs: Use system configured default
+        NULL,                                                                 // palgSupportedAlgs: Use system configured default
+        0,                                                                    // grbitEnabledProtocols: Use system configured default
+        0,                                                                    // dwMinimumCipherStrength: Use system configured default
+        0,                                                                    // dwMaximumCipherStrength: Use system configured default
+        0,                                                                    // dwSessionLifespan: Use system configured default = 10hr
 #if EAP_TLS >= EAP_TLS_SCHANNEL_FULL
-        SCH_CRED_AUTO_CRED_VALIDATION                                     | // dwFlags: Let Schannel verify server certificate
+        SCH_CRED_AUTO_CRED_VALIDATION                                       | // dwFlags: Let Schannel verify server certificate
 #else
-        SCH_CRED_MANUAL_CRED_VALIDATION                                   | // dwFlags: Prevent Schannel verify server certificate (we want to use custom root CA store and multiple name checking)
+        SCH_CRED_MANUAL_CRED_VALIDATION                                     | // dwFlags: Prevent Schannel verify server certificate (we want to use custom root CA store and multiple name checking)
 #endif
-        SCH_CRED_CACHE_ONLY_URL_RETRIEVAL_ON_CREATE                       | // dwFlags: Do not attempt online revocation check - we do not expect to have network connection yet
-        SCH_CRED_IGNORE_NO_REVOCATION_CHECK                               | // dwFlags: Ignore no-revocation-check errors - as we cannot check for revocation, it makes little sense to insist certificate has to have revocation set-up
-        SCH_CRED_IGNORE_REVOCATION_OFFLINE                                | // dwFlags: Ignore offline-revocation errors - we do not expect to have network connection yet
-        SCH_CRED_NO_DEFAULT_CREDS                                         | // dwFlags: If client certificate we provided is not acceptable, do not try to select one on your own
-        (m_cfg.m_server_names.empty() ? SCH_CRED_NO_SERVERNAME_CHECK : 0) | // dwFlags: When no expected server name is given, do not do the server name check.
-        0x00400000ul /*SCH_USE_STRONG_CRYPTO*/,                             // dwFlags: Do not use broken ciphers
-        0                                                                   // dwCredFormat
+        SCH_CRED_CACHE_ONLY_URL_RETRIEVAL_ON_CREATE                         | // dwFlags: Do not attempt online revocation check - we do not expect to have network connection yet
+        SCH_CRED_IGNORE_NO_REVOCATION_CHECK                                 | // dwFlags: Ignore no-revocation-check errors - as we cannot check for revocation, it makes little sense to insist certificate has to have revocation set-up
+        SCH_CRED_IGNORE_REVOCATION_OFFLINE                                  | // dwFlags: Ignore offline-revocation errors - we do not expect to have network connection yet
+        SCH_CRED_NO_DEFAULT_CREDS                                           | // dwFlags: If client certificate we provided is not acceptable, do not try to select one on your own
+        (m_cfg.m_server_names.empty() ? SCH_CRED_NO_SERVERNAME_CHECK : 0ul) | // dwFlags: When no expected server name is given, do not do the server name check.
+        SCH_USE_STRONG_CRYPTO,                                                // dwFlags: Do not use broken ciphers
+        0                                                                     // dwCredFormat
     };
     SECURITY_STATUS stat = m_sc_cred.acquire(NULL, UNISP_NAME, SECPKG_CRED_OUTBOUND, NULL, &cred);
     if (FAILED(stat))
@@ -268,6 +268,19 @@ EapPeerMethodResponseAction eap::method_tls::process_request_packet(
     _In_                                       DWORD dwReceivedPacketSize)
 {
     assert(pReceivedPacket || dwReceivedPacketSize == 0);
+
+    static const ULONG sc_flags =
+        ISC_REQ_REPLAY_DETECT          | // Detect replayed messages that have been encoded by using the EncryptMessage or MakeSignature functions.
+        ISC_REQ_SEQUENCE_DETECT        | // Detect messages received out of sequence.
+        ISC_REQ_CONFIDENTIALITY        | // Encrypt messages by using the EncryptMessage function.
+        ISC_REQ_INTEGRITY              | // Sign messages and verify signatures by using the EncryptMessage and MakeSignature functions.
+#if EAP_TLS < EAP_TLS_SCHANNEL_FULL
+        ISC_REQ_MANUAL_CRED_VALIDATION | // Schannel must not authenticate the server automatically.
+#endif
+        ISC_REQ_STREAM                 | // Support a stream-oriented connection.
+        ISC_REQ_USE_SUPPLIED_CREDS     | // Schannel must not attempt to supply credentials for the client automatically.
+        ISC_REQ_EXTENDED_ERROR         | // When errors occur, the remote party will be notified.
+        ISC_REQ_ALLOCATE_MEMORY;         // The security package allocates output buffers for us. We are using sec_buffer_desc helper class to FreeContextBuffer() them.
 
     user_impersonator impersonating(m_user_ctx);
 
@@ -293,7 +306,7 @@ EapPeerMethodResponseAction eap::method_tls::process_request_packet(
         SECURITY_STATUS status = m_sc_ctx.initialize(
             m_sc_cred,
             !m_sc_target_name.empty() ? m_sc_target_name.c_str() : NULL,
-            ISC_REQ_REPLAY_DETECT | ISC_REQ_SEQUENCE_DETECT | ISC_REQ_CONFIDENTIALITY | ISC_REQ_INTEGRITY | ISC_REQ_STREAM | /*ISC_REQ_USE_SUPPLIED_CREDS |*/ ISC_REQ_EXTENDED_ERROR | ISC_REQ_ALLOCATE_MEMORY,
+            sc_flags,
             0,
             &buf_in_desc,
             &buf_out_desc);
@@ -355,7 +368,7 @@ EapPeerMethodResponseAction eap::method_tls::process_request_packet(
         SECURITY_STATUS status = m_sc_ctx.process(
             m_sc_cred,
             !m_sc_target_name.empty() ? m_sc_target_name.c_str() : NULL,
-            ISC_REQ_REPLAY_DETECT | ISC_REQ_SEQUENCE_DETECT | ISC_REQ_CONFIDENTIALITY | ISC_REQ_INTEGRITY | ISC_REQ_STREAM | /*ISC_REQ_USE_SUPPLIED_CREDS |*/ ISC_REQ_EXTENDED_ERROR | ISC_REQ_ALLOCATE_MEMORY,
+            sc_flags,
             0,
             &buf_in_desc,
             &buf_out_desc);
