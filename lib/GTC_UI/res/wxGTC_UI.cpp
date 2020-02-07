@@ -1,8 +1,8 @@
-///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Jun 17 2015)
+﻿///////////////////////////////////////////////////////////////////////////
+// C++ code generated with wxFormBuilder (version Aug  8 2018)
 // http://www.wxformbuilder.org/
 //
-// PLEASE DO "NOT" EDIT THIS FILE!
+// PLEASE DO *NOT* EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
 #include <PCH.h>
@@ -74,7 +74,7 @@ wxGTCConfigPanelBase::wxGTCConfigPanelBase( wxWindow* parent, wxWindowID id, con
 	m_auth_mode = new wxChoicebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxCHB_DEFAULT );
 	m_auth_mode->SetToolTip( _("Select EAP-GTC authentication mode from the list") );
 	
-	sb_vertical->Add( m_auth_mode, 1, wxEXPAND, FromDIP(5) );
+	sb_vertical->Add( m_auth_mode, 0, wxEXPAND, FromDIP(5) );
 	
 	
 	this->SetSizer( sb_vertical );
