@@ -1,12 +1,11 @@
 ﻿///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Aug  8 2018)
+// C++ code generated with wxFormBuilder (version Oct 26 2018)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO *NOT* EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
-#ifndef __WXGTC_UI_H__
-#define __WXGTC_UI_H__
+#pragma once
 
 #include <wx/artprov.h>
 #include <wx/xrc/xmlres.h>
@@ -32,10 +31,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// Class wxGTCResponsePanelBase
 ///////////////////////////////////////////////////////////////////////////////
-class wxGTCResponsePanelBase : public wxPanel 
+class wxGTCResponsePanelBase : public wxPanel
 {
 	private:
-	
+
 	protected:
 		wxStaticBoxSizer* m_sb_response;
 		wxStaticBitmap* m_response_icon;
@@ -43,34 +42,33 @@ class wxGTCResponsePanelBase : public wxPanel
 		wxStaticText* m_response_label;
 		wxStaticText* m_challenge;
 		wxTextCtrl* m_response;
-	
+
 	public:
-		
+
 		wxGTCResponsePanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, long style = wxTAB_TRAVERSAL ); 
 		~wxGTCResponsePanelBase();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class wxGTCConfigPanelBase
 ///////////////////////////////////////////////////////////////////////////////
-class wxGTCConfigPanelBase : public wxPanel 
+class wxGTCConfigPanelBase : public wxPanel
 {
 	private:
-	
+
 	protected:
 		wxStaticText* m_auth_mode_label;
 		wxChoicebook* m_auth_mode;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnUpdateUI( wxUpdateUIEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
+
 		wxGTCConfigPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, long style = wxTAB_TRAVERSAL ); 
 		~wxGTCConfigPanelBase();
-	
+
 };
 
-#endif //__WXGTC_UI_H__

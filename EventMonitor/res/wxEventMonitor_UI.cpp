@@ -1,8 +1,8 @@
-///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Jun 17 2015)
+﻿///////////////////////////////////////////////////////////////////////////
+// C++ code generated with wxFormBuilder (version Oct 26 2018)
 // http://www.wxformbuilder.org/
 //
-// PLEASE DO "NOT" EDIT THIS FILE!
+// PLEASE DO *NOT* EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
 #include "PCH.h"
@@ -17,11 +17,11 @@ wxEventMonitorLogPanelBase::wxEventMonitorLogPanelBase( wxWindow* parent, wxWind
 {
 	wxBoxSizer* bSizerMain;
 	bSizerMain = new wxBoxSizer( wxVERTICAL );
-	
-	m_log = new wxETWListCtrl( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_NO_SORT_HEADER|wxLC_REPORT|wxLC_VIRTUAL|wxNO_BORDER, wxDefaultValidator, wxT("EventMonitorLog") );
+
+	m_log = new wxETWListCtrl( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_NO_SORT_HEADER|wxLC_REPORT|wxLC_VIRTUAL|wxBORDER_NONE, wxDefaultValidator, wxT("EventMonitorLog") );
 	bSizerMain->Add( m_log, 1, wxEXPAND, FromDIP(5) );
-	
-	
+
+
 	this->SetSizer( bSizerMain );
 	this->Layout();
 	bSizerMain->Fit( this );

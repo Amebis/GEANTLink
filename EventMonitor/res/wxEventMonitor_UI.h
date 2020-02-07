@@ -1,12 +1,11 @@
-///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Jun 17 2015)
+﻿///////////////////////////////////////////////////////////////////////////
+// C++ code generated with wxFormBuilder (version Oct 26 2018)
 // http://www.wxformbuilder.org/
 //
-// PLEASE DO "NOT" EDIT THIS FILE!
+// PLEASE DO *NOT* EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
-#ifndef __WXEVENTMONITOR_UI_H__
-#define __WXEVENTMONITOR_UI_H__
+#pragma once
 
 #include <wx/artprov.h>
 #include <wx/xrc/xmlres.h>
@@ -27,18 +26,17 @@ class wxETWListCtrl;
 ///////////////////////////////////////////////////////////////////////////////
 /// Class wxEventMonitorLogPanelBase
 ///////////////////////////////////////////////////////////////////////////////
-class wxEventMonitorLogPanelBase : public wxPanel 
+class wxEventMonitorLogPanelBase : public wxPanel
 {
 	private:
-	
+
 	protected:
-	
+
 	public:
 		wxETWListCtrl* m_log;
-		
-		wxEventMonitorLogPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("EventMonitorLogPanel") ); 
+
+		wxEventMonitorLogPanelBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxT("EventMonitorLogPanel") );
 		~wxEventMonitorLogPanelBase();
-	
+
 };
 
-#endif //__WXEVENTMONITOR_UI_H__
