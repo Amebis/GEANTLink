@@ -20,12 +20,10 @@
 
 #pragma once
 
-// Prevent warnings from wxWidgets headers
-#define _CRT_SECURE_NO_WARNINGS
-
 #if EAPMETHOD_TYPE == 21
-#include "../../lib/TTLS_UI/include/Module.h"
-#define EAPMETHOD_PEER_UI eap::peer_ttls_ui
+#include "../lib/TTLS/include/Method.h"
+#include "../lib/TTLS/include/Module.h"
+#define EAPMETHOD_PEER eap::peer_ttls
 #else
 #error Unknown EAP Method type.
 #endif

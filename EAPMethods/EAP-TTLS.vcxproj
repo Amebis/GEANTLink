@@ -27,8 +27,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{DD7A97CA-F18E-43B7-95C4-D06E6A291624}</ProjectGuid>
-    <RootNamespace>EAP-TTLS_UI</RootNamespace>
+    <ProjectGuid>{331B6077-E3E2-4867-B93E-9D3F57280DE7}</ProjectGuid>
+    <RootNamespace>EAP-TTLS</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -78,7 +78,7 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="EAPMethod_UI.props" />
+    <Import Project="EAPMethod.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
@@ -103,45 +103,26 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" />
   <ItemGroup>
-    <ProjectReference Include="..\..\lib\EapHost\build\EapHost.vcxproj">
+    <ProjectReference Include="..\lib\EapHost\build\EapHost.vcxproj">
       <Project>{b385ec2b-c3f4-48bb-9bac-8b996de7f754}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\lib\EapHost_UI\build\EapHost_UI.vcxproj">
-      <Project>{13d2d8b5-f6aa-459d-b5f7-29b95dd9d583}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\lib\GTC\build\GTC.vcxproj">
+    <ProjectReference Include="..\lib\GTC\build\GTC.vcxproj">
       <Project>{114a70bb-8698-4a0c-8c90-58f22edd8129}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\lib\GTC_UI\build\GTC_UI.vcxproj">
-      <Project>{34680813-3a52-46fb-b5a8-1e4bbf770855}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\lib\MSCHAPv2\build\MSCHAPv2.vcxproj">
+    <ProjectReference Include="..\lib\MSCHAPv2\build\MSCHAPv2.vcxproj">
       <Project>{86a6d6a0-4b7d-4134-be81-a5755c77584d}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\lib\MSCHAPv2_UI\build\MSCHAPv2_UI.vcxproj">
-      <Project>{7af5b922-7c17-428a-97e0-09e3b41a684d}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\lib\PAP\build\PAP.vcxproj">
+    <ProjectReference Include="..\lib\PAP\build\PAP.vcxproj">
       <Project>{36b0cf8a-7794-46c3-8099-825ba962b4c7}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\lib\PAP_UI\build\PAP_UI.vcxproj">
-      <Project>{3d309c2e-64ab-4bc4-a16d-468571a2bc1a}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\lib\TLS\build\TLS.vcxproj">
+    <ProjectReference Include="..\lib\TLS\build\TLS.vcxproj">
       <Project>{4d40cb8a-812e-4f12-b23a-31af743878e8}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\lib\TLS_UI\build\TLS_UI.vcxproj">
-      <Project>{9a25c261-8ade-4938-8393-e857ef0e37e9}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\lib\TTLS\build\TTLS.vcxproj">
+    <ProjectReference Include="..\lib\TTLS\build\TTLS.vcxproj">
       <Project>{ee0ef0d9-a475-4038-8637-5754724f65b0}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\lib\TTLS_UI\build\TTLS_UI.vcxproj">
-      <Project>{42f0f0f4-c928-4860-a4e4-94991c2c3d90}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\..\include\xgettext.targets" />
   </ImportGroup>
 </Project>

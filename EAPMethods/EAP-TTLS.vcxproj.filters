@@ -15,20 +15,20 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\PCH.h">
+    <ClInclude Include="PCH.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\PCH.cpp">
+    <ClCompile Include="PCH.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Main.cpp">
+    <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="..\res\EAPMethod.rc">
+    <ResourceCompile Include="res\EAPMethod.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>

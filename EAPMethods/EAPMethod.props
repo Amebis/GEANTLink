@@ -11,11 +11,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\PCH.h" />
+    <ClInclude Include="PCH.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\Main.cpp" />
-    <ClCompile Include="..\src\PCH.cpp">
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="PCH.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>
@@ -23,6 +23,6 @@
     <None Include="EAPMethod.def" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="..\res\EAPMethod.rc" />
+    <ResourceCompile Include="res\EAPMethod.rc" />
   </ItemGroup>
 </Project>
