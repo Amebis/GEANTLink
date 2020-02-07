@@ -38,7 +38,7 @@ Suite of EAP supplicants for Microsoft Windows - IEEE 802.1X clients for enterpr
 
 ### Deployment
 
-- Released as multi-lingual x86, x64, and ARM64 MSI packages; Group Policy deployment supported
+- Released as multi-lingual x86, AMD64, and ARM64 MSI packages; Group Policy deployment supported
 - [MsiUseFeature utility](https://github.com/Amebis/GEANTLink/tree/master/MsiUseFeature) for the product install state testing (for embedding this product into other setup packages)
 - [CredWrite utility](https://github.com/Amebis/GEANTLink/tree/master/CredWrite) for automated user credential import to Credential Manager
 - [WLANManager utility](https://github.com/Amebis/GEANTLink/tree/master/WLANManager) to allow network profile configuration dialog shortcuts
@@ -78,7 +78,7 @@ This product is using wxWidgets static libraries. Since upstream wxWidgets libra
 3. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 COMPILER_VERSION=142`
 4. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 COMPILER_VERSION=142 BUILD=release`
 
-#### Compiling wxWidgets x64 static libraries
+#### Compiling wxWidgets AMD64 static libraries
 
 1. Start _x64 Native Tools Command Prompt for VS 2019_
 2. Change working folder to `build\msw`
