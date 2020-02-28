@@ -1,50 +1,36 @@
 # Translators:
 # Zenon Mousmoulas <zenon@mousmoulas.gr>, 2017
 # Vicky Kons <vickyk@admin.grnet.gr>, 2017
-# Simon Rozman <simon@rozman.si>, 2018
+# Simon Rozman <simon@rozman.si>, 2020
+# Halil Adem <hadem@noc.grnet.gr>, 2020
 # 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: EAPMethods\n"
-"POT-Creation-Date: 2018-06-20 15:30+0200\n"
+"POT-Creation-Date: 2020-02-06 16:51+0100\n"
 "PO-Revision-Date: 2016-08-25 06:18+0000\n"
-"Last-Translator: Simon Rozman <simon@rozman.si>, 2018\n"
+"Last-Translator: Halil Adem <hadem@noc.grnet.gr>, 2020\n"
 "Language-Team: Greek (https://www.transifex.com/eduroam_devel/teams/11799/el/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: el\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.0.8\n"
-"X-Poedit-Basepath: ../../..\n"
+"X-Generator: Poedit 2.2.4\n"
+"X-Poedit-Basepath: ../..\n"
 "X-Poedit-KeywordsList: _\n"
-"X-Poedit-SearchPath-0: master/lib/EAPBase_UI\n"
-"X-Poedit-SearchPath-1: master/lib/EapHost_UI\n"
-"X-Poedit-SearchPath-10: ver1.1/lib/MSCHAPv2_UI\n"
-"X-Poedit-SearchPath-11: ver1.1/lib/PAP_UI\n"
-"X-Poedit-SearchPath-12: ver1.1/lib/TLS_UI\n"
-"X-Poedit-SearchPath-13: ver1.1/lib/TTLS_UI\n"
-"X-Poedit-SearchPath-14: ver1.1/EAPMethods\n"
-"X-Poedit-SearchPath-15: ver1.0/lib/EAPBase_UI\n"
-"X-Poedit-SearchPath-16: ver1.0/lib/MSCHAPv2_UI\n"
-"X-Poedit-SearchPath-17: ver1.0/lib/PAP_UI\n"
-"X-Poedit-SearchPath-18: ver1.0/lib/TLS_UI\n"
-"X-Poedit-SearchPath-19: ver1.0/lib/TTLS_UI\n"
-"X-Poedit-SearchPath-2: master/lib/GTC_UI\n"
-"X-Poedit-SearchPath-20: ver1.0/EAPMethods\n"
-"X-Poedit-SearchPath-3: master/lib/MSCHAPv2_UI\n"
-"X-Poedit-SearchPath-4: master/lib/PAP_UI\n"
-"X-Poedit-SearchPath-5: master/lib/TLS_UI\n"
-"X-Poedit-SearchPath-6: master/lib/TTLS_UI\n"
-"X-Poedit-SearchPath-7: master/EAPMethods\n"
-"X-Poedit-SearchPath-8: ver1.1/lib/EAPBase_UI\n"
-"X-Poedit-SearchPath-9: ver1.1/lib/EapHost_UI\n"
+"X-Poedit-SearchPath-0: lib/EAPBase_UI\n"
+"X-Poedit-SearchPath-1: lib/EapHost_UI\n"
+"X-Poedit-SearchPath-2: lib/GTC_UI\n"
+"X-Poedit-SearchPath-3: lib/MSCHAPv2_UI\n"
+"X-Poedit-SearchPath-4: lib/PAP_UI\n"
+"X-Poedit-SearchPath-5: lib/TLS_UI\n"
+"X-Poedit-SearchPath-6: lib/TTLS_UI\n"
+"X-Poedit-SearchPath-7: EAPMethods\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 
-#: master/lib/EAPBase_UI/include/EAP_UI.h:285
-#: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:302
-#: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:284
+#: lib/EAPBase_UI/include/EAP_UI.h:294
 #, c-format
 msgid ""
 "Are you sure you want to permanently remove %s provider from configuration?"
@@ -52,172 +38,106 @@ msgstr ""
 "Είστε βέβαιοι ότι θέλετε να καταργήσετε οριστικά τον πάροχο %s από τη "
 "διαμόρφωση;"
 
-#: master/lib/EAPBase_UI/include/EAP_UI.h:285
-#: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:302
-#: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:284
+#: lib/EAPBase_UI/include/EAP_UI.h:294
 msgid "Warning"
 msgstr "Προειδοποίηση"
 
-#: master/lib/EAPBase_UI/include/EAP_UI.h:371
-#: master/lib/EAPBase_UI/res/wxEAP_UI.h:119
-#: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:367
-#: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:377
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.h:119
-#: ver1.0/lib/EAPBase_UI/src/EAP_UI.cpp:128
-#: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:370
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.h:119
+#: lib/EAPBase_UI/include/EAP_UI.h:380 lib/EAPBase_UI/res/wxEAP_UI.h:117
 msgid "EAP Credentials"
 msgstr "Διαπιστευτήρια EAP"
 
-#: master/lib/EAPBase_UI/include/EAP_UI.h:641
-#: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:576
-#: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:640
+#: lib/EAPBase_UI/include/EAP_UI.h:724
 msgid "Provider Settings"
 msgstr "Ρυθμίσεις παρόχων"
 
-#: master/lib/EAPBase_UI/include/EAP_UI.h:674
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:229
-#: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:605
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:229
-#: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:673
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:229
+#: lib/EAPBase_UI/include/EAP_UI.h:757 lib/EAPBase_UI/res/wxEAP_UI.cpp:229
 #, c-format
 msgid "%s User Credentials"
 msgstr "%s Διαπιστευτήρια Χρήστη"
 
-#: master/lib/EAPBase_UI/include/EAP_UI.h:793
-#: master/lib/TTLS_UI/src/Module.cpp:285 master/lib/TTLS_UI/src/Module.cpp:357
-#: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:724
-#: ver1.0/lib/TTLS_UI/src/Module.cpp:275 ver1.0/lib/TTLS_UI/src/Module.cpp:285
-#: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:792
-#: ver1.1/lib/TTLS_UI/src/Module.cpp:263 ver1.1/lib/TTLS_UI/src/Module.cpp:319
+#: lib/EAPBase_UI/include/EAP_UI.h:876 lib/TTLS_UI/src/Module.cpp:196
+#: lib/TTLS_UI/src/Module.cpp:305
 #, c-format
 msgid "Error writing credentials to Credential Manager: %hs (error %u)"
 msgstr ""
 "Σφάλμα κατά την εγγραφή των διαπιστευτηρίων στο Credential Manager: %hs "
 "(σφάλμα %u)"
 
-#: master/lib/EAPBase_UI/include/EAP_UI.h:796
-#: master/lib/TTLS_UI/src/Module.cpp:287 master/lib/TTLS_UI/src/Module.cpp:359
-#: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:727
-#: ver1.0/lib/TTLS_UI/src/Module.cpp:277 ver1.0/lib/TTLS_UI/src/Module.cpp:287
-#: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:795
-#: ver1.1/lib/TTLS_UI/src/Module.cpp:265 ver1.1/lib/TTLS_UI/src/Module.cpp:321
+#: lib/EAPBase_UI/include/EAP_UI.h:879 lib/TTLS_UI/src/Module.cpp:198
+#: lib/TTLS_UI/src/Module.cpp:307
 msgid "Writing credentials failed."
 msgstr "Η εγγραφή των διαπιστευτηρίων απέτυχε."
 
-#: master/lib/EAPBase_UI/include/EAP_UI.h:816
-#: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:747
-#: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:815
+#: lib/EAPBase_UI/include/EAP_UI.h:899
 #, c-format
 msgid "Deleting credentials failed (error %u)."
 msgstr "Η διαγραφή των διαπιστευτηρίων απέτυχε (σφάλμα %u)."
 
-#: master/lib/EAPBase_UI/include/EAP_UI.h:855
-#: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:788
-#: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:854
+#: lib/EAPBase_UI/include/EAP_UI.h:938
 #, c-format
 msgid "(error %u)"
 msgstr "(σφάλμα %u)"
 
-#: master/lib/EAPBase_UI/include/EAP_UI.h:859
-#: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:792
-#: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:858
+#: lib/EAPBase_UI/include/EAP_UI.h:942
 msgid "(error)"
 msgstr "(σφάλμα)"
 
-#: master/lib/EAPBase_UI/include/EAP_UI.h:870
-#: master/lib/EAPBase_UI/include/EAP_UI.h:879
-#: master/lib/TLS_UI/src/TLS_UI.cpp:61
-#: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:803
-#: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:812
-#: ver1.0/lib/TLS_UI/src/TLS_UI.cpp:59
-#: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:869
-#: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:878
-#: ver1.1/lib/TLS_UI/src/TLS_UI.cpp:61
-msgid "(empty)"
-msgstr "(κενό)"
+#: lib/EAPBase_UI/include/EAP_UI.h:953 lib/EAPBase_UI/include/EAP_UI.h:962
+#: lib/TLS_UI/src/TLS_UI.cpp:61
+msgid "(none)"
+msgstr "(κανένα)"
 
-#: master/lib/EAPBase_UI/include/EAP_UI.h:870
-#: master/lib/EAPBase_UI/include/EAP_UI.h:879
-#: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:803
-#: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:812
-#: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:869
-#: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:878
+#: lib/EAPBase_UI/include/EAP_UI.h:953 lib/EAPBase_UI/include/EAP_UI.h:962
 msgid "(blank ID)"
 msgstr "(κενό ID)"
 
-#: master/lib/EAPBase_UI/include/EAP_UI.h:919
-#: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:854
-#: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:918
+#: lib/EAPBase_UI/include/EAP_UI.h:1002
 msgid "&Remember"
 msgstr "&Υπενθύμιση"
 
-#: master/lib/EAPBase_UI/include/EAP_UI.h:920
-#: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:855
-#: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:919
+#: lib/EAPBase_UI/include/EAP_UI.h:1003
 msgid "Check if you would like to save credentials"
 msgstr "Ελέγξτε αν θέλετε να αποθηκεύσετε τα διαπιστευτήρια"
 
-#: master/lib/EAPBase_UI/include/EAP_UI.h:1131
-#: ver1.0/lib/EAPBase_UI/include/EAP_UI.h:1000
-#: ver1.1/lib/EAPBase_UI/include/EAP_UI.h:1077
+#: lib/EAPBase_UI/include/EAP_UI.h:1212
 msgid "(Your Organization)"
 msgstr "(Ο Φορέας σας)"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:37
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:37
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:37
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:37
 msgid "+"
 msgstr "+"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:38
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:38
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:38
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:38
 msgid "Adds new provider"
 msgstr "Προσθέτει νέο πάροχο"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:42
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:42
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:42
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:42
 msgid "-"
 msgstr "-"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:43
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:43
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:43
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:43
 msgid "Removes selected provider"
 msgstr "Αφαιρεί επιλεγμένο πάροχο"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:47
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:47
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:47
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:47
 msgid "Advanced..."
 msgstr "Προχωρημένο..."
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:48
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:48
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:48
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:48
 msgid "Opens dialog with provider settings"
 msgstr "Ανοίγει ένα παράθυρο διαλόγου με τις ρυθμίσεις του παρόχου"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:240
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:240
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:240
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:240
 msgid "Select the source where your credentials used to connect are stored."
 msgstr ""
 "Επιλέξτε την πηγή όπου είναι αποθηκευμένα τα διαπιστευτήριά σας που "
 "χρησιμοποιείται για τη σύνδεση."
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:244
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:244
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:244
-msgid "Use credentials from Credential &Manager"
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:244
+msgid "Use from Credential &Manager"
 msgstr "Χρησιμοποιήστε τα διαπιστευτήρια από τον Credential &Manager"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:245
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:245
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:245
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:245
 msgid ""
 "Select this option if you would like to use credentials stored in Windows "
 "Credential Manager"
@@ -225,31 +145,20 @@ msgstr ""
 "Επιλέξτε αυτήν την επιλογή αν θέλετε να χρησιμοποιήσετε τα διαπιστευτήρια "
 "που αποθηκεύονται στο Windows Credential Manager"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:255
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:299
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:255
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:299
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:255
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:299
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:255 lib/EAPBase_UI/res/wxEAP_UI.cpp:299
 msgid "Identity:"
 msgstr "Ταυτότητα:"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:262
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:262
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:262
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:262
 msgid "Your present credentials stored in Windows Credential Manager"
 msgstr ""
 "Τα παρόντα διαπιστευτήρια είναι αποθηκευμένα στο Windows Credential Manager"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:272
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:272
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:272
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:272
 msgid "&Clear Credentials"
 msgstr "&Καθαρίσμος διαπιστευτηρίων"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:273
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:273
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:273
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:273
 msgid ""
 "Click to clear your credentials from Credential Manager.\n"
 "Note: You will be prompted to enter credentials when connecting."
@@ -257,34 +166,20 @@ msgstr ""
 "Επιλέξτε να καθαρίσετε τα διαπιστευτήρια σας από τον Credential Manager\n"
 "Σημείωση: Θα σας ζητηθεί να εισαγάγετε τις πιστοποιήσεις σας κατά τη σύνδεση."
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:277
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:316
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:277
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:316
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:277
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:316
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:277 lib/EAPBase_UI/res/wxEAP_UI.cpp:316
 msgid "&Set Credentials..."
 msgstr "&Ρυθμίση των διαπιστευτηρίων..."
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:278
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:317
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:278
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:317
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:278
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:317
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:278 lib/EAPBase_UI/res/wxEAP_UI.cpp:317
 msgid "Click here to set or modify your credentials"
 msgstr ""
 "Κάντε κλικ εδώ για να ρυθμίσετε ή να τροποποιήσετε τα διαπιστευτήριά σας"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:288
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:288
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:288
-msgid "Use credentials from &profile configuration"
-msgstr "Χρησιμοποιήστε τα διαπιστευτήρια από το &προφίλ ρύθμισης παραμέτρων"
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:288
+msgid "Use from &profile configuration"
+msgstr "Χρησιμοποιήστε τα διαπιστευτήρια από το &προφίλ ρύθμισης παραμέτρων:"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:289
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:289
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:289
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:289
 msgid ""
 "Select this option if you would like to store credentials as a part of  "
 "profile configuration"
@@ -292,67 +187,47 @@ msgstr ""
 "Επιλέξτε αυτήν την επιλογή αν θέλετε να αποθηκεύσετε τα διαπιστευτήρια ως "
 "μέρος της διαμόρφωσης προφίλ"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:306
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:306
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:306
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:306
 msgid "Profile configuration credentials"
 msgstr "Προφίλ ρύθμισης διαπιστευτηρίων"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:359
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:359
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:359
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:359
 msgid "User ID and Password"
 msgstr "ID χρήστη και κωδικός πρόσβασης"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:369
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:369
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:369
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:369
 msgid "Please provide your user ID and password."
 msgstr "Παρακαλείσθε να δώσετε το όνομα χρήστη και τον κωδικό πρόσβασής σας."
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:379
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:443
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:379
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:379
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:379 lib/EAPBase_UI/res/wxEAP_UI.cpp:443
 msgid "User ID:"
 msgstr "ID Χρήστη:"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:384
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:448
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:384
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:384
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:384 lib/EAPBase_UI/res/wxEAP_UI.cpp:448
 msgid "Enter your user name here (user@domain.org, DOMAIN\\User, etc.)"
 msgstr "Εισάγετε εδώ το όνομα χρήστη (user@domain.org, DOMAIN\\User,etc.)"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:388
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:388
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:388
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:388
 msgid "Password:"
 msgstr "Κωδικός Πρόσβασης:"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:393
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:393
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:393
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:393
 msgid "Enter your password here"
 msgstr "Εισάγετε τον κωδικό πρόσβασης σας εδώ"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:423
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:423
 msgid "User ID"
 msgstr "ID Χρήστη"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:433
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:433
 msgid "Please provide your user ID."
 msgstr "Παρακαλείσθε να δώσετε το όνομα χρήστη"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:473
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:424
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:424
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:473
 msgid "Your Organization"
 msgstr "Ο Φορέας σας"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:484
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:435
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:435
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:484
 msgid ""
 "Describe your organization to customize user prompts.  When organization is "
 "introduced, end-users find program messages easier to understand and act."
@@ -361,78 +236,54 @@ msgstr ""
 "παρουσιάζεται ο φορέας, οι τελικοί χρήστες κατανοούν πιο εύκολα τα μηνύματα "
 "των προγραμμάτων και τις ενέργειές τους."
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:491
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:442
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:442
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:491
 msgid "Your organization &name:"
 msgstr "Το όνομα &του Φορέα σας:"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:496
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:447
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:447
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:496
 msgid ""
 "Your organization name as it will appear on helpdesk contact notifications"
 msgstr ""
 "Το όνομα του φορέα σας, όπως αυτό θα εμφανίζεται στις ειδοποιήσεις των "
 "επαφών του helpdesk"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:500
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:451
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:451
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:500
 msgid "(Keep it short, please)"
 msgstr "(Παρακαλώ, περιοριστείτε)"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:510
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:461
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:461
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:510
 msgid "Helpdesk contact &information:"
 msgstr "Πληροφορίες& επικοινωνίας Helpdesk"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:520
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:471
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:471
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:520
 msgid "¶"
 msgstr "¶"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:527
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:478
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:478
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:527
 msgid "Your helpdesk website address"
 msgstr "H διεύθυνση της ιστοσελίδας του Helpdesk"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:531
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:482
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:482
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:531
 msgid "*"
 msgstr "*"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:538
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:489
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:489
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:538
 msgid "Your helpdesk e-mail address"
 msgstr "Tο e-mail του Helpdesk"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:542
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:493
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:493
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:542
 msgid ")"
 msgstr ")"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:549
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:500
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:500
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:549
 msgid "Your helpdesk phone number"
 msgstr "Ο αριθμός τηλεφώνου του Helpdesk"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:577
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:528
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:528
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:577
 msgid "Provider Unique Identifier"
 msgstr "Πάροχος Μοναδικoύ Αναγνωριστικού"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:588
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:539
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:539
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:588
 msgid ""
 "Assign your organization a unique ID to allow sharing the same credential "
 "set across different network profiles."
@@ -440,47 +291,33 @@ msgstr ""
 "Αναθέστε στον φορέα σας ένα μοναδικό αναγνωριστικό για να επιτρέπεται να "
 "μοιράζεται τα ίδια διαπιστευτήρια σε διαφορετικά προφίλ του δικτύου."
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:595
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:546
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:546
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:595
 msgid "&Namespace:"
 msgstr "&Περιοχή:"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:599
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:550
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:550
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:599
 msgid "urn:RFC4282:realm"
 msgstr "urn:RFC4282:realm"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:599
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:550
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:550
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:599
 msgid "urn:uuid"
 msgstr "urn:uuid"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:611
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:562
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:562
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:611
 msgid "Provider unique &identifier:"
 msgstr "Πάροχος μοναδικού &αναγνωριστικού:"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:616
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:567
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:567
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:616
 msgid "Your organization ID to assign same credentials from other profiles"
 msgstr ""
 "Το αναγνωριστικό του φορέα σας για να παρέχετε ίδια διαπιστευτήρια από άλλα "
 "προφίλ"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:641
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:592
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:592
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:641
 msgid "Configuration Lock"
 msgstr "Διαμόρφωση κλειδώματος"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:652
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:603
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:603
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:652
 msgid ""
 "Your configuration can be locked to prevent accidental modification by end-"
 "users. Users will only be allowed to enter credentials."
@@ -489,9 +326,7 @@ msgstr ""
 "αλλαγές από τους τελικούς χρήστες. Στους  χρήστες θα επιτρέπεται μόνο να "
 "εισαγουν τα διαπιστευτήρια."
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:659
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:610
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:610
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:659
 msgid ""
 "&Lock this configuration and prevent any further modification via user "
 "interface."
@@ -499,68 +334,88 @@ msgstr ""
 "&Αποκλεισμός αυτής της διαμόρφωσης και αποτρέψτε οποιαδήποτε περαιτέρω "
 "τροποποίηση μέσω της διεπαφής χρήστη."
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.cpp:662
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.cpp:613
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.cpp:613
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:662
 msgid "(Warning: Once locked, you can not revert using this dialog!)"
 msgstr ""
 "(Προσοχή: Μόλις κλειδωθεί, δεν μπορείτε να το επαναφέρετε χρησιμοποιώντας "
 "αυτό το διάλογο!)"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.h:69
-#: ver1.0/lib/EAPBase_UI/res/wxEAP_UI.h:69
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.h:69
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:727
+msgid "Identity"
+msgstr "Ταυτότητα"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:738
+msgid "Select the user ID supplicant introduces itself as to authenticator:"
+msgstr ""
+"Επιλέξτε το αιτούμενο αναγνωριστικό χρήστη να εισάγει τον εαυτο του ως  "
+"πιστοποιητικό:"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:745
+msgid "&True identity"
+msgstr "&Επαληθευμένη Ταυτότητα"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:746
+msgid "Use my true user name"
+msgstr "Χρησιμοποιήσε το αληθινό όνομα χρήστη μου"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:750
+msgid "Use &empty identity"
+msgstr "Χρησιμοποιήστε &κενή ταυτότητα"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:751
+msgid "Omit my user name and use @mydomain.org only"
+msgstr ""
+"Παραλείψτε το όνομα χρήστη μου και χρησιμοποιήστε μόνο το @mydomain.org"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:758
+msgid "&Custom identity:"
+msgstr "&Προσαρμοσμένη ταυτότητα:"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:759
+msgid "Specify custom identity"
+msgstr "Καθορίστε τη διαμόρφωση της ταυτότητας"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:764
+msgid "Custom identity to use"
+msgstr "Χρήση της προσαρμοσμένης ταυτότητας"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.h:67
 msgid "EAP Connection Configuration"
 msgstr "Διαμόρφωση σύνδεσης EAP"
 
-#: master/lib/EAPBase_UI/res/wxEAP_UI.h:336
-#: ver1.1/lib/EAPBase_UI/res/wxEAP_UI.h:314
+#: lib/EAPBase_UI/res/wxEAP_UI.h:334
 msgid "EAP Identity Provider"
 msgstr "Πάροχος υπηρεσιών EAP"
 
-#: master/lib/EAPBase_UI/src/EAP_UI.cpp:103
-#: ver1.0/lib/EAPBase_UI/src/EAP_UI.cpp:99
-#: ver1.1/lib/EAPBase_UI/src/EAP_UI.cpp:103
+#: lib/EAPBase_UI/src/EAP_UI.cpp:103
 #, c-format
 msgid "%s Credentials"
 msgstr "%s Διαπιστευτήρια"
 
-#: master/lib/EAPBase_UI/src/EAP_UI.cpp:139
-#: ver1.0/lib/EAPBase_UI/src/EAP_UI.cpp:173
-#: ver1.1/lib/EAPBase_UI/src/EAP_UI.cpp:139
+#: lib/EAPBase_UI/src/EAP_UI.cpp:139
 #, c-format
 msgid "For additional help and instructions, please contact %s at:"
 msgstr ""
 "Για περισσότερη βοήθεια και οδηγίες, παρακαλούμε επικοινωνήστε μαζί μας %s "
 "στο:"
 
-#: master/lib/EAPBase_UI/src/EAP_UI.cpp:140
-#: ver1.0/lib/EAPBase_UI/src/EAP_UI.cpp:174
-#: ver1.1/lib/EAPBase_UI/src/EAP_UI.cpp:140
+#: lib/EAPBase_UI/src/EAP_UI.cpp:140
 msgid "your provider"
 msgstr "ο πάροχος σας"
 
-#: master/lib/EAPBase_UI/src/EAP_UI.cpp:159
-#: ver1.0/lib/EAPBase_UI/src/EAP_UI.cpp:193
-#: ver1.1/lib/EAPBase_UI/src/EAP_UI.cpp:159
+#: lib/EAPBase_UI/src/EAP_UI.cpp:159
 msgid "Open the default web browser"
 msgstr "Ανοίξτε ένα προεπιλεγμένο φυλλομετρητή"
 
-#: master/lib/EAPBase_UI/src/EAP_UI.cpp:170
-#: ver1.0/lib/EAPBase_UI/src/EAP_UI.cpp:204
-#: ver1.1/lib/EAPBase_UI/src/EAP_UI.cpp:170
+#: lib/EAPBase_UI/src/EAP_UI.cpp:170
 msgid "Open your e-mail program"
 msgstr "Ανοίξτε το πρόγραμμα του e-mail σας"
 
-#: master/lib/EAPBase_UI/src/EAP_UI.cpp:181
-#: ver1.0/lib/EAPBase_UI/src/EAP_UI.cpp:215
-#: ver1.1/lib/EAPBase_UI/src/EAP_UI.cpp:181
+#: lib/EAPBase_UI/src/EAP_UI.cpp:181
 msgid "Dial the phone number"
 msgstr "Πληκτρολογήστε το αριθμό τηλεφώνου"
 
-#: master/lib/EAPBase_UI/src/EAP_UI.cpp:203
-#: ver1.0/lib/EAPBase_UI/src/EAP_UI.cpp:235
-#: ver1.1/lib/EAPBase_UI/src/EAP_UI.cpp:203
+#: lib/EAPBase_UI/src/EAP_UI.cpp:203
 #, c-format
 msgid ""
 "%s has pre-set parts of this configuration. Those parts are locked to "
@@ -569,53 +424,39 @@ msgstr ""
 "%s έχει προ-ρυθμισεί τμήματα αυτής της διαμόρφωσης. Τα μέρη αυτά είναι "
 "κλειδωμένα για να εμποδίστει η τυχαία τροποποίηση."
 
-#: master/lib/EAPBase_UI/src/EAP_UI.cpp:204
-#: ver1.0/lib/EAPBase_UI/src/EAP_UI.cpp:236
-#: ver1.1/lib/EAPBase_UI/src/EAP_UI.cpp:204
+#: lib/EAPBase_UI/src/EAP_UI.cpp:204
 msgid "Your provider"
 msgstr "Ο πάροχός σας"
 
-#: master/lib/EAPBase_UI/src/EAP_UI.cpp:225
-#: ver1.0/lib/EAPBase_UI/src/EAP_UI.cpp:257
-#: ver1.1/lib/EAPBase_UI/src/EAP_UI.cpp:225
+#: lib/EAPBase_UI/src/EAP_UI.cpp:225
 msgid "Previous attempt to connect reported invalid credentials."
 msgstr ""
 "Η προηγούμενη προσπάθεια για να συνδεθείτε ανέφερε μη έγκυρα διαπιστευτήρια."
 
-#: master/lib/EAPBase_UI/src/EAP_UI.cpp:226
-#: ver1.0/lib/EAPBase_UI/src/EAP_UI.cpp:258
-#: ver1.1/lib/EAPBase_UI/src/EAP_UI.cpp:226
+#: lib/EAPBase_UI/src/EAP_UI.cpp:226
 msgid "Previous attempt to connect reported your credentials expired."
 msgstr ""
 "Η προηγούμενη προσπάθεια για να συνδεθείτε ανέφερε ότι τα διαπιστευτήριά σας"
 " έχουν λήξει."
 
-#: master/lib/EAPBase_UI/src/EAP_UI.cpp:227
-#: ver1.0/lib/EAPBase_UI/src/EAP_UI.cpp:259
-#: ver1.1/lib/EAPBase_UI/src/EAP_UI.cpp:227
+#: lib/EAPBase_UI/src/EAP_UI.cpp:227
 msgid ""
 "Previous attempt to connect reported your credentials are being changed."
 msgstr ""
 "Η προηγούμενη προσπάθεια να συνδεθείτε ανέφερε ότι τα διαπιστευτήρια σας "
 "έχουν αλλάξει."
 
-#: master/lib/EAPBase_UI/src/EAP_UI.cpp:228
-#: ver1.0/lib/EAPBase_UI/src/EAP_UI.cpp:260
-#: ver1.1/lib/EAPBase_UI/src/EAP_UI.cpp:228
+#: lib/EAPBase_UI/src/EAP_UI.cpp:228
 msgid "Previous attempt to connect failed."
 msgstr "Η προηγούμενη προσπάθεια σύνδεσης απέτυχε."
 
-#: master/lib/EAPBase_UI/src/EAP_UI.cpp:229
-#: ver1.0/lib/EAPBase_UI/src/EAP_UI.cpp:261
-#: ver1.1/lib/EAPBase_UI/src/EAP_UI.cpp:229
+#: lib/EAPBase_UI/src/EAP_UI.cpp:229
 msgid "Please, make sure your credentials are correct, or try again later."
 msgstr ""
 "Παρακαλώ, βεβαιωθείτε ότι τα διαπιστευτήρια σας είναι σωστά ή δοκιμάστε ξανά"
 " αργότερα."
 
-#: master/lib/EAPBase_UI/src/EAP_UI.cpp:250
-#: ver1.0/lib/EAPBase_UI/src/EAP_UI.cpp:282
-#: ver1.1/lib/EAPBase_UI/src/EAP_UI.cpp:250
+#: lib/EAPBase_UI/src/EAP_UI.cpp:250
 #, c-format
 msgid ""
 "The %s version installed on this computer logs credentials in visible and "
@@ -624,121 +465,102 @@ msgstr ""
 "Η %s εγκατεστημένη έκδοση σε αυτόν τον υπολογιστή συνδέει τα  διαπιστευτήρια"
 " με ορατό και ευανάγνωστο τρόπο."
 
-#: master/lib/EAPBase_UI/src/EAP_UI.cpp:251
-#: ver1.0/lib/EAPBase_UI/src/EAP_UI.cpp:283
-#: ver1.1/lib/EAPBase_UI/src/EAP_UI.cpp:251
+#: lib/EAPBase_UI/src/EAP_UI.cpp:251
 msgid "Please, reconsider necessity to enter your credentials."
 msgstr "Παρακαλούμε, θεωρείτε απαραίτητο να εισαγάγετε τα διαπιστευτήριά σας."
 
-#: master/lib/EapHost_UI/res/wxEapHost_UI.cpp:17
-#: ver1.1/lib/EapHost_UI/res/wxEapHost_UI.cpp:17
+#: lib/EapHost_UI/res/wxEapHost_UI.cpp:17
 msgid "Inner EAP Method"
 msgstr "Εσωτερικοί μέθοδοι EAP"
 
-#: master/lib/EapHost_UI/res/wxEapHost_UI.cpp:28
-#: ver1.1/lib/EapHost_UI/res/wxEapHost_UI.cpp:28
+#: lib/EapHost_UI/res/wxEapHost_UI.cpp:28
 msgid "Select and configure inner EAP method"
 msgstr "Επιλέξτε και ρυθμίστε την εσωτερική μέθοδο EAP"
 
-#: master/lib/EapHost_UI/res/wxEapHost_UI.cpp:40
-#: ver1.1/lib/EapHost_UI/res/wxEapHost_UI.cpp:40
+#: lib/EapHost_UI/res/wxEapHost_UI.cpp:40
 msgid "&Settings"
 msgstr "&Ρυθμίσεις"
 
-#: master/lib/EapHost_UI/src/EapHost_UI.cpp:59
-#: ver1.1/lib/EapHost_UI/src/EapHost_UI.cpp:59
+#: lib/EapHost_UI/src/EapHost_UI.cpp:59
 #, c-format
 msgid "Enumerating EAP methods failed (error %u, %s, %s)."
 msgstr "Αποτυχία απαρίθμησης των μεθόδων EAP (σφάλμα %u, %s, %s)."
 
-#: master/lib/EapHost_UI/src/EapHost_UI.cpp:61
-#: ver1.1/lib/EapHost_UI/src/EapHost_UI.cpp:61
+#: lib/EapHost_UI/src/EapHost_UI.cpp:61
 #, c-format
 msgid "Enumerating EAP methods failed (error %u)."
 msgstr "Αποτυχία απαρίθμησης των μεθόδων EAP (σφάλμα %u)."
 
-#: master/lib/EapHost_UI/src/EapHost_UI.cpp:136
-#: ver1.1/lib/EapHost_UI/src/EapHost_UI.cpp:136
+#: lib/EapHost_UI/src/EapHost_UI.cpp:136
 #, c-format
 msgid "Configuring EAP method failed (error %u, %s, %s)."
 msgstr "Απέτυχε η διαμόρφωση της μεθόδου EAP (σφάλμα %u, %s, %s)."
 
-#: master/lib/EapHost_UI/src/EapHost_UI.cpp:138
-#: ver1.1/lib/EapHost_UI/src/EapHost_UI.cpp:138
+#: lib/EapHost_UI/src/EapHost_UI.cpp:138
 #, c-format
 msgid "Configuring EAP method failed (error %u)."
 msgstr "Απέτυχε η διαμόρφωση της μεθόδου EAP (σφάλμα %u)."
 
-#: master/lib/GTC_UI/include/GTC_UI.h:111
-#: master/lib/GTC_UI/res/wxGTC_UI.cpp:16
+#: lib/GTC_UI/include/GTC_UI.h:114 lib/GTC_UI/res/wxGTC_UI.cpp:16
 msgid "GTC Challenge"
 msgstr "GTC Challenge"
 
-#: master/lib/GTC_UI/res/wxGTC_UI.cpp:26
+#: lib/GTC_UI/res/wxGTC_UI.cpp:26
 msgid "Please provide your response."
 msgstr "Παρακαλώ δώστε την απάντησή σας."
 
-#: master/lib/GTC_UI/res/wxGTC_UI.cpp:38
+#: lib/GTC_UI/res/wxGTC_UI.cpp:38
 msgid "Server challenge"
 msgstr "Server challenge"
 
-#: master/lib/GTC_UI/res/wxGTC_UI.cpp:43
+#: lib/GTC_UI/res/wxGTC_UI.cpp:43
 msgid "Enter your response here"
 msgstr "Εισάγετε την απάντησή σας εδώ"
 
-#: master/lib/GTC_UI/res/wxGTC_UI.cpp:70
+#: lib/GTC_UI/res/wxGTC_UI.cpp:70
 msgid "EAP-GTC authentication &mode:"
 msgstr "EAP-GTC πιστοποίηση &μέθοδος:"
 
-#: master/lib/GTC_UI/res/wxGTC_UI.cpp:75
+#: lib/GTC_UI/res/wxGTC_UI.cpp:75
 msgid "Select EAP-GTC authentication mode from the list"
 msgstr "Επιλέξτε την EAP-GTC ταυτοποίηση από τη λίστα"
 
-#: master/lib/GTC_UI/src/GTC_UI.cpp:39
+#: lib/GTC_UI/src/GTC_UI.cpp:39
 msgid "Challenge/Response"
 msgstr "Διαταραχή/Ανταπόκριση"
 
-#: master/lib/GTC_UI/src/GTC_UI.cpp:41
+#: lib/GTC_UI/src/GTC_UI.cpp:41
 msgid "Password"
 msgstr "Κωδικός πρόσβασης"
 
-#: master/lib/GTC_UI/src/GTC_UI.cpp:119
+#: lib/GTC_UI/src/GTC_UI.cpp:119
 #, c-format
 msgid "%s Challenge"
 msgstr "%s Challenge"
 
-#: master/lib/MSCHAPv2_UI/src/MSCHAPv2_UI.cpp:33
-#: ver1.0/lib/MSCHAPv2_UI/src/MSCHAPv2_UI.cpp:33
-#: ver1.1/lib/MSCHAPv2_UI/src/MSCHAPv2_UI.cpp:33
+#: lib/MSCHAPv2_UI/src/MSCHAPv2_UI.cpp:33
 msgid "MSCHAPv2 User ID and Password"
 msgstr "MSCHAPv2 ID χρήστη και κωδικός πρόσβασης"
 
-#: master/lib/PAP_UI/src/PAP_UI.cpp:33 ver1.0/lib/PAP_UI/src/PAP_UI.cpp:33
-#: ver1.1/lib/PAP_UI/src/PAP_UI.cpp:33
+#: lib/PAP_UI/src/PAP_UI.cpp:33
 msgid "PAP User ID and Password"
 msgstr "PAP ID χρήστη και κωδικός πρόσβασης"
 
-#: master/lib/TLS_UI/res/wxTLS_UI.cpp:17 ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:17
-#: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:17
+#: lib/TLS_UI/res/wxTLS_UI.cpp:17
 msgid "Server Trust"
 msgstr "Εμπιστευτικό Διακομιστή"
 
-#: master/lib/TLS_UI/res/wxTLS_UI.cpp:28 ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:28
-#: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:28
-msgid ""
-"Describe the servers you trust to prevent credential interception in case of"
-" man-in-the-middle attacks."
+#: lib/TLS_UI/res/wxTLS_UI.cpp:28
+msgid "Describe the servers you trust to prevent man-in-the-middle attacks."
 msgstr ""
-"Περιγράψτε τους διακομιστές που εμπιστεύεστε για την πρόληψη υποκλοπἠς των "
-"διαπιστευτηρίων σε περίπτωση επιθέσεων man-in-the-middle."
+"Περιγράψτε τους διακομιστές που εμπιστεύεστε για την πρόληψη επιθέσεων man-"
+"in-the-middle."
 
-#: master/lib/TLS_UI/res/wxTLS_UI.cpp:35 ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:35
-#: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:35
+#: lib/TLS_UI/res/wxTLS_UI.cpp:35
 msgid "Acceptable Certificate Authorities:"
 msgstr "Αποδεκτές αρχές εκδόσεων πιστοποιητικών:"
 
-#: master/lib/TLS_UI/res/wxTLS_UI.cpp:40 ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:40
-#: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:40
+#: lib/TLS_UI/res/wxTLS_UI.cpp:40
 msgid ""
 "Server's certificate must be issued by one of certificate authorities listed"
 " here"
@@ -746,46 +568,38 @@ msgstr ""
 "Το πιστοποιητικό του διακομιστή πρέπει να εκδίδεται από μία από τις αρχές "
 "έκδοσης πιστοποιητικών που αναφέρονται εδώ"
 
-#: master/lib/TLS_UI/res/wxTLS_UI.cpp:47 ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:47
-#: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:47
+#: lib/TLS_UI/res/wxTLS_UI.cpp:47
 msgid "Add CA from Store..."
 msgstr "Προσθήκη CA από το Store..."
 
-#: master/lib/TLS_UI/res/wxTLS_UI.cpp:48 ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:48
-#: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:48
+#: lib/TLS_UI/res/wxTLS_UI.cpp:48
 msgid ""
 "Adds a new certificate authority from the certificate store to the list"
 msgstr ""
 "Προσθέτει μια νέα αρχή πιστοποιητικoύ στη λίστα από το κατάστημα "
 "πιστοποιητικών "
 
-#: master/lib/TLS_UI/res/wxTLS_UI.cpp:52 ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:52
-#: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:52
+#: lib/TLS_UI/res/wxTLS_UI.cpp:52
 msgid "Add CA from File..."
 msgstr "Προσθήκη CA από Φάκελο..."
 
-#: master/lib/TLS_UI/res/wxTLS_UI.cpp:53 ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:53
-#: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:53
+#: lib/TLS_UI/res/wxTLS_UI.cpp:53
 msgid "Adds a new certificate authority from the file to the list"
 msgstr "Προσθέτει μια νέα αρχή πιστοποιητικού από το αρχείο στη λίστα"
 
-#: master/lib/TLS_UI/res/wxTLS_UI.cpp:57 ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:57
-#: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:57
+#: lib/TLS_UI/res/wxTLS_UI.cpp:57
 msgid "&Remove CA"
 msgstr "&Αφαιρέστε CA"
 
-#: master/lib/TLS_UI/res/wxTLS_UI.cpp:58 ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:58
-#: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:58
+#: lib/TLS_UI/res/wxTLS_UI.cpp:58
 msgid "Removes selected certificate authorities from the list"
 msgstr "Αφαιρεί επιλεγμένα πιστοποιητικά από τη λίστα"
 
-#: master/lib/TLS_UI/res/wxTLS_UI.cpp:71 ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:71
-#: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:71
+#: lib/TLS_UI/res/wxTLS_UI.cpp:71
 msgid "Acceptable server &names:"
 msgstr "Αποδεκτά &ονόματα server:"
 
-#: master/lib/TLS_UI/res/wxTLS_UI.cpp:76 ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:76
-#: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:76
+#: lib/TLS_UI/res/wxTLS_UI.cpp:76
 msgid ""
 "A semicolon delimited list of acceptable server FQDN names; blank to skip "
 "name check; Unicode characters allowed"
@@ -794,41 +608,30 @@ msgstr ""
 "εξυπηρετητών· αφήστε κενό για να παρακάμψετε την επιλογή ονόματος· "
 "επιτρέπονται οι χαρακτήρες unicode"
 
-#: master/lib/TLS_UI/res/wxTLS_UI.cpp:80 ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:80
-#: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:80
+#: lib/TLS_UI/res/wxTLS_UI.cpp:80
 msgid "(Example: foo.bar.com;server2.bar.com)"
 msgstr "(Παράδειγμα: foo.bar.com;server2.bar.com)"
 
-#: master/lib/TLS_UI/res/wxTLS_UI.cpp:118 master/lib/TLS_UI/src/TLS_UI.cpp:325
-#: ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:118 ver1.0/lib/TLS_UI/src/TLS_UI.cpp:317
-#: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:118 ver1.1/lib/TLS_UI/src/TLS_UI.cpp:325
+#: lib/TLS_UI/res/wxTLS_UI.cpp:118 lib/TLS_UI/src/TLS_UI.cpp:329
 msgid "User Certificate"
 msgstr "Πιστοποιητικό χρήστη"
 
-#: master/lib/TLS_UI/res/wxTLS_UI.cpp:128
-#: ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:128
-#: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:128
+#: lib/TLS_UI/res/wxTLS_UI.cpp:128
 msgid "Please select your &certificate to use for authentication."
 msgstr ""
 "Επιλέξτε το &πιστοποιητικό σας που θα χρησιμοποιηθεί για τον έλεγχο "
 "ταυτότητας."
 
-#: master/lib/TLS_UI/res/wxTLS_UI.cpp:135
-#: ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:135
-#: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:135
+#: lib/TLS_UI/res/wxTLS_UI.cpp:135
 msgid "Client certificate to use for authentication"
 msgstr ""
 "Το πιστοποιητικό πελάτη που θα χρησιμοποιηθεί για τον έλεγχο της ταυτότητας"
 
-#: master/lib/TLS_UI/res/wxTLS_UI.cpp:142
-#: ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:142
-#: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:142
+#: lib/TLS_UI/res/wxTLS_UI.cpp:142
 msgid "Custom &identity:"
 msgstr "Προσαρμοσμένη &ταυτότητα:"
 
-#: master/lib/TLS_UI/res/wxTLS_UI.cpp:147
-#: ver1.0/lib/TLS_UI/res/wxTLS_UI.cpp:147
-#: ver1.1/lib/TLS_UI/res/wxTLS_UI.cpp:147
+#: lib/TLS_UI/res/wxTLS_UI.cpp:147
 msgid ""
 "Your identity (username@domain) to override one from certificate; or blank "
 "to use one provided in certificate"
@@ -836,198 +639,108 @@ msgstr ""
 "Η ταυτότητά σας (username@domain) για να παρακάμψετε ένα πιστοποιητικό· ή "
 "κενό για να χρησιμοποιήσετε όποια ταυτότητα παρέχεται από πιστοποιητικό"
 
-#: master/lib/TLS_UI/src/TLS_UI.cpp:252 ver1.0/lib/TLS_UI/src/TLS_UI.cpp:246
-#: ver1.1/lib/TLS_UI/src/TLS_UI.cpp:252
+#: lib/TLS_UI/src/TLS_UI.cpp:256
 msgid "Add Certificate"
 msgstr "Προσθήκη Πιστοποιητικού"
 
-#: master/lib/TLS_UI/src/TLS_UI.cpp:253 ver1.0/lib/TLS_UI/src/TLS_UI.cpp:247
-#: ver1.1/lib/TLS_UI/src/TLS_UI.cpp:253
+#: lib/TLS_UI/src/TLS_UI.cpp:257
 msgid "Certificate Files (*.cer;*.crt;*.der;*.p7b;*.pem)"
 msgstr "Αρχεία Πιστοποιητικών  (*.cer;*.crt;*.der;*.p7b;*.pem)"
 
-#: master/lib/TLS_UI/src/TLS_UI.cpp:254 ver1.0/lib/TLS_UI/src/TLS_UI.cpp:248
-#: ver1.1/lib/TLS_UI/src/TLS_UI.cpp:254
+#: lib/TLS_UI/src/TLS_UI.cpp:258
 msgid "X.509 Certificate Files (*.cer;*.crt;*.der;*.pem)"
 msgstr "X.509 Αρχεία Πιστοποιητικών (*.cer;*.crt;*.der;*.pem)"
 
-#: master/lib/TLS_UI/src/TLS_UI.cpp:255 ver1.0/lib/TLS_UI/src/TLS_UI.cpp:249
-#: ver1.1/lib/TLS_UI/src/TLS_UI.cpp:255
+#: lib/TLS_UI/src/TLS_UI.cpp:259
 msgid "PKCS #7 Certificate Files (*.p7b)"
 msgstr "PKCS #7 Αρχεία Πιστοποιητικών (*.p7b)"
 
-#: master/lib/TLS_UI/src/TLS_UI.cpp:256 ver1.0/lib/TLS_UI/src/TLS_UI.cpp:250
-#: ver1.1/lib/TLS_UI/src/TLS_UI.cpp:256
+#: lib/TLS_UI/src/TLS_UI.cpp:260
 msgid "All Files (*.*)"
 msgstr "Όλα τα αρχεία (*.*)"
 
-#: master/lib/TLS_UI/src/TLS_UI.cpp:270 ver1.0/lib/TLS_UI/src/TLS_UI.cpp:264
-#: ver1.1/lib/TLS_UI/src/TLS_UI.cpp:270
+#: lib/TLS_UI/src/TLS_UI.cpp:274
 #, c-format
 msgid "Invalid or unsupported certificate file %s"
 msgstr "Άκυρο ή μη υποστηριζόμενο αρχείο πιστοποιητικού %s"
 
-#: master/lib/TLS_UI/src/TLS_UI.cpp:270 ver1.0/lib/TLS_UI/src/TLS_UI.cpp:264
-#: ver1.1/lib/TLS_UI/src/TLS_UI.cpp:270
+#: lib/TLS_UI/src/TLS_UI.cpp:274
 msgid "Error"
 msgstr "Σφάλμα"
 
-#: master/lib/TTLS_UI/res/wxTTLS_UI.cpp:17
-#: ver1.0/lib/TTLS_UI/res/wxTTLS_UI.cpp:17
-#: ver1.1/lib/TTLS_UI/res/wxTTLS_UI.cpp:17
-msgid "Outer Identity"
-msgstr "Εξωτερική ταυτότητα"
-
-#: master/lib/TTLS_UI/res/wxTTLS_UI.cpp:28
-#: ver1.0/lib/TTLS_UI/res/wxTTLS_UI.cpp:28
-#: ver1.1/lib/TTLS_UI/res/wxTTLS_UI.cpp:28
-msgid "Select the user ID supplicant introduces itself as to authenticator:"
-msgstr ""
-"Επιλέξτε το αιτούμενο αναγνωριστικό χρήστη να εισάγει τον εαυτο του ως  "
-"πιστοποιητικό:"
-
-#: master/lib/TTLS_UI/res/wxTTLS_UI.cpp:35
-#: ver1.0/lib/TTLS_UI/res/wxTTLS_UI.cpp:35
-#: ver1.1/lib/TTLS_UI/res/wxTTLS_UI.cpp:35
-msgid "&True identity"
-msgstr "&Επαληθευμένη Ταυτότητα"
-
-#: master/lib/TTLS_UI/res/wxTTLS_UI.cpp:36
-#: ver1.0/lib/TTLS_UI/res/wxTTLS_UI.cpp:36
-#: ver1.1/lib/TTLS_UI/res/wxTTLS_UI.cpp:36
-msgid "Use my true user name"
-msgstr "Χρησιμοποιήσε το αληθινό όνομα χρήστη μου"
-
-#: master/lib/TTLS_UI/res/wxTTLS_UI.cpp:40
-#: ver1.0/lib/TTLS_UI/res/wxTTLS_UI.cpp:40
-#: ver1.1/lib/TTLS_UI/res/wxTTLS_UI.cpp:40
-msgid "Use &empty outer identity"
-msgstr "Χρησιμοποιήστε &κενή εξωτερική ταυτότητα"
-
-#: master/lib/TTLS_UI/res/wxTTLS_UI.cpp:41
-#: ver1.0/lib/TTLS_UI/res/wxTTLS_UI.cpp:41
-#: ver1.1/lib/TTLS_UI/res/wxTTLS_UI.cpp:41
-msgid "Omit my user name and use @mydomain.org only"
-msgstr ""
-"Παραλείψτε το όνομα χρήστη μου και χρησιμοποιήστε μόνο το @mydomain.org"
-
-#: master/lib/TTLS_UI/res/wxTTLS_UI.cpp:48
-#: ver1.0/lib/TTLS_UI/res/wxTTLS_UI.cpp:48
-#: ver1.1/lib/TTLS_UI/res/wxTTLS_UI.cpp:48
-msgid "&Custom outer identity:"
-msgstr "&Διαμόρφωση της εξωτερικής ταυτότητας:"
-
-#: master/lib/TTLS_UI/res/wxTTLS_UI.cpp:49
-#: ver1.0/lib/TTLS_UI/res/wxTTLS_UI.cpp:49
-#: ver1.1/lib/TTLS_UI/res/wxTTLS_UI.cpp:49
-msgid "Specify custom outer identity"
-msgstr "Καθορίστε τη διαμόρφωση της εξωτερικής ταυτότητας"
-
-#: master/lib/TTLS_UI/res/wxTTLS_UI.cpp:54
-#: ver1.0/lib/TTLS_UI/res/wxTTLS_UI.cpp:54
-#: ver1.1/lib/TTLS_UI/res/wxTTLS_UI.cpp:54
-msgid "Custom outer identity to use"
-msgstr "Προσαρμόστε την εξωτερική ταυτότητα για να την χρησιμοποιήσετε"
-
-#: master/lib/TTLS_UI/src/Module.cpp:394 ver1.1/lib/TTLS_UI/src/Module.cpp:356
+#: lib/TTLS_UI/src/Module.cpp:249
 #, c-format
 msgid "Invoking EAP identity UI failed (error %u, %s, %s)."
 msgstr "Απέτυχη η επίκληση της EAP UI ταυτότητας (σφάλμα %u, %s, %s)."
 
-#: master/lib/TTLS_UI/src/Module.cpp:396 ver1.1/lib/TTLS_UI/src/Module.cpp:358
+#: lib/TTLS_UI/src/Module.cpp:252
 #, c-format
 msgid "Invoking EAP identity UI failed (error %u)."
 msgstr "Απέτυχη η επίκληση της EAP UI ταυτότητας (σφάλμα %u)."
 
-#: master/lib/TTLS_UI/src/Module.cpp:532
+#: lib/TTLS_UI/src/Module.cpp:376
 #, c-format
 msgid "Invoking EAP interactive UI failed (error %u, %s, %s)."
 msgstr ""
 "Η επίκληση της διαδραστικότητας του EAP UI απέτυχε (error %u, %s, %s)."
 
-#: master/lib/TTLS_UI/src/Module.cpp:535
+#: lib/TTLS_UI/src/Module.cpp:379
 #, c-format
 msgid "Invoking EAP interactive UI failed (error %u)."
 msgstr "Η επίκληση της διαδραστικότητας του EAP UI απέτυχε (error %u)."
 
-#: master/lib/TTLS_UI/src/TTLS_UI.cpp:118
-#: ver1.0/lib/TTLS_UI/src/TTLS_UI.cpp:36
-#: ver1.0/lib/TTLS_UI/src/TTLS_UI.cpp:182
-#: ver1.1/lib/TTLS_UI/src/TTLS_UI.cpp:117
+#: lib/TTLS_UI/src/TTLS_UI.cpp:37
 msgid "Inner Authentication"
 msgstr "Ταυτοποίηση εσωτερικής ταυτότητας"
 
-#: master/lib/TTLS_UI/src/TTLS_UI.cpp:124
-#: ver1.0/lib/TTLS_UI/src/TTLS_UI.cpp:188
-#: ver1.1/lib/TTLS_UI/src/TTLS_UI.cpp:123
+#: lib/TTLS_UI/src/TTLS_UI.cpp:43
 msgid "Select inner authentication method from the list"
 msgstr "Επιλέξτε την μέθοδο ταυτοποίησης εσωτερικής ταυτότητας από τη λίστα"
 
-#: master/lib/TTLS_UI/src/TTLS_UI.cpp:126
-#: ver1.0/lib/TTLS_UI/src/TTLS_UI.cpp:190
-#: ver1.1/lib/TTLS_UI/src/TTLS_UI.cpp:125
-msgid "PAP"
-msgstr "PAP"
-
-#: master/lib/TTLS_UI/src/TTLS_UI.cpp:128
-#: ver1.0/lib/TTLS_UI/src/TTLS_UI.cpp:192
-#: ver1.1/lib/TTLS_UI/src/TTLS_UI.cpp:127
-msgid "MSCHAPv2"
-msgstr "MSCHAPv2"
-
-#: master/lib/TTLS_UI/src/TTLS_UI.cpp:130
-#: ver1.1/lib/TTLS_UI/src/TTLS_UI.cpp:129
-msgid "EAP-MSCHAPv2"
-msgstr "EAP-MSCHAPv2"
-
-#: master/lib/TTLS_UI/src/TTLS_UI.cpp:132
-msgid "EAP-GTC"
-msgstr "EAP-GTC"
-
-#: master/lib/TTLS_UI/src/TTLS_UI.cpp:135
-#: ver1.1/lib/TTLS_UI/src/TTLS_UI.cpp:132
-msgid "Other EAP methods..."
-msgstr "Άλλοι μέθοδοι EAP..."
-
-#: master/lib/TTLS_UI/src/TTLS_UI.cpp:141
-#: ver1.0/lib/TTLS_UI/src/TTLS_UI.cpp:61
-#: ver1.0/lib/TTLS_UI/src/TTLS_UI.cpp:197
-#: ver1.1/lib/TTLS_UI/src/TTLS_UI.cpp:138
+#: lib/TTLS_UI/src/TTLS_UI.cpp:48
 msgid "Outer Authentication"
 msgstr "Ταυτοποίηση εξωτερικής ταυτότητας"
 
-#: master/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
-#: master/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
-#: ver1.0/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
-#: ver1.0/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
-#: ver1.1/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
-#: ver1.1/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
+#: lib/TTLS_UI/src/TTLS_UI.cpp:127
+msgid "PAP"
+msgstr "PAP"
+
+#: lib/TTLS_UI/src/TTLS_UI.cpp:129
+msgid "MSCHAPv2"
+msgstr "MSCHAPv2"
+
+#: lib/TTLS_UI/src/TTLS_UI.cpp:131
+msgid "EAP-MSCHAPv2"
+msgstr "EAP-MSCHAPv2"
+
+#: lib/TTLS_UI/src/TTLS_UI.cpp:133
+msgid "EAP-GTC"
+msgstr "EAP-GTC"
+
+#: lib/TTLS_UI/src/TTLS_UI.cpp:136
+msgid "Other EAP methods..."
+msgstr "Άλλοι μέθοδοι EAP..."
+
+#: EAPMethods/MSIBuild.EAP-TTLS/en_US.ARM64.Release.Feature-2.idtx:4
+#: EAPMethods/MSIBuild.EAP-TTLS/en_US.Win32.Release.Feature-2.idtx:4
+#: EAPMethods/MSIBuild.EAP-TTLS/en_US.x64.Release.Feature-2.idtx:4
+msgid "EAP-TTLS"
+msgstr "EAP-TTLS"
+
+#: EAPMethods/MSIBuild.EAP-TTLS/en_US.ARM64.Release.Feature-2.idtx:4
+#: EAPMethods/MSIBuild.EAP-TTLS/en_US.Win32.Release.Feature-2.idtx:4
+#: EAPMethods/MSIBuild.EAP-TTLS/en_US.x64.Release.Feature-2.idtx:4
+msgid "EAP-TTLS Method"
+msgstr "Μέθοδος EAP-TTLS"
+
+#: EAPMethods/MSIBuild/en_US.ARM64.Release.Feature-2.idtx:4
+#: EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
+#: EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
 msgid "EAP Methods"
 msgstr "Μέθοδοι EAP"
 
-#: master/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
-#: master/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
-#: ver1.0/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
-#: ver1.0/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
-#: ver1.1/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
-#: ver1.1/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
+#: EAPMethods/MSIBuild/en_US.ARM64.Release.Feature-2.idtx:4
+#: EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
+#: EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
 msgid "Modules to support individual EAP methods"
 msgstr "Ενότητες για την ενίσχυση μεμονωμένων μεθόδων EAP"
-
-#: master/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:5
-#: master/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:5
-#: ver1.0/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:5
-#: ver1.0/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:5
-#: ver1.1/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:5
-#: ver1.1/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:5
-msgid "TTLS"
-msgstr "TTLS"
-
-#: master/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:5
-#: master/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:5
-#: ver1.0/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:5
-#: ver1.0/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:5
-#: ver1.1/EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:5
-#: ver1.1/EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:5
-msgid "Tunneled Transport Layer Security"
-msgstr "Tunneled Transport Layer Security"

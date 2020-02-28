@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WLANManager\n"
-"POT-Creation-Date: 2016-11-08 11:51+0100\n"
+"POT-Creation-Date: 2019-08-12 14:09+0200\n"
 "PO-Revision-Date: 2016-08-28 10:03+0000\n"
 "Last-Translator: Dubravko Penezic <dpenezic@gmail.com>, 2016\n"
 "Language-Team: Croatian (Croatia) (https://www.transifex.com/eduroam_devel/teams/11799/hr_HR/)\n"
@@ -14,14 +14,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: hr_HR\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Generator: Poedit 1.8.11\n"
-"X-Poedit-Basepath: ../../..\n"
+"X-Generator: Poedit 2.2.3\n"
+"X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: _\n"
-"X-Poedit-SearchPath-0: master/WLANManager\n"
-"X-Poedit-SearchPath-1: ver1.1/WLANManager\n"
-"X-Poedit-SearchPath-2: ver1.0/WLANManager\n"
+"X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 
+#: MSIBuild/en_US.ARM64.Debug.Feature-2.idtx:4
+#: MSIBuild/en_US.ARM64.Release.Feature-2.idtx:4
 #: MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
 #: MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
 #: MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
@@ -29,6 +29,8 @@ msgstr ""
 msgid "WLAN Manager"
 msgstr "WLAN Manager"
 
+#: MSIBuild/en_US.ARM64.Debug.Feature-2.idtx:4
+#: MSIBuild/en_US.ARM64.Release.Feature-2.idtx:4
 #: MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
 #: MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
 #: MSIBuild/en_US.x64.Debug.Feature-2.idtx:4

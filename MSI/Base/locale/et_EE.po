@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: GÉANTLink MSI\n"
-"POT-Creation-Date: 2017-02-02 18:14+0100\n"
+"POT-Creation-Date: 2019-08-12 14:04+0200\n"
 "PO-Revision-Date: 2016-09-10 07:51+0000\n"
 "Last-Translator: Anne M <anne@eenet.ee>, 2018\n"
 "Language-Team: Estonian (https://www.transifex.com/eduroam_devel/teams/11799/et/)\n"
@@ -15,67 +15,29 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: et\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 1.8.11\n"
-"X-Poedit-Basepath: ../../../..\n"
+"X-Generator: Poedit 2.2.3\n"
+"X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: _\n"
-"X-Poedit-SearchPath-0: master/MSI/Base/Main\n"
-"X-Poedit-SearchPath-1: ver1.1/MSI/Base/Main\n"
-"X-Poedit-SearchPath-2: ver1.0/MSI/Base/Main\n"
+"X-Poedit-SearchPath-0: Main\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 
-#: master/MSI/Base/Main/en_US.Win32.Debug.LaunchCondition-2.idtx:4
-#: master/MSI/Base/Main/en_US.Win32.Release.LaunchCondition-2.idtx:4
-#: master/MSI/Base/Main/en_US.x64.Debug.LaunchCondition-2.idtx:4
-#: master/MSI/Base/Main/en_US.x64.Release.LaunchCondition-2.idtx:4
-#: ver1.0/MSI/Base/Main/en_US.Win32.Debug.LaunchCondition-2.idtx:4
-#: ver1.0/MSI/Base/Main/en_US.Win32.Release.LaunchCondition-2.idtx:4
-#: ver1.0/MSI/Base/Main/en_US.x64.Debug.LaunchCondition-2.idtx:4
-#: ver1.0/MSI/Base/Main/en_US.x64.Release.LaunchCondition-2.idtx:4
-#: ver1.1/MSI/Base/Main/en_US.Win32.Debug.LaunchCondition-2.idtx:4
-#: ver1.1/MSI/Base/Main/en_US.Win32.Release.LaunchCondition-2.idtx:4
-#: ver1.1/MSI/Base/Main/en_US.x64.Debug.LaunchCondition-2.idtx:4
-#: ver1.1/MSI/Base/Main/en_US.x64.Release.LaunchCondition-2.idtx:4
+#: Main/en_US.ARM64.Release.LaunchCondition-2.idtx:4
+#: Main/en_US.Win32.Release.LaunchCondition-2.idtx:4
+#: Main/en_US.x64.Release.LaunchCondition-2.idtx:4
 msgid "[ProductName] requires Windows Vista or later version of Windows."
 msgstr "[ProductName] vajab Windows Vistat või uuemat Windowsi versiooni."
 
-#: master/MSI/Base/Main/en_US.Win32.Debug.Property-2.idtx:4
-#: master/MSI/Base/Main/en_US.Win32.Debug.Property-2.idtx:5
-#: master/MSI/Base/Main/en_US.Win32.Release.Property-2.idtx:4
-#: master/MSI/Base/Main/en_US.Win32.Release.Property-2.idtx:5
-#: master/MSI/Base/Main/en_US.x64.Debug.Property-2.idtx:4
-#: master/MSI/Base/Main/en_US.x64.Debug.Property-2.idtx:5
-#: master/MSI/Base/Main/en_US.x64.Release.Property-2.idtx:4
-#: master/MSI/Base/Main/en_US.x64.Release.Property-2.idtx:5
-#: ver1.0/MSI/Base/Main/en_US.Win32.Debug.Property-2.idtx:4
-#: ver1.0/MSI/Base/Main/en_US.Win32.Debug.Property-2.idtx:5
-#: ver1.0/MSI/Base/Main/en_US.Win32.Release.Property-2.idtx:4
-#: ver1.0/MSI/Base/Main/en_US.Win32.Release.Property-2.idtx:5
-#: ver1.0/MSI/Base/Main/en_US.x64.Debug.Property-2.idtx:4
-#: ver1.0/MSI/Base/Main/en_US.x64.Debug.Property-2.idtx:5
-#: ver1.0/MSI/Base/Main/en_US.x64.Release.Property-2.idtx:4
-#: ver1.0/MSI/Base/Main/en_US.x64.Release.Property-2.idtx:5
-#: ver1.1/MSI/Base/Main/en_US.Win32.Debug.Property-2.idtx:4
-#: ver1.1/MSI/Base/Main/en_US.Win32.Debug.Property-2.idtx:5
-#: ver1.1/MSI/Base/Main/en_US.Win32.Release.Property-2.idtx:4
-#: ver1.1/MSI/Base/Main/en_US.Win32.Release.Property-2.idtx:5
-#: ver1.1/MSI/Base/Main/en_US.x64.Debug.Property-2.idtx:4
-#: ver1.1/MSI/Base/Main/en_US.x64.Debug.Property-2.idtx:5
-#: ver1.1/MSI/Base/Main/en_US.x64.Release.Property-2.idtx:4
-#: ver1.1/MSI/Base/Main/en_US.x64.Release.Property-2.idtx:5
+#: Main/en_US.ARM64.Release.Property-2.idtx:4
+#: Main/en_US.ARM64.Release.Property-2.idtx:5
+#: Main/en_US.Win32.Release.Property-2.idtx:4
+#: Main/en_US.Win32.Release.Property-2.idtx:5
+#: Main/en_US.x64.Release.Property-2.idtx:4
+#: Main/en_US.x64.Release.Property-2.idtx:5
 msgid "http://www.geant.org/"
 msgstr "http://www.geant.org/"
 
-#: master/MSI/Base/Main/en_US.Win32.Debug.Property-2.idtx:6
-#: master/MSI/Base/Main/en_US.Win32.Release.Property-2.idtx:6
-#: master/MSI/Base/Main/en_US.x64.Debug.Property-2.idtx:6
-#: master/MSI/Base/Main/en_US.x64.Release.Property-2.idtx:6
-#: ver1.0/MSI/Base/Main/en_US.Win32.Debug.Property-2.idtx:6
-#: ver1.0/MSI/Base/Main/en_US.Win32.Release.Property-2.idtx:6
-#: ver1.0/MSI/Base/Main/en_US.x64.Debug.Property-2.idtx:6
-#: ver1.0/MSI/Base/Main/en_US.x64.Release.Property-2.idtx:6
-#: ver1.1/MSI/Base/Main/en_US.Win32.Debug.Property-2.idtx:6
-#: ver1.1/MSI/Base/Main/en_US.Win32.Release.Property-2.idtx:6
-#: ver1.1/MSI/Base/Main/en_US.x64.Debug.Property-2.idtx:6
-#: ver1.1/MSI/Base/Main/en_US.x64.Release.Property-2.idtx:6
+#: Main/en_US.ARM64.Release.Property-2.idtx:6
+#: Main/en_US.Win32.Release.Property-2.idtx:6
+#: Main/en_US.x64.Release.Property-2.idtx:6
 msgid "https://github.com/Amebis/GEANTLink/releases"
 msgstr "https://github.com/Amebis/GEANTLink/releases"
