@@ -5,7 +5,6 @@
 /Win32.Release
 /x64.Debug
 /x64.Release
-/*PackageGUID.mak
 /*.cab
 /*.ddf
 /*.dep
