@@ -1,4 +1,4 @@
 /*.msi
 /CredWrite.exe
 /MsiUseFeature.exe
-/WLANManager-*.exe
+/WLANManager*.exe
