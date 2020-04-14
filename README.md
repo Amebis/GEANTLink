@@ -73,25 +73,27 @@ This product is using wxWidgets static libraries. Since upstream wxWidgets libra
 
 #### Compiling wxWidgets x86 static libraries
 
-1. Start _x86 Native Tools Command Prompt for VS 2019_
+1. Start command prompt
 2. Change working folder to `build\msw`
-3. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 COMPILER_VERSION=142`
-4. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 COMPILER_VERSION=142 BUILD=release`
+3. Run: `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsamd64_x86.bat"`
+4. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 COMPILER_VERSION=142`
+5. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 COMPILER_VERSION=142 BUILD=release`
 
 #### Compiling wxWidgets x64 static libraries
 
-1. Start _x64 Native Tools Command Prompt for VS 2019_
+1. Start command prompt
 2. Change working folder to `build\msw`
-3. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 COMPILER_VERSION=142 TARGET_CPU=X64`
-4. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 COMPILER_VERSION=142 TARGET_CPU=X64 BUILD=release`
+3. Run: `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"`
+4. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 COMPILER_VERSION=142 TARGET_CPU=X64`
+5. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 COMPILER_VERSION=142 TARGET_CPU=X64 BUILD=release`
 
 #### Compiling wxWidgets ARM64 static libraries
 
 1. Start command prompt
 2. Change working folder to `build\msw`
 3. Run: `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsamd64_arm64.bat"`
-3. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 COMPILER_VERSION=142 TARGET_CPU=ARM64 USE_OPENGL=0`
-4. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 COMPILER_VERSION=142 TARGET_CPU=ARM64 USE_OPENGL=0 BUILD=release`
+4. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 COMPILER_VERSION=142 TARGET_CPU=ARM64 USE_OPENGL=0`
+5. Run: `nmake /f makefile.vc /ls RUNTIME_LIBS=static SHARED=0 COMPILER_VERSION=142 TARGET_CPU=ARM64 USE_OPENGL=0 BUILD=release`
 
 #### Specifying wxWidgets path
 
@@ -143,7 +145,7 @@ To debug early life of our GUI DLL, uncomment `Sleep(10000)` in `DllMain()` of t
 
 #### Building in command line
 
-Open _x64 Native Tools Command Prompt for VS 2019_ for building.
+Open _Developer Command Prompt for VS 2019_ for building.
 
 Use Microsoft NMAKE to build the project.
 
