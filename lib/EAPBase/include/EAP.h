@@ -606,9 +606,14 @@ namespace eap
     {
     public:
         ///
-        /// Constructs configuration
+        /// Constructs a configuration
         ///
         packable();
+
+        ///
+        /// Destructs the configuration
+        ///
+        virtual ~packable();
 
         /// \name BLOB management
         /// @{

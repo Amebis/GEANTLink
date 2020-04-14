@@ -35,6 +35,11 @@ eap::packable::packable()
 }
 
 
+eap::packable::~packable()
+{
+}
+
+
 void eap::packable::operator<<(_Inout_ cursor_out &cursor) const
 {
     UNREFERENCED_PARAMETER(cursor);
