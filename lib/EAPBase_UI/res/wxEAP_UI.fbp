@@ -1159,7 +1159,7 @@
                                 </object>
                                 <object class="sizeritem" expanded="1">
                                     <property name="border">5</property>
-                                    <property name="flag">wxEXPAND|wxALL</property>
+                                    <property name="flag">wxEXPAND</property>
                                     <property name="proportion">0</property>
                                     <object class="wxBoxSizer" expanded="1">
                                         <property name="minimum_size"></property>
@@ -1168,7 +1168,7 @@
                                         <property name="permission">none</property>
                                         <object class="sizeritem" expanded="1">
                                             <property name="border">5</property>
-                                            <property name="flag">wxEXPAND|wxBOTTOM</property>
+                                            <property name="flag">wxEXPAND|wxALL</property>
                                             <property name="proportion">1</property>
                                             <object class="wxBoxSizer" expanded="1">
                                                 <property name="minimum_size"></property>
@@ -1304,7 +1304,7 @@
                                         </object>
                                         <object class="sizeritem" expanded="1">
                                             <property name="border">5</property>
-                                            <property name="flag">wxEXPAND|wxTOP</property>
+                                            <property name="flag">wxEXPAND|wxALL</property>
                                             <property name="proportion">1</property>
                                             <object class="wxBoxSizer" expanded="1">
                                                 <property name="minimum_size"></property>
@@ -3819,7 +3819,7 @@
                                 </object>
                                 <object class="sizeritem" expanded="1">
                                     <property name="border">5</property>
-                                    <property name="flag">wxEXPAND|wxALL</property>
+                                    <property name="flag">wxEXPAND</property>
                                     <property name="proportion">0</property>
                                     <object class="wxBoxSizer" expanded="1">
                                         <property name="minimum_size"></property>
@@ -3828,7 +3828,7 @@
                                         <property name="permission">none</property>
                                         <object class="sizeritem" expanded="1">
                                             <property name="border">5</property>
-                                            <property name="flag">wxEXPAND|wxBOTTOM</property>
+                                            <property name="flag">wxEXPAND|wxALL</property>
                                             <property name="proportion">0</property>
                                             <object class="wxCheckBox" expanded="1">
                                                 <property name="BottomDockable">1</property>
@@ -4254,7 +4254,7 @@
                                 </object>
                                 <object class="sizeritem" expanded="1">
                                     <property name="border">5</property>
-                                    <property name="flag">wxEXPAND|wxALL</property>
+                                    <property name="flag">wxEXPAND</property>
                                     <property name="proportion">0</property>
                                     <object class="wxBoxSizer" expanded="1">
                                         <property name="minimum_size"></property>
@@ -4263,7 +4263,7 @@
                                         <property name="permission">none</property>
                                         <object class="sizeritem" expanded="0">
                                             <property name="border">5</property>
-                                            <property name="flag">wxEXPAND</property>
+                                            <property name="flag">wxEXPAND|wxALL</property>
                                             <property name="proportion">1</property>
                                             <object class="wxRadioButton" expanded="0">
                                                 <property name="BottomDockable">1</property>
@@ -4327,7 +4327,7 @@
                                         </object>
                                         <object class="sizeritem" expanded="0">
                                             <property name="border">5</property>
-                                            <property name="flag">wxEXPAND</property>
+                                            <property name="flag">wxEXPAND|wxALL</property>
                                             <property name="proportion">1</property>
                                             <object class="wxRadioButton" expanded="0">
                                                 <property name="BottomDockable">1</property>
@@ -4400,7 +4400,7 @@
                                                 <property name="permission">none</property>
                                                 <object class="sizeritem" expanded="0">
                                                     <property name="border">5</property>
-                                                    <property name="flag">wxEXPAND</property>
+                                                    <property name="flag">wxEXPAND|wxALL</property>
                                                     <property name="proportion">0</property>
                                                     <object class="wxRadioButton" expanded="0">
                                                         <property name="BottomDockable">1</property>

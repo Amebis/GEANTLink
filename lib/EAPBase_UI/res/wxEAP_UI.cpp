@@ -260,7 +260,7 @@ wxEAPCredentialsConfigPanelBase::wxEAPCredentialsConfigPanelBase( wxWindow* pare
 	sb_storage->Add( m_storage_identity, 1, wxEXPAND, FromDIP(5) );
 
 
-	sb_credentials_radio->Add( sb_storage, 1, wxEXPAND|wxBOTTOM, FromDIP(5) );
+	sb_credentials_radio->Add( sb_storage, 1, wxEXPAND|wxALL, FromDIP(5) );
 
 	wxBoxSizer* sb_config;
 	sb_config = new wxBoxSizer( wxHORIZONTAL );
@@ -278,10 +278,10 @@ wxEAPCredentialsConfigPanelBase::wxEAPCredentialsConfigPanelBase( wxWindow* pare
 	sb_config->Add( m_config_identity, 1, wxEXPAND, FromDIP(5) );
 
 
-	sb_credentials_radio->Add( sb_config, 1, wxEXPAND|wxTOP, FromDIP(5) );
+	sb_credentials_radio->Add( sb_config, 1, wxEXPAND|wxALL, FromDIP(5) );
 
 
-	sb_credentials_vert->Add( sb_credentials_radio, 0, wxEXPAND|wxALL, FromDIP(5) );
+	sb_credentials_vert->Add( sb_credentials_radio, 0, wxEXPAND, FromDIP(5) );
 
 	wxBoxSizer* sb_buttons_storage;
 	sb_buttons_storage = new wxBoxSizer( wxHORIZONTAL );
@@ -630,14 +630,14 @@ wxEAPProviderLockPanelBase::wxEAPProviderLockPanelBase( wxWindow* parent, wxWind
 	sb_provider_lock_inner = new wxBoxSizer( wxVERTICAL );
 
 	m_provider_lock = new wxCheckBox( sb_provider_lock->GetStaticBox(), wxID_ANY, _("&Lock this configuration and prevent any further modification via user interface."), wxDefaultPosition, wxDefaultSize, 0 );
-	sb_provider_lock_inner->Add( m_provider_lock, 0, wxEXPAND|wxBOTTOM, FromDIP(5) );
+	sb_provider_lock_inner->Add( m_provider_lock, 0, wxEXPAND|wxALL, FromDIP(5) );
 
 	m_provider_lock_note = new wxStaticText( sb_provider_lock->GetStaticBox(), wxID_ANY, _("(Warning: Once locked, you can not revert using this dialog!)"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_provider_lock_note->Wrap( -1 );
 	sb_provider_lock_inner->Add( m_provider_lock_note, 0, wxALIGN_RIGHT, FromDIP(5) );
 
 
-	sb_provider_lock_vert->Add( sb_provider_lock_inner, 0, wxEXPAND|wxALL, FromDIP(5) );
+	sb_provider_lock_vert->Add( sb_provider_lock_inner, 0, wxEXPAND, FromDIP(5) );
 
 
 	sb_provider_lock_horiz->Add( sb_provider_lock_vert, 1, wxEXPAND, FromDIP(5) );
@@ -718,12 +718,12 @@ wxEAPIdentityConfigPanelBase::wxEAPIdentityConfigPanelBase( wxWindow* parent, wx
 	m_identity_same = new wxRadioButton( sb_identity->GetStaticBox(), wxID_ANY, _("&True identity"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP );
 	m_identity_same->SetToolTip( _("Use my true user name") );
 
-	sb_identity_radio->Add( m_identity_same, 1, wxEXPAND, FromDIP(5) );
+	sb_identity_radio->Add( m_identity_same, 1, wxEXPAND|wxALL, FromDIP(5) );
 
 	m_identity_empty = new wxRadioButton( sb_identity->GetStaticBox(), wxID_ANY, _("Use &empty identity"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_identity_empty->SetToolTip( _("Omit my user name and use @mydomain.org only") );
 
-	sb_identity_radio->Add( m_identity_empty, 1, wxEXPAND, FromDIP(5) );
+	sb_identity_radio->Add( m_identity_empty, 1, wxEXPAND|wxALL, FromDIP(5) );
 
 	wxBoxSizer* sb_identity_custom;
 	sb_identity_custom = new wxBoxSizer( wxHORIZONTAL );
@@ -731,7 +731,7 @@ wxEAPIdentityConfigPanelBase::wxEAPIdentityConfigPanelBase( wxWindow* parent, wx
 	m_identity_custom = new wxRadioButton( sb_identity->GetStaticBox(), wxID_ANY, _("&Custom identity:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_identity_custom->SetToolTip( _("Specify custom identity") );
 
-	sb_identity_custom->Add( m_identity_custom, 0, wxEXPAND, FromDIP(5) );
+	sb_identity_custom->Add( m_identity_custom, 0, wxEXPAND|wxALL, FromDIP(5) );
 
 	m_identity_custom_val = new wxTextCtrl( sb_identity->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	m_identity_custom_val->SetToolTip( _("Custom identity to use") );
@@ -742,7 +742,7 @@ wxEAPIdentityConfigPanelBase::wxEAPIdentityConfigPanelBase( wxWindow* parent, wx
 	sb_identity_radio->Add( sb_identity_custom, 1, wxEXPAND, FromDIP(5) );
 
 
-	sb_identity_vert->Add( sb_identity_radio, 0, wxEXPAND|wxALL, FromDIP(5) );
+	sb_identity_vert->Add( sb_identity_radio, 0, wxEXPAND, FromDIP(5) );
 
 
 	sb_identity_horiz->Add( sb_identity_vert, 1, wxEXPAND, FromDIP(5) );
