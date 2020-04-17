@@ -166,21 +166,17 @@ class wxEAPCredentialsConfigPanelBase : public wxPanel
 		wxStaticBitmap* m_credentials_icon;
 		wxStaticText* m_credentials_label;
 		wxRadioButton* m_storage;
-		wxStaticText* m_storage_identity_label;
 		wxStaticText* m_storage_identity;
-		wxButton* m_storage_clear;
-		wxButton* m_storage_set;
 		wxRadioButton* m_config;
-		wxStaticText* m_config_identity_label;
 		wxStaticText* m_config_identity;
-		wxButton* m_config_set;
+		wxButton* m_clear;
+		wxButton* m_set;
 		wxTimer m_timer_storage;
 
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnUpdateUI( wxUpdateUIEvent& event ) { event.Skip(); }
-		virtual void OnClearStorage( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnSetStorage( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnSetConfig( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnClear( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSet( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnTimerStorage( wxTimerEvent& event ) { event.Skip(); }
 
 

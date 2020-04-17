@@ -37,6 +37,7 @@
 
 class wxCertificateClientData;
 class wxCertificateHashClientData;
+class wxCertificateValidator;
 class wxTLSCredentialsPanel;
 class wxTLSServerTrustPanel;
 class wxTLSConfigPanel;
@@ -105,6 +106,51 @@ public:
 
 
 ///
+/// User certificate validator - checks if a (valid) user certificate is selected
+///
+class wxCertificateValidator : public wxValidator
+{
+public:
+    ///
+    /// Construct the validator with a value to store data
+    ///
+    wxCertificateValidator(wxCertificateHashClientData *val = NULL);
+
+    ///
+    /// Copies this validator
+    ///
+    virtual wxObject* Clone() const;
+
+    ///
+    /// Validates the value
+    ///
+    virtual bool Validate(wxWindow *parent);
+
+    ///
+    /// Transfers the value to the window
+    ///
+    virtual bool TransferToWindow();
+
+    ///
+    /// Transfers the value from the window
+    ///
+    virtual bool TransferFromWindow();
+
+    ///
+    /// Parses FQDN list value
+    ///
+    static bool Parse(const wxCertificateHashClientData *val_in, wxChoice *ctrl, wxWindow *parent, wxCertificateHashClientData *val_out = NULL);
+
+protected:
+    wxCertificateHashClientData *m_val;  ///< Pointer to variable to receive control's parsed value
+
+private:
+    wxDECLARE_DYNAMIC_CLASS(wxCertificateValidator);
+    wxDECLARE_NO_ASSIGN_CLASS(wxCertificateValidator);
+};
+
+
+///
 /// TLS credential panel
 ///
 class wxTLSCredentialsPanel : public wxEAPCredentialsPanel<eap::credentials_tls, wxTLSCredentialsPanelBase>
@@ -127,6 +173,9 @@ protected:
     virtual bool TransferDataFromWindow();
     virtual void OnUpdateUI(wxUpdateUIEvent& event);
     /// \endcond
+
+protected:
+    wxCertificateHashClientData m_certificate_val;  ///< Client certificate hash value
 };
 
 

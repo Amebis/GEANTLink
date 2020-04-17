@@ -40,6 +40,91 @@ wxCertificateClientData::~wxCertificateClientData()
 
 
 //////////////////////////////////////////////////////////////////////
+// wxCertificateValidator
+//////////////////////////////////////////////////////////////////////
+
+wxIMPLEMENT_DYNAMIC_CLASS(wxCertificateValidator, wxValidator);
+
+
+wxCertificateValidator::wxCertificateValidator(wxCertificateHashClientData *val) :
+    m_val(val),
+    wxValidator()
+{
+}
+
+
+wxObject* wxCertificateValidator::Clone() const
+{
+    return new wxCertificateValidator(*this);
+}
+
+
+bool wxCertificateValidator::Validate(wxWindow *parent)
+{
+    wxChoice *ctrl = (wxChoice*)GetWindow();
+    if (!ctrl || !ctrl->IsEnabled()) return true;
+
+    int sel = ctrl->GetSelection();
+    const wxCertificateHashClientData *val =
+        sel != wxNOT_FOUND && ctrl->HasClientObjectData() ?
+            dynamic_cast<const wxCertificateHashClientData*>(ctrl->GetClientObject(sel)) :
+            NULL;
+
+    return Parse(val, ctrl, parent);
+}
+
+
+bool wxCertificateValidator::TransferToWindow()
+{
+    wxASSERT(GetWindow()->IsKindOf(CLASSINFO(wxChoice)));
+    wxChoice *ctrl = (wxChoice*)GetWindow();
+
+    if (m_val) {
+        if (ctrl->HasClientObjectData()) {
+            for (unsigned int i = 0, n = ctrl->GetCount(); i < n; i++) {
+                const wxCertificateHashClientData *val = dynamic_cast<const wxCertificateHashClientData*>(ctrl->GetClientObject(i));
+                if (val && m_val->m_cert_hash == val->m_cert_hash) {
+                    ctrl->SetSelection(i);
+                    return true;
+                }
+            }
+        }
+        ctrl->SetSelection(wxNOT_FOUND);
+    }
+
+    return true;
+}
+
+
+bool wxCertificateValidator::TransferFromWindow()
+{
+    wxASSERT(GetWindow()->IsKindOf(CLASSINFO(wxChoice)));
+    wxChoice *ctrl = (wxChoice*)GetWindow();
+
+    int sel = ctrl->GetSelection();
+    const wxCertificateHashClientData *val =
+        sel != wxNOT_FOUND && ctrl->HasClientObjectData() ?
+            dynamic_cast<const wxCertificateHashClientData*>(ctrl->GetClientObject(sel)) :
+            NULL;
+
+    return Parse(val, ctrl, NULL, m_val);
+}
+
+
+bool wxCertificateValidator::Parse(const wxCertificateHashClientData *val_in, wxChoice *ctrl, wxWindow *parent, wxCertificateHashClientData *val_out)
+{
+    if (!val_in) {
+        ctrl->SetFocus();
+        wxMessageBox(_("No certificate selected"), _("Validation conflict"), wxOK | wxICON_EXCLAMATION, parent);
+        return false;
+    }
+
+    if (val_out) val_out->m_cert_hash = val_in->m_cert_hash;
+    return true;
+}
+
+
+//////////////////////////////////////////////////////////////////////
 // wxTLSCredentialsPanel
 //////////////////////////////////////////////////////////////////////
 
@@ -50,16 +135,8 @@ wxTLSCredentialsPanel::wxTLSCredentialsPanel(const eap::config_provider &prov, c
     winstd::library lib_shell32;
     if (lib_shell32.load(_T("certmgr.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
         m_credentials_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(6170)));
-}
 
-
-/// \cond internal
-
-bool wxTLSCredentialsPanel::TransferDataToWindow()
-{
     // Populate certificate list.
-    m_certificate->Append(_("(none)"), (wxCertificateHashClientData*)NULL);
-    bool is_found = false;
     winstd::cert_store store;
     if (store.create(CERT_STORE_PROV_SYSTEM, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, (HCRYPTPROV)NULL, CERT_SYSTEM_STORE_CURRENT_USER, _T("My"))) {
         for (PCCERT_CONTEXT cert = NULL; (cert = CertEnumCertificatesInStore(store, cert)) != NULL;) {
@@ -77,18 +154,21 @@ bool wxTLSCredentialsPanel::TransferDataToWindow()
             }
 
             // Add to list.
-            bool is_selected = m_cred.m_cert_hash == data->m_cert_hash;
             winstd::tstring name(std::move(eap::get_cert_title(cert)));
-            int i = m_certificate->Append(name, data.release());
-            if (is_selected) {
-                m_certificate->SetSelection(i);
-                is_found = true;
-            }
+            m_certificate->Append(name, data.release());
         }
     }
 
-    if (!is_found)
-        m_certificate->SetSelection(0);
+    m_certificate->SetValidator(wxCertificateValidator(&m_certificate_val));
+}
+
+
+/// \cond internal
+
+bool wxTLSCredentialsPanel::TransferDataToWindow()
+{
+    // Set client certificate hash. The wxChoice control will set selection using validator.
+    m_certificate_val.m_cert_hash = m_cred.m_cert_hash;
 
     m_identity->SetValue(m_cred.m_identity);
 
@@ -98,22 +178,13 @@ bool wxTLSCredentialsPanel::TransferDataToWindow()
 
 bool wxTLSCredentialsPanel::TransferDataFromWindow()
 {
-    // Check if m_certificate control has selected item, and has client object data (at least one user certificate on the list). Then try to get the data from selected item.
-    int sel = m_certificate->GetSelection();
-    const wxCertificateHashClientData *data =
-        sel != wxNOT_FOUND && m_certificate->HasClientObjectData() ?
-            dynamic_cast<const wxCertificateHashClientData*>(m_certificate->GetClientObject(sel)) :
-            NULL;
-    if (data)
-        m_cred.m_cert_hash = data->m_cert_hash;
-    else
-        m_cred.m_cert_hash.clear();
+    if (!wxEAPCredentialsPanel<eap::credentials_tls, wxTLSCredentialsPanelBase>::TransferDataFromWindow())
+        return false;
 
-    m_cred.m_identity = m_identity->GetValue();
+    m_cred.m_cert_hash = m_certificate_val.m_cert_hash;
+    m_cred.m_identity  = m_identity->GetValue();
 
-    // Inherited TransferDataFromWindow() calls m_cred.store().
-    // Therefore, call it only now, that m_cred is set.
-    return wxEAPCredentialsPanel<eap::credentials_tls, wxTLSCredentialsPanelBase>::TransferDataFromWindow();
+    return true;
 }
 
 

@@ -126,6 +126,7 @@ inline void wxInitializeConfig();
 #include <wx/intl.h>
 #include <wx/log.h>
 #include <wx/thread.h>
+#include <wx/valtext.h>
 
 #include <CommCtrl.h>
 
@@ -810,107 +811,96 @@ protected:
     {
         wxEAPCredentialsConfigPanelBase::OnUpdateUI(event);
 
-        if (m_cfg.m_allow_save) {
-            if (m_storage->GetValue()) {
-                m_storage_identity->Enable(true);
-                m_storage_set     ->Enable(true);
-                m_storage_clear   ->Enable(m_has_storage);
-            } else {
-                m_storage_identity->Enable(false);
-                m_storage_set     ->Enable(false);
-                m_storage_clear   ->Enable(false);
-            }
-        } else {
-            m_storage_identity->Enable(false);
-            m_storage_set     ->Enable(false);
-            m_storage_clear   ->Enable(false);
-        }
+        bool is_storage = m_storage->GetValue();
+
+        m_storage_identity->Enable(m_cfg.m_allow_save && is_storage);
+        m_config_identity->Enable(!m_prov.m_read_only && !is_storage);
 
         if (m_prov.m_read_only) {
             // This is provider-locked configuration. Disable controls.
             // To avoid run-away selection of radio buttons, disable the selected one last.
-            if (m_storage->GetValue()) {
+            if (is_storage) {
                 m_config ->Enable(false);
                 m_storage->Enable(false);
             } else {
                 m_storage->Enable(false);
                 m_config ->Enable(false);
             }
-            m_config_identity->Enable(false);
-            m_config_set     ->Enable(false);
         } else {
             // This is not a provider-locked configuration. Selectively enable/disable controls.
             m_storage->Enable(true);
             m_config->Enable(true);
-            if (m_storage->GetValue()) {
-                m_config_identity->Enable(false);
-                m_config_set     ->Enable(false);
-            } else {
-                m_config_identity->Enable(true);
-                m_config_set     ->Enable(true);
-            }
+        }
+
+        if (is_storage) {
+            m_set  ->Enable(m_cfg.m_allow_save);
+            m_clear->Enable(m_cfg.m_allow_save && m_has_storage);
+        } else {
+            m_set  ->Enable(!m_prov.m_read_only);
+            m_clear->Enable(!m_prov.m_read_only && !m_cred_config.empty());
         }
     }
 
 
-    virtual void OnSetStorage(wxCommandEvent& event)
+    virtual void OnSet(wxCommandEvent& event)
     {
-        wxEAPCredentialsConfigPanelBase::OnSetStorage(event);
+        wxEAPCredentialsConfigPanelBase::OnSet(event);
 
-        m_timer_storage.Stop();
+        if (m_storage->GetValue()) {
+            m_timer_storage.Stop();
 
-        // Read credentials from Credential Manager.
-        RetrieveStorageCredentials();
+            // Read credentials from Credential Manager.
+            RetrieveStorageCredentials();
 
-        // Display credential prompt.
-        wxEAPCredentialsDialog dlg(m_prov, this);
-        _wxT *panel = new _wxT(m_prov, m_cfg, m_cred_storage, &dlg, true);
-        dlg.AddContent(panel);
-        if (dlg.ShowModal() == wxID_OK) {
-            // Write credentials to credential manager.
-            try {
-                m_cred_storage.store(m_prov.get_id().c_str(), m_cfg.m_level);
-                m_has_storage = TRUE;
-                UpdateStorageIdentity();
-            } catch (winstd::win_runtime_error &err) {
-                wxLogError(winstd::tstring_printf(_("Error writing credentials to Credential Manager: %hs (error %u)"), err.what(), err.number()).c_str());
-                RetrieveStorageCredentials();
-            } catch (...) {
-                wxLogError(_("Writing credentials failed."));
-                RetrieveStorageCredentials();
+            // Display credential prompt.
+            wxEAPCredentialsDialog dlg(m_prov, this);
+            _wxT *panel = new _wxT(m_prov, m_cfg, m_cred_storage, &dlg, true);
+            dlg.AddContent(panel);
+            if (dlg.ShowModal() == wxID_OK) {
+                // Write credentials to credential manager.
+                try {
+                    m_cred_storage.store(m_prov.get_id().c_str(), m_cfg.m_level);
+                    m_has_storage = true;
+                    UpdateStorageIdentity();
+                } catch (winstd::win_runtime_error &err) {
+                    wxLogError(winstd::tstring_printf(_("Error writing credentials to Credential Manager: %hs (error %u)"), err.what(), err.number()).c_str());
+                    RetrieveStorageCredentials();
+                } catch (...) {
+                    wxLogError(_("Writing credentials failed."));
+                    RetrieveStorageCredentials();
+                }
             }
+
+            m_timer_storage.Start(3000);
+        } else {
+            wxEAPCredentialsDialog dlg(m_prov, this);
+            _wxT *panel = new _wxT(m_prov, m_cfg, m_cred_config, &dlg, true);
+            dlg.AddContent(panel);
+            if (dlg.ShowModal() == wxID_OK)
+                UpdateConfigIdentity();
         }
-
-        m_timer_storage.Start(3000);
     }
 
 
-    virtual void OnClearStorage(wxCommandEvent& event)
+    virtual void OnClear(wxCommandEvent& event)
     {
-        wxEAPCredentialsConfigPanelBase::OnClearStorage(event);
+        wxEAPCredentialsConfigPanelBase::OnClear(event);
 
-        m_timer_storage.Stop();
+        if (m_storage->GetValue()) {
+            m_timer_storage.Stop();
 
-        if (CredDelete(m_cred_storage.target_name(m_prov.get_id().c_str(), m_cfg.m_level).c_str(), CRED_TYPE_GENERIC, 0)) {
-            m_storage_identity->SetLabel(wxEmptyString);
-            m_cred_storage.clear();
-            m_has_storage = false;
-        } else
-            wxLogError(_("Deleting credentials failed (error %u)."), GetLastError());
+            if (CredDelete(m_cred_storage.target_name(m_prov.get_id().c_str(), m_cfg.m_level).c_str(), CRED_TYPE_GENERIC, 0)) {
+                m_storage_identity->SetLabel(wxEmptyString);
+                m_cred_storage.clear();
+                m_has_storage = false;
+            } else
+                wxLogError(_("Deleting credentials failed (error %u)."), GetLastError());
 
-        m_timer_storage.Start(3000);
-    }
-
-
-    virtual void OnSetConfig(wxCommandEvent& event)
-    {
-        wxEAPCredentialsConfigPanelBase::OnSetConfig(event);
-
-        wxEAPCredentialsDialog dlg(m_prov, this);
-        _wxT *panel = new _wxT(m_prov, m_cfg, m_cred_config, &dlg, true);
-        dlg.AddContent(panel);
-        if (dlg.ShowModal() == wxID_OK)
+            m_timer_storage.Start(3000);
+        } else {
+            m_cred_config.clear();
             UpdateConfigIdentity();
+        }
     }
 
 
@@ -931,7 +921,7 @@ protected:
             UpdateStorageIdentity();
         } catch (winstd::win_runtime_error &err) {
             if (err.number() == ERROR_NOT_FOUND) {
-                m_storage_identity->SetLabel(wxEmptyString);
+                m_storage_identity->SetLabel(_("(none)"));
                 m_cred_storage.clear();
                 m_has_storage = false;
             } else {
@@ -1074,6 +1064,8 @@ public:
 
         if (layout)
             this->Layout();
+
+        m_identity->SetValidator(wxTextValidator(wxFILTER_EMPTY));
     }
 
 protected:
@@ -1088,6 +1080,10 @@ protected:
             // Credential prompt mode & Using configured credentials
             m_identity_label->Enable(false);
             m_identity      ->Enable(false);
+        } else {
+            // Configuration mode or using stored credentials. Enable controls.
+            m_identity_label->Enable(true);
+            m_identity      ->Enable(true);
         }
 
         return wxEAPCredentialsPanel<_Tcred, _Tbase>::TransferDataToWindow();
@@ -1136,6 +1132,8 @@ public:
             m_password_label->SetLabel(m_prov.m_lbl_alt_password);
             this->Layout();
         }
+
+        m_password->SetValidator(wxTextValidator(wxFILTER_EMPTY));
     }
 
 protected:
@@ -1150,6 +1148,10 @@ protected:
             // Credential prompt mode & Using configured credentials
             m_password_label->Enable(false);
             m_password      ->Enable(false);
+        } else {
+            // Configuration mode or using stored credentials. Enable controls.
+            m_password_label->Enable(true);
+            m_password      ->Enable(true);
         }
 
         return wxIdentityCredentialsPanel<_Tcred, _Tbase>::TransferDataToWindow();
