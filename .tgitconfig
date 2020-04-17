@@ -1,0 +1,4 @@
+[tgit]
+	projectlanguage = 1033
+	warnnosignedoffby = true
+	icon = include/icon_full.ico
