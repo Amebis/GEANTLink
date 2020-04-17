@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: EAPMethods\n"
-"POT-Creation-Date: 2020-02-06 16:51+0100\n"
+"POT-Creation-Date: 2020-04-17 06:54+0200\n"
 "PO-Revision-Date: 2016-06-02 12:27+0200\n"
 "Last-Translator: Simon Rozman <simon.rozman@amebis.si>\n"
 "Language-Team: Amebis, d. o. o., Kamnik <info@amebis.si>\n"
@@ -220,24 +220,12 @@ msgstr ""
 msgid "Helpdesk contact &information:"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:520
-msgid "¶"
-msgstr ""
-
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:527
 msgid "Your helpdesk website address"
 msgstr ""
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:531
-msgid "*"
-msgstr ""
-
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:538
 msgid "Your helpdesk e-mail address"
-msgstr ""
-
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:542
-msgid ")"
 msgstr ""
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:549

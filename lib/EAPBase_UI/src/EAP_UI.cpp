@@ -150,7 +150,7 @@ void wxEAPNotePanel::CreateContactFields(const eap::config_provider &prov)
         wxFont font_wingdings(-1, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Wingdings"));
 
         if (!prov.m_help_web.empty()) {
-            m_help_web_label = new wxStaticText(this, wxID_ANY, wxT("\xb6"), wxDefaultPosition, wxDefaultSize, 0);
+            m_help_web_label = new wxStaticText(this, wxID_ANY, L"\u00b6", wxDefaultPosition, wxDefaultSize, 0);
             m_help_web_label->Wrap(-1);
             m_help_web_label->SetFont(font_wingdings);
             sb_contact_tbl->Add(m_help_web_label, 0, wxEXPAND|wxALIGN_TOP, FromDIP(5));
@@ -161,7 +161,7 @@ void wxEAPNotePanel::CreateContactFields(const eap::config_provider &prov)
         }
 
         if (!prov.m_help_email.empty()) {
-            m_help_email_label = new wxStaticText(this, wxID_ANY, wxT("\x2a"), wxDefaultPosition, wxDefaultSize, 0);
+            m_help_email_label = new wxStaticText(this, wxID_ANY, L"\u002a", wxDefaultPosition, wxDefaultSize, 0);
             m_help_email_label->Wrap(-1);
             m_help_email_label->SetFont(font_wingdings);
             sb_contact_tbl->Add(m_help_email_label, 0, wxEXPAND|wxALIGN_TOP, FromDIP(5));
@@ -172,7 +172,7 @@ void wxEAPNotePanel::CreateContactFields(const eap::config_provider &prov)
         }
 
         if (!prov.m_help_phone.empty()) {
-            m_help_phone_label = new wxStaticText(this, wxID_ANY, wxT("\x29"), wxDefaultPosition, wxDefaultSize, 0);
+            m_help_phone_label = new wxStaticText(this, wxID_ANY, L"\u0029", wxDefaultPosition, wxDefaultSize, 0);
             m_help_phone_label->Wrap(-1);
             m_help_phone_label->SetFont(font_wingdings);
             sb_contact_tbl->Add(m_help_phone_label, 0, wxEXPAND|wxALIGN_TOP, FromDIP(5));

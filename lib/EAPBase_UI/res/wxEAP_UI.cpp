@@ -517,7 +517,7 @@ wxEAPProviderContactInfoPanelBase::wxEAPProviderContactInfoPanelBase( wxWindow* 
 	sb_provider_helpdesk_inner->SetFlexibleDirection( wxBOTH );
 	sb_provider_helpdesk_inner->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 
-	m_provider_web_icon = new wxStaticText( sb_provider_contact->GetStaticBox(), wxID_ANY, _("¶"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_provider_web_icon = new wxStaticText( sb_provider_contact->GetStaticBox(), wxID_ANY, L"\u00b6", wxDefaultPosition, wxDefaultSize, 0 );
 	m_provider_web_icon->Wrap( -1 );
 	m_provider_web_icon->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Wingdings") ) );
 
@@ -528,7 +528,7 @@ wxEAPProviderContactInfoPanelBase::wxEAPProviderContactInfoPanelBase( wxWindow* 
 
 	sb_provider_helpdesk_inner->Add( m_provider_web, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL|wxBOTTOM, FromDIP(5) );
 
-	m_provider_email_icon = new wxStaticText( sb_provider_contact->GetStaticBox(), wxID_ANY, _("*"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_provider_email_icon = new wxStaticText( sb_provider_contact->GetStaticBox(), wxID_ANY, L"\u002a", wxDefaultPosition, wxDefaultSize, 0 );
 	m_provider_email_icon->Wrap( -1 );
 	m_provider_email_icon->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Wingdings") ) );
 
@@ -539,7 +539,7 @@ wxEAPProviderContactInfoPanelBase::wxEAPProviderContactInfoPanelBase( wxWindow* 
 
 	sb_provider_helpdesk_inner->Add( m_provider_email, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL|wxBOTTOM, FromDIP(5) );
 
-	m_provider_phone_icon = new wxStaticText( sb_provider_contact->GetStaticBox(), wxID_ANY, _(")"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_provider_phone_icon = new wxStaticText( sb_provider_contact->GetStaticBox(), wxID_ANY, L"\u0029", wxDefaultPosition, wxDefaultSize, 0 );
 	m_provider_phone_icon->Wrap( -1 );
 	m_provider_phone_icon->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Wingdings") ) );
 
