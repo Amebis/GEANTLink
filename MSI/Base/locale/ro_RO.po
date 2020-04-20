@@ -1,0 +1,44 @@
+# Translators:
+# Raul Opruta <raul.opruta@roedu.net>, 2020
+# Simon Rozman <simon@rozman.si>, 2020
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: GÉANTLink MSI\n"
+"POT-Creation-Date: 2019-08-12 14:04+0200\n"
+"PO-Revision-Date: 2016-09-10 07:51+0000\n"
+"Last-Translator: Simon Rozman <simon@rozman.si>, 2020\n"
+"Language-Team: Romanian (Romania) (https://www.transifex.com/eduroam_devel/teams/11799/ro_RO/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ro_RO\n"
+"Plural-Forms: nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?2:1));\n"
+"X-Generator: Poedit 2.2.3\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-KeywordsList: _\n"
+"X-Poedit-SearchPath-0: Main\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+
+#: Main/en_US.ARM64.Release.LaunchCondition-2.idtx:4
+#: Main/en_US.Win32.Release.LaunchCondition-2.idtx:4
+#: Main/en_US.x64.Release.LaunchCondition-2.idtx:4
+msgid "[ProductName] requires Windows Vista or later version of Windows."
+msgstr ""
+"[ProductName] necesită Windows Vista sau versiunea ulterioară a Windows."
+
+#: Main/en_US.ARM64.Release.Property-2.idtx:4
+#: Main/en_US.ARM64.Release.Property-2.idtx:5
+#: Main/en_US.Win32.Release.Property-2.idtx:4
+#: Main/en_US.Win32.Release.Property-2.idtx:5
+#: Main/en_US.x64.Release.Property-2.idtx:4
+#: Main/en_US.x64.Release.Property-2.idtx:5
+msgid "http://www.geant.org/"
+msgstr "http://www.geant.org/"
+
+#: Main/en_US.ARM64.Release.Property-2.idtx:6
+#: Main/en_US.Win32.Release.Property-2.idtx:6
+#: Main/en_US.x64.Release.Property-2.idtx:6
+msgid "https://github.com/Amebis/GEANTLink/releases"
+msgstr "https://github.com/Amebis/GEANTLink/releases"

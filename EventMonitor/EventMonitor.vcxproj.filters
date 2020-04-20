@@ -75,6 +75,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <POCompile Include="locale\ro_RO.po">
+      <Filter>Resource Files\Localization</Filter>
+    </POCompile>
     <POCompile Include="locale\sl_SI.po">
       <Filter>Resource Files\Localization</Filter>
     </POCompile>

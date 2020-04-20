@@ -1,0 +1,232 @@
+# Translators:
+# Raul Opruta <raul.opruta@roedu.net>, 2020
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: EventMonitor\n"
+"POT-Creation-Date: 2019-08-12 14:04+0200\n"
+"PO-Revision-Date: 2016-08-27 11:21+0000\n"
+"Last-Translator: Raul Opruta <raul.opruta@roedu.net>, 2020\n"
+"Language-Team: Romanian (Romania) (https://www.transifex.com/eduroam_devel/teams/11799/ro_RO/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ro_RO\n"
+"Plural-Forms: nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?2:1));\n"
+"X-Generator: Poedit 2.2.3\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-KeywordsList: _\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+
+#: App.cpp:61 Frame.h:75 MSIBuild/en_US.ARM64.Release.Feature-2.idtx:4
+#: MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
+#: MSIBuild/en_US.x64.Release.Feature-2.idtx:4
+msgid "Event Monitor"
+msgstr "Monitor de evenimente"
+
+#: ETWLog.cpp:83
+#, c-format
+msgid "Error opening event trace (error %u)."
+msgstr "Eroare la deschiderea urmării evenimentului (eroare %u )."
+
+#: ETWLog.cpp:171
+msgid "Time"
+msgstr "Timp"
+
+#: ETWLog.cpp:172
+msgid "PID"
+msgstr "PID"
+
+#: ETWLog.cpp:173
+msgid "TID"
+msgstr "TID"
+
+#: ETWLog.cpp:174
+msgid "Source"
+msgstr "Sursă"
+
+#: ETWLog.cpp:175
+msgid "Event"
+msgstr "Eveniment"
+
+#: ETWLog.cpp:232
+msgid ""
+"Access denied creating event session: you need administrative privileges "
+"(Run As Administrator) or be a member of Performance Log Users group to "
+"start event tracing session."
+msgstr ""
+"Accesul refuzat la crearea sesiunii de evenimente: aveți nevoie de "
+"privilegii administrative (Run As Administrator) sau să fiți membru al "
+"grupului Utilizatori de performantă pentru a începe sesiunea de urmărire a "
+"evenimentelor."
+
+#: ETWLog.cpp:235
+#, c-format
+msgid "The %s event session already exists."
+msgstr "Sesiunea de eveniment %s există deja."
+
+#: ETWLog.cpp:239
+#, c-format
+msgid "Error creating event session (error %u)."
+msgstr "Eroare la crearea sesiunii evenimentului (eroare %u )."
+
+#: ETWLog.cpp:255 ETWLog.cpp:271 ETWLog.cpp:285
+#, c-format
+msgid "Error enabling %s event provider (error %u)."
+msgstr "Eroare la activarea %s furnizorului de evenimente (eroare %u )."
+
+#: Frame.cpp:48 Frame.cpp:108 Frame.cpp:113 Frame.cpp:168 Frame.cpp:170
+#, c-format
+msgid "Toggles display of %s records"
+msgstr "Afișarea comutatorilor de pe %s înregistrări"
+
+#: Frame.cpp:65
+msgid "E&xit"
+msgstr "Ieşire"
+
+#: Frame.cpp:65
+msgid "Quits this program"
+msgstr "Renunță la acest program"
+
+#: Frame.cpp:69
+msgid "&Program"
+msgstr "&Program"
+
+#: Frame.cpp:73
+msgid "&Copy"
+msgstr "&Copie"
+
+#: Frame.cpp:73 Frame.cpp:154
+msgid "Copies selected records to clipboard"
+msgstr "Copiază înregistrările selectate în clipboard"
+
+#: Frame.cpp:78
+msgid "Copy A&ll"
+msgstr "Copiați toate"
+
+#: Frame.cpp:78 Frame.cpp:156
+msgid "Copies all records to clipboard (including hidden)"
+msgstr "Copiază toate înregistrările în clipboard (inclusiv ascunse)"
+
+#: Frame.cpp:83 Frame.cpp:158
+msgid "Clear"
+msgstr "Clar"
+
+#: Frame.cpp:83 Frame.cpp:158
+msgid "Clears all records from the log"
+msgstr "Șterge toate înregistrările din jurnal"
+
+#: Frame.cpp:90
+msgid "Select &All"
+msgstr "Selectează &tot"
+
+#: Frame.cpp:90
+msgid "Selects all visible records"
+msgstr "Selectează toate înregistrările vizibile"
+
+#: Frame.cpp:94
+msgid "Select &None"
+msgstr "Selectați & Nici unul"
+
+#: Frame.cpp:94
+msgid "Clears record selection"
+msgstr "Șterge selecția recordului"
+
+#: Frame.cpp:97 Frame.cpp:142
+msgid "&Edit"
+msgstr "&Editează"
+
+#: Frame.cpp:101
+msgid "Auto &Scroll"
+msgstr "Auto & scroll"
+
+#: Frame.cpp:101 Frame.cpp:164
+msgid "Automatically scrolls to the most recent records as they come-in"
+msgstr "Derulați automat la cele mai recente înregistrări pe măsură ce intră"
+
+#: Frame.cpp:123 Frame.cpp:176
+msgid "Verbose"
+msgstr "Prolix "
+
+#: Frame.cpp:123 Frame.cpp:176
+msgid "Displays all levels of records"
+msgstr "Afișează toate nivelurile de înregistrări"
+
+#: Frame.cpp:127 Frame.cpp:178
+msgid "Informational"
+msgstr "Informațional"
+
+#: Frame.cpp:127 Frame.cpp:178
+msgid "Displays all records up to informational level"
+msgstr "Afișează toate înregistrările până la nivel informațional "
+
+#: Frame.cpp:131 Frame.cpp:180
+msgid "Warning"
+msgstr "Avertizare"
+
+#: Frame.cpp:131 Frame.cpp:180
+msgid "Displays all records up to warning level"
+msgstr "Afișează toate înregistrările până la nivelul de avertizare"
+
+#: Frame.cpp:135 Frame.cpp:182
+msgid "Error"
+msgstr "Eroare"
+
+#: Frame.cpp:135 Frame.cpp:182
+msgid "Displays error level records only"
+msgstr "Afișează doar înregistrări la nivel de eroare"
+
+#: Frame.cpp:142 Frame.cpp:146
+#, c-format
+msgid "%s toolbar"
+msgstr "%s Bara de instrumente"
+
+#: Frame.cpp:142 Frame.cpp:146
+#, c-format
+msgid "Toggles display of %s toolbar"
+msgstr "Comută afișarea barei de instrumente %s"
+
+#: Frame.cpp:142 Frame.cpp:146 Frame.cpp:185
+msgid "View"
+msgstr "Vezi"
+
+#: Frame.cpp:146 Frame.cpp:149
+msgid "&View"
+msgstr "&Vezi"
+
+#: Frame.cpp:154
+msgid "Copy"
+msgstr "Copiază"
+
+#: Frame.cpp:156
+msgid "Copy All"
+msgstr "Copiați toate"
+
+#: Frame.cpp:161
+msgid "Edit"
+msgstr "Editați "
+
+#: Frame.cpp:164
+msgid "Auto Scroll"
+msgstr "Derulare automată"
+
+#: Frame.cpp:189
+msgid "Trace Log"
+msgstr "Jurnal de urmărire"
+
+#: MSIBuild/en_US.ARM64.Release.Feature-2.idtx:4
+#: MSIBuild/en_US.ARM64.Release.Shortcut-2.idtx:4
+#: MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
+#: MSIBuild/en_US.Win32.Release.Shortcut-2.idtx:4
+#: MSIBuild/en_US.x64.Release.Feature-2.idtx:4
+#: MSIBuild/en_US.x64.Release.Shortcut-2.idtx:4
+msgid "Real-time display of internal events"
+msgstr "Afișare în timp real a evenimentelor interne"
+
+#: MSIBuild/en_US.ARM64.Release.Shortcut-2.idtx:4
+#: MSIBuild/en_US.Win32.Release.Shortcut-2.idtx:4
+#: MSIBuild/en_US.x64.Release.Shortcut-2.idtx:4
+msgid "EVENTM~1|GÉANTLink Event Monitor"
+msgstr "EVENTM~1|GÉANT  Monitor de evenimente de legătură "

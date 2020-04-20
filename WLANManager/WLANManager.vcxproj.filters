@@ -116,6 +116,9 @@
     <None Include="locale\sk_SK.po">
       <Filter>Resource Files\Localization</Filter>
     </None>
+    <None Include="locale\ro_RO.po">
+      <Filter>Resource Files\Localization</Filter>
+    </None>
     <None Include="locale\sl_SI.po">
       <Filter>Resource Files\Localization</Filter>
     </None>

@@ -152,6 +152,7 @@
     <None Include="locale\pt_PT.po" />
     <None Include="locale\ru_RU.po" />
     <None Include="locale\sk_SK.po" />
+    <None Include="locale\ro_RO.po" />
     <None Include="locale\sl_SI.po" />
     <None Include="locale\sr_RS.po" />
     <None Include="locale\sv_SE.po" />

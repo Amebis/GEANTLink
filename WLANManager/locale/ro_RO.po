@@ -1,0 +1,42 @@
+# Translators:
+# Raul Opruta <raul.opruta@roedu.net>, 2020
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: WLANManager\n"
+"POT-Creation-Date: 2019-08-12 14:09+0200\n"
+"PO-Revision-Date: 2016-08-28 10:03+0000\n"
+"Last-Translator: Raul Opruta <raul.opruta@roedu.net>, 2020\n"
+"Language-Team: Romanian (Romania) (https://www.transifex.com/eduroam_devel/teams/11799/ro_RO/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ro_RO\n"
+"Plural-Forms: nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?2:1));\n"
+"X-Generator: Poedit 2.2.3\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-KeywordsList: _\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+
+#: MSIBuild/en_US.ARM64.Debug.Feature-2.idtx:4
+#: MSIBuild/en_US.ARM64.Release.Feature-2.idtx:4
+#: MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
+#: MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
+#: MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
+#: MSIBuild/en_US.x64.Release.Feature-2.idtx:4
+msgid "WLAN Manager"
+msgstr "Manager WLAN"
+
+#: MSIBuild/en_US.ARM64.Debug.Feature-2.idtx:4
+#: MSIBuild/en_US.ARM64.Release.Feature-2.idtx:4
+#: MSIBuild/en_US.Win32.Debug.Feature-2.idtx:4
+#: MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
+#: MSIBuild/en_US.x64.Debug.Feature-2.idtx:4
+#: MSIBuild/en_US.x64.Release.Feature-2.idtx:4
+msgid ""
+"Helper utility to support direct shortcuts to Wireless Network Properties"
+msgstr ""
+"Utilitar de ajutor pentru a susține scurtături directe către Proprietățile "
+"rețelei wireless"

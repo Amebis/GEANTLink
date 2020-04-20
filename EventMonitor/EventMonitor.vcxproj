@@ -175,6 +175,7 @@
     <POCompile Include="locale\pt_PT.po" />
     <POCompile Include="locale\ru_RU.po" />
     <POCompile Include="locale\sk_SK.po" />
+    <POCompile Include="locale\ro_RO.po" />
     <POCompile Include="locale\sl_SI.po" />
     <POCompile Include="locale\sr_RS.po" />
     <POCompile Include="locale\sv_SE.po" />

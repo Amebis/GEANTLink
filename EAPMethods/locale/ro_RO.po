@@ -1,0 +1,728 @@
+# Translators:
+# Raul Opruta <raul.opruta@roedu.net>, 2020
+# Simon Rozman <simon@rozman.si>, 2020
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: EAPMethods\n"
+"POT-Creation-Date: 2020-04-17 14:55+0200\n"
+"PO-Revision-Date: 2016-08-25 06:18+0000\n"
+"Last-Translator: Simon Rozman <simon@rozman.si>, 2020\n"
+"Language-Team: Romanian (Romania) (https://www.transifex.com/eduroam_devel/teams/11799/ro_RO/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ro_RO\n"
+"Plural-Forms: nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?2:1));\n"
+"X-Generator: Poedit 2.3\n"
+"X-Poedit-Basepath: ../..\n"
+"X-Poedit-KeywordsList: _\n"
+"X-Poedit-SearchPath-0: lib/EAPBase_UI\n"
+"X-Poedit-SearchPath-1: lib/EapHost_UI\n"
+"X-Poedit-SearchPath-2: lib/GTC_UI\n"
+"X-Poedit-SearchPath-3: lib/MSCHAPv2_UI\n"
+"X-Poedit-SearchPath-4: lib/PAP_UI\n"
+"X-Poedit-SearchPath-5: lib/TLS_UI\n"
+"X-Poedit-SearchPath-6: lib/TTLS_UI\n"
+"X-Poedit-SearchPath-7: EAPMethods\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+
+#: lib/EAPBase_UI/include/EAP_UI.h:295
+#, c-format
+msgid ""
+"Are you sure you want to permanently remove %s provider from configuration?"
+msgstr ""
+"Sunteți sigur că doriți să eliminați definitiv furnizorul %s din "
+"configurație?"
+
+#: lib/EAPBase_UI/include/EAP_UI.h:295
+msgid "Warning"
+msgstr "Avertizare"
+
+#: lib/EAPBase_UI/include/EAP_UI.h:381 lib/EAPBase_UI/res/wxEAP_UI.h:116
+msgid "EAP Credentials"
+msgstr "Credenţiale EAP"
+
+#: lib/EAPBase_UI/include/EAP_UI.h:725
+msgid "Provider Settings"
+msgstr "Setări de provider"
+
+#: lib/EAPBase_UI/include/EAP_UI.h:758 lib/EAPBase_UI/res/wxEAP_UI.cpp:229
+#, c-format
+msgid "%s User Credentials"
+msgstr "%s Credenţiale utilizator"
+
+#: lib/EAPBase_UI/include/EAP_UI.h:866 lib/TTLS_UI/src/Module.cpp:196
+#: lib/TTLS_UI/src/Module.cpp:305
+#, c-format
+msgid "Error writing credentials to Credential Manager: %hs (error %u)"
+msgstr ""
+"Eroare la scriere a credențialelor în Managerul de credențiale: % hs "
+"(eroare%u)"
+
+#: lib/EAPBase_UI/include/EAP_UI.h:869 lib/TTLS_UI/src/Module.cpp:198
+#: lib/TTLS_UI/src/Module.cpp:307
+msgid "Writing credentials failed."
+msgstr " Scrierea credențialele nu au reușit."
+
+#: lib/EAPBase_UI/include/EAP_UI.h:897
+#, c-format
+msgid "Deleting credentials failed (error %u)."
+msgstr "Ştergerea credenţialelor eşuată (eroare %u)."
+
+#: lib/EAPBase_UI/include/EAP_UI.h:924 lib/EAPBase_UI/include/EAP_UI.h:943
+#: lib/EAPBase_UI/include/EAP_UI.h:952
+msgid "(none)"
+msgstr "(nici unul)"
+
+#: lib/EAPBase_UI/include/EAP_UI.h:928
+#, c-format
+msgid "(error %u)"
+msgstr "(eroare %u )"
+
+#: lib/EAPBase_UI/include/EAP_UI.h:932
+msgid "(error)"
+msgstr "(eroare)"
+
+#: lib/EAPBase_UI/include/EAP_UI.h:943 lib/EAPBase_UI/include/EAP_UI.h:952
+msgid "(blank ID)"
+msgstr "(ID gol)"
+
+#: lib/EAPBase_UI/include/EAP_UI.h:992
+msgid "&Remember"
+msgstr "&Ţine minte"
+
+#: lib/EAPBase_UI/include/EAP_UI.h:993
+msgid "Check if you would like to save credentials"
+msgstr " Verificați dacă doriți să salvați datele de acreditare"
+
+#: lib/EAPBase_UI/include/EAP_UI.h:1214
+msgid "(Your Organization)"
+msgstr "(Organizaţia ta)"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:37
+msgid "+"
+msgstr "+"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:38
+msgid "Adds new provider"
+msgstr "Adaugă un nou furnizor"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:42
+msgid "-"
+msgstr "-"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:43
+msgid "Removes selected provider"
+msgstr "Înlătură furnizorul selectat"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:47
+msgid "Advanced..."
+msgstr "Avansat..."
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:48
+msgid "Opens dialog with provider settings"
+msgstr "Deschide dialogul cu setările furnizorului"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:240
+msgid "Select the source where your credentials used to connect are stored."
+msgstr ""
+"Selectați sursa în care sunt stocate datele de acreditare folosite pentru a "
+"vă conecta."
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:250
+msgid "Use from Credential &Manager:"
+msgstr "Utilizați de la Credențiale & Management:"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:251
+msgid ""
+"Select this option if you would like to use credentials stored in Windows "
+"Credential Manager"
+msgstr ""
+"Selectați această opțiune dacă doriți să utilizați credețialele stocate în "
+"Windows Credential Manager"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:258
+msgid "Your present credentials stored in Windows Credential Manager"
+msgstr "Credențiele dvs. actuale sunt stocate în Windows Credential Manager"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:268
+msgid "Use from &profile configuration:"
+msgstr "Utilizați din configurarea profilului:"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:269
+msgid ""
+"Select this option if you would like to store credentials as a part of  "
+"profile configuration"
+msgstr ""
+"Selectați această opțiune dacă doriți să stocați credențialele  ca parte a "
+"configurației profilului"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:276
+msgid "Profile configuration credentials"
+msgstr " Credențialele de configurare a profilului"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:289
+msgid "&Clear Credentials"
+msgstr "%Ştergere Credenţiale"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:290
+msgid ""
+"Click to clear your credentials from Credential Manager.\n"
+"Note: You will be prompted to enter credentials when connecting."
+msgstr ""
+"Faceți clic pentru a șterge credențialele din Managerul de credenţiale.\n"
+"Notă: Vi se va solicita să introduceți credențialele atunci când vă conectați."
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:294
+msgid "&Set Credentials..."
+msgstr "&Setare credenţiale"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:295
+msgid "Click here to set or modify your credentials"
+msgstr "Apasă aici pentru a modifica credenţialele"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:332
+msgid "User ID and Password"
+msgstr "ID de utilizator și parolă"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:342
+msgid "Please provide your user ID and password."
+msgstr "Vă rugăm să furnizați ID-ul de utilizator și parola."
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:352 lib/EAPBase_UI/res/wxEAP_UI.cpp:416
+msgid "User ID:"
+msgstr "ID utilizator:"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:357 lib/EAPBase_UI/res/wxEAP_UI.cpp:421
+msgid "Enter your user name here (user@domain.org, DOMAIN\\User, etc.)"
+msgstr ""
+"Introduceți numele de utilizator aici (user@domain.org, DOMENIU \\ User "
+"etc.)"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:361
+msgid "Password:"
+msgstr "Parolă:"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:366
+msgid "Enter your password here"
+msgstr "Introduceţi parola aici:"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:396
+msgid "User ID"
+msgstr "ID Utilizator"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:406
+msgid "Please provide your user ID."
+msgstr "Vă rugăm să furnizați ID-ul de utilizator."
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:446
+msgid "Your Organization"
+msgstr "Organizaţia dumneavostră"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:457
+msgid ""
+"Describe your organization to customize user prompts.  When organization is "
+"introduced, end-users find program messages easier to understand and act."
+msgstr ""
+"Descrieți organizația dumneavoastră pentru a personaliza solicitările "
+"utilizatorilor. Când este introdusă organizația, utilizatorii finali găsesc "
+"mesajele de program mai ușor de înțeles și de acționat."
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:464
+msgid "Your organization &name:"
+msgstr "Numele organizaţiei dumneavoastră &:"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:469
+msgid ""
+"Your organization name as it will appear on helpdesk contact notifications"
+msgstr ""
+"Numele organizației dumneavoastră, așa cum va apărea în notificările de "
+"contact ale helpdesk"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:473
+msgid "(Keep it short, please)"
+msgstr "(Păstrați-l scurt, vă rog)"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:483
+msgid "Helpdesk contact &information:"
+msgstr "Contact și informații despre asistență:"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:500
+msgid "Your helpdesk website address"
+msgstr "Adresa web de asistență"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:511
+msgid "Your helpdesk e-mail address"
+msgstr "Adresa de e-mail de asistență"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:522
+msgid "Your helpdesk phone number"
+msgstr "Numărul de telefon de asistență"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:550
+msgid "Provider Unique Identifier"
+msgstr "Identificator unic al furnizorului"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:561
+msgid ""
+"Assign your organization a unique ID to allow sharing the same credential "
+"set across different network profiles."
+msgstr ""
+"Alocați organizației dumneavostră un ID unic care să permită partajarea "
+"aceluiași set de credințiale pe diferite profiluri de rețea."
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:568
+msgid "&Namespace:"
+msgstr "&Spaţiu de nume:"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:572
+msgid "urn:RFC4282:realm"
+msgstr "urn:RFC4282:realm"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:572
+msgid "urn:uuid"
+msgstr "urn:uuid"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:584
+msgid "Provider unique &identifier:"
+msgstr "Identificator unic și identificator:"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:589
+msgid "Your organization ID to assign same credentials from other profiles"
+msgstr ""
+"ID-ul organizației dumneavoastră pentru a atribui aceleași date de "
+"acreditare de la alte profiluri"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:614
+msgid "Configuration Lock"
+msgstr "Configurare Blocată"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:625
+msgid ""
+"Your configuration can be locked to prevent accidental modification by end-"
+"users. Users will only be allowed to enter credentials."
+msgstr ""
+"Configurația dumneavoastră poate fi blocată pentru a preveni modificarea "
+"accidentală de către utilizatorii finali. Utilizatorii vor avea voie să "
+"introducă numai datele de acreditare."
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:632
+msgid ""
+"&Lock this configuration and prevent any further modification via user "
+"interface."
+msgstr ""
+"& Blocați această configurație și preveniți alte modificări prin interfața "
+"utilizatorului"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:635
+msgid "(Warning: Once locked, you can not revert using this dialog!)"
+msgstr "(Avertisment: odată blocat, nu puteți reveni folosind acest dialog!)"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:700
+msgid "Identity"
+msgstr "Identitate"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:711
+msgid "Select the user ID supplicant introduces itself as to authenticator:"
+msgstr ""
+"Selectați ID-ul utilizatorului implicit care se introduce ca autentificator:"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:718
+msgid "&True identity"
+msgstr "&Identitate adevărată"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:719
+msgid "Use my true user name"
+msgstr "Utilizați numele meu de utilizator adevărat"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:723
+msgid "Use &empty identity"
+msgstr "Utilizați & identitate goală"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:724
+msgid "Omit my user name and use @mydomain.org only"
+msgstr "Omiteți numele meu de utilizator si folositi doar @ mydomain.org"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:731
+msgid "&Custom identity:"
+msgstr "& Identitate personalizată:"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:732
+msgid "Specify custom identity"
+msgstr "Precizați identitatea personalizată"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:737
+msgid "Custom identity to use"
+msgstr "Identitate personalizată de utilizat"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.h:66
+msgid "EAP Connection Configuration"
+msgstr "Configurare conexiune EAP"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.h:329
+msgid "EAP Identity Provider"
+msgstr "Furnizor de identitate EAP"
+
+#: lib/EAPBase_UI/src/EAP_UI.cpp:103
+#, c-format
+msgid "%s Credentials"
+msgstr "%s Credenţiale"
+
+#: lib/EAPBase_UI/src/EAP_UI.cpp:139
+#, c-format
+msgid "For additional help and instructions, please contact %s at:"
+msgstr ""
+"Pentru ajutor și instrucțiuni suplimentare, vă rugăm să contactați %s la : "
+
+#: lib/EAPBase_UI/src/EAP_UI.cpp:140
+msgid "your provider"
+msgstr "providerul dumneavoastră"
+
+#: lib/EAPBase_UI/src/EAP_UI.cpp:159
+msgid "Open the default web browser"
+msgstr "Deschideți browserul web implicit"
+
+#: lib/EAPBase_UI/src/EAP_UI.cpp:170
+msgid "Open your e-mail program"
+msgstr "Deschideți programul de e-mail"
+
+#: lib/EAPBase_UI/src/EAP_UI.cpp:181
+msgid "Dial the phone number"
+msgstr "Apelează numărul de telefon"
+
+#: lib/EAPBase_UI/src/EAP_UI.cpp:203
+#, c-format
+msgid ""
+"%s has pre-set parts of this configuration. Those parts are locked to "
+"prevent accidental modification."
+msgstr ""
+"%s are părți prestabilite ale acestei configurații. Aceste piese sunt "
+"blocate pentru a preveni modificarea accidentală."
+
+#: lib/EAPBase_UI/src/EAP_UI.cpp:204
+msgid "Your provider"
+msgstr "Furnizorul dumneavostră"
+
+#: lib/EAPBase_UI/src/EAP_UI.cpp:225
+msgid "Previous attempt to connect reported invalid credentials."
+msgstr "Încercarea anterioară de conectare a raportat credențiale nevalide ."
+
+#: lib/EAPBase_UI/src/EAP_UI.cpp:226
+msgid "Previous attempt to connect reported your credentials expired."
+msgstr ""
+"Încercarea anterioară de conectare a raportat datele de acreditare expirate."
+
+#: lib/EAPBase_UI/src/EAP_UI.cpp:227
+msgid ""
+"Previous attempt to connect reported your credentials are being changed."
+msgstr ""
+"Încercarea anterioară de conectare a raportat că datele de acreditare au "
+"fost modificate."
+
+#: lib/EAPBase_UI/src/EAP_UI.cpp:228
+msgid "Previous attempt to connect failed."
+msgstr "Încercarea anterioară de conectare a eșuat."
+
+#: lib/EAPBase_UI/src/EAP_UI.cpp:229
+msgid "Please, make sure your credentials are correct, or try again later."
+msgstr ""
+"Vă rugăm, asigurați-vă că datele de acreditare sunt corecte sau încercați "
+"din nou mai târziu."
+
+#: lib/EAPBase_UI/src/EAP_UI.cpp:250
+#, c-format
+msgid ""
+"The %s version installed on this computer logs credentials in visible and "
+"easy to read way."
+msgstr ""
+"Versiunea instalată %s pe acest computer înregistrează datele de acreditare "
+"în mod vizibil și ușor de citit."
+
+#: lib/EAPBase_UI/src/EAP_UI.cpp:251
+msgid "Please, reconsider necessity to enter your credentials."
+msgstr ""
+"Vă rugăm să reconsiderați necesitatea de a introduce datele de acreditare."
+
+#: lib/EapHost_UI/res/wxEapHost_UI.cpp:17
+msgid "Inner EAP Method"
+msgstr "Metoda EAP interioară"
+
+#: lib/EapHost_UI/res/wxEapHost_UI.cpp:28
+msgid "Select and configure inner EAP method"
+msgstr "Selectați și configurați metoda EAP interioară"
+
+#: lib/EapHost_UI/res/wxEapHost_UI.cpp:40
+msgid "&Settings"
+msgstr "&Setări"
+
+#: lib/EapHost_UI/src/EapHost_UI.cpp:59
+#, c-format
+msgid "Enumerating EAP methods failed (error %u, %s, %s)."
+msgstr "Enumerarea metodelor EAP a eșuat (eroare %u , %s , %s )."
+
+#: lib/EapHost_UI/src/EapHost_UI.cpp:61
+#, c-format
+msgid "Enumerating EAP methods failed (error %u)."
+msgstr "Enumerarea metodelor EAP a eșuat (eroare %u )."
+
+#: lib/EapHost_UI/src/EapHost_UI.cpp:136
+#, c-format
+msgid "Configuring EAP method failed (error %u, %s, %s)."
+msgstr "Configurarea metodei EAP a eșuat (eroare %u,%s,%s)."
+
+#: lib/EapHost_UI/src/EapHost_UI.cpp:138
+#, c-format
+msgid "Configuring EAP method failed (error %u)."
+msgstr "Configurarea metodei EAP a eșuat (eroare %u )."
+
+#: lib/GTC_UI/include/GTC_UI.h:114 lib/GTC_UI/res/wxGTC_UI.cpp:16
+msgid "GTC Challenge"
+msgstr "Provocarea GTC"
+
+#: lib/GTC_UI/res/wxGTC_UI.cpp:26
+msgid "Please provide your response."
+msgstr "Vă rugăm să ne oferiți răspunsul."
+
+#: lib/GTC_UI/res/wxGTC_UI.cpp:38
+msgid "Server challenge"
+msgstr "Provocarea serverului"
+
+#: lib/GTC_UI/res/wxGTC_UI.cpp:43
+msgid "Enter your response here"
+msgstr "Introduceți răspunsul aici"
+
+#: lib/GTC_UI/res/wxGTC_UI.cpp:70
+msgid "EAP-GTC authentication &mode:"
+msgstr "Autentificare și &mod EAP-GTC:"
+
+#: lib/GTC_UI/res/wxGTC_UI.cpp:75
+msgid "Select EAP-GTC authentication mode from the list"
+msgstr "Selectați modul de autentificare EAP-GTC din listă"
+
+#: lib/GTC_UI/src/GTC_UI.cpp:39
+msgid "Challenge/Response"
+msgstr "Provocare/Răspuns"
+
+#: lib/GTC_UI/src/GTC_UI.cpp:41
+msgid "Password"
+msgstr "Parolă"
+
+#: lib/GTC_UI/src/GTC_UI.cpp:119
+#, c-format
+msgid "%s Challenge"
+msgstr "%s Provocare"
+
+#: lib/MSCHAPv2_UI/src/MSCHAPv2_UI.cpp:33
+msgid "MSCHAPv2 User ID and Password"
+msgstr "MSCHAPv2 Utilizator şi Parolă"
+
+#: lib/PAP_UI/src/PAP_UI.cpp:33
+msgid "PAP User ID and Password"
+msgstr "PAP Utilizator şi Parolă"
+
+#: lib/TLS_UI/res/wxTLS_UI.cpp:17
+msgid "Server Trust"
+msgstr "Server de încredere"
+
+#: lib/TLS_UI/res/wxTLS_UI.cpp:28
+msgid "Describe the servers you trust to prevent man-in-the-middle attacks."
+msgstr ""
+"Descrieți serverele de încredere pentru a preveni atacurile de tipul man-in-"
+"the-middle."
+
+#: lib/TLS_UI/res/wxTLS_UI.cpp:35
+msgid "Acceptable Certificate Authorities:"
+msgstr "Autorități de certificare acceptate:"
+
+#: lib/TLS_UI/res/wxTLS_UI.cpp:40
+msgid ""
+"Server's certificate must be issued by one of certificate authorities listed"
+" here"
+msgstr ""
+"Certificatul de server trebuie eliberat de una dintre autoritățile de "
+"certificare enumerate aici"
+
+#: lib/TLS_UI/res/wxTLS_UI.cpp:47
+msgid "Add CA from Store..."
+msgstr "Adăugare CA din magazin..."
+
+#: lib/TLS_UI/res/wxTLS_UI.cpp:48
+msgid ""
+"Adds a new certificate authority from the certificate store to the list"
+msgstr ""
+"Adaugă o nouă autoritate de certificare din magazinul de certificate în "
+"listă"
+
+#: lib/TLS_UI/res/wxTLS_UI.cpp:52
+msgid "Add CA from File..."
+msgstr "Adăugare CA din fişier..."
+
+#: lib/TLS_UI/res/wxTLS_UI.cpp:53
+msgid "Adds a new certificate authority from the file to the list"
+msgstr "Adaugă o nouă autoritate de certificare din fișier în listă"
+
+#: lib/TLS_UI/res/wxTLS_UI.cpp:57
+msgid "&Remove CA"
+msgstr "&Ştergere CA"
+
+#: lib/TLS_UI/res/wxTLS_UI.cpp:58
+msgid "Removes selected certificate authorities from the list"
+msgstr "Îndepărtează autoritățile de certificare selectate din listă"
+
+#: lib/TLS_UI/res/wxTLS_UI.cpp:71
+msgid "Acceptable server &names:"
+msgstr "Server și nume acceptate:"
+
+#: lib/TLS_UI/res/wxTLS_UI.cpp:76
+msgid ""
+"A semicolon delimited list of acceptable server FQDN names; blank to skip "
+"name check; Unicode characters allowed"
+msgstr ""
+"Punct și virgulă delimitează lista de nume de servere FQDN ; lăsați spațiu "
+"gol pentru a omite verificarea numelui; Caractere Unicode permise"
+
+#: lib/TLS_UI/res/wxTLS_UI.cpp:80
+msgid "(Example: foo.bar.com;server2.bar.com)"
+msgstr "(Exemplu: foo.bar.com;server2.bar.com)"
+
+#: lib/TLS_UI/res/wxTLS_UI.cpp:118 lib/TLS_UI/src/TLS_UI.cpp:400
+msgid "User Certificate"
+msgstr "Certificatul de utilizator"
+
+#: lib/TLS_UI/res/wxTLS_UI.cpp:128
+msgid "Please select your &certificate to use for authentication."
+msgstr ""
+"Vă rugăm să selectați certificatul dumneavoastră de utilizat pentru "
+"autentificare."
+
+#: lib/TLS_UI/res/wxTLS_UI.cpp:135
+msgid "Client certificate to use for authentication"
+msgstr "Certificat de client de folosit pentru autentificare"
+
+#: lib/TLS_UI/res/wxTLS_UI.cpp:142
+msgid "Custom &identity:"
+msgstr "Personalizare și identitate:"
+
+#: lib/TLS_UI/res/wxTLS_UI.cpp:147
+msgid ""
+"Your identity (username@domain) to override one from certificate; or blank "
+"to use one provided in certificate"
+msgstr ""
+"Identitatea dumneavoastră (nume de utilizator @ domeniu) pentru a trece "
+"peste un certificat; sau necompletat pentru a utiliza unul prevăzut în "
+"certificat"
+
+#: lib/TLS_UI/src/TLS_UI.cpp:118
+msgid "No certificate selected"
+msgstr ""
+
+#: lib/TLS_UI/src/TLS_UI.cpp:118
+msgid "Validation conflict"
+msgstr ""
+
+#: lib/TLS_UI/src/TLS_UI.cpp:327
+msgid "Add Certificate"
+msgstr "Adaugă certificat"
+
+#: lib/TLS_UI/src/TLS_UI.cpp:328
+msgid "Certificate Files (*.cer;*.crt;*.der;*.p7b;*.pem)"
+msgstr "Fişierele Certificat  (*.cer;*.crt;*.der;*.p7b;*.pem)"
+
+#: lib/TLS_UI/src/TLS_UI.cpp:329
+msgid "X.509 Certificate Files (*.cer;*.crt;*.der;*.pem)"
+msgstr "X.509 Fişierele Certificat (*.cer;*.crt;*.der;*.pem)"
+
+#: lib/TLS_UI/src/TLS_UI.cpp:330
+msgid "PKCS #7 Certificate Files (*.p7b)"
+msgstr "PKCS #7 Fişierele Certificat (*.p7b)"
+
+#: lib/TLS_UI/src/TLS_UI.cpp:331
+msgid "All Files (*.*)"
+msgstr "Toate filele (*.*)"
+
+#: lib/TLS_UI/src/TLS_UI.cpp:345
+#, c-format
+msgid "Invalid or unsupported certificate file %s"
+msgstr "Fișier de certificat %s nevalid sau neacceptat "
+
+#: lib/TLS_UI/src/TLS_UI.cpp:345
+msgid "Error"
+msgstr "Eroare"
+
+#: lib/TTLS_UI/src/Module.cpp:249
+#, c-format
+msgid "Invoking EAP identity UI failed (error %u, %s, %s)."
+msgstr " Invocarea interfaței de identitate EAP a eșuat (eroare%u,%s,%s)."
+
+#: lib/TTLS_UI/src/Module.cpp:252
+#, c-format
+msgid "Invoking EAP identity UI failed (error %u)."
+msgstr "Invocarea interfaței de identitate EAP a eșuat (eroare%u)."
+
+#: lib/TTLS_UI/src/Module.cpp:376
+#, c-format
+msgid "Invoking EAP interactive UI failed (error %u, %s, %s)."
+msgstr "Invocarea  EAP EI interactivă  a eșuat (eroare %u,%s,%s)."
+
+#: lib/TTLS_UI/src/Module.cpp:379
+#, c-format
+msgid "Invoking EAP interactive UI failed (error %u)."
+msgstr "Invocarea EAP EI interactivă a eșuat (eroare %u)."
+
+#: lib/TTLS_UI/src/TTLS_UI.cpp:37
+msgid "Outer Authentication"
+msgstr "Autentificare exterioară"
+
+#: lib/TTLS_UI/src/TTLS_UI.cpp:50
+msgid "Inner Authentication"
+msgstr "Autentificare interioară"
+
+#: lib/TTLS_UI/src/TTLS_UI.cpp:56
+msgid "Select inner authentication method from the list"
+msgstr "Selectați metoda de autentificare interioară din listă"
+
+#: lib/TTLS_UI/src/TTLS_UI.cpp:127
+msgid "PAP"
+msgstr "PAP"
+
+#: lib/TTLS_UI/src/TTLS_UI.cpp:129
+msgid "MSCHAPv2"
+msgstr "MSCHAPv2"
+
+#: lib/TTLS_UI/src/TTLS_UI.cpp:131
+msgid "EAP-MSCHAPv2"
+msgstr "EAP-MSCHAPv2"
+
+#: lib/TTLS_UI/src/TTLS_UI.cpp:133
+msgid "EAP-GTC"
+msgstr "EAP-GTC"
+
+#: lib/TTLS_UI/src/TTLS_UI.cpp:136
+msgid "Other EAP methods..."
+msgstr "Alte metode EAP..."
+
+#: EAPMethods/MSIBuild.EAP-TTLS/en_US.ARM64.Release.Feature-2.idtx:4
+#: EAPMethods/MSIBuild.EAP-TTLS/en_US.Win32.Release.Feature-2.idtx:4
+#: EAPMethods/MSIBuild.EAP-TTLS/en_US.x64.Release.Feature-2.idtx:4
+msgid "EAP-TTLS"
+msgstr "EAP-TTLS"
+
+#: EAPMethods/MSIBuild.EAP-TTLS/en_US.ARM64.Release.Feature-2.idtx:4
+#: EAPMethods/MSIBuild.EAP-TTLS/en_US.Win32.Release.Feature-2.idtx:4
+#: EAPMethods/MSIBuild.EAP-TTLS/en_US.x64.Release.Feature-2.idtx:4
+msgid "EAP-TTLS Method"
+msgstr "Metoda EAP-TTLS"
+
+#: EAPMethods/MSIBuild/en_US.ARM64.Release.Feature-2.idtx:4
+#: EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
+#: EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
+msgid "EAP Methods"
+msgstr "Metodele EAP"
+
+#: EAPMethods/MSIBuild/en_US.ARM64.Release.Feature-2.idtx:4
+#: EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
+#: EAPMethods/MSIBuild/en_US.x64.Release.Feature-2.idtx:4
+msgid "Modules to support individual EAP methods"
+msgstr "Module pentru a sprijini metodele individuale EAP"
