@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: EAPMethods\n"
-"POT-Creation-Date: 2020-02-06 16:51+0100\n"
+"POT-Creation-Date: 2020-04-17 14:55+0200\n"
 "PO-Revision-Date: 2016-08-25 06:18+0000\n"
 "Last-Translator: Simon Rozman <simon@rozman.si>, 2020\n"
 "Language-Team: Catalan (Spain) (https://www.transifex.com/eduroam_devel/teams/11799/ca_ES/)\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: ca_ES\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.2.4\n"
+"X-Generator: Poedit 2.3\n"
 "X-Poedit-Basepath: ../..\n"
 "X-Poedit-KeywordsList: _\n"
 "X-Poedit-SearchPath-0: lib/EAPBase_UI\n"
@@ -29,31 +29,31 @@ msgstr ""
 "X-Poedit-SearchPath-7: EAPMethods\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 
-#: lib/EAPBase_UI/include/EAP_UI.h:294
+#: lib/EAPBase_UI/include/EAP_UI.h:295
 #, c-format
 msgid ""
 "Are you sure you want to permanently remove %s provider from configuration?"
 msgstr ""
 "Segur que voleu esborrar permanentment el proveidor %s de la configuració?"
 
-#: lib/EAPBase_UI/include/EAP_UI.h:294
+#: lib/EAPBase_UI/include/EAP_UI.h:295
 msgid "Warning"
 msgstr "Alerta"
 
-#: lib/EAPBase_UI/include/EAP_UI.h:380 lib/EAPBase_UI/res/wxEAP_UI.h:117
+#: lib/EAPBase_UI/include/EAP_UI.h:381 lib/EAPBase_UI/res/wxEAP_UI.h:116
 msgid "EAP Credentials"
 msgstr "Credencials EAP"
 
-#: lib/EAPBase_UI/include/EAP_UI.h:724
+#: lib/EAPBase_UI/include/EAP_UI.h:725
 msgid "Provider Settings"
 msgstr "Ajustos del proveidor"
 
-#: lib/EAPBase_UI/include/EAP_UI.h:757 lib/EAPBase_UI/res/wxEAP_UI.cpp:229
+#: lib/EAPBase_UI/include/EAP_UI.h:758 lib/EAPBase_UI/res/wxEAP_UI.cpp:229
 #, c-format
 msgid "%s User Credentials"
 msgstr "%s Credencials d'usuari"
 
-#: lib/EAPBase_UI/include/EAP_UI.h:876 lib/TTLS_UI/src/Module.cpp:196
+#: lib/EAPBase_UI/include/EAP_UI.h:866 lib/TTLS_UI/src/Module.cpp:196
 #: lib/TTLS_UI/src/Module.cpp:305
 #, c-format
 msgid "Error writing credentials to Credential Manager: %hs (error %u)"
@@ -61,43 +61,43 @@ msgstr ""
 "Error escrivint les credencial a l'Administrador de credencials: %hs (error "
 "%u)"
 
-#: lib/EAPBase_UI/include/EAP_UI.h:879 lib/TTLS_UI/src/Module.cpp:198
+#: lib/EAPBase_UI/include/EAP_UI.h:869 lib/TTLS_UI/src/Module.cpp:198
 #: lib/TTLS_UI/src/Module.cpp:307
 msgid "Writing credentials failed."
 msgstr "Ha fallat l'escriptura de les credencials."
 
-#: lib/EAPBase_UI/include/EAP_UI.h:899
+#: lib/EAPBase_UI/include/EAP_UI.h:897
 #, c-format
 msgid "Deleting credentials failed (error %u)."
 msgstr "Ha fallat l'esborrat de credencials (error %u)."
 
-#: lib/EAPBase_UI/include/EAP_UI.h:938
+#: lib/EAPBase_UI/include/EAP_UI.h:924 lib/EAPBase_UI/include/EAP_UI.h:943
+#: lib/EAPBase_UI/include/EAP_UI.h:952
+msgid "(none)"
+msgstr ""
+
+#: lib/EAPBase_UI/include/EAP_UI.h:928
 #, c-format
 msgid "(error %u)"
 msgstr "(error %u)"
 
-#: lib/EAPBase_UI/include/EAP_UI.h:942
+#: lib/EAPBase_UI/include/EAP_UI.h:932
 msgid "(error)"
 msgstr "(error)"
 
-#: lib/EAPBase_UI/include/EAP_UI.h:953 lib/EAPBase_UI/include/EAP_UI.h:962
-#: lib/TLS_UI/src/TLS_UI.cpp:61
-msgid "(none)"
-msgstr ""
-
-#: lib/EAPBase_UI/include/EAP_UI.h:953 lib/EAPBase_UI/include/EAP_UI.h:962
+#: lib/EAPBase_UI/include/EAP_UI.h:943 lib/EAPBase_UI/include/EAP_UI.h:952
 msgid "(blank ID)"
 msgstr "(ID buit)"
 
-#: lib/EAPBase_UI/include/EAP_UI.h:1002
+#: lib/EAPBase_UI/include/EAP_UI.h:992
 msgid "&Remember"
 msgstr "&Recordar"
 
-#: lib/EAPBase_UI/include/EAP_UI.h:1003
+#: lib/EAPBase_UI/include/EAP_UI.h:993
 msgid "Check if you would like to save credentials"
 msgstr "Marqueu si voleu desar les credencials"
 
-#: lib/EAPBase_UI/include/EAP_UI.h:1212
+#: lib/EAPBase_UI/include/EAP_UI.h:1214
 msgid "(Your Organization)"
 msgstr "(La vostra organització)"
 
@@ -130,11 +130,11 @@ msgid "Select the source where your credentials used to connect are stored."
 msgstr ""
 "Selecciona la font on es desen les credencials de connexió utilitzades"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:244
-msgid "Use from Credential &Manager"
-msgstr ""
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:250
+msgid "Use from Credential &Manager:"
+msgstr "Utilitzar del Credential &Manager: "
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:245
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:251
 msgid ""
 "Select this option if you would like to use credentials stored in Windows "
 "Credential Manager"
@@ -142,40 +142,16 @@ msgstr ""
 "Seleccioneu aquesta opció si voleu utilitzar les credencials desades a "
 "l'Administrador de Credencials de Windows"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:255 lib/EAPBase_UI/res/wxEAP_UI.cpp:299
-msgid "Identity:"
-msgstr "Identitat:"
-
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:262
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:258
 msgid "Your present credentials stored in Windows Credential Manager"
 msgstr ""
 "Les vostres credencials actuals a l'Administrador de Credencials de Windows"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:272
-msgid "&Clear Credentials"
-msgstr "&Esborra les credencials"
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:268
+msgid "Use from &profile configuration:"
+msgstr "Utilitzeu de la configuració del vostre &perfil:"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:273
-msgid ""
-"Click to clear your credentials from Credential Manager.\n"
-"Note: You will be prompted to enter credentials when connecting."
-msgstr ""
-"Cliqueu per a esborrar les credencials de l'Administrador de Credencials.\n"
-"Nota: Se us demanaran noves credencials en connectar."
-
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:277 lib/EAPBase_UI/res/wxEAP_UI.cpp:316
-msgid "&Set Credentials..."
-msgstr "&Desa les credencials..."
-
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:278 lib/EAPBase_UI/res/wxEAP_UI.cpp:317
-msgid "Click here to set or modify your credentials"
-msgstr "Cliqueu aquí per a desar o modificar les vostres credencials"
-
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:288
-msgid "Use from &profile configuration"
-msgstr ""
-
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:289
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:269
 msgid ""
 "Select this option if you would like to store credentials as a part of  "
 "profile configuration"
@@ -183,49 +159,69 @@ msgstr ""
 "Escolliu aquesta opció si voleu desar les credencials com a part del perfil "
 "de configuració"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:306
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:276
 msgid "Profile configuration credentials"
 msgstr "Configuració de credencials del perfil"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:359
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:289
+msgid "&Clear Credentials"
+msgstr "&Esborra les credencials"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:290
+msgid ""
+"Click to clear your credentials from Credential Manager.\n"
+"Note: You will be prompted to enter credentials when connecting."
+msgstr ""
+"Cliqueu per a esborrar les credencials de l'Administrador de Credencials.\n"
+"Nota: Se us demanaran noves credencials en connectar."
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:294
+msgid "&Set Credentials..."
+msgstr "&Desa les credencials..."
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:295
+msgid "Click here to set or modify your credentials"
+msgstr "Cliqueu aquí per a desar o modificar les vostres credencials"
+
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:332
 msgid "User ID and Password"
 msgstr "ID d'usuari i contrasenya"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:369
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:342
 msgid "Please provide your user ID and password."
 msgstr "Introduïu el vostre ID d'usuari i contrasenya"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:379 lib/EAPBase_UI/res/wxEAP_UI.cpp:443
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:352 lib/EAPBase_UI/res/wxEAP_UI.cpp:416
 msgid "User ID:"
 msgstr "ID d'usuari:"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:384 lib/EAPBase_UI/res/wxEAP_UI.cpp:448
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:357 lib/EAPBase_UI/res/wxEAP_UI.cpp:421
 msgid "Enter your user name here (user@domain.org, DOMAIN\\User, etc.)"
 msgstr ""
 "Introduïu el vostre identificador aquí (identificador@domini.org, "
 "DOMINI\\identificador, etc.)"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:388
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:361
 msgid "Password:"
 msgstr "Contrasenya:"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:393
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:366
 msgid "Enter your password here"
 msgstr "Introduïu la vostra contrasenya aquí"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:423
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:396
 msgid "User ID"
 msgstr "ID d'usuari"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:433
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:406
 msgid "Please provide your user ID."
 msgstr "Introduïu el vostre ID."
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:473
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:446
 msgid "Your Organization"
 msgstr "La vostra organització"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:484
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:457
 msgid ""
 "Describe your organization to customize user prompts.  When organization is "
 "introduced, end-users find program messages easier to understand and act."
@@ -233,54 +229,42 @@ msgstr ""
 "Descriviu la vostra organització per personalitzar la interfície. Quan s'hi "
 "introdueix, l'usuari troba missatges més comprensibles i senzills de seguir."
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:491
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:464
 msgid "Your organization &name:"
 msgstr "El &nom de la vostra organització:"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:496
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:469
 msgid ""
 "Your organization name as it will appear on helpdesk contact notifications"
 msgstr ""
 "El nom de la vostra organització tal i com apareixerà en les notificacions "
 "de contacte del SAU"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:500
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:473
 msgid "(Keep it short, please)"
 msgstr "(Sigueu breu)"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:510
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:483
 msgid "Helpdesk contact &information:"
 msgstr "Contacte d'ajuda i &informació:"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:520
-msgid "¶"
-msgstr "¶"
-
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:527
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:500
 msgid "Your helpdesk website address"
 msgstr "Adreça web del centre de suport"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:531
-msgid "*"
-msgstr "*"
-
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:538
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:511
 msgid "Your helpdesk e-mail address"
 msgstr "Adreça de correu del centre de suport"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:542
-msgid ")"
-msgstr ")"
-
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:549
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:522
 msgid "Your helpdesk phone number"
 msgstr "Telèfon del centre de suport"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:577
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:550
 msgid "Provider Unique Identifier"
 msgstr "Identificador únic del proveidor"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:588
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:561
 msgid ""
 "Assign your organization a unique ID to allow sharing the same credential "
 "set across different network profiles."
@@ -288,33 +272,33 @@ msgstr ""
 "Assigneu a la vostra organització un ID únic per a comparit el mateix joc de"
 " credencials entre diferents perfils de xarxa."
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:595
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:568
 msgid "&Namespace:"
 msgstr "&Namespace:"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:599
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:572
 msgid "urn:RFC4282:realm"
 msgstr "urn:RFC4282:realm"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:599
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:572
 msgid "urn:uuid"
 msgstr "urn:uuid"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:611
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:584
 msgid "Provider unique &identifier:"
 msgstr "&Identificador únic del proveidor:"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:616
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:589
 msgid "Your organization ID to assign same credentials from other profiles"
 msgstr ""
 "L'ID de la vostra organització per assignar les mateixes credencials des "
 "d'altres perfils"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:641
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:614
 msgid "Configuration Lock"
 msgstr "Bloqueig de configuració"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:652
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:625
 msgid ""
 "Your configuration can be locked to prevent accidental modification by end-"
 "users. Users will only be allowed to enter credentials."
@@ -322,7 +306,7 @@ msgstr ""
 "Podeu bloquejar la configuració per prevenir modificacions accidentals dels "
 "usuaris finals. Els usuaris només podran introduir credencials."
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:659
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:632
 msgid ""
 "&Lock this configuration and prevent any further modification via user "
 "interface."
@@ -330,53 +314,53 @@ msgstr ""
 "&Bloqueja la configuració i preveniu qualsevol modificació via interfície "
 "d'usuari."
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:662
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:635
 msgid "(Warning: Once locked, you can not revert using this dialog!)"
 msgstr ""
 "(Alerta: un cop bloquejada, no ho podeu revertir des d'aquesta finestra!)"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:727
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:700
 msgid "Identity"
-msgstr ""
+msgstr "Identitat:"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:738
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:711
 msgid "Select the user ID supplicant introduces itself as to authenticator:"
 msgstr ""
 "Seleccioneu l'ID d'usuari que presenta el propi client a l'autentitcador:"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:745
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:718
 msgid "&True identity"
 msgstr "Identitat &real"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:746
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:719
 msgid "Use my true user name"
 msgstr "Utitlitza el meu usuari real"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:750
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:723
 msgid "Use &empty identity"
-msgstr ""
+msgstr "Utilitza una identitat &buida"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:751
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:724
 msgid "Omit my user name and use @mydomain.org only"
 msgstr "Omet el meu identificador i utilitza només @elmeudomini.org"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:758
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:731
 msgid "&Custom identity:"
-msgstr ""
+msgstr "Personalitza la &identitat:"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:759
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:732
 msgid "Specify custom identity"
-msgstr ""
+msgstr "Especifiqueu la identitat personalitzada"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.cpp:764
+#: lib/EAPBase_UI/res/wxEAP_UI.cpp:737
 msgid "Custom identity to use"
-msgstr ""
+msgstr "Identitat a utilitzar:"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.h:67
+#: lib/EAPBase_UI/res/wxEAP_UI.h:66
 msgid "EAP Connection Configuration"
 msgstr "Configuració de la connexió EAP"
 
-#: lib/EAPBase_UI/res/wxEAP_UI.h:334
+#: lib/EAPBase_UI/res/wxEAP_UI.h:329
 msgid "EAP Identity Provider"
 msgstr "Proveïdor d'Identitat EAP"
 
@@ -596,7 +580,7 @@ msgstr ""
 msgid "(Example: foo.bar.com;server2.bar.com)"
 msgstr "(Per exemple: foo.bar.com;server2.bar.com)"
 
-#: lib/TLS_UI/res/wxTLS_UI.cpp:118 lib/TLS_UI/src/TLS_UI.cpp:329
+#: lib/TLS_UI/res/wxTLS_UI.cpp:118 lib/TLS_UI/src/TLS_UI.cpp:400
 msgid "User Certificate"
 msgstr "Certificat d'usuari"
 
@@ -620,32 +604,40 @@ msgstr ""
 "La vostra identitat (identificador@domini) per substituir la indicada en el "
 "certificat; o en blanc per fer servir la continguda en el mateix"
 
-#: lib/TLS_UI/src/TLS_UI.cpp:256
+#: lib/TLS_UI/src/TLS_UI.cpp:118
+msgid "No certificate selected"
+msgstr ""
+
+#: lib/TLS_UI/src/TLS_UI.cpp:118
+msgid "Validation conflict"
+msgstr "Conflicte de validació"
+
+#: lib/TLS_UI/src/TLS_UI.cpp:327
 msgid "Add Certificate"
 msgstr "Afegeix un certificat"
 
-#: lib/TLS_UI/src/TLS_UI.cpp:257
+#: lib/TLS_UI/src/TLS_UI.cpp:328
 msgid "Certificate Files (*.cer;*.crt;*.der;*.p7b;*.pem)"
 msgstr "Fitxers de certificat (*.cer;*.crt;*.der;*.p7b;*.pem)"
 
-#: lib/TLS_UI/src/TLS_UI.cpp:258
+#: lib/TLS_UI/src/TLS_UI.cpp:329
 msgid "X.509 Certificate Files (*.cer;*.crt;*.der;*.pem)"
 msgstr "Fitxers de certificat X.509 (*.cer;*.crt;*.der;*.pem)"
 
-#: lib/TLS_UI/src/TLS_UI.cpp:259
+#: lib/TLS_UI/src/TLS_UI.cpp:330
 msgid "PKCS #7 Certificate Files (*.p7b)"
 msgstr "Fitxers de certificat PKCS #7 (*.p7b)"
 
-#: lib/TLS_UI/src/TLS_UI.cpp:260
+#: lib/TLS_UI/src/TLS_UI.cpp:331
 msgid "All Files (*.*)"
 msgstr "Tots els fitxers (*.*)"
 
-#: lib/TLS_UI/src/TLS_UI.cpp:274
+#: lib/TLS_UI/src/TLS_UI.cpp:345
 #, c-format
 msgid "Invalid or unsupported certificate file %s"
 msgstr "Fitxer de certificat no vàlid o no suportat %s"
 
-#: lib/TLS_UI/src/TLS_UI.cpp:274
+#: lib/TLS_UI/src/TLS_UI.cpp:345
 msgid "Error"
 msgstr "Error"
 
@@ -671,16 +663,16 @@ msgid "Invoking EAP interactive UI failed (error %u)."
 msgstr "Ha fallat la interfície d'usuari interactiva EAP  (error %u)."
 
 #: lib/TTLS_UI/src/TTLS_UI.cpp:37
+msgid "Outer Authentication"
+msgstr "Autenticació externa"
+
+#: lib/TTLS_UI/src/TTLS_UI.cpp:50
 msgid "Inner Authentication"
 msgstr "Autenticació interna"
 
-#: lib/TTLS_UI/src/TTLS_UI.cpp:43
+#: lib/TTLS_UI/src/TTLS_UI.cpp:56
 msgid "Select inner authentication method from the list"
 msgstr "Escolliu de la llista el mètode d'autenticació externa"
-
-#: lib/TTLS_UI/src/TTLS_UI.cpp:48
-msgid "Outer Authentication"
-msgstr "Autenticació externa"
 
 #: lib/TTLS_UI/src/TTLS_UI.cpp:127
 msgid "PAP"
@@ -712,7 +704,7 @@ msgstr "EAP-TTLS"
 #: EAPMethods/MSIBuild.EAP-TTLS/en_US.Win32.Release.Feature-2.idtx:4
 #: EAPMethods/MSIBuild.EAP-TTLS/en_US.x64.Release.Feature-2.idtx:4
 msgid "EAP-TTLS Method"
-msgstr ""
+msgstr "Mètode EAP-TTLS"
 
 #: EAPMethods/MSIBuild/en_US.ARM64.Release.Feature-2.idtx:4
 #: EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
