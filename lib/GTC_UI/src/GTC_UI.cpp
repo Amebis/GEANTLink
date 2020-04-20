@@ -137,6 +137,9 @@ wxGTCResponsePanel::wxGTCResponsePanel(winstd::sanitizing_wstring &response, con
     m_challenge->SetLabelText(challenge);
     m_challenge->Wrap(FromDIP(200));
 
+    // Response must not be empty.
+    m_response->SetValidator(wxTextValidator(wxFILTER_EMPTY));
+
     this->Layout();
 }
 
