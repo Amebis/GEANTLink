@@ -327,7 +327,8 @@ namespace eap
         enum class enc_alg_t {
             unknown = -1,   ///< Unknown encryption
             none = 0,       ///< Unencrypted
-            native,         ///< native module encryption
+            native,         ///< native module encryption (version 2)
+            native_v1,      ///< native module encryption (version 1, deprecated)
             kph,            ///< KPH encryption
         };
 

@@ -364,6 +364,7 @@ namespace eap
         ///
         /// \returns Encrypted data with 16B MD5 hash appended
         ///
+        [[deprecated("Unencrypted hash allows dictionary attacks")]]
         std::vector<unsigned char> encrypt_md5(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size) const;
 
 
@@ -376,6 +377,7 @@ namespace eap
         /// \returns Encrypted data with 16B MD5 hash appended
         ///
         template<class _Elem, class _Traits, class _Ax>
+        [[deprecated("Unencrypted hash allows dictionary attacks")]]
         std::vector<unsigned char> encrypt_md5(_In_ HCRYPTPROV hProv, _In_ const std::basic_string<_Elem, _Traits, _Ax> &val) const
         {
             return encrypt_md5(hProv, val.c_str(), val.length()*sizeof(_Elem));
@@ -391,6 +393,7 @@ namespace eap
         /// \returns Encrypted data with 16B MD5 hash appended
         ///
         template<class _Traits, class _Ax>
+        [[deprecated("Unencrypted hash allows dictionary attacks")]]
         std::vector<unsigned char> encrypt_md5(_In_ HCRYPTPROV hProv, _In_ const std::basic_string<wchar_t, _Traits, _Ax> &val) const
         {
             winstd::sanitizing_string val_utf8;
@@ -451,7 +454,7 @@ namespace eap
         template<class _Elem, class _Traits, class _Ax>
         std::basic_string<_Elem, _Traits, _Ax> decrypt_str(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _In_opt_ HCRYPTHASH hHash = NULL) const
         {
-            std::vector<_Elem, sanitizing_allocator<_Elem> > buf(std::move(decrypt(hProv, data, size, hHash)));
+            std::vector<_Elem, sanitizing_allocator<_Elem> > buf(std::move(decrypt<_Elem, sanitizing_allocator<_Elem> >(hProv, data, size, hHash)));
             return std::basic_string<_Elem, _Traits, _Ax>(buf.data(), buf.size());
         }
 
@@ -469,7 +472,7 @@ namespace eap
         template<class _Traits, class _Ax>
         std::basic_string<wchar_t, _Traits, _Ax> decrypt_str(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size, _In_opt_ HCRYPTHASH hHash = NULL) const
         {
-            winstd::sanitizing_string buf(std::move(decrypt_str(hProv, data, size, hHash)));
+            winstd::sanitizing_string buf(std::move(decrypt_str<char, std::char_traits<char>, sanitizing_allocator<char> >(hProv, data, size, hHash)));
             std::basic_string<wchar_t, _Traits, _Ax> dec;
             MultiByteToWideChar(CP_UTF8, 0, buf, dec);
             return dec;
@@ -486,6 +489,7 @@ namespace eap
         /// \returns Decrypted data
         ///
         template<class _Ty, class _Ax>
+        [[deprecated("Unencrypted hash allows dictionary attacks")]]
         std::vector<_Ty, _Ax> decrypt_md5(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size) const
         {
             // Create hash.
@@ -522,6 +526,7 @@ namespace eap
         /// \returns Decrypted string
         ///
         template<class _Elem, class _Traits, class _Ax>
+        [[deprecated("Unencrypted hash allows dictionary attacks")]]
         std::basic_string<_Elem, _Traits, _Ax> decrypt_str_md5(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size) const
         {
             std::vector<_Elem, sanitizing_allocator<_Elem> > buf(std::move(decrypt_md5<_Elem, sanitizing_allocator<_Elem> >(hProv, data, size)));
@@ -539,6 +544,7 @@ namespace eap
         /// \returns Decrypted string
         ///
         template<class _Traits, class _Ax>
+        [[deprecated("Unencrypted hash allows dictionary attacks")]]
         std::basic_string<wchar_t, _Traits, _Ax> decrypt_str_md5(_In_ HCRYPTPROV hProv, _In_bytecount_(size) const void *data, _In_ size_t size) const
         {
             winstd::sanitizing_string buf(std::move(decrypt_str_md5<char, std::char_traits<char>, sanitizing_allocator<char> >(hProv, data, size)));
@@ -573,7 +579,7 @@ namespace eap
                 throw winstd::win_runtime_error(__FUNCTION__ " CryptAcquireContext failed.");
 
             // Decrypt data.
-            return std::move(decrypt_md5<unsigned char, winstd::sanitizing_allocator<unsigned char> >(cp, pDataIn, dwDataInSize));
+            return std::move(decrypt<unsigned char, winstd::sanitizing_allocator<unsigned char> >(cp, pDataIn, dwDataInSize));
 #else
             return sanitizing_blob(pDataIn, pDataIn + dwDataInSize);
 #endif
@@ -602,7 +608,7 @@ namespace eap
                 throw winstd::win_runtime_error(__FUNCTION__ " CryptAcquireContext failed.");
 
             // Decrypt data.
-            std::vector<unsigned char, winstd::sanitizing_allocator<unsigned char> > data(std::move(decrypt_md5<unsigned char, winstd::sanitizing_allocator<unsigned char> >(cp, pDataIn, dwDataInSize)));
+            std::vector<unsigned char, winstd::sanitizing_allocator<unsigned char> > data(std::move(decrypt<unsigned char, winstd::sanitizing_allocator<unsigned char> >(cp, pDataIn, dwDataInSize)));
 
             cursor_in cursor = { data.data(), data.data() + data.size() };
 #else
@@ -637,7 +643,7 @@ namespace eap
                 throw winstd::win_runtime_error(__FUNCTION__ " CryptAcquireContext failed.");
 
             // Encrypt BLOB.
-            std::vector<unsigned char> data_enc(std::move(encrypt_md5(cp, data.data(), data.size())));
+            std::vector<unsigned char> data_enc(std::move(encrypt(cp, data.data(), data.size())));
 
             // Copy encrypted BLOB to output.
             *pdwDataOutSize = (DWORD)data_enc.size();
@@ -685,7 +691,7 @@ namespace eap
                 throw winstd::win_runtime_error(__FUNCTION__ " CryptAcquireContext failed.");
 
             // Encrypt BLOB.
-            std::vector<unsigned char> data_enc(std::move(encrypt_md5(cp, data.data(), data.size())));
+            std::vector<unsigned char> data_enc(std::move(encrypt(cp, data.data(), data.size())));
 
             // Copy encrypted BLOB to output.
             *pdwDataOutSize = (DWORD)data_enc.size();

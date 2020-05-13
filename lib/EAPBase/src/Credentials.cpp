@@ -436,12 +436,12 @@ void eap::credentials_pass::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *p
 
     default:
         // Use default encryption method for all others (including unencrypted).
-        vector<unsigned char> password_enc(std::move(m_module.encrypt_md5(cp, m_password)));
+        vector<unsigned char> password_enc(std::move(m_module.encrypt(cp, m_password)));
         com_obj<IXMLDOMElement> pXmlElPassword;
         if (FAILED(hr = eapxml::put_element_base64(pDoc, pConfigRoot, bstr(L"Password"), namespace_eapmetadata, password_enc.data(), password_enc.size(), std::addressof(pXmlElPassword))))
             throw com_runtime_error(hr, __FUNCTION__ " Error creating <Password> element.");
 
-        pXmlElPassword->setAttribute(bstr(L"encryption"), variant(_L(PRODUCT_NAME_STR)));
+        pXmlElPassword->setAttribute(bstr(L"encryption"), variant(_L(PRODUCT_NAME_STR) _L(" v2")));
     }
 }
 
@@ -464,7 +464,7 @@ void eap::credentials_pass::load(_In_ IXMLDOMNode *pConfigRoot)
     if (FAILED(eapxml::get_attrib_value(pXmlElPassword, bstr(L"encryption"), encryption)))
         encryption = NULL;
 
-    if (encryption && CompareStringEx(LOCALE_NAME_INVARIANT, NORM_IGNORECASE, encryption, encryption.length(), _L(PRODUCT_NAME_STR), -1, NULL, NULL, 0) == CSTR_EQUAL) {
+    if (encryption && CompareStringEx(LOCALE_NAME_INVARIANT, NORM_IGNORECASE, encryption, encryption.length(), _L(PRODUCT_NAME_STR) _L(" v2"), -1, NULL, NULL, 0) == CSTR_EQUAL) {
         // Decode Base64.
         winstd::base64_dec dec;
         bool is_last;
@@ -476,8 +476,23 @@ void eap::credentials_pass::load(_In_ IXMLDOMNode *pConfigRoot)
         if (!cp.create(NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
             throw win_runtime_error(__FUNCTION__ " CryptAcquireContext failed.");
 
-        m_password = m_module.decrypt_str_md5<char_traits<wchar_t>, sanitizing_allocator<wchar_t> >(cp, password_enc.data(), password_enc.size());
+        m_password = m_module.decrypt_str<char_traits<wchar_t>, sanitizing_allocator<wchar_t> >(cp, password_enc.data(), password_enc.size());
         m_enc_alg  = enc_alg_t::native;
+    } else if (encryption && CompareStringEx(LOCALE_NAME_INVARIANT, NORM_IGNORECASE, encryption, encryption.length(), _L(PRODUCT_NAME_STR), -1, NULL, NULL, 0) == CSTR_EQUAL) {
+        // Decode Base64.
+        winstd::base64_dec dec;
+        bool is_last;
+        vector<unsigned char> password_enc;
+        dec.decode(password_enc, is_last, (BSTR)password, password.length());
+
+        // Prepare cryptographics provider.
+        crypt_prov cp;
+        if (!cp.create(NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
+            throw win_runtime_error(__FUNCTION__ " CryptAcquireContext failed.");
+
+        #pragma warning(suppress: 4996) // Support for backward compatibility.
+        m_password = m_module.decrypt_str_md5<char_traits<wchar_t>, sanitizing_allocator<wchar_t> >(cp, password_enc.data(), password_enc.size());
+        m_enc_alg  = enc_alg_t::native_v1;
     } else if (encryption && CompareStringEx(LOCALE_NAME_INVARIANT, NORM_IGNORECASE, encryption, encryption.length(), _L("KPH"), -1, NULL, NULL, 0) == CSTR_EQUAL) {
         // Decrypt password.
         sanitizing_string password_utf8(std::move(kph_decrypt<OLECHAR>(password)));
