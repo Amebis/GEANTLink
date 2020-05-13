@@ -67,6 +67,8 @@ wxTLSTunnelConfigWindow::wxTLSTunnelConfigWindow(eap::config_provider &prov, eap
     this->SetSizer(sb_content);
     this->Layout();
 
+    m_outer_identity->SetFocusFromKbd();
+
     this->Connect(wxEVT_UPDATE_UI, wxUpdateUIEventHandler(wxTLSTunnelConfigWindow::OnUpdateUI));
 }
 
@@ -135,9 +137,6 @@ wxTTLSConfigWindow::wxTTLSConfigWindow(eap::config_provider &prov, eap::config_m
     wxEapHostConfigPanel *panel_eaphost = new wxEapHostConfigPanel(m_prov, m_cfg_eaphost, m_inner_type);
     m_inner_type->AddPage(panel_eaphost, _("Other EAP methods..."));
 #endif
-
-    // m_inner_type->SetFocusFromKbd(); // This control steals mouse-wheel scrolling for itself
-    panel_pap->SetFocusFromKbd();
 }
 
 
