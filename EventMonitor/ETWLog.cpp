@@ -608,33 +608,34 @@ wxString wxETWListCtrl::OnGetItemText(const winstd::event_rec &rec, long column)
         // Get event meta-info.
         unique_ptr<TRACE_EVENT_INFO> info;
         ULONG ulResult;
-        if ((ulResult = TdhGetEventInformation((PEVENT_RECORD)&rec, 0, NULL, info)) == ERROR_SUCCESS) {
-            if (info->DecodingSource != DecodingSourceWPP) {
-                if (rec.EventHeader.Flags & EVENT_HEADER_FLAG_STRING_ONLY) {
-                    // This is a string-only event. Print it.
-                    return reinterpret_cast<LPCWSTR>(rec.UserData);
-                } else {
-                    // This is not a string-only event. Prepare parameters.
+        if ((ulResult = TdhGetEventInformation((PEVENT_RECORD)&rec, 0, NULL, info)) != ERROR_SUCCESS)
+            return tstring_printf(_T("(Error getting event information (error %u))"), ulResult).c_str();
 
-                    BYTE nPtrSize = (rec.EventHeader.Flags & EVENT_HEADER_FLAG_32_BIT_HEADER) ? 4 : 8;
-                    vector<tstring> props;
-                    vector<DWORD_PTR> props_msg;
-                    props.reserve(info->TopLevelPropertyCount);
-                    props_msg.reserve(info->TopLevelPropertyCount);
-                    for (ULONG i = 0; i < info->TopLevelPropertyCount; i++) {
-                        props.push_back(std::move(PropertyToString((PEVENT_RECORD)&rec, info.get(), i, NULL, 0, nPtrSize)));
-                        props_msg.push_back((DWORD_PTR)props[i].c_str());
-                    }
+        if (info->DecodingSource != DecodingSourceWPP) {
+            if (rec.EventHeader.Flags & EVENT_HEADER_FLAG_STRING_ONLY) {
+                // This is a string-only event. Print it.
+                return reinterpret_cast<LPCWSTR>(rec.UserData);
+            } else {
+                // This is not a string-only event. Prepare parameters.
 
-                    if (info->EventMessageOffset) {
-                        // Format the message.
-                        return wstring_msg(0, reinterpret_cast<LPCTSTR>(reinterpret_cast<LPCBYTE>(info.get()) + info->EventMessageOffset), props_msg.data()).c_str();
-                    }
+                BYTE nPtrSize = (rec.EventHeader.Flags & EVENT_HEADER_FLAG_32_BIT_HEADER) ? 4 : 8;
+                vector<tstring> props;
+                vector<DWORD_PTR> props_msg;
+                props.reserve(info->TopLevelPropertyCount);
+                props_msg.reserve(info->TopLevelPropertyCount);
+                for (ULONG i = 0; i < info->TopLevelPropertyCount; i++) {
+                    props.push_back(std::move(PropertyToString((PEVENT_RECORD)&rec, info.get(), i, NULL, 0, nPtrSize)));
+                    props_msg.push_back((DWORD_PTR)props[i].c_str());
                 }
-            } else if (info->EventMessageOffset) {
-                // This is a WPP event.
-                return reinterpret_cast<LPCWSTR>(reinterpret_cast<LPCBYTE>(info.get()) + info->EventMessageOffset);
+
+                if (info->EventMessageOffset) {
+                    // Format the message.
+                    return wstring_msg(0, reinterpret_cast<LPCTSTR>(reinterpret_cast<LPCBYTE>(info.get()) + info->EventMessageOffset), props_msg.data()).c_str();
+                }
             }
+        } else if (info->EventMessageOffset) {
+            // This is a WPP event.
+            return reinterpret_cast<LPCWSTR>(reinterpret_cast<LPCBYTE>(info.get()) + info->EventMessageOffset);
         }
     }
     }
@@ -1059,7 +1060,7 @@ static tstring PropertyToString(PEVENT_RECORD pEvent, PTRACE_EVENT_INFO pInfo, U
     // Get the size of the array if the property is an array.
     ULONG ulArraySize = 0;
     if ((ulResult = GetArraySize(pEvent, pInfo, ulPropIndex, &ulArraySize)) != ERROR_SUCCESS)
-        return tstring_printf(_T("(Error getting array size (error %u))"), ulResult);;
+        return tstring_printf(_T("(Error getting array size (error %u))"), ulResult);
 
     tstring out;
     bool out_nonfirst = false;
