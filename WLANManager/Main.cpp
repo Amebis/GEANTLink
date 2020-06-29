@@ -162,26 +162,21 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     UNREFERENCED_PARAMETER(lpCmdLine);
     UNREFERENCED_PARAMETER(nCmdShow);
 
-    int res = 0;
+    _CrtSetDbgFlag(_crtDbgFlag | _CRTDBG_ALLOC_MEM_DF | _CRTDBG_CHECK_ALWAYS_DF | _CRTDBG_CHECK_CRT_DF | _CRTDBG_LEAK_CHECK_DF);
+
+    // Note: When a debugger is attached to this process, the WlanUIEditProfile() will raise an exception and fail.
+    // It was accidentially discovered, that COM initialization resolves this issue.
+    com_initializer com_init(NULL);
 
     {
-        // Note: When a debugger is attached to this process, the WlanUIEditProfile() will raise an exception and fail.
-        // It was accidentially discovered, that COM initialization resolves this issue.
-        com_initializer com_init(NULL);
-
-        {
-            // Initialize Windows XP visual styles
-            INITCOMMONCONTROLSEX icc;
-            icc.dwSize = sizeof(INITCOMMONCONTROLSEX);
-            icc.dwICC = ICC_WIN95_CLASSES | ICC_STANDARD_CLASSES | ICC_LINK_CLASS;
-            InitCommonControlsEx(&icc);
-        }
-
-        pfnWlanReasonCodeToString = WlanReasonCodeToString;
-
-        res = WLANManager();
+        // Initialize Windows XP visual styles
+        INITCOMMONCONTROLSEX icc;
+        icc.dwSize = sizeof(INITCOMMONCONTROLSEX);
+        icc.dwICC = ICC_WIN95_CLASSES | ICC_STANDARD_CLASSES | ICC_LINK_CLASS;
+        InitCommonControlsEx(&icc);
     }
 
-    assert(!_CrtDumpMemoryLeaks());
-    return res;
+    pfnWlanReasonCodeToString = WlanReasonCodeToString;
+
+    return WLANManager();
 }

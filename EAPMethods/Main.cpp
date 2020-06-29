@@ -41,10 +41,10 @@ BOOL WINAPI DllMain(_In_ HINSTANCE hinstDLL, _In_ DWORD fdwReason, _In_ LPVOID l
     if (fdwReason == DLL_PROCESS_ATTACH) {
 #ifdef _DEBUG
         //Sleep(10000);
+        _CrtSetDbgFlag(_crtDbgFlag | _CRTDBG_ALLOC_MEM_DF | _CRTDBG_CHECK_ALWAYS_DF | _CRTDBG_CHECK_CRT_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
         g_peer.m_instance = hinstDLL;
-    } else if (fdwReason == DLL_PROCESS_DETACH)
-        assert(!_CrtDumpMemoryLeaks());
+    }
 
     return TRUE;
 }

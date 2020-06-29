@@ -42,6 +42,7 @@ BOOL WINAPI DllMain(_In_ HINSTANCE hinstDLL, _In_ DWORD fdwReason, _In_ LPVOID l
     if (fdwReason == DLL_PROCESS_ATTACH) {
 #ifdef _DEBUG
         //Sleep(10000);
+        _CrtSetDbgFlag(_crtDbgFlag | _CRTDBG_ALLOC_MEM_DF | _CRTDBG_CHECK_ALWAYS_DF | _CRTDBG_CHECK_CRT_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
         g_peer.m_instance = hinstDLL;
 
@@ -55,10 +56,6 @@ BOOL WINAPI DllMain(_In_ HINSTANCE hinstDLL, _In_ DWORD fdwReason, _In_ LPVOID l
     } else if (fdwReason == DLL_PROCESS_DETACH) {
         if (g_act_ctx)
             ReleaseActCtx(g_act_ctx);
-
-        // wxWidgets library has some global objects allocating data on heap in constructors,
-        // causing false-positive memory leak reports.
-        //assert(!_CrtDumpMemoryLeaks());
     }
 
     return TRUE;
