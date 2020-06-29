@@ -108,29 +108,14 @@
   <ItemGroup>
     <CustomBuild Include="..\res\EventsETW.man">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">mc.exe "%(Identity)" -u -b -e "h" -h "$(IntDir)." -r "$(IntDir)."</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">mc.exe "%(Identity)" -u -b -e "h" -h "$(IntDir)." -r "$(IntDir)."</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">mc.exe "%(Identity)" -u -b -e "h" -h "$(IntDir)." -r "$(IntDir)."</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">mc.exe "%(Identity)" -u -b -e "h" -h "$(IntDir)." -r "$(IntDir)."</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">mc.exe "%(Identity)" -u -b -e "h" -h "$(IntDir)." -r "$(IntDir)."</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">mc.exe "%(Identity)" -u -b -e "h" -h "$(IntDir)." -r "$(IntDir)."</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compiling manifest...</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compiling manifest...</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compiling manifest...</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">Compiling manifest...</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compiling manifest...</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">Compiling manifest...</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)EventsETW.h;$(IntDir)EventsETW.rc;$(IntDir)EventsETW_MSG00001.bin;$(IntDir)EventsETWTEMP.BIN;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)EventsETW.h;$(IntDir)EventsETW.rc;$(IntDir)EventsETW_MSG00001.bin;$(IntDir)EventsETWTEMP.BIN;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)EventsETW.h;$(IntDir)EventsETW.rc;$(IntDir)EventsETW_MSG00001.bin;$(IntDir)EventsETWTEMP.BIN;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">$(IntDir)EventsETW.h;$(IntDir)EventsETW.rc;$(IntDir)EventsETW_MSG00001.bin;$(IntDir)EventsETWTEMP.BIN;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)EventsETW.h;$(IntDir)EventsETW.rc;$(IntDir)EventsETW_MSG00001.bin;$(IntDir)EventsETWTEMP.BIN;%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">$(IntDir)EventsETW.h;$(IntDir)EventsETW.rc;$(IntDir)EventsETW_MSG00001.bin;$(IntDir)EventsETWTEMP.BIN;%(Outputs)</Outputs>
+      <Command>mc.exe "%(Identity)" -u -b -e "h" -h "$(IntDir)." -r "$(IntDir)."</Command>
+      <Message>Compiling manifest...</Message>
+      <Outputs>$(IntDir)EventsETW.h;$(IntDir)EventsETW.rc;$(IntDir)EventsETW_MSG00001.bin;$(IntDir)EventsETWTEMP.BIN;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Events.rc" />
+    <ResourceCompile Include="..\res\Events.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

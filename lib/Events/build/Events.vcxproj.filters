@@ -20,7 +20,7 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Events.rc">
+    <ResourceCompile Include="..\res\Events.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>
