@@ -18,6 +18,7 @@
     <ClCompile Include="PCH.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Register.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="EAPMethod.def" />

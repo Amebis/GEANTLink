@@ -21,6 +21,7 @@
     <ClCompile Include="PCH_UI.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Register_UI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="EAPMethod_UI.def" />

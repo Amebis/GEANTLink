@@ -29,3 +29,5 @@
 #else
 #error Unknown EAP Method type.
 #endif
+
+extern EAPMETHOD_PEER_UI g_peer;
