@@ -1,6 +1,7 @@
+# 
 # Translators:
 # eduki <ecercos@xtec.cat>, 2018
-# jmontane, 2019
+# Joan Montané, 2019
 # Simon Rozman <simon@rozman.si>, 2020
 # 
 #, fuzzy

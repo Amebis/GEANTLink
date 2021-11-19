@@ -1,7 +1,8 @@
+# 
 # Translators:
 # Indrek Rokk <indrek.rokk@eenet.ee>, 2018
-# Anne M <anne@eenet.ee>, 2019
 # Simon Rozman <simon@rozman.si>, 2020
+# Anne M <anne@eenet.ee>, 2021
 # 
 #, fuzzy
 msgid ""
@@ -9,7 +10,7 @@ msgstr ""
 "Project-Id-Version: EAPMethods\n"
 "POT-Creation-Date: 2020-04-17 14:55+0200\n"
 "PO-Revision-Date: 2016-08-25 06:18+0000\n"
-"Last-Translator: Simon Rozman <simon@rozman.si>, 2020\n"
+"Last-Translator: Anne M <anne@eenet.ee>, 2021\n"
 "Language-Team: Estonian (https://www.transifex.com/eduroam_devel/teams/11799/et/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -75,7 +76,7 @@ msgstr "Kasutajakonto andmete kustutamine ebaõnnestus (viga %u)."
 #: lib/EAPBase_UI/include/EAP_UI.h:924 lib/EAPBase_UI/include/EAP_UI.h:943
 #: lib/EAPBase_UI/include/EAP_UI.h:952
 msgid "(none)"
-msgstr ""
+msgstr "(ei midagi)"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:928
 #, c-format
@@ -520,7 +521,7 @@ msgstr "Serveri usaldamine"
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:28
 msgid "Describe the servers you trust to prevent man-in-the-middle attacks."
-msgstr ""
+msgstr "Loetle serverid, mida usaldad vahendusrünnete tõrjumiseks."
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:35
 msgid "Acceptable Certificate Authorities:"
@@ -601,11 +602,11 @@ msgstr ""
 
 #: lib/TLS_UI/src/TLS_UI.cpp:118
 msgid "No certificate selected"
-msgstr ""
+msgstr "Sertifikaati ei ole valitud"
 
 #: lib/TLS_UI/src/TLS_UI.cpp:118
 msgid "Validation conflict"
-msgstr ""
+msgstr "Valideerimiskonflikt"
 
 #: lib/TLS_UI/src/TLS_UI.cpp:327
 msgid "Add Certificate"
