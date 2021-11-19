@@ -21,7 +21,7 @@
 class wxEventMonitorFrame;
 class wxPersistentEventMonitorFrame;
 
-#pragma once;
+#pragma once
 
 #include "LogPanel.h"
 
