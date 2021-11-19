@@ -79,8 +79,8 @@ namespace eap
 
     class packable;
 
-    template<size_t N> struct WINSTD_NOVTABLE sanitizing_blob_f;
-    template<size_t N> struct WINSTD_NOVTABLE sanitizing_blob_zf;
+    template<size_t N> struct sanitizing_blob_f;
+    template<size_t N> struct sanitizing_blob_zf;
 
     ///
     /// \defgroup EAPBaseSanitizing  Sanitizing memory
@@ -653,7 +653,7 @@ namespace eap
     ///
     /// Sanitizing BLOB of fixed size
     ///
-    template<size_t N> struct WINSTD_NOVTABLE sanitizing_blob_f
+    template<size_t N> struct sanitizing_blob_f
     {
         unsigned char data[N]; ///< BLOB data
 
@@ -807,7 +807,7 @@ namespace eap
     ///
     /// Sanitizing BLOB of fixed size (zero initialized)
     ///
-    template<size_t N> struct WINSTD_NOVTABLE sanitizing_blob_zf : sanitizing_blob_f<N>
+    template<size_t N> struct sanitizing_blob_zf : sanitizing_blob_f<N>
     {
         ///
         /// Constructor

@@ -24,12 +24,12 @@
 namespace eap
 {
     enum class chap_packet_code_t : unsigned char;
-    struct WINSTD_NOVTABLE chap_header;
-    struct WINSTD_NOVTABLE challenge_mschapv2;
-    struct WINSTD_NOVTABLE challenge_hash;
-    struct WINSTD_NOVTABLE nt_password_hash;
-    struct WINSTD_NOVTABLE nt_response;
-    struct WINSTD_NOVTABLE authenticator_response;
+    struct chap_header;
+    struct challenge_mschapv2;
+    struct challenge_hash;
+    struct nt_password_hash;
+    struct nt_response;
+    struct authenticator_response;
 
     ///
     /// \defgroup MSCHAPv2  MSCHAPv2
@@ -80,7 +80,7 @@ namespace eap
     ///
     /// CHAP packet header base class
     ///
-    struct WINSTD_NOVTABLE chap_header
+    struct chap_header
     {
         chap_packet_code_t code;    ///< CHAP packet code
         unsigned char ident;        ///< CHAP identifier
@@ -91,7 +91,7 @@ namespace eap
     ///
     /// MSCHAPv2 Challenge
     ///
-    struct WINSTD_NOVTABLE challenge_mschapv2 : public sanitizing_blob_xf<16>
+    struct challenge_mschapv2 : public sanitizing_blob_xf<16>
     {
         ///
         /// Generates random challenge
@@ -105,7 +105,7 @@ namespace eap
     ///
     /// MSCHAPv2 Challenge Hash
     ///
-    struct WINSTD_NOVTABLE challenge_hash : public sanitizing_blob_xf<8>
+    struct challenge_hash : public sanitizing_blob_xf<8>
     {
         ///
         /// Constructor
@@ -149,7 +149,7 @@ namespace eap
     ///
     /// NT-Password Hash
     ///
-    struct WINSTD_NOVTABLE nt_password_hash : public sanitizing_blob_xf<16>
+    struct nt_password_hash : public sanitizing_blob_xf<16>
     {
         ///
         /// Constructor
@@ -201,7 +201,7 @@ namespace eap
     ///
     /// NT-Response
     ///
-    struct WINSTD_NOVTABLE nt_response : public sanitizing_blob_xf<24>
+    struct nt_response : public sanitizing_blob_xf<24>
     {
         ///
         /// Constructor
@@ -247,7 +247,7 @@ namespace eap
     ///
     /// Authenticator Response
     ///
-    struct WINSTD_NOVTABLE authenticator_response : public sanitizing_blob_xf<20>
+    struct authenticator_response : public sanitizing_blob_xf<20>
     {
         ///
         /// Constructor
