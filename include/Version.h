@@ -1,6 +1,6 @@
 ﻿/*
     SPDX-License-Identifier: GPL-3.0-or-later
-    Copyright © 2015-2020 Amebis
+    Copyright © 2015-2021 Amebis
     Copyright © 2016 GÉANT
 */
 
@@ -37,7 +37,7 @@
 // Human readable product version and build year for UI
 //
 #define PRODUCT_VERSION_STR      "1.3b"
-#define PRODUCT_BUILD_YEAR_STR   "2020"
+#define PRODUCT_BUILD_YEAR_STR   "2021"
 
 //
 // Numerical version presentation for ProductVersion propery in
