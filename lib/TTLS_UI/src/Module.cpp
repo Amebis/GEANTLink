@@ -25,21 +25,20 @@ using namespace winstd;
 
 
 //////////////////////////////////////////////////////////////////////
-// eap::peer_ttls_ui
+// eap::peer_peap_ui
 //////////////////////////////////////////////////////////////////////
 
-eap::peer_ttls_ui::peer_ttls_ui() : peer_ui(eap_type_t::ttls, _T("EAP-TTLS_UI"))
+eap::peer_peap_ui::peer_peap_ui() : peer_ui(eap_type_t::peap, _T("PEAP_UI"))
 {
 }
 
 
-eap::config_method* eap::peer_ttls_ui::make_config()
+eap::peer_peap_ui::peer_peap_ui(_In_ eap_type_t eap_method, _In_opt_ LPCTSTR domain) : peer_ui(eap_method, domain)
 {
-    return new config_method_ttls(*this, 0);
 }
 
 
-void eap::peer_ttls_ui::invoke_config_ui(
+void eap::peer_peap_ui::invoke_config_ui(
     _In_                                     HWND  hwndParent,
     _In_count_(dwConnectionDataInSize) const BYTE  *pConnectionDataIn,
     _In_                                     DWORD dwConnectionDataInSize,
@@ -59,7 +58,7 @@ void eap::peer_ttls_ui::invoke_config_ui(
     wxInitializerPeer init(m_instance, m_domain, hwndParent);
 
     // Create and launch configuration dialog.
-    wxEAPConfigDialog<wxTTLSConfigWindow> dlg(cfg, init.m_parent);
+    wxEAPConfigDialog<wxPEAPConfigWindow> dlg(cfg, init.m_parent);
     if (!init.m_parent) {
         FLASHWINFO fwi = { sizeof(FLASHWINFO), dlg.GetHWND(), FLASHW_ALL | FLASHW_TIMERNOFG };
         ::FlashWindowEx(&fwi);
@@ -72,7 +71,7 @@ void eap::peer_ttls_ui::invoke_config_ui(
 }
 
 
-void eap::peer_ttls_ui::invoke_identity_ui(
+void eap::peer_peap_ui::invoke_identity_ui(
     _In_                                   HWND   hwndParent,
     _In_                                   DWORD  dwFlags,
     _In_count_(dwConnectionDataSize) const BYTE   *pConnectionData,
@@ -260,27 +259,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
             wxUICanceller lock(hWndCurrent, dlg.GetHWND());
             if (eap::config_method::status_t::cred_begin <= cfg_method->m_inner->m_last_status && cfg_method->m_inner->m_last_status < eap::config_method::status_t::cred_end)
                 dlg.AddContent(new wxEAPCredentialWarningPanel(*cfg_prov, cfg_method->m_inner->m_last_status, &dlg));
-            wxEAPCredentialsPanelBase *panel = NULL;
-            switch (cfg_method->m_inner->get_method_id()) {
-                case eap_type_t::legacy_pap     : panel = new wxPAPCredentialsPanel     (*cfg_prov, *dynamic_cast<const eap::config_method_pap        *>(cfg_method->m_inner.get()), *dynamic_cast<eap::credentials_pass    *>(cred->m_inner.get()), &dlg, false); break;
-                case eap_type_t::legacy_mschapv2: panel = new wxMSCHAPv2CredentialsPanel(*cfg_prov, *dynamic_cast<const eap::config_method_mschapv2   *>(cfg_method->m_inner.get()), *dynamic_cast<eap::credentials_pass    *>(cred->m_inner.get()), &dlg, false); break;
-                case eap_type_t::mschapv2       : panel = new wxMSCHAPv2CredentialsPanel(*cfg_prov, *dynamic_cast<const eap::config_method_eapmschapv2*>(cfg_method->m_inner.get()), *dynamic_cast<eap::credentials_pass    *>(cred->m_inner.get()), &dlg, false); break;
-                case eap_type_t::gtc            : {
-                    // EAP-GTC credential prompt differes for "Challenge/Response" and "Password" authentication modes.
-                    eap::credentials_identity *cred_resp;
-                    eap::credentials_pass     *cred_pass;
-                    if ((cred_resp = dynamic_cast<eap::credentials_identity*>(cred->m_inner.get())) != NULL)
-                        panel = new wxGTCResponseCredentialsPanel(*cfg_prov, *dynamic_cast<const eap::config_method_eapgtc*>(cfg_method->m_inner.get()), *cred_resp, &dlg, false);
-                    else if ((cred_pass = dynamic_cast<eap::credentials_pass*>(cred->m_inner.get())) != NULL)
-                        panel = new wxGTCPasswordCredentialsPanel(*cfg_prov, *dynamic_cast<const eap::config_method_eapgtc*>(cfg_method->m_inner.get()), *cred_pass, &dlg, false);
-                    else
-                        wxLogError("Unsupported authentication mode.");
-                    break;
-                }
-                default: wxLogError("Unsupported inner authentication method.");
-            }
-            if (!panel)
-                throw invalid_argument("Invalid authentication mode");
+            wxEAPCredentialsPanelBase *panel = make_inner_credential_panel(*cfg_prov, *dynamic_cast<config_method_with_cred*>(cfg_method->m_inner.get()), cred->m_inner.get(), &dlg);
             panel->SetRemember(src_inner == eap::credentials::source_t::storage);
             dlg.AddContent(panel);
 
@@ -322,7 +301,7 @@ void eap::peer_ttls_ui::invoke_identity_ui(
 }
 
 
-void eap::peer_ttls_ui::invoke_interactive_ui(
+void eap::peer_peap_ui::invoke_interactive_ui(
     _In_                                  HWND  hwndParent,
     _In_count_(dwUIContextDataSize) const BYTE  *pUIContextData,
     _In_                                  DWORD dwUIContextDataSize,
@@ -415,4 +394,84 @@ void eap::peer_ttls_ui::invoke_interactive_ui(
 
     // Pack output data.
     pack(ctx.m_data, ppDataFromInteractiveUI, pdwDataFromInteractiveUISize);
+}
+
+
+wxEAPCredentialsPanelBase* eap::peer_peap_ui::make_inner_credential_panel(const config_provider &prov, const config_method_with_cred &cfg, credentials *cred, wxWindow *parent) const
+{
+    switch (cfg.get_method_id()) {
+        case eap_type_t::mschapv2: return new wxMSCHAPv2CredentialsPanel(prov, dynamic_cast<const eap::config_method_eapmschapv2&>(cfg), *dynamic_cast<eap::credentials_pass*>(cred), parent, false); break;
+        case eap_type_t::gtc     : {
+            // EAP-GTC credential prompt differes for "Challenge/Response" and "Password" authentication modes.
+            eap::credentials_identity *cred_resp;
+            eap::credentials_pass     *cred_pass;
+            if ((cred_resp = dynamic_cast<eap::credentials_identity*>(cred)) != NULL)
+                return new wxGTCResponseCredentialsPanel(prov, dynamic_cast<const eap::config_method_eapgtc&>(cfg), *cred_resp, parent, false);
+            else if ((cred_pass = dynamic_cast<eap::credentials_pass*>(cred)) != NULL)
+                return new wxGTCPasswordCredentialsPanel(prov, dynamic_cast<const eap::config_method_eapgtc&>(cfg), *cred_pass, parent, false);
+            else
+                wxLogError("Unsupported authentication mode.");
+            break;
+        }
+        default: wxLogError("Unsupported inner authentication method.");
+    }
+    throw invalid_argument("Invalid authentication mode");
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// eap::peer_ttls_ui
+//////////////////////////////////////////////////////////////////////
+
+eap::peer_ttls_ui::peer_ttls_ui() : peer_peap_ui(eap_type_t::ttls, _T("EAP-TTLS_UI"))
+{
+}
+
+
+eap::config_method* eap::peer_ttls_ui::make_config()
+{
+    return new config_method_ttls(*this, 0);
+}
+
+
+void eap::peer_ttls_ui::invoke_config_ui(
+    _In_                                     HWND  hwndParent,
+    _In_count_(dwConnectionDataInSize) const BYTE  *pConnectionDataIn,
+    _In_                                     DWORD dwConnectionDataInSize,
+    _Out_                                    BYTE  **ppConnectionDataOut,
+    _Out_                                    DWORD *pdwConnectionDataOutSize)
+{
+    // Unpack configuration.
+    config_connection cfg(*this);
+    if (dwConnectionDataInSize) {
+        // Load existing configuration.
+        unpack(cfg, pConnectionDataIn, dwConnectionDataInSize);
+    } else {
+        // This is a blank network profile. `cfg` is already set to defaults.
+    }
+
+    // Initialize application.
+    wxInitializerPeer init(m_instance, m_domain, hwndParent);
+
+    // Create and launch configuration dialog.
+    wxEAPConfigDialog<wxTTLSConfigWindow> dlg(cfg, init.m_parent);
+    if (!init.m_parent) {
+        FLASHWINFO fwi = { sizeof(FLASHWINFO), dlg.GetHWND(), FLASHW_ALL | FLASHW_TIMERNOFG };
+        ::FlashWindowEx(&fwi);
+    }
+    if (dlg.ShowModal() != wxID_OK)
+        throw win_runtime_error(ERROR_CANCELLED, __FUNCTION__ " Cancelled.");
+
+    // Pack new configuration.
+    pack(cfg, ppConnectionDataOut, pdwConnectionDataOutSize);
+}
+
+
+wxEAPCredentialsPanelBase* eap::peer_ttls_ui::make_inner_credential_panel(const config_provider &prov, const config_method_with_cred &cfg, credentials *cred, wxWindow *parent) const
+{
+    switch (cfg.get_method_id()) {
+        case eap_type_t::legacy_pap     : return new wxPAPCredentialsPanel     (prov, dynamic_cast<const eap::config_method_pap     &>(cfg), *dynamic_cast<eap::credentials_pass*>(cred), parent, false); break;
+        case eap_type_t::legacy_mschapv2: return new wxMSCHAPv2CredentialsPanel(prov, dynamic_cast<const eap::config_method_mschapv2&>(cfg), *dynamic_cast<eap::credentials_pass*>(cred), parent, false); break;
+    }
+    return peer_peap_ui::make_inner_credential_panel(prov, cfg, cred, parent);
 }

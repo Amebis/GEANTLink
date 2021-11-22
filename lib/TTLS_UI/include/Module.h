@@ -37,22 +37,26 @@ namespace eap
     /// @{
 
     ///
-    /// TTLS UI peer
+    /// PEAP UI peer
     ///
-    class peer_ttls_ui : public peer_ui
+    class peer_peap_ui : public peer_ui
     {
     public:
         ///
-        /// Constructs a EAP-TTLS UI peer module
+        /// Constructs a PEAP UI peer module
         ///
-        peer_ttls_ui();
+        peer_peap_ui();
 
+    protected:
         ///
-        /// @copydoc eap::method::make_config()
-        /// \returns This implementation always returns `eap::config_method_ttls` type of configuration
+        /// Constructs a peer module
         ///
-        virtual config_method* make_config();
+        /// \param[in] eap_method  EAP method type ID
+        /// \param[in] domain      Localization catalog domain name. Usually EAP method name followed by "_UI".
+        ///
+        peer_peap_ui(_In_ winstd::eap_type_t eap_method, _In_opt_ LPCTSTR domain);
 
+    public:
         virtual void invoke_config_ui(
             _In_                                     HWND  hwndParent,
             _In_count_(dwConnectionDataInSize) const BYTE  *pConnectionDataIn,
@@ -77,6 +81,37 @@ namespace eap
             _In_                                  DWORD dwUIContextDataSize,
             _Inout_                               BYTE  **ppDataFromInteractiveUI,
             _Inout_                               DWORD *pdwDataFromInteractiveUISize);
+
+    protected:
+        virtual wxEAPCredentialsPanelBase* make_inner_credential_panel(const config_provider &prov, const config_method_with_cred &cfg, credentials *cred, wxWindow *parent) const;
+    };
+
+    ///
+    /// EAP-TTLS UI peer
+    ///
+    class peer_ttls_ui : public peer_peap_ui
+    {
+    public:
+        ///
+        /// Constructs a EAP-TTLS UI peer module
+        ///
+        peer_ttls_ui();
+
+        ///
+        /// @copydoc eap::method::make_config()
+        /// \returns This implementation always returns `eap::config_method_ttls` type of configuration
+        ///
+        virtual config_method* make_config();
+
+        virtual void invoke_config_ui(
+            _In_                                     HWND  hwndParent,
+            _In_count_(dwConnectionDataInSize) const BYTE  *pConnectionDataIn,
+            _In_                                     DWORD dwConnectionDataInSize,
+            _Out_                                    BYTE  **ppConnectionDataOut,
+            _Out_                                    DWORD *pdwConnectionDataOutSize);
+
+    protected:
+        virtual wxEAPCredentialsPanelBase* make_inner_credential_panel(const config_provider &prov, const config_method_with_cred &cfg, credentials *cred, wxWindow *parent) const;
     };
 
     /// @}

@@ -112,12 +112,10 @@ void wxTLSTunnelConfigWindow::OnUpdateUI(wxUpdateUIEvent& event)
 
 
 //////////////////////////////////////////////////////////////////////
-// wxTTLSConfigWindow
+// wxPEAPConfigWindow
 //////////////////////////////////////////////////////////////////////
 
-wxTTLSConfigWindow::wxTTLSConfigWindow(eap::config_provider &prov, eap::config_method &cfg, wxWindow* parent) :
-    m_cfg_pap        (cfg.m_module, cfg.m_level + 1),
-    m_cfg_mschapv2   (cfg.m_module, cfg.m_level + 1),
+wxPEAPConfigWindow::wxPEAPConfigWindow(eap::config_provider &prov, eap::config_method &cfg, wxWindow* parent) :
     m_cfg_eapmschapv2(cfg.m_module, cfg.m_level + 1),
     m_cfg_eapgtc     (cfg.m_module, cfg.m_level + 1),
 #if EAP_INNER_EAPHOST
@@ -125,18 +123,89 @@ wxTTLSConfigWindow::wxTTLSConfigWindow(eap::config_provider &prov, eap::config_m
 #endif
     wxTLSTunnelConfigWindow(prov, cfg, parent)
 {
-    wxPAPConfigPanel *panel_pap = new wxPAPConfigPanel(m_prov, m_cfg_pap, m_inner_type);
-    m_inner_type->AddPage(panel_pap, _("PAP"));
-    wxMSCHAPv2ConfigPanel *panel_mschapv2 = new wxMSCHAPv2ConfigPanel(m_prov, m_cfg_mschapv2, m_inner_type);
-    m_inner_type->AddPage(panel_mschapv2, _("MSCHAPv2"));
-    wxMSCHAPv2ConfigPanel *panel_eapmschapv2 = new wxMSCHAPv2ConfigPanel(m_prov, m_cfg_eapmschapv2, m_inner_type);
-    m_inner_type->AddPage(panel_eapmschapv2, _("EAP-MSCHAPv2"));
-    wxGTCConfigPanel *panel_eapgtc = new wxGTCConfigPanel(m_prov, m_cfg_eapgtc, m_inner_type);
-    m_inner_type->AddPage(panel_eapgtc, _("EAP-GTC"));
+    m_panel_eapmschapv2 = new wxMSCHAPv2ConfigPanel(m_prov, m_cfg_eapmschapv2, m_inner_type);
+    m_inner_type->AddPage(m_panel_eapmschapv2, _("EAP-MSCHAPv2"));
+    m_panel_eapgtc = new wxGTCConfigPanel(m_prov, m_cfg_eapgtc, m_inner_type);
+    m_inner_type->AddPage(m_panel_eapgtc, _("EAP-GTC"));
 #if EAP_INNER_EAPHOST
-    wxEapHostConfigPanel *panel_eaphost = new wxEapHostConfigPanel(m_prov, m_cfg_eaphost, m_inner_type);
-    m_inner_type->AddPage(panel_eaphost, _("Other EAP methods..."));
+    m_panel_eaphost = new wxEapHostConfigPanel(m_prov, m_cfg_eaphost, m_inner_type);
+    m_inner_type->AddPage(m_panel_eaphost, _("Other EAP methods..."));
 #endif
+}
+
+
+/// \cond internal
+
+bool wxPEAPConfigWindow::TransferDataToWindow()
+{
+    auto &cfg = dynamic_cast<eap::config_method_tls_tunnel&>(m_cfg);
+
+    switch (cfg.m_inner->get_method_id()) {
+    case winstd::eap_type_t::mschapv2:
+        m_cfg_eapmschapv2 = dynamic_cast<eap::config_method_eapmschapv2&>(*cfg.m_inner);
+        m_inner_type->SetSelection(m_inner_type->FindPage(m_panel_eapmschapv2));
+        break;
+
+    case winstd::eap_type_t::gtc:
+        m_cfg_eapgtc = dynamic_cast<eap::config_method_eapgtc&>(*cfg.m_inner);
+        m_inner_type->SetSelection(m_inner_type->FindPage(m_panel_eapgtc));
+        break;
+
+#if EAP_INNER_EAPHOST
+    case winstd::eap_type_t::undefined:
+        m_cfg_eaphost = dynamic_cast<eap::config_method_eaphost&>(*cfg.m_inner);
+        m_inner_type->SetSelection(m_inner_type->FindPage(m_panel_eaphost));
+        break;
+#endif
+    }
+
+    return wxTLSTunnelConfigWindow::TransferDataToWindow();
+}
+
+
+bool wxPEAPConfigWindow::TransferDataFromWindow()
+{
+    wxCHECK(wxTLSTunnelConfigWindow::TransferDataFromWindow(), false);
+
+    auto &cfg = dynamic_cast<eap::config_method_tls_tunnel&>(m_cfg);
+
+    if (!m_prov.m_read_only) {
+        // This is not a provider-locked configuration. Save the data.
+        int idx = m_inner_type->GetSelection();
+        if (idx != wxNOT_FOUND) {
+            wxWindow *page = m_inner_type->GetPage(idx);
+            if (page == m_panel_eapmschapv2)
+                cfg.m_inner.reset(new eap::config_method_eapmschapv2(m_cfg_eapmschapv2));
+            else if (page == m_panel_eapgtc)
+                cfg.m_inner.reset(new eap::config_method_eapgtc(m_cfg_eapgtc));
+#if EAP_INNER_EAPHOST
+            else if (page == m_panel_eaphost)
+                cfg.m_inner.reset(new eap::config_method_eaphost(m_cfg_eaphost));
+#endif
+        }
+    }
+
+    return true;
+}
+
+/// \endcond
+
+
+//////////////////////////////////////////////////////////////////////
+// wxTTLSConfigWindow
+//////////////////////////////////////////////////////////////////////
+
+wxTTLSConfigWindow::wxTTLSConfigWindow(eap::config_provider &prov, eap::config_method &cfg, wxWindow* parent) :
+    m_cfg_pap     (cfg.m_module, cfg.m_level + 1),
+    m_cfg_mschapv2(cfg.m_module, cfg.m_level + 1),
+    wxPEAPConfigWindow(prov, cfg, parent)
+{
+    m_panel_pap = new wxPAPConfigPanel(m_prov, m_cfg_pap, m_inner_type);
+    m_inner_type->InsertPage(0, m_panel_pap, _("PAP"));
+    m_panel_mschapv2 = new wxMSCHAPv2ConfigPanel(m_prov, m_cfg_mschapv2, m_inner_type);
+    m_inner_type->InsertPage(1, m_panel_mschapv2, _("MSCHAPv2"));
+
+    m_panel_pap->SetFocusFromKbd();
 }
 
 
@@ -144,78 +213,40 @@ wxTTLSConfigWindow::wxTTLSConfigWindow(eap::config_provider &prov, eap::config_m
 
 bool wxTTLSConfigWindow::TransferDataToWindow()
 {
-    auto &cfg_ttls = dynamic_cast<eap::config_method_tls_tunnel&>(m_cfg);
+    auto &cfg = dynamic_cast<eap::config_method_tls_tunnel&>(m_cfg);
 
     // Native inner methods
-    switch (cfg_ttls.m_inner->get_method_id()) {
+    switch (cfg.m_inner->get_method_id()) {
     case winstd::eap_type_t::legacy_pap:
-        m_cfg_pap = dynamic_cast<eap::config_method_pap&>(*cfg_ttls.m_inner);
-        m_inner_type->SetSelection(0); // 0=PAP
+        m_cfg_pap = dynamic_cast<eap::config_method_pap&>(*cfg.m_inner);
+        m_inner_type->SetSelection(m_inner_type->FindPage(m_panel_pap));
         break;
 
     case winstd::eap_type_t::legacy_mschapv2:
-        m_cfg_mschapv2 = dynamic_cast<eap::config_method_mschapv2&>(*cfg_ttls.m_inner);
-        m_inner_type->SetSelection(1); // 1=MSCHAPv2
+        m_cfg_mschapv2 = dynamic_cast<eap::config_method_mschapv2&>(*cfg.m_inner);
+        m_inner_type->SetSelection(m_inner_type->FindPage(m_panel_mschapv2));
         break;
-
-    case winstd::eap_type_t::mschapv2:
-        m_cfg_eapmschapv2 = dynamic_cast<eap::config_method_eapmschapv2&>(*cfg_ttls.m_inner);
-        m_inner_type->SetSelection(2); // 2=EAP-MSCHAPv2
-        break;
-
-    case winstd::eap_type_t::gtc:
-        m_cfg_eapgtc = dynamic_cast<eap::config_method_eapgtc&>(*cfg_ttls.m_inner);
-        m_inner_type->SetSelection(3); // 3=EAP-GTC
-        break;
-
-    case winstd::eap_type_t::undefined:
-        m_cfg_eaphost = dynamic_cast<eap::config_method_eaphost&>(*cfg_ttls.m_inner);
-        m_inner_type->SetSelection(4); // 4=EapHost
-        break;
-
-    default:
-        wxFAIL_MSG(wxT("Unsupported inner authentication method type."));
     }
 
-    // Do not invoke inherited TransferDataToWindow(), as it will call others TransferDataToWindow().
-    // This will handle wxTTLSConfigWindow::OnInitDialog() via wxEVT_INIT_DIALOG forwarding.
-    return true /*wxScrolledWindow::TransferDataToWindow()*/;
+    return wxPEAPConfigWindow::TransferDataToWindow();
 }
 
 
 bool wxTTLSConfigWindow::TransferDataFromWindow()
 {
-    wxCHECK(wxTLSTunnelConfigWindow::TransferDataFromWindow(), false);
+    wxCHECK(wxPEAPConfigWindow::TransferDataFromWindow(), false);
 
-    auto &cfg_ttls = dynamic_cast<eap::config_method_tls_tunnel&>(m_cfg);
+    auto &cfg = dynamic_cast<eap::config_method_tls_tunnel&>(m_cfg);
 
     if (!m_prov.m_read_only) {
         // This is not a provider-locked configuration. Save the data.
-        switch (m_inner_type->GetSelection()) {
-        case 0: // 0=PAP
-            cfg_ttls.m_inner.reset(new eap::config_method_pap(m_cfg_pap));
-            break;
-
-        case 1: // 1=MSCHAPv2
-            cfg_ttls.m_inner.reset(new eap::config_method_mschapv2(m_cfg_mschapv2));
-            break;
-
-        case 2: // 2=EAP-MSCHAPv2
-            cfg_ttls.m_inner.reset(new eap::config_method_eapmschapv2(m_cfg_eapmschapv2));
-            break;
-
-        case 3: // 3=EAP-GTC
-            cfg_ttls.m_inner.reset(new eap::config_method_eapgtc(m_cfg_eapgtc));
-            break;
-
-#if EAP_INNER_EAPHOST
-        case 4: // 4=EapHost
-            cfg_ttls.m_inner.reset(new eap::config_method_eaphost(m_cfg_eaphost));
-            break;
-#endif
-
-        default:
-            wxFAIL_MSG(wxT("Unsupported inner authentication method type."));
+        int idx = m_inner_type->GetSelection();
+        if (idx != wxNOT_FOUND) {
+            wxWindow *page = m_inner_type->GetPage(idx);
+            if (page == m_panel_pap)
+                cfg.m_inner.reset(new eap::config_method_pap(m_cfg_pap));
+            else if (page == m_panel_mschapv2)
+                cfg.m_inner.reset(new eap::config_method_mschapv2(m_cfg_mschapv2));
         }
     }
 
