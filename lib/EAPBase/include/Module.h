@@ -411,6 +411,8 @@ namespace eap
                 throw winstd::win_runtime_error(__FUNCTION__ " Key import failed.");
 
             // Import the 256-bit AES session key.
+            if (size < 268)
+                throw std::invalid_argument(__FUNCTION__ " Encrypted data too short.");
             winstd::crypt_key key_aes;
             if (!CryptImportKey(hProv, reinterpret_cast<LPCBYTE>(data), 268, key_rsa, 0, &key_aes))
                 throw winstd::win_runtime_error(__FUNCTION__ " CryptImportKey failed.");
