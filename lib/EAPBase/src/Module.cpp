@@ -505,8 +505,18 @@ EAP_SESSION_HANDLE eap::peer::begin_session(
     // Unpack configuration.
     unpack(s->m_cfg, pConnectionData, dwConnectionDataSize);
 
-    // Unpack credentials.
-    unpack(s->m_cred, pUserData, dwUserDataSize);
+    if (dwUserDataSize) {
+        // Unpack credentials.
+        unpack(s->m_cred, pUserData, dwUserDataSize);
+    } else {
+        // Regenerate user credentials.
+        user_impersonator impersonating(hTokenImpersonateUser);
+        auto cfg_method = combine_credentials(dwFlags, s->m_cfg, pUserData, dwUserDataSize, s->m_cred);
+        if (!cfg_method) {
+            // Credentials missing or incomplete.
+            throw invalid_argument(__FUNCTION__ " Credentials are not available.");
+        }
+    }
 
     // Look-up the provider.
     config_method *cfg_method;
