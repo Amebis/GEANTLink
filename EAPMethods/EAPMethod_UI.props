@@ -3,8 +3,6 @@
   <ImportGroup Label="PropertySheets">
     <Import Project="Common.props" />
   </ImportGroup>
-  <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
   <ItemDefinitionGroup>
     <ClCompile>
       <PrecompiledHeaderFile>PCH_UI.h</PrecompiledHeaderFile>
@@ -67,7 +65,7 @@
     <ProjectReference Include="..\lib\EAPBase_UI\build\EAPBase_UI.vcxproj">
       <Project>{d4b54856-be1f-4937-a8f7-495125be76be}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\lib\wxExtend\build\wxExtendLib-16.0.vcxproj">
+    <ProjectReference Include="..\lib\wxExtend\build\wxExtendLib.vcxproj">
       <Project>{d3e29951-d9f5-486d-a167-20ae8e90b1fa}</Project>
     </ProjectReference>
   </ItemGroup>

@@ -15,7 +15,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EAP-TTLS", "EAPMethods\EAP-
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{E66A3FE1-4EE4-401F-8EAD-BE518B230393}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WinStd", "lib\WinStd\build\WinStd-16.0.vcxproj", "{47399D91-7EB9-41DE-B521-514BA5DB0C43}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WinStd", "lib\WinStd\build\WinStd.vcxproj", "{47399D91-7EB9-41DE-B521-514BA5DB0C43}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utilities", "Utilities", "{7B5EC9B7-208C-426A-941D-DAF9271BD4A4}"
 EndProject
@@ -45,7 +45,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MsiUseFeature", "MsiUseFeat
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EventMonitor", "EventMonitor\EventMonitor.vcxproj", "{E0D0725B-B2FC-4225-9481-CA9B1B6306F2}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxExtend", "lib\wxExtend\build\wxExtendLib-16.0.vcxproj", "{D3E29951-D9F5-486D-A167-20AE8E90B1FA}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxExtend", "lib\wxExtend\build\wxExtendLib.vcxproj", "{D3E29951-D9F5-486D-A167-20AE8E90B1FA}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WLANManager", "WLANManager\WLANManager.vcxproj", "{BFCAA3B4-97A9-4EA9-8FE1-F30280142BCC}"
 EndProject

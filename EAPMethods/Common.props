@@ -4,7 +4,6 @@
     <Import Project="..\include\$(Platform).props" />
     <Import Project="..\include\$(Configuration).props" />
   </ImportGroup>
-  <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_PropertySheetDisplayName>EAP Method Common</_PropertySheetDisplayName>
     <OutDir>..\output\$(Platform).$(Configuration)\</OutDir>
@@ -21,7 +20,7 @@
     <ProjectReference Include="..\lib\Events\build\Events.vcxproj">
       <Project>{d63f24bd-92a0-4d6b-8b69-ed947e4d2b1b}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\lib\WinStd\build\WinStd-16.0.vcxproj">
+    <ProjectReference Include="..\lib\WinStd\build\WinStd.vcxproj">
       <Project>{47399d91-7eb9-41de-b521-514ba5db0c43}</Project>
     </ProjectReference>
   </ItemGroup>

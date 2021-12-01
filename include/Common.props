@@ -8,7 +8,6 @@
   <ImportGroup Label="ExtensionSettings">
     <Import Project="xgettext.props" />
   </ImportGroup>
-  <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <IntDir>temp\$(MSBuildProjectName).$(Platform).$(Configuration).$(PlatformToolset)\</IntDir>
     <OutDir>temp\$(MSBuildProjectName).$(Platform).$(Configuration).$(PlatformToolset)\</OutDir>
@@ -42,5 +41,4 @@
       <EnableDpiAwareness>true</EnableDpiAwareness>
     </Manifest>
   </ItemDefinitionGroup>
-  <ItemGroup />
 </Project>

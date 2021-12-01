@@ -8,7 +8,6 @@
   <ImportGroup Label="PropertySheets">
     <Import Project="Common.props" />
   </ImportGroup>
-  <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <LibraryPath>$(WXWIN)\lib\vc$(PlatformToolsetVersion)_arm64_lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
@@ -25,5 +24,4 @@
       <AdditionalDependencies>advapi32.lib;ole32.lib;oleaut32.lib;shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup />
 </Project>

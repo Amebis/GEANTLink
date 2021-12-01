@@ -8,7 +8,6 @@
   <ImportGroup Label="PropertySheets">
     <Import Project="Common.props" />
   </ImportGroup>
-  <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <LibraryPath>$(WXWIN)\lib\vc$(PlatformToolsetVersion)_lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
@@ -21,5 +20,4 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup />
 </Project>

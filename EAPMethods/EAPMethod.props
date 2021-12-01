@@ -3,8 +3,6 @@
   <ImportGroup Label="PropertySheets">
     <Import Project="Common.props" />
   </ImportGroup>
-  <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
   <ItemDefinitionGroup>
     <Link>
       <ModuleDefinitionFile>EAPMethod.def</ModuleDefinitionFile>
