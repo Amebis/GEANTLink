@@ -53,6 +53,9 @@
     <Import Project="..\..\..\include\$(Configuration).props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <OutDir>..\..\..\output\$(Platform).$(Configuration)\</OutDir>
+  </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>..\..\Events\build\temp\Events.$(Platform).$(Configuration).$(PlatformToolset);..\..\WinStd\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
