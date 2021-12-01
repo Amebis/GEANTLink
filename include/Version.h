@@ -17,12 +17,6 @@
 #pragma once
 
 //
-// Product version as a single DWORD
-// Note: Used for version comparison within C/C++ code.
-//
-#define PRODUCT_VERSION          0x01030400
-
-//
 // Product version by components
 // Note: Resource Compiler has limited preprocessing capability,
 // thus we need to specify major, minor and other version components

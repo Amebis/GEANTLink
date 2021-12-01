@@ -92,8 +92,12 @@ DWORD WINAPI EapPeerGetInfo(EAP_TYPE* pEapType, EAP_PEER_METHOD_ROUTINES* pEapPe
     if (pEapType->type != EAPMETHOD_TYPE)
         return dwResult = ERROR_NOT_SUPPORTED;
 
-    pEapPeerMethodRoutines->dwVersion                    = PRODUCT_VERSION;
-    pEapPeerMethodRoutines->pEapType                     = NULL;
+    pEapPeerMethodRoutines->dwVersion =
+        ((PRODUCT_VERSION_MAJ   & 0xff) << 24) |
+        ((PRODUCT_VERSION_MIN   & 0xff) << 16) |
+        ((PRODUCT_VERSION_REV   & 0xff) <<  8) |
+         (PRODUCT_VERSION_BUILD & 0xff);
+    pEapPeerMethodRoutines->pEapType = NULL;
 
     pEapPeerMethodRoutines->EapPeerInitialize            = EapPeerInitialize;
     pEapPeerMethodRoutines->EapPeerShutdown              = EapPeerShutdown;
