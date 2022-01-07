@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!--
     SPDX-License-Identifier: GPL-3.0-or-later
-    Copyright © 1991-2021 Amebis
+    Copyright © 1991-2022 Amebis
     Copyright © 2016 GÉANT
 -->
 <package>
 	<job id="MkLnk">
 		<runtime>
-			<description>Creates shortcut to a program - Copyright © 2015-2021 Amebis</description>
+			<description>Creates shortcut to a program - Copyright © 2015-2022 Amebis</description>
 			<unnamed name="&lt;Shortcut.lnk&gt;" required="true"  helpstring="Shortcut file to create"/>
 			<unnamed name="&lt;Target&gt;"       required="true"  helpstring="Target file the shortcut invokes"/>
 			<named name="A" type="string"        required="false" helpstring="Command line arguments"/>
