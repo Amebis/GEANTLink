@@ -452,7 +452,7 @@ void eap::credentials_pass::load(_In_ IXMLDOMNode *pConfigRoot)
 
     if (encryption && CompareStringEx(LOCALE_NAME_INVARIANT, NORM_IGNORECASE, encryption, encryption.length(), _L(PRODUCT_NAME_STR) _L(" v2"), -1, NULL, NULL, 0) == CSTR_EQUAL) {
         // Decode Base64.
-        winstd::base64_dec dec;
+        stdex::base64_dec dec;
         bool is_last;
         vector<unsigned char> password_enc;
         dec.decode(password_enc, is_last, (BSTR)password, password.length());
@@ -466,7 +466,7 @@ void eap::credentials_pass::load(_In_ IXMLDOMNode *pConfigRoot)
         m_enc_alg  = enc_alg_t::native;
     } else if (encryption && CompareStringEx(LOCALE_NAME_INVARIANT, NORM_IGNORECASE, encryption, encryption.length(), _L(PRODUCT_NAME_STR), -1, NULL, NULL, 0) == CSTR_EQUAL) {
         // Decode Base64.
-        winstd::base64_dec dec;
+        stdex::base64_dec dec;
         bool is_last;
         vector<unsigned char> password_enc;
         dec.decode(password_enc, is_last, (BSTR)password, password.length());

@@ -544,8 +544,8 @@ namespace eapxml
 
 #pragma once
 
-#include <WinStd/Base64.h>
 #include <WinStd/Hex.h>
+#include <stdex/base64>
 
 #include <assert.h>
 
@@ -711,7 +711,7 @@ namespace eapxml
         winstd::bstr bstr;
         HRESULT hr = get_element_value(pXmlParent, bstrElementName, bstr, ppXmlElement);
         if (SUCCEEDED(hr)) {
-            winstd::base64_dec dec;
+            stdex::base64_dec dec;
             bool is_last;
             dec.decode(aValue, is_last, (BSTR)bstr, bstr.length());
         }
@@ -866,7 +866,7 @@ namespace eapxml
     inline HRESULT put_element_base64(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _In_bytecount_(nValueLen) LPCVOID pValue, _In_ SIZE_T nValueLen, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement)
     {
         std::wstring sBase64;
-        winstd::base64_enc enc;
+        stdex::base64_enc enc;
         enc.encode(sBase64, pValue, nValueLen);
         return put_element_value(pDoc, pCurrentDOMNode, bstrElementName, bstrNamespace, winstd::bstr(sBase64), ppXmlElement);
     }
@@ -945,7 +945,7 @@ namespace eapxml
         winstd::bstr bstr;
         HRESULT hr = get_attrib_value(pXmlParent, bstrAttributeName, &bstr);
         if (SUCCEEDED(hr)) {
-            winstd::base64_dec dec;
+            stdex::base64_dec dec;
             bool is_last;
             dec.decode(aValue, is_last, (BSTR)bstr, bstr.length());
         }
@@ -998,7 +998,7 @@ namespace eapxml
     inline HRESULT put_attrib_base64(_In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrAttributeName, _In_bytecount_(nValueLen) LPCVOID pValue, _In_ SIZE_T nValueLen)
     {
         std::wstring sBase64;
-        winstd::base64_enc enc;
+        stdex::base64_enc enc;
         enc.encode(sBase64, pValue, nValueLen);
         return put_attrib_value(pCurrentDOMNode, bstrAttributeName, winstd::bstr(sBase64));
     }

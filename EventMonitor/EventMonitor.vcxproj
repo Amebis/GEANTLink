@@ -58,7 +58,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>..\lib\Events\build\temp\Events.$(Platform).$(Configuration).$(PlatformToolset);..\lib\WinStd\include;..\lib\wxExtend\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\lib\Events\build\temp\Events.$(Platform).$(Configuration).$(PlatformToolset);..\lib\WinStd\include;..\lib\stdex\include;..\lib\wxExtend\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>

@@ -58,7 +58,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\Events\build\temp\Events.$(Platform).$(Configuration).$(PlatformToolset);..\..\WinStd\include;..\..\wxExtend\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\Events\build\temp\Events.$(Platform).$(Configuration).$(PlatformToolset);..\..\WinStd\include;..\..\stdex\include;..\..\wxExtend\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -7,6 +7,7 @@
 #include "PCH.h"
 
 using namespace std;
+using namespace stdex;
 using namespace winstd;
 
 class module_dummy : public eap::module {

@@ -11,8 +11,8 @@
 #include "../lib/EAPBase/include/Module.h"
 
 #include <WinStd/Common.h>
-#include <WinStd/Base64.h>
 #include <WinStd/Win.h>
+#include <stdex/base64>
 
 #include <Windows.h>
 #include <eaptypes.h> // Must include after <Windows.h>

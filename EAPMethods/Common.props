@@ -10,7 +10,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir);..\lib\Events\build\temp\Events.$(Platform).$(Configuration).$(PlatformToolset);..\lib\WinStd\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);..\lib\Events\build\temp\Events.$(Platform).$(Configuration).$(PlatformToolset);..\lib\WinStd\include;..\lib\stdex\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>

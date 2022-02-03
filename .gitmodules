@@ -7,3 +7,6 @@
 [submodule "lib/wxExtend"]
 	path = lib/wxExtend
 	url = https://github.com/Amebis/wxExtend.git
+[submodule "lib/stdex"]
+	path = lib/stdex
+	url = https://github.com/Amebis/stdex.git
