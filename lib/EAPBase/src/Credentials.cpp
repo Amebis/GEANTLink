@@ -292,7 +292,7 @@ eap::credentials::source_t eap::credentials_identity::combine(
     if (cred_cached) {
         // Using EAP service cached credentials.
         *this = *dynamic_cast<const credentials_identity*>(cred_cached);
-        m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CACHED2, event_data((unsigned int)cfg.get_method_id()), event_data(credentials_identity::get_name()), event_data(pszTargetName), event_data::blank);
+        m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CACHED2, event_data((unsigned int)cfg.get_method_id()), event_data(credentials_identity::get_name()), event_data(pszTargetName), blank_event_data);
         return source_t::cache;
     }
 
@@ -300,7 +300,7 @@ eap::credentials::source_t eap::credentials_identity::combine(
     if (cfg_with_cred && cfg_with_cred->m_use_cred) {
         // Using configured credentials.
         *this = *dynamic_cast<const credentials_identity*>(cfg_with_cred->m_cred.get());
-        m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CONFIG2, event_data((unsigned int)cfg.get_method_id()), event_data(credentials_identity::get_name()), event_data(pszTargetName), event_data::blank);
+        m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CONFIG2, event_data((unsigned int)cfg.get_method_id()), event_data(credentials_identity::get_name()), event_data(pszTargetName), blank_event_data);
         return source_t::config;
     }
 
@@ -311,7 +311,7 @@ eap::credentials::source_t eap::credentials_identity::combine(
 
             // Using stored credentials.
             *this = std::move(cred_loaded);
-            m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_STORED2, event_data((unsigned int)cfg.get_method_id()), event_data(credentials_identity::get_name()), event_data(pszTargetName), event_data::blank);
+            m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_STORED2, event_data((unsigned int)cfg.get_method_id()), event_data(credentials_identity::get_name()), event_data(pszTargetName), blank_event_data);
             return source_t::storage;
         } catch (...) {
             // Not actually an error.
@@ -609,7 +609,7 @@ eap::credentials::source_t eap::credentials_pass::combine(
     if (cred_cached) {
         // Using EAP service cached credentials.
         *this = *dynamic_cast<const credentials_pass*>(cred_cached);
-        m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CACHED2, event_data((unsigned int)cfg.get_method_id()), event_data(credentials_pass::get_name()), event_data(pszTargetName), event_data::blank);
+        m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CACHED2, event_data((unsigned int)cfg.get_method_id()), event_data(credentials_pass::get_name()), event_data(pszTargetName), blank_event_data);
         return source_t::cache;
     }
 
@@ -617,7 +617,7 @@ eap::credentials::source_t eap::credentials_pass::combine(
     if (cfg_with_cred && cfg_with_cred->m_use_cred) {
         // Using configured credentials.
         *this = *dynamic_cast<const credentials_pass*>(cfg_with_cred->m_cred.get());
-        m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CONFIG2, event_data((unsigned int)cfg.get_method_id()), event_data(credentials_pass::get_name()), event_data(pszTargetName), event_data::blank);
+        m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CONFIG2, event_data((unsigned int)cfg.get_method_id()), event_data(credentials_pass::get_name()), event_data(pszTargetName), blank_event_data);
         return source_t::config;
     }
 
@@ -628,7 +628,7 @@ eap::credentials::source_t eap::credentials_pass::combine(
 
             // Using stored credentials.
             *this = std::move(cred_loaded);
-            m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_STORED2, event_data((unsigned int)cfg.get_method_id()), event_data(credentials_pass::get_name()), event_data(pszTargetName), event_data::blank);
+            m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_STORED2, event_data((unsigned int)cfg.get_method_id()), event_data(credentials_pass::get_name()), event_data(pszTargetName), blank_event_data);
             return source_t::storage;
         } catch (...) {
             // Not actually an error.

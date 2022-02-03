@@ -90,7 +90,7 @@ void eap::method_mschapv2_base::process_success(_In_ const list<string> &argv)
             if (resp.size() != sizeof(resp_exp) || memcmp(resp.data(), &resp_exp, sizeof(resp_exp)) != 0)
                 throw invalid_argument(__FUNCTION__ " MS-CHAP2-Success authentication response string failed.");
 
-            m_module.log_event(&EAPMETHOD_METHOD_SUCCESS, event_data((unsigned int)m_cfg.get_method_id()), event_data::blank);
+            m_module.log_event(&EAPMETHOD_METHOD_SUCCESS, event_data((unsigned int)m_cfg.get_method_id()), blank_event_data);
             is_success = true;
         }
     }
@@ -107,7 +107,7 @@ void eap::method_mschapv2_base::process_error(_In_ const list<string> &argv)
         const string &val = *arg;
         if ((val[0] == 'E' || val[0] == 'e') && val[1] == '=') {
             DWORD dwResult = strtoul(val.data() + 2, NULL, 10);
-            m_module.log_event(&EAPMETHOD_METHOD_FAILURE_ERROR, event_data((unsigned int)m_cfg.get_method_id()), event_data(dwResult), event_data::blank);
+            m_module.log_event(&EAPMETHOD_METHOD_FAILURE_ERROR, event_data((unsigned int)m_cfg.get_method_id()), event_data(dwResult), blank_event_data);
             switch (dwResult) {
             case ERROR_ACCT_DISABLED         : m_cfg.m_last_status = config_method::status_t::account_disabled   ; break;
             case ERROR_RESTRICTED_LOGON_HOURS: m_cfg.m_last_status = config_method::status_t::account_logon_hours; break;
@@ -122,7 +122,7 @@ void eap::method_mschapv2_base::process_error(_In_ const list<string> &argv)
             dec.decode(m_challenge_server, is_last, val.data() + 2, (size_t)-1);
         } else if ((val[0] == 'M' || val[0] == 'm') && val[1] == '=') {
             MultiByteToWideChar(CP_UTF8, 0, val.data() + 2, (int)val.length() - 2, m_cfg.m_last_msg);
-            m_module.log_event(&EAPMETHOD_METHOD_FAILURE_ERROR1, event_data((unsigned int)m_cfg.get_method_id()), event_data(m_cfg.m_last_msg), event_data::blank);
+            m_module.log_event(&EAPMETHOD_METHOD_FAILURE_ERROR1, event_data((unsigned int)m_cfg.get_method_id()), event_data(m_cfg.m_last_msg), blank_event_data);
         }
     }
 }
@@ -185,7 +185,7 @@ EapPeerMethodResponseAction eap::method_mschapv2::process_request_packet(
 
         switch (hdr->code) {
         case chap_packet_code_t::challenge: {
-            m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_t::mschapv2), event_data::blank);
+            m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_t::mschapv2), blank_event_data);
 
             if (msg + 1 > msg_end)
                 throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Incomplete CHAP challenge packet.");
@@ -282,7 +282,7 @@ EapPeerMethodResponseAction eap::method_mschapv2_diameter::process_request_packe
 
     switch (m_phase) {
     case phase_t::init: {
-        m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_t::legacy_mschapv2), event_data::blank);
+        m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_t::legacy_mschapv2), blank_event_data);
 
         // Randomize Peer-Challenge.
         m_challenge_client.randomize(m_cp);

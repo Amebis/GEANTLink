@@ -19,7 +19,7 @@ eap::module::module(_In_ eap_type_t eap_method) :
     m_instance(NULL)
 {
     m_ep.create(&EAPMETHOD_TRACE_EVENT_PROVIDER);
-    m_ep.write(&EAPMETHOD_TRACE_EVT_MODULE_LOAD, event_data((unsigned int)m_eap_method), event_data::blank);
+    m_ep.write(&EAPMETHOD_TRACE_EVT_MODULE_LOAD, event_data((unsigned int)m_eap_method), blank_event_data);
 
     m_heap.create(0, 0, 0);
 }
@@ -27,7 +27,7 @@ eap::module::module(_In_ eap_type_t eap_method) :
 
 eap::module::~module()
 {
-    m_ep.write(&EAPMETHOD_TRACE_EVT_MODULE_UNLOAD, event_data((unsigned int)m_eap_method), event_data::blank);
+    m_ep.write(&EAPMETHOD_TRACE_EVT_MODULE_UNLOAD, event_data((unsigned int)m_eap_method), blank_event_data);
 }
 
 
@@ -367,7 +367,7 @@ void eap::peer::get_identity(
         // Credentials missing or incomplete.
         if ((dwFlags & EAP_FLAG_MACHINE_AUTH) == 0) {
             // Per-user authentication, request UI.
-            log_event(&EAPMETHOD_TRACE_EVT_CRED_INVOKE_UI2, event_data::blank);
+            log_event(&EAPMETHOD_TRACE_EVT_CRED_INVOKE_UI2, blank_event_data);
             *ppUserDataOut = NULL;
             *pdwUserDataOutSize = 0;
             *pfInvokeUI = TRUE;
@@ -381,7 +381,7 @@ void eap::peer::get_identity(
 
     // Build our identity. ;)
     wstring identity(std::move(cfg_method->get_public_identity(*cred_out.m_cred.get())));
-    log_event(&EAPMETHOD_TRACE_EVT_CRED_OUTER_ID1, event_data((unsigned int)cfg_method->get_method_id()), event_data(identity), event_data::blank);
+    log_event(&EAPMETHOD_TRACE_EVT_CRED_OUTER_ID1, event_data((unsigned int)cfg_method->get_method_id()), event_data(identity), blank_event_data);
     size_t size = sizeof(WCHAR)*(identity.length() + 1);
     *ppwszIdentity = (WCHAR*)alloc_memory(size);
     memcpy(*ppwszIdentity, identity.c_str(), size);

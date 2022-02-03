@@ -43,14 +43,14 @@ EapPeerMethodResponseAction eap::method_gtc::process_request_packet(
 {
     assert(pReceivedPacket || dwReceivedPacketSize == 0);
 
-    m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_t::gtc), event_data::blank);
+    m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_t::gtc), blank_event_data);
 
     credentials_pass *cred_pass;
     if (dynamic_cast<credentials_identity*>(&m_cred)) {
         // Read authenticator challenge as UTF-8 encoded string.
         MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)pReceivedPacket, dwReceivedPacketSize, m_challenge);
 
-        m_module.log_event(&EAPMETHOD_GTC_RESPONSE_REQ, event_data((unsigned int)eap_type_t::gtc), event_data::blank);
+        m_module.log_event(&EAPMETHOD_GTC_RESPONSE_REQ, event_data((unsigned int)eap_type_t::gtc), blank_event_data);
 
         // User must respond to the challenge.
         return EapPeerMethodResponseActionInvokeUI;
@@ -110,7 +110,7 @@ EapPeerMethodResponseAction eap::method_gtc::set_ui_context(
     _In_count_(dwUIContextDataSize) const BYTE  *pUIContextData,
     _In_                                  DWORD dwUIContextDataSize)
 {
-    m_module.log_event(&EAPMETHOD_GTC_RESPONSE, event_data((unsigned int)eap_type_t::gtc), event_data::blank);
+    m_module.log_event(&EAPMETHOD_GTC_RESPONSE, event_data((unsigned int)eap_type_t::gtc), blank_event_data);
 
     // Save GTC response.
     m_response.assign(

@@ -49,7 +49,7 @@ EapPeerMethodResponseAction eap::method_pap_diameter::process_request_packet(
 
     switch (m_phase) {
     case phase_t::init: {
-        m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_t::legacy_pap), event_data::blank);
+        m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)eap_type_t::legacy_pap), blank_event_data);
 
         // Convert username and password to UTF-8.
         sanitizing_string identity_utf8, password_utf8;

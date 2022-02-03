@@ -220,7 +220,7 @@ eap::credentials::source_t eap::credentials_eaphost::combine(
     if (cred_cached) {
         // Using EAP service cached credentials.
         *this = *dynamic_cast<const credentials_eaphost*>(cred_cached);
-        m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CACHED2, event_data((unsigned int)cfg.get_method_id()), event_data(get_name()), event_data(pszTargetName), event_data::blank);
+        m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CACHED2, event_data((unsigned int)cfg.get_method_id()), event_data(get_name()), event_data(pszTargetName), blank_event_data);
         src = source_t::cache;
     }
 
@@ -232,7 +232,7 @@ eap::credentials::source_t eap::credentials_eaphost::combine(
         if (cfg_with_cred && cfg_with_cred->m_use_cred) {
             // Using configured credentials.
             *this = *dynamic_cast<const credentials_eaphost*>(cfg_with_cred->m_cred.get());
-            m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CONFIG2, event_data((unsigned int)cfg.get_method_id()), event_data(credentials_eaphost::get_name()), event_data(pszTargetName), event_data::blank);
+            m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CONFIG2, event_data((unsigned int)cfg.get_method_id()), event_data(credentials_eaphost::get_name()), event_data(pszTargetName), blank_event_data);
             src = source_t::config;
         }
     }
@@ -244,7 +244,7 @@ eap::credentials::source_t eap::credentials_eaphost::combine(
 
             // Using stored credentials.
             *this = std::move(cred_loaded);
-            m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_STORED2, event_data((unsigned int)cfg.get_method_id()), event_data(get_name()), event_data(pszTargetName), event_data::blank);
+            m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_STORED2, event_data((unsigned int)cfg.get_method_id()), event_data(get_name()), event_data(pszTargetName), blank_event_data);
             src = source_t::storage;
         } catch (...) {
             // Not actually an error.
@@ -276,7 +276,7 @@ eap::credentials::source_t eap::credentials_eaphost::combine(
             BYTE *_cred_data = cred_data.get();
             m_cred_blob.assign(_cred_data, _cred_data + cred_data_size);
             SecureZeroMemory(_cred_data, cred_data_size);
-            m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_EAPHOST, event_data((unsigned int)cfg.get_method_id()), event_data(get_name()), event_data(pszTargetName), event_data::blank);
+            m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_EAPHOST, event_data((unsigned int)cfg.get_method_id()), event_data(get_name()), event_data(pszTargetName), blank_event_data);
             return source_t::lower;
         } else
             SecureZeroMemory(cred_data.get(), cred_data_size);
@@ -285,7 +285,7 @@ eap::credentials::source_t eap::credentials_eaphost::combine(
         m_module.log_error(error.get());
     } else {
         // A runtime error in inner EAP method occurred.
-        m_module.log_event(&EAPMETHOD_TRACE_EVT_WIN_ERROR, event_data((unsigned int)dwResult), event_data(__FUNCTION__ " EapHostPeerGetIdentity failed."), event_data::blank);
+        m_module.log_event(&EAPMETHOD_TRACE_EVT_WIN_ERROR, event_data((unsigned int)dwResult), event_data(__FUNCTION__ " EapHostPeerGetIdentity failed."), blank_event_data);
     }
 
     return source_t::unknown;

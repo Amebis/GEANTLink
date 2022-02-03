@@ -70,7 +70,7 @@ _Success_(return != 0) const eap::config_method_with_cred* eap::peer_tls_tunnel:
 
         // Get method configuration.
         if (cfg_prov->m_methods.empty()) {
-            log_event(&EAPMETHOD_TRACE_EVT_CRED_NO_METHOD, event_data(target_name), event_data::blank);
+            log_event(&EAPMETHOD_TRACE_EVT_CRED_NO_METHOD, event_data(target_name), blank_event_data);
             continue;
         }
         const config_method_tls_tunnel *cfg_method = dynamic_cast<const config_method_tls_tunnel*>(cfg_prov->m_methods.front().get());
@@ -95,7 +95,7 @@ _Success_(return != 0) const eap::config_method_with_cred* eap::peer_tls_tunnel:
             *cfg_method,
             cfg_method->m_allow_save ? _target_name : NULL);
         if (src_outer == eap::credentials::source_t::unknown) {
-            log_event(&EAPMETHOD_TRACE_EVT_CRED_UNKNOWN3, event_data(target_name), event_data((unsigned int)eap_type_t::tls), event_data::blank);
+            log_event(&EAPMETHOD_TRACE_EVT_CRED_UNKNOWN3, event_data(target_name), event_data((unsigned int)eap_type_t::tls), blank_event_data);
             continue;
         }
 
@@ -110,7 +110,7 @@ _Success_(return != 0) const eap::config_method_with_cred* eap::peer_tls_tunnel:
             *cfg_method->m_inner,
             cfg_method->m_inner->m_allow_save ? _target_name : NULL);
         if (src_inner == eap::credentials::source_t::unknown) {
-            log_event(&EAPMETHOD_TRACE_EVT_CRED_UNKNOWN3, event_data(target_name), event_data((unsigned int)cfg_method->m_inner->get_method_id()), event_data::blank);
+            log_event(&EAPMETHOD_TRACE_EVT_CRED_UNKNOWN3, event_data(target_name), event_data((unsigned int)cfg_method->m_inner->get_method_id()), blank_event_data);
             continue;
         }
 
@@ -119,13 +119,13 @@ _Success_(return != 0) const eap::config_method_with_cred* eap::peer_tls_tunnel:
         if ((dwFlags & EAP_FLAG_MACHINE_AUTH) == 0) {
             if (config_method::status_t::cred_begin <= cfg_method->m_last_status && cfg_method->m_last_status < config_method::status_t::cred_end) {
                 // Outer: Credentials failed on last connection attempt.
-                log_event(&EAPMETHOD_TRACE_EVT_CRED_PROBLEM2, event_data(target_name), event_data((unsigned int)eap_type_t::tls), event_data((unsigned int)cfg_method->m_last_status), event_data::blank);
+                log_event(&EAPMETHOD_TRACE_EVT_CRED_PROBLEM2, event_data(target_name), event_data((unsigned int)eap_type_t::tls), event_data((unsigned int)cfg_method->m_last_status), blank_event_data);
                 continue;
             }
 
             if (config_method::status_t::cred_begin <= cfg_method->m_inner->m_last_status && cfg_method->m_inner->m_last_status < config_method::status_t::cred_end) {
                 // Inner: Credentials failed on last connection attempt.
-                log_event(&EAPMETHOD_TRACE_EVT_CRED_PROBLEM2, event_data(target_name), event_data((unsigned int)cfg_method->m_inner->get_method_id()), event_data((unsigned int)cfg_method->m_inner->m_last_status), event_data::blank);
+                log_event(&EAPMETHOD_TRACE_EVT_CRED_PROBLEM2, event_data(target_name), event_data((unsigned int)cfg_method->m_inner->get_method_id()), event_data((unsigned int)cfg_method->m_inner->m_last_status), blank_event_data);
                 continue;
             }
         }

@@ -57,7 +57,7 @@ EapPeerMethodResponseAction eap::method_defrag::process_request_packet(
         m_module.log_event(&EAPMETHOD_DEFRAG_VERSION,
             event_data(m_version),
             event_data(data_version),
-            event_data::blank);
+            blank_event_data);
         m_phase = phase_t::established;
     } else if (data_version != m_version)
         throw win_runtime_error(EAP_E_EAPHOST_METHOD_INVALID_PACKET, __FUNCTION__ " Protocol version mismatch.");
@@ -272,7 +272,7 @@ EapPeerMethodResponseAction eap::method_tls::process_request_packet(
 
     switch (m_phase) {
     case phase_t::handshake_init: {
-        m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)m_cfg.get_method_id()), event_data::blank);
+        m_module.log_event(&EAPMETHOD_METHOD_HANDSHAKE_START2, event_data((unsigned int)m_cfg.get_method_id()), blank_event_data);
 
         // Prepare input buffer(s).
         SecBuffer buf_in[] = {
@@ -416,7 +416,7 @@ EapPeerMethodResponseAction eap::method_tls::process_request_packet(
             } else {
                 SecPkgContext_Authority auth;
                 if (FAILED(status = QueryContextAttributes(m_sc_ctx, SECPKG_ATTR_AUTHORITY, &auth))) {
-                    m_module.log_event(&EAPMETHOD_TLS_QUERY_FAILED, event_data((unsigned int)SECPKG_ATTR_AUTHORITY), event_data(status), event_data::blank);
+                    m_module.log_event(&EAPMETHOD_TLS_QUERY_FAILED, event_data((unsigned int)SECPKG_ATTR_AUTHORITY), event_data(status), blank_event_data);
                     auth.sAuthorityName = _T("");
                 }
 
@@ -432,9 +432,9 @@ EapPeerMethodResponseAction eap::method_tls::process_request_packet(
                         event_data(info.dwHashStrength),
                         event_data(info.aiExch),
                         event_data(info.dwExchStrength),
-                        event_data::blank);
+                        blank_event_data);
                 else
-                    m_module.log_event(&EAPMETHOD_TLS_QUERY_FAILED, event_data((unsigned int)SECPKG_ATTR_CONNECTION_INFO), event_data(status), event_data::blank);
+                    m_module.log_event(&EAPMETHOD_TLS_QUERY_FAILED, event_data((unsigned int)SECPKG_ATTR_CONNECTION_INFO), event_data(status), blank_event_data);
 
                 m_phase = phase_t::finished;
                 m_cfg.m_last_status = config_method::status_t::auth_failed; // Blame protocol if we fail beyond this point.
@@ -557,7 +557,7 @@ void eap::method_tls::get_result(
         m_eap_attr.push_back(std::move(a));
 
         // Append blank EAP attribute.
-        m_eap_attr.push_back(eap_attr::blank);
+        m_eap_attr.push_back(blank_eap_attr);
 
         m_eap_attr_desc.dwNumberOfAttributes = (DWORD)m_eap_attr.size();
         m_eap_attr_desc.pAttribs = m_eap_attr.data();
@@ -651,7 +651,7 @@ void eap::method_tls::verify_server_trust() const
             memcmp(m_sc_cert->pbCertEncoded, (*c)->pbCertEncoded, m_sc_cert->cbCertEncoded) == 0)
         {
             // Server certificate found directly on the trusted root CA list.
-            m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_TRUSTED_EX1, event_data((unsigned int)m_cfg.get_method_id()), event_data::blank);
+            m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_TRUSTED_EX1, event_data((unsigned int)m_cfg.get_method_id()), blank_event_data);
             return;
         }
     }
@@ -700,7 +700,7 @@ void eap::method_tls::verify_server_trust() const
                     if (san_info->rgAltEntry[idx_entry].dwAltNameChoice == CERT_ALT_NAME_DNS_NAME &&
                         _wcsicmp(s->c_str(), san_info->rgAltEntry[idx_entry].pwszDNSName) == 0)
                     {
-                        m_module.log_event(&EAPMETHOD_TLS_SERVER_NAME_TRUSTED2, event_data((unsigned int)m_cfg.get_method_id()), event_data(san_info->rgAltEntry[idx_entry].pwszDNSName), event_data::blank);
+                        m_module.log_event(&EAPMETHOD_TLS_SERVER_NAME_TRUSTED2, event_data((unsigned int)m_cfg.get_method_id()), event_data(san_info->rgAltEntry[idx_entry].pwszDNSName), blank_event_data);
                         found = true;
                     }
                 }
@@ -715,7 +715,7 @@ void eap::method_tls::verify_server_trust() const
 
             for (auto s = m_cfg.m_server_names.cbegin(), s_end = m_cfg.m_server_names.cend(); !found && s != s_end; ++s) {
                 if (_wcsicmp(s->c_str(), subj.c_str()) == 0) {
-                    m_module.log_event(&EAPMETHOD_TLS_SERVER_NAME_TRUSTED2, event_data((unsigned int)m_cfg.get_method_id()), event_data(subj), event_data::blank);
+                    m_module.log_event(&EAPMETHOD_TLS_SERVER_NAME_TRUSTED2, event_data((unsigned int)m_cfg.get_method_id()), event_data(subj), blank_event_data);
                     found = true;
                 }
             }
@@ -805,7 +805,7 @@ void eap::method_tls::verify_server_trust() const
         }
     }
 
-    m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_TRUSTED1, event_data((unsigned int)m_cfg.get_method_id()), event_data::blank);
+    m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_TRUSTED1, event_data((unsigned int)m_cfg.get_method_id()), blank_event_data);
 }
 
 #endif

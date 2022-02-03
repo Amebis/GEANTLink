@@ -235,7 +235,7 @@ eap::credentials::source_t eap::credentials_tls::combine(
     if (cred_cached) {
         // Using EAP service cached credentials.
         *this = *dynamic_cast<const credentials_tls*>(cred_cached);
-        m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CACHED2, event_data((unsigned int)eap_type_t::tls), event_data(credentials_tls::get_name()), event_data(pszTargetName), event_data::blank);
+        m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CACHED2, event_data((unsigned int)eap_type_t::tls), event_data(credentials_tls::get_name()), event_data(pszTargetName), blank_event_data);
         return source_t::cache;
     }
 
@@ -243,7 +243,7 @@ eap::credentials::source_t eap::credentials_tls::combine(
     if (cfg_with_cred && cfg_with_cred->m_use_cred) {
         // Using configured credentials.
         *this = *dynamic_cast<const credentials_tls*>(cfg_with_cred->m_cred.get());
-        m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CONFIG2, event_data((unsigned int)eap_type_t::tls), event_data(credentials_tls::get_name()), event_data(pszTargetName), event_data::blank);
+        m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_CONFIG2, event_data((unsigned int)eap_type_t::tls), event_data(credentials_tls::get_name()), event_data(pszTargetName), blank_event_data);
         return source_t::config;
     }
 
@@ -254,7 +254,7 @@ eap::credentials::source_t eap::credentials_tls::combine(
 
             // Using stored credentials.
             *this = std::move(cred_loaded);
-            m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_STORED2, event_data((unsigned int)eap_type_t::tls), event_data(credentials_tls::get_name()), event_data(pszTargetName), event_data::blank);
+            m_module.log_event(&EAPMETHOD_TRACE_EVT_CRED_STORED2, event_data((unsigned int)eap_type_t::tls), event_data(credentials_tls::get_name()), event_data(pszTargetName), blank_event_data);
             return source_t::storage;
         } catch (...) {
             // Not actually an error.

@@ -74,11 +74,6 @@
     <ResourceCompile Include="WLANManager.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\lib\WinStd\build\WinStd.vcxproj">
-      <Project>{47399d91-7eb9-41de-b521-514ba5db0c43}</Project>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="locale\bg_BG.po" />
     <None Include="locale\ca_ES.po" />
     <None Include="locale\cs_CZ.po" />

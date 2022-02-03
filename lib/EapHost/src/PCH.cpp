@@ -5,3 +5,5 @@
 */
 
 #include "PCH.h"
+
+#pragma comment(lib, "Eappcfg.lib")
