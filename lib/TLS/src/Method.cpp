@@ -9,6 +9,7 @@
 #pragma comment(lib, "Secur32.lib")
 
 using namespace std;
+using namespace stdex;
 using namespace winstd;
 
 
