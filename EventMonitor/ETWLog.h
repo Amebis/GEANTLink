@@ -31,6 +31,7 @@ class wxPersistentETWListCtrl;
 #include <wx/persist/window.h>
 #include <wx/thread.h>
 
+#include <stdex/vector_queue>
 #include <WinStd/ETW.h>
 
 #include <memory>
@@ -307,8 +308,8 @@ protected:
     guidset m_sources;                                  ///< Set of enabled sources
 
     wxListItemAttr m_item_attr[2][4];                   ///< Current item attributes
-    winstd::vector_queue<winstd::event_rec> m_rec_db;   ///< Event record database
-    winstd::vector_queue<size_t> m_rec_idx;             ///< Event record database indices of shown records
+    stdex::vector_queue<winstd::event_rec> m_rec_db;    ///< Event record database
+    stdex::vector_queue<size_t> m_rec_idx;              ///< Event record database indices of shown records
 
     size_t m_col_format_width[5];                       ///< Column widths for pre-formatted row display (0 = unlimited)
 };
