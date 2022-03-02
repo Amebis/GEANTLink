@@ -96,8 +96,8 @@ namespace eap
 
         public:
             module &m_module;                  ///< Module
-            winstd::win_handle<NULL> m_thread; ///< Thread
-            winstd::win_handle<NULL> m_abort;  ///< Thread abort event
+            winstd::thread m_thread;           ///< Thread
+            winstd::event m_abort;             ///< Thread abort event
             winstd::cert_context m_cert;       ///< Server certificate
         };
 

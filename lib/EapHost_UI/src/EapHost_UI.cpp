@@ -31,8 +31,8 @@ wxEapHostMethodConfigPanel::wxEapHostMethodConfigPanel(const eap::config_provide
     UNREFERENCED_PARAMETER(prov);
 
     // Load and set icon.
-    winstd::library lib_shell32;
-    if (lib_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
+    winstd::library lib_shell32(LoadLibraryEx(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE));
+    if (!!lib_shell32)
         m_method_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(175)));
 
     winstd::eap_method_info_array methods;

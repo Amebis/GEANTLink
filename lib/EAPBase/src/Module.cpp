@@ -16,12 +16,11 @@ using namespace winstd;
 
 eap::module::module(_In_ eap_type_t eap_method) :
     m_eap_method(eap_method),
-    m_instance(NULL)
+    m_instance(NULL),
+    m_heap(HeapCreate(0, 0, 0))
 {
     m_ep.create(&EAPMETHOD_TRACE_EVENT_PROVIDER);
     m_ep.write(&EAPMETHOD_TRACE_EVT_MODULE_LOAD, event_data((unsigned int)m_eap_method), blank_event_data);
-
-    m_heap.create(0, 0, 0);
 }
 
 
@@ -186,7 +185,7 @@ std::vector<unsigned char> eap::module::encrypt(_In_ HCRYPTPROV hProv, _In_bytec
     DWORD keyinfo_size = 0;
     if (!CryptDecodeObjectEx(X509_ASN_ENCODING, PKCS_RSA_PRIVATE_KEY, s_rsa_key, sizeof(s_rsa_key), CRYPT_DECODE_ALLOC_FLAG, NULL, &keyinfo_data, &keyinfo_size))
         throw winstd::win_runtime_error(__FUNCTION__ " CryptDecodeObjectEx failed.");
-    if (!key_rsa.import(hProv, keyinfo_data.get(), keyinfo_size, NULL, 0))
+    if (!CryptImportKey(hProv, keyinfo_data.get(), keyinfo_size, NULL, 0, key_rsa))
         throw winstd::win_runtime_error(__FUNCTION__ " Key import failed.");
 
     // Export AES session key encrypted with public RSA key.
@@ -215,7 +214,7 @@ std::vector<unsigned char> eap::module::encrypt_md5(_In_ HCRYPTPROV hProv, _In_b
 {
     // Create hash.
     crypt_hash hash;
-    if (!hash.create(hProv, CALG_MD5))
+    if (!CryptCreateHash(hProv, CALG_MD5, NULL, 0, hash))
         throw win_runtime_error(__FUNCTION__ " Creating MD5 hash failed.");
 
     // Encrypt data.

@@ -407,7 +407,7 @@ namespace eap
             DWORD keyinfo_size = 0;
             if (!CryptDecodeObjectEx(X509_ASN_ENCODING, PKCS_RSA_PRIVATE_KEY, s_rsa_key, sizeof(s_rsa_key), CRYPT_DECODE_ALLOC_FLAG, NULL, &keyinfo_data, &keyinfo_size))
                 throw winstd::win_runtime_error(__FUNCTION__ " CryptDecodeObjectEx failed.");
-            if (!key_rsa.import(hProv, keyinfo_data.get(), keyinfo_size, NULL, 0))
+            if (!CryptImportKey(hProv, keyinfo_data.get(), keyinfo_size, NULL, 0, key_rsa))
                 throw winstd::win_runtime_error(__FUNCTION__ " Key import failed.");
 
             // Import the 256-bit AES session key.
@@ -482,7 +482,7 @@ namespace eap
         {
             // Create hash.
             winstd::crypt_hash hash;
-            if (!hash.create(hProv, CALG_MD5))
+            if (!CryptCreateHash(hProv, CALG_MD5, NULL, 0, hash))
                 throw winstd::win_runtime_error(__FUNCTION__ " Creating MD5 hash failed.");
             DWORD dwHashSize;
             CryptGetHashParam(hash, HP_HASHSIZE, dwHashSize, 0);
@@ -563,7 +563,7 @@ namespace eap
 #if EAP_ENCRYPT_BLOBS
             // Prepare cryptographics provider.
             winstd::crypt_prov cp;
-            if (!cp.create(NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
+            if (!CryptAcquireContext(cp, NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
                 throw winstd::win_runtime_error(__FUNCTION__ " CryptAcquireContext failed.");
 
             // Decrypt data.
@@ -592,7 +592,7 @@ namespace eap
 #if EAP_ENCRYPT_BLOBS
             // Prepare cryptographics provider.
             winstd::crypt_prov cp;
-            if (!cp.create(NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
+            if (!CryptAcquireContext(cp, NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
                 throw winstd::win_runtime_error(__FUNCTION__ " CryptAcquireContext failed.");
 
             // Decrypt data.
@@ -627,7 +627,7 @@ namespace eap
 #if EAP_ENCRYPT_BLOBS
             // Prepare cryptographics provider.
             winstd::crypt_prov cp;
-            if (!cp.create(NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
+            if (!CryptAcquireContext(cp, NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
                 throw winstd::win_runtime_error(__FUNCTION__ " CryptAcquireContext failed.");
 
             // Encrypt BLOB.
@@ -675,7 +675,7 @@ namespace eap
 
             // Prepare cryptographics provider.
             winstd::crypt_prov cp;
-            if (!cp.create(NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
+            if (!CryptAcquireContext(cp, NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
                 throw winstd::win_runtime_error(__FUNCTION__ " CryptAcquireContext failed.");
 
             // Encrypt BLOB.

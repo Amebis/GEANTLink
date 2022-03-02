@@ -40,13 +40,14 @@ static int MsiUseFeature()
 
     if (nArgs > 2) {
         reg_key key;
-        if (!key.open(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\") _T(VENDOR_NAME_STR) _T("\\") _T(PRODUCT_NAME_STR), 0, KEY_READ)) {
-            OutputDebugStr(_T("Product registry key cannot be opened (error %u).\n"), GetLastError());
+        LSTATUS s = RegOpenKeyEx(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\") _T(VENDOR_NAME_STR) _T("\\") _T(PRODUCT_NAME_STR), 0, KEY_READ, key);
+        if (s != ERROR_SUCCESS) {
+            OutputDebugStr(_T("Product registry key cannot be opened (error %u).\n"), s);
             return 3;
         }
 
         wstring lang;
-        LSTATUS s = RegQueryStringValue(key, _T("Language"), lang);
+        s = RegQueryStringValue(key, _T("Language"), lang);
         if (s != ERROR_SUCCESS) {
             OutputDebugStr(_T("Error reading registry value (error %u).\n"), s);
             return 3;

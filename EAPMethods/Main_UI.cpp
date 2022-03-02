@@ -171,7 +171,7 @@ DWORD WINAPI EapPeerConfigBlob2Xml(
 
     // Create configuration XML document.
     com_obj<IXMLDOMDocument2> pConfigDoc;
-    if (FAILED(hr = pConfigDoc.create(CLSID_DOMDocument60, NULL, CLSCTX_INPROC_SERVER)))
+    if (FAILED(hr = CoCreateInstance(CLSID_DOMDocument60, NULL, CLSCTX_INPROC_SERVER, pConfigDoc)))
         return dwResult = g_peer.log_error(ppEapError, HRESULT_CODE(hr), _T(__FUNCTION__) _T(" Error creating XML document."));
 
     pConfigDoc->put_async(VARIANT_FALSE);

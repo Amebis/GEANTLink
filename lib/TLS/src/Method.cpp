@@ -195,7 +195,8 @@ void eap::method_tls::begin_session(
 #endif
     }
 
-    if (!m_store.create(CERT_STORE_PROV_SYSTEM, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, (HCRYPTPROV)NULL, CERT_SYSTEM_STORE_CURRENT_USER, _T("My")))
+    m_store = CertOpenStore(CERT_STORE_PROV_SYSTEM, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, (HCRYPTPROV)NULL, CERT_SYSTEM_STORE_CURRENT_USER, _T("My"));
+    if (!m_store)
         throw win_runtime_error(__FUNCTION__ " CertOpenStore failed.");
 
     // Prepare client credentials for Schannel.
@@ -372,7 +373,7 @@ EapPeerMethodResponseAction eap::method_tls::process_request_packet(
 
             // Verify cached CRL (entire chain).
             reg_key key;
-            if (key.open(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\") _T(VENDOR_NAME_STR) _T("\\") _T(PRODUCT_NAME_STR) _T("\\TLSCRL"), 0, KEY_READ)) {
+            if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\") _T(VENDOR_NAME_STR) _T("\\") _T(PRODUCT_NAME_STR) _T("\\TLSCRL"), 0, KEY_READ, key) == ERROR_SUCCESS) {
                 wstring hash_unicode;
                 vector<unsigned char> hash, subj;
                 for (cert_context c(m_sc_cert); c;) {
@@ -731,8 +732,8 @@ void eap::method_tls::verify_server_trust() const
         throw sec_runtime_error(SEC_E_CERT_UNKNOWN, __FUNCTION__ " Server is using a self-signed certificate. Cannot trust it.");
 
     // Create temporary certificate store of our trusted root CAs.
-    cert_store store;
-    if (!store.create(CERT_STORE_PROV_MEMORY, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, NULL, 0, NULL))
+    cert_store store(CertOpenStore(CERT_STORE_PROV_MEMORY, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, NULL, 0, NULL));
+    if (!store)
         throw win_runtime_error(__FUNCTION__ " Error creating temporary certificate store.");
     for (auto c = m_cfg.m_trusted_root_ca.cbegin(), c_end = m_cfg.m_trusted_root_ca.cend(); c != c_end; ++c)
         CertAddCertificateContextToStore(store, *c, CERT_STORE_ADD_REPLACE_EXISTING, NULL);
@@ -770,7 +771,7 @@ void eap::method_tls::verify_server_trust() const
 #endif
     };
     cert_chain_context context;
-    if (!context.create(NULL, m_sc_cert, NULL, store, &chain_params, 0))
+    if (!CertGetCertificateChain(NULL, m_sc_cert, NULL, store, &chain_params, 0, NULL, context))
         throw win_runtime_error(__FUNCTION__ " Error creating certificate chain context.");
 
     // Check chain validation error flags. Ignore CERT_TRUST_IS_UNTRUSTED_ROOT flag since we check root CA explicitly.

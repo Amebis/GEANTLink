@@ -202,7 +202,7 @@ DWORD WINAPI eap::peer_tls_base::crl_checker::verify(_In_ crl_checker *obj)
                     // One of the certificates in the chain was revoked as compromised. Black-list it.
                     obj->m_module.log_event(&EAPMETHOD_TLS_SERVER_CERT_REVOKED, event_data((unsigned int)obj->m_module.m_eap_method), event_data(subj), event_data(status_rev.dwReason), blank_event_data);
                     reg_key key;
-                    if (key.create(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\") _T(VENDOR_NAME_STR) _T("\\") _T(PRODUCT_NAME_STR) _T("\\TLSCRL"), NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE)) {
+                    if (RegCreateKeyEx(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\") _T(VENDOR_NAME_STR) _T("\\") _T(PRODUCT_NAME_STR) _T("\\TLSCRL"), NULL, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, key, NULL) == ERROR_SUCCESS) {
                         vector<unsigned char> hash;
                         if (CertGetCertificateContextProperty(cert, CERT_HASH_PROP_ID, hash)) {
                             wstring hash_unicode;

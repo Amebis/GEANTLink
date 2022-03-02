@@ -115,8 +115,8 @@ wxGTCResponsePanel::wxGTCResponsePanel(winstd::sanitizing_wstring &response, con
     m_response_value(response)
 {
     // Load and set icon.
-    winstd::library lib_shell32;
-    if (lib_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
+    winstd::library lib_shell32(LoadLibraryEx(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE));
+    if (!!lib_shell32)
         m_response_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(24)));
 
     // Set challenge label.

@@ -182,8 +182,8 @@ void wxEAPNotePanel::CreateContactFields(const eap::config_provider &prov)
 wxEAPProviderLockedPanel::wxEAPProviderLockedPanel(const eap::config_provider &prov, wxWindow* parent) : wxEAPNotePanel(parent)
 {
     // Load and set icon.
-    winstd::library lib_shell32;
-    if (lib_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
+    winstd::library lib_shell32(LoadLibraryEx(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE));
+    if (!!lib_shell32)
         m_note_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(48)));
 
     m_note_label->SetLabel(wxString::Format(_("%s has pre-set parts of this configuration. Those parts are locked to prevent accidental modification."),
@@ -203,8 +203,8 @@ wxEAPProviderLockedPanel::wxEAPProviderLockedPanel(const eap::config_provider &p
 wxEAPCredentialWarningPanel::wxEAPCredentialWarningPanel(const eap::config_provider &prov, eap::config_method::status_t status, wxWindow* parent) : wxEAPNotePanel(parent)
 {
     // Load and set icon.
-    winstd::library lib_shell32;
-    if (lib_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
+    winstd::library lib_shell32(LoadLibraryEx(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE));
+    if (!!lib_shell32)
         m_note_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(161)));
 
     m_note_label->SetLabel((
@@ -285,8 +285,8 @@ wxEAPProviderContactInfoPanel::wxEAPProviderContactInfoPanel(eap::config_provide
     wxEAPProviderContactInfoPanelBase(parent)
 {
     // Load and set icon.
-    winstd::library lib_shell32;
-    if (lib_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
+    winstd::library lib_shell32(LoadLibraryEx(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE));
+    if (!!lib_shell32)
         m_provider_contact_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(259)));
 }
 
@@ -328,8 +328,8 @@ wxEAPProviderIDPanel::wxEAPProviderIDPanel(eap::config_provider &prov, wxWindow*
     wxEAPProviderIDPanelBase(parent)
 {
     // Load and set icon.
-    winstd::library lib_shell32;
-    if (lib_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
+    winstd::library lib_shell32(LoadLibraryEx(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE));
+    if (!!lib_shell32)
         m_provider_id_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(29)));
 }
 
@@ -367,8 +367,8 @@ wxEAPProviderLockPanel::wxEAPProviderLockPanel(eap::config_provider &prov, wxWin
     wxEAPProviderLockPanelBase(parent)
 {
     // Load and set icon.
-    winstd::library lib_shell32;
-    if (lib_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
+    winstd::library lib_shell32(LoadLibraryEx(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE));
+    if (!!lib_shell32)
         m_provider_lock_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(1003)));
 }
 
@@ -465,8 +465,8 @@ wxEAPIdentityConfigPanel::wxEAPIdentityConfigPanel(const eap::config_provider &p
     wxEAPIdentityConfigPanelBase(parent)
 {
     // Load and set icon.
-    winstd::library lib_shell32;
-    if (lib_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
+    winstd::library lib_shell32(LoadLibraryEx(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE));
+    if (!!lib_shell32)
         m_identity_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(265)));
 }
 

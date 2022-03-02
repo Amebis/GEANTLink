@@ -56,7 +56,7 @@ crypt_key eap::create_des_key(_In_ HCRYPTPROV cp, _In_count_(size) const unsigne
 
     // Import key.
     crypt_key k;
-    if (!k.import(cp, key_blob.data(), (DWORD)key_blob.size(), NULL, 0))
+    if (!CryptImportKey(cp, key_blob.data(), (DWORD)key_blob.size(), NULL, 0, k))
         throw winstd::win_runtime_error(__FUNCTION__ " Error importing key 1/3.");
     return k;
 }
@@ -90,7 +90,7 @@ eap::challenge_hash::challenge_hash(
     _In_z_ const char               *username)
 {
     crypt_hash hash;
-    if (!hash.create(cp, CALG_SHA))
+    if (!CryptCreateHash(cp, CALG_SHA, NULL, 0, hash))
         throw win_runtime_error(__FUNCTION__ " Creating SHA hash failed.");
     if (!CryptHashData(hash, (const BYTE*)&challenge_client      , (DWORD)sizeof(challenge_client), 0) ||
         !CryptHashData(hash,              challenge_server.data(), (DWORD)challenge_server.size() , 0) ||
@@ -135,7 +135,7 @@ eap::nt_password_hash::nt_password_hash(
     _In_z_ const wchar_t    *password)
 {
     crypt_hash hash;
-    if (!hash.create(cp, CALG_MD4))
+    if (!CryptCreateHash(cp, CALG_MD4, NULL, 0, hash))
         throw win_runtime_error(__FUNCTION__ " Creating MD4 hash failed.");
     if (!CryptHashData(hash, (const BYTE*)password, (DWORD)(wcslen(password) * sizeof(wchar_t)), 0))
         throw win_runtime_error(__FUNCTION__ " Error hashing data.");
@@ -150,7 +150,7 @@ eap::nt_password_hash::nt_password_hash(
     _In_ const nt_password_hash &pwd_hash)
 {
     crypt_hash hash;
-    if (!hash.create(cp, CALG_MD4))
+    if (!CryptCreateHash(cp, CALG_MD4, NULL, 0, hash))
         throw win_runtime_error(__FUNCTION__ " Creating MD4 hash failed.");
     if (!CryptHashData(hash, (const BYTE*)&pwd_hash, (DWORD)sizeof(pwd_hash), 0))
         throw win_runtime_error(__FUNCTION__ " Error hashing data.");
@@ -271,7 +271,7 @@ eap::authenticator_response::authenticator_response(
     nt_password_hash hash_hash_pwd(cp, nt_password_hash(cp, password));
 
     crypt_hash hash;
-    if (!hash.create(cp, CALG_SHA))
+    if (!CryptCreateHash(cp, CALG_SHA, NULL, 0, hash))
         throw win_runtime_error(__FUNCTION__ " Creating SHA hash failed.");
     if (!CryptHashData(hash, (const BYTE*)&hash_hash_pwd, (DWORD)sizeof(hash_hash_pwd), 0) ||
         !CryptHashData(hash, (const BYTE*)&nt_resp      , (DWORD)sizeof(nt_resp      ), 0) ||
@@ -291,7 +291,7 @@ eap::authenticator_response::authenticator_response(
     };
     challenge_hash challenge(cp, challenge_server, challenge_client, username);
 
-    if (!hash.create(cp, CALG_SHA))
+    if (!CryptCreateHash(cp, CALG_SHA, NULL, 0, hash))
         throw win_runtime_error(__FUNCTION__ " Creating SHA hash failed.");
     if (!CryptHashData(hash,              hash_val  ,        size_hash_val    , 0) ||
         !CryptHashData(hash, (const BYTE*)&challenge, (DWORD)sizeof(challenge), 0) ||

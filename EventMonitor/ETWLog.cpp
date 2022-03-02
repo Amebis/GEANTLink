@@ -64,8 +64,8 @@ wxEventTraceProcessorThread::wxEventTraceProcessorThread(wxEvtHandler *parent, c
     for (size_t i = 0, i_end = sessions.GetCount(); i < i_end; i++) {
         // Open trace.
         tlf.LoggerName = const_cast<LPTSTR>((LPCTSTR)(sessions[i]));
-        event_trace trace;
-        if (!trace.create(&tlf)) {
+        event_trace trace(OpenTrace(&tlf));
+        if (!trace) {
             wxLogError(_("Error opening event trace (error %u)."), GetLastError());
             continue;
         }

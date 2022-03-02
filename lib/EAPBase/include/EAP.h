@@ -1264,7 +1264,7 @@ inline void operator>>(_Inout_ eap::cursor_in &cursor, _Out_ winstd::cert_contex
     if (dwCertEncodedSize) {
         auto ptr_end = cursor.ptr + dwCertEncodedSize;
         assert(ptr_end <= cursor.ptr_end);
-        val.create(dwCertEncodingType, (BYTE*)cursor.ptr, dwCertEncodedSize);
+        val = CertCreateCertificateContext(dwCertEncodingType, (BYTE*)cursor.ptr, dwCertEncodedSize);
         cursor.ptr = ptr_end;
     } else
         val.free();

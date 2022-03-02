@@ -205,9 +205,9 @@ std::wstring eap::credentials_tls::get_identity() const
         return m_identity;
     } else if (!m_cert_hash.empty()) {
         // Find certificate in the store.
-        winstd::cert_store store;
-        vector<unsigned char> hash;
-        if (store.create(CERT_STORE_PROV_SYSTEM, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, (HCRYPTPROV)NULL, CERT_SYSTEM_STORE_CURRENT_USER, _T("My"))) {
+        winstd::cert_store store(CertOpenStore(CERT_STORE_PROV_SYSTEM, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, (HCRYPTPROV)NULL, CERT_SYSTEM_STORE_CURRENT_USER, _T("My")));
+        if (!!store) {
+            vector<unsigned char> hash;
             for (PCCERT_CONTEXT cert = NULL; (cert = CertEnumCertificatesInStore(store, cert)) != NULL;) {
                 if (CertGetCertificateContextProperty(cert, CERT_HASH_PROP_ID, hash) &&
                     hash == m_cert_hash)

@@ -33,14 +33,9 @@ wxEventMonitorFrame::wxEventMonitorFrame(wxWindow* parent, wxWindowID id, const 
     wxString prod_status_bar;
     prod_status_bar.Printf(_("Toggles display of %s records"), wxT(PRODUCT_NAME_STR));
 
-    winstd::library lib_comres;
-    lib_comres.load(_T("comres.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE);
-
-    winstd::library lib_ieframe;
-    lib_ieframe.load(_T("ieframe.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE);
-
-    winstd::library lib_shell32;
-    lib_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE);
+    winstd::library lib_comres(LoadLibraryEx(_T("comres.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE));
+    winstd::library lib_ieframe(LoadLibraryEx(_T("ieframe.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE));
+    winstd::library lib_shell32(LoadLibraryEx(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE));
 
     wxSize size_menu(GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON));
     wxSize size_tool(size_menu);

@@ -38,7 +38,7 @@ void eap::method_mschapv2_base::begin_session(
     m_cfg.m_last_msg.clear();
 
     // Create cryptographics provider for support needs (client challenge ...).
-    if (!m_cp.create(NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
+    if (!CryptAcquireContext(m_cp, NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
         throw win_runtime_error(__FUNCTION__ " Error creating cryptographics provider.");
 }
 

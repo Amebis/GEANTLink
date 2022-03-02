@@ -118,13 +118,13 @@ wxTLSCredentialsPanel::wxTLSCredentialsPanel(const eap::config_provider &prov, c
     wxEAPCredentialsPanel<eap::credentials_tls, wxTLSCredentialsPanelBase>(prov, cfg, cred, parent, is_config)
 {
     // Load and set icon.
-    winstd::library lib_shell32;
-    if (lib_shell32.load(_T("certmgr.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
-        m_credentials_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(6170)));
+    winstd::library lib_certmgr(LoadLibraryEx(_T("certmgr.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE));
+    if (!!lib_certmgr)
+        m_credentials_icon->SetIcon(wxLoadIconFromResource(lib_certmgr, MAKEINTRESOURCE(6170)));
 
     // Populate certificate list.
-    winstd::cert_store store;
-    if (store.create(CERT_STORE_PROV_SYSTEM, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, (HCRYPTPROV)NULL, CERT_SYSTEM_STORE_CURRENT_USER, _T("My"))) {
+    winstd::cert_store store(CertOpenStore(CERT_STORE_PROV_SYSTEM, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, (HCRYPTPROV)NULL, CERT_SYSTEM_STORE_CURRENT_USER, _T("My")));
+    if (!!store) {
         for (PCCERT_CONTEXT cert = NULL; (cert = CertEnumCertificatesInStore(store, cert)) != NULL;) {
             DWORD dwKeySpec = 0, dwSize = sizeof(dwKeySpec);
             if (!CertGetCertificateContextProperty(cert, CERT_KEY_SPEC_PROP_ID, &dwKeySpec, &dwSize) || !dwKeySpec) {
@@ -202,8 +202,8 @@ wxTLSServerTrustPanel::wxTLSServerTrustPanel(const eap::config_provider &prov, e
     wxTLSServerTrustPanelBase(parent)
 {
     // Load and set icon.
-    winstd::library lib_certmgr;
-    if (lib_certmgr.load(_T("certmgr.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
+    winstd::library lib_certmgr(LoadLibraryEx(_T("certmgr.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE));
+    if (!!lib_certmgr)
         m_server_trust_icon->SetIcon(wxLoadIconFromResource(lib_certmgr, MAKEINTRESOURCE(379)));
 
     // Do not use cfg.m_server_names directly, so we can decide not to store the value in case of provider-locked configuration.
@@ -294,8 +294,8 @@ void wxTLSServerTrustPanel::OnRootCAAddStore(wxCommandEvent& event)
 {
     wxTLSServerTrustPanelBase::OnRootCAAddStore(event);
 
-    winstd::cert_store store;
-    if (store.create(NULL, _T("ROOT"))) {
+    winstd::cert_store store(CertOpenSystemStore(NULL, _T("ROOT")));
+    if (!!store) {
         winstd::cert_context cert;
         #pragma warning(suppress: 6387) // The pvReserved parameter is annotated as _In_
         cert.attach(CryptUIDlgSelectCertificateFromStore(store, this->GetHWND(), NULL, NULL, 0, 0, NULL));
@@ -323,8 +323,8 @@ void wxTLSServerTrustPanel::OnRootCAAddFile(wxCommandEvent& event)
     open_dialog.GetPaths(paths);
     for (size_t i = 0, i_end = paths.GetCount(); i < i_end; i++) {
         // Load certificate(s) from file.
-        winstd::cert_store cs;
-        if (cs.create(CERT_STORE_PROV_FILENAME, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, NULL, CERT_STORE_OPEN_EXISTING_FLAG | CERT_STORE_READONLY_FLAG, static_cast<LPCTSTR>(paths[i]))) {
+        winstd::cert_store cs(CertOpenStore(CERT_STORE_PROV_FILENAME, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, NULL, CERT_STORE_OPEN_EXISTING_FLAG | CERT_STORE_READONLY_FLAG, static_cast<LPCTSTR>(paths[i])));
+        if (!!cs) {
             for (PCCERT_CONTEXT cert = NULL; (cert = CertEnumCertificatesInStore(cs, cert)) != NULL;)
                 AddRootCA(cert);
         } else

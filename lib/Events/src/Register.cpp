@@ -65,9 +65,11 @@ STDAPI DllRegisterServer()
 
         // Register event channels.
         reg_key key_channels, key_channels_operational, key_channels_analytic;
-        if (!key_channels.open(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\WINEVT\\Channels"), 0, KEY_CREATE_SUB_KEY)) throw win_runtime_error();
+        LSTATUS s = RegOpenKeyEx(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\WINEVT\\Channels"), 0, KEY_CREATE_SUB_KEY, key_channels);
+        if (s != ERROR_SUCCESS) throw win_runtime_error(s);
         sprintf(sz, _T("%s/Operational"), event_provider_name.c_str());
-        if (!key_channels_operational.create(key_channels, sz.c_str(), NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE)) throw win_runtime_error();
+        s = RegCreateKeyEx(key_channels, sz.c_str(), NULL, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, key_channels_operational, NULL);
+        if (s != ERROR_SUCCESS) throw win_runtime_error(s);
         set_value(key_channels_operational, _T("OwningPublisher")   , event_provider_guid);
         set_value(key_channels_operational, _T("Enabled")           , (DWORD)0);
         set_value(key_channels_operational, _T("Isolation")         , (DWORD)0);
@@ -78,7 +80,8 @@ STDAPI DllRegisterServer()
         set_value(key_channels_operational, _T("AutoBackupLogFiles"), (DWORD)0);
         set_value(key_channels_operational, _T("Type")              , (DWORD)1);
         sprintf(sz, _T("%s/Analytic"), event_provider_name.c_str());
-        if (!key_channels_analytic.create(key_channels, sz.c_str(), NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE)) throw win_runtime_error();
+        s = RegCreateKeyEx(key_channels, sz.c_str(), NULL, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, key_channels_analytic, NULL);
+        if (s != ERROR_SUCCESS) throw win_runtime_error(s);
         set_value(key_channels_analytic, _T("OwningPublisher"), event_provider_guid);
         set_value(key_channels_analytic, _T("Enabled")        , (DWORD)0);
         set_value(key_channels_analytic, _T("Isolation")      , (DWORD)0);
@@ -90,8 +93,10 @@ STDAPI DllRegisterServer()
 
         // Register event publishers.
         reg_key key_publishers, key_event_source;
-        if (!key_publishers.open(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\WINEVT\\Publishers"), 0, KEY_CREATE_SUB_KEY)) throw win_runtime_error();
-        if (!key_event_source.create(key_publishers, event_provider_guid.c_str(), NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE)) throw win_runtime_error();
+        s = RegOpenKeyEx(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\WINEVT\\Publishers"), 0, KEY_CREATE_SUB_KEY, key_publishers);
+        if (s != ERROR_SUCCESS) throw win_runtime_error(s);
+        s = RegCreateKeyEx(key_publishers, event_provider_guid.c_str(), NULL, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, key_event_source, NULL);
+        if (s != ERROR_SUCCESS) throw win_runtime_error(s);
         set_value(key_event_source, NULL                  , event_provider_name);
         if (!GetModuleFileName(g_hInstance, sz)) throw win_runtime_error("GetModuleFileName failed.");
         set_value(key_event_source, _T("MessageFileName") , sz);
@@ -100,13 +105,16 @@ STDAPI DllRegisterServer()
 
         // Bind channels and publishers.
         reg_key key_channel_refs, key_channel_refs_operational, key_channel_refs_analytic;
-        if (!key_channel_refs.create(key_event_source, _T("ChannelReferences"), NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE)) throw win_runtime_error();
-        if (!key_channel_refs_operational.create(key_channel_refs, _T("0"), NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE)) throw win_runtime_error();
+        s = RegCreateKeyEx(key_event_source, _T("ChannelReferences"), NULL, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, key_channel_refs, NULL);
+        if (s != ERROR_SUCCESS) throw win_runtime_error(s);
+        s = RegCreateKeyEx(key_channel_refs, _T("0"), NULL, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, key_channel_refs_operational, NULL);
+        if (s != ERROR_SUCCESS) throw win_runtime_error(s);
         sprintf(sz, _T("%s/Operational"), event_provider_name.c_str());
         set_value(key_channel_refs_operational, NULL       , sz);
         set_value(key_channel_refs_operational, _T("Id")   , (DWORD)16);
         set_value(key_channel_refs_operational, _T("Flags"), (DWORD)0);
-        if (!key_channel_refs_analytic.create(key_channel_refs, _T("1"), NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE)) throw win_runtime_error();
+        s = RegCreateKeyEx(key_channel_refs, _T("1"), NULL, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, key_channel_refs_analytic, NULL);
+        if (s != ERROR_SUCCESS) throw win_runtime_error(s);
         sprintf(sz, _T("%s/Analytic"), event_provider_name.c_str());
         set_value(key_channel_refs_analytic, NULL       , sz);
         set_value(key_channel_refs_analytic, _T("Id")   , (DWORD)17);
@@ -134,14 +142,16 @@ STDAPI DllUnregisterServer()
     // Unregister event publishers.
     try {
         reg_key key_publishers;
-        if (!key_publishers.open(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\WINEVT\\Publishers"), 0, KEY_READ)) throw win_runtime_error();
+        LSTATUS s = RegOpenKeyEx(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\WINEVT\\Publishers"), 0, KEY_READ, key_publishers);
+        if (s != ERROR_SUCCESS) throw win_runtime_error(s);
         key_publishers.delete_subkey(tstring_guid(EAPMETHOD_TRACE_EVENT_PROVIDER).c_str());
     } catch(...) {}
 
     // Unregister event channels.
     try {
         reg_key key_channels;
-        if (!key_channels.open(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\WINEVT\\Channels"), 0, KEY_READ)) throw win_runtime_error();
+        LSTATUS s = RegOpenKeyEx(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\WINEVT\\Channels"), 0, KEY_READ, key_channels);
+        if (s != ERROR_SUCCESS) throw win_runtime_error(s);
         key_channels.delete_subkey(_T(VENDOR_NAME_STR) _T("-") _T(PRODUCT_NAME_STR) _T("-EAPMethod/Operational"));
         key_channels.delete_subkey(_T(VENDOR_NAME_STR) _T("-") _T(PRODUCT_NAME_STR) _T("-EAPMethod/Analytic"));
     } catch(...) {}

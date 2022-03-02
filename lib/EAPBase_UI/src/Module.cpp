@@ -171,8 +171,8 @@ void eap::monitor_ui::release_slaves(_In_bytecount_(size) const void *data, _In_
         GetWindowThreadProcessId(*slave, &pid_slave);
 
         // Get slave's process handle.
-        process proc_slave;
-        if (!proc_slave.open(PROCESS_VM_OPERATION | PROCESS_VM_WRITE, 0, pid_slave))
+        process proc_slave(OpenProcess(PROCESS_VM_OPERATION | PROCESS_VM_WRITE, 0, pid_slave));
+        if (!proc_slave)
             continue;
 
         // Allocate memory in slave's virtual memory space and save data to it.

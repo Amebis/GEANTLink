@@ -744,8 +744,8 @@ public:
         m_sb_credentials->GetStaticBox()->SetLabel(method.empty() ? wxString::Format(_("%s User Credentials"), cfg.get_method_str()) : method);
 
         // Load and set icon.
-        winstd::library lib_shell32;
-        if (lib_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
+        winstd::library lib_shell32(LoadLibraryEx(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE));
+        if (!!lib_shell32)
             m_credentials_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(/*16770*/269)));
     }
 
@@ -1032,8 +1032,8 @@ public:
         wxEAPCredentialsPanel<_Tcred, _Tbase>(prov, cfg, cred, parent, is_config)
     {
         // Load and set icon.
-        winstd::library lib_shell32;
-        if (lib_shell32.load(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
+        winstd::library lib_shell32(LoadLibraryEx(_T("shell32.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE));
+        if (!!lib_shell32)
             m_credentials_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(/*16770*/269)));
 
         bool layout = false;
@@ -1110,9 +1110,9 @@ public:
         wxIdentityCredentialsPanel<_Tcred, _Tbase>(prov, cfg, cred, parent, is_config)
     {
         // Load and set icon.
-        winstd::library lib_shell32;
-        if (lib_shell32.load(_T("imageres.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE))
-            m_credentials_icon->SetIcon(wxLoadIconFromResource(lib_shell32, MAKEINTRESOURCE(82)));
+        winstd::library lib_imageres(LoadLibraryEx(_T("imageres.dll"), NULL, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE));
+        if (!!lib_imageres)
+            m_credentials_icon->SetIcon(wxLoadIconFromResource(lib_imageres, MAKEINTRESOURCE(82)));
 
         if (!m_prov.m_lbl_alt_password.empty()) {
             m_password_label->SetLabel(m_prov.m_lbl_alt_password);

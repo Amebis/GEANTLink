@@ -403,7 +403,7 @@ void eap::credentials_pass::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *p
 
     // Prepare cryptographics provider.
     crypt_prov cp;
-    if (!cp.create(NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
+    if (!CryptAcquireContext(cp, NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
         throw win_runtime_error(__FUNCTION__ " CryptAcquireContext failed.");
 
     // <Password>
@@ -459,7 +459,7 @@ void eap::credentials_pass::load(_In_ IXMLDOMNode *pConfigRoot)
 
         // Prepare cryptographics provider.
         crypt_prov cp;
-        if (!cp.create(NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
+        if (!CryptAcquireContext(cp, NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
             throw win_runtime_error(__FUNCTION__ " CryptAcquireContext failed.");
 
         m_password = m_module.decrypt_str<char_traits<wchar_t>, sanitizing_allocator<wchar_t> >(cp, password_enc.data(), password_enc.size());
@@ -473,7 +473,7 @@ void eap::credentials_pass::load(_In_ IXMLDOMNode *pConfigRoot)
 
         // Prepare cryptographics provider.
         crypt_prov cp;
-        if (!cp.create(NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
+        if (!CryptAcquireContext(cp, NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
             throw win_runtime_error(__FUNCTION__ " CryptAcquireContext failed.");
 
         #pragma warning(suppress: 4996) // Support for backward compatibility.

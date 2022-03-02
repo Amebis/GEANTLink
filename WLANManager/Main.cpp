@@ -53,8 +53,9 @@ static int WLANManager()
     // Open WLAN handle.
     DWORD dwNegotiatedVersion;
     wlan_handle wlan;
-    if (!wlan.open(WLAN_API_MAKE_VERSION(2, 0), &dwNegotiatedVersion)) {
-        DisplayError(_T("%s function failed (error %u)."), _T("WlanOpenHandle"), GetLastError());
+    DWORD dwResult = WlanOpenHandle(WLAN_API_MAKE_VERSION(2, 0), NULL, &dwNegotiatedVersion, wlan);
+    if (dwResult != ERROR_SUCCESS) {
+        DisplayError(_T("%s function failed (error %u)."), _T("WlanOpenHandle"), dwResult);
         return 2;
     } else if (dwNegotiatedVersion < WLAN_API_MAKE_VERSION(2, 0)) {
         DisplayError(_T("WlanOpenHandle negotiated unsupported version (expected: %u, negotiated: %u)."), WLAN_API_MAKE_VERSION(2, 0), dwNegotiatedVersion);
@@ -65,7 +66,7 @@ static int WLANManager()
     {
         // Get a list of WLAN interfaces.
         WLAN_INTERFACE_INFO_LIST *pInterfaceList;
-        DWORD dwResult = WlanEnumInterfaces(wlan, NULL, &pInterfaceList);
+        dwResult = WlanEnumInterfaces(wlan, NULL, &pInterfaceList);
         if (dwResult != ERROR_SUCCESS) {
             DisplayError(_T("%s function failed (error %u)."), _T("WlanEnumInterfaces"), dwResult);
             return 4;
@@ -84,7 +85,7 @@ static int WLANManager()
         if (!interface_name.empty()) {
             // Read the interface name from registry.
             reg_key key;
-            if (key.open(HKEY_LOCAL_MACHINE, tstring_printf(_T("SYSTEM\\CurrentControlSet\\Control\\Network\\%s\\%s\\Connection"), devclass_net.c_str(), tstring_guid(interfaces->InterfaceInfo[i].InterfaceGuid).c_str()).c_str(), 0, KEY_READ)) {
+            if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, tstring_printf(_T("SYSTEM\\CurrentControlSet\\Control\\Network\\%s\\%s\\Connection"), devclass_net.c_str(), tstring_guid(interfaces->InterfaceInfo[i].InterfaceGuid).c_str()).c_str(), 0, KEY_READ, key) == ERROR_SUCCESS) {
                 wstring name;
                 if (RegQueryStringValue(key, _T("Name"), name) == ERROR_SUCCESS && _wcsicmp(interface_name.c_str(), name.c_str()) != 0) {
                     // Not the interface we are interested in.
@@ -97,7 +98,7 @@ static int WLANManager()
         {
             // Get a list of profiles.
             WLAN_PROFILE_INFO_LIST *pProfileList;
-            DWORD dwResult = WlanGetProfileList(wlan, &(interfaces->InterfaceInfo[i].InterfaceGuid), NULL, &pProfileList);
+            dwResult = WlanGetProfileList(wlan, &(interfaces->InterfaceInfo[i].InterfaceGuid), NULL, &pProfileList);
             if (dwResult != ERROR_SUCCESS) {
                 DisplayError(_T("%s function failed (error %u)."), _T("WlanGetProfileList"), dwResult);
                 return 4;
@@ -117,7 +118,7 @@ static int WLANManager()
         // Launch WLAN profile config dialog.
         WLAN_REASON_CODE wlrc = L2_REASON_CODE_SUCCESS;
         #pragma warning(suppress: 6387) // TODO: MSDN nor SAL annotation don't indicate NULL HWND are OK with WlanUIEditProfile().
-        DWORD dwResult = WlanUIEditProfile(WLAN_UI_API_VERSION, pwcArglist[2], &(interfaces->InterfaceInfo[i].InterfaceGuid), NULL, WLSecurityPage, NULL, &wlrc);
+        dwResult = WlanUIEditProfile(WLAN_UI_API_VERSION, pwcArglist[2], &(interfaces->InterfaceInfo[i].InterfaceGuid), NULL, WLSecurityPage, NULL, &wlrc);
         if (dwResult != ERROR_SUCCESS) {
             // WlanUIEditProfile() displays own error dialog on failure.
             //DisplayError(_T("%s function failed (error %u)."), _T("WlanUIEditProfile"), dwResult);
