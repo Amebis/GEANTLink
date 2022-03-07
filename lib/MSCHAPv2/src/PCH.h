@@ -12,7 +12,7 @@
 
 #include "../../EAPBase/include/Module.h"
 
-#include <stdex/hex>
+#include <stdex/hex.h>
 
 #include <Windows.h>
 #include <EapHostError.h> // include after Windows.h

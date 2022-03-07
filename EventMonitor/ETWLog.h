@@ -31,7 +31,7 @@ class wxPersistentETWListCtrl;
 #include <wx/persist/window.h>
 #include <wx/thread.h>
 
-#include <stdex/vector_queue>
+#include <stdex/vector_queue.h>
 #include <WinStd/ETW.h>
 
 #include <memory>
