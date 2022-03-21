@@ -17,6 +17,7 @@
     <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <CAExcludePath>$(WXWIN);$(CAExcludePath)</CAExcludePath>
+    <SpectreMitigation>Spectre</SpectreMitigation>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
