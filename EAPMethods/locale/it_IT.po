@@ -2,6 +2,7 @@
 # Translators:
 # Daniele Albrizio <daniele@albrizio.it>, 2018
 # Simon Rozman <simon@rozman.si>, 2020
+# Daniele Albrizio <dalbrizio@gmail.com>, 2022
 # 
 #, fuzzy
 msgid ""
@@ -9,7 +10,7 @@ msgstr ""
 "Project-Id-Version: EAPMethods\n"
 "POT-Creation-Date: 2020-04-17 14:55+0200\n"
 "PO-Revision-Date: 2016-08-25 06:18+0000\n"
-"Last-Translator: Simon Rozman <simon@rozman.si>, 2020\n"
+"Last-Translator: Daniele Albrizio <dalbrizio@gmail.com>, 2022\n"
 "Language-Team: Italian (Italy) (https://www.transifex.com/eduroam_devel/teams/11799/it_IT/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -75,7 +76,7 @@ msgstr "Cancellazione delle credenziali non riuscita (errore %u)."
 #: lib/EAPBase_UI/include/EAP_UI.h:924 lib/EAPBase_UI/include/EAP_UI.h:943
 #: lib/EAPBase_UI/include/EAP_UI.h:952
 msgid "(none)"
-msgstr ""
+msgstr "(nessuno)"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:928
 #, c-format
@@ -88,7 +89,7 @@ msgstr "(errore)"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:943 lib/EAPBase_UI/include/EAP_UI.h:952
 msgid "(blank ID)"
-msgstr ""
+msgstr "(ID vuoto)"
 
 #: lib/EAPBase_UI/include/EAP_UI.h:992
 msgid "&Remember"
@@ -329,6 +330,7 @@ msgstr "Identità"
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:711
 msgid "Select the user ID supplicant introduces itself as to authenticator:"
 msgstr ""
+"Seleziona l'ID utente con cui il supplicant si presenta all'autenticatore:"
 
 #: lib/EAPBase_UI/res/wxEAP_UI.cpp:718
 msgid "&True identity"
@@ -528,6 +530,7 @@ msgstr "Fiducia nel Server"
 #: lib/TLS_UI/res/wxTLS_UI.cpp:28
 msgid "Describe the servers you trust to prevent man-in-the-middle attacks."
 msgstr ""
+"Descrivi i server di cui ti fidi per prevenire attacchi man-in-the-middle."
 
 #: lib/TLS_UI/res/wxTLS_UI.cpp:35
 msgid "Acceptable Certificate Authorities:"
@@ -610,7 +613,7 @@ msgstr ""
 
 #: lib/TLS_UI/src/TLS_UI.cpp:118
 msgid "No certificate selected"
-msgstr ""
+msgstr "Nessun certificato selezionato "
 
 #: lib/TLS_UI/src/TLS_UI.cpp:118
 msgid "Validation conflict"
@@ -714,7 +717,7 @@ msgstr "EAP-TTLS"
 #: EAPMethods/MSIBuild.EAP-TTLS/en_US.Win32.Release.Feature-2.idtx:4
 #: EAPMethods/MSIBuild.EAP-TTLS/en_US.x64.Release.Feature-2.idtx:4
 msgid "EAP-TTLS Method"
-msgstr ""
+msgstr "Metodo EAP-TTLS"
 
 #: EAPMethods/MSIBuild/en_US.ARM64.Release.Feature-2.idtx:4
 #: EAPMethods/MSIBuild/en_US.Win32.Release.Feature-2.idtx:4
