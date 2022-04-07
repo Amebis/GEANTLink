@@ -24,26 +24,26 @@
 //
 #define PRODUCT_VERSION_MAJ      1
 #define PRODUCT_VERSION_MIN      3
-#define PRODUCT_VERSION_REV      5
+#define PRODUCT_VERSION_REV      6
 #define PRODUCT_VERSION_BUILD    0
 
 //
 // Human readable product version and build year for UI
 //
-#define PRODUCT_VERSION_STR      "1.3e"
+#define PRODUCT_VERSION_STR      "1.3f"
 #define PRODUCT_BUILD_YEAR_STR   "2022"
 
 //
 // Numerical version presentation for ProductVersion propery in
 // MSI packages (syntax: N.N[.N[.N]])
 //
-#define PRODUCT_VERSION_INST     "1.3.5"
+#define PRODUCT_VERSION_INST     "1.3.6"
 
 //
 // The product code for ProductCode property in MSI packages
 // Replace with new on every version change, regardless how minor it is.
 //
-#define PRODUCT_VERSION_GUID     "{DCFDC4D7-81DE-4BEA-9E35-62BB56766EA6}"
+#define PRODUCT_VERSION_GUID     "{F3A75C61-A341-4EE7-BEFC-D2491D6182F1}"
 
 //
 // Product vendor
