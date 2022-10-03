@@ -1,6 +1,6 @@
 # 
 # Translators:
-# Tom Ivar Myren <tom.myren@uninett.no>, 2017
+# Tom Ivar Myren <tom.myren@sikt.no>, 2017
 # Simon Rozman <simon@rozman.si>, 2020
 # 
 #, fuzzy
