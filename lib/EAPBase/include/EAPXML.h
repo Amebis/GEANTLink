@@ -763,11 +763,11 @@ namespace eapxml
         winstd::bstr bstrDefault, bstrEn;
         for (long i = 0; ; i++) {
             if (i >= lCount) {
-                if (bstrDefault != NULL) {
+                if (!!bstrDefault) {
                     // Return "C" localization.
                     pbstrValue = std::move(bstrDefault);
                     return S_OK;
-                } else if (bstrEn != NULL) {
+                } else if (!!bstrEn) {
                     // Return "en" localization.
                     pbstrValue = std::move(bstrEn);
                     return S_OK;
@@ -853,13 +853,25 @@ namespace eapxml
 
     inline HRESULT put_element_value(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _In_ DWORD dwValue, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement)
     {
-        return put_element_value(pDoc, pCurrentDOMNode, bstrElementName, bstrNamespace, winstd::bstr(winstd::wstring_printf(L"%d", dwValue)), ppXmlElement);
+        return put_element_value(
+            pDoc,
+            pCurrentDOMNode,
+            bstrElementName,
+            bstrNamespace,
+            winstd::bstr(winstd::wstring_printf(L"%d", dwValue)),
+            ppXmlElement);
     }
 
 
     inline HRESULT put_element_value(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrElementName, _In_opt_z_ const BSTR bstrNamespace, _In_ bool bValue, _Out_opt_ winstd::com_obj<IXMLDOMElement> *ppXmlElement)
     {
-        return put_element_value(pDoc, pCurrentDOMNode, bstrElementName, bstrNamespace, winstd::bstr(bValue ? L"true": L"false"), ppXmlElement);
+        return put_element_value(
+            pDoc,
+            pCurrentDOMNode,
+            bstrElementName,
+            bstrNamespace,
+            winstd::bstr(bValue ? L"true": L"false"),
+            ppXmlElement);
     }
 
 
@@ -868,7 +880,13 @@ namespace eapxml
         std::wstring sBase64;
         stdex::base64_enc enc;
         enc.encode(sBase64, pValue, nValueLen);
-        return put_element_value(pDoc, pCurrentDOMNode, bstrElementName, bstrNamespace, winstd::bstr(sBase64), ppXmlElement);
+        return put_element_value(
+            pDoc,
+            pCurrentDOMNode,
+            bstrElementName,
+            bstrNamespace,
+            winstd::bstr(sBase64),
+            ppXmlElement);
     }
 
 
@@ -877,7 +895,13 @@ namespace eapxml
         std::wstring sHex;
         stdex::hex_enc enc;
         enc.encode(sHex, pValue, nValueLen);
-        return put_element_value(pDoc, pCurrentDOMNode, bstrElementName, bstrNamespace, winstd::bstr(sHex), ppXmlElement);
+        return put_element_value(
+            pDoc,
+            pCurrentDOMNode,
+            bstrElementName,
+            bstrNamespace,
+            winstd::bstr(sHex),
+            ppXmlElement);
     }
 
 
@@ -985,13 +1009,19 @@ namespace eapxml
 
     inline HRESULT put_attrib_value(_In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrAttributeName, _In_ DWORD dwValue)
     {
-        return put_attrib_value(pCurrentDOMNode, bstrAttributeName, winstd::bstr(winstd::wstring_printf(L"%d", dwValue)));
+        return put_attrib_value(
+            pCurrentDOMNode,
+            bstrAttributeName,
+            winstd::bstr(winstd::wstring_printf(L"%d", dwValue)));
     }
 
 
     inline HRESULT put_attrib_value(_In_ IXMLDOMNode *pCurrentDOMNode, _In_z_ const BSTR bstrAttributeName, _In_ bool bValue)
     {
-        return put_attrib_value(pCurrentDOMNode, bstrAttributeName, winstd::bstr(bValue ? L"true": L"false"));
+        return put_attrib_value(
+            pCurrentDOMNode,
+            bstrAttributeName,
+            winstd::bstr(bValue ? L"true": L"false"));
     }
 
 
@@ -1000,7 +1030,10 @@ namespace eapxml
         std::wstring sBase64;
         stdex::base64_enc enc;
         enc.encode(sBase64, pValue, nValueLen);
-        return put_attrib_value(pCurrentDOMNode, bstrAttributeName, winstd::bstr(sBase64));
+        return put_attrib_value(
+            pCurrentDOMNode,
+            bstrAttributeName,
+            winstd::bstr(sBase64));
     }
 
 
@@ -1009,7 +1042,10 @@ namespace eapxml
         std::wstring sHex;
         stdex::hex_enc enc;
         enc.encode(sHex, pValue, nValueLen);
-        return put_attrib_value(pCurrentDOMNode, bstrAttributeName, winstd::bstr(sHex));
+        return put_attrib_value(
+            pCurrentDOMNode,
+            bstrAttributeName,
+            winstd::bstr(sHex));
     }
 
 
