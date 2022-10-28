@@ -530,8 +530,6 @@ void eap::method_tls::get_result(
     method::get_result(reason, pResult);
 
     if (reason == EapPeerMethodResultSuccess) {
-        eap_attr a;
-
         // Prepare EAP result attributes.
         if (pResult->pAttribArray) {
             m_eap_attr.reserve((size_t)pResult->pAttribArray->dwNumberOfAttributes + 3);
@@ -551,12 +549,18 @@ void eap::method_tls::get_result(
         get_keying_material(recv, send);
 
         // MSK: MPPE-Recv-Key
-        a.create_ms_mppe_key(16, recv.data, sizeof(recv.data));
-        m_eap_attr.push_back(std::move(a));
+        {
+            eap_attr a;
+            a.create_ms_mppe_key(16, recv.data, sizeof(recv.data));
+            m_eap_attr.push_back(std::move(a));
+        }
 
         // MSK: MPPE-Send-Key
-        a.create_ms_mppe_key(17, send.data, sizeof(send.data));
-        m_eap_attr.push_back(std::move(a));
+        {
+            eap_attr a;
+            a.create_ms_mppe_key(17, send.data, sizeof(send.data));
+            m_eap_attr.push_back(std::move(a));
+        }
 
         // Append blank EAP attribute.
         m_eap_attr.push_back(blank_eap_attr);
