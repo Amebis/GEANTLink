@@ -12,6 +12,7 @@
 
 #include "../../EAPBase/include/Module.h"
 
+#include <stdex/memory.hpp>
 #include <WinStd/Cred.h>
 #include <WinStd/Win.h>
 

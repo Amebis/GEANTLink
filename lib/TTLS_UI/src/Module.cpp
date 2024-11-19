@@ -215,9 +215,9 @@ void eap::peer_peap_ui::invoke_identity_ui(
                 hwndParent,
                 (DWORD)cfg_inner_eaphost->m_cfg_blob.size(), cfg_inner_eaphost->m_cfg_blob.data(),
                 (DWORD)cred_inner->m_cred_blob.size(), cred_inner->m_cred_blob.data(),
-                &cred_data_size, get_ptr(cred_data),
-                get_ptr(identity),
-                get_ptr(error),
+                &cred_data_size, stdex::get_ptr(cred_data),
+                stdex::get_ptr(identity),
+                stdex::get_ptr(error),
                 NULL);
             if (dwResult == ERROR_SUCCESS) {
                 // Inner EAP method provided credentials.
@@ -330,7 +330,7 @@ void eap::peer_peap_ui::invoke_interactive_ui(
             ctx.m_data.data(),
             &dwSizeofDataFromInteractiveUI,
             &pDataFromInteractiveUI,
-            get_ptr(error));
+            stdex::get_ptr(error));
         if (dwResult == ERROR_SUCCESS) {
             // Inner EAP method provided response.
             ctx.m_data.assign(pDataFromInteractiveUI, pDataFromInteractiveUI + dwSizeofDataFromInteractiveUI);

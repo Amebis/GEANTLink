@@ -50,7 +50,7 @@ void eap::method_eaphost::begin_session(
         dwMaxSendPacketSize,
         NULL, NULL, NULL,
         &m_session_id,
-        get_ptr(error));
+        stdex::get_ptr(error));
     if (dwResult == ERROR_SUCCESS) {
         // Session succesfully created.
     } else if (error)
@@ -64,7 +64,7 @@ void eap::method_eaphost::end_session()
 {
     // End EapHost peer session.
     eap_error_runtime error;
-    DWORD dwResult = EapHostPeerEndSession(m_session_id, get_ptr(error));
+    DWORD dwResult = EapHostPeerEndSession(m_session_id, stdex::get_ptr(error));
     if (dwResult == ERROR_SUCCESS) {
         // Session successfuly ended.
     } else if (error)
@@ -90,7 +90,7 @@ EapPeerMethodResponseAction eap::method_eaphost::process_request_packet(
         dwReceivedPacketSize,
         reinterpret_cast<const BYTE*>(pReceivedPacket),
         &action,
-        get_ptr(error));
+        stdex::get_ptr(error));
     if (dwResult == ERROR_SUCCESS) {
         // Packet successfuly processed.
         return action_h2p(action);
@@ -112,7 +112,7 @@ void eap::method_eaphost::get_response_packet(
         m_session_id,
         &size_max,
         &_packet,
-        get_ptr(error));
+        stdex::get_ptr(error));
     if (dwResult == ERROR_SUCCESS) {
         // Packet successfuly prepared.
         packet.assign(_packet, _packet + size_max);
@@ -134,7 +134,7 @@ void eap::method_eaphost::get_result(
         m_session_id,
         EapHostPeerMethodResultFromMethod,
         &result,
-        get_ptr(error));
+        stdex::get_ptr(error));
     if (dwResult == ERROR_SUCCESS) {
         // Result successfuly returned.
         method::get_result(reason, pResult);
@@ -181,7 +181,7 @@ void eap::method_eaphost::get_ui_context(_Out_ sanitizing_blob &context_data)
         m_session_id,
         &dwUIContextDataSize,
         &pUIContextData,
-        get_ptr(error));
+        stdex::get_ptr(error));
     if (dwResult == ERROR_SUCCESS) {
         // UI context data successfuly returned.
         context_data.assign(pUIContextData, pUIContextData + dwUIContextDataSize);
@@ -207,7 +207,7 @@ EapPeerMethodResponseAction eap::method_eaphost::set_ui_context(
         dwUIContextDataSize,
         pUIContextData,
         &action,
-        get_ptr(error));
+        stdex::get_ptr(error));
     if (dwResult == ERROR_SUCCESS) {
         // UI context data successfuly returned.
         return action_h2p(action);
@@ -225,7 +225,7 @@ void eap::method_eaphost::get_response_attributes(_Out_ EapAttributes *pAttribs)
     DWORD dwResult = EapHostPeerGetResponseAttributes(
         m_session_id,
         pAttribs,
-        get_ptr(error));
+        stdex::get_ptr(error));
     if (dwResult == ERROR_SUCCESS) {
         // Response attributes successfuly returned.
     } else if (error)
@@ -244,7 +244,7 @@ EapPeerMethodResponseAction eap::method_eaphost::set_response_attributes(_In_ co
         m_session_id,
         pAttribs,
         &action,
-        get_ptr(error));
+        stdex::get_ptr(error));
     if (dwResult == ERROR_SUCCESS) {
         // Response attributes successfuly set.
         return action_h2p(action);

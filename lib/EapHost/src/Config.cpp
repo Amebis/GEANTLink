@@ -77,7 +77,7 @@ void eap::config_method_eaphost::save(_In_ IXMLDOMDocument *pDoc, _In_ IXMLDOMNo
     // Convert configuration BLOB to XML using EapHost (and ultimately method peer's EapPeerConfigBlob2Xml).
     com_obj<IXMLDOMDocument2> pConfigDoc;
     eap_error error;
-    DWORD dwResult = EapHostPeerConfigBlob2Xml(0, m_type, (DWORD)m_cfg_blob.size(), const_cast<BYTE*>(m_cfg_blob.data()), &pConfigDoc, get_ptr(error));
+    DWORD dwResult = EapHostPeerConfigBlob2Xml(0, m_type, (DWORD)m_cfg_blob.size(), const_cast<BYTE*>(m_cfg_blob.data()), &pConfigDoc, stdex::get_ptr(error));
     if (dwResult == ERROR_SUCCESS) {
         HRESULT hr;
 
@@ -108,7 +108,7 @@ void eap::config_method_eaphost::load(_In_ IXMLDOMNode *pConfigRoot)
         DWORD cfg_data_size = 0;
         eap_blob cfg_data;
         eap_error error;
-        DWORD dwResult = EapHostPeerConfigXml2Blob(0, pXmlElEapHostConfig, &cfg_data_size, get_ptr(cfg_data), &m_type, get_ptr(error));
+        DWORD dwResult = EapHostPeerConfigXml2Blob(0, pXmlElEapHostConfig, &cfg_data_size, stdex::get_ptr(cfg_data), &m_type, stdex::get_ptr(error));
         if (dwResult == ERROR_SUCCESS) {
             LPCBYTE _cfg_data = cfg_data.get();
             m_cfg_blob.assign(_cfg_data, _cfg_data + cfg_data_size);

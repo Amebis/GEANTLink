@@ -265,9 +265,9 @@ eap::credentials::source_t eap::credentials_eaphost::combine(
         src != source_t::unknown ? (DWORD)m_cred_blob.size() : 0, src != source_t::unknown ? m_cred_blob.data() : NULL,
         NULL,
         &fInvokeUI,
-        &cred_data_size, get_ptr(cred_data),
-        get_ptr(identity),
-        get_ptr(error),
+        &cred_data_size, stdex::get_ptr(cred_data),
+        stdex::get_ptr(identity),
+        stdex::get_ptr(error),
         NULL);
     if (dwResult == ERROR_SUCCESS) {
         if (identity && !fInvokeUI) {

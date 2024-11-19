@@ -544,8 +544,8 @@ namespace eapxml
 
 #pragma once
 
-#include <stdex/hex.h>
-#include <stdex/base64.h>
+#include <stdex/hex.hpp>
+#include <stdex/base64.hpp>
 
 #include <assert.h>
 

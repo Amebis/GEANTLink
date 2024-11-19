@@ -8,6 +8,7 @@
 
 #include "../include/EapHost_UI.h"
 
+#include <stdex/memory.hpp>
 #include <WinStd/EAP.h>
 
 #include <eaphostpeerconfigapis.h>

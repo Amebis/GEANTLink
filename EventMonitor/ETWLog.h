@@ -31,7 +31,7 @@ class wxPersistentETWListCtrl;
 #include <wx/persist/window.h>
 #include <wx/thread.h>
 
-#include <stdex/vector_queue.h>
+#include <stdex/vector_queue.hpp>
 #include <WinStd/ETW.h>
 
 #include <memory>
@@ -155,7 +155,7 @@ protected:
     ///
     /// Functor for GUID comparison
     ///
-    struct less_guid : public std::binary_function<GUID, GUID, bool>
+    struct less_guid
     {
         ///
         /// Compares two GUIDs

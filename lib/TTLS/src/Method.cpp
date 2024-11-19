@@ -83,6 +83,7 @@ EapPeerMethodResponseAction eap::method_eapmsg::process_request_packet(
                     break;
                 }
                 // Do not break out of this case to allow continuing with the following case, checking there is no second mandatory EAP-Message present.
+                [[fallthrough]];
 
             default:
                 if (hdr->flags & diameter_avp_flag_mandatory)

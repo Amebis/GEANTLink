@@ -11,7 +11,7 @@
 
 #include "../../EAPBase/include/Module.h"
 
-#include <stdex/hex.h>
+#include <stdex/hex.hpp>
 
 #include <Windows.h>
 #include <EapHostError.h> // include after Windows.h

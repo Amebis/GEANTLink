@@ -12,7 +12,7 @@
 
 #include <WinStd/Common.h>
 #include <WinStd/Win.h>
-#include <stdex/base64.h>
+#include <stdex/base64.hpp>
 
 #include <Windows.h>
 #include <eaptypes.h> // Must include after <Windows.h>

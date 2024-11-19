@@ -20,4 +20,6 @@
 #include "../../EapHost/include/Credentials.h"
 #include "../../EapBase/include/UIContext.h"
 
+#include <stdex/memory.hpp>
+
 #include <wx/choicdlg.h>
