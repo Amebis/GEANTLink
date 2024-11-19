@@ -101,14 +101,25 @@ The product compilation references wxWidgets libraries using `WXWIN` environment
 
 ### Digital Signing of Build Outputs
 
-In order to have the build process digitally sign output files, one should provide the following:
+In order to have the build process digitally sign the Release output files, one should setup either:
 
-1. A signing certificate installed in the current user’s certificate store.
-2. The following variables in the environment:
-  - `ManifestCertificateThumbprint` - set the value to certificate’s SHA1 thumbprint (hexadecimal, without spaces, i.e. `bc0d8da45f9eeefcbe4e334e1fc262804df88d7e`).
-  - `ManifestTimestampRFC3161Url` - set the value to URL used to perform RFC3161 timestamp signature (i.e. `http://sha256timestamp.ws.symantec.com/sha256/timestamp`). In order to perform timestamp signing successfully, the computer running the build should be online and able to access this URL.
+- Local signing:
+   1. A signing certificate/hardware key
+   2. The following variables in the environment:
+      - `ManifestCertificateThumbprint` - set the value to certificate’s SHA1 thumbprint (hexadecimal, without spaces, e.g. `bc0d8da45f9eeefcbe4e334e1fc262804df88d7e`).
+      - `ManifestTimestampRFC3161Url` - set the value to URL used to perform timestamp signature (e.g. `http://sha256timestamp.ws.symantec.com/sha256/timestamp`, `http://timestamp.digicert.com` etc.). In order to perform the timestamp signing successfully, the computer running the build should be online and able to access this URL.
 
-Please note that only Release builds are configured for timestamp signing. Debug configurations do not attempt to timestamp sign the resulting DLL and EXE files in order to speed up the building process and enable offline building.
+- Microsoft Trusted Signing:
+   1. Install [Trusted Signing dlib package](https://www.nuget.org/packages/Microsoft.Trusted.Signing.Client):
+      ```cmd
+      nuget install Microsoft.Trusted.Signing.Client -Version 1.0.53 -x`
+      ```
+   2. Provide a [`manifest.json`](https://learn.microsoft.com/en-us/azure/trusted-signing/how-to-signing-integrations#create-a-json-file) file and place it at `%APPDATA%\Microsoft.Trusted.Signing.Client.json`:
+      ```cmd
+      notepad "%APPDATA%\Microsoft.Trusted.Signing.Client.json"
+      ```
+
+Debug configurations are not digitally signed by design.
 
 ### Building
 

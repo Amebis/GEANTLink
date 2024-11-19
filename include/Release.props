@@ -26,9 +26,14 @@
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
   </ItemDefinitionGroup>
-  <Target Name="Sign" Condition="'$(ManifestCertificateThumbprint)' != '' and ('$(ConfigurationType)' == 'Application' or '$(ConfigurationType)' == 'DynamicLibrary')" AfterTargets="_Manifest" BeforeTargets="RegisterOutput" Inputs="$(OutDir)$(TargetName)$(TargetExt)" Outputs="$(IntDir)$(TargetName).sign">
-    <Message Text="Signing output file..." />
-    <Exec Command="signtool.exe sign /sha1 &quot;%ManifestCertificateThumbprint%&quot; /fd sha256 /tr &quot;%ManifestTimestampRFC3161Url%&quot; /td sha256 /q &quot;$(OutDir)$(TargetName)$(TargetExt)&quot;" />
+  <Target Name="SignLocal" Condition="('$(ConfigurationType)' == 'Application' or '$(ConfigurationType)' == 'DynamicLibrary') and '$(ManifestCertificateThumbprint)' != ''"
+    AfterTargets="_Manifest" BeforeTargets="RegisterOutput" Inputs="$(OutDir)$(TargetName)$(TargetExt)" Outputs="$(IntDir)$(TargetName).sign">
+    <Exec Command="signtool.exe sign /sha1 &quot;$(ManifestCertificateThumbprint)&quot; /fd SHA256 /tr &quot;$(ManifestTimestampRFC3161Url)&quot; /td SHA256 /q &quot;$(TargetPath)&quot;" />
+    <Touch Files="$(IntDir)$(TargetName).sign" AlwaysCreate="true" />
+  </Target>
+  <Target Name="SignAzure" Condition="('$(ConfigurationType)' == 'Application' or '$(ConfigurationType)' == 'DynamicLibrary') and exists('$(APPDATA)\Microsoft.Trusted.Signing.Client.json')"
+    AfterTargets="_Manifest" BeforeTargets="RegisterOutput" Inputs="$(OutDir)$(TargetName)$(TargetExt)" Outputs="$(IntDir)$(TargetName).sign">
+    <Exec Command="signtool.exe sign /dlib &quot;$(USERPROFILE)\.nuget\packages\microsoft.trusted.signing.client\1.0.53\bin\$(PreferredToolArchitecture)\Azure.CodeSigning.Dlib.dll&quot; /dmdf &quot;$(APPDATA)\Microsoft.Trusted.Signing.Client.json&quot; /fd SHA256 /tr &quot;http://timestamp.acs.microsoft.com&quot; /td SHA256 /q &quot;$(TargetPath)&quot;" />
     <Touch Files="$(IntDir)$(TargetName).sign" AlwaysCreate="true" />
   </Target>
 </Project>
